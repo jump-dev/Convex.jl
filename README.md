@@ -12,7 +12,7 @@ To install, just open a Julia prompt and call
 
     Pkg.clone("git@github.com:madeleineudell/CVX.jl.git")
 
-You'll also need to install the python module cvxpy and its dependencies, cvxopt and ecos
+You'll also need to install the python module cvxpy and its dependencies, cvxopt and ecos.
 
     easy_install cvxopt; easy_install ecos; easy_install cvxpy
 
