@@ -1,11 +1,11 @@
 module CVX
 
 # package code goes here
-require("expressions.jl")
-require("arithmetic.jl")
-require("constraints.jl")
-require("problems.jl")
-require("cvxpy.jl")
-require("atoms.jl")
+include("expressions.jl")
+include("arithmetic.jl")
+include("constraints.jl")
+include("problems.jl")
+include("solvers/cvxpy.jl")
+include("atoms.jl")
 
 end # module
