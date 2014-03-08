@@ -7,7 +7,7 @@ type Problem
 	status
 	optval
 	variables
-	function Problem(head::Symbol,obj::CvxExpr,constr::Array{CvxConstr})
+	function Problem(head::Symbol,obj::CvxExpr,constr=CvxConstr[]::Array{CvxConstr})
 		if !all([x<=1 for x in obj.size])
 			error("only scalar optimization problems allowed. got size(obj) = $(obj.size)")
 		end
@@ -29,9 +29,9 @@ end
 # Problem(obj::CvxExpr,constr::Array{CvxConstr}) = obj.vexity == :concave ? Problem(:maximize,obj,constr) : Problem(:minimize,obj,constr)
 Problem(head::Symbol,obj::CvxExpr,constr::CvxConstr...) = Problem(head,obj,[constr...])
 minimize(obj::CvxExpr,constr::CvxConstr...) = Problem(:minimize,obj,[constr...])
-minimize(obj::CvxExpr,constr::Array{CvxConstr}) = Problem(:minimize,obj,constr)
+minimize(obj::CvxExpr,constr=CvxConstr[]::Array{CvxConstr}) = Problem(:minimize,obj,constr)
 maximize(obj::CvxExpr,constr::CvxConstr...) = Problem(:maximize,obj,[constr...])
-maximize(obj::CvxExpr,constr::Array{CvxConstr}) = Problem(:maximize,obj,constr)
+maximize(obj::CvxExpr,constr=CvxConstr[]::Array{CvxConstr}) = Problem(:maximize,obj,constr)
 # display(p::Problem) = idea: loop through variables, name them sequentially if they don't already have names, and display operations prettily with variables names
 # println("Problem($(p.head),$(p.obj),$(p.constr)")
 

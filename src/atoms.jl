@@ -1,6 +1,12 @@
-export transpose, ctranspose, kl_div, lambda_min, lambda_max, log_det, norm, quad_form, quad_over_lin, abs, pos, square
+import Base.sum, Base.abs, Base.sqrt, Base.log
+export transpose, ctranspose, kl_div, lambda_min, lambda_max, log_det, norm, quad_form, quad_over_lin, abs, pos, square, sum, log, sqrt, inv_pos
+
+# TODO
+# * m
 
 # cvxpy atoms
+#['abs', 'affine', 'atom', 'elementwise', 'geo_mean', 'inv_pos', 'lambda_max', 'lambda_min', 'log', 'max', 'min', 'neg', 'nonlinear', 'norm', 'norm1', 'norm2', 'normInf', 'normNuc', 'norm_inf', 'norm_nuc', 'pos', 'quad_form', 'quad_over_lin', 'sigma_max', 'sqrt', 'square', 'sum', 'vstack']
+# cvxpy atoms still to go
 #['abs', 'affine', 'atom', 'elementwise', 'geo_mean', 'inv_pos', 'lambda_max', 'lambda_min', 'log', 'max', 'min', 'neg', 'nonlinear', 'norm', 'norm1', 'norm2', 'normInf', 'normNuc', 'norm_inf', 'norm_nuc', 'pos', 'quad_form', 'quad_over_lin', 'sigma_max', 'sqrt', 'square', 'sum', 'vstack']
 
 # slicing atoms
@@ -87,6 +93,8 @@ function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
 		error("quad_over_lin(x,y) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
 end
+# max(), min()
+
 ### matrix to matrix
 #max(*args)
 #min(*args)
@@ -113,8 +121,24 @@ function abs(x::AbstractCvxExpr)
 	end
 end
 # entr # entropy
-# inv_pos
-# log
+function inv_pos(x::AbstractCvxExpr)
+	if x.vexity == :constant
+		return CvxExpr(:inv_pos,[x],:constant,:pos,x.size)
+	elseif x.vexity == :linear || x.vexity ==:concave
+		return CvxExpr(:inv_pos,[x],:convex,:pos,x.size)	
+	else
+		error("inv_pos(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
+	end
+end
+function log(x::AbstractCvxExpr)
+	if x.vexity == :constant
+		return CvxExpr(:log,[x],:constant,:any,x.size)
+	elseif x.vexity == :linear || x.vexity ==:concave
+		return CvxExpr(:log,[x],:concave,:any,x.size)	
+	else
+		error("log(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
+	end
+end
 function sum(x::AbstractCvxExpr)
 	return CvxExpr(:sum,[x],x.vexity,x.sign,(1,1))
 end
@@ -138,7 +162,15 @@ function pos(x::AbstractCvxExpr)
 		error("pos(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
 end
-	# sqrt
+function sqrt(x::AbstractCvxExpr)
+	if x.vexity == :constant
+		return CvxExpr(:sqrt,[x],:constant,:pos,x.size)
+	elseif x.vexity == :linear || x.vexity ==:concave
+		return CvxExpr(:sqrt,[x],:concave,:pos,x.size)	
+	else
+		error("sqrt(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
+	end
+end
 function square(x::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:square,[x],:constant,:pos,x.size)

@@ -7,8 +7,10 @@ abstract AbstractCvxExpr
 # 	vexity --- one of :linear, :convex, :concave, :constant
 # 	sign   --- one of :pos, :neg, :any
 # 	size   --- a tuple giving the size of the expression
-global vexities = [:constant, :linear, :convex, :concave]
-global signs    = [:pos, :neg, :any, :zero] # xxx add zero, useful for parameters
+vexities = [:constant, :linear, :convex, :concave]
+signs    = [:pos, :neg, :any, :zero] # xxx add zero, useful for parameters
+# Values consist of any type that can be a Constant
+Value = Union(Number,AbstractArray)
 size(x::AbstractCvxExpr) = x.size
 sign(x::AbstractCvxExpr) = x.sign
 vexity(x::AbstractCvxExpr) = x.vexity
@@ -17,11 +19,11 @@ vexity(x::AbstractCvxExpr) = x.vexity
 # end
 
 type CvxExpr <: AbstractCvxExpr
-	head
-	args
-	vexity
-	sign
-	size
+	head::Symbol
+	args::Array{AbstractCvxExpr}
+	vexity::Symbol
+	sign::Symbol
+	size::Tuple
 	function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple)
 		if !(sign in signs)
 			error("sign must be one of :pos, :neg, :any; got $sign")
@@ -35,52 +37,60 @@ end
 CvxExpr(head::Symbol,arg,vexity::Symbol,sign::Symbol,size::Tuple) = CvxExpr(head,[arg],vexity,sign,size)
 
 type Variable <: AbstractCvxExpr
-	head
+	head::Symbol
 	value
-	vexity
-	sign
-	size
-	Variable(size::Tuple,sign::Symbol) = sign in signs ? new(:variable,nothing,:linear,sign,size) : error("sign must be one of :pos, :neg, :any; got $sign")
+	vexity::Symbol
+	sign::Symbol
+	size::Tuple
+	function Variable(head::Symbol,size::Tuple,sign::Symbol)
+		if !(sign in signs)
+			error("sign must be one of :pos, :neg, :zero, :any; got $sign")
+		end
+		if head == :variable
+			new(head,nothing,:linear,sign,size)
+		elseif head == :parameter
+			new(head,nothing,:constant,sign,size)
+		end		
+	end	
 end
+Variable(size::Tuple,sign::Symbol; kwargs...) = Variable(:variable,size,sign; kwargs...)
 Variable(size::Tuple; kwargs...) = Variable(size,:any; kwargs...)
 Variable(size...; kwargs...) = Variable(size,:any; kwargs...)
 Variable(size::Integer,sign::Symbol; kwargs...) = Variable(Tuple(size),sign; kwargs...)
-
-type Parameter <: AbstractCvxExpr
-	head
-	value
-	vexity
-	sign
-	size
-	Parameter(size::Tuple,sign::Symbol) = sign in signs ? new(:parameter,nothing,:constant,sign,size) : error("sign must be one of :pos, :neg, :any; got $sign")
-end
+Parameter(size::Tuple,sign::Symbol; kwargs...) = Variable(:parameter,size,sign; kwargs...)
 Parameter(size::Tuple; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size...; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size::Integer,sign::Symbol; kwargs...) = Parameter(Tuple(size),sign; kwargs...)
+function parameter!(x::Variable)
+	x.head = :parameter
+	x.vexity = :constant
+	x
+end
+function variable!(x::Variable)
+	x.head = :variable
+	x.vexity = :linear
+	x
+end
 
 type Constant <: AbstractCvxExpr
-	head
-	value
-	vexity
-	sign
-	size
-	Constant(x::Array,sign) = sign in signs ? new(:constant,x,:constant,sign,size(x)) : error("sign must be one of :pos, :neg, :any; got $sign")
-	Constant(x::Number,sign) = sign in signs ? new(:constant,[x],:constant,sign,()) : error("sign must be one of :pos, :neg, :any; got $sign")
+	head::Symbol
+	value::Value
+	vexity::Symbol
+	sign::Symbol
+	size::Tuple
+	Constant(x::Value,sign) = sign in signs ? new(:constant,x,:constant,sign,size(x)) : error("sign must be one of :pos, :neg, :zero, :any; got $sign")
 end
-function Constant(x)
+function Constant(x::Number)
 	# find the sign for scalar constants
-	try
-		if x > 0
-			return Constant(x,:pos)
-		elseif x < 0
-			return Constant(x,:neg)	
-		elseif x == 0
-			return Constant(x,:zero)
-		end
-	catch
-		return Constant(x,:any)
+	if x > 0
+		return Constant(x,:pos)
+	elseif x < 0
+		return Constant(x,:neg)	
+	elseif x == 0
+		return Constant(x,:zero)
 	end
 end
+Constant(x::Value) = Constant(x,:any)
 
 ### Unique ids
 unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Ptr{Uint8}, (Any,), x)

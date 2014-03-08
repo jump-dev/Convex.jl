@@ -8,7 +8,7 @@ function convert(::Type{CvxExpr},x)
 		return Constant(x)
 	end
 end
-promote_rule(::Type{CvxExpr}, ::Type{Array}) = CvxExpr
+promote_rule(::Type{CvxExpr}, ::Type{AbstractArray}) = CvxExpr
 promote_rule(::Type{CvxExpr}, ::Type{Number}) = CvxExpr
 
 ### Utility functions for arithmetic
@@ -55,7 +55,7 @@ end
 
 # multiple arguments
 for op = (:promote_vexity, :promote_sign, :promote_shape)
-  @eval ($op)(arg1,arg2,args...) = ($op)(($op)(arg1,arg2),args...)
+  @eval ($op)(arg1,arg2,arg3,args...) = length(args)==0 ? ($op)(($op)(arg1,arg2),arg3) : ($op)(($op)(arg1,arg2),arg3,args...)
 end
 
 function reverse_vexity(x::AbstractCvxExpr)
@@ -90,7 +90,7 @@ end
 
 ### Arithmetic for expressions
 +(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxExpr(:+,[x,y],promote_vexity(x,y),promote_sign(x,y),promote_size(x,y))
-+(x::AbstractCvxExpr,y) = +(x,convert(CvxExpr,y))
++(x::AbstractCvxExpr,y::Value) = +(x,convert(CvxExpr,y))
 +(x,y::AbstractCvxExpr) = +(y,convert(CvxExpr,x))
 -(x::AbstractCvxExpr,y::AbstractCvxExpr) = +(x,-y)
 -(x::AbstractCvxExpr,y) = +(x,-y)
@@ -145,15 +145,15 @@ function *(x::AbstractCvxExpr,y::AbstractCvxExpr)
 		sign = :any
 	elseif :zero in signs
 		sign = :zero
-	elseif size(signs) == 1
+	elseif length(signs) == 1
 		sign = :pos
 	else
 		sign = :neg
 	end
 	CvxExpr(:*,[x,y],vexity,sign,size)
 end
-*(x::AbstractCvxExpr,y) = *(x,convert(CvxExpr,y))
-*(x,y::AbstractCvxExpr) = *(convert(CvxExpr,x),y)
+*(x::AbstractCvxExpr,y::Value) = *(x,convert(CvxExpr,y))
+*(x::Value,y::AbstractCvxExpr) = *(convert(CvxExpr,x),y)
 
 # only division by constant scalars is allowed, but we need to provide it for use with parameters, maybe
 function inv(y::AbstractCvxExpr)
