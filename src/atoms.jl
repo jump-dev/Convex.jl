@@ -2,7 +2,7 @@ import Base.sum, Base.abs, Base.sqrt, Base.log
 export transpose, ctranspose, kl_div, lambda_min, lambda_max, log_det, norm, quad_form, quad_over_lin, abs, pos, square, sum, log, sqrt, inv_pos
 
 # TODO
-# * m
+# * max, min
 
 # cvxpy atoms
 #['abs', 'affine', 'atom', 'elementwise', 'geo_mean', 'inv_pos', 'lambda_max', 'lambda_min', 'log', 'max', 'min', 'neg', 'nonlinear', 'norm', 'norm1', 'norm2', 'normInf', 'normNuc', 'norm_inf', 'norm_nuc', 'pos', 'quad_form', 'quad_over_lin', 'sigma_max', 'sqrt', 'square', 'sum', 'vstack']
@@ -47,16 +47,17 @@ function log_det(x::AbstractCvxExpr)
 		error("log_det(x) not DCP compliant for x = $x")
 	end
 end
-# conversion of p from symbol to string if necessary will be done automatically
 function norm(x::AbstractCvxExpr, p = 2)
+	norm_map = {1=>:norm1, 2=>:norm2, :inf=>:norm_inf, :nuc=>:norm_nuc}
+	norm_type = norm_map[p]
 	if x.vexity == :constant
-		return CvxExpr(:norm,[x,p],:constant,:pos,(1,1))
+		return CvxExpr(norm_type,[x],:constant,:pos,(1,1))
 	elseif x.vexity == :linear
-		return CvxExpr(:norm,[x,p],:convex,:pos,(1,1))	
+		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))	
 	elseif x.vexity == :convex && x.sign == :pos
-		return CvxExpr(:norm,[x,p],:convex,:pos,(1,1))	
+		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))	
 	elseif x.vexity == :concave && x.sign == :neg
-		return CvxExpr(:norm,[x,p],:convex,:pos,(1,1))		
+		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))		
 	else
 		error("norm(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
