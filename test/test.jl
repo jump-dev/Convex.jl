@@ -1,4 +1,6 @@
-require("ast.jl")
+@everywhere require("src/CVX.jl")
+@everywhere using CVX
+
 TOL = .0001
 
 x = Parameter(3)
@@ -23,6 +25,7 @@ y = Variable()
 p = Problem(:minimize,abs(y),[y >= 1])
 @assert abs(solve!(p) - 1) <= TOL
 
-x = Variable()
-p = Problem(:minimize,kl_div(x,y),[y >= 1 , x <= 0])
-@assert abs(solve!(p) - 1) <= TOL
+# x = Variable()
+# p = Problem(:minimize,kl_div(x,y),[y >= 1 , x <= 0])
+# print
+# @assert abs(solve!(p) - 1) <= TOL

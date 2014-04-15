@@ -3,6 +3,8 @@ using PyCall
 @pyimport numpy
 @pyimport cvxopt
 
+# export cvxpy_solve!
+
 pyconstrmap = {:(==) => :__eq__, :(>=) => :__ge__, :(<=) => :__le__}
 
 function cvxpy_solve!(p::Problem)
@@ -67,7 +69,7 @@ function make_2d(t::Tuple)
 		return (1,1)
 	elseif length(t) == 1
 		return (t[1],1)
-	else 
+	else
 		return t[1:2]
 	end
 end

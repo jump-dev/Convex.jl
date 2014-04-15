@@ -1,4 +1,4 @@
-export Problem, minimize, maximize, solve!
+export Problem, minimize, maximize, get_variables, solve!
 
 type Problem
 	head::Symbol
