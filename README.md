@@ -16,6 +16,10 @@ You'll also need to install the python module cvxpy and its dependencies, cvxopt
 
     easy_install cvxopt; easy_install ecos; easy_install cvxpy
 
+You'll also need PyCall, which you can get by opening a Julia prompt and calling
+
+	Pkg.add("PyCall")
+
 # Usage
 
 The interface for this package is not yet stable, but we give a few usage examples to start with.
