@@ -6,7 +6,7 @@
 
 # This Week's Updates
 
-- Here is stuff we will tell Madeleine about! Hopefully she won't hate us.
+- Baby ECOS problem
 
 ---
 

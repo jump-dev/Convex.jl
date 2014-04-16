@@ -1,5 +1,5 @@
 import Base.convert, Base.size
-export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, size
+export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, size, unique_id
 
 abstract AbstractCvxExpr
 # every type inheriting from the AbstractCvxExpr type should have the following properties
