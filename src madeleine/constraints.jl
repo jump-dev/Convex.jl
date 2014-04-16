@@ -32,33 +32,32 @@ type CvxConstr
         vexity = :convex
       else
         error("constraint is not DCP compliant")
-      end
+      end   
     else
       error("unrecognized comparison $head")
     end
-
+    
     canon_form = ()->
       begin
         if lhs.head == :constant && rhs.head == :constant
           error ("TODO")
         elseif lhs.head == :constant
           if head == :(>=)
-            return {:coeffs => [1], :vars => [unique_id(rhs)], :constant => lhs.value, :is_eq => false, :size => rhs.size}
-          else
-            return {:coeffs => [-1], :vars => [unique_id(rhs)], :constant => -(lhs.value), :is_eq => (head == :(==)), :size => rhs.size}
+            return {:coeffs => [1], :vars => [unique_id(rhs)], :constant => lhs.value, :is_eq => false}
+          else 
+            return {:coeffs => [-1], :vars => [unique_id(rhs)], :constant => -(lhs.value), :is_eq => (head == :(==))}
           end
         elseif rhs.head == :constant
           if head == :(>=)
-            return {:coeffs => [-1], :vars => [unique_id(lhs)], :constant => -(rhs.value), :is_eq => false, :size => lhs.size}
+            return {:coeffs => [-1], :vars => [unique_id(lhs)], :constant => -(rhs.value), :is_eq => false}
           else
-            return {:coeffs => [1], :vars => [unique_id(lhs)], :constant => rhs.value, :is_eq => (head == :(==)), :size => lhs.size}
+            return {:coeffs => [1], :vars => [unique_id(lhs)], :constant => rhs.value, :is_eq => (head == :(==))}
           end
         else
           if head == :(>=)
-            # TODO: fix size
-            return {:coeffs => [1 -1], :vars => [unique_id(rhs); unique_id(lhs)], :constant => 0, :is_eq => false, :size => maximum(lhs.size)}
+            return {:coeffs => [1 -1], :vars => [unique_id(rhs); unique_id(lhs)], :constant => 0, :is_eq => false}
           else
-            return {:coeffs => [1 -1], :vars => [unique_id(lhs); unique_id(rhs)], :constant => 0, :is_eq => (head == :(==)), :size => maximum(lhs.size)}
+            return {:coeffs => [1 -1], :vars => [unique_id(lhs); unique_id(rhs)], :constant => 0, :is_eq => (head == :(==))}
           end
         end
       end

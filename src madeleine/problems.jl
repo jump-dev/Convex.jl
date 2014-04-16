@@ -25,7 +25,6 @@ type Problem
 		new(head,obj,constr,nothing,nothing,get_var_dict(obj,constr))
 	end
 end
-
 # infer min or max from vexity of obj
 # Problem(obj::CvxExpr,constr::Array{CvxConstr}) = obj.vexity == :concave ? Problem(:maximize,obj,constr) : Problem(:minimize,obj,constr)
 Problem(head::Symbol,obj::CvxExpr,constr::CvxConstr...) = Problem(head,obj,[constr...])
@@ -36,77 +35,16 @@ maximize(obj::CvxExpr,constr=CvxConstr[]::Array{CvxConstr}) = Problem(:maximize,
 # display(p::Problem) = idea: loop through variables, name them sequentially if they don't already have names, and display operations prettily with variables names
 # println("Problem($(p.head),$(p.obj),$(p.constr)")
 
-function create_matrix(canonical_constraints_array)
-	n = 0
-	variable_index = Dict()
-	m = 0
-
-	for constraint in canonical_constraints_array
-		for vars in constraint[:vars]
-			if !haskey(variable_index, vars)
-				variable_index[vars] = n + 1
-				n += maximum(constraint[:size])
-			end
-			m += maximum(constraint[:size])
-		end
-	end
-
-	constants = zeros(m, 1)
-	G = spzeros(m, n)
-	m_index = 1
-	for constraint in canonical_constraints_array
-		size = maximum(constraint[:size])
-
-		for i = 1:length(constraint[:vars])
-			vars = constraint[:vars][i]
-			# TODO: This won't work, for stuff like Bx<=d, only works for constant * x
-			# FML
-			G[m_index : m_index + size - 1, variable_index[vars] : variable_index[vars] + size - 1] =
-					speye(size) * constraint[:coeffs][i]
-		end
-
-		# If we have variables of size n, we have n constants since vars <= b will be overloaded
-		constants[m_index : m_index + size - 1] = constraint[:constant]
-		m_index += size
-	end
-
-	return m, n, G, constants, variable_index
-end
 
 # For now, assuming it is an LP, so objective is of the form c' * x
-function ecos_solve!(p::Problem)
-	objective = p.obj
-
-	canonical_constraints_array = Dict{Any,Any}[]
-	for constraint in p.constr
-		push!(canonical_constraints_array, constraint.canon_form())
-	end
-
-	m, n, G, constants, variable_index = create_matrix(canonical_constraints_array)
-	# Now, all we need to is create c
-
-	c = zeros(n, 1)
-	lhs = objective.args[1].value
-	# If all had was c'x, we'd be done, but we introduced more variables
-	uid = objective.args[2].uid()
-	c[variable_index[uid] : variable_index[uid] + length(lhs) - 1] = lhs
-	println("m is $m")
-	println(n)
-	println(G)
-	println(constants)
-	println(c)
-	sol = ecos_solve(n=n, m=m, p=0, G=G, c=c, h=constants)
-	return sol
-	# TODO: Instead of returning sol, update problem and shit
+function ecos_solve!(p:Problem)
+	objective = p.objective
 end
 
 function solve!(p::Problem,method=:ecos)
 	if method == :ecos
-		sol = ecos_solve!(p)
-		println(sol)
-		println(sol[:x])
-		println(sol[:status])
-		return sol
+		ecos_solve!(p:Problem)
+		return "TODO"
 	else
 		println("method $method not implemented")
 	end

@@ -31,22 +31,17 @@ type CvxExpr <: AbstractCvxExpr
   sign::Symbol
   size::Tuple
   evalfn::Function
-  uid::Function
-  canon_form::Function
-  function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple)
+  function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple,evalfn::Function)
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :any; got $sign")
     elseif !(vexity in vexities)
       error("vexity must be one of :constant, :linear, :convex, :concave; got $vexity")
     else
-      this = new(head,args,vexity,sign,size)
-      this.uid = ()->unique_id(this)
-      return this
+      return new(head,args,vexity,sign,size,evalfn)
     end
   end
 end
-
-CvxExpr(head::Symbol,arg,vexity::Symbol,sign::Symbol,size::Tuple) = CvxExpr(head,[arg],vexity,sign,size)
+CvxExpr(head::Symbol,arg,vexity::Symbol,sign::Symbol,size::Tuple,evalfn::Function) = CvxExpr(head,[arg],vexity,sign,size,evalfn)
 
 type Variable <: AbstractCvxExpr
   head::Symbol
@@ -55,22 +50,19 @@ type Variable <: AbstractCvxExpr
   sign::Symbol
   size::Tuple
   evalfn::Function
-  uid::Function
   function Variable(head::Symbol,size::Tuple,sign::Symbol)
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :zero, :any; got $sign")
     end
     if head == :variable
-      this = new(head,nothing,:linear,sign,size)
+      v = new(head,nothing,:linear,sign,size)
     elseif head == :parameter
-      this = new(head,nothing,:constant,sign,size)
+      v = new(head,nothing,:constant,sign,size)
     end
-    this.uid = ()->unique_id(this)
-    this.evalfn = ()->this.value
-    return this
+    v.evalfn = ()->v.value
+    return v
   end
 end
-
 Variable(size::Tuple,sign::Symbol; kwargs...) = Variable(:variable,size,sign; kwargs...)
 Variable(size::Tuple; kwargs...) = Variable(size,:any; kwargs...)
 Variable(size...; kwargs...) = Variable(size,:any; kwargs...)
@@ -79,7 +71,6 @@ Parameter(size::Tuple,sign::Symbol; kwargs...) = Variable(:parameter,size,sign; 
 Parameter(size::Tuple; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size...; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size::Integer,sign::Symbol; kwargs...) = Parameter(Tuple(size),sign; kwargs...)
-
 function parameter!(x::Variable)
   x.head = :parameter
   x.vexity = :constant

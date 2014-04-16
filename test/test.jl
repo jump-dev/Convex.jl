@@ -1,8 +1,14 @@
 @everywhere require("src/CVX.jl")
 @everywhere using CVX
 
+x = Variable(2)
+c = Constant([1.0 1.0])
 
-sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
+p = Problem(:minimize, dot(c, x), [1 <= x, x <= 2])
+solve!(p)
+
+# ecos_solve(n=2, m=4, c=[1.0, 1.0], h=[-1.0, -1.0, 2.0, 2.0], G=G, p=0)
+# sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
 #TOL = .0001
 
 #x = Parameter(3)

@@ -68,7 +68,7 @@ function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
   # TODO: Check how many we need to keep
   # 4 means we keep x,y,z,s, 3 means x,y,z and so on
   num_vars_to_keep = 4
-  # ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
+  ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
   return solution
 end
 
@@ -79,16 +79,16 @@ function get_ecos_solution(pwork, n, p, m, ret_val)
   # TODO: Worry about freeing memory?
 
   # x is the 12th
-  x_ptr = unsafe_load(double_ptr, 5)
+  x_ptr = unsafe_load(double_ptr, 12)
   x = pointer_to_array(x_ptr, n)
 
-  y_ptr = unsafe_load(double_ptr, 6)
+  y_ptr = unsafe_load(double_ptr, 13)
   y = pointer_to_array(y_ptr, p)
 
-  z_ptr = unsafe_load(double_ptr, 7)
+  z_ptr = unsafe_load(double_ptr, 14)
   z = pointer_to_array(z_ptr, m)
 
-  s_ptr = unsafe_load(double_ptr, 8)
+  s_ptr = unsafe_load(double_ptr, 15)
   s = pointer_to_array(s_ptr, m)
 
   if ret_val == 0
@@ -99,5 +99,5 @@ function get_ecos_solution(pwork, n, p, m, ret_val)
     status = "dual infeasible"
   end
 
-  return [:x=> x, :y=> y, :z=>s, :s=>s, :status=> status, :ret_val=>ret_val]
+  return ["x"=> x, "y"=> y, "z"=>s, "s"=>s, "status"=> status, "ret_val"=>ret_val]
 end
