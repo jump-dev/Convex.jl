@@ -9,7 +9,7 @@ type CvxConstr
   vexity
   size
   dual_value
-    canon_form
+  canon_form::Function
   function CvxConstr(head::Symbol,lhs::AbstractCvxExpr,rhs::AbstractCvxExpr)
     # promote sizes for zero-length dimensions, and check others match
     size = promote_size(lhs,rhs)
@@ -36,30 +36,33 @@ type CvxConstr
     else
       error("unrecognized comparison $head")
     end
+    
+    canon_form = ()->
+      begin
+        if lhs.head == :constant && rhs.head == :constant
+          error ("TODO")
+        elseif lhs.head == :constant
+          if head == :(>=)
+            return {:coeffs => [1], :vars => [unique_id(rhs)], :constant => lhs.value, :is_eq => false}
+          else 
+            return {:coeffs => [-1], :vars => [unique_id(rhs)], :constant => -(lhs.value), :is_eq => (head == :(==))}
+          end
+        elseif rhs.head == :constant
+          if head == :(>=)
+            return {:coeffs => [-1], :vars => [unique_id(lhs)], :constant => -(rhs.value), :is_eq => false}
+          else
+            return {:coeffs => [1], :vars => [unique_id(lhs)], :constant => rhs.value, :is_eq => (head == :(==))}
+          end
+        else
+          if head == :(>=)
+            return {:coeffs => [1 -1], :vars => [unique_id(rhs); unique_id(lhs)], :constant => 0, :is_eq => false}
+          else
+            return {:coeffs => [1 -1], :vars => [unique_id(lhs); unique_id(rhs)], :constant => 0, :is_eq => (head == :(==))}
+          end
+        end
+      end
 
-    if lhs.head == :constant && rhs.head == :constant
-      error ("TODO")
-    elseif lhs.head == :constant
-      if head == :(>=)
-        return {:coeffs => [1], :vars => [unique_id(rhs)], :constant => lhs.value, :is_eq => false}
-      else 
-        return {:coeffs => [-1], :vars => [unique_id(rhs)], :constant => -(lhs.value), :is_eq => (head == :(==))}
-      end
-    elseif rhs.head == :constant
-      if head == :(>=)
-        return {:coeffs => [-1], :vars => [unique_id(lhs)], :constant => -(rhs.value), :is_eq => false}
-      else
-        return {:coeffs => [1], :vars => [unique_id(lhs)], :constant => rhs.value, :is_eq => (head == :(==))}
-      end
-    else
-      if head == :(>=)
-        return {:coeffs => [1 -1], :vars => [unique_id(rhs); unique_id(lhs)], :constant => 0, :is_eq => false}
-      else
-        return {:coeffs => [1 -1], :vars => [unique_id(lhs); unique_id(rhs)], :constant => 0, :is_eq => (head == :(==))}
-      end
-    end
-
-    return new(head,lhs,rhs,vexity,size,nothing)
+    return new(head,lhs,rhs,vexity,size,nothing,canon_form)
   end
 end
 
