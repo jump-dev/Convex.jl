@@ -1,32 +1,8 @@
 @everywhere require("src/CVX.jl")
 @everywhere using CVX
 
-n = 2
-m = 2
-p = 0
-l = 2
-ncones = 0
-q = convert(Ptr{Int64}, C_NULL)
-Gpr = [-1.0, -2.0, -2.0, -1.0]
-Gjc = [0, 2, 4]
-Gir = [0, 1, 0, 1]
-Apr = convert(Ptr{Float64}, C_NULL)
-Ajc = convert(Ptr{Int64}, C_NULL)
-Air = convert(Ptr{Int64}, C_NULL)
-c = [1.0, 1.0]
-h = [-2.0, -2.0]
-b = convert(Ptr{Float64}, C_NULL)
-pwork = ccall((:ECOS_setup, "../ecos/ecos.so"), Ptr{Void}, 
-	          (Int64, Int64, Int64, Int64, Int64, Ptr{Int64}, Ptr{Float64}, Ptr{Int64}, Ptr{Int64}, 
-	           Ptr{Float64}, Ptr{Int64}, Ptr{Int64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}), 
-	           n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, c, h, b)
-ccall((:ECOS_solve, "../ecos/ecos.so"), Int64, (Ptr{Void},), pwork)
-dptr = convert(Ptr{Ptr{Float64}}, pwork)
-ptr = unsafe_load(dptr, 12)
-x1 = unsafe_load(ptr, 1)
-x2 = unsafe_load(ptr, 2)
 
-
+sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
 #TOL = .0001
 
 #x = Parameter(3)
