@@ -1,3 +1,16 @@
+# Questions
+
+Variable v/s Parameter
+Why do variables have linear vexity and what does it mean for a parameter to have a constant vexity
+Canonicalization
+-what exactly are variables
+-we need to create a variable for each node but isnt the AST already doing that
+
+# KV's junk
+
+cd("Desktop/CVX.jl")
+include("test/test.jl")
+
 # Next Week's Todos (04/14)
 
 - Implement canonicalization: Hopefully there won't be big efficiency concerns here, it's mostly just up to how the language is implemented.

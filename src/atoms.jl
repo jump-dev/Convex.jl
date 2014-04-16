@@ -14,7 +14,7 @@ export transpose, ctranspose, kl_div, lambda_min, lambda_max, log_det, norm, qua
 transpose(x::AbstractCvxExpr) = CvxExpr(:transpose,[x],x.vexity,x.sign,reverse(x.size))
 ctranspose(x::AbstractCvxExpr) = transpose(x)
 getindex(x::AbstractCvxExpr,index...) = CvxExpr(:index,[x,index...],x.vexity,x.sign,size)
-# this breaks the syntax [x,y] to concatenate lists of expressions as in arguments to atoms 
+# this breaks the syntax [x,y] to concatenate lists of expressions as in arguments to atoms
 # extend to *args
 # vcat(args::Array{AbstractCvxExpr}) = CvxExpr(:vstack,args,promote_vexity([a.vexity for a in args]...),promote_sign([a.sign for a in args]...),sizes...)
 
@@ -53,11 +53,11 @@ function norm(x::AbstractCvxExpr, p = 2)
 	if x.vexity == :constant
 		return CvxExpr(norm_type,[x],:constant,:pos,(1,1))
 	elseif x.vexity == :linear
-		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))	
+		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))
 	elseif x.vexity == :convex && x.sign == :pos
-		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))	
+		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))
 	elseif x.vexity == :concave && x.sign == :neg
-		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))		
+		return CvxExpr(norm_type,[x],:convex,:pos,(1,1))
 	else
 		error("norm(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
@@ -67,7 +67,7 @@ function quad_form(x::AbstractCvxExpr, P::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:quad_form,[x,P],P.vexity,:any,(1,1))
 	elseif P.vexity == :constant
-		return CvxExpr(:quad_form,[x,P],:convex,:pos,(1,1))		
+		return CvxExpr(:quad_form,[x,P],:convex,:pos,(1,1))
 	else
 		error("at least one argument to quad_form must be constant")
 	end
@@ -85,15 +85,16 @@ function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:quad_over_lin,[x,y],:convex,:pos,size)
 	elseif x.vexity == :linear
-		return CvxExpr(:quad_over_lin,[x,y],:convex,:pos,size)	
+		return CvxExpr(:quad_over_lin,[x,y],:convex,:pos,size)
 	elseif x.vexity == :convex && x.sign == :pos
-		return CvxExpr(:quad_over_lin,[x,P],:convex,:pos,size)	
+		return CvxExpr(:quad_over_lin,[x,P],:convex,:pos,size)
 	elseif x.vexity == :concave && x.sign == :neg
-		return CvxExpr(:quad_over_lin,[x,P],:convex,:pos,size)		
+		return CvxExpr(:quad_over_lin,[x,P],:convex,:pos,size)
 	else
 		error("quad_over_lin(x,y) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
 end
+
 # max(), min()
 
 ### matrix to matrix
@@ -109,14 +110,14 @@ function abs(x::AbstractCvxExpr)
 		if x.sign == :pos
 			return CvxExpr(:abs,[x],:linear,:pos,x.size)
 		elseif x.sign == :neg
-			return CvxExpr(:abs,[x],:linear,:pos,x.size)	
+			return CvxExpr(:abs,[x],:linear,:pos,x.size)
 		else
-			return CvxExpr(:abs,[x],:convex,:pos,x.size)	
+			return CvxExpr(:abs,[x],:convex,:pos,x.size)
 		end
 	elseif x.vexity == :convex && x.sign == :pos
-		return CvxExpr(:abs,[x],:convex,:pos,x.size)	
+		return CvxExpr(:abs,[x],:convex,:pos,x.size)
 	elseif x.vexity == :concave && x.sign == :neg
-		return CvxExpr(:abs,[x],:convex,:pos,x.size)		
+		return CvxExpr(:abs,[x],:convex,:pos,x.size)
 	else
 		error("abs(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
@@ -126,7 +127,7 @@ function inv_pos(x::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:inv_pos,[x],:constant,:pos,x.size)
 	elseif x.vexity == :linear || x.vexity ==:concave
-		return CvxExpr(:inv_pos,[x],:convex,:pos,x.size)	
+		return CvxExpr(:inv_pos,[x],:convex,:pos,x.size)
 	else
 		error("inv_pos(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
@@ -135,7 +136,7 @@ function log(x::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:log,[x],:constant,:any,x.size)
 	elseif x.vexity == :linear || x.vexity ==:concave
-		return CvxExpr(:log,[x],:concave,:any,x.size)	
+		return CvxExpr(:log,[x],:concave,:any,x.size)
 	else
 		error("log(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
@@ -150,15 +151,15 @@ function pos(x::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:pos,[x],:constant,:pos,x.size)
 	elseif x.sign == :neg || x.sign == :zero
-		return CvxExpr(:pos,[x],:constant,:zero,x.size)	
+		return CvxExpr(:pos,[x],:constant,:zero,x.size)
 	elseif x.vexity == :linear
 		if x.sign == :pos
 			return CvxExpr(:pos,[x],:linear,:pos,x.size)
 		else
-			return CvxExpr(:pos,[x],:convex,:pos,x.size)	
+			return CvxExpr(:pos,[x],:convex,:pos,x.size)
 		end
 	elseif x.vexity == :convex
-		return CvxExpr(:pos,[x],:convex,:pos,x.size)		
+		return CvxExpr(:pos,[x],:convex,:pos,x.size)
 	else
 		error("pos(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
@@ -167,7 +168,7 @@ function sqrt(x::AbstractCvxExpr)
 	if x.vexity == :constant
 		return CvxExpr(:sqrt,[x],:constant,:pos,x.size)
 	elseif x.vexity == :linear || x.vexity ==:concave
-		return CvxExpr(:sqrt,[x],:concave,:pos,x.size)	
+		return CvxExpr(:sqrt,[x],:concave,:pos,x.size)
 	else
 		error("sqrt(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
@@ -178,9 +179,9 @@ function square(x::AbstractCvxExpr)
 	elseif x.vexity == :linear
 		return CvxExpr(:square,[x],:convex,:pos,x.size)
 	elseif x.vexity == :convex && ( x.sign == :pos || x.sign == :zero )
-		return CvxExpr(:square,[x],:convex,:pos,x.size)	
+		return CvxExpr(:square,[x],:convex,:pos,x.size)
 	elseif x.vexity == :concave && ( x.sign == :neg || x.sign == :zero )
-		return CvxExpr(:square,[x],:convex,:pos,x.size)		
+		return CvxExpr(:square,[x],:convex,:pos,x.size)
 	else
 		error("square(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
 	end
