@@ -2,13 +2,13 @@ export Problem, minimize, maximize, get_variables, solve!
 
 type Problem
 	head::Symbol
-	obj::CvxExpr
+	obj::AbstractCvxExpr
 	constr::Array{CvxConstr}
 	status
 	optval
 	variables
 
-	function Problem(head::Symbol,obj::CvxExpr,constr=CvxConstr[]::Array{CvxConstr})
+	function Problem(head::Symbol,obj::AbstractCvxExpr,constr=CvxConstr[]::Array{CvxConstr})
 		if !all([x<=1 for x in obj.size])
 			error("only scalar optimization problems allowed. got size(obj) = $(obj.size)")
 		end
@@ -21,17 +21,17 @@ type Problem
 			error("Problem.head must be one of :minimize, :maximize")
 		end
 
-		new(head,obj,constr,nothing,nothing,get_var_dict(obj,constr))
+		new(head, obj, constr, nothing, nothing, get_var_dict(obj, constr))
 	end
 end
 
 # infer min or max from vexity of obj
-# Problem(obj::CvxExpr,constr::Array{CvxConstr}) = obj.vexity == :concave ? Problem(:maximize,obj,constr) : Problem(:minimize,obj,constr)
-Problem(head::Symbol, obj::CvxExpr, constr::CvxConstr...) = Problem(head, obj, [constr...])
-minimize(obj::CvxExpr, constr::CvxConstr...) = Problem(:minimize, obj, [constr...])
-minimize(obj::CvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:minimize, obj, constr)
-maximize(obj::CvxExpr, constr::CvxConstr...) = Problem(:maximize, obj, [constr...])
-maximize(obj::CvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:maximize, obj, constr)
+# Problem(obj::AbstractCvxExpr,constr::Array{CvxConstr}) = obj.vexity == :concave ? Problem(:maximize,obj,constr) : Problem(:minimize,obj,constr)
+Problem(head::Symbol, obj::AbstractCvxExpr, constr::CvxConstr...) = Problem(head, obj, [constr...])
+minimize(obj::AbstractCvxExpr, constr::CvxConstr...) = Problem(:minimize, obj, [constr...])
+minimize(obj::AbstractCvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:minimize, obj, constr)
+maximize(obj::AbstractCvxExpr, constr::CvxConstr...) = Problem(:maximize, obj, [constr...])
+maximize(obj::AbstractCvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:maximize, obj, constr)
 # display(p::Problem) = idea: loop through variables, name them sequentially if they don't already have names, and display operations prettily with variables names
 # println("Problem($(p.head),$(p.obj),$(p.constr)")
 
@@ -50,28 +50,30 @@ end
 
 
 # For now, assuming it is an LP, so objective is of the form c' * x
-function ecos_solve!(p::Problem)
-	objective = p.obj
+function ecos_solve!(problem::Problem)
+	objective = problem.obj
 
-	canonical_constraints_array = Dict{Any,Any}[]
-	for constraint in p.constr
-		push!(canonical_constraints_array, constraint.canon_form())
+	canonical_constraints_array = Any[]
+	for constraint in problem.constr
+		append!(canonical_constraints_array, constraint.canon_form())
 	end
 
-	push!(canonical_constraints_array, objective.canon_form())
-	m, n, G, h, A, b, variable_index = create_ecos_matrices(canonical_constraints_array)
+	append!(canonical_constraints_array, objective.canon_form())
+	m, n, p, G, h, A, b, variable_index = create_ecos_matrices(canonical_constraints_array)
 	# Now, all we need to is create c
 
 	c = zeros(n, 1)
 
 	# TODO: Handle cases such as minimize 1 or the case where objective isn't in variable index
 	uid = objective.uid()
-	c[variable_index[uid] : variable_index[uid] + length(lhs) - 1] = 1
+	c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
 	println("m is $m")
-	println(n)
-	println(G)
-	println(h)
-	println(c)
+	println("n is $n")
+	println("G is $G")
+	println("h is $h")
+	println("c is $c")
+	println("A is $A")
+	println("p is $p")
 	sol = ecos_solve(n=n, m=m, p=p, G=G, c=c, h=h, A=A, b=b)
 	return sol
 	# TODO: Instead of returning sol, update problem and shit
@@ -100,7 +102,7 @@ function create_ecos_matrices(canonical_constraints_array)
 				n += size(constraint[:coeffs][i], 2)
 			end
 
-			if constraint.is_eq
+			if constraint[:is_eq]
 				p += size(constraint[:coeffs][i], 1)
 			else
 				m += size(constraint[:coeffs][i], 1)
@@ -108,17 +110,17 @@ function create_ecos_matrices(canonical_constraints_array)
 		end
 	end
 
-	h = m == 0 ? nothing : zeros(m, 1)
+	h = m == 0 ? nothing: zeros(m, 1)
 	G = m == 0 ? nothing: spzeros(m, n)
 	b = p == 0 ? nothing: zeros(p, 1)
 	A = p == 0 ? nothing: spzeros(p, n)
 
-	m_index = 1
-	p_index = 1
+	m_index = 1::Int64
+	p_index = 1::Int64
 
 	# Now, we actually stuff the matrices A and G
 	for constraint in canonical_constraints_array
-
+		m_var = 0::Int64
 		for i = 1:length(constraint[:vars])
 			var = constraint[:vars][i]
 			# Technically, the m_var size of all the variables should be the same, otherwise nothing makes
@@ -126,16 +128,20 @@ function create_ecos_matrices(canonical_constraints_array)
 			m_var = size(constraint[:coeffs][i], 1)
 			n_var = size(constraint[:coeffs][i], 2)
 
-			if constraint.is_eq
+			if constraint[:is_eq]
 				A[p_index : p_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
 					constraint[:coeffs][i]
 			else
+
+				# println(constraint[:coeffs][i])
+				# println(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1])
+
 				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
 					constraint[:coeffs][i]
 			end
 		end
 
-		if constraint.is_eq
+		if constraint[:is_eq]
 			b[p_index : p_index + m_var - 1] = constraint[:constant]
 			p_index += m_var
 		else
@@ -144,11 +150,13 @@ function create_ecos_matrices(canonical_constraints_array)
 		end
 	end
 
-	return m, n, G, h, A, b, variable_index
+	return m, n, p, G, h, A, b, variable_index
 end
 
 
 function get_variables(e::AbstractCvxExpr)
+	return nothing
+	# TODO: this is also broken
 	if e.head == :variable
 		return [(unique_id(e),e)]
 	elseif e.head == :parameter
@@ -172,10 +180,14 @@ end
 get_variables(e) = Set()
 
 function get_var_dict(p::Problem)
+	# TODO: this is also broken
+	return nothing
 	get_var_dict(p.obj,p.constr)
 end
 
-function get_var_dict(obj::CvxExpr, constr::Array{CvxConstr})
+function get_var_dict(obj::AbstractCvxExpr, constr::Array{CvxConstr})
+	# TODO: this is also broken
+	return nothing
 	vars = get_variables(obj)
 	for c in constr
 		subvars = get_variables(c.lhs);

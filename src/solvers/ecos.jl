@@ -24,10 +24,11 @@ end
 #
 # Returns:
 # A dictionary 'solution' of type:
-# {:x => x, :y => y, :z =>s, :s =>s, :status => status, :ret_val => ret_val}
+# {:x => x, :y => y, :z => z, :s => s, :status => status, :ret_val => ret_val}
 # where x are the primal variables, y are the multipliers for the equality constraints
 # z are the multipliers for the conic inequalities
 #
+# TODO: i should specify their types
 function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
     q=nothing, G=nothing, A=nothing, c=nothing, h=nothing, b=nothing, debug=false)
 
@@ -128,5 +129,5 @@ function get_ecos_solution(pwork, n, p, m, ret_val)
     status = "unknown problem in solver"
   end
 
-  return {:x => x, :y => y, :z =>s, :s => s, :status => status, :ret_val => ret_val}
+  return {:x => x, :y => y, :z => z, :s => s, :status => status, :ret_val => ret_val}
 end

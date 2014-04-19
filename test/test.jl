@@ -1,6 +1,39 @@
 @everywhere require("src/CVX.jl")
 @everywhere using CVX
 
+
+# Test 1
+x = Variable(1)
+p = Problem(:minimize, -x, [x <= 0])
+solve!(p)
+
+# Test 2
+x = Variable(1)
+p = Problem(:minimize, x, [x >= 2, x <= 4])
+solve!(p)
+
+# Test 3
+x = Variable(1)
+p = Problem(:minimize, 2.0 * x, [x >= 2, x <= 4])
+solve!(p)
+
+# Test 4
+x = Variable(2)
+p = Problem(:minimize, dot([2.0; 2.0], x), [x >= [1.1; 1.1]])
+solve!(p)
+
+# Test 5
+x = Variable(2)
+A = 1.5 * eye(2)
+p = Problem(:minimize, dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
+solve!(p)
+
+# Test 6
+x = Variable(1)
+y = Variable(1)
+p = Problem(:minimize, x + y, [x >= 3, y >= 2])
+solve!(p)
+
 # sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
 #TOL = .0001
 

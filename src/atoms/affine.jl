@@ -11,14 +11,36 @@ export dot
 
 # slicing atoms
 # get the right names for these
-transpose(x::AbstractCvxExpr) = CvxExpr(:transpose,[x],x.vexity,x.sign,reverse(x.size))
-ctranspose(x::AbstractCvxExpr) = transpose(x)
-getindex(x::AbstractCvxExpr,index...) = CvxExpr(:index,[x,index...],x.vexity,x.sign,size(index))
+# transpose(x::AbstractCvxExpr) = CvxExpr(:transpose,[x],x.vexity,x.sign,reverse(x.size))
+# ctranspose(x::AbstractCvxExpr) = transpose(x)
+# getindex(x::AbstractCvxExpr,index...) = CvxExpr(:index,[x,index...],x.vexity,x.sign,size(index))
 # this breaks the syntax [x,y] to concatenate lists of expressions as in arguments to atoms
 # extend to *args
 # vcat(args::Array{AbstractCvxExpr}) = CvxExpr(:vstack,args,promote_vexity([a.vexity for a in args]...),promote_sign([a.sign for a in args]...),sizes...)
 
 function dot(x::AbstractCvxExpr, y::AbstractCvxExpr)
-	# TODO: error checks
-	return CvxExpr(:dot, [x y], :linear, :any, (1, 1))
+	if Set(x.vexity, y.vexity) != Set(:constant, :linear)
+		error("TODO: Implement quadratic shit")
+		# TODO: Also check x and y are vectors
+	end
+
+	lin, cons = x.vexity == :linear ? (x, y) : (y, x)
+	@assert cons.size == lin.size
+
+	this = CvxExpr(:dot, [x y], :linear, :any, (1, 1))
+
+	# TODO: Don't do any, make more efficient
+	canon_constr_array = Any[{
+    :coeffs => Any[1.0, -cons.value'],
+    :vars => [this.uid(), lin.uid()],
+    :constant => 0,
+    :is_eq => true
+  }]
+
+  this.canon_form = ()->append!(canon_constr_array, lin.canon_form())
+  return this
 end
+
+dot(x::Value, y::AbstractCvxExpr) = dot(convert(CvxExpr, x), y)
+dot(x::AbstractCvxExpr, y::Value) = dot(x, convert(CvxExpr, y))
+

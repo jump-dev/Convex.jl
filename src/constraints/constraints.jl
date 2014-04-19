@@ -17,9 +17,19 @@ type CvxConstr
   canon_form::Function
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
     # promote sizes for zero-length dimensions, and check others match
+    if lhs.vexity == :constant && rhs.vexity == :linear && head == :(<=)
+      return CvxConstr(:(>=), -lhs, -rhs)
+    elseif lhs.vexity == :linear && rhs.vexity == :constant && head == :(>=)
+      return CvxConstr(:(<=), -lhs, -rhs)
+    end
+    println("In CvxConstr")
+    println("lhs is $lhs")
+    println("rhs is $rhs")
+
     size = promote_size(lhs, rhs)
 
     # check vexity
+    # TODO: Many dead constraints, remove
     if head == :(==)
       if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
         vexity = :linear
@@ -44,9 +54,9 @@ type CvxConstr
 
     canon_form = ()->
       begin
-        if lhs.head == :constant && rhs.head == :constant
+        if lhs.vexity == :constant && rhs.vexity == :constant
           error ("TODO")
-        elseif lhs.head == :constant
+        elseif lhs.vexity == :constant
           if head == :(>=)
             canon_constr = {
               # TODO: Be careful with the size
@@ -55,27 +65,13 @@ type CvxConstr
               :constant => promote_value(lhs.value, rhs.size[1]),
               :is_eq => false
             }
-          else
-            canon_constr = {
-              :coeffs => Any[speye(rhs.size[1])],
-              :vars => [unique_id(rhs)],
-              :constant => promote_value(-lhs.value, rhs.size[1]),
-              :is_eq => (head == :(==))
-            }
           end
 
           canon_constr_array = rhs.canon_form()
           push!(canon_constr_array, canon_constr)
 
-        elseif rhs.head == :constant
-          if head == :(>=)
-            canon_constr = {
-              :coeffs => Any[speye(lhs.size[1])],
-              :vars => [unique_id(lhs)],
-              :constant => promote_value(-rhs.value, lhs.size[1]),
-              :is_eq => false
-            }
-          else
+        elseif rhs.vexity == :constant
+          if head == :(<=)
             canon_constr = {
               :coeffs => Any[speye(lhs.size[1])],
               :vars => [unique_id(lhs)],
@@ -88,6 +84,7 @@ type CvxConstr
           push!(canon_constr_array, canon_constr)
 
         else
+          # TODO, this won't work, handle later
           if head == :(>=)
             # TODO: fix size
             canon_constr = {
@@ -121,6 +118,7 @@ end
 <=(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(<=),x,y)
 >(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(>=),x,y)
 <(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(<=),x,y)
+
 ==(x::Value,y::AbstractCvxExpr) = CvxConstr(:(==),y,convert(CvxExpr,x))
 >=(x::Value,y::AbstractCvxExpr) = CvxConstr(:(<=),y,convert(CvxExpr,x))
 <=(x::Value,y::AbstractCvxExpr) = CvxConstr(:(>=),y,convert(CvxExpr,x))

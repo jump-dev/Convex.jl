@@ -10,10 +10,13 @@ function convert(::Type{CvxExpr},x)
     return Constant(x)
   end
 end
+
+# TODO: WTF is going on
 promote_rule(::Type{CvxExpr}, ::Type{AbstractArray}) = CvxExpr
 promote_rule(::Type{CvxExpr}, ::Type{Number}) = CvxExpr
 
 ### Utility functions for arithmetic
+# TODO: This function is broken, but in use
 function promote_size(x::AbstractCvxExpr,y::AbstractCvxExpr)
   if x.size == y.size
     size = x.size
@@ -24,6 +27,10 @@ function promote_size(x::AbstractCvxExpr,y::AbstractCvxExpr)
   elseif length(x.size) == 1 && Set(x.size[1],1) == Set(y.size...)
     size = y.size
   elseif length(y.size) == 1 && Set(y.size[1],1) == Set(x.size...)
+    size = x.size
+  elseif maximum(x.size) == 1
+    size = y.size
+  elseif maximum(y.size) == 1
     size = x.size
   else
     error("size of arguments must be the same; got $(x.size),$(y.size)")
@@ -55,9 +62,9 @@ function promote_sign(x::AbstractCvxExpr,y::AbstractCvxExpr)
   end
 end
 
-function promote_value(x::Value, size::Int64)
-  if size(x, 1) < size
-    return ones(size, 1) * x
+function promote_value(x::Value, sz::Int64)
+  if size(x, 1) < sz
+    return ones(sz, 1) * x
   end
   return x
 end
