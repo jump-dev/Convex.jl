@@ -6,6 +6,7 @@ export CvxConstr, ==, >=, <=, <, >
 # TODO: CVX constraint should be an abstract class and children should be stuff
 # like CVXEqualityConstr. Read:
 # http://docs.julialang.org/en/release-0.2/manual/performance-tips/#break-functions-into-multiple-definitions
+
 type CvxConstr
   head
   lhs
@@ -47,60 +48,68 @@ type CvxConstr
           error ("TODO")
         elseif lhs.head == :constant
           if head == :(>=)
-            return {
-              :coeffs => [1],
+            canon_constr = {
+              # TODO: Be careful with the size
+              :coeffs => Any[speye(rhs.size[1])],
               :vars => [unique_id(rhs)],
-              :constant => lhs.value,
-              :is_eq => false,
-              :size => rhs.size
+              :constant => promote_value(lhs.value, rhs.size[1]),
+              :is_eq => false
             }
           else
-            return {
-              :coeffs => [-1],
+            canon_constr = {
+              :coeffs => Any[speye(rhs.size[1])],
               :vars => [unique_id(rhs)],
-              :constant => -(lhs.value),
-              :is_eq => (head == :(==)),
-              :size => rhs.size
+              :constant => promote_value(-lhs.value, rhs.size[1]),
+              :is_eq => (head == :(==))
             }
           end
+
+          canon_constr_array = rhs.canon_form()
+          push!(canon_constr_array, canon_constr)
+
         elseif rhs.head == :constant
           if head == :(>=)
-            return {
-              :coeffs => [-1],
+            canon_constr = {
+              :coeffs => Any[speye(lhs.size[1])],
               :vars => [unique_id(lhs)],
-              :constant => -(rhs.value),
-              :is_eq => false,
-              :size => lhs.size
+              :constant => promote_value(-rhs.value, lhs.size[1]),
+              :is_eq => false
             }
           else
-            return {
-              :coeffs => [1],
+            canon_constr = {
+              :coeffs => Any[speye(lhs.size[1])],
               :vars => [unique_id(lhs)],
-              :constant => rhs.value,
-              :is_eq => (head == :(==)),
-              :size => lhs.size
+              :constant => promote_value(rhs.value, lhs.size[1]),
+              :is_eq => (head == :(==))
             }
           end
+
+          canon_constr_array = lhs.canon_form()
+          push!(canon_constr_array, canon_constr)
+
         else
           if head == :(>=)
             # TODO: fix size
-            return {
-              :coeffs => [1 -1],
+            canon_constr = {
+              :coeffs => Any[speye(rhs.size[1]), -speye(lhs.size[1])],
               :vars => [unique_id(rhs); unique_id(lhs)],
-              :constant => 0,
+              :constant => promote_value(0, rhs.size[1]),
               :is_eq => false,
-              :size => maximum(lhs.size)
             }
           else
-            return {
-              :coeffs => [1 -1],
+            canon_constr = {
+              :coeffs => Any[speye(lhs.size[1]), -speye(rhs.size[1])],
               :vars => [unique_id(lhs); unique_id(rhs)],
-              :constant => 0,
-              :is_eq => (head == :(==)),
-              :size => maximum(lhs.size)
+              :constant => promote_value(0, rhs.size[1]),
+              :is_eq => (head == :(==))
             }
           end
+
+          canon_constr_array = lhs.canon_form()
+          append!(canon_constr_array, rhs.canon_form())
+          push!(canon_constr_array, canon_constr)
         end
+        return canon_constr_array
       end
 
     return new(head,lhs,rhs,vexity,size,nothing,canon_form)

@@ -30,7 +30,6 @@ type CvxExpr <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  evalfn::Function
   uid::Function
   canon_form::Function
   function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple)
@@ -54,7 +53,6 @@ type Variable <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  evalfn::Function
   uid::Function
   function Variable(head::Symbol,size::Tuple,sign::Symbol)
     if !(sign in signs)

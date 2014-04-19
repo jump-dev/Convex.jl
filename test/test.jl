@@ -1,8 +1,7 @@
 @everywhere require("src/CVX.jl")
 @everywhere using CVX
 
-
-sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
+# sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
 #TOL = .0001
 
 #x = Parameter(3)
