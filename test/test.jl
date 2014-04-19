@@ -34,6 +34,22 @@ y = Variable(1)
 p = Problem(:minimize, x + y, [x >= 3, y >= 2])
 solve!(p)
 
+# Test 7
+x = Variable(1)
+y = Variable(1)
+p = Problem(:minimize, 2.0*x - 5.0*y, [100.0 <= x, x >= 200.0, 80.0 <= y, y <= 170.0, y >= -x])
+solve!(p)
+
+# Test 8
+x = Variable(2)
+y = Variable(2)
+p = Problem(:minimize, dot([2.0; 2.0], x) + dot([2.0; 2.0], y), [x >= [1.1; 1.1], y >= [1.1; 1.1]])
+solve!(p)
+
+# TODO: take care of this
+# p = Problem(:minimize, 2*x - 5*y, [100 <= x, x >= 200, 80 <= y, y <= 170, y >= -x + 200])
+# solve!(p)
+
 # sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
 #TOL = .0001
 

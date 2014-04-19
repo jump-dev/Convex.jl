@@ -52,7 +52,7 @@ end
 function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), promote_size(x, y))
 
-  if x.size != y.size
+  if x.size[1] != y.size[1]
     error("TODO: Implement overloading of +")
   end
 
