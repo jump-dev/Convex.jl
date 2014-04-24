@@ -1,8 +1,8 @@
-export convert, promote_value, promote_rule, promote_size, promote_vexity, promote_sign
+export convert, promote_value, promote_rule, promote_size, promote_vexity, promote_sign, print_debug
 export reverse_vexity, reverse_sign
 
-
 ### Conversion and promotion
+# TODO: The difference between conversion and promotion is messy.
 function convert(::Type{CvxExpr},x)
   if typeof(x) == CvxExpr
     return x
@@ -89,5 +89,11 @@ function reverse_sign(x::AbstractCvxExpr)
     return :neg
   else
     return sign
+  end
+end
+
+function print_debug(debug, args...)
+  if (debug)
+    println(args)
   end
 end

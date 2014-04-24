@@ -32,6 +32,8 @@ type CvxExpr <: AbstractCvxExpr
   size::Tuple
   uid::Function
   canon_form::Function
+  # TODO: args::Array works, everything else fucks up (eg args or args::Array{AbstractCvxExpr})
+  # Check why
   function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple)
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :any; got $sign")
@@ -85,6 +87,8 @@ function parameter!(x::Variable)
   x.vexity = :constant
   x
 end
+
+# TODO: Why did madeleine do this
 function variable!(x::Variable)
   x.head = :variable
   x.vexity = :linear
@@ -121,6 +125,7 @@ function Constant(x::Number)
   end
 end
 
+# Case to catch arrays, not scalar numbers
 Constant(x::Value) = Constant(x,:any)
 
 ### Unique ids

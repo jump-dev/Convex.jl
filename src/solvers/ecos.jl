@@ -1,10 +1,5 @@
 export ecos_solve
 
-function print_debug(debug, args...)
-  if (debug)
-    println(args)
-  end
-end
 
 # Calls the ECOS C solver
 #

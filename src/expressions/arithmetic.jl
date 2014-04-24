@@ -6,6 +6,7 @@ for op = (:promote_vexity, :promote_sign, :promote_shape)
   @eval ($op)(arg1,arg2,arg3,args...) = length(args)==0 ? ($op)(($op)(arg1,arg2),arg3) : ($op)(($op)(arg1,arg2),arg3,args...)
 end
 
+# TODO: We shouldn't have a size() and an x.size
 function size(x::AbstractCvxExpr)
   return x.size
 end
