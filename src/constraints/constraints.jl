@@ -22,9 +22,9 @@ type CvxConstr
     elseif lhs.vexity == :linear && rhs.vexity == :constant && head == :(>=)
       return CvxConstr(:(<=), -lhs, -rhs)
     end
-    println("In CvxConstr")
-    println("lhs is $lhs")
-    println("rhs is $rhs")
+    # println("In CvxConstr")
+    # println("lhs is $lhs")
+    # println("rhs is $rhs")
 
     size = promote_size(lhs, rhs)
 

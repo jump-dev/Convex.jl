@@ -41,7 +41,7 @@ function solve!(p::Problem,method=:ecos)
 		sol = ecos_solve!(p)
 		# println(sol)
 		# println(sol[:x])
-		println(sol[:status])
+		# println(sol[:status])
 		return sol
 	else
 		println("method $method not implemented")
