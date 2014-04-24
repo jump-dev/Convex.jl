@@ -104,7 +104,7 @@ type Constant <: AbstractCvxExpr
   canon_form::Function
   function Constant(x::Value,sign)
     if sign in signs
-      sz = size(x) == () ? (1, 1) : size(x)
+      sz = size(x) == () ? (1, 1) : (size(x, 1), size(x, 2))
       this = new(:constant,x,:constant,sign,sz)
       this.canon_form = ()->Any[]
       return this

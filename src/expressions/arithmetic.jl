@@ -75,6 +75,33 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   return this
 end
 
+function +(x::AbstractCvxExpr, y::Constant)
+  this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), promote_size(x, y))
+
+  if x.size != y.size && y.size != (1, 1)
+    error("bad boy")
+  end
+
+  sz = x.size[1]
+  # TODO: Not Any. Also deal with matrix variables
+  canon_constr_array = Any[{
+    :coeffs => Any[-speye(sz), speye(sz)],
+    :vars => [x.uid(), this.uid()],
+    :constant => promote_value(y.value, sz),
+    :is_eq => true
+  }]
+
+  this.canon_form = ()->begin
+    append!(canon_constr_array, x.canon_form())
+    return canon_constr_array
+  end
+
+  return this
+
+end
+
++(y::Constant, x::AbstractCvxExpr) = +(x::AbstractCvxExpr, y::Constant)
+
 +(x::AbstractCvxExpr, y::Value) = +(x, convert(CvxExpr, y))
 +(x, y::AbstractCvxExpr) = +(y, convert(CvxExpr, x))
 -(x::AbstractCvxExpr, y::AbstractCvxExpr) = +(x, -y)

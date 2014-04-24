@@ -39,8 +39,8 @@ maximize(obj::AbstractCvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:
 function solve!(p::Problem,method=:ecos)
 	if method == :ecos
 		sol = ecos_solve!(p)
-		println(sol)
-		println(sol[:x])
+		# println(sol)
+		# println(sol[:x])
 		println(sol[:status])
 		return sol
 	else
@@ -67,14 +67,22 @@ function ecos_solve!(problem::Problem)
 	# TODO: Handle cases such as minimize 1 or the case where objective isn't in variable index
 	uid = objective.uid()
 	c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
-	println("m is $m")
-	println("n is $n")
-	println("G is $G")
-	println("h is $h")
-	println("c is $c")
-	println("A is $A")
-	println("p is $p")
+
+	if problem.head == :maximize
+		c = -c;
+	end
+	# println("m is $m")
+	# println("n is $n")
+	# println("G is $G")
+	# println("h is $h")
+	# println("c is $c")
+	# println("A is $A")
+	# println("p is $p")
 	sol = ecos_solve(n=n, m=m, p=p, G=G, c=c, h=h, A=A, b=b)
+	if problem.head == :maximize
+		c = -c;
+	end
+	println(c' * sol[:x])
 	return sol
 	# TODO: Instead of returning sol, update problem and shit
 end

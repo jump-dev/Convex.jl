@@ -86,7 +86,7 @@ function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
   # TODO: Check how many we need to keep
   # 4 means we keep x,y,z,s, 3 means x,y,z and so on
   num_vars_to_keep = 4
-  # ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
+  ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
   return solution
 end
 
@@ -94,7 +94,6 @@ end
 # Given the arguments, returns a dictionary with variables x, y, z, s and status
 function get_ecos_solution(pwork, n, p, m, ret_val)
   double_ptr = convert(Ptr{Ptr{Float64}}, pwork)
-  # TODO: Worry about freeing memory?
 
   # x is the 5th
   x_ptr = unsafe_load(double_ptr, 5)

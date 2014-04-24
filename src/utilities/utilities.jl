@@ -69,7 +69,6 @@ function promote_value(x::Value, sz::Int64)
   return x
 end
 
-
 function reverse_vexity(x::AbstractCvxExpr)
   vexity = x.vexity
   if vexity == :convex
