@@ -4,10 +4,54 @@
 x = Variable(2)
 c = Constant([1.0 1.0])
 
-p = Problem(:minimize, dot(c, x), [1 <= x, x <= 2])
+# Test 1
+x = Variable(1)
+p = Problem(:minimize, -x, [x <= 0])
 solve!(p)
 
-# ecos_solve(n=2, m=4, c=[1.0, 1.0], h=[-1.0, -1.0, 2.0, 2.0], G=G, p=0)
+# Test 2
+x = Variable(1)
+p = Problem(:minimize, x, [x >= 2, x <= 4])
+solve!(p)
+
+# Test 3
+x = Variable(1)
+p = Problem(:minimize, 2.0 * x, [x >= 2, x <= 4])
+solve!(p)
+
+# Test 4
+x = Variable(2)
+p = Problem(:minimize, dot([2.0; 2.0], x), [x >= [1.1; 1.1]])
+solve!(p)
+
+# Test 5
+x = Variable(2)
+A = 1.5 * eye(2)
+p = Problem(:minimize, dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
+solve!(p)
+
+# Test 6
+x = Variable(1)
+y = Variable(1)
+p = Problem(:minimize, x + y, [x >= 3, y >= 2])
+solve!(p)
+
+# Test 7
+x = Variable(1)
+y = Variable(1)
+p = Problem(:minimize, 2.0*x - 5.0*y, [100.0 <= x, x >= 200.0, 80.0 <= y, y <= 170.0, y >= -x])
+solve!(p)
+
+# Test 8
+x = Variable(2)
+y = Variable(2)
+p = Problem(:minimize, dot([2.0; 2.0], x) + dot([2.0; 2.0], y), [x >= [1.1; 1.1], y >= [1.1; 1.1]])
+solve!(p)
+
+# TODO: take care of this
+# p = Problem(:minimize, 2*x - 5*y, [100 <= x, x >= 200, 80 <= y, y <= 170, y >= -x + 200])
+# solve!(p)
+
 # sol = ecos_solve(n=2, m=2, p=0, G=[-1 -2; -2 -1], c=[1.0, 1.0], h=[-2.0, -2.0])
 #TOL = .0001
 

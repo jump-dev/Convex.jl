@@ -1,5 +1,5 @@
 import Base.convert, Base.size
-export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, size, unique_id
+export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, size, unique_id, Value
 
 abstract AbstractCvxExpr
 # every type inheriting from the AbstractCvxExpr type should have the following properties
@@ -30,9 +30,10 @@ type CvxExpr <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  evalfn::Function
   uid::Function
   canon_form::Function
+  # TODO: args::Array works, everything else fucks up (eg args or args::Array{AbstractCvxExpr})
+  # Check why
   function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple)
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :any; got $sign")
@@ -54,8 +55,8 @@ type Variable <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  evalfn::Function
   uid::Function
+  canon_form::Function
   function Variable(head::Symbol,size::Tuple,sign::Symbol)
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :zero, :any; got $sign")
@@ -66,7 +67,8 @@ type Variable <: AbstractCvxExpr
       this = new(head,nothing,:constant,sign,size)
     end
     this.uid = ()->unique_id(this)
-    this.evalfn = ()->this.value
+    # Variables are already in canonical form
+    this.canon_form = ()->Any[]
     return this
   end
 end
@@ -85,6 +87,8 @@ function parameter!(x::Variable)
   x.vexity = :constant
   x
 end
+
+# TODO: Why did madeleine do this
 function variable!(x::Variable)
   x.head = :variable
   x.vexity = :linear
@@ -97,7 +101,17 @@ type Constant <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  Constant(x::Value,sign) = sign in signs ? new(:constant,x,:constant,sign,size(x)) : error("sign must be one of :pos, :neg, :zero, :any; got $sign")
+  canon_form::Function
+  function Constant(x::Value,sign)
+    if sign in signs
+      sz = size(x) == () ? (1, 1) : size(x)
+      this = new(:constant,x,:constant,sign,sz)
+      this.canon_form = ()->Any[]
+      return this
+    else
+      error("sign must be one of :pos, :neg, :zero, :any; got $sign")
+    end
+  end
 end
 
 function Constant(x::Number)
@@ -110,6 +124,8 @@ function Constant(x::Number)
     return Constant(x,:zero)
   end
 end
+
+# Case to catch arrays, not scalar numbers
 Constant(x::Value) = Constant(x,:any)
 
 ### Unique ids

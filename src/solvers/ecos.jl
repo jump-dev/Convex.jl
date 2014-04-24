@@ -1,12 +1,30 @@
 export ecos_solve
 
-function print_debug(args...)
-  println(args)
-end
-
-# TODO: Document
+# Calls the ECOS C solver
+#
+# Input
+# n: is the number of variables,
+# m: is the number of inequality constraints (dimension 1 of the matrix G and the
+# length of the vector h),
+# p: is the number of equality constraints (can be 0)
+# l: is the dimension of the positive orthant, i.e. in Gx+s=h, s in K, the first l
+# elements of s are >=0
+# ncones: is the number of second-order cones present in K
+# q: is an array of integers of length ncones, where each element defines the dimension
+# of the cone
+# c is an array of type float of size n
+# h is an array of type float of size m
+# b is an array of type float of size p (can be nothing if no equalities are present)
+#
+# Returns:
+# A dictionary 'solution' of type:
+# {:x => x, :y => y, :z => z, :s => s, :status => status, :ret_val => ret_val}
+# where x are the primal variables, y are the multipliers for the equality constraints
+# z are the multipliers for the conic inequalities
+#
+# TODO: I should specify their types
 function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
-    q=nothing, G=nothing, A=nothing, c=nothing, h=nothing, b=nothing )
+    q=nothing, G=nothing, A=nothing, c=nothing, h=nothing, b=nothing, debug=false)
 
   @assert n != nothing
   @assert m != nothing
@@ -19,7 +37,7 @@ function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
 
   if l == nothing
     l = m
-    print_debug("Value of l=nothing, setting it to the same as m=$m");
+    print_debug(debug, "Value of l=nothing, setting it to the same as m=$m");
   end
 
   if ncones == nothing
@@ -78,7 +96,7 @@ function get_ecos_solution(pwork, n, p, m, ret_val)
   double_ptr = convert(Ptr{Ptr{Float64}}, pwork)
   # TODO: Worry about freeing memory?
 
-  # x is the 12th
+  # x is the 5th
   x_ptr = unsafe_load(double_ptr, 5)
   x = pointer_to_array(x_ptr, n)
 
@@ -95,9 +113,15 @@ function get_ecos_solution(pwork, n, p, m, ret_val)
     status = "solved"
   elseif ret_val == 1
     status = "primal infeasible"
-  else
+  elseif ret_val == 2
     status = "dual infeasible"
+  elseif ret_val == -1
+    status = "max iterations reached"
+  elseif ret_val == -2 || ret_val == -3
+    status = "numerical problems in solver"
+  else
+    status = "unknown problem in solver"
   end
 
-  return [:x=> x, :y=> y, :z=>s, :s=>s, :status=> status, :ret_val=>ret_val]
+  return {:x => x, :y => y, :z => z, :s => s, :status => status, :ret_val => ret_val}
 end
