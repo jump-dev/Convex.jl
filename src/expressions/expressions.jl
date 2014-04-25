@@ -58,6 +58,9 @@ type Variable <: AbstractCvxExpr
   uid::Function
   canon_form::Function
   function Variable(head::Symbol,size::Tuple,sign::Symbol)
+    if length(size) == 1
+      size = (size[1], 1)
+    end
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :zero, :any; got $sign")
     end
@@ -76,11 +79,11 @@ end
 Variable(size::Tuple,sign::Symbol; kwargs...) = Variable(:variable,size,sign; kwargs...)
 Variable(size::Tuple; kwargs...) = Variable(size,:any; kwargs...)
 Variable(size...; kwargs...) = Variable(size,:any; kwargs...)
-Variable(size::Integer,sign::Symbol; kwargs...) = Variable(Tuple(size),sign; kwargs...)
+Variable(size::Integer,sign::Symbol; kwargs...) = Variable(tuple(size),sign; kwargs...)
 Parameter(size::Tuple,sign::Symbol; kwargs...) = Variable(:parameter,size,sign; kwargs...)
 Parameter(size::Tuple; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size...; kwargs...) = Parameter(size,:any; kwargs...)
-Parameter(size::Integer,sign::Symbol; kwargs...) = Parameter(Tuple(size),sign; kwargs...)
+Parameter(size::Integer,sign::Symbol; kwargs...) = Parameter(tuple(size),sign; kwargs...)
 
 function parameter!(x::Variable)
   x.head = :parameter
@@ -104,7 +107,7 @@ type Constant <: AbstractCvxExpr
   canon_form::Function
   function Constant(x::Value,sign)
     if sign in signs
-      sz = size(x) == () ? (1, 1) : (size(x, 1), size(x, 2))
+      sz = (size(x, 1), size(x, 2))
       this = new(:constant,x,:constant,sign,sz)
       this.canon_form = ()->Any[]
       return this

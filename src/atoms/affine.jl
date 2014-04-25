@@ -20,7 +20,7 @@ export dot
 
 function dot(x::AbstractCvxExpr, y::AbstractCvxExpr)
 	if Set(x.vexity, y.vexity) != Set(:constant, :linear)
-		error("TODO: Implement quadratic shit")
+		error("TODO: Only LP for now")
 		# TODO: Also check x and y are vectors
 	end
 
@@ -44,3 +44,6 @@ end
 dot(x::Value, y::AbstractCvxExpr) = dot(convert(CvxExpr, x), y)
 dot(x::AbstractCvxExpr, y::Value) = dot(x, convert(CvxExpr, y))
 
+function sum(x::AbstractCvxExpr)
+  return dot(x, ones(x.size))
+end

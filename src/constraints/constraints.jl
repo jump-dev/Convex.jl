@@ -26,7 +26,7 @@ type CvxConstr
     println("lhs is $lhs")
     println("rhs is $rhs")
 
-    size = promote_size(lhs, rhs)
+    promote_for_add!(lhs, rhs)
 
     # check vexity
     # TODO: Many dead constraints, remove
@@ -62,7 +62,7 @@ type CvxConstr
               # TODO: Be careful with the size
               :coeffs => Any[speye(rhs.size[1])],
               :vars => [unique_id(rhs)],
-              :constant => promote_value(lhs.value, rhs.size[1]),
+              :constant => lhs.value,
               :is_eq => false
             }
           end
@@ -75,7 +75,7 @@ type CvxConstr
             canon_constr = {
               :coeffs => Any[speye(lhs.size[1])],
               :vars => [unique_id(lhs)],
-              :constant => promote_value(rhs.value, lhs.size[1]),
+              :constant => rhs.value,
               :is_eq => (head == :(==))
             }
           end
@@ -90,14 +90,14 @@ type CvxConstr
             canon_constr = {
               :coeffs => Any[speye(rhs.size[1]), -speye(lhs.size[1])],
               :vars => [unique_id(rhs); unique_id(lhs)],
-              :constant => promote_value(0, rhs.size[1]),
-              :is_eq => false,
+              :constant => zeros(rhs.size),
+              :is_eq => false
             }
           else
             canon_constr = {
               :coeffs => Any[speye(lhs.size[1]), -speye(rhs.size[1])],
               :vars => [unique_id(lhs); unique_id(rhs)],
-              :constant => promote_value(0, rhs.size[1]),
+              :constant => zeros(lhs.size),
               :is_eq => (head == :(==))
             }
           end

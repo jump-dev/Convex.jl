@@ -137,15 +137,17 @@ function create_ecos_matrices(canonical_constraints_array)
 			n_var = size(constraint[:coeffs][i], 2)
 
 			if constraint[:is_eq]
+				# TODO: Julia has problems, not converting ints to floats 
 				A[p_index : p_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
-					constraint[:coeffs][i]
+					constraint[:coeffs][i] * 1.0
 			else
 
 				# println(constraint[:coeffs][i])
 				# println(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1])
-
+				
+        # TODO: Julia has problems, not converting ints to floats 
 				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
-					constraint[:coeffs][i]
+					constraint[:coeffs][i] * 1.0
 			end
 		end
 
