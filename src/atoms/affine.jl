@@ -25,6 +25,8 @@ function dot(x::AbstractCvxExpr, y::AbstractCvxExpr)
 	end
 
 	lin, cons = x.vexity == :linear ? (x, y) : (y, x)
+  # println(cons.size)
+  # println(lin.size)
 	@assert cons.size == lin.size
 
 	this = CvxExpr(:dot, [x y], :linear, :any, (1, 1))
