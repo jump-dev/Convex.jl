@@ -22,14 +22,10 @@ type CvxConstr
     elseif lhs.vexity == :linear && rhs.vexity == :constant && head == :(>=)
       return CvxConstr(:(<=), -lhs, -rhs)
     end
-    # println("In CvxConstr")
-    # println("lhs is $lhs")
-    # println("rhs is $rhs")
 
     promote_for_add!(lhs, rhs)
 
     # check vexity
-    # TODO: Many dead constraints, remove
     if head == :(==)
       if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
         vexity = :linear
@@ -60,7 +56,7 @@ type CvxConstr
           if head == :(>=)
             canon_constr = {
               # TODO: Be careful with the size
-              :coeffs => Any[speye(rhs.size[1])],
+              :coeffs => Any[speye(get_vectorized_size(rhs))],
               :vars => [unique_id(rhs)],
               :constant => lhs.value,
               :is_eq => false
@@ -73,7 +69,7 @@ type CvxConstr
         elseif rhs.vexity == :constant
           if head == :(<=)
             canon_constr = {
-              :coeffs => Any[speye(lhs.size[1])],
+              :coeffs => Any[speye(get_vectorized_size(lhs))],
               :vars => [unique_id(lhs)],
               :constant => rhs.value,
               :is_eq => (head == :(==))
@@ -84,20 +80,18 @@ type CvxConstr
           push!(canon_constr_array, canon_constr)
 
         else
-          # TODO, this won't work, handle later
           if head == :(>=)
-            # TODO: fix size
             canon_constr = {
-              :coeffs => Any[speye(rhs.size[1]), -speye(lhs.size[1])],
+              :coeffs => Any[speye(get_vectorized_size(rhs)), -speye(get_vectorized_size(lhs))],
               :vars => [unique_id(rhs); unique_id(lhs)],
-              :constant => zeros(rhs.size),
+              :constant => zeros(get_vectorized_size(rhs)),
               :is_eq => false
             }
           else
             canon_constr = {
-              :coeffs => Any[speye(lhs.size[1]), -speye(rhs.size[1])],
+              :coeffs => Any[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))],
               :vars => [unique_id(lhs); unique_id(rhs)],
-              :constant => zeros(lhs.size),
+              :constant => zeros(get_vectorized_size(lhs)),
               :is_eq => (head == :(==))
             }
           end

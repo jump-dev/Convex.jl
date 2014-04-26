@@ -20,9 +20,6 @@ function eval(x::AbstractCvxExpr)
 
   end
 end
-# function display(x::CvxExpr)
-#   println("$(x.head)($(display(y) for y in x.args))")
-# end
 
 type CvxExpr <: AbstractCvxExpr
   head::Symbol
@@ -32,7 +29,7 @@ type CvxExpr <: AbstractCvxExpr
   size::Tuple
   uid::Function
   canon_form::Function
-  # TODO: args::Array works, everything else fucks up (eg args or args::Array{AbstractCvxExpr})
+  # TODO: args::Array works, everything else does not (eg args or args::Array{AbstractCvxExpr})
   # Check why
   function CvxExpr(head::Symbol,args::Array,vexity::Symbol,sign::Symbol,size::Tuple)
     if !(sign in signs)
@@ -86,19 +83,6 @@ Parameter(size::Tuple; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size...; kwargs...) = Parameter(size,:any; kwargs...)
 Parameter(size::Integer,sign::Symbol; kwargs...) = Parameter(tuple(size),sign; kwargs...)
 
-function parameter!(x::Variable)
-  x.head = :parameter
-  x.vexity = :constant
-  x
-end
-
-# TODO: Why did madeleine do this
-function variable!(x::Variable)
-  x.head = :variable
-  x.vexity = :linear
-  x
-end
-
 type Constant <: AbstractCvxExpr
   head::Symbol
   value::Value
@@ -140,4 +124,3 @@ Constant(x::Value) = Constant(x,:any)
 
 ### Unique ids
 unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Ptr{Uint8}, (Any,), x)
-#convert(::Type{Bool}, x::CvxConstr) = unique_id(x.lhs) == unique_id(x.rhs)

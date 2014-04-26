@@ -1,5 +1,5 @@
-export convert, promote_value, promote_rule, promote_for_add!, promote_for_mul!, promote_vexity, promote_sign, print_debug
-export reverse_vexity, reverse_sign
+export convert, promote_value, promote_for_add!, promote_for_mul!, promote_vexity, promote_sign, print_debug
+export reverse_vexity, reverse_sign, get_vectorized_size
 
 ### Conversion and promotion
 # TODO: The difference between conversion and promotion is messy.
@@ -11,30 +11,28 @@ function convert(::Type{CvxExpr},x)
   end
 end
 
-# TODO: WTF is going on
-promote_rule(::Type{CvxExpr}, ::Type{AbstractArray}) = CvxExpr
-promote_rule(::Type{CvxExpr}, ::Type{Number}) = CvxExpr
-
-
-
-
 ### Utility functions for arithmetic
-function promote_for_add!(x::Constant, sz::Int64)
-  x.size = (sz, 1)
-  x.value = x.value*ones(sz, 1)
+
+function get_vectorized_size(x::AbstractCvxExpr)
+  return x.size[1] * x.size[2]
 end
 
-function promote_for_add!(x::AbstractCvxExpr, sz::Int64)
-  x = ones(sz)*x
+function promote_for_add!(x::Constant, sz::(Int64, Int64))
+  x.size = sz
+  x.value = x.value * ones(sz...)
+end
+
+function promote_for_add!(x::AbstractCvxExpr, sz::(Int64, Int64))
+  x = ones(sz...) * x
 end
 
 function promote_for_add!(x::AbstractCvxExpr, y::AbstractCvxExpr)
   if x.size == y.size
     return
   elseif maximum(x.size) == 1
-    promote_for_add!(x, y.size[1])
+    promote_for_add!(x, y.size)
   elseif maximum(y.size) == 1
-    promote_for_add!(y, x.size[1])
+    promote_for_add!(y, x.size)
   else
     error("size of arguments cannot be added; got $(x.size),$(y.size)")
   end
@@ -114,4 +112,10 @@ function print_debug(debug, args...)
   if (debug)
     println(args)
   end
+end
+
+# multiple arguments
+# TODO: Check if it is needed
+for op = (:promote_vexity, :promote_sign, :promote_shape)
+  @eval ($op)(arg1,arg2,arg3,args...) = length(args)==0 ? ($op)(($op)(arg1,arg2),arg3) : ($op)(($op)(arg1,arg2),arg3,args...)
 end

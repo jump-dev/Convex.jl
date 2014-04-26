@@ -25,15 +25,11 @@ type Problem
 	end
 end
 
-# infer min or max from vexity of obj
-# Problem(obj::AbstractCvxExpr,constr::Array{CvxConstr}) = obj.vexity == :concave ? Problem(:maximize,obj,constr) : Problem(:minimize,obj,constr)
 Problem(head::Symbol, obj::AbstractCvxExpr, constr::CvxConstr...) = Problem(head, obj, [constr...])
 minimize(obj::AbstractCvxExpr, constr::CvxConstr...) = Problem(:minimize, obj, [constr...])
 minimize(obj::AbstractCvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:minimize, obj, constr)
 maximize(obj::AbstractCvxExpr, constr::CvxConstr...) = Problem(:maximize, obj, [constr...])
 maximize(obj::AbstractCvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:maximize, obj, constr)
-# display(p::Problem) = idea: loop through variables, name them sequentially if they don't already have names, and display operations prettily with variables names
-# println("Problem($(p.head),$(p.obj),$(p.constr)")
 
 
 function solve!(p::Problem,method=:ecos)

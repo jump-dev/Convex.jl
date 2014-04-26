@@ -65,6 +65,11 @@ o = 3*y
 p = Problem(:minimize,o,c)
 solve!(p)
 @assert abs(p.optval - 3) < TOLERANCE
+
+X = Variable(2, 2)
+y = Variable(1)
+c = [1, 1]
+# p = Problem(:minimize, y, [X >= 1, y >= X])
 # println(x.value)
 # @assert x.value - y.value*[1.0,2.0,3.0] <= 0
 
