@@ -135,12 +135,8 @@ function create_ecos_matrices(canonical_constraints_array)
 					constraint[:coeffs][i] * 1.0
 			else
 
-				println(constraint[:coeffs][i] * 1.0)
-				println(typeof(constraint[:coeffs][i] * 1.0))
-				println("m_ind $m_index, m_var $m_var, $(variable_index[var]) $n_var")
-				println(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1])
-				println(typeof(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1]))
-				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] = (constraint[:coeffs][i] * 1.0)
+				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
+					constraint[:coeffs][i] * 1.0
 			end
 		end
 
