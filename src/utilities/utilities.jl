@@ -45,10 +45,6 @@ function promote_for_mul!(x::Constant, sz::Int64)
   x.value = x.value*speye(sz)
 end
 
-function promote_for_mul!(x::AbstractCvxExpr, sz::Int64)
-  x = speye(sz)*x
-end
-
 function promote_for_mul!(x::AbstractCvxExpr, y::AbstractCvxExpr)
   if x.size[2] == y.size[1]
     return
@@ -59,7 +55,7 @@ function promote_for_mul!(x::AbstractCvxExpr, y::AbstractCvxExpr)
   else
     error("size of arguments cannot be multiplied; got $(x.size),$(y.size)")
   end
-end  
+end
 
 function promote_vexity(x::AbstractCvxExpr,y::AbstractCvxExpr)
   v1 = x.vexity; v2 = y.vexity; vexities = Set(v1,v2)

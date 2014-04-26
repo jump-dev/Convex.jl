@@ -76,7 +76,7 @@ function +(x::Constant, y::Constant)
   # TODO this won't work once we extend constants to parameters
   this = Constant(x.value + y.value)
   return this
-end 
+end
 
 function +(x::AbstractCvxExpr, y::Constant)
   promote_for_add!(x, y)
@@ -116,7 +116,7 @@ function *(x::Constant, y::AbstractCvxExpr)
   if y.vexity != :linear
     error("Only LPs allowed for now")
   end
-  
+
   promote_for_mul!(x, y)
   size = (x.size[1], y.size[2])
 
@@ -131,27 +131,65 @@ function *(x::Constant, y::AbstractCvxExpr)
   else
     sign = :neg
   end
-  
+
   this = CvxExpr(:*, [x, y], y.vexity, sign, size)
 
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
     :coeffs => Any[speye(size[1]), -x.value],
     :vars => [this.uid(), y.uid()],
-    :constant => zeros(size),
+    :constant => spzeros(size...),
     :is_eq => true
   }]
- 
+
   this.canon_form = ()->append!(canon_constr_array, x.canon_form())
   return this
 end
 
 function *(x::AbstractCvxExpr, y::Constant)
-  if y.size != (1, 1)
-    error("Can only multiply constant after expression for now")
+
+  if y.size == (1, 1)
+    return y * x
   end
 
-  return y*x
+  if x.vexity != :linear
+    error("Only LPs allowed for now")
+  end
+
+  lhs = x
+  if x.size[2] != y.size[1]
+    if x.size != (1, 1)
+      error("Can't promote size of variable with size $(x.size) to $(y.size).")
+    end
+    return y * x
+  end
+
+  size = (x.size[1], y.size[2])
+
+  # determine sign
+  signs = Set(x.sign,y.sign)
+  if :any in signs
+    sign = :any
+  elseif :zero in signs
+    sign = :zero
+  elseif length(signs) == 1
+    sign = :pos
+  else
+    sign = :neg
+  end
+
+  this = CvxExpr(:*, [x, y], y.vexity, sign, size)
+
+  canon_constr_array = Any[{
+    # TODO we'll need to cache references to parameters in the future
+    :coeffs => Any[speye(size[1]), -y.value],
+    :vars => [this.uid(), x.uid()],
+    :constant => spzeros(size...),
+    :is_eq => true
+  }]
+
+  this.canon_form = ()->append!(canon_constr_array, y.canon_form())
+  return this
 end
 
 *(x::AbstractCvxExpr,y::Value) = *(x,convert(CvxExpr,y))

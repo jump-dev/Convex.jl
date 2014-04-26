@@ -38,11 +38,7 @@ maximize(obj::AbstractCvxExpr, constr=CvxConstr[]::Array{CvxConstr}) = Problem(:
 
 function solve!(p::Problem,method=:ecos)
 	if method == :ecos
-		sol = ecos_solve!(p)
-		# println(sol)
-		# println(sol[:x])
-		# println(sol[:status])
-		return sol
+		ecos_solve!(p)
 	else
 		println("method $method not implemented")
 	end
@@ -71,20 +67,16 @@ function ecos_solve!(problem::Problem)
 	if problem.head == :maximize
 		c = -c;
 	end
-	# println("m is $m")
-	# println("n is $n")
-	# println("G is $G")
-	# println("h is $h")
-	# println("c is $c")
-	# println("A is $A")
-	# println("p is $p")
+
 	sol = ecos_solve(n=n, m=m, p=p, G=G, c=c, h=h, A=A, b=b)
 	if problem.head == :maximize
 		c = -c;
 	end
-	println(c' * sol[:x])
-	return sol
-	# TODO: Instead of returning sol, update problem and shit
+	problem.optval = c' * sol[:x]
+	# TODO: After switching to Julia 0.3, use dot().
+	# Transpose returns an array, so fetch the element
+	problem.optval = problem.optval[1]
+	problem.status = sol[:status]
 end
 
 
@@ -137,17 +129,18 @@ function create_ecos_matrices(canonical_constraints_array)
 			n_var = size(constraint[:coeffs][i], 2)
 
 			if constraint[:is_eq]
-				# TODO: Julia has problems, not converting ints to floats 
+				# TODO: Julia has problems not converting ints to floats
+				# An issue has been filed and fixed in newer versions of julia
 				A[p_index : p_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
 					constraint[:coeffs][i] * 1.0
 			else
 
-				# println(constraint[:coeffs][i])
-				# println(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1])
-				
-        # TODO: Julia has problems, not converting ints to floats 
-				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
-					constraint[:coeffs][i] * 1.0
+				println(constraint[:coeffs][i] * 1.0)
+				println(typeof(constraint[:coeffs][i] * 1.0))
+				println("m_ind $m_index, m_var $m_var, $(variable_index[var]) $n_var")
+				println(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1])
+				println(typeof(G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1]))
+				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] = (constraint[:coeffs][i] * 1.0)
 			end
 		end
 

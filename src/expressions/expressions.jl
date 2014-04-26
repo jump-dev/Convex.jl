@@ -109,7 +109,13 @@ type Constant <: AbstractCvxExpr
   function Constant(x::Value,sign)
     if sign in signs
       sz = (size(x, 1), size(x, 2))
-      this = new(:constant,x,:constant,sign,sz)
+      # TODO: We're doing a double tranpose right now because the (1, ) causes
+      # a bug in the sparse matrix implementation
+      # g = spzeros(5)
+      # g[1:5,1:1]=a
+      # causes an error
+      # Once julia fixes it, we can get back to x
+      this = new(:constant,x'',:constant,sign,sz)
       this.canon_form = ()->Any[]
       return this
     else
