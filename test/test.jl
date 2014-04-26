@@ -1,9 +1,6 @@
 @everywhere require("src/CVX.jl")
 @everywhere using CVX
 
-# x = Variable(2)
-# c = Constant([1.0 1.0])
-
 # # Test 1
 # x = Variable(1)
 # p = Problem(:minimize, -x, [x <= 0])
@@ -46,6 +43,11 @@
 # x = Variable(2)
 # y = Variable(2)
 # p = Problem(:minimize, dot([2.0; 2.0], x) + dot([2.0; 2.0], y), [x >= [1.1; 1.1], y >= [1.1; 1.1]])
+# solve!(p)
+
+# # Test 9
+# x = Variable(2)
+# p = Problem(:minimize, x[1] + x[2], [x >= 1])
 # solve!(p)
 
 # TODO: take care of this

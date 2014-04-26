@@ -8,5 +8,6 @@ include("problems/problems.jl")
 include("utilities/utilities.jl")
 include("solvers/ecos.jl")
 include("atoms/affine.jl")
+include("atoms/index.jl")
 
 end # module
