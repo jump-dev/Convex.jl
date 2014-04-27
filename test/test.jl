@@ -80,10 +80,13 @@ solve!(p)
 
 # Test 12
 I = Constant(eye(2))
-p = Problem(:maximize, c' * (eye(2) + X + I) * c, [X + ones(2, 2) <= [1 2; 3 4]])
+p = Problem(:maximize, c' * (eye(2) + X + I + 1) * c, [X + ones(2, 2) <= [1 2; 3 4]])
 solve!(p)
-@assert abs(p.optval - 10) < TOLERANCE
+@assert abs(p.optval - 14) < TOLERANCE
 
+x = Variable(1)
+# p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])
+# solve!(p)
 # p = Problem(:minimize, y, [X >= 1, y >= X])
 # println(x.value)
 # @assert x.value - y.value*[1.0,2.0,3.0] <= 0

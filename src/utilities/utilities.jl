@@ -1,5 +1,5 @@
 export convert, promote_value, promote_for_add!, promote_for_mul!, promote_vexity, promote_sign, print_debug
-export reverse_vexity, reverse_sign, get_vectorized_size
+export reverse_vexity, reverse_sign, get_vectorized_size, full
 
 ### Conversion and promotion
 # TODO: The difference between conversion and promotion is messy.
@@ -9,6 +9,16 @@ function convert(::Type{CvxExpr}, x)
   else
     return Constant(x)
   end
+end
+
+# In mul_div.jl, we need to get the full matrix due to bug in kron implementation
+# full however, isn't defined if x is a number, so we use this as a workaround
+function full(x::Number)
+  return x
+end
+
+function full(x)
+  return Base.full(x)
 end
 
 ### Utility functions for arithmetic

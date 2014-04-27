@@ -28,8 +28,8 @@ function *(x::Constant, y::AbstractCvxExpr)
 
   this = CvxExpr(:*, [x, y], y.vexity, sign, sz)
 
-  # TODO: Change to speye once Julia fixes kron bug
-  vectorized_mul = kron(eye(sz[2]), x.value)
+  # TODO: Change to speye and remove full once Julia fixes kron bug
+  vectorized_mul = sparse(kron(eye(sz[2]), full(x.value)))
 
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
@@ -75,10 +75,10 @@ function *(x::AbstractCvxExpr, y::Constant)
     sign = :neg
   end
 
-  # TODO: Change to speye once Julia fixes kron bug
-  vectorized_mul = kron(y.value', eye(sz[1]))
+  # TODO: Change to speye and remove full once Julia fixes kron bug
+  vectorized_mul = sparse(kron(full(y.value'), eye(sz[1])))
 
-  this = CvxExpr(:*, [x, y], y.vexity, sign, sz)
+  this = CvxExpr(:*, [x, y], x.vexity, sign, sz)
 
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
