@@ -12,10 +12,10 @@ function *(x::Constant, y::AbstractCvxExpr)
   end
 
   promote_for_mul!(x, y)
-  size = (x.size[1], y.size[2])
+  sz = (x.size[1], y.size[2])
 
   # determine sign
-  signs = Set(x.sign,y.sign)
+  signs = Set(x.sign, y.sign)
   if :any in signs
     sign = :any
   elseif :zero in signs
@@ -26,13 +26,16 @@ function *(x::Constant, y::AbstractCvxExpr)
     sign = :neg
   end
 
-  this = CvxExpr(:*, [x, y], y.vexity, sign, size)
+  this = CvxExpr(:*, [x, y], y.vexity, sign, sz)
+
+  # TODO: Change to speye once Julia fixes kron bug
+  vectorized_mul = kron(eye(sz[2]), x.value)
 
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
-    :coeffs => Any[speye(size[1]), -x.value],
+    :coeffs => Any[speye(get_vectorized_size(sz)), -vectorized_mul],
     :vars => [this.uid(), y.uid()],
-    :constant => spzeros(size...),
+    :constant => spzeros(get_vectorized_size(sz), 1),
     :is_eq => true
   }]
 
@@ -58,10 +61,10 @@ function *(x::AbstractCvxExpr, y::Constant)
     return y * x
   end
 
-  size = (x.size[1], y.size[2])
+  sz = (x.size[1], y.size[2])
 
   # determine sign
-  signs = Set(x.sign,y.sign)
+  signs = Set(x.sign, y.sign)
   if :any in signs
     sign = :any
   elseif :zero in signs
@@ -72,13 +75,16 @@ function *(x::AbstractCvxExpr, y::Constant)
     sign = :neg
   end
 
-  this = CvxExpr(:*, [x, y], y.vexity, sign, size)
+  # TODO: Change to speye once Julia fixes kron bug
+  vectorized_mul = kron(y.value', eye(sz[1]))
+
+  this = CvxExpr(:*, [x, y], y.vexity, sign, sz)
 
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
-    :coeffs => Any[speye(size[1]), -y.value],
+    :coeffs => Any[speye(get_vectorized_size(sz)), -vectorized_mul],
     :vars => [this.uid(), x.uid()],
-    :constant => spzeros(size...),
+    :constant => spzeros(get_vectorized_size(sz), 1),
     :is_eq => true
   }]
 
@@ -86,8 +92,8 @@ function *(x::AbstractCvxExpr, y::Constant)
   return this
 end
 
-*(x::AbstractCvxExpr,y::Value) = *(x,convert(CvxExpr,y))
-*(x::Value,y::AbstractCvxExpr) = *(convert(CvxExpr,x),y)
+*(x::AbstractCvxExpr, y::Value) = *(x, convert(CvxExpr, y))
+*(x::Value, y::AbstractCvxExpr) = *(convert(CvxExpr, x), y)
 
 # TODO: implement inv
 # only division by constant scalars is allowed, but we need to provide it for use with parameters, maybe

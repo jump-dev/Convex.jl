@@ -3,7 +3,7 @@ export reverse_vexity, reverse_sign, get_vectorized_size
 
 ### Conversion and promotion
 # TODO: The difference between conversion and promotion is messy.
-function convert(::Type{CvxExpr},x)
+function convert(::Type{CvxExpr}, x)
   if typeof(x) == CvxExpr
     return x
   else
@@ -12,6 +12,10 @@ function convert(::Type{CvxExpr},x)
 end
 
 ### Utility functions for arithmetic
+
+function get_vectorized_size(sz::(Int64, Int64))
+  return sz[1] * sz[2]
+end
 
 function get_vectorized_size(x::AbstractCvxExpr)
   return x.size[1] * x.size[2]
@@ -55,9 +59,9 @@ function promote_for_mul!(x::AbstractCvxExpr, y::AbstractCvxExpr)
   end
 end
 
-function promote_vexity(x::AbstractCvxExpr,y::AbstractCvxExpr)
-  v1 = x.vexity; v2 = y.vexity; vexities = Set(v1,v2)
-  if vexities == Set(:convex,:concave)
+function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  v1 = x.vexity; v2 = y.vexity; vexities = Set(v1, v2)
+  if vexities == Set(:convex, :concave)
     error("expression not DCP compliant")
   elseif :convex in vexities
     return :convex
@@ -70,8 +74,8 @@ function promote_vexity(x::AbstractCvxExpr,y::AbstractCvxExpr)
   end
 end
 
-function promote_sign(x::AbstractCvxExpr,y::AbstractCvxExpr)
-  s1 = x.sign; s2 = y.sign; signs = Set(s1,s2)
+function promote_sign(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  s1 = x.sign; s2 = y.sign; signs = Set(s1, s2)
   if :any in signs || signs == Set(:pos,:neg)
     return :any
   else # then s1==s2

@@ -15,9 +15,9 @@ function -(x::AbstractCvxExpr)
     this.canon_form = ()->Any[]
   else
     canon_constr_array = Any[{
-      :coeffs => Any[speye(x.size[1]), speye(x.size[1])],
+      :coeffs => Any[speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
       :vars => [this.uid(), x.uid()],
-      :constant => zeros(x.size),
+      :constant => zeros(get_vectorized_size(x)),
       :is_eq => true
     }]
 
@@ -34,9 +34,11 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
 
   # TODO: Not Any. Also deal with matrix variables
   canon_constr_array = Any[{
-    :coeffs => Any[-speye(x.size[1]), -speye(x.size[1]), speye(x.size[1])],
+    :coeffs => Any[-speye(get_vectorized_size(x)),
+      -speye(get_vectorized_size(x)),
+      speye(get_vectorized_size(x))],
     :vars => [x.uid(), y.uid(), this.uid()],
-    :constant => zeros(x.size),
+    :constant => zeros(get_vectorized_size(x)),
     :is_eq => true
   }]
 
@@ -52,6 +54,7 @@ end
 
 function +(x::Constant, y::Constant)
   # TODO this won't work once we extend constants to parameters
+  promote_for_add!(x, y)
   this = Constant(x.value + y.value)
   return this
 end
@@ -63,7 +66,7 @@ function +(x::AbstractCvxExpr, y::Constant)
 
   # TODO: Not Any. Also deal with matrix variables
   canon_constr_array = Any[{
-    :coeffs => Any[-speye(x.size[1]), speye(x.size[1])],
+    :coeffs => Any[-speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
     :vars => [x.uid(), this.uid()],
     # TODO we'll need to cache references to constants/parameters in the future
     :constant => y.value,

@@ -66,6 +66,16 @@ p = Problem(:minimize,o,c)
 solve!(p)
 @assert abs(p.optval - 3) < TOLERANCE
 
+# Test 10
+x = Variable(1)
+c = ones(1)
+p = Problem(:minimize, c' * x * c, [x >= 1])
+
+# Test 11
+# X = Variable(2, 2)
+# c = ones(2, 1)
+# p = Problem(:minimize, c' * X * c, [X >= ones(2, 2)])
+
 X = Variable(2, 2)
 y = Variable(1)
 c = [1, 1]

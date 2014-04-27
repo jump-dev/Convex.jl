@@ -54,11 +54,12 @@ type CvxConstr
           error ("TODO")
         elseif lhs.vexity == :constant
           if head == :(>=)
+            constant = typeof(lhs.value) <: Number ? lhs.value : vec(lhs.value)
             canon_constr = {
               # TODO: Be careful with the size
               :coeffs => Any[speye(get_vectorized_size(rhs))],
               :vars => [unique_id(rhs)],
-              :constant => lhs.value,
+              :constant => constant,
               :is_eq => false
             }
           end
@@ -68,10 +69,11 @@ type CvxConstr
 
         elseif rhs.vexity == :constant
           if head == :(<=)
+            constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
             canon_constr = {
               :coeffs => Any[speye(get_vectorized_size(lhs))],
               :vars => [unique_id(lhs)],
-              :constant => rhs.value,
+              :constant => constant,
               :is_eq => (head == :(==))
             }
           end
