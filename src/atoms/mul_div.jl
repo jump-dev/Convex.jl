@@ -39,7 +39,7 @@ function *(x::Constant, y::AbstractCvxExpr)
     :is_eq => true
   }]
 
-  this.canon_form = ()->append!(canon_constr_array, x.canon_form())
+  this.canon_form = ()->append!(canon_constr_array, y.canon_form())
   return this
 end
 
@@ -88,7 +88,7 @@ function *(x::AbstractCvxExpr, y::Constant)
     :is_eq => true
   }]
 
-  this.canon_form = ()->append!(canon_constr_array, y.canon_form())
+  this.canon_form = ()->append!(canon_constr_array, x.canon_form())
   return this
 end
 

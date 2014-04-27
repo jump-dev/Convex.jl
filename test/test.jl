@@ -58,27 +58,32 @@ solve!(p)
 # Test 9
 y = Variable(1)
 x = Variable(3)
-z = [1.0,2.0,3.0] * y
-k = -y * [1.0,2.0,3.0]
+z = [1.0, 2.0, 3.0] * y
+k = -y * [1.0, 2.0, 3.0]
 c = [y <= 3.0, y >= 0.0, x >= ones(3), k <= x, x <= z]
-o = 3*y
+o = 3 * y
 p = Problem(:minimize,o,c)
 solve!(p)
 @assert abs(p.optval - 3) < TOLERANCE
 
 # Test 10
-x = Variable(1)
-c = ones(1)
-p = Problem(:minimize, c' * x * c, [x >= 1])
+X = Variable(2, 2)
+c = ones(2, 1)
+p = Problem(:minimize, c' * X * c, [X >= ones(2, 2)])
+solve!(p)
+@assert abs(p.optval - 4) < TOLERANCE
 
 # Test 11
-# X = Variable(2, 2)
-# c = ones(2, 1)
-# p = Problem(:minimize, c' * X * c, [X >= ones(2, 2)])
+p = Problem(:maximize, c' * X * c, [X <= [1 2; 3 4]])
+solve!(p)
+@assert abs(p.optval - 10) < TOLERANCE
 
-X = Variable(2, 2)
-y = Variable(1)
-c = [1, 1]
+# Test 12
+I = Constant(eye(2))
+p = Problem(:maximize, c' * (eye(2) + X + I) * c, [X + ones(2, 2) <= [1 2; 3 4]])
+solve!(p)
+@assert abs(p.optval - 10) < TOLERANCE
+
 # p = Problem(:minimize, y, [X >= 1, y >= X])
 # println(x.value)
 # @assert x.value - y.value*[1.0,2.0,3.0] <= 0
@@ -86,9 +91,9 @@ c = [1, 1]
 # try some atoms
 #y = Variable()
 #p = Problem(:minimize,abs(y),[y >= 1])
-#@assert abs(solve!(p) - 1) <= TOL
+#@assert abs(solve!(p) - 1) <= TOLERANCE
 
 # x = Variable()
 # p = Problem(:minimize,kl_div(x,y),[y >= 1 , x <= 0])
 # print
-# @assert abs(solve!(p) - 1) <= TOL
+# @assert abs(solve!(p) - 1) <= TOLERANCE
