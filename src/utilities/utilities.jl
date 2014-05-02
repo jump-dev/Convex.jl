@@ -1,4 +1,5 @@
-export convert, promote_value, promote_for_add!, promote_for_mul!, promote_vexity, promote_sign, print_debug
+import Base.vec
+export convert, promote_value, promote_for_add, promote_for_mul, promote_vexity, promote_sign, print_debug
 export reverse_vexity, reverse_sign, get_vectorized_size, full
 
 ### Conversion and promotion
@@ -21,6 +22,11 @@ function full(x)
   return Base.full(x)
 end
 
+# Julia cannot vectorize sparse matrices. This will handle it for now
+function vec(x::SparseMatrixCSC)
+  return Base.vec(full(x))
+end
+
 ### Utility functions for arithmetic
 
 function get_vectorized_size(sz::(Int64, Int64))
@@ -31,42 +37,66 @@ function get_vectorized_size(x::AbstractCvxExpr)
   return x.size[1] * x.size[2]
 end
 
-function promote_for_add!(x::Constant, sz::(Int64, Int64))
-  x.size = sz
-  x.value = x.value * ones(sz...)
+function promote_for_add(x::Constant, sz::(Int64, Int64))
+  this = Constant(x.value * ones(sz...), x.sign)
+  return this
 end
 
-function promote_for_add!(x::AbstractCvxExpr, sz::(Int64, Int64))
-  x = ones(sz...) * x
+function promote_for_add(x::AbstractCvxExpr, sz::(Int64, Int64))
+  this = ones(sz...) * x
+  return this
 end
 
-function promote_for_add!(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.size == y.size
-    return
-  elseif maximum(x.size) == 1
-    promote_for_add!(x, y.size)
-  elseif maximum(y.size) == 1
-    promote_for_add!(y, x.size)
-  else
-    error("size of arguments cannot be added; got $(x.size),$(y.size)")
+# TODO: performance of promote for add can be very slow
+# trivial things like y <= 2*y when y is big cause huge slowdown
+function promote_for_add(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  if x.size != y.size
+    if maximum(x.size) == 1
+      x = promote_for_add(x, y.size)
+    elseif maximum(y.size) == 1
+      y = promote_for_add(y, x.size)
+    else
+      error("size of arguments cannot be added; got $(x.size),$(y.size)")
+    end
   end
+  
+  return (x, y)
 end
 
-function promote_for_mul!(x::Constant, sz::Int64)
-  x.size = (sz, sz)
-  x.value = x.value*speye(sz)
+function promote_for_mul(x::AbstractCvxExpr, sz::Int64)
+  # make x into eye(sz)*x
+  # make new expre for this with canon_form() X[i,i] = x
+  promoted_size = sz*sz
+  this = CvxExpr(:promotion, [x], x.vexity, x.sign, (sz, sz))
+  
+  canon_constr_array = Any[{
+    # TODO we'll need to cache references to parameters in the future
+    :coeffs => Any[speye(promoted_size), -sparse(vec(speye(sz)))],
+    :vars => [this.uid(), x.uid()],
+    :constant => spzeros(promoted_size, 1),
+    :is_eq => true
+  }]
+
+  this.canon_form = ()->append!(canon_constr_array, x.canon_form())
+  return this
 end
 
-function promote_for_mul!(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.size[2] == y.size[1]
-    return
-  elseif maximum(x.size) == 1
-    promote_for_mul!(x, y.size[1])
-  elseif maximum(y.size) == 1
-    promote_for_mul!(y, x.size[2])
-  else
-    error("size of arguments cannot be multiplied; got $(x.size),$(y.size)")
+function promote_for_mul(x::Constant, sz::Int64)
+  this = Constant(x.value*speye(sz), x.sign)
+  return this
+end
+
+function promote_for_mul(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  if x.size[2] != y.size[1]
+    if maximum(x.size) == 1
+      x = promote_for_mul(x, y.size[1])
+    elseif maximum(y.size) == 1
+      y = promote_for_mul(y, x.size[2])
+    else
+      error("size of arguments cannot be multiplied; got $(x.size),$(y.size)")
+    end
   end
+  return (x, y)
 end
 
 function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)

@@ -7,6 +7,7 @@ type Problem
 	status
 	optval
 	variables
+	sol
 
 	function Problem(head::Symbol,obj::AbstractCvxExpr,constr=CvxConstr[]::Array{CvxConstr})
 		if !all([x<=1 for x in obj.size])
@@ -73,6 +74,7 @@ function ecos_solve!(problem::Problem)
 	# Transpose returns an array, so fetch the element
 	problem.optval = problem.optval[1]
 	problem.status = sol[:status]
+	problem.sol = sol
 end
 
 

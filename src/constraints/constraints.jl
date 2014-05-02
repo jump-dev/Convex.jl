@@ -23,7 +23,7 @@ type CvxConstr
       return CvxConstr(:(<=), -lhs, -rhs)
     end
 
-    promote_for_add!(lhs, rhs)
+    lhs, rhs = promote_for_add(lhs, rhs)
 
     # check vexity
     if head == :(==)

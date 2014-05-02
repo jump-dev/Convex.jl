@@ -3,6 +3,7 @@ export getindex
 # TODO: Only works for vectors
 function getindex(x::AbstractCvxExpr, indices::Range1{Int64})
   c = spzeros(x.size...)
+  #TODO: Does not work for range @kvmohan
   c[indices, :] = 1.0
   return dot(c, x)
 end

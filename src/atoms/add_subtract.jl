@@ -29,7 +29,7 @@ end
 
 
 function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  promote_for_add!(x, y)
+  x, y = promote_for_add(x, y)
   this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
 
   # TODO: Not Any. Also deal with matrix variables
@@ -54,14 +54,14 @@ end
 
 function +(x::Constant, y::Constant)
   # TODO this won't work once we extend constants to parameters
-  promote_for_add!(x, y)
+  x, y = promote_for_add(x, y)
   this = Constant(x.value + y.value)
   return this
 end
 
 
 function +(x::AbstractCvxExpr, y::Constant)
-  promote_for_add!(x, y)
+  x, y = promote_for_add(x, y)
   this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
 
   # TODO: Not Any. Also deal with matrix variables
@@ -69,7 +69,7 @@ function +(x::AbstractCvxExpr, y::Constant)
     :coeffs => Any[-speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
     :vars => [x.uid(), this.uid()],
     # TODO we'll need to cache references to constants/parameters in the future
-    :constant => y.value,
+    :constant => vec(y.value),
     :is_eq => true
   }]
 
