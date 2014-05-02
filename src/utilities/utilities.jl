@@ -1,6 +1,6 @@
 import Base.vec
 export convert, promote_value, promote_for_add, promote_for_mul, promote_vexity, promote_sign, print_debug
-export reverse_vexity, reverse_sign, get_vectorized_size, full
+export reverse_vexity, reverse_sign, get_vectorized_size, full, kron_prod_1, kron_prod_2
 
 ### Conversion and promotion
 # TODO: The difference between conversion and promotion is messy.
@@ -27,6 +27,32 @@ function vec(x::SparseMatrixCSC)
   return Base.vec(full(x))
 end
 
+# computes the sparse form kronecker product of eye(sz)*x
+function kron_prod_1(x, sz)
+  prod = spzeros(sz*size(x, 1), sz*size(x, 2))
+  for k = 1:sz
+    for i = 1:size(x, 1)
+      for j = 1:size(x, 2)
+        prod[(k-1)*size(x, 1) + i, (k-1)*size(x, 2) + j] = x[i,j]
+      end
+    end
+  end
+  return prod
+end
+
+# computes the sparse form kronecker product of x*eye(sz)
+function kron_prod_2(x, sz)
+  prod = spzeros(sz*size(x, 1), sz*size(x, 2))
+  for i = 1:size(x, 1)
+    for j = 1:size(x, 2)
+      for k = 1:sz
+        prod[(i-1)*sz + k, (j-1)*sz + k] = x[i,j]
+      end
+    end
+  end
+  return prod
+end
+
 ### Utility functions for arithmetic
 
 function get_vectorized_size(sz::(Int64, Int64))
@@ -47,8 +73,6 @@ function promote_for_add(x::AbstractCvxExpr, sz::(Int64, Int64))
   return this
 end
 
-# TODO: performance of promote for add can be very slow
-# trivial things like y <= 2*y when y is big cause huge slowdown
 function promote_for_add(x::AbstractCvxExpr, y::AbstractCvxExpr)
   if x.size != y.size
     if maximum(x.size) == 1
@@ -59,7 +83,7 @@ function promote_for_add(x::AbstractCvxExpr, y::AbstractCvxExpr)
       error("size of arguments cannot be added; got $(x.size),$(y.size)")
     end
   end
-  
+
   return (x, y)
 end
 

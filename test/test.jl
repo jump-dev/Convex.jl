@@ -99,11 +99,11 @@ TOLERANCE = .0001
 # @assert abs(p.optval - 0) < TOLERANCE
 
 # Test 15
-x = Variable(1)
-c = ones(2, 1)
-p = Problem(:minimize, c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) < x])
-solve!(p)
-@assert abs(p.optval - 6) < TOLERANCE
+# x = Variable(1)
+# c = ones(2, 1)
+# p = Problem(:minimize, c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) < x])
+# solve!(p)
+# @assert abs(p.optval - 6) < TOLERANCE
 
 #TODO code so inefficient even python is faster
 function test()
