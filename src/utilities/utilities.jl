@@ -12,45 +12,9 @@ function convert(::Type{CvxExpr}, x)
   end
 end
 
-# In mul_div.jl, we need to get the full matrix due to bug in kron implementation
-# full however, isn't defined if x is a number, so we use this as a workaround
-function full(x::Number)
-  return x
-end
-
-function full(x)
-  return Base.full(x)
-end
-
 # Julia cannot vectorize sparse matrices. This will handle it for now
 function vec(x::SparseMatrixCSC)
   return Base.vec(full(x))
-end
-
-# computes the sparse form kronecker product of eye(sz)*x
-function kron_prod_1(x, sz)
-  prod = spzeros(sz*size(x, 1), sz*size(x, 2))
-  for k = 1:sz
-    for i = 1:size(x, 1)
-      for j = 1:size(x, 2)
-        prod[(k-1)*size(x, 1) + i, (k-1)*size(x, 2) + j] = x[i,j]
-      end
-    end
-  end
-  return prod
-end
-
-# computes the sparse form kronecker product of x*eye(sz)
-function kron_prod_2(x, sz)
-  prod = spzeros(sz*size(x, 1), sz*size(x, 2))
-  for i = 1:size(x, 1)
-    for j = 1:size(x, 2)
-      for k = 1:sz
-        prod[(i-1)*sz + k, (j-1)*sz + k] = x[i,j]
-      end
-    end
-  end
-  return prod
 end
 
 ### Utility functions for arithmetic
@@ -92,7 +56,7 @@ function promote_for_mul(x::AbstractCvxExpr, sz::Int64)
   # make new expre for this with canon_form() X[i,i] = x
   promoted_size = sz*sz
   this = CvxExpr(:promotion, [x], x.vexity, x.sign, (sz, sz))
-  
+
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
     :coeffs => Any[speye(promoted_size), -sparse(vec(speye(sz)))],
@@ -187,3 +151,19 @@ end
 for op = (:promote_vexity, :promote_sign, :promote_shape)
   @eval ($op)(arg1,arg2,arg3,args...) = length(args)==0 ? ($op)(($op)(arg1,arg2),arg3) : ($op)(($op)(arg1,arg2),arg3,args...)
 end
+
+
+# TODO: This is taken from the julia code, remove after updating to new version
+function kron{Tv1,Ti1,Tv2,Ti2}(A::SparseMatrixCSC{Tv1,Ti1}, B::SparseMatrixCSC{Tv2,Ti2})
+  Tv_res = promote_type(Tv1, Tv2)
+  Ti_res = promote_type(Ti1, Ti2)
+  A = convert(SparseMatrixCSC{Tv_res,Ti_res}, A)
+  B = convert(SparseMatrixCSC{Tv_res,Ti_res}, B)
+  return Base.kron(A,B)
+ end
+
+ kron(A::SparseMatrixCSC, B::VecOrMat) = kron(A, sparse(B))
+ kron(A::VecOrMat, B::SparseMatrixCSC) = kron(sparse(A), B)
+
+kron(A::SparseMatrixCSC, B::Number) = kron(A, [B])
+kron(A::Number, B::SparseMatrixCSC) = kron([A], B)

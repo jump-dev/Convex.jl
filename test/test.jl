@@ -98,7 +98,7 @@ TOLERANCE = .0001
 # solve!(p)
 # @assert abs(p.optval - 0) < TOLERANCE
 
-# Test 15
+# # Test 15
 # x = Variable(1)
 # c = ones(2, 1)
 # p = Problem(:minimize, c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) < x])
