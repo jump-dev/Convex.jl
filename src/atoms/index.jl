@@ -1,19 +1,24 @@
 export getindex
 
-# TODO: Only works for vectors
-function getindex(x::AbstractCvxExpr, indices::Range1{Int64})
-  c = spzeros(x.size...)
-  #TODO: Does not work for range @kvmohan
-  c[indices, :] = 1.0
-  return dot(c, x)
+function getindex(x::AbstractCvxExpr, rows::Range1{Int64}, cols::Range1{Int64}=1:1)
+  # Overload for row vectors
+  if x.size[1] == 1 && rows != 1:1
+    cols = rows
+    rows = 1:1
+  end
+
+  length_rows = length(rows)
+  lh = spzeros(length_rows, x.size[1])
+  lh[:, rows] = speye(length_rows)
+
+  length_cols = length(cols)
+  rh = spzeros(x.size[2], length_cols)
+  rh[cols, :] = speye(length_cols)
+
+  return lh * x * rh
 end
 
-function getindex(x::AbstractCvxExpr, index::Int64)
-  sz = get_vectorized_size(x.size)
-  c = spzeros(1, sz)
-  c[index] = 1.0
-  return c * x
-end
+getindex(x::AbstractCvxExpr, row::Int64, col::Int64=1) = getindex(x, row:row, col:col)
 
 # If a non-Int64 is passed, we try to convert it into an Int64. For something like 1.0
 # this will work. For a float like 1.5, convert will throw an InexactError

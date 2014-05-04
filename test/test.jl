@@ -105,7 +105,7 @@ p = Problem(:minimize, c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) <
 solve!(p)
 @assert abs(p.optval - 6) < TOLERANCE
 
-# # Test 16
+# Test 16
 N = 20
 x = Variable(1)
 y = Variable(N, N)
@@ -114,14 +114,14 @@ p = Problem(:minimize, c' * (y + x) * c, [x >= 3, 2*y >= 0, y <= x])
 solve!(p)
 @assert abs(p.optval - 1200) < TOLERANCE
 
-# # Test 17
+# Test 17
 x = Variable(2)
 c = ones(2, 1)
 p = Problem(:minimize, x' * c, x >= 1)
 solve!(p)
 @assert abs(p.optval - 2) < TOLERANCE
 
-# # # Test 18
+# Test 18
 rows = 2
 cols = 3
 r = rand(rows, cols)
@@ -132,8 +132,37 @@ d = ones(rows, 1)
 p = Problem(:minimize, c * x' * d + d' * x * c' + (c * x''''' * d)',
             [x' >= r_2, x >= r, x''' >= r_2, x'' >= r]);
 solve!(p)
-s = sum(max(r, r_2'))*3
+s = Base.sum(Base.max(r, r_2')) * 3
 @assert abs(p.optval - s) < TOLERANCE
+
+rows = 6
+cols = 8
+n = 2
+X = Variable(rows, cols)
+A = randn(rows, cols)
+c = rand(1, n)
+p = Problem(:minimize, c * X[1:n, 5:5+n-1]' * c', X >= A)
+solve!(p);
+s = c * A[1:n, 5:5+n-1]' * c'
+@assert abs(p.optval - s[1]) < TOLERANCE
+
+# Test 20
+x = Variable(1, 10)
+p = Problem(:minimize, sum(x[2:5]), x >= [1 2 3 4 5 6 7 8 9 10])
+solve!(p)
+@assert abs(p.optval - 14) < TOLERANCE
+
+x = Variable(10)
+a = rand(10, 1)
+p = Problem(:maximize, sum(x[2:6]), x <= a)
+solve!(p)
+@assert abs(p.optval - sum(a[2:6])) < TOLERANCE
+
+x = Variable(10)
+a = rand(10, 1)
+p = Problem(:minimize, max(x), x >= a)
+solve!(p)
+@assert abs(p.optval - Base.max(a)) < TOLERANCE
 
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])

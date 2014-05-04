@@ -9,6 +9,8 @@ include("solvers/ecos.jl")
 include("atoms/add_subtract.jl")
 include("atoms/mul_div.jl")
 include("atoms/affine.jl")
+include("atoms/minmax.jl")
 include("atoms/index.jl")
+
 
 end # module

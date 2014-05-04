@@ -25,7 +25,7 @@ function *(x::Constant, y::AbstractCvxExpr)
 
   #TODO changing constant value. should make new constant
   if x.size[2] != y.size[1] && x.size == (1,1)
-    x.value = speye(y.size[1])*x.value
+    x.value = speye(y.size[1])*x.value[1]
     x.size = (size(x.value, 1), size(x.value, 2))
   end
 
@@ -68,7 +68,8 @@ end
 function *(x::AbstractCvxExpr, y::Constant)
 
   if y.size == (1, 1) || x.size == (1, 1)
-    return y * x
+    # We do y[1] since y might be a 1 x 1 matrix
+    return y[1] * x
   end
 
   if x.vexity != :linear
