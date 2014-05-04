@@ -20,8 +20,9 @@ function -(x::AbstractCvxExpr)
       :constant => zeros(get_vectorized_size(x)),
       :is_eq => true
     }]
+    append!(canon_constr_array, x.canon_form())
 
-    this.canon_form = ()->append!(canon_constr_array, x.canon_form())
+    this.canon_form = ()->canon_constr_array
   end
 
   return this
@@ -41,10 +42,10 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
     :constant => zeros(get_vectorized_size(x)),
     :is_eq => true
   }]
+  append!(canon_constr_array, x.canon_form())
+  append!(canon_constr_array, y.canon_form())
 
   this.canon_form = ()->begin
-    append!(canon_constr_array, x.canon_form())
-    append!(canon_constr_array, y.canon_form())
     return canon_constr_array
   end
 
@@ -72,9 +73,8 @@ function +(x::AbstractCvxExpr, y::Constant)
     :constant => vec(y.value),
     :is_eq => true
   }]
-
+  append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->begin
-    append!(canon_constr_array, x.canon_form())
     return canon_constr_array
   end
   return this
