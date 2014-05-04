@@ -53,14 +53,14 @@ type CvxConstr
         if lhs.vexity == :constant && rhs.vexity == :constant
           error ("TODO")
         elseif lhs.vexity == :constant
-          if head == :(>=)
+          if head != :(<=)
             constant = typeof(lhs.value) <: Number ? lhs.value : vec(lhs.value)
             canon_constr = {
               # TODO: Be careful with the size
               :coeffs => Any[speye(get_vectorized_size(rhs))],
               :vars => [unique_id(rhs)],
               :constant => constant,
-              :is_eq => false
+              :is_eq => (head == :(==))
             }
           end
 

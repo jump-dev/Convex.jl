@@ -135,6 +135,7 @@ solve!(p)
 s = Base.sum(Base.max(r, r_2')) * 3
 @assert abs(p.optval - s) < TOLERANCE
 
+# Test 19
 rows = 6
 cols = 8
 n = 2
@@ -152,18 +153,47 @@ p = Problem(:minimize, sum(x[2:5]), x >= [1 2 3 4 5 6 7 8 9 10])
 solve!(p)
 @assert abs(p.optval - 14) < TOLERANCE
 
+# Test 21
 x = Variable(10)
 a = rand(10, 1)
 p = Problem(:maximize, sum(x[2:6]), x <= a)
 solve!(p)
 @assert abs(p.optval - sum(a[2:6])) < TOLERANCE
 
+# Test 22
 x = Variable(10)
 a = rand(10, 1)
 p = Problem(:minimize, max(x), x >= a)
 solve!(p)
-@assert abs(p.optval - Base.max(a)) < TOLERANCE
+@assert abs(p.optval - Base.maximum(a)) < TOLERANCE
 
+# Test 23
+x = Variable(10, 10)
+y = Variable(10, 10)
+a = rand(10, 10)
+b = rand(10, 10)
+p = Problem(:minimize, max(x, y), x >= a, y >= b)
+solve!(p)
+max_a = Base.maximum(a)
+max_b = Base.maximum(b)
+@assert abs(p.optval - Base.max(max_a, max_b)) < TOLERANCE
+
+# # Test 24
+# x = Variable(1)
+# a = rand(10, 10)
+# p = Problem(:minimize, min(x), x >= 1)
+# solve!(p)
+# p.status
+# max_a = Base.maximum(-a)
+# max_b = Base.maximum(-b)
+# @assert abs(p.optval - Base.max(max_a, max_b)) < TOLERANCE
+
+
+# x1 = Variable(1)
+# x2 = Variable(1)
+# p = Problem(:minimize, 4*x1 + x2,
+#             [3*x1 + x2 == 3, 4*x1 + 3*x2 >= 6, x1 + 2*x2 <=3, x1 >=0, x2 >=0])
+# solve!(p)
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])
 # solve!(p)
