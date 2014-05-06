@@ -9,7 +9,7 @@ p = Problem(:minimize, -x, [x <= 0])
 solve!(p)
 @assert abs(p.optval - 0) <= TOLERANCE
 
-# # Test 2
+# Test 2
 x = Variable(1)
 p = Problem(:minimize, x, [x >= 2, x <= 4])
 solve!(p)
@@ -210,16 +210,19 @@ solve!(p)
 @assert abs(p.optval) < TOLERANCE
 
 # Test 28
+x1 = Variable(1)
+x2 = Variable(1)
+p = Problem(:minimize, 4*x1 + x2,
+            [3*x1 + x2 == 3, 4*x1 + 3*x2 >= 6, x1 + 2*x2 <=3, x1 >=0, x2 >=0])
+solve!(p)
+@assert abs(p.optval - 3.6) < TOLERANCE
+
+# Test 29
 # x = Variable(3)
 # p = Problem(:minimize, sum(abs(x)), [-2 <= x, x <= 1])
 # solve!(p)
 # @assert abs(p.optval) < TOLERANCE
 
-# x1 = Variable(1)
-# x2 = Variable(1)
-# p = Problem(:minimize, 4*x1 + x2,
-#             [3*x1 + x2 == 3, 4*x1 + 3*x2 >= 6, x1 + 2*x2 <=3, x1 >=0, x2 >=0])
-# solve!(p)
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])
 # solve!(p)

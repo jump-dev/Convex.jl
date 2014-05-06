@@ -16,13 +16,6 @@ type CvxConstr
   dual_value
   canon_form::Function
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
-    # promote sizes for zero-length dimensions, and check others match
-    if lhs.vexity == :constant && rhs.vexity == :linear && head == :(<=)
-      return CvxConstr(:(>=), -lhs, -rhs)
-    elseif lhs.vexity == :linear && rhs.vexity == :constant && head == :(>=)
-      return CvxConstr(:(<=), -lhs, -rhs)
-    end
-
     lhs, rhs = promote_for_add(lhs, rhs)
 
     # check vexity
@@ -41,11 +34,7 @@ type CvxConstr
         vexity = :convex
       end
     elseif head == :(>=)
-      if rhs.vexity in (:linear, :constant, :convex)  && lhs.vexity in (:linear, :constant, :concave)
-        vexity = :convex
-      else
-        error("constraint is not DCP compliant")
-      end
+      error(">= should have been transformed to <=")
     else
       error("unrecognized comparison $head")
     end
@@ -54,51 +43,26 @@ type CvxConstr
       begin
         if lhs.vexity == :constant && rhs.vexity == :constant
           error ("TODO")
-        elseif lhs.vexity == :constant
-          if head != :(<=)
-            constant = typeof(lhs.value) <: Number ? lhs.value : vec(lhs.value)
-            canon_constr = {
-              # TODO: Be careful with the size
-              :coeffs => Any[speye(get_vectorized_size(rhs))],
-              :vars => [unique_id(rhs)],
-              :constant => constant,
-              :is_eq => (head == :(==))
-            }
-          end
-
-          canon_constr_array = rhs.canon_form()
-          push!(canon_constr_array, canon_constr)
 
         elseif rhs.vexity == :constant
-          if head == :(<=)
-            constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
-            canon_constr = {
-              :coeffs => Any[speye(get_vectorized_size(lhs))],
-              :vars => [unique_id(lhs)],
-              :constant => constant,
-              :is_eq => (head == :(==))
-            }
-          end
+          constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
+          canon_constr = {
+            :coeffs => Any[speye(get_vectorized_size(lhs))],
+            :vars => [unique_id(lhs)],
+            :constant => constant,
+            :is_eq => (head == :(==))
+          }
 
           canon_constr_array = lhs.canon_form()
           push!(canon_constr_array, canon_constr)
 
         else
-          if head == :(>=)
-            canon_constr = {
-              :coeffs => Any[speye(get_vectorized_size(rhs)), -speye(get_vectorized_size(lhs))],
-              :vars => [unique_id(rhs); unique_id(lhs)],
-              :constant => zeros(get_vectorized_size(rhs)),
-              :is_eq => false
-            }
-          else
-            canon_constr = {
-              :coeffs => Any[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))],
-              :vars => [unique_id(lhs); unique_id(rhs)],
-              :constant => zeros(get_vectorized_size(lhs)),
-              :is_eq => (head == :(==))
-            }
-          end
+          canon_constr = {
+            :coeffs => Any[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))],
+            :vars => [unique_id(lhs); unique_id(rhs)],
+            :constant => zeros(get_vectorized_size(lhs)),
+            :is_eq => (head == :(==))
+          }
 
           canon_constr_array = lhs.canon_form()
           append!(canon_constr_array, rhs.canon_form())
@@ -111,19 +75,20 @@ type CvxConstr
   end
 end
 
-==(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(==),x,y)
->=(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(>=),x,y)
-<=(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(<=),x,y)
->(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(>=),x,y)
-<(x::AbstractCvxExpr,y::AbstractCvxExpr) = CvxConstr(:(<=),x,y)
+==(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(==), x, y)
+>=(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(<=), y, x)
+<=(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(<=), x, y)
+>(x::AbstractCvxExpr, y::AbstractCvxExpr) = >=(x, y)
+<(x::AbstractCvxExpr, y::AbstractCvxExpr) = <=(x, y)
 
-==(x::Value,y::AbstractCvxExpr) = CvxConstr(:(==),y,convert(CvxExpr,x))
->=(x::Value,y::AbstractCvxExpr) = CvxConstr(:(<=),y,convert(CvxExpr,x))
-<=(x::Value,y::AbstractCvxExpr) = CvxConstr(:(>=),y,convert(CvxExpr,x))
->(x::Value,y::AbstractCvxExpr) = CvxConstr(:(<=),y,convert(CvxExpr,x))
-<(x::Value,y::AbstractCvxExpr) = CvxConstr(:(>=),y,convert(CvxExpr,x))
-==(x::AbstractCvxExpr,y::Value)= CvxConstr(:(==),x,convert(CvxExpr,y))
->=(x::AbstractCvxExpr,y::Value) = CvxConstr(:(>=),x,convert(CvxExpr,y))
-<=(x::AbstractCvxExpr,y::Value) = CvxConstr(:(<=),x,convert(CvxExpr,y))
->(x::AbstractCvxExpr,y::Value) = CvxConstr(:(>=),x,convert(CvxExpr,y))
-<(x::AbstractCvxExpr,y::Value) = CvxConstr(:(<=),x,convert(CvxExpr,y))
+==(x::Value, y::AbstractCvxExpr) = CvxConstr(:(==), y, convert(CvxExpr,x))
+>=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), y, convert(CvxExpr,x))
+<=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -convert(CvxExpr,x))
+>(x::Value, y::AbstractCvxExpr) = <=(y, x)
+<(x::Value, y::AbstractCvxExpr) = >=(y, x)
+
+==(x::AbstractCvxExpr, y::Value)= CvxConstr(:(==), x, convert(CvxExpr,y))
+>=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), -x, -convert(CvxExpr,y))
+<=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), x, convert(CvxExpr,y))
+>(x::AbstractCvxExpr, y::Value) = >=(x, y)
+<(x::AbstractCvxExpr, y::Value) = <=(x, y)
