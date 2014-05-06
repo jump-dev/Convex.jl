@@ -36,7 +36,9 @@ type CvxConstr
       if lhs.vexity in (:linear, :constant, :convex) && rhs.vexity in (:linear, :constant, :concave)
         vexity = :convex
       else
-        error("constraint is not DCP compliant")
+        # error("constraint is not DCP compliant")
+        # TODO: Figure it out
+        vexity = :convex
       end
     elseif head == :(>=)
       if rhs.vexity in (:linear, :constant, :convex)  && lhs.vexity in (:linear, :constant, :concave)

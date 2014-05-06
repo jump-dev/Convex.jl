@@ -11,6 +11,7 @@ function max(x::AbstractCvxExpr)
   return this
 end
 
+# TODO: Is this expected behavior?
 function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
   # TODO: handle vexities and signs
   this = CvxExpr(:max, [x], x.vexity, :pos, (1, 1))
@@ -52,4 +53,4 @@ min(x::AbstractCvxExpr, y::Value) = min(x, convert(CvxExpr, y))
 min(y::Value, x::AbstractCvxExpr) = min(x, convert(CvxExpr, y))
 
 pos(x::AbstractCvxExpr) = max(x, 0)
-neg(x::AbstractCvxExpr) = min(x, 0)
+neg(x::AbstractCvxExpr) = max(-x, 0)

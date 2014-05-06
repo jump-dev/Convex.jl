@@ -1,6 +1,19 @@
 import Base.abs
 
-export norm, abs
+export norm, abs, norm_inf
+
+function norm_inf(x::AbstractCvxExpr)
+  # TODO: handle vexities and signs
+  this = CvxExpr(:norm_inf, [x], x.vexity, :pos, (1, 1))
+
+  # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
+  this.canon_form = ()->Any[]
+  canon_constr_array = (x <= this).canon_form()
+  append!(canon_constr_array, (-this <= x).canon_form())
+  this.canon_form = ()->canon_constr_array
+  return this
+end
+
 
 # TODO: Everything
 function norm(x::AbstractCvxExpr, p = 2)
@@ -23,20 +36,28 @@ end
 
 function abs(x::AbstractCvxExpr)
   if x.vexity == :constant
-    return CvxExpr(:abs,[x],:constant,:pos,x.size)
+    this = CvxExpr(:abs,[x],:constant,:pos,x.size)
   elseif x.vexity == :linear
     if x.sign == :pos
-      return CvxExpr(:abs,[x],:linear,:pos,x.size)
+      this = CvxExpr(:abs,[x],:linear,:pos,x.size)
     elseif x.sign == :neg
-      return CvxExpr(:abs,[x],:linear,:pos,x.size)
+      this = CvxExpr(:abs,[x],:linear,:pos,x.size)
     else
-      return CvxExpr(:abs,[x],:convex,:pos,x.size)
+      this = CvxExpr(:abs,[x],:convex,:pos,x.size)
     end
   elseif x.vexity == :convex && x.sign == :pos
-    return CvxExpr(:abs,[x],:convex,:pos,x.size)
+    this = CvxExpr(:abs,[x],:convex,:pos,x.size)
   elseif x.vexity == :concave && x.sign == :neg
-    return CvxExpr(:abs,[x],:convex,:pos,x.size)
+    this = CvxExpr(:abs,[x],:convex,:pos,x.size)
   else
     error("abs(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
   end
+
+  println(this.vexity)
+  # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
+  this.canon_form = ()->Any[]
+  canon_constr_array = (x <= this).canon_form()
+  append!(canon_constr_array, (-this <= x).canon_form())
+  this.canon_form = ()->canon_constr_array
+  return this
 end

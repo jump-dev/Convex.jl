@@ -172,22 +172,48 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = Problem(:minimize, max(x, y), x >= a, y >= b)
+p = Problem(:minimize, max(x, y), [x >= a, y >= b])
 solve!(p)
 max_a = Base.maximum(a)
 max_b = Base.maximum(b)
 @assert abs(p.optval - Base.max(max_a, max_b)) < TOLERANCE
 
-# # Test 24
-# x = Variable(1)
-# a = rand(10, 10)
-# p = Problem(:minimize, min(x), x >= 1)
-# solve!(p)
-# p.status
-# max_a = Base.maximum(-a)
-# max_b = Base.maximum(-b)
-# @assert abs(p.optval - Base.max(max_a, max_b)) < TOLERANCE
+# Test 24
+x = Variable(1)
+a = rand(10, 10)
+p = Problem(:maximize, min(x), x <= a)
+solve!(p)
+@assert abs(p.optval - Base.minimum(a)) < TOLERANCE
 
+# Test 25
+x = Variable(10, 10)
+y = Variable(10, 10)
+a = rand(10, 10)
+b = rand(10, 10)
+p = Problem(:maximize, min(x, y), [x <= a, y <= b])
+solve!(p)
+min_a = Base.minimum(a)
+min_b = Base.minimum(b)
+@assert abs(p.optval - Base.min(min_a, min_b)) < TOLERANCE
+
+# Test 26
+x = Variable(3)
+a = [-2; 1; 2]
+p = Problem(:minimize, sum(pos(x)), [pos(x) >= 0, x >= a, x <= 2])
+solve!(p)
+@assert abs(p.optval - 2) < TOLERANCE
+
+# Test 27
+x = Variable(3)
+p = Problem(:minimize, norm_inf(x), [-2 <= x, x <= 1])
+solve!(p)
+@assert abs(p.optval) < TOLERANCE
+
+# Test 28
+# x = Variable(3)
+# p = Problem(:minimize, sum(abs(x)), [-2 <= x, x <= 1])
+# solve!(p)
+# @assert abs(p.optval) < TOLERANCE
 
 # x1 = Variable(1)
 # x2 = Variable(1)
