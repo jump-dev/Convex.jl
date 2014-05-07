@@ -7,12 +7,16 @@ include("solution.jl")
 include("problems/problems.jl")
 include("utilities/utilities.jl")
 include("solvers/ecos.jl")
-include("atoms/add_subtract.jl")
-include("atoms/mul_div.jl")
-include("atoms/affine.jl")
-include("atoms/minmax.jl")
-include("atoms/norm.jl")
-include("atoms/index.jl")
 
+# Atoms
+include("atoms/affine/add_subtract.jl")
+include("atoms/affine/dot.jl")
+include("atoms/affine/index.jl")
+include("atoms/affine/multiply_divide.jl")
+include("atoms/affine/stack.jl")
+include("atoms/affine/sum.jl")
+include("atoms/affine/transpose.jl")
+include("atoms/elementwise/minmax.jl")
+include("atoms/norm.jl")
 
 end # module

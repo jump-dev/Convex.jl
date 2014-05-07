@@ -76,7 +76,7 @@ function ecos_solve!(problem::Problem)
 	c = zeros(n, 1)
 
 	if objective.vexity != :constant
-		uid = objective.uid()
+		uid = objective.uid
 		c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
 	end
 
@@ -197,7 +197,7 @@ end
 # Updates var_dict with the ids of the variables as keys and variables as values
 function get_var_dict!(e::AbstractCvxExpr, var_dict::Dict{Ptr{Uint8}, Variable})
 	if e.head == :variable
-		var_dict[e.uid()] = e
+		var_dict[e.uid] = e
 	elseif e.head == :parameter || e.head == :constant
 		return
 	else

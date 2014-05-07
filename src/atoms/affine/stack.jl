@@ -1,5 +1,4 @@
-import Base.sum, Base.abs, Base.sqrt, Base.log
-export dot, transpose, ctranspose, sum, hcat, vertcat
+export hcat, vertcat
 
 function hcat(args::AbstractCvxExpr...)
   num_rows = args[1].size[1]
@@ -28,6 +27,8 @@ function hcat(args::AbstractCvxExpr...)
   return this
 end
 
+# Called vertcat since vcat would interfere with how we pass the constraints
+# to the problem
 function vertcat(args::AbstractCvxExpr...)
   num_cols = args[1].size[2]
   num_rows = 0
@@ -38,7 +39,7 @@ function vertcat(args::AbstractCvxExpr...)
     end
     num_rows += arg.size[1]
   end
-  #TODO not doing vexity
+  # TODO: not doing vexity
   this = CvxExpr(:vcat, [args...], args[1].vexity, :any, (num_rows, num_cols))
 
   this.canon_form = ()->Any[]
@@ -53,60 +54,4 @@ function vertcat(args::AbstractCvxExpr...)
   this.canon_form = ()->canon_constr_array
 
   return this
-end
-
-function transpose(x::AbstractCvxExpr)
-  sz = get_vectorized_size(x.size)
-  coeffs = spzeros(sz, sz)
-  num_rows = x.size[1]
-  num_cols = x.size[2]
-  for r = 1:num_rows
-    for c = 1:num_cols
-      i = (c - 1) * num_rows + r
-      j = (r - 1) * num_cols + c
-      coeffs[i, j] = 1.0
-    end
-  end
-
-  this = CvxExpr(:transpose, [x], x.vexity, x.sign, (x.size[2], x.size[1]))
-  canon_constr_array = Any[{
-    :coeffs => Any[speye(sz), -coeffs],
-    :vars => [x.uid(), this.uid()],
-    :constant => spzeros(sz, 1),
-    :is_eq => true
-  }]
-  append!(canon_constr_array, x.canon_form())
-  this.canon_form = ()->canon_constr_array
-  return this
-end
-
-ctranspose(x::AbstractCvxExpr) = transpose(x)
-
-function transpose(x::Constant)
-  return Constant(x.value')
-end
-
-ctranspose(x::Constant) = transpose(x)
-
-function dot(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  return x' * y
-end
-
-dot(x::Value, y::AbstractCvxExpr) = dot(convert(CvxExpr, x), y)
-dot(x::AbstractCvxExpr, y::Value) = dot(x, convert(CvxExpr, y))
-
-function sum(x::AbstractCvxExpr)
-  if x.size == (1, 1)
-    return x
-  elseif x.size[1] == 1
-    return x * ones(x.size[2], 1)
-  elseif x.size[2] == 1
-    return ones(1, x.size[1]) * x
-  else
-    return ones(1, x.size[1]) * x * ones(x.size[2], 1)
-  end
-end
-
-function sum(x::Constant)
-  return Constant(sum(x.value))
 end

@@ -1,7 +1,6 @@
 export *, /
 
-### Utilities for handling vexity and sign for multiplication/division
-
+# Utilities for handling vexity and sign for multiplication/division
 function promote_sign(x::Constant, y::AbstractCvxExpr)
   if x.sign == :zero || y.sign == :zero
     return :zero
@@ -41,13 +40,11 @@ function *(x::Constant, y::AbstractCvxExpr)
   if x.size[2] == y.size[1]
     sz = (x.size[1], y.size[2])
     this = CvxExpr(:*, [x, y], promote_vexity(x, y), promote_sign(x, y), sz)
-
     vectorized_mul = kron(speye(sz[2]), x.value)
-
     canon_constr_array = Any[{
       # TODO we'll need to cache references to parameters in the future
       :coeffs => Any[speye(get_vectorized_size(sz)), -vectorized_mul],
-      :vars => [this.uid(), y.uid()],
+      :vars => [this.uid, y.uid],
       :constant => spzeros(get_vectorized_size(sz), 1),
       :is_eq => true
     }]
@@ -57,15 +54,15 @@ function *(x::Constant, y::AbstractCvxExpr)
 
   elseif y.size == (1,1)
     this = CvxExpr(:*, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
-
     canon_constr_array = Any[{
       # TODO we'll need to cache references to parameters in the future
       # TODO the double transpose to keep julia from slaying us
       :coeffs => Any[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))],
-      :vars => [this.uid(), y.uid()],
+      :vars => [this.uid, y.uid],
       :constant => spzeros(get_vectorized_size(x.size), 1),
       :is_eq => true
     }]
+
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
     return this
 
@@ -81,15 +78,13 @@ function *(x::AbstractCvxExpr, y::Constant)
   end
 
   sz = (x.size[1], y.size[2])
-
   vectorized_mul = kron(y.value', speye(sz[1]))
 
   this = CvxExpr(:*, [x, y], promote_vexity(y, x), promote_sign(y, x), sz)
-
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
     :coeffs => Any[speye(get_vectorized_size(sz)), -vectorized_mul],
-    :vars => [this.uid(), x.uid()],
+    :vars => [this.uid, x.uid],
     :constant => spzeros(get_vectorized_size(sz), 1),
     :is_eq => true
   }]
@@ -101,15 +96,14 @@ end
 *(x::AbstractCvxExpr, y::Value) = *(x, convert(CvxExpr, y))
 *(x::Value, y::AbstractCvxExpr) = *(convert(CvxExpr, x), y)
 
-# TODO: implement inv
-# only division by constant scalars is allowed, but we need to provide it for use with parameters, maybe
+# Only division by constant scalars is allowed
 function inv(y::Constant)
   # determine size
   if y.size != (1,1)
     error("only division by constant scalars is allowed.")
   end
-
-  return Constant(1/y.value)
+  return Constant(1 / y.value)
 end
-/(x::AbstractCvxExpr,y::Constant) = *(x,inv(y))
-/(x::AbstractCvxExpr,y::Number) = *(x,1/y)
+
+/(x::AbstractCvxExpr, y::Constant) = *(x, inv(y))
+/(x::AbstractCvxExpr, y::Number) = *(x, 1 / y)

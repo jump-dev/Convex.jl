@@ -18,7 +18,7 @@ type CvxExpr <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  uid::Function
+  uid::Ptr{Uint8}
   canon_form::Function
   # TODO: args::Array works, everything else does not (eg args or args::Array{AbstractCvxExpr})
   # Check why
@@ -29,7 +29,7 @@ type CvxExpr <: AbstractCvxExpr
       error("vexity must be one of :constant, :linear, :convex, :concave; got $vexity")
     else
       this = new(head, args, vexity, sign, size)
-      this.uid = ()->unique_id(this)
+      this.uid = unique_id(this)
       return this
     end
   end
@@ -44,7 +44,7 @@ type Variable <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::Tuple
-  uid::Function
+  uid::Ptr{Uint8}
   canon_form::Function
 
   function Variable(head::Symbol, size::Tuple, sign::Symbol)
@@ -59,7 +59,7 @@ type Variable <: AbstractCvxExpr
     elseif head == :parameter
       this = new(head, nothing, :constant, sign, size)
     end
-    this.uid = ()->unique_id(this)
+    this.uid = unique_id(this)
     # Variables are already in canonical form
     this.canon_form = ()->Any[]
     return this

@@ -1,7 +1,6 @@
 export +, -
 
-### Utilities for handling vexity and sign for addition/subtraction
-
+# Utilities for handling vexity and sign for addition/subtraction
 function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
   vexities = Set(x.vexity, y.vexity)
   if vexities == Set(:convex, :concave)
@@ -47,7 +46,7 @@ function -(x::AbstractCvxExpr)
   else
     canon_constr_array = Any[{
       :coeffs => Any[speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
-      :vars => [this.uid(), x.uid()],
+      :vars => [this.uid, x.uid],
       :constant => zeros(get_vectorized_size(x)),
       :is_eq => true
     }]
@@ -70,7 +69,7 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
     :coeffs => Any[-speye(get_vectorized_size(x)),
       -speye(get_vectorized_size(x)),
       speye(get_vectorized_size(x))],
-    :vars => [x.uid(), y.uid(), this.uid()],
+    :vars => [x.uid, y.uid, this.uid],
     :constant => zeros(get_vectorized_size(x)),
     :is_eq => true
   }]
@@ -100,7 +99,7 @@ function +(x::AbstractCvxExpr, y::Constant)
   # TODO: Not Any. Also deal with matrix variables
   canon_constr_array = Any[{
     :coeffs => Any[-speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
-    :vars => [x.uid(), this.uid()],
+    :vars => [x.uid, this.uid],
     # TODO we'll need to cache references to constants/parameters in the future
     :constant => vec(y.value),
     :is_eq => true
