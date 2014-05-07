@@ -69,11 +69,11 @@ function ecos_solve!(problem::Problem)
 	if problem.head == :maximize
 		c = -c;
 	end
-	problem.optval = c' * sol[:x]
+	problem.optval = c' * sol.x
 	# TODO: After switching to Julia 0.3, use dot().
 	# Transpose returns an array, so fetch the element
 	problem.optval = problem.optval[1]
-	problem.status = sol[:status]
+	problem.status = sol.status
 	problem.sol = sol
 end
 
