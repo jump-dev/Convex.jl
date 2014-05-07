@@ -1,3 +1,5 @@
+import Base.norm
+
 function perfTest(N=100000)
   start = time()
   x = Variable(N);
@@ -23,57 +25,64 @@ function test()
   return p
 end
 
-# Assuming speed of calling rand, sprand, etc is negligible
-function test2(m=1e4, n=1e4, q=1e4)
+# Assuming speed of calling randn, sprandn, etc is negligible for now...
+# This is untrue. We'll soon generate data files.
+# Also we'll need lucky data for this to be feasible.
+# test2(10, 15, 10); sometimes gets feasible, bounded problems
+function test2(m=1000, n=1000, q=1000)
   x = Variable(n);
-  b = Variable(m);
-  d = Variable(q);
-  A = rand(m,n);
-  C = rand(q,n);
-  c = rand(n);
-  p = Problem(:minimize, c' * x, [A*x <=b, C*x <=d])
-  solve!(p)
+  A = randn(m,n);
+  b = randn(m);
+  C = randn(q,n);
+  d = C * randn(n);
+  c = randn(n);
+  p = Problem(:minimize, c' * x, [A*x <=b, C*x == d]);
+  solve!(p);
   println(p.optval)
   return p
 end
 
-function test2sparse(m=1e5, n=1e5, q=1e5, p=0.1)
+# test2sparse(10,10,5,0.4); sometimes gets bounded, feasible problems
+function test2sparse(m=1000, n=1000, q=1000, p=0.1)
   x = Variable(n);
-  b = Variable(m);
-  d = Variable(q);
-  A = sprand(m,n,p);
-  C = sprand(q,n,p);
-  c = rand(n);
-  p = Problem(:minimize, c' * x, [A*x <=b, C*x <=d])
-  solve!(p)
+  A = sprandn(m,n,p);
+  b = randn(m);
+  C = sprandn(q,n,p);
+  d = C * randn(n);
+  c = randn(n);
+  p = Problem(:minimize, c' * x, [A*x <=b, C*x ==d]);
+  solve!(p);
   println(p.optval)
   return p
 end
 
 # http://see.stanford.edu/materials/lsocoee364a/hw4sol.pdf
-function test3(m=1e4,n=1e4) 
-  t = Variable();
-  A = rand(m,n);
-  x = rand(n); # TODO: The more interesting problem is to make x also a variable
+# close to optimal with 10, 10
+function test3(m=1000,n=1000) 
+  t = Variable(1);
+  A = randn(m,n);
+  x = randn(n); # TODO: The more interesting problem is to make x also a variable
   # but then we don't have the solution analytically
   # we can compare it to minimize norm(A*x-b, 'inf') in Matlab with variable x
-  b = rand(m);
-  p = Problem(:minimize, t, [A*x - b <= t*ones(m,1), -t*ones(m,1) <= A*x - b])
-  solve!(p)
+  b = randn(m);
+  p = Problem(:minimize, t, [A*x - b <= t*ones(m,1), -t*ones(m,1) <= A*x - b]);
+  solve!(p);
   println(p.optval)
-  soln = norm(A*x - b, Inf)
+  soln = Base.norm(A*x - b, Inf)
+  println("Solution and deviation from solution")
   println(soln)
   println(p.optval - soln)
   return p
 end
 
 # http://see.stanford.edu/materials/lsocoee364a/hw4sol.pdf
-function test4(m=1e4, n=1e4)
+# we get close to optimal with 10, 10
+function test4(m=1000, n=1000)
   s = Variable(m);
-  x = rand(n); # TODO: This is also more interesting with x = Variable(n)
+  x = randn(n); # TODO: This is also more interesting with x = Variable(n)
   # We can compare it to minimize norm(A*x-b, 1) in Matlab with variable x
-  A = rand(m,n);
-  b = rand(m);
+  A = randn(m,n);
+  b = randn(m);
   p = Problem(:minimize, sum(s), [A*x - b <= s, A*x - b >= -s])
   solve!(p)
   return p
