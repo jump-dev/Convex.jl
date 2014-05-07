@@ -19,7 +19,7 @@ type Solution
   }
 
   function Solution(x::Array{Float64, 1}, y::Array{Float64, 1}, z::Array{Float64, 1}, ret_val::Int64)
-    if ret_val in status_map
+    if haskey(status_map, ret_val)
       return new(x, y, z, status_map[ret_val], ret_val)
     else
       return new(x, y, z, "unknown problem in solver", ret_val)
