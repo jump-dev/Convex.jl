@@ -1,11 +1,15 @@
 export ecos_solve
 
+VecOrMatOrSparse = Union(Vector, Matrix, SparseMatrixCSC)
+VecOrMatOrSparseOrNothing = Union(Vector, Matrix, SparseMatrixCSC, Nothing)
+ArrayFloat64OrNothing = Union(Array{Float64, }, Nothing)
+
 # Calls the ECOS C solver
 #
 # Input
-# n: is the number of variables,
+# n: is the number of variables
 # m: is the number of inequality constraints (dimension 1 of the matrix G and the
-# length of the vector h),
+# length of the vector h)
 # p: is the number of equality constraints (can be 0)
 # l: is the dimension of the positive orthant, i.e. in Gx+s=h, s in K, the first l
 # elements of s are >=0
@@ -17,34 +21,25 @@ export ecos_solve
 # b is an array of type float of size p (can be nothing if no equalities are present)
 #
 # Returns:
-# A dictionary 'solution' of type:
-# {:x => x, :y => y, :z => z, :s => s, :status => status, :ret_val => ret_val}
+# An object of type Solution consisting of x, y, z, status and ret_va
 # where x are the primal variables, y are the multipliers for the equality constraints
 # z are the multipliers for the conic inequalities
 #
-# TODO: I should specify their types
-function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
-    q=nothing, G=nothing, A=nothing, c=nothing, h=nothing, b=nothing, debug=false)
+# Some of the keyword arguments such as n, m, c, h, G are required. Hence, their default
+# values are nothing, forcing them to be provided. Other keyword arguments need not
+# be provided.
+#
+function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
+    ncones::Int64=0, q::Array{Int64, }=[0], G::VecOrMatOrSparse=nothing,
+    A::VecOrMatOrSparseOrNothing=nothing, c::Array{Float64, }=nothing,
+    h::Array{Float64, }=nothing, b::ArrayFloat64OrNothing=nothing, debug::Bool=false)
 
-  @assert n != nothing
-  @assert m != nothing
-  @assert p != nothing
-
-  @assert c != nothing
-  @assert h != nothing
-
-  @assert G != nothing
-
-  if l == nothing
+  if l == 0
     l = m
-    print_debug(debug, "Value of l=nothing, setting it to the same as m=$m");
+    print_debug(debug, "Value of l=0, setting it to the same as m=$m");
   end
 
-  if ncones == nothing
-    ncones = 0
-  end
-
-  if q == nothing
+  if q == [0]
     q = convert(Ptr{Int64}, C_NULL)
   end
 
@@ -54,17 +49,17 @@ function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
     Air = convert(Ptr{Int64}, C_NULL)
   else
     sparseA = sparse(A)
-    # TODO: hack to make it float, find a better way
+    # Hack to make it a float, find a better way
     Apr = sparseA.nzval * 1.0
-    # -1 since C is 0 indexed
+    # -1 since the C language is 0 indexed
     Ajc = sparseA.colptr - 1
     Air = sparseA.rowval - 1
   end
 
   sparseG = sparse(G)
-  # TODO: hack to make it float, find a better way
+  # Hack to make it a float, find a better way
   Gpr = sparseG.nzval * 1.0
-  # -1 since C is 0 indexed
+  # -1 since the C  language is 0 indexed
   Gjc = sparseG.colptr - 1
   Gir = sparseG.rowval - 1
 
@@ -84,18 +79,18 @@ function ecos_solve(;n=nothing, m=nothing, p=nothing, l=nothing, ncones=nothing,
   solution = get_ecos_solution(pwork, n, p, m, ret_val)
 
   # TODO: Check how many we need to keep
-  # 4 means we keep x,y,z,s, 3 means x,y,z and so on
-  num_vars_to_keep = 4
+  # 3 means we keep x,y,z 2 means x,y and so on
+  num_vars_to_keep = 3
   ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
   return solution
 end
 
 
-# Given the arguments, returns a dictionary with variables x, y, z, s and status
+# Given the arguments, returns an object of type Solution
 function get_ecos_solution(pwork, n, p, m, ret_val)
   double_ptr = convert(Ptr{Ptr{Float64}}, pwork)
 
-  # x is the 5th
+  # x is the 5th element in the struct
   x_ptr = unsafe_load(double_ptr, 5)
   x = pointer_to_array(x_ptr, n)
 
@@ -105,22 +100,5 @@ function get_ecos_solution(pwork, n, p, m, ret_val)
   z_ptr = unsafe_load(double_ptr, 7)
   z = pointer_to_array(z_ptr, m)
 
-  s_ptr = unsafe_load(double_ptr, 8)
-  s = pointer_to_array(s_ptr, m)
-
-  if ret_val == 0
-    status = "solved"
-  elseif ret_val == 1
-    status = "primal infeasible"
-  elseif ret_val == 2
-    status = "dual infeasible"
-  elseif ret_val == -1
-    status = "max iterations reached"
-  elseif ret_val == -2 || ret_val == -3
-    status = "numerical problems in solver"
-  else
-    status = "unknown problem in solver"
-  end
-
-  return {:x => x, :y => y, :z => z, :s => s, :status => status, :ret_val => ret_val}
+  return Solution(x, y, z, ret_val)
 end
