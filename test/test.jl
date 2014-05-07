@@ -217,7 +217,21 @@ p = Problem(:minimize, 4*x1 + x2,
 solve!(p)
 @assert abs(p.optval - 3.6) < TOLERANCE
 
-# Test 29
+# # Test 29
+x = Variable(4, 4)
+y = Variable(4, 6)
+p = Problem(:maximize, sum(x) + sum(y), [hcat(x, y) <= 2])
+solve!(p)
+@assert (p.optval - 80) < TOLERANCE
+
+# # Test 30
+x = Variable(4, 4)
+y = Variable(4, 6)
+p = Problem(:maximize, sum(x) + sum(y), [vertcat(x, y') <= 2])
+solve!(p)
+@assert (p.optval - 80) < TOLERANCE
+
+# Test
 # x = Variable(3)
 # p = Problem(:minimize, sum(abs(x)), [-2 <= x, x <= 1])
 # solve!(p)

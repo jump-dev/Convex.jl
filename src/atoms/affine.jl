@@ -1,5 +1,5 @@
 import Base.sum, Base.abs, Base.sqrt, Base.log
-export dot, transpose, ctranspose, sum, hcat, vcat
+export dot, transpose, ctranspose, sum, hcat, vertcat
 # TODO
 # * max, min
 
@@ -7,7 +7,7 @@ export dot, transpose, ctranspose, sum, hcat, vcat
 # extend to *args
 # vcat(args::Array{AbstractCvxExpr}) = CvxExpr(:vstack,args,promote_vexity([a.vexity for a in args]...),promote_sign([a.sign for a in args]...),sizes...)
 
-function hcat(args::Array{AbstractCvxExpr})
+function hcat(args::AbstractCvxExpr...)
   num_rows = args[1].size[1]
   num_cols = 0
   # TODO: Vexity
@@ -17,7 +17,7 @@ function hcat(args::Array{AbstractCvxExpr})
     end
     num_cols += arg.size[2]
   end
-  this = CvxExpr(:hcat, args, args[1].vexity, :any, (num_rows, num_cols))
+  this = CvxExpr(:hcat, [args...], args[1].vexity, :any, (num_rows, num_cols))
 
   this.canon_form = ()->Any[]
 
@@ -30,19 +30,21 @@ function hcat(args::Array{AbstractCvxExpr})
     cols_so_far += arg.size[2]
   end
   this.canon_form = ()->canon_constr_array
+
+  return this
 end
 
-function vcat(args::Array{AbstractCvxExpr})
+function vertcat(args::AbstractCvxExpr...)
   num_cols = args[1].size[2]
   num_rows = 0
 
   for arg in args
-    if arg.size[1] != num_cols
+    if arg.size[2] != num_cols
       error("Must have same number of columns for vertical concatentation")
     end
-    num_rows += arg.size[2]
+    num_rows += arg.size[1]
   end
-  this = CvxExpr(:vcat, args, args[1].vexity, :any, (num_rows, num_cols))
+  this = CvxExpr(:vcat, [args...], args[1].vexity, :any, (num_rows, num_cols))
 
   this.canon_form = ()->Any[]
   canon_constr_array = Any[]
@@ -54,6 +56,8 @@ function vcat(args::Array{AbstractCvxExpr})
     rows_so_far += arg.size[1]
   end
   this.canon_form = ()->canon_constr_array
+
+  return this
 end
 
 function transpose(x::AbstractCvxExpr)
@@ -101,13 +105,13 @@ function sum(x::AbstractCvxExpr)
     return x
   elseif x.size[1] == 1
     return x * ones(x.size[2], 1)
-  else
+  elseif x.size[2] == 1
     return ones(1, x.size[1]) * x
+  else
+    return ones(1, x.size[1]) * x * ones(x.size[2], 1)
   end
 end
 
 function sum(x::Constant)
   return Constant(sum(x.value))
 end
-
-hcat
