@@ -55,7 +55,7 @@ function promote_for_add(x::Constant, sz::(Int64, Int64))
 end
 
 function promote_for_add(x::AbstractCvxExpr, sz::(Int64, Int64))
-  this = ones(sz...) * x
+  this = Constant(ones(sz...), :pos) * x
   return this
 end
 
