@@ -1,11 +1,5 @@
 import Base.sum, Base.abs, Base.sqrt, Base.log
 export dot, transpose, ctranspose, sum, hcat, vertcat
-# TODO
-# * max, min
-
-# this breaks the syntax [x,y] to concatenate lists of expressions as in arguments to atoms
-# extend to *args
-# vcat(args::Array{AbstractCvxExpr}) = CvxExpr(:vstack,args,promote_vexity([a.vexity for a in args]...),promote_sign([a.sign for a in args]...),sizes...)
 
 function hcat(args::AbstractCvxExpr...)
   num_rows = args[1].size[1]
@@ -44,6 +38,7 @@ function vertcat(args::AbstractCvxExpr...)
     end
     num_rows += arg.size[1]
   end
+  #TODO not doing vexity
   this = CvxExpr(:vcat, [args...], args[1].vexity, :any, (num_rows, num_cols))
 
   this.canon_form = ()->Any[]

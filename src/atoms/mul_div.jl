@@ -1,37 +1,46 @@
 export *, /
 
+### Utilities for handling vexity and sign for multiplication/division
+
+function promote_sign(x::Constant, y::AbstractCvxExpr)
+  if x.sign == :zero || y.sign == :zero
+    return :zero
+  elseif x.sign == :pos
+    return y.sign
+  elseif x.sign == :neg
+    return reverse_sign(y)
+  else
+    return :any
+  end
+end
+
+function promote_vexity(x::Constant, y::AbstractCvxExpr)
+  if y.vexity == :linear
+    return :linear
+  elseif x.sign == :pos || x.size == :zero
+    return y.vexity
+  elseif x.sign == :neg
+    return reverse_vexity(y)
+  else
+    error("expression not DCP compliant")
+  end
+end
+
+
 function *(x::Constant, y::Constant)
   # TODO this won't work once we extend constants to parameters
-  this = Constant(x.value * y.value)
-  return this
+  return Constant(x.value * y.value)
 end
 
 function *(x::Constant, y::AbstractCvxExpr)
-  if y.vexity != :linear
-    error("Only LPs allowed for now")
-  end
 
-  # determine sign
-  signs = Set(x.sign, y.sign)
-  if :any in signs
-    sign = :any
-  elseif :zero in signs
-    sign = :zero
-  elseif length(signs) == 1
-    sign = :pos
-  else
-    sign = :neg
-  end
-
-  #TODO changing constant value. should make new constant
   if x.size[2] != y.size[1] && x.size == (1,1)
-    x.value = speye(y.size[1])*x.value[1]
-    x.size = (size(x.value, 1), size(x.value, 2))
+    x = Constant(speye(y.size[1])*x.value[1], x.sign)
   end
 
   if x.size[2] == y.size[1]
     sz = (x.size[1], y.size[2])
-    this = CvxExpr(:*, [x, y], y.vexity, sign, sz)
+    this = CvxExpr(:*, [x, y], promote_vexity(x, y), promote_sign(x, y), sz)
 
     vectorized_mul = kron(speye(sz[2]), x.value)
 
@@ -47,7 +56,7 @@ function *(x::Constant, y::AbstractCvxExpr)
     return this
 
   elseif y.size == (1,1)
-    this = CvxExpr(:*, [x, y], y.vexity, sign, x.size)
+    this = CvxExpr(:*, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
 
     canon_constr_array = Any[{
       # TODO we'll need to cache references to parameters in the future
@@ -68,39 +77,14 @@ end
 function *(x::AbstractCvxExpr, y::Constant)
 
   if y.size == (1, 1) || x.size == (1, 1)
-    # We do y[1] since y might be a 1 x 1 matrix
-    return y[1] * x
-  end
-
-  if x.vexity != :linear
-    error("Only LPs allowed for now")
-  end
-
-  lhs = x
-  if x.size[2] != y.size[1]
-    if x.size != (1, 1)
-      error("Can't promote size of variable with size $(x.size) to $(y.size).")
-    end
     return y * x
   end
 
   sz = (x.size[1], y.size[2])
 
-  # determine sign
-  signs = Set(x.sign, y.sign)
-  if :any in signs
-    sign = :any
-  elseif :zero in signs
-    sign = :zero
-  elseif length(signs) == 1
-    sign = :pos
-  else
-    sign = :neg
-  end
-
   vectorized_mul = kron(y.value', speye(sz[1]))
 
-  this = CvxExpr(:*, [x, y], x.vexity, sign, sz)
+  this = CvxExpr(:*, [x, y], promote_vexity(y, x), promote_sign(y, x), sz)
 
   canon_constr_array = Any[{
     # TODO we'll need to cache references to parameters in the future
@@ -129,4 +113,3 @@ function inv(y::Constant)
 end
 /(x::AbstractCvxExpr,y::Constant) = *(x,inv(y))
 /(x::AbstractCvxExpr,y::Number) = *(x,1/y)
-# hcat and vcat (only vcat exists in cvxpy)

@@ -1,5 +1,36 @@
 export +, -
 
+### Utilities for handling vexity and sign for addition/subtraction
+
+function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  vexities = Set(x.vexity, y.vexity)
+  if vexities == Set(:convex, :concave)
+    error("expression not DCP compliant")
+  elseif :convex in vexities
+    return :convex
+  elseif :concave in vexities
+    return :concave
+  elseif :linear in vexities
+    return :linear
+  else
+    return :constant
+  end
+end
+
+function promote_sign(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  signs = Set(x.sign, y.sign)
+  if :any in signs || signs == Set(:pos,:neg)
+    return :any
+  elseif x.sign == :zero
+    return y.sign
+  elseif y.sign == :zero
+    return x.sign
+  else
+    return x.sign
+  end
+end
+
+### Unary Negation
 
 function -(x::Constant)
   # TODO this won't work once we extend constants to parameters
@@ -28,6 +59,7 @@ function -(x::AbstractCvxExpr)
   return this
 end
 
+### Binary Addition/Subtraction
 
 function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   x, y = promote_for_add(x, y)
