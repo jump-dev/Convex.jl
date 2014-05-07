@@ -33,14 +33,20 @@ type Problem
 	end
 end
 
-Problem(head::Symbol, objective::AbstractCvxExpr, constr::CvxConstr...) = Problem(head, objective, [constr...])
+Problem(head::Symbol, objective::AbstractCvxExpr, constr::CvxConstr...) =
+	Problem(head, objective, [constr...])
 
 # Allow users to simply type minimize or maximize
-minimize(objective::AbstractCvxExpr, constr::CvxConstr...) = Problem(:minimize, objective, [constr...])
-minimize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) = Problem(:minimize, objective, constr)
-maximize(objective::AbstractCvxExpr, constr::CvxConstr...) = Problem(:maximize, objective, [constr...])
-maximize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) = Problem(:maximize, objective, constr)
-is_feasible(constr::Array{CvxConstr}=CvxConstr[]) = Problem(:minimize, Constant(0), constr)
+minimize(objective::AbstractCvxExpr, constr::CvxConstr...) =
+	Problem(:minimize, objective, [constr...])
+minimize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) =
+	Problem(:minimize, objective, constr)
+maximize(objective::AbstractCvxExpr, constr::CvxConstr...) =
+	Problem(:maximize, objective, [constr...])
+maximize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) =
+	Problem(:maximize, objective, constr)
+is_feasible(constr::Array{CvxConstr}=CvxConstr[]) =
+	Problem(:minimize, Constant(0), constr)
 
 function solve!(p::Problem, method=:ecos)
 	if method == :ecos
@@ -146,8 +152,8 @@ function create_ecos_matrices(canonical_constraints_array)
 		length_constraint_vars = length(constraint[:vars])
 		for i = 1:length_constraint_vars
 			var = constraint[:vars][i]
-			# Technically, the m_var size of all the variables should be the same, otherwise nothing makes
-			# sense
+			# Technically, the m_var size of all the variables should be the same,
+			# otherwise nothing makes sense
 			m_var = size(constraint[:coeffs][i], 1)
 			n_var = size(constraint[:coeffs][i], 2)
 
@@ -175,7 +181,8 @@ function create_ecos_matrices(canonical_constraints_array)
 	return m, n, p, G, h, A, b, variable_index
 end
 
-# Now that the problem has been solved, populate the optimal values of the variables back into them
+# Now that the problem has been solved, populate the optimal values of the
+# variables back into them
 function populate_variables!(problem::Problem, variable_index::Dict{Ptr{Uint8}, Int64})
 	x = problem.solution.x
 	var_dict = problem.var_dict
@@ -185,7 +192,8 @@ function populate_variables!(problem::Problem, variable_index::Dict{Ptr{Uint8}, 
 	end
 end
 
-# Recursively traverses the AST for the AbstractCvxExpr and finds the variables that were defined
+# Recursively traverses the AST for the AbstractCvxExpr and finds the variables
+# that were defined
 # Updates var_dict with the ids of the variables as keys and variables as values
 function get_var_dict!(e::AbstractCvxExpr, var_dict::Dict{Ptr{Uint8}, Variable})
 	if e.head == :variable
@@ -199,7 +207,8 @@ function get_var_dict!(e::AbstractCvxExpr, var_dict::Dict{Ptr{Uint8}, Variable})
 	end
 end
 
-# hacky way to not crash on recursion when some arguments for some atoms are symbols or numbers
+# hacky way to not crash on recursion when some arguments for some atoms are
+# symbols or numbers
 get_var_dict!(e, var_dict) = nothing
 
 function get_var_dict(p::Problem)

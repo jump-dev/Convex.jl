@@ -17,7 +17,6 @@ type CvxConstr
   canon_form::Function
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
     lhs, rhs = promote_for_add(lhs, rhs)
-
     # check vexity
     if head == :(==)
       if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
@@ -71,7 +70,7 @@ type CvxConstr
         return canon_constr_array
       end
 
-    return new(head,lhs,rhs,vexity,size,nothing,canon_form)
+    return new(head, lhs, rhs, vexity, size, nothing, canon_form)
   end
 end
 
@@ -81,14 +80,14 @@ end
 >(x::AbstractCvxExpr, y::AbstractCvxExpr) = >=(x, y)
 <(x::AbstractCvxExpr, y::AbstractCvxExpr) = <=(x, y)
 
-==(x::Value, y::AbstractCvxExpr) = CvxConstr(:(==), y, convert(CvxExpr,x))
->=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), y, convert(CvxExpr,x))
-<=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -convert(CvxExpr,x))
+==(x::Value, y::AbstractCvxExpr) = CvxConstr(:(==), y, convert(CvxExpr, x))
+>=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), y, convert(CvxExpr, x))
+<=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -convert(CvxExpr, x))
 >(x::Value, y::AbstractCvxExpr) = <=(y, x)
 <(x::Value, y::AbstractCvxExpr) = >=(y, x)
 
-==(x::AbstractCvxExpr, y::Value)= CvxConstr(:(==), x, convert(CvxExpr,y))
->=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), -x, -convert(CvxExpr,y))
-<=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), x, convert(CvxExpr,y))
+==(x::AbstractCvxExpr, y::Value)= CvxConstr(:(==), x, convert(CvxExpr, y))
+>=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), -x, -convert(CvxExpr, y))
+<=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), x, convert(CvxExpr, y))
 >(x::AbstractCvxExpr, y::Value) = >=(x, y)
 <(x::AbstractCvxExpr, y::Value) = <=(x, y)
