@@ -17,12 +17,12 @@ type CvxExpr <: AbstractCvxExpr
   args::Array{AbstractCvxExpr}
   vexity::Symbol
   sign::Symbol
-  size::Tuple
-  uid::Ptr{Uint8}
+  size::(Int64, Int64)
+  uid::Int64
   canon_form::Function
   # TODO: args::Array works, everything else does not (eg args or args::Array{AbstractCvxExpr})
   # Check why
-  function CvxExpr(head::Symbol, args::Array, vexity::Symbol, sign::Symbol, size::Tuple)
+  function CvxExpr(head::Symbol, args::Array, vexity::Symbol, sign::Symbol, size::(Int64, Int64))
     if !(sign in signs)
       error("sign must be one of :pos, :neg, :any; got $sign")
     elseif !(vexity in vexities)
@@ -35,7 +35,7 @@ type CvxExpr <: AbstractCvxExpr
   end
 end
 
-CvxExpr(head::Symbol, arg, vexity::Symbol, sign::Symbol, size::Tuple) =
+CvxExpr(head::Symbol, arg, vexity::Symbol, sign::Symbol, size::(Int64, Int64)) =
   CvxExpr(head, [arg], vexity, sign, size)
 
 type Variable <: AbstractCvxExpr
@@ -43,11 +43,11 @@ type Variable <: AbstractCvxExpr
   value
   vexity::Symbol
   sign::Symbol
-  size::Tuple
-  uid::Ptr{Uint8}
+  size::(Int64, Int64)
+  uid::Int64
   canon_form::Function
 
-  function Variable(head::Symbol, size::Tuple, sign::Symbol)
+  function Variable(head::Symbol, size::(Int64, Int64), sign::Symbol)
     if length(size) == 1
       size = (size[1], 1)
     end
@@ -61,31 +61,31 @@ type Variable <: AbstractCvxExpr
     end
     this.uid = unique_id(this)
     # Variables are already in canonical form
-    this.canon_form = ()->Any[]
+    this.canon_form = ()->CanonicalConstr[]
     return this
   end
 end
 
-Variable(size::Tuple, sign::Symbol) = Variable(:variable, size, sign)
-Variable(size::Tuple) = Variable(size, :any)
+Variable(size::(Int64, Int64), sign::Symbol) = Variable(:variable, size, sign)
+Variable(size::(Int64, Int64)) = Variable(size, :any)
 Variable(size...) = Variable(size, :any)
 Variable(size::Integer) = Variable((size, 1),:any)
 Variable(size::Integer, sign::Symbol) = Variable((size, 1), sign)
 
-Parameter(size::Tuple, sign::Symbol) = Variable(:parameter, size, sign)
-Parameter(size::Tuple) = Parameter(size, :any)
+Parameter(size::(Int64, Int64), sign::Symbol) = Variable(:parameter, size, sign)
+Parameter(size::(Int64, Int64)) = Parameter(size, :any)
 Parameter(size...) = Parameter(size, :any)
-Parameter(size::Integer, sign::Symbol) = Parameter(tuple(size), sign)
+Parameter(size::Integer, sign::Symbol) = Parameter((size, 1), sign)
 
 type Constant <: AbstractCvxExpr
   head::Symbol
   value::Value
   vexity::Symbol
   sign::Symbol
-  size::Tuple
+  size::(Int64, Int64)
   canon_form::Function
 
-  function Constant(x::Value,sign)
+  function Constant(x::Value, sign)
     if sign in signs
       sz = (size(x, 1), size(x, 2))
       # TODO: We're doing a double tranpose right now because the (1, ) causes
@@ -94,8 +94,8 @@ type Constant <: AbstractCvxExpr
       # g[1:5, 1:1]=a
       # causes an error
       # Once julia fixes it, we can probably move back to x
-      this = new(:constant,x'',:constant,sign,sz)
-      this.canon_form = ()->Any[]
+      this = new(:constant, x'', :constant, sign, sz)
+      this.canon_form = ()->CanonicalConstr[]
       return this
     else
       error("sign must be one of :pos, :neg, :zero or :any but got $sign")
@@ -118,4 +118,4 @@ end
 Constant(x::Value) = Constant(x, :any)
 
 # Unique ids
-unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Ptr{Uint8}, (Any, ), x)
+unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Int64, (Any, ), x)

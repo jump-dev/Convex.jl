@@ -1,9 +1,5 @@
 export ecos_solve
 
-VecOrMatOrSparse = Union(Vector, Matrix, SparseMatrixCSC)
-VecOrMatOrSparseOrNothing = Union(Vector, Matrix, SparseMatrixCSC, Nothing)
-ArrayFloat64OrNothing = Union(Array{Float64, }, Nothing)
-
 # Calls the ECOS C solver
 #
 # Input

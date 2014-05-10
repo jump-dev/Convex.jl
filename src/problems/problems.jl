@@ -14,7 +14,7 @@ type Problem
 	status::ASCIIString
 	optval::Float64OrNothing
 	solution::SolutionOrNothing
-	var_dict::Dict{Ptr{Uint8}, Variable}
+	var_dict::Dict{Int64, Variable}
 
 	function Problem(head::Symbol, objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[])
 		if !all([x <= 1 for x in objective.size])
@@ -64,7 +64,7 @@ end
 function ecos_solve!(problem::Problem)
 	objective = problem.objective
 
-	canonical_constraints_array = Any[]
+	canonical_constraints_array = CanonicalConstr[]
 	for constraint in problem.constr
 		append!(canonical_constraints_array, constraint.canon_form())
 	end
@@ -110,29 +110,29 @@ end
 # as well as the equality matrix A and b
 function create_ecos_matrices(canonical_constraints_array)
 	n = 0
-	variable_index = Dict{Ptr{Uint8}, Int64}()
+	variable_index = Dict{Int64, Int64}()
 	m = 0
 	p = 0
 
 	# Loop over all the constraints to figure out the size of G and A
 	for constraint in canonical_constraints_array
 		# Loop over each variable in the constraint
-		length_constraint_vars = length(constraint[:vars])
+		length_constraint_vars = length(constraint.vars)
 		for i = 1:length_constraint_vars
-			var = constraint[:vars][i]
+			var = constraint.vars[i]
 
 			# If we haven't already taken into account the size of this variable,
 			# add it to the size of the variable
 			if !haskey(variable_index, var)
 				variable_index[var] = n + 1
 
-				n += size(constraint[:coeffs][i], 2)
+				n += size(constraint.coeffs[i], 2)
 			end
 
-			if constraint[:is_eq]
-				p += size(constraint[:coeffs][i], 1)
+			if constraint.is_eq
+				p += size(constraint.coeffs[i], 1)
 			else
-				m += size(constraint[:coeffs][i], 1)
+				m += size(constraint.coeffs[i], 1)
 			end
 		end
 	end
@@ -149,31 +149,31 @@ function create_ecos_matrices(canonical_constraints_array)
 	for constraint in canonical_constraints_array
 		m_var = 0::Int64
 
-		length_constraint_vars = length(constraint[:vars])
+		length_constraint_vars = length(constraint.vars)
 		for i = 1:length_constraint_vars
-			var = constraint[:vars][i]
+			var = constraint.vars[i]
 			# Technically, the m_var size of all the variables should be the same,
 			# otherwise nothing makes sense
-			m_var = size(constraint[:coeffs][i], 1)
-			n_var = size(constraint[:coeffs][i], 2)
+			m_var = size(constraint.coeffs[i], 1)
+			n_var = size(constraint.coeffs[i], 2)
 
-			if constraint[:is_eq]
+			if constraint.is_eq
 				# TODO: Julia has problems not converting ints to floats
 				# An issue has been filed and should be fixed in newer versions of julia
 				A[p_index : p_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
-					constraint[:coeffs][i] * 1.0
+					constraint.coeffs[i] * 1.0
 			else
 
 				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
-					constraint[:coeffs][i] * 1.0
+					constraint.coeffs[i] * 1.0
 			end
 		end
 
-		if constraint[:is_eq]
-			b[p_index : p_index + m_var - 1] = constraint[:constant]
+		if constraint.is_eq
+			b[p_index : p_index + m_var - 1] = constraint.constant
 			p_index += m_var
 		else
-			h[m_index : m_index + m_var - 1] = constraint[:constant]
+			h[m_index : m_index + m_var - 1] = constraint.constant
 			m_index += m_var
 		end
 	end
@@ -183,7 +183,7 @@ end
 
 # Now that the problem has been solved, populate the optimal values of the
 # variables back into them
-function populate_variables!(problem::Problem, variable_index::Dict{Ptr{Uint8}, Int64})
+function populate_variables!(problem::Problem, variable_index::Dict{Int64, Int64})
 	x = problem.solution.x
 	var_dict = problem.var_dict
 	for (id, var) in var_dict
@@ -195,7 +195,7 @@ end
 # Recursively traverses the AST for the AbstractCvxExpr and finds the variables
 # that were defined
 # Updates var_dict with the ids of the variables as keys and variables as values
-function get_var_dict!(e::AbstractCvxExpr, var_dict::Dict{Ptr{Uint8}, Variable})
+function get_var_dict!(e::AbstractCvxExpr, var_dict::Dict{Int64, Variable})
 	if e.head == :variable
 		var_dict[e.uid] = e
 	elseif e.head == :parameter || e.head == :constant
@@ -216,7 +216,7 @@ function get_var_dict(p::Problem)
 end
 
 function get_var_dict(objective::AbstractCvxExpr, constr::Array{CvxConstr})
-	var_dict = Dict{Ptr{Uint8}, Variable}()
+	var_dict = Dict{Int64, Variable}()
 
 	get_var_dict!(objective, var_dict)
 	for c in constr

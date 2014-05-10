@@ -41,27 +41,22 @@ function *(x::Constant, y::AbstractCvxExpr)
     sz = (x.size[1], y.size[2])
     this = CvxExpr(:*, [x, y], promote_vexity(x, y), promote_sign(x, y), sz)
     vectorized_mul = kron(speye(sz[2]), x.value)
-    canon_constr_array = Any[{
-      # TODO we'll need to cache references to parameters in the future
-      :coeffs => Any[speye(get_vectorized_size(sz)), -vectorized_mul],
-      :vars => [this.uid, y.uid],
-      :constant => spzeros(get_vectorized_size(sz), 1),
-      :is_eq => true
-    }]
+
+    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
+    vars = [this.uid, y.uid]
+    constant = spzeros(get_vectorized_size(sz), 1)
+    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
 
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
     return this
 
   elseif y.size == (1,1)
     this = CvxExpr(:*, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
-    canon_constr_array = Any[{
-      # TODO we'll need to cache references to parameters in the future
-      # TODO the double transpose to keep julia from slaying us
-      :coeffs => Any[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))],
-      :vars => [this.uid, y.uid],
-      :constant => spzeros(get_vectorized_size(x.size), 1),
-      :is_eq => true
-    }]
+
+    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))]
+    vars = [this.uid, y.uid]
+    constant = spzeros(get_vectorized_size(x.size), 1)
+    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
 
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
     return this
@@ -72,7 +67,6 @@ function *(x::Constant, y::AbstractCvxExpr)
 end
 
 function *(x::AbstractCvxExpr, y::Constant)
-
   if y.size == (1, 1) || x.size == (1, 1)
     return y * x
   end
@@ -81,13 +75,11 @@ function *(x::AbstractCvxExpr, y::Constant)
   vectorized_mul = kron(y.value', speye(sz[1]))
 
   this = CvxExpr(:*, [x, y], promote_vexity(y, x), promote_sign(y, x), sz)
-  canon_constr_array = Any[{
-    # TODO we'll need to cache references to parameters in the future
-    :coeffs => Any[speye(get_vectorized_size(sz)), -vectorized_mul],
-    :vars => [this.uid, x.uid],
-    :constant => spzeros(get_vectorized_size(sz), 1),
-    :is_eq => true
-  }]
+
+  coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
+  vars = [this.uid, x.uid]
+  constant = spzeros(get_vectorized_size(sz), 1)
+  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
 
   this.canon_form = ()->append!(canon_constr_array, x.canon_form())
   return this
@@ -99,7 +91,7 @@ end
 # Only division by constant scalars is allowed
 function inv(y::Constant)
   # determine size
-  if y.size != (1,1)
+  if y.size != (1, 1)
     error("only division by constant scalars is allowed.")
   end
   return Constant(1 / y.value)

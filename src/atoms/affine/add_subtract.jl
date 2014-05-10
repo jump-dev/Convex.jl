@@ -1,6 +1,7 @@
 export +, -
 
-# Utilities for handling vexity and sign for addition/subtraction
+### Utilities for handling vexity and sign for addition/subtraction
+
 function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
   vexities = Set(x.vexity, y.vexity)
   if vexities == Set(:convex, :concave)
@@ -36,20 +37,17 @@ function -(x::Constant)
   return Constant(-x.value)
 end
 
-
 function -(x::AbstractCvxExpr)
   this = CvxExpr(:-, [x], reverse_vexity(x), reverse_sign(x), x.size)
 
-  # TODO: Not Any
   if x.vexity == :constant
-    this.canon_form = ()->Any[]
+    this.canon_form = ()->CanonicalConstr[]
   else
-    canon_constr_array = Any[{
-      :coeffs => Any[speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
-      :vars => [this.uid, x.uid],
-      :constant => zeros(get_vectorized_size(x)),
-      :is_eq => true
-    }]
+    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x)), speye(get_vectorized_size(x))]
+
+    vars = [this.uid, x.uid]
+    constant = zeros(get_vectorized_size(x))
+    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
     append!(canon_constr_array, x.canon_form())
 
     this.canon_form = ()->canon_constr_array
@@ -64,15 +62,14 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   x, y = promote_for_add(x, y)
   this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
 
-  # TODO: Not Any. Also deal with matrix variables
-  canon_constr_array = Any[{
-    :coeffs => Any[-speye(get_vectorized_size(x)),
+  coeffs = VecOrMatOrSparse[-speye(get_vectorized_size(x)),
       -speye(get_vectorized_size(x)),
-      speye(get_vectorized_size(x))],
-    :vars => [x.uid, y.uid, this.uid],
-    :constant => zeros(get_vectorized_size(x)),
-    :is_eq => true
-  }]
+      speye(get_vectorized_size(x))]
+  vars = [x.uid, y.uid, this.uid]
+  constant = zeros(get_vectorized_size(x))
+
+  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
+
   append!(canon_constr_array, x.canon_form())
   append!(canon_constr_array, y.canon_form())
 
@@ -96,14 +93,11 @@ function +(x::AbstractCvxExpr, y::Constant)
   x, y = promote_for_add(x, y)
   this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
 
-  # TODO: Not Any. Also deal with matrix variables
-  canon_constr_array = Any[{
-    :coeffs => Any[-speye(get_vectorized_size(x)), speye(get_vectorized_size(x))],
-    :vars => [x.uid, this.uid],
-    # TODO we'll need to cache references to constants/parameters in the future
-    :constant => vec(y.value),
-    :is_eq => true
-  }]
+  coeffs = VecOrMatOrSparse[-speye(get_vectorized_size(x)), speye(get_vectorized_size(x))]
+  vars = [x.uid, this.uid]
+  constant = vec(y.value)
+  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
+
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->begin
     return canon_constr_array

@@ -15,14 +15,14 @@ function transpose(x::AbstractCvxExpr)
   end
 
   this = CvxExpr(:transpose, [x], x.vexity, x.sign, (x.size[2], x.size[1]))
-  canon_constr_array = Any[{
-    :coeffs => Any[speye(sz), -coeffs],
-    :vars => [x.uid, this.uid],
-    :constant => spzeros(sz, 1),
-    :is_eq => true
-  }]
 
-  append!(canon_constr_array, x.canon_form())
+  coeffs = VecOrMatOrSparse[speye(sz), -coeffs]
+  vars = [x.uid, this.uid]
+  canon_constr = CanonicalConstr(coeffs, vars, spzeros(sz, 1), true)
+
+  canon_constr_array = x.canon_form()
+  push!(canon_constr_array, canon_constr)
+
   this.canon_form = ()->canon_constr_array
   return this
 end

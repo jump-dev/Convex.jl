@@ -212,8 +212,8 @@ solve!(p)
 # Test 28
 x1 = Variable(1)
 x2 = Variable(1)
-p = Problem(:minimize, 4*x1 + x2,
-            [3*x1 + x2 == 3, 4*x1 + 3*x2 >= 6, x1 + 2*x2 <=3, x1 >=0, x2 >=0])
+p = Problem(:minimize, 4x1 + x2,
+            [3x1 + x2 == 3, 4x1 + 3x2 >= 6, x1 + 2x2 <=3, x1 >=0, x2 >=0])
 solve!(p)
 @assert abs(p.optval - 3.6) < TOLERANCE
 
@@ -227,7 +227,7 @@ solve!(p)
 # Test 30
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = Problem(:maximize, sum(x) + sum(y), [vertcat(x, y') <= 2])
+p = maximize(sum(x) + sum(y), [vertcat(x, y') <= 2])
 solve!(p)
 @assert (p.optval - 80) < TOLERANCE
 

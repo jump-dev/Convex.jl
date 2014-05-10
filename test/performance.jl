@@ -10,7 +10,7 @@ function perfTest(N=100000)
   println(time() - start)
 end
 
-#TODO code so inefficient even python is faster
+# TODO code so inefficient even python is faster
 function test()
   start = time()
   N = 200
@@ -58,7 +58,7 @@ end
 
 # http://see.stanford.edu/materials/lsocoee364a/hw4sol.pdf
 # close to optimal with 10, 10
-function test3(m=1000,n=1000) 
+function test3(m=1000,n=1000)
   t = Variable(1);
   A = randn(m,n);
   x = randn(n); # TODO: The more interesting problem is to make x also a variable

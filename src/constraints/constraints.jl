@@ -1,23 +1,46 @@
-export CvxConstr, ==, >=, <=, <, >
+export CanonicalConstr, CvxConstr, ==, >=, <=, <, >
 
-# TODO: Break down constraints.jl into multiple files- for equality/exponential,
+# TODO: Break down constraints.jl into multiple constraints: equality/exponential,
 # SOCP, SDP etc constraints
 
 # TODO: CVX constraint should be an abstract class and children should be stuff
 # like CVXEqualityConstr. Read:
 # http://docs.julialang.org/en/release-0.2/manual/performance-tips/#break-functions-into-multiple-definitions
 
+type CanonicalConstr
+  coeffs::VecOrMatOrSparse
+  vars::Array{Int64, 1}
+  constant::Value
+  is_eq::Bool
+
+  function CanonicalConstr(coeffs::VecOrMat, vars::Array{Int64, 1}, constant::Value, is_eq::Bool)
+    return new(coeffs, vars, constant, is_eq)
+  end
+
+  function CanonicalConstr(coeffs::Number, vars::Array{Int64, 1}, constant::Value, is_eq::Bool)
+    return new([coeffs], vars, constant, is_eq)
+  end
+
+  function CanonicalConstr(coeffs::VecOrMat, vars::Int64, constant::Value, is_eq::Bool)
+    return new(coeffs, [vars], constant, is_eq)
+  end
+
+  function CanonicalConstr(coeffs::Number, vars::Int64, constant::Value, is_eq::Bool)
+    return new([coeffs], [vars], constant, is_eq)
+  end
+end
+
+
 type CvxConstr
   head
-  lhs
-  rhs
-  vexity
-  size
+  lhs::AbstractCvxExpr
+  rhs::AbstractCvxExpr
+  vexity::Symbol
   dual_value
   canon_form::Function
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
     lhs, rhs = promote_for_add(lhs, rhs)
-    # check vexity
+    # Check vexity
     if head == :(==)
       if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
         vexity = :linear
@@ -45,24 +68,18 @@ type CvxConstr
 
         elseif rhs.vexity == :constant
           constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
-          canon_constr = {
-            :coeffs => Any[speye(get_vectorized_size(lhs))],
-            :vars => [unique_id(lhs)],
-            :constant => constant,
-            :is_eq => (head == :(==))
-          }
 
+          coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs))]
+          canon_constr = CanonicalConstr(coeffs, unique_id(lhs), constant, (head == :(==)))
           canon_constr_array = lhs.canon_form()
           push!(canon_constr_array, canon_constr)
 
         else
-          canon_constr = {
-            :coeffs => Any[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))],
-            :vars => [unique_id(lhs); unique_id(rhs)],
-            :constant => zeros(get_vectorized_size(lhs)),
-            :is_eq => (head == :(==))
-          }
+          coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))]
+          vars = [unique_id(lhs); unique_id(rhs)]
+          constant = zeros(get_vectorized_size(lhs))
 
+          canon_constr = CanonicalConstr(coeffs, vars, constant, (head == :(==)))
           canon_constr_array = lhs.canon_form()
           append!(canon_constr_array, rhs.canon_form())
           push!(canon_constr_array, canon_constr)
@@ -70,7 +87,7 @@ type CvxConstr
         return canon_constr_array
       end
 
-    return new(head, lhs, rhs, vexity, size, nothing, canon_form)
+    return new(head, lhs, rhs, vexity, nothing, canon_form)
   end
 end
 

@@ -2,6 +2,7 @@ export Solution
 
 # Declares the Solution type, which stores the primal and dual variables as well
 # as the status of the solver
+# TODO: Call primal, dual
 type Solution
   x::Array{Float64, 1}
   y::Array{Float64, 1}

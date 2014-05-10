@@ -7,7 +7,7 @@ function norm_inf(x::AbstractCvxExpr)
   this = CvxExpr(:norm_inf, [x], x.vexity, :pos, (1, 1))
 
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
-  this.canon_form = ()->Any[]
+  this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
   this.canon_form = ()->canon_constr_array
@@ -55,7 +55,7 @@ function abs(x::AbstractCvxExpr)
 
   println(this.vexity)
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
-  this.canon_form = ()->Any[]
+  this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
   this.canon_form = ()->canon_constr_array

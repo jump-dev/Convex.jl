@@ -8,7 +8,7 @@ function max(x::AbstractCvxExpr)
   this = CvxExpr(:max, [x], :convex, :pos, (1, 1))
 
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
-  this.canon_form = ()->Any[]
+  this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   this.canon_form = ()->canon_constr_array
   return this
@@ -21,7 +21,7 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
     error("max of concave function is not DCP compliant")
   end
   this = CvxExpr(:max, [x, y], :convex, :pos, (1, 1))
-  this.canon_form = ()->Any[]
+  this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (y <= this).canon_form())
 
@@ -41,7 +41,7 @@ function min(x::AbstractCvxExpr)
   this = CvxExpr(:min, [x], :concave, :neg, (1, 1))
 
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
-  this.canon_form = ()->Any[]
+  this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (this <= x).canon_form()
   this.canon_form = ()->canon_constr_array
   return this
@@ -53,7 +53,7 @@ function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
     error("min of convex function is not DCP compliant")
   end
   this = CvxExpr(:min, [x], x.vexity, :pos, (1, 1))
-  this.canon_form = ()->[]
+  this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (this <= x).canon_form()
   append!(canon_constr_array, (this <= y).canon_form())
 

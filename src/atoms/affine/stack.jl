@@ -12,9 +12,9 @@ function hcat(args::AbstractCvxExpr...)
   end
   this = CvxExpr(:hcat, [args...], args[1].vexity, :any, (num_rows, num_cols))
 
-  this.canon_form = ()->Any[]
+  this.canon_form = ()->CanonicalConstr[]
 
-  canon_constr_array = Any[]
+  canon_constr_array = CanonicalConstr[]
   cols_so_far = 0
   for arg in args
     coeffs = spzeros(num_cols, arg.size[2])
@@ -42,8 +42,8 @@ function vertcat(args::AbstractCvxExpr...)
   # TODO: not doing vexity
   this = CvxExpr(:vcat, [args...], args[1].vexity, :any, (num_rows, num_cols))
 
-  this.canon_form = ()->Any[]
-  canon_constr_array = Any[]
+  this.canon_form = ()->CanonicalConstr[]
+  canon_constr_array = CanonicalConstr[]
   rows_so_far = 0
   for arg in args
     coeffs = spzeros(arg.size[1], num_rows)
