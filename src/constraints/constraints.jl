@@ -73,7 +73,6 @@ type CvxConstr
           canon_constr = CanonicalConstr(coeffs, unique_id(lhs), constant, (head == :(==)))
           canon_constr_array = lhs.canon_form()
           push!(canon_constr_array, canon_constr)
-
         else
           coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))]
           vars = [unique_id(lhs); unique_id(rhs)]
@@ -96,6 +95,12 @@ end
 <=(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(<=), x, y)
 >(x::AbstractCvxExpr, y::AbstractCvxExpr) = >=(x, y)
 <(x::AbstractCvxExpr, y::AbstractCvxExpr) = <=(x, y)
+
+==(x::Constant, y::AbstractCvxExpr) = CvxConstr(:(==), y, x)
+<=(x::Constant, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -x)
+>=(x::Constant, y::AbstractCvxExpr) = CvxConstr(:(<=), y, x)
+>(x::Constant, y::AbstractCvxExpr) = <=(y, x)
+<(x::Constant, y::AbstractCvxExpr) = >=(y, x)
 
 ==(x::Value, y::AbstractCvxExpr) = CvxConstr(:(==), y, convert(CvxExpr, x))
 >=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), y, convert(CvxExpr, x))

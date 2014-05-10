@@ -115,7 +115,14 @@ function Constant(x::Number)
 end
 
 # Case to catch arrays, not scalar numbers
-Constant(x::Value) = Constant(x, :any)
+function Constant(x::Value)
+  if all(x .>= 0)
+    return Constant(x, :pos)
+  elseif all(x .<= 0)
+    return Constant(x, :neg)
+  end
+  return Constant(x, :any)
+end
 
 # Unique ids
 unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Int64, (Any, ), x)

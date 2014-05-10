@@ -172,7 +172,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = Problem(:minimize, max(x, y), [x >= a, y >= b])
+p = Problem(:minimize, max(max(x, y)), [x >= a, y >= b])
 solve!(p)
 max_a = Base.maximum(a)
 max_b = Base.maximum(b)
@@ -190,7 +190,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = Problem(:maximize, min(x, y), [x <= a, y <= b])
+p = Problem(:maximize, min(min(x, y)), [x <= a, y <= b])
 solve!(p)
 min_a = Base.minimum(a)
 min_b = Base.minimum(b)
@@ -199,9 +199,10 @@ min_b = Base.minimum(b)
 # Test 26
 x = Variable(3)
 a = [-2; 1; 2]
-p = Problem(:minimize, sum(pos(x)), [pos(x) >= 0, x >= a, x <= 2])
+p = Problem(:minimize, sum(pos(x)), [x >= a, x <= 2])
 solve!(p)
-@assert abs(p.optval - 2) < TOLERANCE
+println(p.optval)
+@assert abs(p.optval - 3) < TOLERANCE
 
 # Test 27
 x = Variable(3)
