@@ -87,3 +87,27 @@ p = maximize(sum(x) + sum(y), [hcat(x, y) <= 2])
 solve!(p)
 ```
 
+* Minimum
+```
+x = Variable(10, 10)
+y = Variable(10, 10)
+a = rand(10, 10)
+b = rand(10, 10)
+p = Problem(:maximize, min(min(x, y)), [x <= a, y <= b])
+solve!(p)
+```
+
+* Norm-Infinity
+```
+x = Variable(3)
+p = Problem(:minimize, norm_inf(x), [-2 <= x, x <= 1])
+solve!(p)
+```
+
+# Credits
+
+- Jenny Hong
+- Karanveer Mohan
+- Madeleine Udell
+- David Zeng
+- Special thanks to Steve Diamond, author of cvxpy, for all his help!
