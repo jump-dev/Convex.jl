@@ -1,63 +1,89 @@
-# CVX
+# CVX.jl
 
+<!--
 [![Build Status](https://travis-ci.org/madeleineudell/CVX.jl.png)](https://travis-ci.org/madeleineudell/CVX.jl)
+-->
 
 CVX.jl is a julia package for disciplied convex programming.
 This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected.
 (Bug reports, of course, are welcome.)
 
+CVX.JL allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and CVX.jl will transfordm your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS and solvers supported by MathProgBase.jl such as Gurobi, GLPK etc).
+
+In its current state, CVX.jl can solve linear programs and very basic convex problems (max, min, norm_inf etc). For example, the following code solves a simple linear program:
+```
+x = Variable()
+y = Variable()
+constraints = [3x + y == 3, 4x + 3y >= 6, x + 2y <=3, x >=0, y >=0]
+p = minimize(4x + y, constraints)
+solve!(p)
+p.optval # 3.6
+x.value # 0.6
+y.value # 1.2
+```
+# Prerequisites
+
+CVX.jl requires
+* [ECOS](http://github.com/ifa-ethz/ecos) >= 1.0.3
+
 # Installation
 
-To install, just open a Julia prompt and call
-
-    Pkg.clone("git@github.com:madeleineudell/CVX.jl.git")
-
-You'll also need to install the python module cvxpy and its dependencies, cvxopt and ecos.
-
-    easy_install cvxopt; easy_install ecos; easy_install cvxpy
-
-You'll also need PyCall, which you can get by opening a Julia prompt and calling
-
-	Pkg.add("PyCall")
+To install, just git clone the repo. Work is still in progress and a clean, easy-to-use/install module will be available soon.
 
 # Usage
 
-The interface for this package is not yet stable, but we give a few usage examples to start with.
+A number of examples can be found in test/test.jl. Here are a few simple examples to start with:
 
-* Norm minimization
+* Dot Product
 ```
-y = Variable(2,2);
-p = minimize(norm(y) - 1,
-    y >= 1)
-println(p)
+x = Variable(2)
+A = 1.5 * eye(2)
+p = minimize(dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
 solve!(p)
 println(p.optval)
-println(y.value)
+println(x.value)
 ```
 
-* Quadratic programming
+* Matrix Variables
 ```
-y = Variable(2);
-A = randn(4,2);
-b = randn(4);
-p = minimize(sum(square(A*y-b)),
-    y >= 0)
-println(p)
+X = Variable(2, 2)
+c = ones(2, 1)
+p = minimize(c' * X * c, [X >= ones(2, 2)])
 solve!(p)
-println(p.optval)
-println(y.value)
+println(X.value)
 ```
 
-* Nonnegative least squares, using an augmented lagrangian to illustrate functional notation
+* Promotion of scalar variables and constants when present with matrices
 ```
-n = 4; m=5; rho=1
-x = Variable(n); z = Variable(n); y = zeros(n);
-D = randn(m,n);
-h = randn(m);
-A = eye(n);
-B = -eye(n);
-c = zeros(n);
-f(x) = sum(square(D*x - h))
-L(x,y,z,rho) = f(x) + rho/2*sum(square(A*x+B*z-c+y))
-solve!(minimize(L(x,y,z),z>=0,A*x+B*z==c))
+N = 20
+x = Variable(1) # x is a scalar variable
+y = Variable(N, N) # y is a 20 x 20 matrix variavble
+c = ones(N, 1)
+# We can add scalar variables to matrix variables. 
+# The following line is equivalent to c' * (y + eye(N) * x) * c
+# Similar overloading is done in other cases
+objective = c' * (y + x) * c 
+p = minimize(objective, [x >= 3, 2y >= 0, y <= x])
+solve!(p)
 ```
+
+* Indexing and Transpose
+```
+rows = 6
+cols = 8
+n = 2
+X = Variable(rows, cols)
+A = randn(rows, cols)
+c = rand(1, n)
+p = minimize(c * X[1:n, 5:5+n-1]' * c', X >= A)
+solve!(p)
+```
+
+* Sum and Concatenation
+```
+x = Variable(4, 4)
+y = Variable(4, 6)
+p = maximize(sum(x) + sum(y), [hcat(x, y) <= 2])
+solve!(p)
+```
+
