@@ -1,1 +1,4 @@
 *.pyc
+scs.jl
+*.c
+*.h

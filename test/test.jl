@@ -110,7 +110,7 @@ N = 20
 x = Variable(1)
 y = Variable(N, N)
 c = ones(N, 1)
-p = Problem(:minimize, c' * (y + x) * c, [x >= 3, 2*y >= 0, y <= x])
+p = Problem(:minimize, c' * (y + x) * c, [x >= 3, 2y >= 0, y <= x])
 solve!(p)
 @assert abs(p.optval - 1200) < TOLERANCE
 
@@ -201,7 +201,6 @@ x = Variable(3)
 a = [-2; 1; 2]
 p = Problem(:minimize, sum(pos(x)), [x >= a, x <= 2])
 solve!(p)
-println(p.optval)
 @assert abs(p.optval - 3) < TOLERANCE
 
 # Test 27

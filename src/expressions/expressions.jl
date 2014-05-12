@@ -66,9 +66,11 @@ type Variable <: AbstractCvxExpr
   end
 end
 
+
 Variable(size::(Int64, Int64), sign::Symbol) = Variable(:variable, size, sign)
 Variable(size::(Int64, Int64)) = Variable(size, :any)
 Variable(size...) = Variable(size, :any)
+Variable() = Variable((1, 1), :any)
 Variable(size::Integer) = Variable((size, 1),:any)
 Variable(size::Integer, sign::Symbol) = Variable((size, 1), sign)
 

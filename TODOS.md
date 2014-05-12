@@ -1,6 +1,29 @@
+point of zero sign
+
+What happens if you take something which is convex and multiply it with something with sign any
+
+max and stuff
+
+do we worry about parameters now
+
+getting dual variables?
+
+The constraints list that we pass in, each constraint has some uid. So we just need to find the duals associated with those constraints (not the constraints created by all the other variables we created in canonicalization)
+
+We should focus on LPs, but the only reason we might want to focus on SOCPs is because there are no conic solvers in Julia
+
+1. delay computation of dual variables
+2. get a a wrapper to scs and figure out a canon form for cone problems
+
+
+TODOS
+1. wrapper for SCS
+2. we can look at GLPK. One time madeleine wanted a corner point so she used a simplex solver rather than an interior point solver. something something? what? something that needs to be done but not urgent?
+
+
 # Next Week's Todos (04/14)
 
-- Next week, we want to finish standard form LPs completely. 
+- Next week, we want to finish standard form LPs completely.
 - Implement canonicalization: Hopefully there won't be big efficiency concerns here, it's mostly just up to how the language is implemented.
 - Add tests
 - Read Performance Tips from Julia docs

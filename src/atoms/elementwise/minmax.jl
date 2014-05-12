@@ -31,8 +31,6 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
   end
 
   this = CvxExpr(:max, [x, y], :convex, :pos, sz)
-  println(x.vexity)
-  println(y.vexity)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (y <= this).canon_form())
