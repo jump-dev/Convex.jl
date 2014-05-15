@@ -1,6 +1,6 @@
 import Base.abs
 
-export norm, abs, norm_inf, norm_2, square, sum_squared
+export norm, abs, norm_inf, norm_2, square, sum_squared, norm_1
 
 function check_size(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1
@@ -58,10 +58,15 @@ function square(x::AbstractCvxExpr)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
-  
+
   return this
 end
 
+function norm_1(x::AbstractCvxExpr)
+  return sum(abs(x))
+end
+
+# TODO: Look at matrix
 function norm_2(x::AbstractCvxExpr)
   check_size(x)
   vexity = promote_vexity(x)
@@ -74,11 +79,11 @@ function norm_2(x::AbstractCvxExpr)
   coeffs =  VecOrMatOrSparse[coeffs1, coeffs2]
   vars = [this.uid, x.uid]
   constant = zeros(cone_size, 1)
-  
+
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
-  
+
   return this
 end
 
