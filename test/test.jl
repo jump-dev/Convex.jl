@@ -266,7 +266,7 @@ A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
 p = Problem(:minimize, sum_squared(A*x + b))
 solve!(p)
-@assert (p.optval - 0.42105) < TOLERANCE
+@assert abs(p.optval - 0.42105) < TOLERANCE
 
 # Test 35
 x = Variable(3)
@@ -282,6 +282,22 @@ lambda = 1
 p = Problem(:minimize, norm_2(A * x + b) + lambda * norm_1(x), x >= 1)
 solve!(p)
 @assert abs(p.optval - 15.4907) < TOLERANCE
+
+# Test 37
+x = Variable(3, 1)
+A = [0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
+p = Problem(:minimize, quad_form(x, A), [x >= 1])
+solve!(p)
+@assert abs(p.optval - 6.1464) < TOLERANCE
+
+# Test 38
+x = Variable(3, 1)
+A = -1.0*[0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
+c = [3 2 4]
+p = Problem(:maximize, c*x , [quad_form(x, A) >= -1])
+solve!(p)
+@assert abs(p.optval - 3.7713) < TOLERANCE
+
 
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])

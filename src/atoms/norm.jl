@@ -1,6 +1,6 @@
 import Base.abs
 
-export norm, abs, norm_inf, norm_2, square, sum_squared, norm_1
+export norm, abs, norm_inf, norm_2, square, sum_squared, norm_1, quad_form
 
 function check_size(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1
@@ -35,6 +35,35 @@ function norm_inf(x::AbstractCvxExpr)
   return this
 end
 
+function quad_form(x::Constant, A::AbstractCvxExpr)
+  return x'*A*x
+end
+
+function quad_form(x::AbstractCvxExpr, A::Constant)
+  if A.size[1] != A.size[2]
+    error("Quadratic form only takes square matrices")
+  end
+  if !issym(full(A.value))
+    error("Quadratic form only defined for symmetric matrices")
+  end
+  V = eigvals(full(A.value))
+  if !all(V .>= 0) && !all(V .<= 0)
+    error("Quadratic forms supported only for semidefinite matrices")
+  end
+  
+  if all(V .>= 0)
+    factor = 1
+  else
+    factor = -1
+  end
+
+  P = sqrtm(full(factor*A.value))
+  return factor*square(norm_2(P*x))
+end
+
+quad_form(x::Value, A::AbstractCvxExpr) = quad_form(convert(CvxExpr, x), A)
+quad_form(x::AbstractCvxExpr, A::Value) = quad_form(x, convert(CvxExpr, A))
+
 function sum_squared(x::AbstractCvxExpr)
   return square(norm_2(x))
 end
@@ -47,12 +76,11 @@ function square(x::AbstractCvxExpr)
   this = CvxExpr(:square, [x], vexity, :pos, (1, 1))
   coeffs1 = spzeros(3, 1)
   coeffs1[1] = -1
+  coeffs1[2] = 1
   coeffs2 = spzeros(3, 1)
-  coeffs2[2] = 1
-  coeffs3 = spzeros(3, 1)
-  coeffs3[3] = -2
-  coeffs = VecOrMatOrSparse[coeffs1, coeffs2, coeffs3]
-  vars = [this.uid, this.uid, x.uid]
+  coeffs2[3] = -2
+  coeffs = VecOrMatOrSparse[coeffs1, coeffs2]
+  vars = [this.uid, x.uid]
   constant = [1; 1; 0]
 
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]

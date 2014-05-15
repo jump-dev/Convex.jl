@@ -73,9 +73,8 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, x.canon_form())
   append!(canon_constr_array, y.canon_form())
 
-  this.canon_form = ()->begin
-    return canon_constr_array
-  end
+  this.canon_form = ()->canon_constr_array
+
 
   return this
 end
@@ -99,9 +98,7 @@ function +(x::AbstractCvxExpr, y::Constant)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
   append!(canon_constr_array, x.canon_form())
-  this.canon_form = ()->begin
-    return canon_constr_array
-  end
+  this.canon_form = ()->canon_constr_array
   return this
 end
 
