@@ -18,7 +18,7 @@ function transpose(x::AbstractCvxExpr)
 
   coeffs = VecOrMatOrSparse[speye(sz), -coeffs]
   vars = [x.uid, this.uid]
-  canon_constr = CanonicalConstr(coeffs, vars, spzeros(sz, 1), true)
+  canon_constr = CanonicalConstr(coeffs, vars, spzeros(sz, 1), true, false)
 
   canon_constr_array = x.canon_form()
   push!(canon_constr_array, canon_constr)

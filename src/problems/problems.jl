@@ -1,4 +1,4 @@
-export Problem, minimize, maximize, get_var_dict, solve!
+export Problem, minimize, maximize, get_var_dict, solve!, ecos_debug
 
 Float64OrNothing = Union(Float64, Nothing)
 SolutionOrNothing = Union(Solution, Nothing)
@@ -56,6 +56,17 @@ function solve!(p::Problem, method=:ecos)
 	end
 end
 
+function ecos_debug(problem::Problem)
+  objective = problem.objective
+
+	canonical_constraints_array = CanonicalConstr[]
+	for constraint in problem.constr
+		append!(canonical_constraints_array, constraint.canon_form())
+	end
+
+	append!(canonical_constraints_array, objective.canon_form())
+	return create_ecos_matrices(canonical_constraints_array)
+end
 
 # CAUTION: For now, we assume we are solving a linear program.
 # Loops over the objective and constraints to get the canonical constraints array.
@@ -70,7 +81,9 @@ function ecos_solve!(problem::Problem)
 	end
 
 	append!(canonical_constraints_array, objective.canon_form())
-	m, n, p, G, h, A, b, variable_index = create_ecos_matrices(canonical_constraints_array)
+	m, n, p, l, ncones, q, G, h, A, b, variable_index = create_ecos_matrices(canonical_constraints_array)
+	#return create_ecos_matrices(canonical_constraints_array)
+
 
 	# Now, all we need to is create c
 	c = zeros(n, 1)
@@ -84,7 +97,7 @@ function ecos_solve!(problem::Problem)
 		c = -c;
 	end
 
-	solution = ecos_solve(n=n, m=m, p=p, G=G, c=c, h=h, A=A, b=b)
+	solution = ecos_solve(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b)
 
 	# Change c back to what it originally was
 	if problem.head == :maximize
@@ -109,11 +122,14 @@ end
 # Given the canonical_constraints_array, creates conic inequality matrix G and h
 # as well as the equality matrix A and b
 function create_ecos_matrices(canonical_constraints_array)
-	n = 0
+	n = 0::Int64
 	variable_index = Dict{Int64, Int64}()
-	m = 0
-	p = 0
-
+	m = 0::Int64
+	p = 0::Int64
+	l = 0::Int64
+	ncones = 0::Int64
+	q = Int64[]
+  
 	# Loop over all the constraints to figure out the size of G and A
 	for constraint in canonical_constraints_array
 		# Loop over each variable in the constraint
@@ -128,12 +144,17 @@ function create_ecos_matrices(canonical_constraints_array)
 
 				n += size(constraint.coeffs[i], 2)
 			end
+		end
 
-			if constraint.is_eq
-				p += size(constraint.coeffs[i], 1)
-			else
-				m += size(constraint.coeffs[i], 1)
-			end
+		if constraint.is_eq
+			p += size(constraint.coeffs[1], 1)
+		elseif constraint.is_conic
+			ncones += 1
+			push!(q, size(constraint.coeffs[1], 1))
+			m += size(constraint.coeffs[1], 1)
+		else
+			l += size(constraint.coeffs[1], 1)
+			m += size(constraint.coeffs[1], 1)
 		end
 	end
 
@@ -142,7 +163,8 @@ function create_ecos_matrices(canonical_constraints_array)
 	b = p == 0 ? nothing: zeros(p, 1)
 	A = p == 0 ? nothing: spzeros(p, n)
 
-	m_index = 1::Int64
+	l_index = 1::Int64
+	c_index = 1::Int64
 	p_index = 1::Int64
 
 	# Now, we actually stuff the matrices A and G
@@ -162,9 +184,11 @@ function create_ecos_matrices(canonical_constraints_array)
 				# An issue has been filed and should be fixed in newer versions of julia
 				A[p_index : p_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
 					constraint.coeffs[i] * 1.0
+			elseif constraint.is_conic
+        G[l + c_index : l + c_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
+					constraint.coeffs[i] * 1.0
 			else
-
-				G[m_index : m_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
+				G[l_index : l_index + m_var - 1, variable_index[var] : variable_index[var] + n_var - 1] =
 					constraint.coeffs[i] * 1.0
 			end
 		end
@@ -172,13 +196,16 @@ function create_ecos_matrices(canonical_constraints_array)
 		if constraint.is_eq
 			b[p_index : p_index + m_var - 1] = constraint.constant
 			p_index += m_var
+		elseif constraint.is_conic
+      h[l + c_index : l + c_index + m_var - 1] = constraint.constant
+      c_index += m_var
 		else
-			h[m_index : m_index + m_var - 1] = constraint.constant
-			m_index += m_var
+			h[l_index : l_index + m_var - 1] = constraint.constant
+			l_index += m_var
 		end
 	end
 
-	return m, n, p, G, h, A, b, variable_index
+	return m, n, p, l, ncones, q, G, h, A, b, variable_index
 end
 
 # Now that the problem has been solved, populate the optimal values of the

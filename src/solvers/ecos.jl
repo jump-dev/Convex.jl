@@ -26,16 +26,11 @@ export ecos_solve
 # be provided.
 #
 function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
-    ncones::Int64=0, q::Array{Int64, }=[0], G::VecOrMatOrSparse=nothing,
+    ncones::Int64=0, q::Array{Int64, }=[], G::VecOrMatOrSparse=nothing,
     A::VecOrMatOrSparseOrNothing=nothing, c::Array{Float64, }=nothing,
     h::Array{Float64, }=nothing, b::ArrayFloat64OrNothing=nothing, debug::Bool=false)
 
-  if l == 0
-    l = m
-    print_debug(debug, "Value of l=0, setting it to the same as m=$m");
-  end
-
-  if q == [0]
+  if q == []
     q = convert(Ptr{Int64}, C_NULL)
   end
 

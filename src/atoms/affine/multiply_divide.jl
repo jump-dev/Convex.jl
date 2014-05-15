@@ -45,7 +45,7 @@ function *(x::Constant, y::AbstractCvxExpr)
     coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
     vars = [this.uid, y.uid]
     constant = spzeros(get_vectorized_size(sz), 1)
-    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
+    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
     return this
@@ -56,7 +56,7 @@ function *(x::Constant, y::AbstractCvxExpr)
     coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))]
     vars = [this.uid, y.uid]
     constant = spzeros(get_vectorized_size(x.size), 1)
-    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
+    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
     return this
@@ -79,7 +79,7 @@ function *(x::AbstractCvxExpr, y::Constant)
   coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
   vars = [this.uid, x.uid]
   constant = spzeros(get_vectorized_size(sz), 1)
-  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true)]
+  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
   this.canon_form = ()->append!(canon_constr_array, x.canon_form())
   return this

@@ -12,21 +12,22 @@ type CanonicalConstr
   vars::Array{Int64, 1}
   constant::Value
   is_eq::Bool
+  is_conic::Bool
 
-  function CanonicalConstr(coeffs::VecOrMat, vars::Array{Int64, 1}, constant::Value, is_eq::Bool)
-    return new(coeffs, vars, constant, is_eq)
+  function CanonicalConstr(coeffs::VecOrMat, vars::Array{Int64, 1}, constant::Value, is_eq::Bool, is_conic::Bool)
+    return new(coeffs, vars, constant, is_eq, is_conic)
   end
 
-  function CanonicalConstr(coeffs::Number, vars::Array{Int64, 1}, constant::Value, is_eq::Bool)
-    return new([coeffs], vars, constant, is_eq)
+  function CanonicalConstr(coeffs::Number, vars::Array{Int64, 1}, constant::Value, is_eq::Bool, is_conic::Bool)
+    return new([coeffs], vars, constant, is_eq, is_conic)
   end
 
-  function CanonicalConstr(coeffs::VecOrMat, vars::Int64, constant::Value, is_eq::Bool)
-    return new(coeffs, [vars], constant, is_eq)
+  function CanonicalConstr(coeffs::VecOrMat, vars::Int64, constant::Value, is_eq::Bool, is_conic::Bool)
+    return new(coeffs, [vars], constant, is_eq, is_conic)
   end
 
-  function CanonicalConstr(coeffs::Number, vars::Int64, constant::Value, is_eq::Bool)
-    return new([coeffs], [vars], constant, is_eq)
+  function CanonicalConstr(coeffs::Number, vars::Int64, constant::Value, is_eq::Bool, is_conic::Bool)
+    return new([coeffs], [vars], constant, is_eq, is_conic)
   end
 end
 
@@ -70,7 +71,7 @@ type CvxConstr
           constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
 
           coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs))]
-          canon_constr = CanonicalConstr(coeffs, unique_id(lhs), constant, (head == :(==)))
+          canon_constr = CanonicalConstr(coeffs, unique_id(lhs), constant, (head == :(==)), false)
           canon_constr_array = lhs.canon_form()
           push!(canon_constr_array, canon_constr)
         else
@@ -78,7 +79,7 @@ type CvxConstr
           vars = [unique_id(lhs); unique_id(rhs)]
           constant = zeros(get_vectorized_size(lhs))
 
-          canon_constr = CanonicalConstr(coeffs, vars, constant, (head == :(==)))
+          canon_constr = CanonicalConstr(coeffs, vars, constant, (head == :(==)), false)
           canon_constr_array = lhs.canon_form()
           append!(canon_constr_array, rhs.canon_form())
           push!(canon_constr_array, canon_constr)

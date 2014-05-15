@@ -1,10 +1,31 @@
 import Base.abs
 
-export norm, abs, norm_inf
+export norm, abs, norm_inf, norm_2, square, sum_squared
+
+function check_size(x::AbstractCvxExpr)
+  if x.size[1] > 1 && x.size[2] > 1
+    error("norm(x) not supported when x has size $(x.size)")
+  end
+end
+
+function promote_vexity(x::AbstractCvxExpr)
+  if x.vexity == :constant
+    return :constant
+  elseif x.vexity == :linear
+    return :convex
+  elseif x.vexity == :convex && x.sign == :pos
+    return :convex
+  elseif x.vexity == :concave && x.sign == :neg
+    return :convex
+  else
+    error("norm(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
+  end
+end
 
 function norm_inf(x::AbstractCvxExpr)
-  # TODO: handle vexities and signs
-  this = CvxExpr(:norm_inf, [x], x.vexity, :pos, (1, 1))
+  check_size(x)
+  vexity = promote_vexity(x)
+  this = CvxExpr(:norm_inf, [x], vexity, :pos, (1, 1))
 
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]
@@ -14,6 +35,52 @@ function norm_inf(x::AbstractCvxExpr)
   return this
 end
 
+function sum_squared(x::AbstractCvxExpr)
+  return square(norm_2(x))
+end
+
+function square(x::AbstractCvxExpr)
+  if x.size != (1, 1)
+    error("Can only square a scalar expression")
+  end
+  vexity = promote_vexity(x)
+  this = CvxExpr(:square, [x], vexity, :pos, (1, 1))
+  coeffs1 = spzeros(3, 1)
+  coeffs1[1] = -1
+  coeffs2 = spzeros(3, 1)
+  coeffs2[2] = 1
+  coeffs3 = spzeros(3, 1)
+  coeffs3[3] = -2
+  coeffs = VecOrMatOrSparse[coeffs1, coeffs2, coeffs3]
+  vars = [this.uid, this.uid, x.uid]
+  constant = [1; 1; 0]
+
+  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
+  append!(canon_constr_array, x.canon_form())
+  this.canon_form = ()->canon_constr_array
+  
+  return this
+end
+
+function norm_2(x::AbstractCvxExpr)
+  check_size(x)
+  vexity = promote_vexity(x)
+  this = CvxExpr(:norm_2, [x], vexity, :pos, (1, 1))
+  cone_size = get_vectorized_size(x) + 1
+
+  coeffs1 = spzeros(cone_size, 1)
+  coeffs1[1] = -1
+  coeffs2 = [spzeros(1, get_vectorized_size(x)); -speye(get_vectorized_size(x))]
+  coeffs =  VecOrMatOrSparse[coeffs1, coeffs2]
+  vars = [this.uid, x.uid]
+  constant = zeros(cone_size, 1)
+  
+  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
+  append!(canon_constr_array, x.canon_form())
+  this.canon_form = ()->canon_constr_array
+  
+  return this
+end
 
 # TODO: Everything
 function norm(x::AbstractCvxExpr, p = 2)
