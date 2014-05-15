@@ -222,14 +222,14 @@ x = Variable(4, 4)
 y = Variable(4, 6)
 p = Problem(:maximize, sum(x) + sum(y), [hcat(x, y) <= 2])
 solve!(p)
-@assert (p.optval - 80) < TOLERANCE
+@assert abs(p.optval - 80) < TOLERANCE
 
 # Test 30
 x = Variable(4, 4)
 y = Variable(4, 6)
 p = maximize(sum(x) + sum(y), [vertcat(x, y') <= 2])
 solve!(p)
-@assert (p.optval - 80) < TOLERANCE
+@assert abs(p.optval - 80) < TOLERANCE
 
 # Test 31
 x = Variable(4, 4)
@@ -241,7 +241,7 @@ constraints = [hcat(x, y) <= 2, z <= 0, z <= x, 2z >= -1]
 objective = sum(x + z) + min(y) + c' * y * d
 p = maximize(objective, constraints)
 solve!(p)
-@assert (p.optval - 130) < TOLERANCE
+@assert abs(p.optval - 130) < TOLERANCE
 
 # Test 32
 x = Variable(2, 1)
@@ -249,7 +249,7 @@ A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
 p = Problem(:minimize, norm_2(A * x + b))
 solve!(p)
-@assert (p.optval - 0.64888) < TOLERANCE
+@assert abs(p.optval - 0.64888) < TOLERANCE
 
 # Test 33
 x = Variable(2, 1)
@@ -258,7 +258,7 @@ b = [2; 3; 4]
 lambda = 1
 p = Problem(:minimize, norm_2(A * x + b) + lambda * norm_2(x), x >= 1)
 solve!(p)
-@assert (p.optval - 14.9049) < TOLERANCE
+@assert abs(p.optval - 14.9049) < TOLERANCE
 
 # Test 34
 x = Variable(2, 1)
@@ -281,7 +281,7 @@ b = [2; 3; 4]
 lambda = 1
 p = Problem(:minimize, norm_2(A * x + b) + lambda * norm_1(x), x >= 1)
 solve!(p)
-@assert (p.optval - 15.4907) < TOLERANCE
+@assert abs(p.optval - 15.4907) < TOLERANCE
 
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])
