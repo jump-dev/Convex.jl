@@ -17,6 +17,10 @@ function vec(x::SparseMatrixCSC)
   return Base.vec(full(x))
 end
 
+function vec(x::Number)
+  return [x]
+end
+
 ### Utility functions for arithmetic
 
 function get_vectorized_size(sz::(Int64, Int64))

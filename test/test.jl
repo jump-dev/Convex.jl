@@ -298,6 +298,15 @@ p = Problem(:maximize, c*x , [quad_form(x, A) >= -1])
 solve!(p)
 @assert abs(p.optval - 3.7713) < TOLERANCE
 
+# Test 39
+x = Variable(3, 1)
+A = [2 -3 5; -2 9 -3; 5 -8 3]
+b = [-3; 9; 5]
+c = [3 2 4]
+d = -3
+p = Problem(:minimize, quad_over_lin(A*x + b, c*x + d))
+solve!(p)
+
 
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])

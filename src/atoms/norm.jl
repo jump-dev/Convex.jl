@@ -1,6 +1,6 @@
 import Base.abs
 
-export norm, abs, norm_inf, norm_2, square, sum_squared, norm_1, quad_form
+export norm, abs, norm_inf, norm_2, square, sum_squared, norm_1, quad_form, quad_over_lin
 
 function check_size(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1
@@ -61,8 +61,52 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
   return factor*square(norm_2(P*x))
 end
 
+function quad_form(x::Constant, A::Constant)
+  return x'*A*x
+end
+
+quad_form(x::Value, A::Value) = quad_form(convert(CvxExpr, x), convert(CvxExpr, A))
 quad_form(x::Value, A::AbstractCvxExpr) = quad_form(convert(CvxExpr, x), A)
 quad_form(x::AbstractCvxExpr, A::Value) = quad_form(x, convert(CvxExpr, A))
+
+
+function check_size_qol(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  if (x.size[1] > 1 && x.size[2] > 1) || y.size != (1, 1)
+    error("quad_over_lin arguments must be a vector and a scalar")
+  end
+end
+
+function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  #TODO vexity and sign checks
+  this = CvxExpr(:quad_over_lin, [x, y], :convex, :pos, (1, 1))
+  x_size = get_vectorized_size(x)
+  cone_size = x_size + 2
+
+  # (y + t, y - t, 2x) socp constraint
+  coeffs1 = [spzeros(2, x_size); -2*speye(x_size)]
+  coeffs2 = spzeros(cone_size, 1)
+  coeffs2[1] = -1
+  coeffs2[2] = -1
+  coeffs3 = spzeros(cone_size, 1)
+  coeffs3[1] = -1
+  coeffs3[2] = 1
+  cone_coeffs = VecOrMatOrSparse[coeffs1, coeffs2, coeffs3]
+  cone_vars = [x.uid, y.uid, this.uid]
+  cone_constant = zeros(cone_size, 1)
+
+  # y >= 0 linear constraint
+  lin_coeffs = VecOrMatOrSparse[-speye(1)]
+  lin_vars = [y.uid]
+  lin_constant = zeros(1, 1)
+
+  canon_constr_array = [CanonicalConstr(cone_coeffs, cone_vars, cone_constant, false, true),
+                        CanonicalConstr(lin_coeffs, lin_vars, lin_constant, false, false)]
+  append!(canon_constr_array, x.canon_form())
+  append!(canon_constr_array, y.canon_form())
+  this.canon_form = ()->canon_constr_array
+
+  return this
+end
 
 function sum_squared(x::AbstractCvxExpr)
   return square(norm_2(x))
