@@ -8,7 +8,6 @@ include("solution.jl")
 include("problems/problems.jl")
 include("utilities/utilities.jl")
 include("solvers/ecos.jl")
-# include("solvers/scs.jl")
 
 # Atoms
 include("atoms/affine/add_subtract.jl")
