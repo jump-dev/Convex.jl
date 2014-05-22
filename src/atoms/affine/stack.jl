@@ -24,6 +24,15 @@ function hcat(args::AbstractCvxExpr...)
   end
   this.canon_form = ()->canon_constr_array
 
+  # TODO: Test this
+  this.evaluate = ()->begin
+    result = args[1].evaluate
+    for arg in args[2:]
+      result = hcat(result, arg.evaluate)
+    end
+    return result
+  end
+
   return this
 end
 
@@ -52,6 +61,14 @@ function vertcat(args::AbstractCvxExpr...)
     rows_so_far += arg.size[1]
   end
   this.canon_form = ()->canon_constr_array
+
+  this.evaluate = ()->begin
+    result = args[1].evaluate
+    for arg in args[2:]
+      result = vcat(result, arg.evaluate)
+    end
+    return result
+  end
 
   return this
 end

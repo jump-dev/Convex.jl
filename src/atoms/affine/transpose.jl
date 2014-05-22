@@ -24,6 +24,7 @@ function transpose(x::AbstractCvxExpr)
   push!(canon_constr_array, canon_constr)
 
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate()'
   return this
 end
 

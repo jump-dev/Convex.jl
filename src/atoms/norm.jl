@@ -32,11 +32,12 @@ function norm_inf(x::AbstractCvxExpr)
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.norm(x.evaluate(), Inf)
   return this
 end
 
 function quad_form(x::Constant, A::AbstractCvxExpr)
-  return x'*A*x
+  return x' * A * x
 end
 
 function quad_form(x::AbstractCvxExpr, A::Constant)
@@ -50,7 +51,7 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
   if !all(V .>= 0) && !all(V .<= 0)
     error("Quadratic forms supported only for semidefinite matrices")
   end
-  
+
   if all(V .>= 0)
     factor = 1
   else
@@ -58,11 +59,11 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
   end
 
   P = sqrtm(full(factor*A.value))
-  return factor*square(norm_2(P*x))
+  return factor * square(norm_2(P * x))
 end
 
 function quad_form(x::Constant, A::Constant)
-  return x'*A*x
+  return x' * A * x
 end
 
 quad_form(x::Value, A::Value) = quad_form(convert(CvxExpr, x), convert(CvxExpr, A))
@@ -105,6 +106,8 @@ function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, y.canon_form())
   this.canon_form = ()->canon_constr_array
 
+  this.evaluate = ()->x.evaluate().^2 / y.evaluate()
+
   return this
 end
 
@@ -130,6 +133,7 @@ function square(x::AbstractCvxExpr)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate().^2
 
   return this
 end
@@ -155,6 +159,7 @@ function norm_2(x::AbstractCvxExpr)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.norm(x.evaluate(), 2)
 
   return this
 end
@@ -203,5 +208,6 @@ function abs(x::AbstractCvxExpr)
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.abs(x.evaluate())
   return this
 end

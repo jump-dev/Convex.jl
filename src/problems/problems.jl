@@ -29,7 +29,7 @@ type Problem
 			error("Problem.head must be one of :minimize or :maximize.")
 		end
 
-		new(head, objective, constr, "to be solved", nothing, nothing, get_var_dict(objective, constr))
+		new(head, objective, constr, "not yet solved", nothing, nothing, get_var_dict(objective, constr))
 	end
 end
 
@@ -45,8 +45,12 @@ maximize(objective::AbstractCvxExpr, constr::CvxConstr...) =
 	Problem(:maximize, objective, [constr...])
 maximize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) =
 	Problem(:maximize, objective, constr)
-is_feasible(constr::Array{CvxConstr}=CvxConstr[]) =
+satisfy(constr::Array{CvxConstr}=CvxConstr[]) =
 	Problem(:minimize, Constant(0), constr)
+
+# +(constraints, constraints) is overwritten in constraints.jl
+add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constr, constraints)
+add_constraints(p::Problem, constraint::CvxConstr) = add_constraints(p, [constraint])
 
 function solve!(p::Problem, method=:ecos)
 	if method == :ecos
@@ -129,7 +133,7 @@ function create_ecos_matrices(canonical_constraints_array)
 	l = 0::Int64
 	ncones = 0::Int64
 	q = Int64[]
-  
+
 	# Loop over all the constraints to figure out the size of G and A
 	for constraint in canonical_constraints_array
 		# Loop over each variable in the constraint

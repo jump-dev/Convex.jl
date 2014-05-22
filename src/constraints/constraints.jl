@@ -1,4 +1,4 @@
-export CanonicalConstr, CvxConstr, ==, >=, <=, <, >
+export CanonicalConstr, CvxConstr, ==, >=, <=, <, >, +
 
 # TODO: Break down constraints.jl into multiple constraints: equality/exponential,
 # SOCP, SDP etc constraints
@@ -114,3 +114,8 @@ end
 <=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), x, convert(CvxExpr, y))
 >(x::AbstractCvxExpr, y::Value) = >=(x, y)
 <(x::AbstractCvxExpr, y::Value) = <=(x, y)
+
++(constraints::Array{CvxConstr}, new_constraint::CvxConstr) =
+  push!(constraints, new_constraint)
++(constraints::Array{CvxConstr}, new_constraints::Array{CvxConstr}) =
+  append!(constraints, new_constraints)
