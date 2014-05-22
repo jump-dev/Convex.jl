@@ -53,6 +53,8 @@ function -(x::AbstractCvxExpr)
     this.canon_form = ()->canon_constr_array
   end
 
+  this.evaluate = ()->-x.evaluate()
+
   return this
 end
 
@@ -74,7 +76,7 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, y.canon_form())
 
   this.canon_form = ()->canon_constr_array
-
+  this.evaluate = ()->x.evaluate() + y.evaluate()
 
   return this
 end
@@ -99,6 +101,7 @@ function +(x::AbstractCvxExpr, y::Constant)
 
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate() + y.evaluate()
   return this
 end
 

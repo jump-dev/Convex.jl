@@ -48,6 +48,9 @@ function *(x::Constant, y::AbstractCvxExpr)
     canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
+
+    this.evaluate = ()->x.evaluate() * y.evaluate()
+
     return this
 
   elseif y.size == (1,1)
@@ -59,6 +62,9 @@ function *(x::Constant, y::AbstractCvxExpr)
     canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
     this.canon_form = ()->append!(canon_constr_array, y.canon_form())
+
+    this.evaluate = ()->x.evaluate() * y.evaluate()
+
     return this
 
   else
@@ -82,6 +88,7 @@ function *(x::AbstractCvxExpr, y::Constant)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
   this.canon_form = ()->append!(canon_constr_array, x.canon_form())
+  this.evaluate = ()->x.evaluate() * y.evaluate()
   return this
 end
 

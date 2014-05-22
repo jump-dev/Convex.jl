@@ -11,6 +11,7 @@ function max(x::AbstractCvxExpr)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.maximum(x.evaluate())
   return this
 end
 
@@ -36,6 +37,7 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, (y <= this).canon_form())
 
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.max(x.evaluate(), y.evaluate())
   return this
 end
 
@@ -54,6 +56,7 @@ function min(x::AbstractCvxExpr)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (this <= x).canon_form()
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.minimum(x.evaluate())
   return this
 end
 
@@ -79,6 +82,7 @@ function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, (this <= y).canon_form())
 
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.min(x.evaluate(), y.evaluate())
   return this
 end
 

@@ -32,6 +32,7 @@ function norm_inf(x::AbstractCvxExpr)
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.norm(x.evaluate(), Inf)
   return this
 end
 
@@ -40,7 +41,7 @@ function quad_form(x::Constant, A::Constant)
 end
 
 function quad_form(x::Constant, A::AbstractCvxExpr)
-  return x'*A*x
+  return x' * A * x
 end
 
 function quad_form(x::AbstractCvxExpr, A::Constant)
@@ -54,7 +55,7 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
   if !all(V .>= 0) && !all(V .<= 0)
     error("Quadratic forms supported only for semidefinite matrices")
   end
-  
+
   if all(V .>= 0)
     factor = 1
   else
@@ -62,7 +63,7 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
   end
 
   P = sqrtm(full(factor*A.value))
-  return factor*square(norm_2(P*x))
+  return factor * square(norm_2(P * x))
 end
 
 quad_form(x::Value, A::Value) = quad_form(convert(CvxExpr, x), convert(CvxExpr, A))
@@ -107,6 +108,7 @@ function quad_over_lin(x::Constant, y::AbstractCvxExpr)
                         CanonicalConstr(lin_coeffs, lin_vars, lin_constant, false, false)]
   append!(canon_constr_array, y.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate()' * x.evaluate() / y.evaluate()
 
   return this
 end
@@ -129,6 +131,7 @@ function quad_over_lin(x::AbstractCvxExpr, y::Constant)
   canon_constr_array = [CanonicalConstr(cone_coeffs, cone_vars, cone_constant, false, true)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate()' * x.evaluate() / y.evaluate()
 
   return this
 end
@@ -161,6 +164,8 @@ function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, x.canon_form())
   append!(canon_constr_array, y.canon_form())
   this.canon_form = ()->canon_constr_array
+
+  this.evaluate = ()->x.evaluate()' * x.evaluate() / y.evaluate()
 
   return this
 end
@@ -199,6 +204,7 @@ function qol_elementwise(x::Constant, y::AbstractCvxExpr)
   push!(canon_constr_array, CanonicalConstr(lin_coeffs, lin_vars, lin_constant, false, false))
   append!(canon_constr_array, y.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate() .^ 2 ./ y.evaluate()
 
   return this
 end
@@ -223,6 +229,7 @@ function qol_elementwise(x::AbstractCvxExpr, y::Constant)
   
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate() .^2 ./ y.evaluate()
 
   return this
 end
@@ -256,6 +263,7 @@ function qol_elementwise(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, x.canon_form())
   append!(canon_constr_array, y.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->x.evaluate() .^ 2 ./ y.evaluate()
 
   return this
 end
@@ -297,6 +305,7 @@ function geo_mean(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, x.canon_form())
   append!(canon_constr_array, y.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.sqrt(x.evaluate() .* y.evaluate())
 
   return this
 end
@@ -338,6 +347,7 @@ function norm_2(x::AbstractCvxExpr)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, false, true)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.norm(x.evaluate(), 2)
 
   return this
 end
@@ -380,11 +390,11 @@ function abs(x::AbstractCvxExpr)
     error("abs(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
   end
 
-  println(this.vexity)
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
   this.canon_form = ()->canon_constr_array
+  this.evaluate = ()->Base.abs(x.evaluate())
   return this
 end

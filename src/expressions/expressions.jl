@@ -20,6 +20,7 @@ type CvxExpr <: AbstractCvxExpr
   size::(Int64, Int64)
   uid::Int64
   canon_form::Function
+  evaluate::Function
   # TODO: args::Array works, everything else does not (eg args or args::Array{AbstractCvxExpr})
   # Check why
   function CvxExpr(head::Symbol, args::Array, vexity::Symbol, sign::Symbol, size::(Int64, Int64))
@@ -44,8 +45,10 @@ type Variable <: AbstractCvxExpr
   vexity::Symbol
   sign::Symbol
   size::(Int64, Int64)
+  value::ValueOrNothing
   uid::Int64
   canon_form::Function
+  evaluate::Function
 
   function Variable(head::Symbol, size::(Int64, Int64), sign::Symbol)
     if length(size) == 1
@@ -55,13 +58,14 @@ type Variable <: AbstractCvxExpr
       error("sign must be one of :pos, :neg, :zero, :any; got $sign")
     end
     if head == :variable
-      this = new(head, nothing, :linear, sign, size)
+      this = new(head, nothing, :linear, sign, size, nothing)
     elseif head == :parameter
-      this = new(head, nothing, :constant, sign, size)
+      this = new(head, nothing, :constant, sign, size, nothing)
     end
     this.uid = unique_id(this)
     # Variables are already in canonical form
     this.canon_form = ()->CanonicalConstr[]
+    this.evaluate = ()->this.value == nothing ? error("value of the variable is yet to be calculated") : this.value
     return this
   end
 end
@@ -86,6 +90,7 @@ type Constant <: AbstractCvxExpr
   sign::Symbol
   size::(Int64, Int64)
   canon_form::Function
+  evaluate::Function
 
   function Constant(x::Value, sign)
     if sign in signs
@@ -98,6 +103,7 @@ type Constant <: AbstractCvxExpr
       # Once julia fixes it, we can probably move back to x
       this = new(:constant, x'', :constant, sign, sz)
       this.canon_form = ()->CanonicalConstr[]
+      this.evaluate = ()->this.value
       return this
     else
       error("sign must be one of :pos, :neg, :zero or :any but got $sign")
