@@ -307,6 +307,15 @@ d = -3
 p = Problem(:minimize, quad_over_lin(A*x + b, c*x + d))
 solve!(p)
 
+# Test 40
+x = Variable(4, 4)
+c = ones(16, 1)
+reshaped = reshape(x, 16, 1)
+a = [1:16]
+p = minimize(c' * reshaped, reshaped >= a)
+solve!(p)
+@assert abs(p.optval - 136) < TOLERANCE
+
 
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])

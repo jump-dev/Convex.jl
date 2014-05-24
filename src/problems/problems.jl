@@ -219,7 +219,7 @@ function populate_variables!(problem::Problem, variable_index::Dict{Int64, Int64
 	var_dict = problem.var_dict
 	for (id, var) in var_dict
 		index = variable_index[id]
-		var.value = reshape(x[index : index + get_vectorized_size(var) - 1], var.size)
+		var.value = Base.reshape(x[index : index + get_vectorized_size(var) - 1], var.size)
 	end
 end
 
