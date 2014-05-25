@@ -19,10 +19,18 @@ function abs(x::AbstractCvxExpr)
     error("abs(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
   end
 
+  # Change vexity to allow <=
+  vexity = this.vexity
+  this.vexity = :linear
+
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (-this <= x).canon_form())
+
+  # Refix vexity
+  this.vexity = vexity
+
   this.canon_form = ()->canon_constr_array
   this.evaluate = ()->Base.abs(x.evaluate())
   return this
