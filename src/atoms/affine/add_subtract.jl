@@ -17,6 +17,7 @@ function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
   end
 end
 
+# Returns the sign of x + y. Returns :any if we can't determine the sign
 function promote_sign(x::AbstractCvxExpr, y::AbstractCvxExpr)
   signs = Set(x.sign, y.sign)
   if :any in signs || signs == Set(:pos,:neg)

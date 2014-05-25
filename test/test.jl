@@ -23,10 +23,10 @@ solve!(p)
 
 # Test 4
 x = Variable(2)
-p = Problem(:minimize, dot([2.0; 2.0], x), [x >= [1.1; 1.1]])
+constr = x >= [1.1; 1.1]
+p = Problem(:minimize, dot([2.0; 2.0], x), constr)
 solve!(p)
 @assert abs(p.optval - 4.4) <= TOLERANCE
-
 
 # Test 5
 x = Variable(2)
@@ -315,7 +315,6 @@ a = [1:16]
 p = minimize(c' * reshaped, reshaped >= a)
 solve!(p)
 @assert abs(p.optval - 136) < TOLERANCE
-
 
 # x = Variable(1)
 # p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])

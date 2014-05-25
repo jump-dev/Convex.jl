@@ -27,7 +27,6 @@ end
 
 
 function *(x::Constant, y::Constant)
-  # TODO this won't work once we extend constants to parameters
   return Constant(x.value * y.value)
 end
 

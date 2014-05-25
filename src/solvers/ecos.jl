@@ -66,12 +66,11 @@ function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
 
   # Solve the problem
   ret_val = ccall((:ECOS_solve, "../ecos/ecos.so"), Int64, (Ptr{Void},), pwork)
-
   solution = get_ecos_solution(pwork, n, p, m, ret_val)
 
   # TODO: Check how many we need to keep
-  # 3 means we keep x,y,z 2 means x,y and so on
-  num_vars_to_keep = 3
+  # 4 means we keep x,y,s,z 2 means x,y and so on
+  num_vars_to_keep = 4
   ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
   return solution
 end

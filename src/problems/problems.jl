@@ -14,7 +14,6 @@ type Problem
 	status::ASCIIString
 	optval::Float64OrNothing
 	solution::SolutionOrNothing
-	var_dict::Dict{Int64, Variable}
 
 	function Problem(head::Symbol, objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[])
 		if !all([x <= 1 for x in objective.size])
@@ -29,7 +28,7 @@ type Problem
 			error("Problem.head must be one of :minimize or :maximize.")
 		end
 
-		new(head, objective, constr, "not yet solved", nothing, nothing, get_var_dict(objective, constr))
+		new(head, objective, constr, "not yet solved", nothing, nothing)
 	end
 end
 
@@ -85,7 +84,8 @@ function ecos_solve!(problem::Problem)
 	end
 
 	append!(canonical_constraints_array, objective.canon_form())
-	m, n, p, l, ncones, q, G, h, A, b, variable_index = create_ecos_matrices(canonical_constraints_array)
+	m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index =
+		create_ecos_matrices(canonical_constraints_array)
 	#return create_ecos_matrices(canonical_constraints_array)
 
 
@@ -119,6 +119,7 @@ function ecos_solve!(problem::Problem)
 	problem.solution = solution
 	if problem.status == "solved"
 		populate_variables!(problem, variable_index)
+		populate_constraints!(problem, eq_constr_index, ineq_constr_index)
 	end
 end
 
@@ -128,6 +129,10 @@ end
 function create_ecos_matrices(canonical_constraints_array)
 	n = 0::Int64
 	variable_index = Dict{Int64, Int64}()
+
+	eq_constr_index = Dict{Int64, Int64}()
+	ineq_constr_index = Dict{Int64, Int64}()
+
 	m = 0::Int64
 	p = 0::Int64
 	l = 0::Int64
@@ -198,31 +203,52 @@ function create_ecos_matrices(canonical_constraints_array)
 		end
 
 		if constraint.is_eq
+			eq_constr_index[constraint.uid] = p_index
 			b[p_index : p_index + m_var - 1] = constraint.constant
 			p_index += m_var
 		elseif constraint.is_conic
+			ineq_constr_index[constraint.uid] = l + c_index
       h[l + c_index : l + c_index + m_var - 1] = constraint.constant
       c_index += m_var
 		else
+			ineq_constr_index[constraint.uid] = l_index
 			h[l_index : l_index + m_var - 1] = constraint.constant
 			l_index += m_var
 		end
 	end
 
-	return m, n, p, l, ncones, q, G, h, A, b, variable_index
+	return m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index
 end
 
 # Now that the problem has been solved, populate the optimal values of the
 # variables back into them
 function populate_variables!(problem::Problem, variable_index::Dict{Int64, Int64})
 	x = problem.solution.x
-	var_dict = problem.var_dict
+	var_dict = get_var_dict(problem.objective, problem.constr)
 	for (id, var) in var_dict
 		index = variable_index[id]
 		var.value = Base.reshape(x[index : index + get_vectorized_size(var) - 1], var.size)
 		if var.size == (1, 1)
 			# Make it a scalar
 			var.value = var.value[1]
+		end
+	end
+end
+
+function populate_constraints!(problem::Problem, eq_constr_index::Dict{Int64, Int64},
+		ineq_constr_index::Dict{Int64, Int64})
+
+	y = problem.solution.y
+	z = problem.solution.z
+
+	for constraint in problem.constr
+		uid = constraint.canon_uid
+		if constraint.head == :(==)
+			index = eq_constr_index[uid]
+			# constraint.dual_value = Base.reshape(y[index : index + get_vectorized_size(constraint.size) - 1], constraint.size)
+		else
+			index = ineq_constr_index[uid]
+			constraint.dual_value = Base.reshape(z[index : index + get_vectorized_size(constraint.size) - 1], constraint.size)
 		end
 	end
 end

@@ -76,4 +76,5 @@ kron(A::SparseMatrixCSC, B::Number) = kron(A, [B])
 kron(A::Number, B::SparseMatrixCSC) = kron([A], B)
 
 # Unique ids
-unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Int64, (Any, ), x)
+unique_id(x::AbstractCvxExpr) = convert(Int64, object_id(x))
+unique_id(x::CanonicalConstr) = convert(Int64, object_id(x))

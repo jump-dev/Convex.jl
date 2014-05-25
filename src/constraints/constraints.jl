@@ -10,21 +10,30 @@ type CanonicalConstr
   constant::Value
   is_eq::Bool
   is_conic::Bool
+  uid::Int64
 
   function CanonicalConstr(coeffs::VecOrMat, vars::Array{Int64, 1}, constant::Value, is_eq::Bool, is_conic::Bool)
-    return new(coeffs, vars, constant, is_eq, is_conic)
+    this = new(coeffs, vars, constant, is_eq, is_conic)
+    this.uid = unique_id(this)
+    return this
   end
 
   function CanonicalConstr(coeffs::Number, vars::Array{Int64, 1}, constant::Value, is_eq::Bool, is_conic::Bool)
-    return new([coeffs], vars, constant, is_eq, is_conic)
+    this = new([coeffs], vars, constant, is_eq, is_conic)
+    this.uid = unique_id(this)
+    return this
   end
 
   function CanonicalConstr(coeffs::VecOrMat, vars::Int64, constant::Value, is_eq::Bool, is_conic::Bool)
-    return new(coeffs, [vars], constant, is_eq, is_conic)
+    this = new(coeffs, [vars], constant, is_eq, is_conic)
+    this.uid = unique_id(this)
+    return this
   end
 
   function CanonicalConstr(coeffs::Number, vars::Int64, constant::Value, is_eq::Bool, is_conic::Bool)
-    return new([coeffs], [vars], constant, is_eq, is_conic)
+    this = new([coeffs], [vars], constant, is_eq, is_conic)
+    this.uid = unique_id(this)
+    return this
   end
 end
 
@@ -34,8 +43,10 @@ type CvxConstr
   lhs::AbstractCvxExpr
   rhs::AbstractCvxExpr
   vexity::Symbol
-  dual_value
+  size::(Int64, Int64)
   canon_form::Function
+  canon_uid::Int64
+  dual_value::ValueOrNothing
 
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
     # Check vexity
@@ -56,6 +67,14 @@ type CvxConstr
     else
       error("unrecognized comparison $head")
     end
+
+    # Size checks will be done in canon_form
+    if lhs.size == (1, 1)
+      sz = rhs.size
+    else
+      sz = lhs.size
+    end
+    constraint = new(head, lhs, rhs, vexity, sz)
 
     canon_form = ()->
       begin
@@ -91,6 +110,8 @@ type CvxConstr
 
           constant = vec(rhs.value)
           canon_constr = CanonicalConstr(coeffs, unique_id(lhs), constant, (head == :(==)), false)
+          constraint.canon_uid = canon_constr.uid
+
           canon_constr_array = lhs.canon_form()
           push!(canon_constr_array, canon_constr)
 
@@ -113,6 +134,8 @@ type CvxConstr
           constant = zeros(sz)
 
           canon_constr = CanonicalConstr(coeffs, vars, constant, (head == :(==)), false)
+          constraint.canon_uid = canon_constr.uid
+
           canon_constr_array = lhs.canon_form()
           append!(canon_constr_array, rhs.canon_form())
           push!(canon_constr_array, canon_constr)
@@ -120,7 +143,8 @@ type CvxConstr
         return canon_constr_array
       end
 
-    return new(head, lhs, rhs, vexity, nothing, canon_form)
+    constraint.canon_form = canon_form
+    return constraint
   end
 end
 
