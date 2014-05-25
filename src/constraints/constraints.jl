@@ -40,7 +40,6 @@ type CvxConstr
   dual_value
   canon_form::Function
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
-    lhs, rhs = promote_for_add(lhs, rhs)
     # Check vexity
     if head == :(==)
       if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
@@ -68,16 +67,37 @@ type CvxConstr
           error ("TODO")
 
         elseif rhs.vexity == :constant
-          constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
+          if rhs.size == (1, 1) && lhs.size != (1, 1)
+            rhs = Constant(rhs.value * ones(lhs.size...), rhs.sign)
+            coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs))]
+          elseif rhs.size != (1, 1) && lhs.size == (1, 1)
+            coeffs = VecOrMatOrSparse[ones(get_vectorized_size(rhs), 1)]
+          elseif lhs.size != rhs.size
+            error("Can't compare expressions of size $(x.size) and $(y.size)")
+          else
+            coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs))]
+          end
 
-          coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs))]
+          constant = typeof(rhs.value) <: Number ? rhs.value : vec(rhs.value)
           canon_constr = CanonicalConstr(coeffs, unique_id(lhs), constant, (head == :(==)), false)
           canon_constr_array = lhs.canon_form()
           push!(canon_constr_array, canon_constr)
+
         else
-          coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs)), -speye(get_vectorized_size(rhs))]
+          if lhs.size == (1, 1) && rhs.size != (1, 1)
+            sz = get_vectorized_size(rhs.size)
+            coeffs = VecOrMatOrSparse[ones(sz, 1), -speye(sz)]
+          elseif lhs.size != (1, 1) && rhs.size == (1, 1)
+            sz = get_vectorized_size(lhs.size)
+            coeffs = VecOrMatOrSparse[speye(sz), -ones(sz, 1)]
+          elseif lhs.size != rhs.size
+            error("Can't compare expressions of size $(x.size) and $(y.size)")
+          else
+            sz = get_vectorized_size(rhs.size)
+            coeffs = VecOrMatOrSparse[speye(sz), -speye(sz)]
+          end
           vars = [unique_id(lhs); unique_id(rhs)]
-          constant = zeros(get_vectorized_size(lhs))
+          constant = zeros(sz)
 
           canon_constr = CanonicalConstr(coeffs, vars, constant, (head == :(==)), false)
           canon_constr_array = lhs.canon_form()

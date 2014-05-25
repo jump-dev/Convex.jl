@@ -220,6 +220,10 @@ function populate_variables!(problem::Problem, variable_index::Dict{Int64, Int64
 	for (id, var) in var_dict
 		index = variable_index[id]
 		var.value = Base.reshape(x[index : index + get_vectorized_size(var) - 1], var.size)
+		if var.size == (1, 1)
+			# Make it a scalar
+			var.value = var.value[1]
+		end
 	end
 end
 

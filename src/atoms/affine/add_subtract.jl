@@ -33,7 +33,6 @@ end
 ### Unary Negation
 
 function -(x::Constant)
-  # TODO this won't work once we extend constants to parameters
   return Constant(-x.value)
 end
 
@@ -61,14 +60,26 @@ end
 ### Binary Addition/Subtraction
 
 function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  x, y = promote_for_add(x, y)
-  this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
+  if x.size != y.size
 
-  coeffs = VecOrMatOrSparse[-speye(get_vectorized_size(x)),
-      -speye(get_vectorized_size(x)),
-      speye(get_vectorized_size(x))]
-  vars = [x.uid, y.uid, this.uid]
-  constant = zeros(get_vectorized_size(x))
+    if x.size == (1, 1)
+      sz_y = get_vectorized_size(y)
+      this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), y.size)
+      coeffs = VecOrMatOrSparse[-ones(sz_y, 1), -speye(sz_y), speye(sz_y)]
+      vars = [x.uid, y.uid, this.uid]
+      constant = zeros(sz_y)
+    elseif y.size == (1, 1)
+      return y + x
+    else
+      error("Can't add expressions of size $(x.size) and $(y.size)")
+    end
+  else
+    sz = get_vectorized_size(y)
+    this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), y.size)
+    coeffs = VecOrMatOrSparse[-speye(sz), -speye(sz), speye(sz)]
+    vars = [x.uid, y.uid, this.uid]
+    constant = zeros(sz)
+  end
 
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
 
@@ -81,20 +92,22 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   return this
 end
 
-
-function +(x::Constant, y::Constant)
-  # TODO this won't work once we extend constants to parameters
-  x, y = promote_for_add(x, y)
-  this = Constant(x.value + y.value)
-  return this
-end
-
-
 function +(x::AbstractCvxExpr, y::Constant)
-  x, y = promote_for_add(x, y)
-  this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
+  if x.size != y.size && x.size == (1, 1)
+    sz_y = get_vectorized_size(y)
+    this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), y.size)
+    coeffs = VecOrMatOrSparse[-ones(sz_y, 1), speye(sz_y)]
+  elseif x.size != y.size && y.size != (1, 1)
+    error("Can't add expressions of size $(x.size) and $(y.size)")
+  else
+    if y.size == (1, 1)
+      y = Constant(y.value * ones(x.size...), y.sign)
+    end
+    sz = get_vectorized_size(x)
+    this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
+    coeffs = VecOrMatOrSparse[-speye(sz), speye(sz)]
+  end
 
-  coeffs = VecOrMatOrSparse[-speye(get_vectorized_size(x)), speye(get_vectorized_size(x))]
   vars = [x.uid, this.uid]
   constant = vec(y.value)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
@@ -105,6 +118,21 @@ function +(x::AbstractCvxExpr, y::Constant)
   return this
 end
 
+function +(x::Constant, y::Constant)
+  this = Constant(x.value + y.value)
+  return this
+end
+
+# Override addition since julia doesn't allow things like [1] + eye(4)
+function +(x::Array{Number,}, y::Array{Number,})
+  if x.size == (1, 1)
+    return x[1] + y
+  elseif y.size == (1, 1)
+    return x + y[1]
+  else
+    return x + y
+  end
+end
 
 +(y::Constant, x::AbstractCvxExpr) = +(x::AbstractCvxExpr, y::Constant)
 +(x::AbstractCvxExpr, y::Value) = +(x, convert(CvxExpr, y))

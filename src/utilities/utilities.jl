@@ -1,6 +1,7 @@
 import Base.vec
-export convert, promote_for_add, print_debug
+export convert, print_debug
 export get_vectorized_size, full, kron, reverse_vexity, reverse_sign
+export unique_id
 
 ### Conversion and promotion
 # TODO: The difference between conversion and promotion is messy.
@@ -53,36 +54,11 @@ function reverse_sign(x::AbstractCvxExpr)
   end
 end
 
-function promote_for_add(x::Constant, sz::(Int64, Int64))
-  this = Constant(x.value * ones(sz...), x.sign)
-  return this
-end
-
-function promote_for_add(x::AbstractCvxExpr, sz::(Int64, Int64))
-  this = Constant(ones(sz...), :pos) * x
-  return this
-end
-
-function promote_for_add(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.size != y.size
-    if maximum(x.size) == 1
-      x = promote_for_add(x, y.size)
-    elseif maximum(y.size) == 1
-      y = promote_for_add(y, x.size)
-    else
-      error("size of arguments cannot be added; got $(x.size),$(y.size)")
-    end
-  end
-
-  return (x, y)
-end
-
 function print_debug(debug, args...)
   if (debug)
     println(args)
   end
 end
-
 
 # TODO: This is taken from the julia code, remove after updating to new version
 function kron{Tv1,Ti1,Tv2,Ti2}(A::SparseMatrixCSC{Tv1,Ti1}, B::SparseMatrixCSC{Tv2,Ti2})
@@ -98,3 +74,6 @@ kron(A::VecOrMat, B::SparseMatrixCSC) = kron(sparse(A), B)
 
 kron(A::SparseMatrixCSC, B::Number) = kron(A, [B])
 kron(A::Number, B::SparseMatrixCSC) = kron([A], B)
+
+# Unique ids
+unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Int64, (Any, ), x)

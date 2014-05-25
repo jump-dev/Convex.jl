@@ -1,5 +1,5 @@
 import Base.convert, Base.size
-export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, unique_id, Value
+export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, Value
 
 abstract AbstractCvxExpr
 # Every type inheriting from the AbstractCvxExpr type should have the following properties:
@@ -41,7 +41,6 @@ CvxExpr(head::Symbol, arg, vexity::Symbol, sign::Symbol, size::(Int64, Int64)) =
 
 type Variable <: AbstractCvxExpr
   head::Symbol
-  value
   vexity::Symbol
   sign::Symbol
   size::(Int64, Int64)
@@ -58,9 +57,9 @@ type Variable <: AbstractCvxExpr
       error("sign must be one of :pos, :neg, :zero, :any; got $sign")
     end
     if head == :variable
-      this = new(head, nothing, :linear, sign, size, nothing)
+      this = new(head, :linear, sign, size, nothing)
     elseif head == :parameter
-      this = new(head, nothing, :constant, sign, size, nothing)
+      this = new(head, :constant, sign, size, nothing)
     end
     this.uid = unique_id(this)
     # Variables are already in canonical form
@@ -131,6 +130,3 @@ function Constant(x::Value)
   end
   return Constant(x, :any)
 end
-
-# Unique ids
-unique_id(x::AbstractCvxExpr) = ccall(:jl_symbol_name, Int64, (Any, ), x)
