@@ -21,8 +21,7 @@ function test()
   println(time() - start)
   solve!(p)
   println(p.optval)
-  println(time() - start)
-  return p
+  println(time() - start);
 end
 
 # Assuming speed of calling randn, sprandn, etc is negligible for now...
