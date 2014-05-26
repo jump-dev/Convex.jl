@@ -8,6 +8,12 @@ function quad_form(x::Constant, A::AbstractCvxExpr)
   return x' * A * x
 end
 
+# TODO: Type checking
+function issym(A)
+  TOLERANCE = 1e-6
+  return all(A-A' .< TOLERANCE)
+end
+
 function quad_form(x::AbstractCvxExpr, A::Constant)
   if A.size[1] != A.size[2]
     error("Quadratic form only takes square matrices")
