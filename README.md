@@ -64,7 +64,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone c
  - quadratic over linear: `quad_over_lin(x, y)`
  - l2-norm squared: `sum_squares(x)`
 
-In addition to these operations, we overload promotions. For example, we can do `max(x, 0) where x is a vector variable but 0 is a scalar.
+In addition to these operations, we overload promotions. For example, we can do `max(x, 0)` where x is a vector variable but 0 is a scalar.
 
 # Prerequisites
 
@@ -122,7 +122,7 @@ The constraints can be added at any time before the problem is solved.
 # No constraints given
 problem = minimize(objective)
 # Add some constraint
-problem.constraints = constraint
+problem.constraints += constraint
 # Add many more constraints
 problem.constraints += [constraint1, constraint2]
 ```
@@ -215,6 +215,6 @@ Currently, CVX.jl is developed and maintained by:
 - David Zeng
 
 In addition to development, we'd like to give a huge thanks to:
-- [Stephen Boyd](http://www.stanford.edu/~boud/): Professor of Electrical Engineering, Stanford University for his continuous input and support.
+- [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University for his continuous input and support.
 - [Steven Diamond](http://www.stanford.edu/~stevend2/): Author of cvxpy. In addition to his  help, several parts of the code have been inspired directly from cvxpy.
 
