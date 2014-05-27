@@ -49,5 +49,7 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
   return this
 end
 
+# TODO: Max across dimensions
+
 max(x::AbstractCvxExpr, y::Value) = max(x, convert(CvxExpr, y))
 max(y::Value, x::AbstractCvxExpr) = max(x, convert(CvxExpr, y))

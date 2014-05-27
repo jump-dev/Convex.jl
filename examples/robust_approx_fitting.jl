@@ -2,7 +2,10 @@
 # Boyd & Vandenberghe "Convex Optimization"
 # Original by Lieven Vandenberghe
 # Adapted for CVX by Joelle Skaf - 10/03/05
+#
 # Adapted for CVX.jl by Karanveer Mohan and David Zeng - 26/05/14
+# Original cvx code and plots here:
+# http://web.cvxr.com/cvx/examples/cvxbook/Ch06_approx_fitting/html/fig6_15.html
 #
 # Consider the least-squares problem:
 #       minimize ||(A + tB)x - b||_2
@@ -62,9 +65,12 @@ for k=1:novals
   errvals_wc = [errvals_wc, Base.norm((A + parvals[k] * B) * x_wc - b)];
 end
 
-# Plots. You'll need Gaston and gnuplot installed. Otherwise,
-# you might have to change the code a bit to work with other plotting
-# libraries
+# Plots. You'll need Gaston and gnuplot installed.
+# For other plotting libraries, you probably have to change the next few lines.
 using Gaston
 Gaston.set_terminal("x11")
-plot(parvals, errvals_ls, "color","blue", parvals, errvals_stoch, "color", "black", parvals, errvals_wc, "color","red")
+plot(parvals, errvals_ls, "color","blue", "legend", "Nominal problem",
+     parvals, errvals_stoch, "color", "black", "legend", "Stochastic Robust Approximation",
+     parvals, errvals_wc, "color", "red", "legend", "Worst-Case Robust Approximation",
+     "title", "Residual r(u) vs a parameter u for three approximate solutions",
+     "xlabel", "u", "ylabel", "r(u) = ||A(u)x-b||_2")

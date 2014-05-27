@@ -4,7 +4,6 @@ export get_vectorized_size, full, kron, reverse_vexity, reverse_sign
 export unique_id
 
 ### Conversion and promotion
-# TODO: The difference between conversion and promotion is messy.
 function convert(::Type{CvxExpr}, x)
   if typeof(x) == CvxExpr
     return x
@@ -66,7 +65,7 @@ function kron{Tv1,Ti1,Tv2,Ti2}(A::SparseMatrixCSC{Tv1,Ti1}, B::SparseMatrixCSC{T
   Ti_res = promote_type(Ti1, Ti2)
   A = convert(SparseMatrixCSC{Tv_res,Ti_res}, A)
   B = convert(SparseMatrixCSC{Tv_res,Ti_res}, B)
-  return Base.kron(A,B)
+  return Base.kron(A, B)
 end
 
 kron(A::SparseMatrixCSC, B::VecOrMat) = kron(A, sparse(B))

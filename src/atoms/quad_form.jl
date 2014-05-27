@@ -8,17 +8,17 @@ function quad_form(x::Constant, A::AbstractCvxExpr)
   return x' * A * x
 end
 
-# TODO: Type checking
-function issym(A)
+# Note that we don't use Base.issym due to accurracy issues in issym
+function is_symmetric(A::Matrix)
   TOLERANCE = 1e-6
-  return all(A-A' .< TOLERANCE)
+  return all(A - A' .< TOLERANCE)
 end
 
 function quad_form(x::AbstractCvxExpr, A::Constant)
   if A.size[1] != A.size[2]
     error("Quadratic form only takes square matrices")
   end
-  if !issym(full(A.value))
+  if !is_symmetric(A.value)
     error("Quadratic form only defined for symmetric matrices")
   end
   V = eigvals(full(A.value))
