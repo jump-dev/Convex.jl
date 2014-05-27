@@ -1,4 +1,4 @@
-export reshape
+export reshape, vec
 
 function reshape(x::AbstractCvxExpr, m::Int64, n::Int64)
   sz = get_vectorized_size(x.size)
@@ -17,4 +17,8 @@ function reshape(x::AbstractCvxExpr, m::Int64, n::Int64)
   this.canon_form = ()->canon_constr_array
   this.evaluate = ()->Base.reshape(x.evaluate(), m, n)
   return this
+end
+
+function vec(x::AbstractCvxExpr)
+  return reshape(x, get_vectorized_size(x), 1)
 end

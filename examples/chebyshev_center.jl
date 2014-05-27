@@ -18,10 +18,10 @@ b = ones(4, 1);
 r = Variable(1)
 x_c = Variable(2)
 p = maximize(r)
-p.constr += a1' * x_c + r * Base.norm(a1, 2) <= b[1];
-p.constr += a2' * x_c + r * Base.norm(a2, 2) <= b[2];
-p.constr += a3' * x_c + r * Base.norm(a3, 2) <= b[3];
-p.constr += a4' * x_c + r * Base.norm(a4, 2) <= b[4];
+p.constraints += a1' * x_c + r * Base.norm(a1, 2) <= b[1];
+p.constraints += a2' * x_c + r * Base.norm(a2, 2) <= b[2];
+p.constraints += a3' * x_c + r * Base.norm(a3, 2) <= b[3];
+p.constraints += a4' * x_c + r * Base.norm(a4, 2) <= b[4];
 solve!(p)
 p.optval
 

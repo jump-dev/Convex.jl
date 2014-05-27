@@ -46,7 +46,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone c
  - diagonal of a matrix: `diag(x)`
  - transpose: `x'`
  - dot product: `x' * y` or `dot(x, y)`
- - reshape: `reshape(x, 2, 3)`
+ - reshape, vec: `reshape(x, 2, 3)` or `vec(x)`
  - min, max element of a vector or matrx: `max(x)`
  - horizontal and vertical stacking: `hcat(x, y); vertcat(x, y)`
 - Elementwise
@@ -209,10 +209,10 @@ solve!(p)
 
 # Credits
 Currently, CVX.jl is developed and maintained by:
-- Jenny Hong
+- [Jenny Hong](http://www.stanford.edu/~jyunhong/)
 - [Karanveer Mohan](http://www.stanford.edu/~kvmohan/)
 - [Madeleine Udell](http://www.stanford.edu/~udell/)
-- David Zeng
+- [David Zeng](http://www.stanford.edu/~dzeng0/)
 
 In addition to development, we'd like to give a huge thanks to:
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University for his continuous input and support.
