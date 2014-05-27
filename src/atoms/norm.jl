@@ -1,5 +1,5 @@
 import Base.abs
-export norm, norm_inf, norm_2, square, sum_squared, norm_1, quad_over_lin, qol_elementwise
+export norm, norm_inf, norm_2, square, sum_squares, norm_1, quad_over_lin, qol_elementwise
 
 function check_size_norm(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1

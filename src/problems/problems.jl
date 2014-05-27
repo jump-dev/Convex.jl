@@ -10,12 +10,12 @@ SolutionOrNothing = Union(Solution, Nothing)
 type Problem
 	head::Symbol
 	objective::AbstractCvxExpr
-	constr::Array{CvxConstr}
+	constraints::Array{CvxConstr}
 	status::ASCIIString
 	optval::Float64OrNothing
 	solution::SolutionOrNothing
 
-	function Problem(head::Symbol, objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[])
+	function Problem(head::Symbol, objective::AbstractCvxExpr, constraints::Array{CvxConstr}=CvxConstr[])
 		if !all([x <= 1 for x in objective.size])
 			error("Only scalar optimization problems allowed, but size(objective) = $(objective.size).")
 		end
@@ -28,27 +28,27 @@ type Problem
 			error("Problem.head must be one of :minimize or :maximize.")
 		end
 
-		new(head, objective, constr, "not yet solved", nothing, nothing)
+		new(head, objective, constraints, "not yet solved", nothing, nothing)
 	end
 end
 
-Problem(head::Symbol, objective::AbstractCvxExpr, constr::CvxConstr...) =
-	Problem(head, objective, [constr...])
+Problem(head::Symbol, objective::AbstractCvxExpr, constraints::CvxConstr...) =
+	Problem(head, objective, [constraints...])
 
 # Allow users to simply type minimize or maximize
-minimize(objective::AbstractCvxExpr, constr::CvxConstr...) =
-	Problem(:minimize, objective, [constr...])
-minimize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) =
-	Problem(:minimize, objective, constr)
-maximize(objective::AbstractCvxExpr, constr::CvxConstr...) =
-	Problem(:maximize, objective, [constr...])
-maximize(objective::AbstractCvxExpr, constr::Array{CvxConstr}=CvxConstr[]) =
-	Problem(:maximize, objective, constr)
-satisfy(constr::Array{CvxConstr}=CvxConstr[]) =
-	Problem(:minimize, Constant(0), constr)
+minimize(objective::AbstractCvxExpr, constraints::CvxConstr...) =
+	Problem(:minimize, objective, [constraints...])
+minimize(objective::AbstractCvxExpr, constraints::Array{CvxConstr}=CvxConstr[]) =
+	Problem(:minimize, objective, constraints)
+maximize(objective::AbstractCvxExpr, constraints::CvxConstr...) =
+	Problem(:maximize, objective, [constraints...])
+maximize(objective::AbstractCvxExpr, constraints::Array{CvxConstr}=CvxConstr[]) =
+	Problem(:maximize, objective, constraints)
+satisfy(constraints::Array{CvxConstr}=CvxConstr[]) =
+	Problem(:minimize, Constant(0), constraints)
 
 # +(constraints, constraints) is overwritten in constraints.jl
-add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constr, constraints)
+add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constraints, constraints)
 add_constraints(p::Problem, constraint::CvxConstr) = add_constraints(p, [constraint])
 
 function solve!(p::Problem, method=:ecos)
@@ -63,7 +63,7 @@ function ecos_debug(problem::Problem)
   objective = problem.objective
 
 	canonical_constraints_array = CanonicalConstr[]
-	for constraint in problem.constr
+	for constraint in problem.constraints
 		append!(canonical_constraints_array, constraint.canon_form())
 	end
 
@@ -79,7 +79,7 @@ function ecos_solve!(problem::Problem)
 	objective = problem.objective
 
 	canonical_constraints_array = CanonicalConstr[]
-	for constraint in problem.constr
+	for constraint in problem.constraints
 		append!(canonical_constraints_array, constraint.canon_form())
 	end
 
@@ -224,7 +224,7 @@ end
 # variables back into them
 function populate_variables!(problem::Problem, variable_index::Dict{Int64, Int64})
 	x = problem.solution.x
-	var_dict = get_var_dict(problem.objective, problem.constr)
+	var_dict = get_var_dict(problem.objective, problem.constraints)
 	for (id, var) in var_dict
 		index = variable_index[id]
 		var.value = Base.reshape(x[index : index + get_vectorized_size(var) - 1], var.size)
@@ -241,7 +241,7 @@ function populate_constraints!(problem::Problem, eq_constr_index::Dict{Int64, In
 	y = problem.solution.y
 	z = problem.solution.z
 
-	for constraint in problem.constr
+	for constraint in problem.constraints
 		uid = constraint.canon_uid
 		if constraint.head == :(==)
 			index = eq_constr_index[uid]
@@ -273,14 +273,14 @@ end
 get_var_dict!(e, var_dict) = nothing
 
 function get_var_dict(p::Problem)
-	return get_var_dict(p.objective, p.constr)
+	return get_var_dict(p.objective, p.constraints)
 end
 
-function get_var_dict(objective::AbstractCvxExpr, constr::Array{CvxConstr})
+function get_var_dict(objective::AbstractCvxExpr, constraints::Array{CvxConstr})
 	var_dict = Dict{Int64, Variable}()
 
 	get_var_dict!(objective, var_dict)
-	for c in constr
+	for c in constraints
 		get_var_dict!(c.lhs, var_dict);
 		get_var_dict!(c.rhs, var_dict);
 	end

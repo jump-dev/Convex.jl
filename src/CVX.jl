@@ -33,7 +33,7 @@ include("atoms/elementwise/inv_pos.jl")
 include("atoms/norm.jl")
 include("atoms/quad_form.jl")
 include("atoms/geo_mean.jl")
-include("atoms/sum_squared.jl")
+include("atoms/sum_squares.jl")
 include("atoms/quad_over_lin.jl")
 
 end # module

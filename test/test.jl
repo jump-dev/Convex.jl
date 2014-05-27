@@ -264,7 +264,7 @@ solve!(p)
 x = Variable(2, 1)
 A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
-p = Problem(:minimize, sum_squared(A*x + b))
+p = Problem(:minimize, sum_squares(A*x + b))
 solve!(p)
 @assert abs(p.optval - 0.42105) < TOLERANCE
 
