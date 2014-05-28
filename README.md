@@ -4,28 +4,32 @@
 [![Build Status](https://travis-ci.org/madeleineudell/CVX.jl.png)](https://travis-ci.org/madeleineudell/CVX.jl)
 -->
 
-CVX.jl is a julia package for disciplined convex programming. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected.
-(Bug reports, of course, are welcome.)
+CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
 
 CVX.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and CVX.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
 # Generate problem data
-m = 20
-n = 20
+m = 4
+n = 5
 A = randn(m, n)
 b = randn(m, 1)
 
-# Create a variable of size n x 1. Matrix variables are also supported
+# Create a variable of size n x 1. 
+# Matrix variables are also supported
 x = Variable(n)
 
 # The problem is to minimize ||Ax + b||^2 subject to x >= 1
-# An alternative form of specifying the constraints is:
-# problem.constraints += [x >= 1, 0 <= x] 
-problem = minimize(sum_squares(A * x + b), [x >= 1, 0 <= x])
+problem = minimize(sum_squares(A * x + b), [0 <= x])
 
-# Solve the problem
+# Alternatively, we can add constraints at any time in the following way:
+problem.constraints += [x <= 1, 0.5 <= 2*x] 
+
+# Solve the problem by calling solve!
 solve!(problem)
+
+# Status (solved, infeasible etc.)
+problem.status
 
 # Optimum value
 problem.optval
@@ -38,7 +42,7 @@ problem.constraints[1].dual_value
 ```
 
 # Supported Operations
-In its current state, CVX.jl supports affine constraints and second-order cone constraints. In most cases these have been suitably overloaded to work seamlessly for scalars, vectors and matrices. A list of operations that can be performed are listed below:
+In its current state, CVX.jl supports affine constraints and second-order cone (SOC) constraints. In most cases these have been suitably overloaded to work seamlessly for scalars, vectors and matrices. A list of operations that can be performed are listed below:
 
 - Affine
  - addition, subtraction, multiplication, division: `+, -, /, *`
@@ -47,11 +51,11 @@ In its current state, CVX.jl supports affine constraints and second-order cone c
  - transpose: `x'`
  - dot product: `x' * y` or `dot(x, y)`
  - reshape, vec: `reshape(x, 2, 3)` or `vec(x)`
- - min, max element of a vector or matrx: `max(x)`
+ - min, max element of a vector or matrix: `max(x)`
  - horizontal and vertical stacking: `hcat(x, y); vertcat(x, y)`
 - Elementwise
  - elementwise min, max between vectors or matrices: `max(x, y)`
- - pos, neg where pos is max(x, 0), neg is -max(-x, 0)
+ - pos, neg where pos is implemented as max(x, 0) and neg is implemented as -max(-x, 0): `pos(x)`
  - inverse pos (1./pos(x)): `inv_pos(x)`
  - square root: `sqrt(x)`
  - square: `square(x)`
@@ -59,12 +63,12 @@ In its current state, CVX.jl supports affine constraints and second-order cone c
  - absolute value: `abs(x)`
 - SOC/ Other supported constraints
  - geometric mean: `geo_mean(x, y)`
- - norm (norm_1, norm_2, norm_inf): `norm(x, 1); norm(x, Inf)`
+ - norm (norm_1, norm_2, norm_inf): `norm(x, 1); norm(x, 2); norm(x, Inf)`
  - quadratic form: `quad_form(P, x)`
  - quadratic over linear: `quad_over_lin(x, y)`
  - l2-norm squared: `sum_squares(x)`
 
-In addition to these operations, we overload promotions. For example, we can do `max(x, 0)` where x is a vector variable but 0 is a scalar.
+In addition to these operations, when there are operations between vectors/matrices and scalars, the scalars are promoted. For example, we can do `max(x, 0)` where x is a vector variable but 0 is a scalar.
 
 # Prerequisites
 
@@ -77,10 +81,10 @@ ECOS.jl is under development. Until then, the only way to use CVX.jl is to downl
 
 To install, just git clone the repo. As mentioned in the previous section, `ecos.so` is expected at a specific location. Work is still in progress and a clean, easy-to-use/install module will be available soon.
 
-# Basic Usage
+# Basic Types
 
 ## Variables
-Variables are self-explanatory. These are the entities whose values will be calculated by solving the problem.
+Variables represent the quantities that we want to find by solving the problem.
 ```
 # Scalar variable
 x = Variable()
@@ -94,7 +98,7 @@ x = Variable(4, 6)
 ```
 
 ## Constants
-Use constants the way you would usually use them in Julia. They should work just fine. There might be a few bugs here and there (for example, giving a sparse matrix as a constant might throw an error in some operation). Please report an issue and we will fix it as soon as we can.
+Use constants the way you would usually use them in Julia. They should work just fine. In case there are any problems, please report an issue and we will fix it as soon as we can.
 
 ## Expressions
 Performing operations on Variables results in Expressions. As the name suggests, these are mathematical expressions. These expressions can be combined with other expressions and so on. Expressions that are created must be DCP-compliant (follow the rules of Disciplined Convex Programming (DCP)). More information on DCP can be found here: http://dcp.stanford.edu/.
@@ -105,12 +109,37 @@ y = sum(x)
 z = 4 * x + y
 z_1 = z[1]
 ```
+CVX.jl allows the values of the expressions to be evaluated directly. 
+```
+x = Variable()
+y = Variable()
+z = Variable()
+expr = x + y + z
+problem = minimize(expr, [ x >= 1, y >= x, 4 * z >= y]
+solve!(problem)
+
+# Once the problem is solved, we can call evaluate() on expr:
+expr.evaluate()
+```
 
 ## Constraints
-Expressions combined with <, >, <=, >= and == create Constraints.
+Constants, Variables and Expressions,  combined with <, >, <=, >= and == create Constraints. 
+```
+x = Variable(5, 5)
+# Equality constraint
+x == 0
+# Greater than/ equal to constraint
+x >= 1
+```
+If a constraint is specified as strictly greater than or less than, it will be converted to a >= or <= constraint respectively. If a strict inequality is needed, one way to do it would be as follows:
+```
+x = Variable()
+slack = Variable()
+constraints = [x + slack >= 0, slack >= 1e-4]
+```
 
 ## Objective
-The objective of the problem is a scalar expression to be maximized or minimize by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`. 
+The objective of the problem is a scalar expression to be maximized or minimized by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`. 
 
 ## Problem
 A problem is an objective and a list of constraints. These are constructed using the form
@@ -216,5 +245,4 @@ Currently, CVX.jl is developed and maintained by:
 
 In addition to development, we'd like to give a huge thanks to:
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): Author of cvxpy. In addition to his  help, several parts of the code have been inspired directly from cvxpy.
-
+- [Steven Diamond](http://www.stanford.edu/~stevend2/): Author of [cvxpy](https://github.com/cvxgrp/cvxpy). In addition to his help, several parts of the code have been inspired from cvxpy.
