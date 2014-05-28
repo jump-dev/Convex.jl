@@ -245,4 +245,4 @@ Currently, CVX.jl is developed and maintained by:
 
 In addition to development, we'd like to give a huge thanks to:
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): Author of [cvxpy](https://github.com/cvxgrp/cvxpy). In addition to his help, several parts of the code have been inspired from cvxpy.
+- [Steven Diamond](http://www.stanford.edu/~stevend2/): Author of [cvxpy](https://github.com/cvxgrp/cvxpy). In addition to his help, CVX.jl's design was inspired from Steven Diamond's [CVXPY](http://cvxpy.org). 
