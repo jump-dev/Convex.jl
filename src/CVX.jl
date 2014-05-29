@@ -18,6 +18,7 @@ include("atoms/affine/stack.jl")
 include("atoms/affine/sum.jl")
 include("atoms/affine/reshape.jl")
 include("atoms/affine/transpose.jl")
+include("atoms/affine/diag.jl")
 
 include("atoms/elementwise/min.jl")
 include("atoms/elementwise/max.jl")

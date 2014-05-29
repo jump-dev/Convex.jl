@@ -1,28 +1,36 @@
 export diag
 
-# TODO: implement diag for non-main diagonal
-function diag(x::AbstractCvxExpr)
+function diag(x::AbstractCvxExpr, k::Int64=0)
   (num_rows, num_cols) = x.size
 
-  num_rows_coeff = Base.min(num_rows, num_cols)
-  num_cols_coeff = get_vectorized_size(x)
-
-  coeff = spzeros(num_rows_coeff, num_cols_coeff)
-
-  for i in num_rows_coeff
-    idx = num_rows * (i - 1) + i
-    coeff[i, idx] = 1
+  if k >= num_cols || k <= -num_rows
+    error("Bounds error in calling diag")
   end
 
-  this = CvxExpr(:diag, [x], x.vexity, x.sign, (num_rows_coeff, 1))
-  coeffs = VecOrMatOrSparse[coeff, -speye(num_rows_coeff)]
+  if k >= 0
+    start_index = k * num_rows + 1
+    sz_diag = Base.min(num_rows, num_cols - k)
+  else
+    start_index = -k + 1
+    sz_diag = Base.min(num_rows + k, num_cols)
+  end
+
+  coeff = spzeros(sz_diag, get_vectorized_size(x))
+
+  for i in 1:sz_diag
+    coeff[i, start_index] = 1
+    start_index += num_rows + 1
+  end
+
+  this = CvxExpr(:diag, [x], x.vexity, x.sign, (sz_diag, 1))
+  coeffs = VecOrMatOrSparse[coeff, -speye(sz_diag)]
   vars = [x.uid, this.uid]
-  constant = zeros(num_rows_coeff)
+  constant = zeros(sz_diag, 1)
 
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
 
-  this.evaluate = ()->Base.diag(x.evaluate(), 0)
+  this.evaluate = ()->Base.diag(x.evaluate(), k)
   return this
 end

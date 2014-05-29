@@ -48,16 +48,14 @@ mu = 1
 p = minimize(mu * sum(square(velocity)) + sum(square(force)), constraints)
 solve!(p)
 
-# TODO: Plotting
-# @David: We should probably just call PyPlot.jl
-# Here is how it would have been plotted in python
-#
-# plt.figure(0, (4,4))
-# plt.quiver(position.value[0,0:T-1:2],position.value[1,0:T-1:2],
-  # force.value[0,::2],force.value[1,::2])
-# plt.plot(position.value[0,:],position.value[1,:],'r')
-# plt.plot(0,0,'bo')
-# plt.plot(final_position[0],final_position[1],'bo')
-# plt.xlim([-2,12]), plt.ylim([-1,4])
-# plt.show()
-#
+# TODO: Test plotting
+using PyPlot
+figure(0, (4,4))
+quiver(position.value[0,0:T-1:2],position.value[1,0:T-1:2],
+  force.value[0,::2],force.value[1,::2])
+plot(position.value[0,:],position.value[1,:],'r')
+plot(0,0,'bo')
+plot(final_position[0],final_position[1],'bo')
+xlim([-2,12])
+ylim([-1,4])
+show()
