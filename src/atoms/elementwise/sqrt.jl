@@ -1,3 +1,4 @@
+import Base.sqrt
 export sqrt
 
 function sqrt(x::AbstractCvxExpr)

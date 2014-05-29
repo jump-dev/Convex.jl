@@ -1,3 +1,4 @@
+import Base.dot
 export dot
 
 function dot(x::AbstractCvxExpr, y::AbstractCvxExpr)

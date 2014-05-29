@@ -1,3 +1,4 @@
+import Base.diag
 export diag
 
 function diag(x::AbstractCvxExpr, k::Int64=0)

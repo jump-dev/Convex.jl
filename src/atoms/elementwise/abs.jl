@@ -1,3 +1,4 @@
+import Base.abs
 export abs
 
 function abs(x::AbstractCvxExpr)

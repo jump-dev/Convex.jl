@@ -1,5 +1,5 @@
-import Base.abs
-export norm, norm_inf, norm_2, square, sum_squares, norm_1, quad_over_lin, qol_elementwise
+import Base.norm
+export norm, norm_inf, norm_2, norm_1
 
 function check_size_norm(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1
@@ -75,4 +75,8 @@ function norm(x::AbstractCvxExpr, p = 2)
   else
     error("Norm $p not defined")
   end
+end
+
+function norm(x)
+  Base.norm(x)
 end

@@ -1,3 +1,4 @@
+import Base.hcat, Base.vcat
 export hcat, vertcat
 
 function hcat(args::AbstractCvxExpr...)

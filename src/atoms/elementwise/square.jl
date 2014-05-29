@@ -1,3 +1,4 @@
+import Base.square
 export square
 
 function square(x::AbstractCvxExpr)

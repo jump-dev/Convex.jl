@@ -1,3 +1,4 @@
+import Base.min
 export min
 
 function min(x::AbstractCvxExpr)

@@ -1,3 +1,4 @@
+import Base.reshape, Base.vec
 export reshape, vec
 
 function reshape(x::AbstractCvxExpr, m::Int64, n::Int64)

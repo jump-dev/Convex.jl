@@ -1,3 +1,4 @@
+import Base.max
 export max
 
 function max(x::AbstractCvxExpr)

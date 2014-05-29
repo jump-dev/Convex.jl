@@ -1,3 +1,4 @@
+import Base.transpose, Base.ctranspose
 export transpose, ctranspose
 
 function transpose(x::AbstractCvxExpr)
