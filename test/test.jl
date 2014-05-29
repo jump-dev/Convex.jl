@@ -1,57 +1,57 @@
-@everywhere require("src/CVX.jl")
-@everywhere using CVX
+require("src/CVX.jl")
+using CVX
 
 TOLERANCE = .0001
 
 # Test 1
 x = Variable(1)
-p = Problem(:minimize, -x, [x <= 0])
+p = minimize(-x, [x <= 0])
 solve!(p)
 @assert abs(p.optval - 0) <= TOLERANCE
 
 # Test 2
 x = Variable(1)
-p = Problem(:minimize, x, [x >= 2, x <= 4])
+p = minimize(x, [x >= 2, x <= 4])
 solve!(p)
 @assert abs(p.optval - 2) <= TOLERANCE
 
 # Test 3
 x = Variable(1)
-p = Problem(:minimize, 2.0 * x, [x >= 2, x <= 4])
+p = minimize(2.0 * x, [x >= 2, x <= 4])
 solve!(p)
 @assert abs(p.optval - 4) <= TOLERANCE
 
 # Test 4
 x = Variable(2)
 constr = x >= [1.1; 1.1]
-p = Problem(:minimize, dot([2.0; 2.0], x), constr)
+p = minimize(dot([2.0; 2.0], x), constr)
 solve!(p)
 @assert abs(p.optval - 4.4) <= TOLERANCE
 
 # Test 5
 x = Variable(2)
 A = 1.5 * eye(2)
-p = Problem(:minimize, dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
+p = minimize(dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
 solve!(p)
 @assert abs(p.optval - 2.9333) <= TOLERANCE
 
 # Test 6
 x = Variable(1)
 y = Variable(1)
-p = Problem(:minimize, x + y, [x >= 3, y >= 2])
+p = minimize(x + y, [x >= 3, y >= 2])
 solve!(p)
 @assert abs(p.optval - 5) <= TOLERANCE
 
 # Test 7
 x = Variable(1)
 y = Variable(1)
-p = Problem(:minimize, 2.0*x - 5.0*y, [100.0 <= x, x <= 200.0, 80.0 <= y, y <= 170.0, y >= -x])
+p = minimize(2.0*x - 5.0*y, [100.0 <= x, x <= 200.0, 80.0 <= y, y <= 170.0, y >= -x])
 solve!(p)
 @assert abs(p.optval + 650) <= TOLERANCE
 
 # Test 8
 x = Variable(2)
-p = Problem(:minimize, x[1] + x[2], [x >= 1])
+p = minimize(x[1] + x[2], [x >= 1])
 solve!(p)
 @assert abs(p.optval - 2) <= TOLERANCE
 
@@ -69,12 +69,12 @@ solve!(p)
 # Test 10
 X = Variable(2, 2)
 c = ones(2, 1)
-p = Problem(:minimize, c' * X * c, [X >= ones(2, 2)])
+p = minimize(c' * X * c, [X >= ones(2, 2)])
 solve!(p)
 @assert abs(p.optval - 4) < TOLERANCE
 
 # Test 11
-p = Problem(:maximize, c' * X * c, [X <= [1 2; 3 4]])
+p = maximize(c' * X * c, [X <= [1 2; 3 4]])
 solve!(p)
 @assert abs(p.optval - 10) < TOLERANCE
 
@@ -82,26 +82,26 @@ solve!(p)
 X = Variable(2, 2)
 I = Constant(eye(2))
 c = ones(2, 1)
-p = Problem(:maximize, c' * (eye(2) + X + I + 1) * c, [X + ones(2, 2) <= [1 2; 3 4]])
+p = maximize(c' * (eye(2) + X + I + 1) * c, [X + ones(2, 2) <= [1 2; 3 4]])
 solve!(p)
 @assert abs(p.optval - 14) < TOLERANCE
 
 # Test 13
 x = Variable(1)
-p = Problem(:minimize, x, [x >= eye(2)])
+p = minimize(x, [x >= eye(2)])
 solve!(p)
 @assert abs(p.optval - 1) < TOLERANCE
 
 # Test 14
 x = Variable(1)
-p = Problem(:minimize, x, [x + eye(2) >= eye(2)])
+p = minimize(x, [x + eye(2) >= eye(2)])
 solve!(p)
 @assert abs(p.optval - 0) < TOLERANCE
 
 # Test 15
 x = Variable(1)
 c = ones(2, 1)
-p = Problem(:minimize, c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) < x])
+p = minimize(c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) < x])
 solve!(p)
 @assert abs(p.optval - 6) < TOLERANCE
 
@@ -110,14 +110,14 @@ N = 20
 x = Variable(1)
 y = Variable(N, N)
 c = ones(N, 1)
-p = Problem(:minimize, c' * (y + x) * c, [x >= 3, 2y >= 0, y <= x])
+p = minimize(c' * (y + x) * c, [x >= 3, 2y >= 0, y <= x])
 solve!(p)
 @assert abs(p.optval - 1200) < TOLERANCE
 
 # Test 17
 x = Variable(2)
 c = ones(2, 1)
-p = Problem(:minimize, x' * c, x >= 1)
+p = minimize(x' * c, x >= 1)
 solve!(p)
 @assert abs(p.optval - 2) < TOLERANCE
 
@@ -129,7 +129,7 @@ r_2 = rand(cols, rows)
 x = Variable(rows, cols)
 c = ones(1, cols)
 d = ones(rows, 1)
-p = Problem(:minimize, c * x' * d + d' * x * c' + (c * x''''' * d)',
+p = minimize(c * x' * d + d' * x * c' + (c * x''''' * d)',
             [x' >= r_2, x >= r, x''' >= r_2, x'' >= r]);
 solve!(p)
 s = Base.sum(Base.max(r, r_2')) * 3
@@ -142,28 +142,28 @@ n = 2
 X = Variable(rows, cols)
 A = randn(rows, cols)
 c = rand(1, n)
-p = Problem(:minimize, c * X[1:n, 5:5+n-1]' * c', X >= A)
+p = minimize(c * X[1:n, 5:5+n-1]' * c', X >= A)
 solve!(p);
 s = c * A[1:n, 5:5+n-1]' * c'
 @assert abs(p.optval - s[1]) < TOLERANCE
 
 # Test 20
 x = Variable(1, 10)
-p = Problem(:minimize, sum(x[2:5]), x >= [1 2 3 4 5 6 7 8 9 10])
+p = minimize(sum(x[2:5]), x >= [1 2 3 4 5 6 7 8 9 10])
 solve!(p)
 @assert abs(p.optval - 14) < TOLERANCE
 
 # Test 21
 x = Variable(10)
 a = rand(10, 1)
-p = Problem(:maximize, sum(x[2:6]), x <= a)
+p = maximize(sum(x[2:6]), x <= a)
 solve!(p)
 @assert abs(p.optval - sum(a[2:6])) < TOLERANCE
 
 # Test 22
 x = Variable(10)
 a = rand(10, 1)
-p = Problem(:minimize, max(x), x >= a)
+p = minimize(max(x), x >= a)
 solve!(p)
 @assert abs(p.optval - Base.maximum(a)) < TOLERANCE
 
@@ -172,7 +172,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = Problem(:minimize, max(max(x, y)), [x >= a, y >= b])
+p = minimize(max(max(x, y)), [x >= a, y >= b])
 solve!(p)
 max_a = Base.maximum(a)
 max_b = Base.maximum(b)
@@ -181,7 +181,7 @@ max_b = Base.maximum(b)
 # Test 24
 x = Variable(1)
 a = rand(10, 10)
-p = Problem(:maximize, min(x), x <= a)
+p = maximize(min(x), x <= a)
 solve!(p)
 @assert abs(p.optval - Base.minimum(a)) < TOLERANCE
 
@@ -190,7 +190,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = Problem(:maximize, min(min(x, y)), [x <= a, y <= b])
+p = maximize(min(min(x, y)), [x <= a, y <= b])
 solve!(p)
 min_a = Base.minimum(a)
 min_b = Base.minimum(b)
@@ -199,20 +199,20 @@ min_b = Base.minimum(b)
 # Test 26
 x = Variable(3)
 a = [-2; 1; 2]
-p = Problem(:minimize, sum(pos(x)), [x >= a, x <= 2])
+p = minimize(sum(pos(x)), [x >= a, x <= 2])
 solve!(p)
 @assert abs(p.optval - 3) < TOLERANCE
 
 # Test 27
 x = Variable(3)
-p = Problem(:minimize, norm_inf(x), [-2 <= x, x <= 1])
+p = minimize(norm_inf(x), [-2 <= x, x <= 1])
 solve!(p)
 @assert abs(p.optval) < TOLERANCE
 
 # Test 28
 x1 = Variable(1)
 x2 = Variable(1)
-p = Problem(:minimize, 4x1 + x2,
+p = minimize(4x1 + x2,
             [3x1 + x2 == 3, 4x1 + 3x2 >= 6, x1 + 2x2 <=3, x1 >=0, x2 >=0])
 solve!(p)
 @assert abs(p.optval - 3.6) < TOLERANCE
@@ -220,7 +220,7 @@ solve!(p)
 # Test 29
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = Problem(:maximize, sum(x) + sum(y), [hcat(x, y) <= 2])
+p = maximize(sum(x) + sum(y), [hcat(x, y) <= 2])
 solve!(p)
 @assert abs(p.optval - 80) < TOLERANCE
 
@@ -247,7 +247,7 @@ solve!(p)
 x = Variable(2, 1)
 A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
-p = Problem(:minimize, norm_2(A * x + b))
+p = minimize(norm_2(A * x + b))
 solve!(p)
 @assert abs(p.optval - 0.64888) < TOLERANCE
 
@@ -256,7 +256,7 @@ x = Variable(2, 1)
 A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
 lambda = 1
-p = Problem(:minimize, norm_2(A * x + b) + lambda * norm_2(x), x >= 1)
+p = minimize(norm_2(A * x + b) + lambda * norm_2(x), x >= 1)
 solve!(p)
 @assert abs(p.optval - 14.9049) < TOLERANCE
 
@@ -264,13 +264,13 @@ solve!(p)
 x = Variable(2, 1)
 A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
-p = Problem(:minimize, sum_squares(A*x + b))
+p = minimize(sum_squares(A*x + b))
 solve!(p)
 @assert abs(p.optval - 0.42105) < TOLERANCE
 
 # Test 35
 x = Variable(3)
-p = Problem(:minimize, sum(abs(x)), [-2 <= x, x <= 1])
+p = minimize(sum(abs(x)), [-2 <= x, x <= 1])
 solve!(p)
 @assert abs(p.optval) < TOLERANCE
 
@@ -279,14 +279,14 @@ x = Variable(2, 1)
 A = [1 2; 2 1; 3 4]
 b = [2; 3; 4]
 lambda = 1
-p = Problem(:minimize, norm_2(A * x + b) + lambda * norm_1(x), x >= 1)
+p = minimize(norm_2(A * x + b) + lambda * norm_1(x), x >= 1)
 solve!(p)
 @assert abs(p.optval - 15.4907) < TOLERANCE
 
 # Test 37
 x = Variable(3, 1)
 A = [0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
-p = Problem(:minimize, quad_form(x, A), [x >= 1])
+p = minimize(quad_form(x, A), [x >= 1])
 solve!(p)
 @assert abs(p.optval - 6.1464) < TOLERANCE
 
@@ -294,7 +294,7 @@ solve!(p)
 x = Variable(3, 1)
 A = -1.0*[0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
 c = [3 2 4]
-p = Problem(:maximize, c*x , [quad_form(x, A) >= -1])
+p = maximize(c*x , [quad_form(x, A) >= -1])
 solve!(p)
 @assert abs(p.optval - 3.7713) < TOLERANCE
 
@@ -304,7 +304,7 @@ A = [2 -3 5; -2 9 -3; 5 -8 3]
 b = [-3; 9; 5]
 c = [3 2 4]
 d = -3
-p = Problem(:minimize, quad_over_lin(A*x + b, c*x + d))
+p = minimize(quad_over_lin(A*x + b, c*x + d))
 solve!(p)
 
 # Test 40
@@ -316,10 +316,17 @@ p = minimize(c' * reshaped, reshaped >= a)
 solve!(p)
 @assert abs(p.optval - 136) < TOLERANCE
 
+
+# Test 41
+x = Variable(4, 4)
+p = minimize(sum(diag(x)), x >= 2)
+solve!(p)
+@assert abs(p.optval - 8) < TOLERANCE
+
 # x = Variable(1)
-# p = Problem(:minimize, x, [eye(2) + x >= ones(2, 2)])
+# p = minimize(x, [eye(2) + x >= ones(2, 2)])
 # solve!(p)
-# p = Problem(:minimize, y, [X >= 1, y >= X])
+# p = minimize(y, [X >= 1, y >= X])
 # println(x.value)
 # @assert x.value - y.value*[1.0,2.0,3.0] <= 0
 
