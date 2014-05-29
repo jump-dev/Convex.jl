@@ -47,7 +47,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
 - Affine
  - addition, subtraction, multiplication, division: `+, -, /, *`
  - indexing into vectors and matrices: `x[1:4, 2:3]`
- - diagonal of a matrix: `diag(x)`
+ - k-th diagonal of a matrix: `diag(x, k)`
  - transpose: `x'`
  - dot product: `x' * y` or `dot(x, y)`
  - reshape, vec: `reshape(x, 2, 3)` or `vec(x)`
@@ -70,16 +70,15 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
 
 In addition to these operations, when there are operations between vectors/matrices and scalars, the scalars are promoted. For example, we can do `max(x, 0)` where x is a vector variable but 0 is a scalar.
 
-# Prerequisites
-
-CVX.jl requires
-* [ECOS](http://github.com/ifa-ethz/ecos) >= 1.0.3
-
-ECOS.jl is under development. Until then, the only way to use CVX.jl is to download ECOS, compile it into a shared library and put it in `../ecos/ecos.so` relative to where CVX.jl exists. This will be fixed soon.
 
 # Installation
-
-To install, just git clone the repo. As mentioned in the previous section, `ecos.so` is expected at a specific location. Work is still in progress and a clean, easy-to-use/install module will be available soon.
+```
+Pkg.clone("git@github.com:karanveerm/CVX.jl.git")
+Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
+Pkg.build("ECOS")  
+```
+You might have to restart Julia.
+This does not work on Windows yet but should work on Mac/ Linux. Please file an issue in case you run into problems during installation. We'll be glad to help!
 
 # Basic Types
 
@@ -225,14 +224,14 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = Problem(:maximize, min(min(x, y)), [x <= a, y <= b])
+p = maximize(min(min(x, y)), [x <= a, y <= b])
 solve!(p)
 ```
 
 * Norm-Infinity
 ```
 x = Variable(3)
-p = Problem(:minimize, norm(x, Inf), [-2 <= x, x <= 1])
+p = minimize(norm(x, Inf), [-2 <= x, x <= 1])
 solve!(p)
 ```
 
@@ -244,5 +243,5 @@ Currently, CVX.jl is developed and maintained by:
 - [David Zeng](http://www.stanford.edu/~dzeng0/)
 
 In addition to development, we'd like to give a huge thanks to:
-- [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): Author of [cvxpy](https://github.com/cvxgrp/cvxpy). In addition to his help, CVX.jl's design was inspired from Steven Diamond's [CVXPY](http://cvxpy.org). 
+- [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University. He is also the co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html). We thank Professor Boyd for his continuous input and support.
+- [Steven Diamond](http://www.stanford.edu/~stevend2/): CVX.jl started out as a wrapper around Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy) and its design has been inspired from CVXPY. We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote http://dcp.stanford.edu/ to teach disciplined convex programming, a useful resource for CVX.jl users.
