@@ -1,3 +1,4 @@
+import ECOS
 export ecos_solve
 
 # Calls the ECOS C solver
@@ -30,65 +31,26 @@ function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
     A::VecOrMatOrSparseOrNothing=nothing, c::Array{Float64, }=nothing,
     h::Array{Float64, }=nothing, b::ArrayFloat64OrNothing=nothing, debug::Bool=false)
 
-  if q == []
-    q = convert(Ptr{Int64}, C_NULL)
-  end
+  ptr_work = ECOS.setup(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b)
+  ret_val = ECOS.solve(ptr_work)
 
-  if A == nothing
-    Apr = convert(Ptr{Float64}, C_NULL)
-    Ajc = convert(Ptr{Int64}, C_NULL)
-    Air = convert(Ptr{Int64}, C_NULL)
-  else
-    sparseA = sparse(A)
-    # Hack to make it a float, find a better way
-    Apr = sparseA.nzval * 1.0
-    # -1 since the C language is 0 indexed
-    Ajc = sparseA.colptr - 1
-    Air = sparseA.rowval - 1
-  end
+  solution = get_ecos_solution(ptr_work, n, p, m, ret_val)
 
-  sparseG = sparse(G)
-  # Hack to make it a float, find a better way
-  Gpr = sparseG.nzval * 1.0
-  # -1 since the C  language is 0 indexed
-  Gjc = sparseG.colptr - 1
-  Gir = sparseG.rowval - 1
-
-  if b == nothing
-    b = convert(Ptr{Float64}, C_NULL)
-  end
-
-  # Call ECOS to setup the problem
-  pwork = ccall((:ECOS_setup, "../ecos/ecos.so"), Ptr{Void},
-      (Int64, Int64, Int64, Int64, Int64, Ptr{Int64}, Ptr{Float64}, Ptr{Int64}, Ptr{Int64},
-      Ptr{Float64}, Ptr{Int64}, Ptr{Int64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}),
-      n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, c, h, b)
-
-  # Solve the problem
-  ret_val = ccall((:ECOS_solve, "../ecos/ecos.so"), Int64, (Ptr{Void},), pwork)
-  solution = get_ecos_solution(pwork, n, p, m, ret_val)
-
-  # TODO: Check how many we need to keep
-  # 4 means we keep x,y,s,z 2 means x,y and so on
+  # 4 means we keep x,y,s,z.
   num_vars_to_keep = 4
-  ccall((:ECOS_cleanup, "../ecos/ecos.so"), Void, (Ptr{Void}, Int64), pwork, num_vars_to_keep)
+  ECOS.cleanup(ptr_work, 4)
   return solution
 end
 
 
 # Given the arguments, returns an object of type Solution
-function get_ecos_solution(pwork, n, p, m, ret_val)
-  double_ptr = convert(Ptr{Ptr{Float64}}, pwork)
+function get_ecos_solution(ptr_work, n, p, m, ret_val)
+  work = pointer_to_array(ptr_work, 1)[1]
 
-  # x is the 5th element in the struct
-  x_ptr = unsafe_load(double_ptr, 5)
-  x = pointer_to_array(x_ptr, n)
-
-  y_ptr = unsafe_load(double_ptr, 6)
-  y = pointer_to_array(y_ptr, p)
-
-  z_ptr = unsafe_load(double_ptr, 7)
-  z = pointer_to_array(z_ptr, m)
+  x = pointer_to_array(work.x, n)
+  y = pointer_to_array(work.y, p)
+  z = pointer_to_array(work.z, m)
+  s = pointer_to_array(work.z, m)
 
   return Solution(x, y, z, ret_val)
 end
