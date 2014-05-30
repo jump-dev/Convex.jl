@@ -28,7 +28,7 @@ function hcat(args::AbstractCvxExpr...)
   # TODO: Test this
   this.evaluate = ()->begin
     result = args[1].evaluate
-    for arg in args[2:]
+    for arg in args[2:end]
       result = hcat(result, arg.evaluate)
     end
     return result
@@ -65,7 +65,7 @@ function vertcat(args::AbstractCvxExpr...)
 
   this.evaluate = ()->begin
     result = args[1].evaluate
-    for arg in args[2:]
+    for arg in args[2:end]
       result = vcat(result, arg.evaluate)
     end
     return result
