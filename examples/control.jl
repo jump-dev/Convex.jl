@@ -45,17 +45,15 @@ constraints += velocity[all_rows, T] == 0
 
 # Solve the problem
 mu = 1
-p = minimize(mu * sum(square(velocity)) + sum(square(force)), constraints)
+p = minimize(mu * sum_squares(vec(velocity)) + sum_squares(vec(force)), constraints)
 solve!(p)
 
-# TODO: Test plotting
-using PyPlot
-figure(0, (4,4))
-quiver(position.value[0,0:T-1:2],position.value[1,0:T-1:2],
-  force.value[0,::2],force.value[1,::2])
-plot(position.value[0,:],position.value[1,:],'r')
-plot(0,0,'bo')
-plot(final_position[0],final_position[1],'bo')
-xlim([-2,12])
-ylim([-1,4])
-show()
+
+import PyPlot.plt
+plt.plot(position.value[1, 1:2:T]', position.value[2, 1:2:T]', "r-", linewidth=1.5)
+plt.quiver(position.value[1, 1:2:T], position.value[2, 1:2:T], force.value[1, 1:2:T-1], force.value[2, 1:2:T-1], width=0.002)
+plt.plot(0, 0, "bo", markersize=10)
+plt.plot(final_position[1], final_position[2], "bo", markersize=10)
+plt.xlim([-15, 16])
+plt.ylim([-10, 16])
+plt.show()
