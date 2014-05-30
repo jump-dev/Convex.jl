@@ -6,6 +6,22 @@
 
 CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
 
+## Table of Contents
+- [Introduction](#user-content-introduction)
+- [Supported Operations](#user-content-supported-operations)
+- [Installation](#user-content-installation)
+- [Basic Types](#user-content-basic-types)
+  - [Variables](#user-content-variables)
+  - [Constants](#user-content-constants)
+  - [Expressions](#user-content-expressions)
+  - [Constraints](#user-content-constraints)
+  - [Objective](#user-content-objective)
+  - [Problem](#user-content-problem)
+- [Examples](#user-content-examples)
+- [Credits](#user-content-credits)
+
+
+## Introduction
 CVX.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and CVX.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
@@ -41,7 +57,7 @@ x.value
 problem.constraints[1].dual_value
 ```
 
-# Supported Operations
+## Supported Operations
 In its current state, CVX.jl supports affine constraints and second-order cone (SOC) constraints. In most cases these have been suitably overloaded to work seamlessly for scalars, vectors and matrices. A list of operations that can be performed are listed below:
 
 - Affine
@@ -71,7 +87,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
 In addition to these operations, when there are operations between vectors/matrices and scalars, the scalars are promoted. For example, we can do `max(x, 0)` where x is a vector variable but 0 is a scalar.
 
 
-# Installation
+## Installation
 ```
 Pkg.clone("git@github.com:karanveerm/CVX.jl.git")
 Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
@@ -80,9 +96,9 @@ Pkg.build("ECOS")
 You might have to restart Julia.
 This does not work on Windows yet but should work on Mac/ Linux. Please file an issue in case you run into problems during installation. We'll be glad to help!
 
-# Basic Types
+## Basic Types
 
-## Variables
+### Variables
 Variables represent the quantities that we want to find by solving the problem.
 ```
 # Scalar variable
@@ -96,10 +112,10 @@ x = Variable(5)
 x = Variable(4, 6)
 ```
 
-## Constants
+### Constants
 Use constants the way you would usually use them in Julia. They should work just fine. In case there are any problems, please report an issue and we will fix it as soon as we can.
 
-## Expressions
+### Expressions
 Performing operations on Variables results in Expressions. As the name suggests, these are mathematical expressions. These expressions can be combined with other expressions and so on. Expressions that are created must be DCP-compliant (follow the rules of Disciplined Convex Programming (DCP)). More information on DCP can be found here: http://dcp.stanford.edu/.
 ```
 x = Variable(5)
@@ -121,7 +137,7 @@ solve!(problem)
 expr.evaluate()
 ```
 
-## Constraints
+### Constraints
 Constants, Variables and Expressions,  combined with <, >, <=, >= and == create Constraints. 
 ```
 x = Variable(5, 5)
@@ -137,10 +153,10 @@ slack = Variable()
 constraints = [x + slack >= 0, slack >= 1e-4]
 ```
 
-## Objective
+### Objective
 The objective of the problem is a scalar expression to be maximized or minimized by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`. 
 
-## Problem
+### Problem
 A problem is an objective and a list of constraints. These are constructed using the form
 ```problem = minimize(objective, constraints)```
 or
@@ -235,7 +251,7 @@ p = minimize(norm(x, Inf), [-2 <= x, x <= 1])
 solve!(p)
 ```
 
-# Credits
+## Credits
 Currently, CVX.jl is developed and maintained by:
 - [Jenny Hong](http://www.stanford.edu/~jyunhong/)
 - [Karanveer Mohan](http://www.stanford.edu/~kvmohan/)
