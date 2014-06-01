@@ -1,5 +1,13 @@
 export getindex
 
+# TODO:
+# Allow indexing with just `:`. eg, x[1, :] or x[2, 5:]
+# Slice a variable or an expression to get only certain elements
+# The canonical form is straightforward:
+# 1. Calculate number of elements needed, call this num_e
+# 2. Create coefficient matrix, coeff, of size num_e * get_vectorized_size(x)
+# 3. Add 1's at the correct places of coeff to allow
+# coeff * vectorized(x) - vectorized(indexed_elements) = 0
 function getindex(x::AbstractCvxExpr, rows::AbstractArray, cols::AbstractArray=[1])
   if size(rows, 1) != 1 && size(rows, 2) != 1
     error("Expected a vector but got size $(size(rows))")
@@ -12,7 +20,7 @@ function getindex(x::AbstractCvxExpr, rows::AbstractArray, cols::AbstractArray=[
   rows = unique(rows)
   cols = unique(cols)
 
-  # number of rows/cols in the coefficient for x in our canonical form
+  # Number of rows/cols in the coefficient for x in our canonical form
   num_rows_coeff = length(rows) * length(cols)
   num_cols_coeff = get_vectorized_size(x)
 

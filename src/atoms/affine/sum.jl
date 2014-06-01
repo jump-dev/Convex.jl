@@ -1,6 +1,7 @@
 import Base.sum
 export sum
 
+# Sum all the elements in x
 function sum(x::AbstractCvxExpr)
   if x.size == (1, 1)
     return x
@@ -13,6 +14,7 @@ function sum(x::AbstractCvxExpr)
   end
 end
 
+# Sum along a given dimension
 function sum(x::AbstractCvxExpr, dimension::Int64)
   if dimension == 1
     return ones(1, x.size[1]) * x

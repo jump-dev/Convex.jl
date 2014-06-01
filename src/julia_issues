@@ -1,2 +1,0 @@
-eye(5) * eye(1) won't work
-c' * X * c will return a 1 x 1 matrix

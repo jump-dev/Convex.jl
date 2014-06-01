@@ -1,6 +1,18 @@
 import Base.diag
 export diag
 
+# Finds the "k"-th diagonal of x as a column vector.
+# If k == 0, it returns the main diagonal and so on.
+# Let x be of size m x n and d be the diagonal.
+# Since x is vectorized, the way canonicalization works is:
+#
+# 1. We calculate the size of the diagonal (sz_diag) and the first index
+# of vectorized x that will be part of d
+# 2. We create the coefficient matrix for vectorized x, called coeff of size
+# sz_diag x mn
+# 3. We populate coeff with 1s at the correct indices
+# The canonical form will then be:
+# coeff * x - d = 0
 function diag(x::AbstractCvxExpr, k::Int64=0)
   (num_rows, num_cols) = x.size
 
