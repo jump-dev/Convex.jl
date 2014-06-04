@@ -72,6 +72,8 @@ function norm(x::AbstractCvxExpr, p = 2)
     return norm_2(x)
   elseif p == Inf
     return norm_inf(x)
+  elseif p == :fro
+    return norm_2(vec(x))
   else
     error("Norm $p not defined")
   end
