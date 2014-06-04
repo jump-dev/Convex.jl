@@ -89,7 +89,7 @@ In addition to these operations, when there are operations between vectors/matri
 
 ## Installation
 ```
-Pkg.clone("git@github.com:karanveerm/CVX.jl.git")
+Pkg.clone("https://github.com/cvxgrp/CVX.jl.git")
 Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
 Pkg.build("ECOS")  
 ```
