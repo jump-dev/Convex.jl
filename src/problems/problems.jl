@@ -245,7 +245,7 @@ function populate_constraints!(problem::Problem, eq_constr_index::Dict{Int64, In
 		uid = constraint.canon_uid
 		if constraint.head == :(==)
 			index = eq_constr_index[uid]
-			# constraint.dual_value = Base.reshape(y[index : index + get_vectorized_size(constraint.size) - 1], constraint.size)
+			constraint.dual_value = Base.reshape(y[index : index + get_vectorized_size(constraint.size) - 1], constraint.size)
 		else
 			index = ineq_constr_index[uid]
 			constraint.dual_value = Base.reshape(z[index : index + get_vectorized_size(constraint.size) - 1], constraint.size)
