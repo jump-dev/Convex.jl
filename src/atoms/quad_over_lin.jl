@@ -8,12 +8,12 @@ function check_size_qol(x::AbstractCvxExpr, y::AbstractCvxExpr)
 end
 
 function quad_over_lin(x::Constant, y::Constant)
-  #TODO sign/size checks
+  # TODO: sign/size checks
   return x' * x / y
 end
 
 function quad_over_lin(x::Constant, y::AbstractCvxExpr)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:quad_over_lin, [x, y], :convex, :pos, (1, 1))
   x_size = get_vectorized_size(x)
   cone_size = x_size + 2
@@ -44,7 +44,7 @@ function quad_over_lin(x::Constant, y::AbstractCvxExpr)
 end
 
 function quad_over_lin(x::AbstractCvxExpr, y::Constant)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:quad_over_lin, [x, y], :convex, :pos, (1, 1))
   x_size = get_vectorized_size(x)
   cone_size = x_size + 2
@@ -67,7 +67,7 @@ function quad_over_lin(x::AbstractCvxExpr, y::Constant)
 end
 
 function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:quad_over_lin, [x, y], :convex, :pos, (1, 1))
   x_size = get_vectorized_size(x)
   cone_size = x_size + 2

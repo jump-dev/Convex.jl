@@ -1,7 +1,9 @@
 export geo_mean
 
+# TODO: We don't allow geometric mean along a dimension of an expression yet
+
 function geo_mean(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:geo_mean, [x, y], :concave, :pos, x.size)
   x_size = get_vectorized_size(x)
 

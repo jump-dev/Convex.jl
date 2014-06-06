@@ -3,14 +3,17 @@ export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, Value
 
 abstract AbstractCvxExpr
 # Every type inheriting from the AbstractCvxExpr type should have the following properties:
-#   head --- a symbol
-#   vexity --- one of :linear, :convex, :concave, :constant
-#   sign   --- one of :pos, :neg, :any
-#   size   --- a tuple giving the size of the expression
+## head
+## vexity - one of :linear, :convex, :concave, :constant
+## sign - one of :pos, :neg, :any
+## size - a tuple giving the size of the expression
+## canon_form - a function that returns an array of type CanonicalConstr with the canonical form
+## of itself and its descendants
+## evaluate - a function that returns the result of what will happen once the expression has been evaluated
 const vexities = [:constant, :linear, :convex, :concave]
 const signs = [:pos, :neg, :any, :zero]
 # Values consist of any type that can be a Constant
-Value = Union(Number,AbstractArray)
+Value = Union(Number, AbstractArray)
 
 type CvxExpr <: AbstractCvxExpr
   head::Symbol
@@ -21,13 +24,12 @@ type CvxExpr <: AbstractCvxExpr
   uid::Int64
   canon_form::Function
   evaluate::Function
-  # TODO: args::Array works, everything else does not (eg args or args::Array{AbstractCvxExpr})
-  # Check why
+  # TODO: Stop using args::Array. Use a tuple instead
   function CvxExpr(head::Symbol, args::Array, vexity::Symbol, sign::Symbol, size::(Int64, Int64))
     if !(sign in signs)
-      error("sign must be one of :pos, :neg, :any; got $sign")
+      error("Sign must be one of :pos, :neg, :any; got $sign")
     elseif !(vexity in vexities)
-      error("vexity must be one of :constant, :linear, :convex, :concave; got $vexity")
+      error("Vexity must be one of :constant, :linear, :convex, :concave; got $vexity")
     else
       this = new(head, args, vexity, sign, size)
       this.uid = unique_id(this)
@@ -54,7 +56,7 @@ type Variable <: AbstractCvxExpr
       size = (size[1], 1)
     end
     if !(sign in signs)
-      error("sign must be one of :pos, :neg, :zero, :any; got $sign")
+      error("Sign must be one of :pos, :neg, :zero, :any; got $sign")
     end
     if head == :variable
       this = new(head, :linear, sign, size, nothing)
@@ -64,7 +66,7 @@ type Variable <: AbstractCvxExpr
     this.uid = unique_id(this)
     # Variables are already in canonical form
     this.canon_form = ()->CanonicalConstr[]
-    this.evaluate = ()->this.value == nothing ? error("value of the variable is yet to be calculated") : this.value
+    this.evaluate = ()->this.value == nothing ? error("Value of the variable is yet to be calculated") : this.value
     return this
   end
 end
@@ -77,6 +79,7 @@ Variable() = Variable((1, 1), :any)
 Variable(size::Integer) = Variable((size, 1),:any)
 Variable(size::Integer, sign::Symbol) = Variable((size, 1), sign)
 
+# TODO: Parameters are currently not in use
 Parameter(size::(Int64, Int64), sign::Symbol) = Variable(:parameter, size, sign)
 Parameter(size::(Int64, Int64)) = Parameter(size, :any)
 Parameter(size...) = Parameter(size, :any)
@@ -105,13 +108,13 @@ type Constant <: AbstractCvxExpr
       this.evaluate = ()->this.value
       return this
     else
-      error("sign must be one of :pos, :neg, :zero or :any but got $sign")
+      error("Sign must be one of :pos, :neg, :zero or :any but got $sign")
     end
   end
 end
 
 function Constant(x::Number)
-  # find the sign for scalar constants
+  # Find the sign for scalar constants
   if x > 0
     return Constant(x, :pos)
   elseif x < 0
@@ -121,8 +124,7 @@ function Constant(x::Number)
   end
 end
 
-# Case to catch arrays, not scalar numbers
-function Constant(x::Value)
+function Constant(x::AbstractArray)
   if all(x .>= 0)
     return Constant(x, :pos)
   elseif all(x .<= 0)

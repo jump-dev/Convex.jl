@@ -1,8 +1,12 @@
 import Base.min
 export min
 
+# TODO: Handle signs for min
+# TODO: Find min across a specific dimension
+
+# Minimum element of `x`
+# Canonical constraint is x <= this if min(x) = this
 function min(x::AbstractCvxExpr)
-  # TODO: handle signs
   if x.vexity == :convex
     error("min of convex function is not DCP compliant")
   end
@@ -22,7 +26,6 @@ function min(x::AbstractCvxExpr)
 end
 
 function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  # TODO: handle signs
   if x.vexity == :convex || y.vexity == :convex
     error("min of convex function is not DCP compliant")
   end

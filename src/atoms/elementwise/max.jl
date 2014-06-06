@@ -1,8 +1,12 @@
 import Base.max
 export max
 
+# TODO: Handle signs for max
+# TODO: Find max across a specific dimension
+
+# Maximum element of `x`
+# Canonical constraint is x <= this if max(x) = this
 function max(x::AbstractCvxExpr)
-  # TODO: handle signs
   if x.vexity == :concave
     error("max of concave function is not DCP compliant")
   end
@@ -21,8 +25,9 @@ function max(x::AbstractCvxExpr)
   return this
 end
 
+# Elementwise maximum between two expressions
+# Canonical constraint is x <= this and y <= this if max(x, y) = this
 function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  # TODO: handle signs
   if x.vexity == :concave || y.vexity == :concave
     error("max of concave function is not DCP compliant")
   end
@@ -49,8 +54,6 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
   this.evaluate = ()->Base.max(x.evaluate(), y.evaluate())
   return this
 end
-
-# TODO: Max across dimensions
 
 max(x::AbstractCvxExpr, y::Value) = max(x, convert(CvxExpr, y))
 max(y::Value, x::AbstractCvxExpr) = max(x, convert(CvxExpr, y))

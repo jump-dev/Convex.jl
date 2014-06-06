@@ -5,7 +5,7 @@ function qol_elementwise(x::Constant, y::Constant)
 end
 
 function qol_elementwise(x::Constant, y::AbstractCvxExpr)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:qol_elementwise, [x, y], :convex, :pos, x.size)
   x_size = get_vectorized_size(x)
 
@@ -36,7 +36,7 @@ function qol_elementwise(x::Constant, y::AbstractCvxExpr)
 end
 
 function qol_elementwise(x::AbstractCvxExpr, y::Constant)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:qol_elementwise, [x, y], :convex, :pos, x.size)
   x_size = get_vectorized_size(x)
 
@@ -61,7 +61,7 @@ function qol_elementwise(x::AbstractCvxExpr, y::Constant)
 end
 
 function qol_elementwise(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  #TODO vexity and sign checks
+  # TODO: vexity and sign checks
   this = CvxExpr(:qol_elementwise, [x, y], :convex, :pos, x.size)
   x_size = get_vectorized_size(x)
 

@@ -7,20 +7,6 @@ function check_size_norm(x::AbstractCvxExpr)
   end
 end
 
-function promote_vexity_norm(x::AbstractCvxExpr)
-  if x.vexity == :constant
-    return :constant
-  elseif x.vexity == :linear
-    return :convex
-  elseif x.vexity == :convex && x.sign == :pos
-    return :convex
-  elseif x.vexity == :concave && x.sign == :neg
-    return :convex
-  else
-    error("norm(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
-  end
-end
-
 function norm_inf(x::AbstractCvxExpr)
   check_size_norm(x)
   vexity = promote_vexity_norm(x)

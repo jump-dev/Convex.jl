@@ -1,35 +1,6 @@
 export +, -
 
-### Utilities for handling vexity and sign for addition/subtraction
-
-function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  vexities = Set(x.vexity, y.vexity)
-  if vexities == Set(:convex, :concave)
-    error("expression not DCP compliant")
-  elseif :convex in vexities
-    return :convex
-  elseif :concave in vexities
-    return :concave
-  elseif :linear in vexities
-    return :linear
-  else
-    return :constant
-  end
-end
-
-# Returns the sign of x + y. Returns :any if we can't determine the sign
-function promote_sign(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  signs = Set(x.sign, y.sign)
-  if :any in signs || signs == Set(:pos,:neg)
-    return :any
-  elseif x.sign == :zero
-    return y.sign
-  elseif y.sign == :zero
-    return x.sign
-  else
-    return x.sign
-  end
-end
+# TODO: Look into .+ and .- and make final decisions
 
 ### Unary Negation
 
@@ -75,7 +46,7 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
 
     if x.size == (1, 1)
       sz_y = get_vectorized_size(y)
-      this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), y.size)
+      this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
       coeffs = VecOrMatOrSparse[-ones(sz_y, 1), -speye(sz_y), speye(sz_y)]
       vars = [x.uid, y.uid, this.uid]
       constant = zeros(sz_y)
@@ -86,7 +57,7 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
     end
   else
     sz = get_vectorized_size(y)
-    this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), y.size)
+    this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
     coeffs = VecOrMatOrSparse[-speye(sz), -speye(sz), speye(sz)]
     vars = [x.uid, y.uid, this.uid]
     constant = zeros(sz)
@@ -104,11 +75,11 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
 end
 
 # Same rules as above. Except that if y is a scalar, we can simply multiply it by
-# ones(...) to promote its size to what it should be.
+# ones(...) to promote its size to what it should be
 function +(x::AbstractCvxExpr, y::Constant)
   if x.size != y.size && x.size == (1, 1)
     sz_y = get_vectorized_size(y)
-    this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), y.size)
+    this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
     coeffs = VecOrMatOrSparse[-ones(sz_y, 1), speye(sz_y)]
   elseif x.size != y.size && y.size != (1, 1)
     error("Can't add expressions of size $(x.size) and $(y.size)")
@@ -117,7 +88,7 @@ function +(x::AbstractCvxExpr, y::Constant)
       y = Constant(y.value * ones(x.size...), y.sign)
     end
     sz = get_vectorized_size(x)
-    this = CvxExpr(:+, [x, y], promote_vexity(x, y), promote_sign(x, y), x.size)
+    this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), x.size)
     coeffs = VecOrMatOrSparse[-speye(sz), speye(sz)]
   end
 

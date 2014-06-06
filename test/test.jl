@@ -1,4 +1,3 @@
-require("src/CVX.jl")
 using CVX
 
 TOLERANCE = .0001
@@ -316,19 +315,18 @@ p = minimize(c' * reshaped, reshaped >= a)
 solve!(p)
 @assert abs(p.optval - 136) < TOLERANCE
 
-
 # Test 41
 x = Variable(4, 4)
 p = minimize(sum(diag(x)), x >= 2)
 solve!(p)
 @assert abs(p.optval - 8) < TOLERANCE
 
-# test 42
-m = Variable(4,5)
-c = [m[3,3]==4,m>=1]
-p = minimize(norm(m,:fro),c)
+# Test 42
+m = Variable(4, 5)
+c = [m[3, 3] == 4, m >= 1]
+p = minimize(norm(m, :fro), c)
 solve!(p)
-@assert abs(m.value[1,1] - 1) < TOLERANCE
+@assert abs(m.value[1, 1] - 1) < TOLERANCE
 
 # x = Variable(1)
 # p = minimize(x, [eye(2) + x >= ones(2, 2)])

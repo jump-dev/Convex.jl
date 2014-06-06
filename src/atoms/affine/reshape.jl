@@ -21,6 +21,7 @@ function reshape(x::AbstractCvxExpr, m::Int64, n::Int64)
   return this
 end
 
+# Vectorizes `x`
 function vec(x::AbstractCvxExpr)
   return reshape(x, get_vectorized_size(x), 1)
 end

@@ -1,5 +1,6 @@
 export square_pos
 
+# Square of pos(x)
 function square_pos(x::AbstractCvxExpr)
-  return qol_elementwise(pos(x), ones(x.size...))
+  return square(pos(x))
 end

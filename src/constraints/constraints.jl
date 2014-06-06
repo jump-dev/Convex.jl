@@ -54,18 +54,18 @@ type CvxConstr
       if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
         vexity = :linear
       else
-        error("equality constraints between nonlinear expressions are not DCP compliant")
+        error("Equality constraints between nonlinear expressions are not DCP compliant")
       end
     elseif head == :(<=)
       if lhs.vexity in (:linear, :constant, :convex) && rhs.vexity in (:linear, :constant, :concave)
         vexity = :convex
       else
-        error("constraint is not DCP compliant")
+        error("Constraint is not DCP compliant")
       end
     elseif head == :(>=)
       error(">= should have been transformed to <=")
     else
-      error("unrecognized comparison $head")
+      error("Unrecognized comparison $head")
     end
 
     # Size checks will be done in canon_form
