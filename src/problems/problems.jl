@@ -71,7 +71,7 @@ function solve!(p::Problem, method=:ecos)
 	end
 end
 
-function getCanonicalConstraints(p::Problem)
+function canonical_constraints(problem::Problem)
     objective = problem.objective
 
     canonical_constraints_array = CanonicalConstr[]
