@@ -57,7 +57,9 @@ end
 function promote_vexity_multiply(x::Constant, y::AbstractCvxExpr)
   if y.vexity == :linear
     return :linear
-  elseif x.sign == :pos || x.size == :zero
+  elseif y.vexity == :constant || x.sign == :zero
+    return :constant
+  elseif x.sign == :pos
     return y.vexity
   elseif x.sign == :neg
     return reverse_vexity(y)
