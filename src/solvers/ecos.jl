@@ -18,9 +18,9 @@ export ecos_solve
 # b is an array of type float of size p (can be nothing if no equalities are present)
 #
 # Returns:
-# An object of type Solution consisting of x, y, z, status and ret_va
+# An object of type Solution consisting of x, y, z, status and ret_val
 # where x are the primal variables, y are the multipliers for the equality constraints
-# z are the multipliers for the conic inequalities
+# z are the multipliers for the inequality constraints 
 #
 # Some of the keyword arguments such as n, m, c, h, G are required. Hence, their default
 # values are nothing, forcing them to be provided. Other keyword arguments need not
@@ -44,13 +44,19 @@ end
 
 
 # Given the arguments, returns an object of type Solution
+# x: primal variables
+# y: dual variables for equality constraints
+# s: slacks for Gx + s <= h, s \in K
+# z: dual variables for inequality constraints s \in K
+# note slacks are nonzero iff dual variables are zero, 
+# by complementary slackness
 function get_ecos_solution(ptr_work, n, p, m, ret_val)
   work = pointer_to_array(ptr_work, 1)[1]
 
   x = pointer_to_array(work.x, n)
   y = pointer_to_array(work.y, p)
   z = pointer_to_array(work.z, m)
-  s = pointer_to_array(work.z, m)
+  s = pointer_to_array(work.s, m)
 
   return Solution(x, y, z, ret_val)
 end

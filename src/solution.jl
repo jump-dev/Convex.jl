@@ -3,10 +3,13 @@ export Solution
 # Declares the Solution type, which stores the primal and dual variables as well
 # as the status of the solver
 # TODO: Call primal, dual
+# x: primal variables
+# y: dual variables for equality constraints
+# z: dual variables for inequality constraints s \in K
 type Solution
-  x::Array{Float64, 1}
-  y::Array{Float64, 1}
-  z::Array{Float64, 1}
+  x::Array{Float64, 1} # x: primal variables
+  y::Array{Float64, 1} # y: dual variables for equality constraints
+  z::Array{Float64, 1} # z: dual variables for inequality constraints s \in K
   status::ASCIIString
   ret_val::Int64
 
