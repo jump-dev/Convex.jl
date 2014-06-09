@@ -67,10 +67,7 @@ function ECOSConicProblem(problem::Problem)
     if objective.vexity != :constant
         uid = objective.uid
         c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
-    end
-    if objective.vexity == :maximize
-        c *= -1
-    end    
+    end  
 
     return ECOSConicProblem(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b), variable_index, eq_constr_index, ineq_constr_index
 end

@@ -54,7 +54,6 @@ add_constraints(p::Problem, constraint::CvxConstr) = add_constraints(p, [constra
 function solve!(problem::Problem, method=:ecos)
 	if method == :ecos
 		ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
-		println("yoyoyo",ecos_problem.c)
 		solution = solve(ecos_problem)
 		if (problem.head == :maximize) && !(problem.optval == nothing)
 			problem.optval = -problem.optval
@@ -76,14 +75,13 @@ function solve!(problem::Problem, method=:ecos)
 end
 
 function canonical_constraints(problem::Problem)
-    objective = problem.objective
-
+	# need to change objective if problem.head == :maximize?
     canonical_constraints_array = CanonicalConstr[]
     for constraint in problem.constraints
         append!(canonical_constraints_array, constraint.canon_form())
     end
 
-    append!(canonical_constraints_array, objective.canon_form())
+    append!(canonical_constraints_array, problem.objective.canon_form())
     return canonical_constraints_array
 end
 
