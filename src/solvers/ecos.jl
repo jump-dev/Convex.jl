@@ -1,5 +1,5 @@
 import ECOS
-export ecos_solve
+export solve
 
 # Calls the ECOS C solver
 #
@@ -30,7 +30,6 @@ function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
     ncones::Int64=0, q::Array{Int64, }=[], G::VecOrMatOrSparse=nothing,
     A::VecOrMatOrSparseOrNothing=nothing, c::Array{Float64, }=nothing,
     h::Array{Float64, }=nothing, b::ArrayFloat64OrNothing=nothing, debug::Bool=false)
-
   ptr_work = ECOS.setup(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b)
   ret_val = ECOS.solve(ptr_work)
 
@@ -41,9 +40,11 @@ function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
   ECOS.cleanup(ptr_work, 4)
   return solution
 end
-ecos_solve(p::ECOSConicProblem) = ecos_solve(n=p.n, m=p.m, p=p.p, l=p.l, ncones=p.ncones, q=p.q, G=p.G, c=p.c, h=p.h, A=p.A, b=p.b)
-ecos_solve(p::Problem) = ecos_solve(ECOSConicProblem(p))
-
+function solve(p::ECOSConicProblem)
+  solution = ecos_solve(n=p.n, m=p.m, p=p.p, l=p.l, ncones=p.ncones, q=p.q, G=p.G, c=p.c, h=p.h, A=p.A, b=p.b)
+  solution.optval = (p.c' * solution.x)[1] # Transpose returns an array, so fetch the element
+  return solution
+end
 # Given the arguments, returns an object of type Solution
 # x: primal variables
 # y: dual variables for equality constraints

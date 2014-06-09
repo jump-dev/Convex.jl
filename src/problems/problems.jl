@@ -51,17 +51,21 @@ satisfy(constraints::Array{CvxConstr}=CvxConstr[]) =
 add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constraints, constraints)
 add_constraints(p::Problem, constraint::CvxConstr) = add_constraints(p, [constraint])
 
-function solve!(p::Problem, method=:ecos)
+function solve!(problem::Problem, method=:ecos)
 	if method == :ecos
-		solution = ecos_solve(p)
+		ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
+		println("yoyoyo",ecos_problem.c)
+		solution = solve(ecos_problem)
+		if (problem.head == :maximize) && !(problem.optval == nothing)
+			problem.optval = -problem.optval
+		end
 	else
 		println("method $method not implemented")
 	end
 
-	# Calculate the solution
+	# Populate the problem with the solution
 	# TODO: After switching to Julia 0.3, use dot().
-	optval = c' * solution.x
-	problem.optval = optval[1] # Transpose returns an array, so fetch the element
+	problem.optval = solution.optval
 	problem.status = solution.status
 	problem.solution = solution
 
