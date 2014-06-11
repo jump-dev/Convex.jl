@@ -73,20 +73,29 @@ function ECOSConicProblem(problem::Problem)
 end
 
 function IneqConicProblem(p::ConicProblem)
-    return p
+    G = -eye(length(p.x))
+    h = zeros(length(p.x))
+    return IneqConicProblem(p.c,p.A,p.b,G,h,p.cones)
 end
 
 function IneqConicProblem(p::ECOSConicProblem)
     cones = [(:NonNeg,p.q)]
     for dim in p.l
         lastidx = cones[-1][-1]
-        append!(cones,(:SOC,lastidx+1:lastidx+dim))
+        push!(cones,(:SOC,lastidx+1:lastidx+dim))
     end
-    return p
+    return IneqConicProblem(p.c,p.A,p.b,p.G,p.h,cones)
 end
 
 function ConicProblem(ip::IneqConicProblem)
-    return ip
+    nslacks = length(ip.h)
+    nvars = length(ip.c)
+    c = [c; zeros(nslacks)]
+    A = [ip.A   zeros(size(A,1), nslacks);
+         ip.G   eye(nslacks)              ]
+    b = [ip.b; zeros(nslacks)]
+    cones = [(cone, idx_range + nvars) for (cone, idx_range) in ip.cones]
+    return ConicProblem(c,A,b,cones)
 end
 
 function ECOSConicProblem(ip::IneqConicProblem)
