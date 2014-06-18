@@ -3,8 +3,8 @@ export +, -
 ### Utilities for handling vexity and sign for addition/subtraction
 
 function promote_vexity(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  vexities = Set(x.vexity, y.vexity)
-  if vexities == Set(:convex, :concave)
+  vexities = Set({x.vexity, y.vexity})
+  if vexities == Set({:convex, :concave})
     error("expression not DCP compliant")
   elseif :convex in vexities
     return :convex
@@ -19,7 +19,7 @@ end
 
 # Returns the sign of x + y. Returns :any if we can't determine the sign
 function promote_sign(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  signs = Set(x.sign, y.sign)
+  signs = Set({x.sign, y.sign})
   if :any in signs || signs == Set(:pos,:neg)
     return :any
   elseif x.sign == :zero
