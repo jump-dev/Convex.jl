@@ -37,6 +37,8 @@ function -(x::Constant)
   return Constant(-x.value)
 end
 
+# If the variable created for -x is w, then the canonical form is
+# - (I * w) + I * -x = 0
 function -(x::AbstractCvxExpr)
   this = CvxExpr(:-, [x], reverse_vexity(x), reverse_sign(x), x.size)
 
@@ -60,6 +62,14 @@ end
 
 ### Binary Addition/Subtraction
 
+# Let w = x + y be the variable created
+# Addition if:
+#
+# 1. x and y are the same size
+# # Canonical form is - x - y + w = 0
+# 2. x is (1, 1) and y is a vector/ matrix of size m x n (Vectorized as of size mn x 1)
+# # Canonical form is -ones(mn, 1) * x - y + w = 0
+# 3. y is (1, 1). We just return y + x which then falls into case 2
 function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   if x.size != y.size
 
@@ -93,6 +103,8 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   return this
 end
 
+# Same rules as above. Except that if y is a scalar, we can simply multiply it by
+# ones(...) to promote its size to what it should be.
 function +(x::AbstractCvxExpr, y::Constant)
   if x.size != y.size && x.size == (1, 1)
     sz_y = get_vectorized_size(y)
@@ -119,6 +131,7 @@ function +(x::AbstractCvxExpr, y::Constant)
   return this
 end
 
+# Adding two constants doesn't require canonicalization
 function +(x::Constant, y::Constant)
   this = Constant(x.value + y.value)
   return this

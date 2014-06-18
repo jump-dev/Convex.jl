@@ -1,6 +1,8 @@
 import Base.transpose, Base.ctranspose
 export transpose, ctranspose
 
+# Since everything is vectorized, the canonical form of x' is simply
+# multiplying x by a permutation matrix such that coeff * vectorized(x) - vectorized(x') = 0
 function transpose(x::AbstractCvxExpr)
   sz = get_vectorized_size(x.size)
   coeffs = spzeros(sz, sz)
@@ -29,6 +31,7 @@ function transpose(x::AbstractCvxExpr)
   return this
 end
 
+# We don't handle complex things (yet)
 ctranspose(x::AbstractCvxExpr) = transpose(x)
 
 function transpose(x::Constant)

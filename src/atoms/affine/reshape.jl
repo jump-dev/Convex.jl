@@ -1,6 +1,7 @@
 import Base.reshape, Base.vec
 export reshape, vec
 
+# Creates a new expression, same as x, but updates the size
 function reshape(x::AbstractCvxExpr, m::Int64, n::Int64)
   sz = get_vectorized_size(x.size)
   if m * n != sz

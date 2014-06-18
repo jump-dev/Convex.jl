@@ -10,7 +10,6 @@ function perfTest(N=100000)
   println(time() - start)
 end
 
-# TODO code so inefficient even python is faster
 function test()
   start = time()
   N = 200

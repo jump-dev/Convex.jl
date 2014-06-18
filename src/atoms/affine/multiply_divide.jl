@@ -1,6 +1,6 @@
 export *, /
 
-# Utilities for handling vexity and sign for multiplication/division
+### Utilities for handling vexity and sign for multiplication/division
 function promote_sign(x::Constant, y::AbstractCvxExpr)
   if x.sign == :zero || y.sign == :zero
     return :zero
@@ -25,11 +25,14 @@ function promote_vexity(x::Constant, y::AbstractCvxExpr)
   end
 end
 
+### Multiplication
 
+# For constants, just multiply their values
 function *(x::Constant, y::Constant)
   return Constant(x.value * y.value)
 end
 
+# TODO: @david: Comment this.
 function *(x::Constant, y::AbstractCvxExpr)
 
   if x.size[2] != y.size[1] && x.size == (1,1)

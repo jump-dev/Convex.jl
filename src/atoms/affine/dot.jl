@@ -1,6 +1,7 @@
 import Base.dot
 export dot
 
+# Dot product is simply implemented using transpose and multiply
 function dot(x::AbstractCvxExpr, y::AbstractCvxExpr)
   return x' * y
 end
