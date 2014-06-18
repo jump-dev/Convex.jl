@@ -323,6 +323,20 @@ p = minimize(sum(diag(x)), x >= 2)
 solve!(p)
 @assert abs(p.optval - 8) < TOLERANCE
 
+# Test 42
+m = Variable(4, 5)
+c = [m[3, 3] == 4, m >= 1]
+p = minimize(norm(m, :fro), c)
+solve!(p)
+@assert abs(m.value[1, 1] - 1) < TOLERANCE
+
+# Test 43
+x = Variable()
+y = Variable(4)
+p = minimize(x + sum(y), [x == 1, y == 3])
+solve!(p)
+@assert abs(p.optval - 13) < TOLERANCE
+
 # x = Variable(1)
 # p = minimize(x, [eye(2) + x >= ones(2, 2)])
 # solve!(p)
