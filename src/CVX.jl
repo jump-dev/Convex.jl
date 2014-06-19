@@ -7,6 +7,7 @@ include("constraints/constraints.jl")
 include("solution.jl")
 include("problems/problems.jl")
 include("utilities/utilities.jl")
+include("utilities/display.jl")
 include("solvers/ecos.jl")
 
 # Atoms
