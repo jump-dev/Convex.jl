@@ -30,10 +30,10 @@ include("atoms/elementwise/square.jl")
 include("atoms/elementwise/square_pos.jl")
 include("atoms/elementwise/qol_elementwise.jl")
 include("atoms/elementwise/inv_pos.jl")
+include("atoms/elementwise/geo_mean.jl")
 
 include("atoms/norm.jl")
 include("atoms/quad_form.jl")
-include("atoms/geo_mean.jl")
 include("atoms/sum_squares.jl")
 include("atoms/quad_over_lin.jl")
 

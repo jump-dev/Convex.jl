@@ -7,8 +7,8 @@ export min
 # Minimum element of `x`
 # Canonical constraint is x <= this if min(x) = this
 function min(x::AbstractCvxExpr)
-  if x.vexity == :convex
-    error("min of convex function is not DCP compliant")
+  if !is_concave(x.vexity)
+    error("min of a non concave function is not DCP compliant")
   end
   # Fake vexity given so >= doesn't throw DCP compliance error
   this = CvxExpr(:min, [x], :linear, x.sign, (1, 1))
@@ -26,8 +26,8 @@ function min(x::AbstractCvxExpr)
 end
 
 function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.vexity == :convex || y.vexity == :convex
-    error("min of convex function is not DCP compliant")
+  if !is_concave(x.vexity) || !is_concave(y.vexity)
+    error("min of a non concave function is not DCP compliant")
   end
 
   if x.size == y.size

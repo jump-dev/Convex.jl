@@ -1,14 +1,30 @@
 export qol_elementwise
 
+# The qol_elementwise atom takes two expressions, x and y, of the same size
+# and returns an expression of the same size, where each element is given by
+# x_i^2 / y_i. Additionally, it is required that y_i >= 0 for all i.
+
 function qol_elementwise(x::Constant, y::Constant)
   return Constant((x.value.^2)./y.value, :pos)
 end
 
 function qol_elementwise(x::Constant, y::AbstractCvxExpr)
-  # TODO: vexity and sign checks
+  if x.size != y.size
+    error("Expressions must have same size for qol_elementwise")
+  end
+  if !is_concave(y.vexity)
+    error("Denominator of qol_elementwise cannot be a convex expression")
+  end
   this = CvxExpr(:qol_elementwise, [x, y], :convex, :pos, x.size)
   x_size = get_vectorized_size(x)
 
+  # If t is the new expression created, then the canonical form is given by
+  # the SOCP constraint (y_i + t_i, y_i - t_i, 2 * x_i) \in Q_3
+  # for each index i. This is equivalent to the conic inequality
+  #   0  0     y_i      2 * x_i
+  #  -1 -1  *  t_i  <=  0
+  #  -1  1              0
+  # which is constructed by the following code
   canon_constr_array = CanonicalConstr[]
   for i = 1:x_size
     coeffs1 = spzeros(3, x_size)
@@ -23,7 +39,7 @@ function qol_elementwise(x::Constant, y::AbstractCvxExpr)
     push!(canon_constr_array, CanonicalConstr(cone_coeffs, cone_vars, cone_constant, false, true))
   end
 
-  # y >= 0 linear constraint
+  # Additionally, y_i >= 0 is also enforced
   lin_coeffs = VecOrMatOrSparse[-speye(x_size)]
   lin_vars = [y.uid]
   lin_constant = zeros(x_size, 1)
@@ -36,10 +52,27 @@ function qol_elementwise(x::Constant, y::AbstractCvxExpr)
 end
 
 function qol_elementwise(x::AbstractCvxExpr, y::Constant)
-  # TODO: vexity and sign checks
+  if x.size != y.size
+    error("Expressions must have same size for qol_elementwise")
+  end
+  if x.sign == :pos && !is_convex(x.vexity) ||
+     x.sign == :neg && !is_concave(x.vexity) ||
+     x.sign == :any && !is_affine(x.vexity)
+    error("Numerator of qol_elementwise expression is not DCP compliant")
+  elseif y.sign == :neg
+    error("Denominator of qol_elementwise cannot be a negative constant")
+  end
+
   this = CvxExpr(:qol_elementwise, [x, y], :convex, :pos, x.size)
   x_size = get_vectorized_size(x)
 
+  # If t is the new expression created, then the canonical form is given by
+  # the SOCP constraint (y_i + t_i, y_i - t_i, 2 * x_i) \in Q_3
+  # for each index i. This is equivalent to the conic inequality
+  #  -2  0     x_i      0
+  #   0 -1  *  t_i  <=  y_i
+  #   0  1              y_i
+  # which is constructed by the following code
   canon_constr_array = CanonicalConstr[]
   for i = 1:x_size
     coeffs1 = spzeros(3, x_size)
@@ -61,10 +94,26 @@ function qol_elementwise(x::AbstractCvxExpr, y::Constant)
 end
 
 function qol_elementwise(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  # TODO: vexity and sign checks
+  if x.size != y.size
+    error("Expressions must have same size for qol_elementwise")
+  end
+  if x.sign == :pos && !is_convex(x.vexity) ||
+     x.sign == :neg && !is_concave(x.vexity) ||
+     x.sign == :any && !is_linear(x.vexity)
+    error("Numerator of qol_elementwise expression is not DCP compliant")
+  elseif !is_concave(y.vexity)
+    error("Denominator of qol_elementwise cannot be a convex expression")
+  end
   this = CvxExpr(:qol_elementwise, [x, y], :convex, :pos, x.size)
   x_size = get_vectorized_size(x)
 
+  # If t is the new expression created, then the canonical form is given by
+  # the SOCP constraint (y_i + t_i, y_i - t_i, 2 * x_i) \in Q_3
+  # for each index i. This is equivalent to the conic inequality
+  #  -2  0  0     x_i      0
+  #   0 -1 -1  *  y_i  <=  0
+  #   0 -1  1     t_i      0
+  # which is constructed by the following code
   canon_constr_array = CanonicalConstr[]
   for i = 1:x_size
     coeffs1 = spzeros(3, x_size)
@@ -81,7 +130,7 @@ function qol_elementwise(x::AbstractCvxExpr, y::AbstractCvxExpr)
     push!(canon_constr_array, CanonicalConstr(cone_coeffs, cone_vars, cone_constant, false, true))
   end
 
-  # y >= 0 linear constraint
+  # Additionally, y_i >= 0 is also enforced
   lin_coeffs = VecOrMatOrSparse[-speye(x_size)]
   lin_vars = [y.uid]
   lin_constant = zeros(x_size, 1)

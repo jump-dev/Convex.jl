@@ -1,12 +1,28 @@
 export geo_mean
 
 # TODO: We don't allow geometric mean along a dimension of an expression yet
+# TODO: geo_mean between expr and const
 
+# Find the elementwise geometric mean between two expressions x and y
+# e.g. for two vectors x and y, compute
+# (sqrt(x_1 * y_1), sqrt(x_2 * y_2), ..., sqrt(x_n * y_n))
 function geo_mean(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  # TODO: vexity and sign checks
+  if x.size != y.size
+    error("Geometric mean only supported between expressions of the same size")
+  end
+  if !is_concave(x.vexity) || !is_concave(x.vexity)
+    errory("Geometric mean of convex expressions is not DCP compliant")
+  end
   this = CvxExpr(:geo_mean, [x, y], :concave, :pos, x.size)
   x_size = get_vectorized_size(x)
 
+  # If t is the new expression created, then the canonical form is given by
+  # the SOCP constraint (y_i + x_i, y_i - x_i, 2 * t_i) \in Q_3
+  # for each index i. This is equivalent to the conic inequality
+  #  -1 -1  0     x_i      0
+  #   1 -1  0  *  y_i  <=  0
+  #   0  0 -2     t_i      0
+  # which is constructed by the following code
   canon_constr_array = CanonicalConstr[]
   for i = 1:x_size
     coeffs1 = spzeros(3, x_size)
@@ -23,7 +39,7 @@ function geo_mean(x::AbstractCvxExpr, y::AbstractCvxExpr)
     push!(canon_constr_array, CanonicalConstr(cone_coeffs, cone_vars, cone_constant, false, true))
   end
 
-  # x,y >= 0 linear constraint
+  # In addition, x_i, y_i >= 0 must also be enforced
   lin_coeffs1 = VecOrMatOrSparse[-speye(x_size)]
   lin_vars1 = [y.uid]
   lin_constant1 = zeros(x_size, 1)

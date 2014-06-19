@@ -1,7 +1,19 @@
 import Base.vec
 export convert
 export get_vectorized_size, kron, reverse_vexity, reverse_sign
-export unique_id
+export unique_id, is_linear, is_convex, is_concave
+
+function is_linear(vexity::Symbol)
+  return vexity == :constant || vexity == :linear
+end
+
+function is_convex(vexity::Symbol)
+  return vexity == :convex || is_linear(vexity)
+end
+
+function is_concave(vexity::Symbol)
+  return vexity == :concave || is_linear(vexity)
+end
 
 function convert(::Type{CvxExpr}, x)
   if typeof(x) == CvxExpr
