@@ -1,6 +1,4 @@
-export +, -
-
-# TODO: Look into .+ and .- and make final decisions
+export +, -, .+, .-
 
 ### Unary Negation
 
@@ -41,7 +39,7 @@ end
 # 2. x is (1, 1) and y is a vector/ matrix of size m x n (Vectorized as of size mn x 1)
 # # Canonical form is -ones(mn, 1) * x - y + w = 0
 # 3. y is (1, 1). We just return y + x which then falls into case 2
-function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
+function .+(x::AbstractCvxExpr, y::AbstractCvxExpr)
   if x.size != y.size
 
     if x.size == (1, 1)
@@ -51,7 +49,7 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
       vars = [x.uid, y.uid, this.uid]
       constant = zeros(sz_y)
     elseif y.size == (1, 1)
-      return y + x
+      return y .+ x
     else
       error("Can't add expressions of size $(x.size) and $(y.size)")
     end
@@ -69,14 +67,14 @@ function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
   append!(canon_constr_array, y.canon_form())
 
   this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->x.evaluate() + y.evaluate()
+  this.evaluate = ()->x.evaluate() .+ y.evaluate()
 
   return this
 end
 
 # Same rules as above. Except that if y is a scalar, we can simply multiply it by
 # ones(...) to promote its size to what it should be
-function +(x::AbstractCvxExpr, y::Constant)
+function .+(x::AbstractCvxExpr, y::Constant)
   if x.size != y.size && x.size == (1, 1)
     sz_y = get_vectorized_size(y)
     this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
@@ -98,13 +96,13 @@ function +(x::AbstractCvxExpr, y::Constant)
 
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->x.evaluate() + y.evaluate()
+  this.evaluate = ()->x.evaluate() .+ y.evaluate()
   return this
 end
 
 # Adding two constants doesn't require canonicalization
-function +(x::Constant, y::Constant)
-  this = Constant(x.value + y.value)
+function .+(x::Constant, y::Constant)
+  this = Constant(x.value .+ y.value)
   return this
 end
 
@@ -119,9 +117,29 @@ function +(x::Array{Number,}, y::Array{Number,})
   end
 end
 
-+(y::Constant, x::AbstractCvxExpr) = +(x::AbstractCvxExpr, y::Constant)
+.+(y::Constant, x::AbstractCvxExpr) = .+(x::AbstractCvxExpr, y::Constant)
+.+(x::AbstractCvxExpr, y::Value) = .+(x, convert(CvxExpr, y))
+.+(x::Value, y::AbstractCvxExpr) = .+(y, convert(CvxExpr, x))
+.-(x::AbstractCvxExpr, y::AbstractCvxExpr) = .+(x, -y)
+.-(x::AbstractCvxExpr, y::Value) = .+(x, -y)
+.-(x::Value, y::AbstractCvxExpr) = .+(-y, x)
+
+function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  if x.size != y.size
+    warn("x + y is deprecated if sizes do not match. Use x .+ y instead.")
+  end
+  return x .+ y
+end
+
 +(x::AbstractCvxExpr, y::Value) = +(x, convert(CvxExpr, y))
-+(x::Value, y::AbstractCvxExpr) = +(y, convert(CvxExpr, x))
--(x::AbstractCvxExpr, y::AbstractCvxExpr) = +(x, -y)
--(x::AbstractCvxExpr, y::Value) = +(x, -y)
--(x::Value, y::AbstractCvxExpr) = +(-y, x)
++(x::Value, y::AbstractCvxExpr) = +(convert(CvxExpr, x), y)
+
+function -(x::AbstractCvxExpr, y::AbstractCvxExpr)
+  if x.size != y.size
+    warn("x - y is deprecated if sizes do not match. Use x .- y instead.")
+  end
+  return x .- y
+end
+
+-(x::AbstractCvxExpr, y::Value) = -(x, convert(CvxExpr, y))
+-(x::Value, y::AbstractCvxExpr) = -(convert(CvxExpr, x), y)

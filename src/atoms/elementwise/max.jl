@@ -42,8 +42,16 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
     error("Got different sizes for x as $(x.size) and y as $(y.size)")
   end
 
+  if x.sign == :pos || y.sign == :pos
+    sign = :pos
+  elseif x.sign == :neg && y.sign == :neg
+    sign = :neg
+  else
+    sign = :any
+  end
+
   # Fake vexity given so <= doesn't throw DCP compliance error
-  this = CvxExpr(:max, [x, y], :linear, :pos, sz)
+  this = CvxExpr(:max, [x, y], :linear, sign, sz)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (y <= this).canon_form())

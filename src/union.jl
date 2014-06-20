@@ -1,4 +1,5 @@
-export VecOrMatOrSparse, VecOrMatOrSparseOrNothing, Value, ArrayFloat64OrNothing, ValueOrNothing
+export VecOrMatOrSparse, VecOrMatOrSparseOrNothing, Value, ArrayFloat64OrNothing
+export ValueOrNothing
 
 # Contains all user defined Unions
 VecOrMatOrSparse = Union(Vector, Matrix, SparseMatrixCSC)

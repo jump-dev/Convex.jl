@@ -1,4 +1,7 @@
 export CanonicalConstr, CvxConstr, ==, >=, <=, <, >, +
+export .==, .>=, .<=, .>, .<
+
+# TODO: Allow matrix-vector comparisons if one dimension matches
 
 # Holds a constraint in canonical_form
 # We have an array of `coeffs` where these coefficients corresponds to `vars`
@@ -176,3 +179,44 @@ end
   push!(constraints, new_constraint)
 +(constraints::Array{CvxConstr}, new_constraints::Array{CvxConstr}) =
   append!(constraints, new_constraints)
+
+# Using .<= or <= have the same behavior as of now
+.==(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(==), x, y)
+.>=(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(<=), y, x)
+.<=(x::AbstractCvxExpr, y::AbstractCvxExpr) = CvxConstr(:(<=), x, y)
+.>(x::AbstractCvxExpr, y::AbstractCvxExpr) = >=(x, y)
+.<(x::AbstractCvxExpr, y::AbstractCvxExpr) = <=(x, y)
+
+.==(x::Constant, y::AbstractCvxExpr) = CvxConstr(:(==), y, x)
+.<=(x::Constant, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -x)
+.>=(x::Constant, y::AbstractCvxExpr) = CvxConstr(:(<=), y, x)
+.>(x::Constant, y::AbstractCvxExpr) = <=(y, x)
+.<(x::Constant, y::AbstractCvxExpr) = >=(y, x)
+
+# The following needs AbstractArray to be handled separately due to ambiguity
+# that otherwise arises with Julia
+.==(x::AbstractArray, y::AbstractCvxExpr) = CvxConstr(:(==), y, convert(CvxExpr, x))
+.==(x::Value, y::AbstractCvxExpr) = CvxConstr(:(==), y, convert(CvxExpr, x))
+
+.>=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), y, convert(CvxExpr, x))
+
+.<=(x::AbstractArray, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -convert(CvxExpr, x))
+.<=(x::Value, y::AbstractCvxExpr) = CvxConstr(:(<=), -y, -convert(CvxExpr, x))
+
+.>(x::Value, y::AbstractCvxExpr) = <=(y, x)
+
+.<(x::AbstractArray, y::AbstractCvxExpr) = >=(y, x)
+.<(x::Value, y::AbstractCvxExpr) = >=(y, x)
+
+.==(x::AbstractCvxExpr, y::AbstractArray)= CvxConstr(:(==), x, convert(CvxExpr, y))
+.==(x::AbstractCvxExpr, y::Value)= CvxConstr(:(==), x, convert(CvxExpr, y))
+
+.>=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), -x, -convert(CvxExpr, y))
+
+.<=(x::AbstractCvxExpr, y::AbstractArray) = CvxConstr(:(<=), x, convert(CvxExpr, y))
+.<=(x::AbstractCvxExpr, y::Value) = CvxConstr(:(<=), x, convert(CvxExpr, y))
+
+.>(x::AbstractCvxExpr, y::Value) = >=(x, y)
+
+.<(x::AbstractCvxExpr, y::AbstractArray) = <=(x, y)
+.<(x::AbstractCvxExpr, y::Value) = <=(x, y)

@@ -40,8 +40,15 @@ function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
     error("Got different sizes for x as $(x.size) and y as $(y.size)")
   end
 
+  if x.sign == :neg || y.sign == :neg
+    sign = :neg
+  elseif x.sign == :pos && y.sign == :pos
+    sign = :pos
+  else
+    sign = :any
+  end
+
   # Fake vexity given so >= doesn't throw DCP compliance error
-  sign = x.sign == y.sign ? x.sign : :any
   this = CvxExpr(:min, [x], :linear, sign, sz)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (this <= x).canon_form()

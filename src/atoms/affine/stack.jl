@@ -1,6 +1,7 @@
 import Base.hcat, Base.vcat
 export hcat, vertcat
 
+AbstractCvxExprOrValue = Union(AbstractCvxExpr, Value)
 # TODO: We should be able to call hcat and vcat as [..., ...] and [...; ...]
 # Right now, this conflicts with the fact that Problem type has a field
 # `constraints::Array{CvxConstr}`
@@ -12,7 +13,18 @@ export hcat, vertcat
 # Then, we loop over each argument and add a canonical constraint of the form
 # `w * coeffs == arg`
 # where `coeffs` is appropriately constructed
-function hcat(args::AbstractCvxExpr...)
+function hcat(given_args::AbstractCvxExprOrValue...)
+
+  # Convert Values to Constants
+  args = AbstractCvxExpr[]
+  for arg in given_args
+    if typeof(arg) <: Value
+      push!(args, Constant(arg))
+    else
+      push!(args, arg)
+    end
+  end
+
   num_rows = args[1].size[1]
   num_cols = 0
   vexity = args[1].vexity
@@ -43,9 +55,8 @@ function hcat(args::AbstractCvxExpr...)
   end
   this.canon_form = ()->canon_constr_array
 
-  # TODO: Test this
   this.evaluate = ()->begin
-    result = args[1].evaluate
+    result = args[1].evaluate()
     for arg in args[2 : end]
       result = hcat(result, arg.evaluate())
     end
@@ -57,7 +68,17 @@ end
 
 # Vertically concatenate the arguments
 # Similar logic to hcat
-function vertcat(args::AbstractCvxExpr...)
+function vertcat(given_args::AbstractCvxExpr...)
+  # Convert Values to Constants
+  args = AbstractCvxExpr[]
+  for arg in given_args
+    if typeof(arg) <: Value
+      push!(args, Constant(arg))
+    else
+      push!(args, arg)
+    end
+  end
+
   num_cols = args[1].size[2]
   num_rows = 0
   vexity = args[1].vexity
@@ -89,7 +110,7 @@ function vertcat(args::AbstractCvxExpr...)
   this.canon_form = ()->canon_constr_array
 
   this.evaluate = ()->begin
-    result = args[1].evaluate
+    result = args[1].evaluate()
     for arg in args[2 : end]
       result = vcat(result, arg.evaluate())
     end
@@ -98,3 +119,6 @@ function vertcat(args::AbstractCvxExpr...)
 
   return this
 end
+
+# TODO: Implement hvcat
+# TODO: Implement repmat
