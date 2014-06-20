@@ -7,6 +7,8 @@
 # radius) that lies in a polyhedron described by linear inequalites in this
 # fashion: P = {x : a_i'*x <= b_i, i=1,...,m} where x is in R^2
 
+using CVX
+
 # Generate the input data
 a1 = [ 2;  1];
 a2 = [ 2; -1];

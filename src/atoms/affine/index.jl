@@ -1,8 +1,5 @@
 export getindex
 
-# TODO:
-# Allow indexing with just `:`. eg, x[1, :] or x[2, 5:]
-
 # Slice a variable or an expression to get only certain elements
 # The canonical form is straightforward:
 # 1. Calculate number of elements needed, call this num_e
@@ -47,8 +44,13 @@ function getindex(x::AbstractCvxExpr, rows::AbstractArray, cols::AbstractArray=[
   append!(canon_constr_array, x.canon_form())
   this.canon_form = ()->canon_constr_array
 
-  this.evaluate = ()->x.evaluate()[rows, cols]
-
+  this.evaluate = ()->begin
+    x_val = x.evaluate()
+    if maximum(rows) > size(x_val, 1) && maximum(cols) == 1
+      return vec(x_val)[rows]
+    end
+    return x_val[rows, cols]
+  end
   return this
 end
 

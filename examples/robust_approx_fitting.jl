@@ -21,6 +21,8 @@
 #           minimize sup{-1<=u<=1} ||(A+tB)x - b||_2)
 #      (reduces to minimizing max{||(A-B)x - b||_2, ||(A+B)x - b||_2} )
 
+using CVX
+
 # Input Data
 m = 20;
 n = 10;

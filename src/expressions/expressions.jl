@@ -1,5 +1,6 @@
-import Base.convert, Base.size
+import Base.convert, Base.size, Base.endof, Base.ndims
 export AbstractCvxExpr, CvxExpr, Variable, Parameter, Constant, Value
+export endof, size, ndims
 
 abstract AbstractCvxExpr
 # Every type inheriting from the AbstractCvxExpr type should have the following properties:
@@ -132,3 +133,19 @@ function Constant(x::AbstractArray)
   end
   return Constant(x, :any)
 end
+
+# The following functions are needed for indexing
+
+endof(x::AbstractCvxExpr) = x.size[1] * x.size[2]
+
+function size(x::AbstractCvxExpr, dim::Integer)
+  if dim < 1
+    error("dimension out of range")
+  elseif dim > 2
+    return 1
+  else
+    return x.size[dim]
+  end
+end
+
+ndims(x::AbstractCvxExpr) = 2

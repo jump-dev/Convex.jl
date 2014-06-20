@@ -5,6 +5,8 @@
 #
 # In this control problem, the object starts from the origin
 
+using CVX
+
 # Some constraints on our motion
 # The object should start from the origin, and end at rest
 initial_velocity = [-20; 20]
@@ -12,8 +14,8 @@ final_position = [10; 0]
 
 T = 100 # The number of timesteps
 h = 0.1 # The time between time intervals
-mass = 1 # Mass of object
-drag = 0.01 # Drag on object
+mass = 0.4 # Mass of object
+drag = 0.02 # Drag on object
 
 
 # Declare the variables we need
@@ -21,27 +23,24 @@ position = Variable(2, T)
 velocity = Variable(2, T)
 force = Variable(2, T - 1)
 
-# CVX.jl is yet to support x[:, idx], so we use all_rows instead here
-all_rows = 1:2
-
 # Create the list of constraints on our variables
 constraints = CvxConstr[]
 for i in 1:T - 1
-  constraints += position[all_rows, i + 1] == position[all_rows, i] + h * velocity[all_rows, i]
+  constraints += position[:, i + 1] == position[:, i] + h * velocity[:, i]
 end
 
 for i in 1:T - 1
-  constraints += velocity[all_rows, i + 1] == velocity[all_rows, i] + h / mass *
-      force[all_rows, i] - drag * velocity[all_rows, i]
+  constraints += velocity[:, i + 1] == velocity[:, i] + h / mass *
+      force[:, i] - drag * velocity[:, i]
 end
 
 # Add position constraints
-constraints += position[all_rows, 1] == 0
-constraints += position[all_rows, T] == final_position
+constraints += position[:, 1] == 0
+constraints += position[:, T] == final_position
 
 # Add velocity constraints
-constraints += velocity[all_rows, 1] == initial_velocity
-constraints += velocity[all_rows, T] == 0
+constraints += velocity[:, 1] == initial_velocity
+constraints += velocity[:, T] == 0
 
 # Solve the problem
 mu = 1
