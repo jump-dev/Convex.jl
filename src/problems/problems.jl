@@ -1,4 +1,4 @@
-export Problem, minimize, maximize, get_var_dict, solve!, ecos_debug
+export Problem, minimize, maximize, satisfy, get_var_dict, solve!, ecos_debug
 
 Float64OrNothing = Union(Float64, Nothing)
 SolutionOrNothing = Union(Solution, Nothing)
@@ -46,6 +46,7 @@ maximize(objective::AbstractCvxExpr, constraints::Array{CvxConstr}=CvxConstr[]) 
 	Problem(:maximize, objective, constraints)
 satisfy(constraints::Array{CvxConstr}=CvxConstr[]) =
 	Problem(:minimize, Constant(0), constraints)
+satisfy(constraint::CvxConstr) = satisfy([constraint])
 
 # +(constraints, constraints) is overwritten in constraints.jl
 add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constraints, constraints)
