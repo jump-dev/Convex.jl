@@ -80,6 +80,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
 - SOC/ Other supported constraints
  - geometric mean: `geo_mean(x, y)`
  - norm (norm_1, norm_2, norm_inf): `norm(x, 1); norm(x, 2); norm(x, Inf)`
+ - vecnorm: `vecnorm(x, 1); vecnorm(x, 2); vecnorm(x, Inf)`
  - quadratic form: `quad_form(P, x)`
  - quadratic over linear: `quad_over_lin(x, y)`
  - l2-norm squared: `sum_squares(x)`

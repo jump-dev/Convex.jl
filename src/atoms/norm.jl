@@ -1,5 +1,5 @@
-import Base.norm
-export norm, norm_inf, norm_2, norm_1
+import Base.norm, Base.vecnorm
+export norm, norm_inf, norm_2, norm_1, norm_fro, vecnorm
 
 function check_size_norm(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1
@@ -30,7 +30,6 @@ function norm_1(x::AbstractCvxExpr)
   return sum(abs(x))
 end
 
-# TODO: Look at matrices
 function norm_2(x::AbstractCvxExpr)
   check_size_norm(x)
   vexity = promote_vexity_norm(x)
@@ -51,7 +50,7 @@ function norm_2(x::AbstractCvxExpr)
   return this
 end
 
-function norm(x::AbstractCvxExpr, p = 2)
+function norm(x::AbstractCvxExpr, p=2)
   if p == 1
     return norm_1(x)
   elseif p == 2
@@ -65,6 +64,9 @@ function norm(x::AbstractCvxExpr, p = 2)
   end
 end
 
-function norm(x)
-  Base.norm(x)
+norm_fro(x::AbstractCvxExpr) = norm_2(vec(x))
+
+function vecnorm(x::AbstractCvxExpr, p=2)
+  vec_x = vec(x)
+  return norm(vec_x, p)
 end
