@@ -5,13 +5,13 @@ export endof, size, ndims
 abstract AbstractCvxExpr
 # Every type inheriting from the AbstractCvxExpr type should have the following properties:
 ## head
-## vexity - one of :linear, :convex, :concave, :constant
+## vexity - one of :affine, :convex, :concave, :constant
 ## sign - one of :pos, :neg, :any
 ## size - a tuple giving the size of the expression
 ## canon_form - a function that returns an array of type CanonicalConstr with the canonical form
 ## of itself and its descendants
 ## evaluate - a function that evaluates the expression and returns the result
-const vexities = [:constant, :linear, :convex, :concave]
+const vexities = [:constant, :affine, :convex, :concave]
 const signs = [:pos, :neg, :any, :zero]
 # Values consist of any type that can be a Constant
 Value = Union(Number, AbstractArray)
@@ -30,7 +30,7 @@ type CvxExpr <: AbstractCvxExpr
     if !(sign in signs)
       error("Sign must be one of :pos, :neg, :any; got $sign")
     elseif !(vexity in vexities)
-      error("Vexity must be one of :constant, :linear, :convex, :concave; got $vexity")
+      error("Vexity must be one of :constant, :affine, :convex, :concave; got $vexity")
     else
       this = new(head, args, vexity, sign, size)
       this.uid = unique_id(this)
@@ -60,7 +60,7 @@ type Variable <: AbstractCvxExpr
       error("Sign must be one of :pos, :neg, :zero, :any; got $sign")
     end
     if head == :variable
-      this = new(head, :linear, sign, size, nothing)
+      this = new(head, :affine, sign, size, nothing)
     elseif head == :parameter
       this = new(head, :constant, sign, size, nothing)
     end

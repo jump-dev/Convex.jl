@@ -54,13 +54,13 @@ type CvxConstr
   function CvxConstr(head::Symbol, lhs::AbstractCvxExpr, rhs::AbstractCvxExpr)
     # Check vexity
     if head == :(==)
-      if lhs.vexity in (:linear, :constant)  && rhs.vexity in (:linear, :constant)
-        vexity = :linear
+      if lhs.vexity in (:affine, :constant)  && rhs.vexity in (:affine, :constant)
+        vexity = :affine
       else
-        error("Equality constraints between nonlinear expressions are not DCP compliant")
+        error("Equality constraints between nonaffine expressions are not DCP compliant")
       end
     elseif head == :(<=)
-      if lhs.vexity in (:linear, :constant, :convex) && rhs.vexity in (:linear, :constant, :concave)
+      if lhs.vexity in (:affine, :constant, :convex) && rhs.vexity in (:affine, :constant, :concave)
         vexity = :convex
       else
         error("Constraint is not DCP compliant")

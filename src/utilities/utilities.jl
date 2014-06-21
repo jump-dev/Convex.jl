@@ -1,18 +1,18 @@
 import Base.vec
 export convert
 export get_vectorized_size, kron, reverse_vexity, reverse_sign
-export unique_id, is_linear, is_convex, is_concave
+export unique_id, is_affine, is_convex, is_concave
 
-function is_linear(vexity::Symbol)
-  return vexity == :constant || vexity == :linear
+function is_affine(vexity::Symbol)
+  return vexity == :constant || vexity == :affine
 end
 
 function is_convex(vexity::Symbol)
-  return vexity == :convex || is_linear(vexity)
+  return vexity == :convex || is_affine(vexity)
 end
 
 function is_concave(vexity::Symbol)
-  return vexity == :concave || is_linear(vexity)
+  return vexity == :concave || is_affine(vexity)
 end
 
 function convert(::Type{CvxExpr}, x)

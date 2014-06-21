@@ -11,7 +11,7 @@ function min(x::AbstractCvxExpr)
     error("min of a non concave function is not DCP compliant")
   end
   # Fake vexity given so >= doesn't throw DCP compliance error
-  this = CvxExpr(:min, [x], :linear, x.sign, (1, 1))
+  this = CvxExpr(:min, [x], :affine, x.sign, (1, 1))
 
   # 'this <= x' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]
@@ -49,7 +49,7 @@ function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
   end
 
   # Fake vexity given so >= doesn't throw DCP compliance error
-  this = CvxExpr(:min, [x], :linear, sign, sz)
+  this = CvxExpr(:min, [x], :affine, sign, sz)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (this <= x).canon_form()
   append!(canon_constr_array, (this <= y).canon_form())

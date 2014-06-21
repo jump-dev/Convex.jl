@@ -11,8 +11,8 @@ function promote_vexity_add(vexity_one::Symbol, vexity_two::Symbol)
     return :convex
   elseif :concave in vexities
     return :concave
-  elseif :linear in vexities
-    return :linear
+  elseif :affine in vexities
+    return :affine
   else
     return :constant
   end
@@ -55,8 +55,8 @@ function promote_sign_multiply(x::Constant, y::AbstractCvxExpr)
 end
 
 function promote_vexity_multiply(x::Constant, y::AbstractCvxExpr)
-  if y.vexity == :linear
-    return :linear
+  if y.vexity == :affine
+    return :affine
   elseif y.vexity == :constant || x.sign == :zero
     return :constant
   elseif x.sign == :pos
@@ -73,7 +73,7 @@ end
 function promote_vexity_norm(x::AbstractCvxExpr)
   if x.vexity == :constant
     return :constant
-  elseif x.vexity == :linear
+  elseif x.vexity == :affine
     return :convex
   elseif x.vexity == :convex && x.sign == :pos
     return :convex

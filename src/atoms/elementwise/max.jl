@@ -11,7 +11,7 @@ function max(x::AbstractCvxExpr)
     error("max of a non convex function is not DCP compliant")
   end
   # Fake vexity given so <= doesn't throw DCP compliance error
-  this = CvxExpr(:max, [x], :linear, x.sign, (1, 1))
+  this = CvxExpr(:max, [x], :affine, x.sign, (1, 1))
 
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]
@@ -51,7 +51,7 @@ function max(x::AbstractCvxExpr, y::AbstractCvxExpr)
   end
 
   # Fake vexity given so <= doesn't throw DCP compliance error
-  this = CvxExpr(:max, [x, y], :linear, sign, sz)
+  this = CvxExpr(:max, [x, y], :affine, sign, sz)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (x <= this).canon_form()
   append!(canon_constr_array, (y <= this).canon_form())

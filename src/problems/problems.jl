@@ -71,7 +71,6 @@ function ecos_debug(problem::Problem)
 	return create_ecos_matrices(canonical_constraints_array)
 end
 
-# CAUTION: For now, we assume we are solving a linear program.
 # Loops over the objective and constraints to get the canonical constraints array.
 # It then calls create_ecos_matrices which will create the inequality/equality matrices
 # and their corresponding coefficients, which are then passed to ecos_solve

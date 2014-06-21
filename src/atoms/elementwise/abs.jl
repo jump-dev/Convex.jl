@@ -6,11 +6,11 @@ export abs
 function abs(x::AbstractCvxExpr)
   if x.vexity == :constant
     this = CvxExpr(:abs, [x], :constant, :pos, x.size)
-  elseif x.vexity == :linear
+  elseif x.vexity == :affine
     if x.sign == :pos
-      this = CvxExpr(:abs, [x], :linear, :pos, x.size)
+      this = CvxExpr(:abs, [x], :affine, :pos, x.size)
     elseif x.sign == :neg
-      this = CvxExpr(:abs, [x], :linear, :pos, x.size)
+      this = CvxExpr(:abs, [x], :affine, :pos, x.size)
     else
       this = CvxExpr(:abs, [x], :convex, :pos, x.size)
     end
@@ -24,7 +24,7 @@ function abs(x::AbstractCvxExpr)
 
   # Change vexity temporarily to allow <=
   vexity = this.vexity
-  this.vexity = :linear
+  this.vexity = :affine
 
   # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]

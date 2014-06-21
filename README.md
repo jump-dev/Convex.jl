@@ -74,7 +74,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
  - pos, neg where pos is implemented as max(x, 0) and neg is implemented as -max(-x, 0): `pos(x)`
  - inverse pos (1./pos(x)): `inv_pos(x)`
  - square root: `sqrt(x)`
- - square: `square(x)`
+ - square: `square(x); x^2; x.^2;`
  - square_pos (square(pos(x)): `square_pos(x)`
  - absolute value: `abs(x)`
 - SOC/ Other supported constraints

@@ -94,7 +94,7 @@ function quad_over_lin(x::AbstractCvxExpr, y::AbstractCvxExpr)
   check_size_qol(x, y)
   if x.sign == :pos && !is_convex(x.vexity) ||
      x.sign == :neg && !is_concave(x.vexity) ||
-     x.sign == :any && !is_linear(x.vexity)
+     x.sign == :any && !is_affine(x.vexity)
     error("Numerator of qol_elementwise expression is not DCP compliant")
   elseif !is_concave(y.vexity)
     error("Denominator of qol_elementwise cannot be a convex expression")
