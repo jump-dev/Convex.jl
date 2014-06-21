@@ -2,6 +2,7 @@ import Base.sum
 export sum
 
 # Sum all the elements in x
+# Implemented by multiplying x with ones(...) on both sides
 function sum(x::AbstractCvxExpr)
   if x.size == (1, 1)
     return x
@@ -27,4 +28,8 @@ end
 
 function sum(x::Constant)
   return Constant(sum(x.value))
+end
+
+function sum(x::Constant, dimension::Int64)
+  return Constant(sum(x.value, dimension))
 end

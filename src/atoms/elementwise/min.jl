@@ -1,13 +1,17 @@
 import Base.min
 export min
 
+# TODO: Handle signs for min
+# TODO: Find min across a specific dimension
+
+# Minimum element of `x`
+# Canonical constraint is x <= this if min(x) = this
 function min(x::AbstractCvxExpr)
-  # TODO: handle signs
-  if x.vexity == :convex
-    error("min of convex function is not DCP compliant")
+  if !is_concave(x.vexity)
+    error("min of a non concave function is not DCP compliant")
   end
   # Fake vexity given so >= doesn't throw DCP compliance error
-  this = CvxExpr(:min, [x], :linear, x.sign, (1, 1))
+  this = CvxExpr(:min, [x], :affine, x.sign, (1, 1))
 
   # 'this <= x' will try to find the canon_form for 'this', so we need to initialize it
   this.canon_form = ()->CanonicalConstr[]
@@ -22,9 +26,8 @@ function min(x::AbstractCvxExpr)
 end
 
 function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  # TODO: handle signs
-  if x.vexity == :convex || y.vexity == :convex
-    error("min of convex function is not DCP compliant")
+  if !is_concave(x.vexity) || !is_concave(y.vexity)
+    error("min of a non concave function is not DCP compliant")
   end
 
   if x.size == y.size
@@ -37,9 +40,16 @@ function min(x::AbstractCvxExpr, y::AbstractCvxExpr)
     error("Got different sizes for x as $(x.size) and y as $(y.size)")
   end
 
+  if x.sign == :neg || y.sign == :neg
+    sign = :neg
+  elseif x.sign == :pos && y.sign == :pos
+    sign = :pos
+  else
+    sign = :any
+  end
+
   # Fake vexity given so >= doesn't throw DCP compliance error
-  sign = x.sign == y.sign ? x.sign : :any
-  this = CvxExpr(:min, [x], :linear, sign, sz)
+  this = CvxExpr(:min, [x], :affine, sign, sz)
   this.canon_form = ()->CanonicalConstr[]
   canon_constr_array = (this <= x).canon_form()
   append!(canon_constr_array, (this <= y).canon_form())

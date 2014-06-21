@@ -17,15 +17,15 @@ type Problem
 
   function Problem(head::Symbol, objective::AbstractCvxExpr, constraints::Array{CvxConstr}=CvxConstr[])
     if !all([x <= 1 for x in objective.size])
-      error("Only scalar optimization problems allowed, but size(objective) = $(objective.size).")
+      error("Only scalar optimization problems allowed, but size(objective) = $(objective.size)")
     end
 
     if head == :minimize && objective.vexity == :concave
-      error("Cannot minimize a concave function.")
+      error("Cannot minimize a concave function")
     elseif head == :maximize && objective.vexity == :convex
-      error("Cannot maximize a convex function.")
+      error("Cannot maximize a convex function")
     elseif head != :maximize && head != :minimize
-      error("Problem.head must be one of :minimize or :maximize.")
+      error("Problem.head must be one of :minimize or :maximize")
     end
 
     new(head, objective, constraints, "not yet solved", nothing, nothing)
@@ -66,7 +66,7 @@ function solve!(p::Problem, method=:ecos)
   if method == :ecos
     ecos_solve!(p)
   else
-    println("method $method not implemented")
+    println("Method $method not implemented")
   end
 end
 
@@ -82,7 +82,6 @@ function ecos_debug(problem::Problem)
   return create_ecos_matrices(canonical_constraints_array)
 end
 
-# CAUTION: For now, we assume we are solving a linear program.
 # Loops over the objective and constraints to get the canonical constraints array.
 # It then calls create_ecos_matrices which will create the inequality/equality matrices
 # and their corresponding coefficients, which are then passed to ecos_solve
@@ -291,10 +290,6 @@ function get_var_dict!(e::AbstractCvxExpr, var_dict::Dict{Int64, Variable})
     end
   end
 end
-
-# hacky way to not crash on recursion when some arguments for some atoms are
-# symbols or numbers
-get_var_dict!(e, var_dict) = nothing
 
 function get_var_dict(p::Problem)
   return get_var_dict(p.objective, p.constraints)

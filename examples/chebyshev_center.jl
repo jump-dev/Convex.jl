@@ -4,8 +4,10 @@
 # Adapted for CVX.jl by Karanveer Mohan and David Zeng - 26/05/14
 #
 # The goal is to find the largest Euclidean ball (i.e. its center and
-# radius) that lies in a polyhedron described by linear inequalites in this
+# radius) that lies in a polyhedron described by affine inequalites in this
 # fashion: P = {x : a_i'*x <= b_i, i=1,...,m} where x is in R^2
+
+using CVX
 
 # Generate the input data
 a1 = [ 2;  1];

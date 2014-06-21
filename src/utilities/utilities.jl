@@ -1,9 +1,20 @@
 import Base.vec
-export convert, print_debug
-export get_vectorized_size, full, kron, reverse_vexity, reverse_sign
-export unique_id
+export convert
+export get_vectorized_size, kron, reverse_vexity, reverse_sign
+export unique_id, is_affine, is_convex, is_concave
 
-### Conversion and promotion
+function is_affine(vexity::Symbol)
+  return vexity == :constant || vexity == :affine
+end
+
+function is_convex(vexity::Symbol)
+  return vexity == :convex || is_affine(vexity)
+end
+
+function is_concave(vexity::Symbol)
+  return vexity == :concave || is_affine(vexity)
+end
+
 function convert(::Type{CvxExpr}, x)
   if typeof(x) == CvxExpr
     return x
@@ -14,7 +25,7 @@ end
 
 # Julia cannot vectorize sparse matrices. This will handle it for now
 function vec(x::SparseMatrixCSC)
-  return Base.vec(full(x))
+  return Base.reshape(x, size(x, 1) * size(x, 2), 1)
 end
 
 function vec(x::Number)
@@ -50,12 +61,6 @@ function reverse_sign(x::AbstractCvxExpr)
     return :neg
   else
     return sign
-  end
-end
-
-function print_debug(debug, args...)
-  if (debug)
-    println(args)
   end
 end
 

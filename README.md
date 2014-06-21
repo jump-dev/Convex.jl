@@ -74,12 +74,13 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
  - pos, neg where pos is implemented as max(x, 0) and neg is implemented as -max(-x, 0): `pos(x)`
  - inverse pos (1./pos(x)): `inv_pos(x)`
  - square root: `sqrt(x)`
- - square: `square(x)`
+ - square: `square(x); x^2; x.^2;`
  - square_pos (square(pos(x)): `square_pos(x)`
  - absolute value: `abs(x)`
 - SOC/ Other supported constraints
  - geometric mean: `geo_mean(x, y)`
  - norm (norm_1, norm_2, norm_inf): `norm(x, 1); norm(x, 2); norm(x, Inf)`
+ - vecnorm: `vecnorm(x, 1); vecnorm(x, 2); vecnorm(x, Inf)`
  - quadratic form: `quad_form(P, x)`
  - quadratic over linear: `quad_over_lin(x, y)`
  - l2-norm squared: `sum_squares(x)`

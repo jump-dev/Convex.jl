@@ -1,4 +1,3 @@
-require("src/CVX.jl")
 using CVX
 
 TOLERANCE = .0001
@@ -82,7 +81,7 @@ solve!(p)
 X = Variable(2, 2)
 I = Constant(eye(2))
 c = ones(2, 1)
-p = maximize(c' * (eye(2) + X + I + 1) * c, [X + ones(2, 2) <= [1 2; 3 4]])
+p = maximize(c' * (eye(2) + X + I .+ 1) * c, [X + ones(2, 2) <= [1 2; 3 4]])
 solve!(p)
 @assert abs(p.optval - 14) < TOLERANCE
 
@@ -94,14 +93,14 @@ solve!(p)
 
 # Test 14
 x = Variable(1)
-p = minimize(x, [x + eye(2) >= eye(2)])
+p = minimize(x, [x .+ eye(2) >= eye(2)])
 solve!(p)
 @assert abs(p.optval - 0) < TOLERANCE
 
 # Test 15
 x = Variable(1)
 c = ones(2, 1)
-p = minimize(c' * (x + eye(2)) * c, [x + eye(3) >= 2*eye(3), -eye(4) < x])
+p = minimize(c' * (x .+ eye(2)) * c, [x .+ eye(3) >= 2 * eye(3), -eye(4) < x])
 solve!(p)
 @assert abs(p.optval - 6) < TOLERANCE
 
@@ -110,7 +109,7 @@ N = 20
 x = Variable(1)
 y = Variable(N, N)
 c = ones(N, 1)
-p = minimize(c' * (y + x) * c, [x >= 3, 2y >= 0, y <= x])
+p = minimize(c' * (y .+ x) * c, [x >= 3, 2y >= 0, y <= x])
 solve!(p)
 @assert abs(p.optval - 1200) < TOLERANCE
 
@@ -238,7 +237,7 @@ z = Variable(1)
 c = ones(4, 1)
 d = 2 * ones(6, 1)
 constraints = [hcat(x, y) <= 2, z <= 0, z <= x, 2z >= -1]
-objective = sum(x + z) + min(y) + c' * y * d
+objective = sum(x .+ z) + min(y) + c' * y * d
 p = maximize(objective, constraints)
 solve!(p)
 @assert abs(p.optval - 130) < TOLERANCE
@@ -315,7 +314,6 @@ a = [1:16]
 p = minimize(c' * reshaped, reshaped >= a)
 solve!(p)
 @assert abs(p.optval - 136) < TOLERANCE
-
 
 # Test 41
 x = Variable(4, 4)

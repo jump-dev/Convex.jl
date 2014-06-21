@@ -14,6 +14,9 @@ function is_symmetric(A::Matrix)
   return all(A - A' .< TOLERANCE)
 end
 
+# Quadratic form: x' * A * x
+# This is equivalent to factor * norm_2(A * x)^2 where factor is positive
+# if the matrix is positive semidefinite, and negative if it is negative semidefinite
 function quad_form(x::AbstractCvxExpr, A::Constant)
   if A.size[1] != A.size[2]
     error("Quadratic form only takes square matrices")
@@ -32,7 +35,7 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
     factor = -1
   end
 
-  P = sqrtm(full(factor*A.value))
+  P = sqrtm(full(factor * A.value))
   return factor * square(norm_2(P * x))
 end
 

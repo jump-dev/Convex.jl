@@ -1,5 +1,5 @@
-import Base.norm
-export norm, norm_inf, norm_2, norm_1
+import Base.norm, Base.vecnorm
+export norm, norm_inf, norm_2, norm_1, norm_fro, vecnorm
 
 function check_size_norm(x::AbstractCvxExpr)
   if x.size[1] > 1 && x.size[2] > 1
@@ -7,44 +7,14 @@ function check_size_norm(x::AbstractCvxExpr)
   end
 end
 
-function promote_vexity_norm(x::AbstractCvxExpr)
-  if x.vexity == :constant
-    return :constant
-  elseif x.vexity == :linear
-    return :convex
-  elseif x.vexity == :convex && x.sign == :pos
-    return :convex
-  elseif x.vexity == :concave && x.sign == :neg
-    return :convex
-  else
-    error("norm(x) is not DCP compliant when x has curvature $(x.vexity) and sign $(x.sign)")
-  end
-end
-
 function norm_inf(x::AbstractCvxExpr)
-  check_size_norm(x)
-  vexity = promote_vexity_norm(x)
-  # Fake vexity for <=
-  this = CvxExpr(:norm_inf, [x], :linear, :pos, (1, 1))
-
-  # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
-  this.canon_form = ()->CanonicalConstr[]
-  canon_constr_array = (x <= this).canon_form()
-  append!(canon_constr_array, (-this <= x).canon_form())
-
-  # Fix vexity
-  this.vexity = vexity
-
-  this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->Base.norm(x.evaluate(), Inf)
-  return this
+  return max(abs(x))
 end
 
 function norm_1(x::AbstractCvxExpr)
   return sum(abs(x))
 end
 
-# TODO: Look at matrices
 function norm_2(x::AbstractCvxExpr)
   check_size_norm(x)
   vexity = promote_vexity_norm(x)
@@ -65,7 +35,7 @@ function norm_2(x::AbstractCvxExpr)
   return this
 end
 
-function norm(x::AbstractCvxExpr, p = 2)
+function norm(x::AbstractCvxExpr, p=2)
   if p == 1
     return norm_1(x)
   elseif p == 2
@@ -79,6 +49,9 @@ function norm(x::AbstractCvxExpr, p = 2)
   end
 end
 
-function norm(x)
-  Base.norm(x)
+norm_fro(x::AbstractCvxExpr) = norm_2(vec(x))
+
+function vecnorm(x::AbstractCvxExpr, p=2)
+  vec_x = vec(x)
+  return norm(vec_x, p)
 end

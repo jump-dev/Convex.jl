@@ -1,9 +1,9 @@
 import Base.diag
 export diag
 
-# Finds the "k"-th diagonal of x as a column vector.
-# If k == 0, it returns the main diagonal and so on.
-# Let x be of size m x n and d be the diagonal.
+# Finds the "k"-th diagonal of x as a column vector
+# If k == 0, it returns the main diagonal and so on
+# Let x be of size m x n and d be the diagonal
 # Since x is vectorized, the way canonicalization works is:
 #
 # 1. We calculate the size of the diagonal (sz_diag) and the first index
