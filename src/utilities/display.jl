@@ -20,7 +20,7 @@ function show(io::IO, c::CvxConstr)
 end
 
 # An expression, for example, 2 * x, will be displayed as:
-# CvxExpr((1, 1), linear, any)
+# CvxExpr((1, 1), affine, any)
 function show(io::IO, e::CvxExpr)
   print(io, "CvxExpr(($(e.size[1]), $(e.size[2])), $(e.vexity), $(e.sign))")
 end
@@ -28,10 +28,10 @@ end
 # A problem, for example, p = minimize(sum(x) + 3, [x >= 0, x >= 1, x <= 10])
 # will be displayed as follows:
 #
-# Problem: minimize CvxExpr((1, 1), linear, any)
+# Problem: minimize CvxExpr((1, 1), affine, any)
 #    subject to
-#      CvxConstr: CvxExpr((2, 3), linear, any) <= 0
-#      CvxConstr: CvxExpr((2, 3), linear, any) <= -1
+#      CvxConstr: CvxExpr((2, 3), affine, any) <= 0
+#      CvxConstr: CvxExpr((2, 3), affine, any) <= -1
 #      CvxConstr: Variable((2, 3), any) <= 10
 #    current status: not yet solved
 #
