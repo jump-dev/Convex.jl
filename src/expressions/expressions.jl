@@ -10,7 +10,7 @@ abstract AbstractCvxExpr
 ## size - a tuple giving the size of the expression
 ## canon_form - a function that returns an array of type CanonicalConstr with the canonical form
 ## of itself and its descendants
-## evaluate - a function that returns the result of what will happen once the expression has been evaluated
+## evaluate - a function that evaluates the expression and returns the result
 const vexities = [:constant, :linear, :convex, :concave]
 const signs = [:pos, :neg, :any, :zero]
 # Values consist of any type that can be a Constant

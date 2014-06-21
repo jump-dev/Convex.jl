@@ -8,22 +8,7 @@ function check_size_norm(x::AbstractCvxExpr)
 end
 
 function norm_inf(x::AbstractCvxExpr)
-  check_size_norm(x)
-  vexity = promote_vexity_norm(x)
-  # Fake vexity for <=
-  this = CvxExpr(:norm_inf, [x], :linear, :pos, (1, 1))
-
-  # 'x <= this' will try to find the canon_form for 'this', so we need to initialize it
-  this.canon_form = ()->CanonicalConstr[]
-  canon_constr_array = (x <= this).canon_form()
-  append!(canon_constr_array, (-this <= x).canon_form())
-
-  # Fix vexity
-  this.vexity = vexity
-
-  this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->Base.norm(x.evaluate(), Inf)
-  return this
+  return max(abs(x))
 end
 
 function norm_1(x::AbstractCvxExpr)
