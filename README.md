@@ -71,7 +71,7 @@ In its current state, CVX.jl supports affine constraints and second-order cone (
  - horizontal and vertical stacking: `hcat(x, y); vertcat(x, y)`
 - Elementwise
  - elementwise min, max between vectors or matrices: `max(x, y)`
- - pos, neg where pos is implemented as max(x, 0) and neg is implemented as -max(-x, 0): `pos(x)`
+ - pos (ie, max(x, 0)) and neg (ie, max(-x,0)): `pos(x)`, `neg(x)`
  - inverse pos (1./pos(x)): `inv_pos(x)`
  - square root: `sqrt(x)`
  - square: `square(x); x^2; x.^2;`
