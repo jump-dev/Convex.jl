@@ -2,7 +2,7 @@ import Base.sum
 export sum
 
 # Sum all the elements in x
-# Implemented by multiplying x with ones(...) on both sides
+# Implemented as 1^T x 1, ie, by multiplying x with ones(...) on both sides
 function sum(x::AbstractCvxExpr)
   if x.size == (1, 1)
     return x

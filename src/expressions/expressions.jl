@@ -104,7 +104,7 @@ type Constant <: AbstractCvxExpr
       # g[1:5, 1:1]=a
       # causes an error
       # Once julia fixes it, we can probably move back to x
-      this = new(:constant, x'', :constant, sign, sz)
+      this = new(:constant, x, :constant, sign, sz)
       this.canon_form = ()->CanonicalConstr[]
       this.evaluate = ()->this.value
       return this
@@ -125,11 +125,13 @@ function Constant(x::Number)
   end
 end
 
-function Constant(x::AbstractArray)
-  if all(x .>= 0)
-    return Constant(x, :pos)
-  elseif all(x .<= 0)
-    return Constant(x, :neg)
+function Constant(x::AbstractArray; check_sign::Bool=true)
+  if check_sign
+    if all(x .>= 0)
+      return Constant(x, :pos)
+    elseif all(x .<= 0)
+      return Constant(x, :neg)
+    end
   end
   return Constant(x, :any)
 end
