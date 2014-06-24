@@ -4,8 +4,8 @@ export promote_vexity_norm
 ### Utilities for handling vexity and sign for add/subtract/hcat/vcat
 
 function promote_vexity_add(vexity_one::Symbol, vexity_two::Symbol)
-  vexities = Set({vexity_one, vexity_two})
-  if vexities == Set({:convex, :concave})
+  vexities = {vexity_one, vexity_two}
+  if :convex in vexities && :concave in vexities
     error("Expression not DCP compliant")
   elseif :convex in vexities
     return :convex
@@ -24,8 +24,8 @@ end
 
 # Returns the sign of x + y. Returns :any if we can't determine the sign
 function promote_sign_add(sign_one::Symbol, sign_two::Symbol)
-  signs = Set({sign_one, sign_two})
-  if :any in signs || signs == Set({:pos, :neg})
+  signs = {sign_one, sign_two}
+  if :any in signs || (:pos in signs && :neg in signs)
     return :any
   elseif sign_one == :zero
     return sign_two

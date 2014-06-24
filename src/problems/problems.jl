@@ -118,22 +118,20 @@ function ecos_solve!(problem::Problem)
     c = -c;
   end
 
-  # Calculate the optimum solution
-  # TODO: After switching to Julia 0.3, use dot().
-  if objective.vexity != :constant
-    optval = c' * solution.x
-  else
-    optval = objective.value
-  end
-
-  # Transpose returns an array, so fetch the element
-  problem.optval = float(optval[1])
   problem.status = solution.status
-
   problem.solution = solution
   if problem.status == "solved"
     populate_variables!(problem, variable_index)
     populate_constraints!(problem, eq_constr_index, ineq_constr_index)
+    # Calculate the optimum solution
+    # TODO: After switching to Julia 0.3, use dot().
+    if objective.vexity != :constant
+      optval = c' * solution.x
+    else
+      optval = objective.value
+    end
+      # Transpose returns an array, so fetch the element
+    problem.optval = float(optval[1])
   end
 end
 

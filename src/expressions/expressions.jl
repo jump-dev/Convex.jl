@@ -126,11 +126,12 @@ function Constant(x::Number)
 end
 
 function Constant(x::AbstractArray)
-  if all(x .>= 0)
-    return Constant(x, :pos)
-  elseif all(x .<= 0)
-    return Constant(x, :neg)
-  end
+  # TODO: Do we need to infer sign of vectors/matrices?
+  # if all(x .>= 0)
+  #   return Constant(x, :pos)
+  # elseif all(x .<= 0)
+  #   return Constant(x, :neg)
+  # end
   return Constant(x, :any)
 end
 
