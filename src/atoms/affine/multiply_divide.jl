@@ -25,7 +25,7 @@ function *(x::Constant, y::AbstractCvxExpr)
     sz = (x.size[1], y.size[2])
     this = CvxExpr(:*, [x, y], promote_vexity_multiply(x, y), promote_sign_multiply(x, y), sz)
 
-    # Kroneckor product for vectorized multiplication
+    # Kronecker product for vectorized multiplication
     vectorized_mul = kron(speye(sz[2]), x.value)
 
     coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
@@ -38,7 +38,7 @@ function *(x::Constant, y::AbstractCvxExpr)
     this.evaluate = ()->x.evaluate() * y.evaluate()
     return this
 
-  elseif y.size == (1, s1)
+  elseif y.size == (1, 1)
     this = CvxExpr(:*, [x, y], promote_vexity_multiply(x, y), promote_sign_multiply(x, y), x.size)
 
     coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))]
