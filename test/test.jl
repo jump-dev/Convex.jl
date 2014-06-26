@@ -74,7 +74,6 @@ solve!(p)
 
 # Test 11
 p = maximize(c' * X * c, [X <= [1 2; 3 4]])
-println(ECOSConicProblem(p))
 solve!(p)
 @assert abs(p.optval - 10) < TOLERANCE
 quit()

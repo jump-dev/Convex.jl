@@ -72,12 +72,13 @@ function ecos_debug(problem::Problem)
   end
 
   append!(canonical_constraints_array, objective.canon_form())
-  return create_ecos_matrices(canonical_constraints_array)
+  return create_ecos_matrices(canonical_constraints_array, objective)
 end
+
 
 # Given the canonical_constraints_array, creates conic inequality matrix G and h
 # as well as the equality matrix A and b
-function create_ecos_matrices(canonical_constraints_array)
+function create_ecos_matrices(canonical_constraints_array, objective)
   n = 0::Int64
   variable_index = Dict{Int64, Int64}()
 
@@ -117,6 +118,15 @@ function create_ecos_matrices(canonical_constraints_array)
       m += size(constraint.coeffs[1], 1)
     end
   end
+
+  # This is a special edge case where the user has an objective that is not
+  # associated with any constraint. For example, minimize(x, y >= 0)
+  # In this case, x would have never been added to the variable index, so we
+  # must fix that
+  if objective.vexity != :constant && !haskey(variable_index, objective.uid)
+    variable_index[objective.uid] = n + 1
+  end
+  n += 1
 
   h = m == 0 ? nothing: zeros(m, 1)
   G = m == 0 ? nothing: spzeros(m, n)

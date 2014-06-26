@@ -59,7 +59,7 @@ ECOSConicProblem(;n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=
 function ECOSConicProblem(problem::Problem)
     canonical_constraints_array = canonical_constraints(problem)
     m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index =
-        create_ecos_matrices(canonical_constraints_array)
+        create_ecos_matrices(canonical_constraints_array, problem.objective)
 
     # Now, all we need to is create c
     c = zeros(n, 1)
