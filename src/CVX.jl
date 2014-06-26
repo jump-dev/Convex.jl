@@ -8,6 +8,7 @@ include("problems/problems.jl")
 include("utilities/promotions.jl")
 include("utilities/utilities.jl")
 include("utilities/display.jl")
+include("problems/conicproblem.jl")
 include("solvers/ecos.jl")
 
 # Atoms

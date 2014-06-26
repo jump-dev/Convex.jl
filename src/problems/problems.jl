@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 export Problem, minimize, maximize, satisfy, get_var_dict, solve!, ecos_debug
+=======
+export Problem, minimize, maximize, get_var_dict, solve!, ecos_debug, getCanonicalConstraints
+>>>>>>> 2a2be048e0b45be933275f59e75358014ede0498
 
 Float64OrNothing = Union(Float64, Nothing)
 SolutionOrNothing = Union(Solution, Nothing)
@@ -62,6 +66,7 @@ satisfy(constraint::CvxConstr) = satisfy([constraint])
 add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constraints, constraints)
 add_constraints(p::Problem, constraint::CvxConstr) = add_constraints(p, [constraint])
 
+<<<<<<< HEAD
 function solve!(p::Problem, method=:ecos)
   if method == :ecos
     ecos_solve!(p)
@@ -133,9 +138,39 @@ function ecos_solve!(problem::Problem)
       # Transpose returns an array, so fetch the element
     problem.optval = float(optval[1])
   end
+=======
+function solve!(problem::Problem, method=:ecos)
+	if method == :ecos
+		ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
+		solution = solve(ecos_problem)
+		if (problem.head == :maximize) && !(problem.optval == nothing)
+			problem.optval = -problem.optval
+		end
+	else
+		println("method $method not implemented")
+	end
+
+	# Populate the problem with the solution
+	# TODO: After switching to Julia 0.3, use dot().
+	problem.optval = solution.optval
+	problem.status = solution.status
+	problem.solution = solution
+
+	if problem.status == "solved"
+		populate_variables!(problem, variable_index)
+		populate_constraints!(problem, eq_constr_index, ineq_constr_index)
+	end
+>>>>>>> 2a2be048e0b45be933275f59e75358014ede0498
 end
 
+function canonical_constraints(problem::Problem)
+	# need to change objective if problem.head == :maximize?
+    canonical_constraints_array = CanonicalConstr[]
+    for constraint in problem.constraints
+        append!(canonical_constraints_array, constraint.canon_form())
+    end
 
+<<<<<<< HEAD
 # Given the canonical_constraints_array, creates conic inequality matrix G and h
 # as well as the equality matrix A and b
 function create_ecos_matrices(canonical_constraints_array, objective)
@@ -239,6 +274,10 @@ function create_ecos_matrices(canonical_constraints_array, objective)
   end
 
   return m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index
+=======
+    append!(canonical_constraints_array, problem.objective.canon_form())
+    return canonical_constraints_array
+>>>>>>> 2a2be048e0b45be933275f59e75358014ede0498
 end
 
 # Now that the problem has been solved, populate the optimal values of the
