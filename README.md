@@ -25,6 +25,8 @@ CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanfo
 CVX.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and CVX.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
+using CVX
+
 # Generate problem data
 m = 4
 n = 5
