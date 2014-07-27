@@ -92,31 +92,33 @@ function ecos_solve!(problem::Problem)
   for constraint in problem.constraints
     append!(canonical_constraints_array, constraint.canon_form())
   end
-
   append!(canonical_constraints_array, objective.canon_form())
-  m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index =
-    create_ecos_matrices(canonical_constraints_array, objective)
+
+
+  #m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index =
+  #  create_ecos_matrices(canonical_constraints_array, objective)
   #return create_ecos_matrices(canonical_constraints_array)
 
+  solution = solve_mpb_ecos(canonical_constraints_array)
 
   # Now, all we need to is create c
-  c = zeros(n, 1)
+  #c = zeros(n, 1)
 
-  if objective.vexity != :constant
-    uid = objective.uid
-    c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
-  end
+  #if objective.vexity != :constant
+  #  uid = objective.uid
+  #  c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
+  #end
 
-  if problem.head == :maximize
-    c = -c;
-  end
+  #if problem.head == :maximize
+  #  c = -c;
+  #end
 
-  solution = ecos_solve(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b)
+  #solution = nothing #ecos_solve(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b)
 
   # Change c back to what it originally was
-  if problem.head == :maximize
-    c = -c;
-  end
+  #if problem.head == :maximize
+  #  c = -c;
+  #end
 
   problem.status = solution.status
   problem.solution = solution
