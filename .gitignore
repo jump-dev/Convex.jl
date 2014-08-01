@@ -1,3 +1,4 @@
 *.pyc
 *.c
 *.h
+*.DS_Store
