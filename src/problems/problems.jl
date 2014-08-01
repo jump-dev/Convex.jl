@@ -1,3 +1,5 @@
+import ECOS, MathProgBase
+
 export Problem, minimize, maximize, satisfy, get_var_dict, solve!, ecos_debug, getCanonicalConstraints
 
 Float64OrNothing = Union(Float64, Nothing)
@@ -62,15 +64,22 @@ satisfy(constraint::CvxConstr) = satisfy([constraint])
 add_constraints(p::Problem, constraints::Array{CvxConstr}) = +(p.constraints, constraints)
 add_constraints(p::Problem, constraint::CvxConstr) = add_constraints(p, [constraint])
 
+solvers = {:ecos=>ECOS.ECOSSolver}
+
 function solve!(problem::Problem, method=:ecos)
   # maximize -> minimize
   if problem.head == :maximize
     problem.objective = -problem.objective
   end
 
+  ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
+  cp = ConicProblem(ecos_problem)
 	if method == :ecos
-		ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
-		solution = solve(ecos_problem)
+		m = MathProgBase.model(solvers[method]())
+    MathProgBase.loadconicproblem!(m, cp.c, cp.A, cp.b, cp.cones)
+    MathProgBase.optimize!(m)
+    println("solved! got ", m)
+    #solution = solve(ecos_problem)
 	else
 		println("method $method not implemented")
 	end
