@@ -98,6 +98,8 @@ function ConicProblem(ip::IneqConicProblem)
     return ConicProblem(c,A,b,cones)
 end
 
+ConicProblem(ep::ECOSConicProblem) = ConicProblem(IneqConicProblem(ep))
+
 function ECOSConicProblem(ip::IneqConicProblem)
     q = 0; l = [];
     for (cone,idx) in ip.cones

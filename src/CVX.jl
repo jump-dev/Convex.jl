@@ -3,13 +3,13 @@ module CVX
 include("union.jl")
 include("expressions/expressions.jl")
 include("constraints/constraints.jl")
-include("solution.jl")
 include("problems/problems.jl")
+include("problems/conicproblem.jl")
+include("solution.jl")
+include("solvers/ecos.jl")
 include("utilities/promotions.jl")
 include("utilities/utilities.jl")
 include("utilities/display.jl")
-include("problems/conicproblem.jl")
-include("solvers/ecos.jl")
 
 # Atoms
 include("atoms/affine/add_subtract.jl")
