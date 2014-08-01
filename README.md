@@ -1,14 +1,13 @@
 # CVX.jl
 
 <!--
-[![Build Status](https://travis-ci.org/madeleineudell/CVX.jl.png)](https://travis-ci.org/madeleineudell/CVX.jl)
+[![Build Status](https://travis-ci.org/cvxgrp/CVX.jl.png)](https://travis-ci.org/cvxgrp/CVX.jl)
 -->
 
 CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
-- [Supported Operations](#user-content-supported-operations)
 - [Installation](#user-content-installation)
 - [Basic Types](#user-content-basic-types)
   - [Variables](#user-content-variables)
@@ -17,6 +16,7 @@ CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanfo
   - [Constraints](#user-content-constraints)
   - [Objective](#user-content-objective)
   - [Problem](#user-content-problem)
+- [Supported Operations](#user-content-supported-operations)
 - [Examples](#user-content-examples)
 - [Credits](#user-content-credits)
 
@@ -25,6 +25,8 @@ CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanfo
 CVX.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and CVX.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
+using CVX
+
 # Generate problem data
 m = 4
 n = 5
@@ -57,39 +59,9 @@ x.value
 problem.constraints[1].dual_value
 ```
 
-## Supported Operations
-In its current state, CVX.jl supports affine constraints and second-order cone (SOC) constraints. In most cases these have been suitably overloaded to work seamlessly for scalars, vectors and matrices. A list of operations that can be performed are listed below:
-
-- Affine
- - addition, subtraction, multiplication, division: `+, -, /, *`
- - indexing into vectors and matrices: `x[1:4, 2:3]`
- - k-th diagonal of a matrix: `diag(x, k)`
- - transpose: `x'`
- - dot product: `x' * y` or `dot(x, y)`
- - reshape, vec: `reshape(x, 2, 3)` or `vec(x)`
- - min, max element of a vector or matrix: `max(x)`
- - horizontal and vertical stacking: `hcat(x, y); vertcat(x, y)`
-- Elementwise
- - elementwise min, max between vectors or matrices: `max(x, y)`
- - pos, neg where pos is implemented as max(x, 0) and neg is implemented as -max(-x, 0): `pos(x)`
- - inverse pos (1./pos(x)): `inv_pos(x)`
- - square root: `sqrt(x)`
- - square: `square(x)`
- - square_pos (square(pos(x)): `square_pos(x)`
- - absolute value: `abs(x)`
-- SOC/ Other supported constraints
- - geometric mean: `geo_mean(x, y)`
- - norm (norm_1, norm_2, norm_inf): `norm(x, 1); norm(x, 2); norm(x, Inf)`
- - quadratic form: `quad_form(P, x)`
- - quadratic over linear: `quad_over_lin(x, y)`
- - l2-norm squared: `sum_squares(x)`
-
-In addition to these operations, when there are operations between vectors/matrices and scalars, the scalars are promoted. For example, we can do `max(x, 0)` where x is a vector variable but 0 is a scalar.
-
-
 ## Installation
 ```
-Pkg.clone("git@github.com:karanveerm/CVX.jl.git")
+Pkg.clone("https://github.com/cvxgrp/CVX.jl.git")
 Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
 Pkg.build("ECOS")  
 ```
@@ -176,6 +148,54 @@ solve!(problem)
 ```
 
 After the problem is solved, the status can be checked by `problem.status`, which can be `solved`, `primal infeasible, `dual infeasible`, `max iterations reached` or `numerical problems in solver`. If the status is `solved`, `problem.optval` will have the optimum value of the problem. Each variable has a `value` that can be used to access the variables optimum value. The optimum value of expressions can also be found by calling the `evaluate()` function of the expression as follows: `expr.evaluate()`. The dual values are stored with the respective constraints and can be accessed as `problem.constraints[idx].dual_value`.
+
+
+## Supported operations
+CVX.jl currently supports the following operations. Except where explicitly noted below, they work seamlessly for scalars, vectors and matrices. These atomic operations ("atoms") may be composed according to the [DCP](dcp.stanford.edu) composition rules to form new convex, concave, or affine expressions.
+
+### Affine atoms
+
+These atoms are affine in their arguments.
+
+ - addition, subtraction, multiplication, division: `+, -, /, *`
+ - indexing into vectors and matrices: `x[1:4, 2:3]`
+ - k-th diagonal of a matrix: `diag(x, k)`
+ - transpose: `x'`
+ - dot product: `x' * y` or `dot(x, y)`
+ - reshape, vec: `reshape(x, 2, 3)` or `vec(x)`
+ - min, max element of a vector or matrix: `max(x)`
+ - horizontal and vertical stacking: `hcat(x, y); vertcat(x, y)`
+
+### Elementwise atoms
+
+These atoms are applied elementwise to their arguments, returning an expression of the same size.
+
+atom | description | vexity | slope | implicit constraint
+-----|--------|--------|------- |-------
+`min(x,y)` | $min(x,y)$ | convex | increasing | none
+`max(x,y)` | $min(x,y)$ | convex | increasing | none
+`pos(x)` | $max(x,0)$ | convex | increasing | none
+`neg(x)` | $max(-x,0)$ | convex | decreasing | none
+`inv_pos(x)` | $1/max(x,0)$ | convex | decreasing | $x>0$
+`sqrt(x)` | $sqrt(x)$ | convex | decreasing | $x>0$
+`square(x)`, `x^2` | $x^2$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
+`abs(x)` | $abs(x)$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
+`geo_mean(x, y)` | $\sqrt{xy}$ | concave | increasing | $x \ge 0$, $y \ge 0$
+
+### Vector and Matrix atoms
+
+These atoms take vector or matrix arguments and return scalar expressions.
+
+atom | description | vexity | slope | implicit constraint
+-----|--------|--------|------- |-------
+`norm(x, p)` | $(\sum x_i^p)^{1/p}$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | `p = 1, 2, Inf`
+`vecnorm(x, p)` | $(\sum x_{ij}^p)^{1/p}$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | `p = 1, 2, Inf`
+`quad_form(x,P)` | $x^T P x$ | convex in $X$, affine in $P$ | increasing on $x \ge 0$, decreasing on $x \le 0$, increasing in $P$ | either $x$ or $P$ must be constant
+`quad_over_lin(x, y)` | $x^T x/y$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$, decreasing in $y$ | $y > 0$
+`sum_squares(x)` | $\sum x_i^2$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
+
+### Promotion
+When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do `max(x, 0)` gives an expression with the shape of `x` whose elements are the maximum of the corresponding element of `x` and `0`.
 
 ## Examples
 A number of very simple can be found in test/test.jl. More sophisticated examples, along with plots can be found in the examples/ directory.

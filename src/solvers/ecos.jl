@@ -27,9 +27,9 @@ export ecos_solve
 # be provided.
 #
 function ecos_solve(;n::Int64=nothing, m::Int64=nothing, p::Int64=0, l::Int64=0,
-    ncones::Int64=0, q::Array{Int64, }=[], G::VecOrMatOrSparse=nothing,
+    ncones::Int64=0, q::Array{Int64, }=[], G::VecOrMatOrSparseOrNothing=nothing,
     A::VecOrMatOrSparseOrNothing=nothing, c::Array{Float64, }=nothing,
-    h::Array{Float64, }=nothing, b::ArrayFloat64OrNothing=nothing, debug::Bool=false)
+    h::ArrayFloat64OrNothing=nothing, b::ArrayFloat64OrNothing=nothing, debug::Bool=false)
 
   ptr_work = ECOS.setup(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b)
   ret_val = ECOS.solve(ptr_work)
