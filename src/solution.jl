@@ -15,7 +15,12 @@ function solve!(problem::Problem, method=:ecos)
       m = MathProgBase.model(solvers[method]())
       MathProgBase.loadconicproblem!(m, cp.c, cp.A, cp.b, cp.cones)
       MathProgBase.optimize!(m)
-      solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
+      try
+        y, z = MathProgBase.getconicdual(m)
+        solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
+      catch
+        solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
+      end
   else
     println("method $method not implemented")
   end
