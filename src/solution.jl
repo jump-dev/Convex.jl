@@ -17,27 +17,26 @@ function solve!(problem::Problem, method=:ecos)
       MathProgBase.optimize!(m)
       try
         y, z = MathProgBase.getconicdual(m)
-        solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
+        problem.solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
       catch
-        solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
+        problem.solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
       end
   else
-    println("method $method not implemented")
+    error("method $method not implemented")
   end
 
   # minimize -> maximize
-  if (problem.head == :maximize) && (solution.status == :Optimal)
-    solution.optval = -solution.optval
+  if (problem.head == :maximize) && (problem.solution.status == :Optimal)
+    problem.solution.optval = -problem.solution.optval
   end
 
   # Populate the problem with the solution
-  problem.optval = solution.optval
-  problem.status = solution.status
-  problem.solution = solution
+  problem.optval = problem.solution.optval
+  problem.status = problem.solution.status
 
   if problem.status == :Optimal
     populate_variables!(problem, variable_index)
-    if solution.dual
+    if problem.solution.dual
       populate_constraints!(problem, eq_constr_index, ineq_constr_index)
     end
   end
