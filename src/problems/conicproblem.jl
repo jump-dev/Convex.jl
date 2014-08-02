@@ -26,12 +26,30 @@ convert(::Type{Range}, i::Integer) = i:i
 
 # The parameter c is the objective vector, the parameter A is the constraint matrix (typically sparse), the parameter b is the vector of right-hand side values, and cones is a list of (Symbol,vars) tuples, where Symbol is one of the above recognized cones and vars is a list of indices of variables which belong to this cone (may be given as a Range). All variables must be listed in exactly one cone, and the indices given must correspond to the order of the columns in in the constraint matrix A. Cones may be listed in any order, and cones of the same class may appear multiple times. For the semidefinite cone, the number of variables present must be a square integer n corresponding to a sqrt(n) x sqrt(n) matrix; 
 # variables should be listed in column-major, or by symmetry, row-major order.
-type ConicProblem{T<:Number}
+type ConicProblem{T}
     c::Array{T, 2}
     A::AbstractArray{T, 2}
     b::Array{T, 2}
-    cones::Array # Array of (Symbol,Range) or (Symbol,Array{Integer}) tuples
+    cones::Array # Array of (Symbol,Iterable{Integer}) tuples
+
+    function ConicProblem(c::Array{T, 2}, A::AbstractArray{T, 2}, b::Array{T, 2}, cones::Array)
+        # verify all variables are in exactly one cone
+        free_vars = Set(1:length(c))
+        set_cones = Array((Symbol,Set), length(cones)+1)
+        for i= 1:length(cones)
+            cone_type, idxs = cones[i]
+            set_cones[i] = cone_type, Set(idxs)
+            free_vars = setdiff(free_vars, set_cones[i][2])
+        end
+        if length(free_vars) > 0
+            set_cones[end] = (:Free, free_vars)
+            cones = set_cones
+        end
+        return new(c, A, b, cones)
+    end
 end
+ConicProblem{T<:Real}(c::Array{T, 2}, A::AbstractArray{T, 2}, b::Array{T, 2}, cones::Array) = ConicProblem{T}(c, A, b, cones)
+
 function show(io::IO, p::ConicProblem)
   print(io, "ConicProblem: minimize c^T x subject to A x <= b, x in K\n
             c:\n$(p.c)
