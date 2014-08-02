@@ -1,6 +1,7 @@
-export get_var_dict, solve!
-
+import ECOS, MathProgBase
 solvers = {:ecos=>ECOS.ECOSSolver}
+
+export get_var_dict, solve!
 
 function solve!(problem::Problem, method=:ecos)
   # maximize -> minimize
@@ -10,18 +11,17 @@ function solve!(problem::Problem, method=:ecos)
 
   ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
   cp = ConicProblem(ecos_problem)
-  if method == :ecos
-    m = MathProgBase.model(solvers[method]())
-    MathProgBase.loadconicproblem!(m, cp.c, cp.A, cp.b, cp.cones)
-    MathProgBase.optimize!(m)
-    println("solved! got ", m)
-    #solution = solve(ecos_problem)
+  if method in keys(solvers)
+      m = MathProgBase.model(solvers[method]())
+      MathProgBase.loadconicproblem!(m, cp.c, cp.A, cp.b, cp.cones)
+      MathProgBase.optimize!(m)
+      solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
   else
     println("method $method not implemented")
   end
 
   # minimize -> maximize
-  if (problem.head == :maximize) && (solution.status == "solved")
+  if (problem.head == :maximize) && (solution.status == :Optimal)
     solution.optval = -solution.optval
   end
 
@@ -30,9 +30,11 @@ function solve!(problem::Problem, method=:ecos)
   problem.status = solution.status
   problem.solution = solution
 
-  if problem.status == "solved"
+  if problem.status == :Optimal
     populate_variables!(problem, variable_index)
-    populate_constraints!(problem, eq_constr_index, ineq_constr_index)
+    if solution.dual
+      populate_constraints!(problem, eq_constr_index, ineq_constr_index)
+    end
   end
 end
 
@@ -61,6 +63,20 @@ function populate_variables!(problem::Problem, variable_index::Dict{Int64, Int64
   end
 end
 
+function ECOSConicProblem(problem::Problem)
+    canonical_constraints_array = canonical_constraints(problem)
+    m, n, p, l, ncones, q, G, h, A, b, variable_index, eq_constr_index, ineq_constr_index =
+        create_ecos_matrices(canonical_constraints_array, problem.objective)
+
+    # Now, all we need to do is create c
+    c = zeros(n, 1)
+    objective = problem.objective
+    if objective.vexity != :constant
+        uid = objective.uid
+        c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
+    end  
+    return ECOSConicProblem(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b), variable_index, eq_constr_index, ineq_constr_index
+end
 function populate_constraints!(problem::Problem, eq_constr_index::Dict{Int64, Int64},
     ineq_constr_index::Dict{Int64, Int64})
 

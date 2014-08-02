@@ -10,33 +10,17 @@ Float64OrNothing = Union(Float64, Nothing)
 # x: primal variables
 # y: dual variables for equality constraints
 # z: dual variables for inequality constraints s \in K
-type Solution
-  x::Array{Float64, 1} # x: primal variables
-  y::Array{Float64, 1} # y: dual variables for equality constraints
-  z::Array{Float64, 1} # z: dual variables for inequality constraints s \in K
-  status::ASCIIString
-  ret_val::Int64
-  optval::Float64OrNothing
-
-  const status_map = {
-    0 => "solved",
-    1 => "primal infeasible",
-    2 => "dual infeasible",
-    -1 => "max iterations reached",
-    -2 => "numerical problems in solver",
-    -3 => "numerical problems in solver"
-  }
-
-  function Solution(x::Array{Float64, 1}, y::Array{Float64, 1}, z::Array{Float64, 1}, ret_val::Int64, optval::Float64OrNothing=nothing)
-    if haskey(status_map, ret_val)
-      return new(x, y, z, status_map[ret_val], ret_val, optval)
-    else
-      return new(x, y, z, "unknown problem in solver", ret_val, optval)
-    end
-  end
+type Solution{T<:Number}
+  x::Array{T, 1} # x: primal variables
+  y::Array{T, 1} # y: dual variables for equality constraints
+  z::Array{T, 1} # z: dual variables for inequality constraints s \in K
+  status::Symbol       # status is a termination status symbol, one of :Optimal, :Infeasible, :Unbounded, :UserLimit (iteration limit or timeout), :Error (and maybe others).
+  optval::T
+  dual::Bool           # true if dual values (y and z) have been populated
 end
 
-
+Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], T[], status, optval, false)
+Solution{T}(x::Array{T, 1}, y::Array{T, 1}, z::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, z, status, optval, true)
 
 Float64OrNothing = Union(Float64, Nothing)
 SolutionOrNothing = Union(Solution, Nothing)
@@ -49,7 +33,7 @@ type Problem
   head::Symbol
   objective::AbstractCvxExpr
   constraints::Array{CvxConstr}
-  status::ASCIIString
+  status::Symbol
   optval::Float64OrNothing
   solution::SolutionOrNothing
 

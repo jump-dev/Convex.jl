@@ -79,17 +79,17 @@ end
 cones(p::IneqConicProblem) = Set(keys(p.cones))
 
 type ECOSConicProblem
-    n::Integer          # number of variables
-    m::Integer          # number of inequality constraints, ie, size(G,1)
-    p::Integer          # number of equality constraints
-    l::Integer          # dimension of the positive orthant constraints
-    ncones::Integer     # number of SOC cones
-    q::Array{Integer, 1}# array of integers of length ncones, where each element defines the dimension of the cone
-    G::Array{Number, 2}      # inequality constraint Gx \leq_K h, m,n = size(G)
-    c::Array{Number, 2}      # objective function
-    h::Array{Number, 2}      # rhs of inequality constraints
-    A::Array{Number, 2}      # equality constraints, p,n = size(A)
-    b::Array{Number, 2}      # rhs of equality constraints
+    n          # number of variables
+    m          # number of inequality constraints, ie, size(G,1)
+    p          # number of equality constraints
+    l          # dimension of the positive orthant constraints
+    ncones     # number of SOC cones
+    q          # array of integers of length ncones, where each element defines the dimension of the cone
+    G      # inequality constraint Gx \leq_K h, m,n = size(G)
+    c      # objective function
+    h      # rhs of inequality constraints
+    A      # equality constraints, p,n = size(A)
+    b      # rhs of equality constraints
 end
 ECOSConicProblem(;n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b) = 
     ECOSConicProblem(n, m, p, l, ncones, q, G, c, h, A, b)
