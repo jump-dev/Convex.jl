@@ -134,7 +134,7 @@ function IneqConicProblem(p::ECOSConicProblem)
     if p.l > 0
         cones = [(:NonNeg,1:p.l)]
     else 
-        cones = []
+        cones = Any[]
     end
     lastidx = p.l
     for dim in p.q
