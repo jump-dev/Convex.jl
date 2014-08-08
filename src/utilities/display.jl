@@ -52,18 +52,18 @@ end
 # above
 
 function show(io::IO, solution::Solution)
-  print(io, "Solution:\nvalue returned by solver $(solution.ret_val)\n")
-  print(io, "status: $(solution.status)\n")
-  print(io, "optimal value of primal variables: $(solution.x)\n")
-  print(io, "optimal value of dual equality variables: $(solution.y)\n")
-  print(io, "optimal value of dual inequality variables: $(solution.z)")
+  print(io, "Solution:\n\tvalue returned by solver: $(solution.optval)\n")
+  print(io, "\tstatus: $(solution.status)\n")
+  print(io, "\toptimal value of primal variables: $(solution.x)\n")
+  print(io, "\toptimal value of dual equality variables: $(solution.y)\n")
+  print(io, "\toptimal value of dual inequality variables: $(solution.z)")
 end
 
 function show(io::IO, canon_constr::CanonicalConstr)
   print(io, "CanonicalConstr: $(canon_constr.uid)\n")
-  print(io, "uid of expressions: $(canon_constr.vars)\n")
-  print(io, "coefficients of above expressions: $(canon_constr.coeffs)\n")
-  print(io, "constant: $(canon_constr.constant)\n")
-  print(io, "equality constraint: $(canon_constr.is_eq)\n")
-  print(io, "conic constraint: $(canon_constr.is_conic)")
+  print(io, "\tuid of expressions: $(canon_constr.vars)\n")
+  print(io, "\tcoefficients of above expressions: $(canon_constr.coeffs)\n")
+  print(io, "\tconstant: $(canon_constr.constant)\n")
+  print(io, "\tequality constraint: $(canon_constr.is_eq)\n")
+  print(io, "\tconic constraint: $(canon_constr.is_conic)")
 end

@@ -1,5 +1,4 @@
 export quad_form
-quad_form_PSD_TOL = 1e-14
 
 function quad_form(x::Constant, A::Constant)
   return x' * A * x
@@ -26,14 +25,13 @@ function quad_form(x::AbstractCvxExpr, A::Constant)
     error("Quadratic form only defined for symmetric matrices")
   end
   V = eigvals(full(A.value))
-  if !all(V .>= -quad_form_PSD_TOL) && !all(V .<= quad_form_PSD_TOL)
-    error("Quadratic forms supported only for semidefinite matrices")
-  end
 
   if all(V .>= 0)
     factor = 1
-  else
+  elseif all(V .<= 0)
     factor = -1
+  else
+    error("Quadratic forms supported only for semidefinite matrices")
   end
 
   P = sqrtm(full(factor * A.value))

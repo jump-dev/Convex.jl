@@ -141,7 +141,12 @@ function IneqConicProblem(p::ECOSConicProblem)
         push!(cones,(:SOC,lastidx+1:lastidx+dim))
         lastidx += dim
     end
-    return IneqConicProblem(p.c,p.A,p.b,p.G,p.h,cones)
+    n = length(p.c); T = eltype(p.c)
+    G = (p.G == nothing ? Array(T,(0,n)) : p.G )
+    A = (p.A == nothing ? Array(T,(0,n)) : p.A )
+    b = (p.b == nothing ? Array(T,(0,1)) : p.b )
+    h = (p.h == nothing ? Array(T,(0,1)) : p.h )
+    return IneqConicProblem(p.c,A,b,G,h,cones)
 end
 
 function ConicProblem(ip::IneqConicProblem)
