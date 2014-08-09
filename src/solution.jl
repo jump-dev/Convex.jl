@@ -1,9 +1,8 @@
 import ECOS, MathProgBase
-solvers = {:ecos=>ECOS.ECOSSolver}
 
 export get_var_dict, solve!
 
-function solve!(problem::Problem, method=:ecos)
+function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProgBase.model(MathProgBase.defaultConicsolver))
   # maximize -> minimize
   if problem.head == :maximize
     problem.objective = -problem.objective
@@ -11,20 +10,14 @@ function solve!(problem::Problem, method=:ecos)
 
   ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
   cp = IneqConicProblem(ecos_problem)
-  if method in keys(solvers)
-      m = MathProgBase.model(solvers[method]())
-      MathProgBase.loadineqconicproblem!(m, cp.c, cp.A, cp.b, cp.G, cp.h, cp.cones)
-      MathProgBase.optimize!(m)
-      try
-        y, z = MathProgBase.getconicdual(m)
-        problem.solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
-      catch
-        problem.solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
-      end
-  else
-    error("method $method not implemented")
+  MathProgBase.loadineqconicproblem!(m, cp.c, cp.A, cp.b, cp.G, cp.h, cp.cones)
+  MathProgBase.optimize!(m)
+  try
+    y, z = MathProgBase.getconicdual(m)
+    problem.solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
+  catch
+    problem.solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
   end
-
   # minimize -> maximize
   if (problem.head == :maximize) && (problem.solution.status == :Optimal)
     problem.solution.optval = -problem.solution.optval
