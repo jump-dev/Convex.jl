@@ -10,10 +10,10 @@ function solve!(problem::Problem, method=:ecos)
   end
 
   ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
-  cp = ConicProblem(ecos_problem)
+  cp = IneqConicProblem(ecos_problem)
   if method in keys(solvers)
       m = MathProgBase.model(solvers[method]())
-      MathProgBase.loadconicproblem!(m, cp.c, cp.A, cp.b, cp.cones)
+      MathProgBase.loadineqconicproblem!(m, cp.c, cp.A, cp.b, cp.G, cp.h, cp.cones)
       MathProgBase.optimize!(m)
       try
         y, z = MathProgBase.getconicdual(m)
