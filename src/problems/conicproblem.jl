@@ -125,7 +125,7 @@ end
 
 function IneqConicProblem(p::ConicProblem)
     m,n = size(p.A)
-    G = -eye(n)
+    G = -speye(n)
     h = zeros(n,1)
     return IneqConicProblem(p.c,p.A,p.b,G,h,p.cones)
 end
@@ -142,8 +142,8 @@ function IneqConicProblem(p::ECOSConicProblem)
         lastidx += dim
     end
     n = length(p.c); T = eltype(p.c)
-    G = (p.G == nothing ? Array(T,(0,n)) : p.G )
-    A = (p.A == nothing ? Array(T,(0,n)) : p.A )
+    G = (p.G == nothing ? spzeros(T,0,n) : p.G )
+    A = (p.A == nothing ? spzeros(T,0,n) : p.A )
     b = (p.b == nothing ? Array(T,(0,1)) : p.b )
     h = (p.h == nothing ? Array(T,(0,1)) : p.h )
     return IneqConicProblem(p.c,A,b,G,h,cones)
@@ -151,16 +151,18 @@ end
 
 function ConicProblem(ip::IneqConicProblem)
     nslacks = length(ip.h)
-    nvars = length(ip.c)
+    neq, nvars = size(cp.A)
     c = [ip.c; zeros(nslacks)]
-    A = [ip.A   zeros(size(ip.A,1), nslacks);
-         ip.G   eye(nslacks)              ]
+    nslacks, n = size(cp.G)
+    A = blkdiag(ip.A, speye(nslacks)) 
+    A[neq+1:end, 1:n] = cp.G
     b = [ip.b; ip.h]
     cones = [(cone, idx_range + nvars) for (cone, idx_range) in ip.cones]
     return ConicProblem(c,A,b,cones)
 end
 
 function ECOSConicProblem(ip::IneqConicProblem)
+    # TODO: preserve sparsity
     l = 0; q = Int64[];
     nonneg_indices = Range[]
     soc_indices = Range[]

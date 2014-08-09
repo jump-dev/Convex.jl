@@ -43,6 +43,9 @@ function .+(x::AbstractCvxExpr, y::AbstractCvxExpr)
   if x.size != y.size
 
     if x.size == (1, 1)
+      if y.size == (1, 1)
+        return sum([x, y])
+      end
       sz_y = get_vectorized_size(y)
       this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
       coeffs = VecOrMatOrSparse[-ones(sz_y, 1), -speye(sz_y), speye(sz_y)]
