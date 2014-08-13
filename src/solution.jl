@@ -11,6 +11,8 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProg
   ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
   cp = IneqConicProblem(ecos_problem)
   MathProgBase.loadineqconicproblem!(m, cp.c, cp.A, cp.b, cp.G, cp.h, cp.cones)
+  #cp = ConicProblem(ecos_problem)
+  #MathProgBase.loadconicproblem!(m, cp.c, cp.A, cp.b, cp.cones)
   MathProgBase.optimize!(m)
   try
     y, z = MathProgBase.getconicdual(m)
