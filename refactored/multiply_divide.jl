@@ -3,7 +3,7 @@ export sign, monotonicity, intrinsic_vexity
 
 ### Multiplication
 
-type MutiplyAtom <: AbstractExpr
+type MultiplyAtom <: AbstractExpr
   head::Symbol
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
@@ -17,6 +17,7 @@ type MutiplyAtom <: AbstractExpr
       sz = (x.size[1], y.size[2])
     else
       error("Cannot multiply two expressions of sizes $(x.size) and $(y.size)")
+    end
     return new(:*, (x, y), sz)
   end
 end

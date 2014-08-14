@@ -1,10 +1,9 @@
 import Base.size, Base.endof, Base.ndims
 export AbstractExpr, AbstractFunc, ConvexFunc, ConcaveFunc, AffineFunc, NoVexityFunc
 export Constant, Variable
-export vexity, sign, size, evaluate
+export vexity, sign, size, evaluate, cone_form
 export endof, ndims
 export VecOrMatOrSparse, VecOrMatOrSparseOrNothing, Value, ArrayFloat64OrNothing, ValueOrNothing
-
 
 ### Abstract types
 
@@ -15,6 +14,7 @@ abstract ConvexFunc <: AbstractFunc
 abstract ConcaveFunc <: AbstractFunc
 abstract NoVexityFunc <: AbstractFunc
 
+unique_id(x::AbstractExpr) = object_id(x)
 
 function vexity(x::AbstractExpr)
   return x.vexity
@@ -36,8 +36,6 @@ end
 function size(x::AbstractExpr)
   return x.size
 end
-
-
 
 ### User-defined Unions
 
@@ -77,6 +75,10 @@ end
 function evaluate(x::Constant)
   return x.value
 end
+
+function cone_form(x::Constant)
+  return ({:Constant, x.value}, ConeConstr[])
+end
 ### Variable Type
 
 type Variable <: AbstractExpr
@@ -90,9 +92,6 @@ type Variable <: AbstractExpr
     if length(size) == 1
       size = (size[1], 1)
     end
-    if !(sign in signs)
-      error("Sign must be one of :pos, :neg, or :any; got $sign")
-    end
     return new(:variable, nothing, Affine(), sign, size)
   end
 
@@ -105,12 +104,15 @@ function evaluate(x::Variable)
   return x.value == nothing ? error("Value of the variable is yet to be calculated") : x.value
 end
 
+function cone_form(x::Variable)
+  return ({unique_id(x), ones(get_vectorized_size(x))}, ConeConstr[])
+end
 
 ### Indexing Utilities
 
-endof(x::AbstractCvxExpr) = x.size[1] * x.size[2]
+endof(x::AbstractExpr) = x.size[1] * x.size[2]
 
-function size(x::AbstractCvxExpr, dim::Integer)
+function size(x::AbstractExpr, dim::Integer)
   if dim < 1
     error("dimension out of range")
   elseif dim > 2
@@ -120,4 +122,6 @@ function size(x::AbstractCvxExpr, dim::Integer)
   end
 end
 
-ndims(x::AbstractCvxExpr) = 2
+ndims(x::AbstractExpr) = 2
+
+get_vectorized_size(x::AbstractExpr) = reduce(*,size(x))

@@ -158,6 +158,7 @@ function ConicProblem(ip::IneqConicProblem)
     A[neq+1:end, 1:n] = cp.G
     b = [ip.b; ip.h]
     cones = [(cone, idx_range + nvars) for (cone, idx_range) in ip.cones]
+    push!(cones, (:free, 1:nvars)) # XXX check this
     return ConicProblem(c,A,b,cones)
 end
 

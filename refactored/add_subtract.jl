@@ -31,6 +31,13 @@ end
 
 -(x::AbstractExpr) = NegateAtom(x)
 
+function cone_form(e::NegateAtom)
+  objective, constraints = cone_form(e.children[1])
+  for var in keys(objective)
+    objective[var] *= -1
+  end
+  return (objective, constraints)
+end
 
 ### Binary Addition/Subtraction
 
@@ -48,6 +55,7 @@ type AdditionAtom <: AffineFunc
       error("Cannot add expressions of sizes $(x.size) and $(y.size)")
     end
     return new(:+, (x, y), sz)
+  end
 end
 
 function monotonicity(x::AdditionAtom)
@@ -60,6 +68,23 @@ end
 
 function evaluate(x::AdditionAtom)
   return evaluate(x.children[1]) + evaluate(x.children[2])
+end
+
+function cone_form(e::AdditionAtom)
+  nchildren = length(e.children)
+  childobjectives = Array(Dict, nchildren)
+  childconstraints = ConeConstr[]
+  for i=1:nchildren
+    childobjectives[i], childconstraints = cone_form(e.children[i])
+    append!(constraints,childconstraints)
+  end
+  objective = Dict()
+  for i=1:nchildren
+    for var in keys(childobjectives[i])
+      objective[var] = has(objective,var) ? childobjectives[i][var] : objective[var] + childobjectives[i][var]
+    end
+  end
+  return (objective, constraints)
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
