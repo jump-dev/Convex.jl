@@ -151,13 +151,17 @@ end
 
 function ConicProblem(ip::IneqConicProblem)
     nslacks = length(ip.h)
-    neq, nvars = size(cp.A)
+    neq, nvars = size(ip.A)
+    # we add a slack variable for each inequality constraint
     c = [ip.c; zeros(nslacks)]
-    nslacks, n = size(cp.G)
+    nslacks, n = size(ip.G)
+    # the new equality constraint matrix A enforces that ip.A * x = ip.b and ip.G * x + s = ip.h
     A = blkdiag(ip.A, speye(nslacks)) 
-    A[neq+1:end, 1:n] = cp.G
+    A[neq+1:end, 1:n] = ip.G
     b = [ip.b; ip.h]
+    # then we simply require s \in cones, and leave x free
     cones = [(cone, idx_range + nvars) for (cone, idx_range) in ip.cones]
+    push!(cones, (:Free, 1:nvars))
     return ConicProblem(c,A,b,cones)
 end
 

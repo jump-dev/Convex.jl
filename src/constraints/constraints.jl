@@ -106,7 +106,7 @@ type CvxConstr
           elseif rhs.size != (1, 1) && lhs.size == (1, 1)
             coeffs = VecOrMatOrSparse[ones(get_vectorized_size(rhs), 1)]
           elseif lhs.size != rhs.size
-            error("Can't compare expressions of size $(x.size) and $(y.size)")
+            error("Can't compare expressions of size $(lhs.size) and $(rhs.size)")
           else
             coeffs = VecOrMatOrSparse[speye(get_vectorized_size(lhs))]
           end
