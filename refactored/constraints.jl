@@ -18,7 +18,7 @@ type EqConstraint
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:==, object_id(lhs) + object_id(rhs), lhs, rhs, sz)
+    return new(:(==), object_id(lhs) + object_id(rhs), lhs, rhs, sz)
   end
 end
 

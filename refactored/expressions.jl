@@ -1,6 +1,7 @@
-import Base.size, Base.endof, Base.ndims
+import Base.sign, Base.size, Base.endof, Base.ndims
 export AbstractExpr, Constant, Variable
 export vexity, sign, size, evaluate
+export dual_conic_form
 export endof, ndims
 export Value, ValueOrNothing
 export get_vectorized_size
@@ -68,9 +69,9 @@ function evaluate(x::Constant)
 end
 
 function dual_conic_form(x::Constant)
-  var_to_coeff = Dict{Uint64, Value}
+  var_to_coeff = Dict{Uint64, Value}()
   var_to_coeff[object_id(:Constant)] = vec(x.value)
-  return (ConicObj(var_to_coeff), ConeConstr[])
+  return (ConicObj(var_to_coeff), ConicConstr[])
 end
 
 
@@ -87,6 +88,7 @@ type Variable <: AbstractExpr
   function Variable(size::(Int64, Int64), sign::Sign=NoSign())
     this = new(:variable, 0, nothing, size, Affine(), sign)
     this.id = object_id(this)
+    return this
   end
 
   Variable(m::Integer, n::Integer, sign::Sign=NoSign()) = Variable((m,n), sign)
@@ -94,7 +96,7 @@ type Variable <: AbstractExpr
   Variable(size::Integer, sign::Sign=NoSign()) = Variable((size, 1), sign)
 end
 
-function vexity(x::)
+function vexity(x::Variable)
   return x.vexity
 end
 
@@ -103,10 +105,10 @@ function evaluate(x::Variable)
 end
 
 function dual_conic_form(x::Variable)
-  var_to_coeff = Dict{Uint64, Value}
+  var_to_coeff = Dict{Uint64, Value}()
   var_to_coeff[x.id] = speye(get_vectorized_size(x))
   # TODO add constraints for Variable sign when needed
-  return (ConicObj(var_to_coeff), ConeConstr[])
+  return (ConicObj(var_to_coeff), ConicConstr[])
 end
 
 

@@ -72,8 +72,8 @@ end
 
 function dual_conic_form(x::AdditionAtom)
   child_cones = map(dual_conic_form, x.children)
-  objective = Coefficients()
-  constraints = ConeContr[]
+  objective = ConicObj(Dict{Uint64, Value}())
+  constraints = ConicConstr[]
   for (child_objective, child_constraints) in child_cones
     append!(constraints, child_constraints)
     objective += child_objective

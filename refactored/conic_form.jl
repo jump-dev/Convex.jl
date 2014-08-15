@@ -12,15 +12,17 @@ function -(c::ConicObj)
 end
 
 function +(c::ConicObj, d::ConicObj)
+  new_obj = ConicObj(copy(c.vars_to_coeffs))
   for var in keys(d.vars_to_coeffs)
-    if !has(c.vars_to_coeffs, var)
-      c.vars_to_coeffs[var] = d.vars_to_coeffs[var]
+    if !haskey(new_obj.vars_to_coeffs, var)
+      new_obj.vars_to_coeffs[var] = d.vars_to_coeffs[var]
     else
       # .+ does not behave properly for sparse matrices
       # need to override behavior
-      c.vars_to_coeffs[var] .+= d.vars_to_coeffs[var]
+      new_obj.vars_to_coeffs[var] .+= d.vars_to_coeffs[var]
     end
   end
+  return new_obj
 end
 
 

@@ -47,34 +47,43 @@ end
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
 
++(v::NoVexity, w::NoVexity) = v
++(v::NoVexity, w::Vexity) = v
++(v::Vexity, w::NoVexity) = w
+
++(v::ConstVexity, w::ConstVexity) = v
++(v::ConstVexity, w::NoVexity) = w
++(v::NoVexity, w::ConstVexity) = v
++(v::ConstVexity, w::Vexity) = w
++(v::Vexity, w::ConstVexity) = v
+
++(v::Affine, w::Affine) = v
++(v::Affine, w::Convex) = w
++(v::Convex, w::Affine) = v
++(v::Affine, w::Concave) = w
++(v::Concave, w::Affine) = v
+
 +(v::Convex, w::Convex) = v
 +(v::Concave, w::Concave) = v
 +(v::Concave, w::Convex) = NoVexity()
 +(v::Convex, w::Concave) = NoVexity()
-+(v::Affine, w::Vexity) = w
-+(v::Vexity, w::Affine) = v
-+(v::Affine, w::Affine) = v
-+(v::Affine, w::ConstVexity) = v
-+(v::ConstVexity, w::Affine) = w
-+(v::NoVexity, w::Vexity) = v
-+(v::Vexity, w::NoVexity) = w
-+(v::NoVexity, w::NoVexity) = v
+
 
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
 +(s::Positive, t::Negative) = NoSign()
 +(s::Negative, t::Positive) = NoSign()
++(s::NoSign, t::NoSign) = s
 +(s::NoSign, t::Sign) = s
 +(s::Sign, t::NoSign) = t
-+(s::NoSign, t::NoSign) = s
 
+*(s::NoSign, t::NoSign) = s
+*(s::NoSign, t::Sign) = s
+*(s::Sign, t::NoSign) = t
 *(s::Positive, t::Positive) = s
-*(s::Positive, t::Sign) = t
-*(s::Sign, t::Positive) = s
+*(s::Positive, t::Negative) = t
+*(s::Negative, t::Positive) = s
 *(s::Negative, t::Negative) = Positive()
-*(s::Negative, t::Sign) = -t
-*(s::Sign, t::Negative) = -s
-*(s::Sign, t::Sign) = NoSign()
 
 *(s::Positive, m::Monotonicity) = m
 *(s::Negative, m::Monotonicity) = -m
