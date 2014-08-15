@@ -1,9 +1,9 @@
 import Base.show
 
-export 
-    ConicProblem, 
+export
+    ConicProblem,
     IneqConicProblem,
-    ConicProblemSolution, 
+    ConicProblemSolution,
     IneqConicProblemSolution,
     ECOSConicProblem,
     cones,
@@ -15,16 +15,16 @@ cones_in = {:LP=>Set({:NonNeg}),
             :SDP=>Set({:NonNeg, :SOC, :SDP})}
 
 import Base.convert
-convert(::Type{Range}, i::Integer) = i:i 
+convert(::Type{Range}, i::Integer) = i:i
 
 # The ConicProblem type stores the problem data
 # a ConicProblem instance corresponds to the problem
 
     # minimize     c'*x
-    # subject to   Ax == b 
+    # subject to   Ax == b
     #              x \in cones
 
-# The parameter c is the objective vector, the parameter A is the constraint matrix (typically sparse), the parameter b is the vector of right-hand side values, and cones is a list of (Symbol,vars) tuples, where Symbol is one of the above recognized cones and vars is a list of indices of variables which belong to this cone (may be given as a Range). All variables must be listed in exactly one cone, and the indices given must correspond to the order of the columns in in the constraint matrix A. Cones may be listed in any order, and cones of the same class may appear multiple times. For the semidefinite cone, the number of variables present must be a square integer n corresponding to a sqrt(n) x sqrt(n) matrix; 
+# The parameter c is the objective vector, the parameter A is the constraint matrix (typically sparse), the parameter b is the vector of right-hand side values, and cones is a list of (Symbol,vars) tuples, where Symbol is one of the above recognized cones and vars is a list of indices of variables which belong to this cone (may be given as a Range). All variables must be listed in exactly one cone, and the indices given must correspond to the order of the columns in in the constraint matrix A. Cones may be listed in any order, and cones of the same class may appear multiple times. For the semidefinite cone, the number of variables present must be a square integer n corresponding to a sqrt(n) x sqrt(n) matrix;
 # variables should be listed in column-major, or by symmetry, row-major order.
 type ConicProblem{T}
     c::Array{T, 2}
@@ -72,7 +72,7 @@ end
 # an IneqConicProblem instance corresponds to the problem
 
     # minimize     c'*x
-    # subject to   Ax == b 
+    # subject to   Ax == b
     #              Gx \leq_cones h
 
 # (this corresponds to the form accepted by the solver ECOS)
@@ -109,14 +109,14 @@ type ECOSConicProblem
     A      # equality constraints, p,n = size(A)
     b      # rhs of equality constraints
 end
-ECOSConicProblem(;n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b) = 
+ECOSConicProblem(;n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b) =
     ECOSConicProblem(n, m, p, l, ncones, q, G, c, h, A, b)
 
 function cones(p::ECOSConicProblem)
     mycones = Set()
     if sum(p.l) > 0
         push!(mycones, :SOC)
-    end 
+    end
     if p.q > 0
         push!(mycones, :NonNeg)
     end
@@ -133,7 +133,7 @@ end
 function IneqConicProblem(p::ECOSConicProblem)
     if p.l > 0
         cones = [(:NonNeg,1:p.l)]
-    else 
+    else
         cones = Any[]
     end
     lastidx = p.l
@@ -156,7 +156,7 @@ function ConicProblem(ip::IneqConicProblem)
     c = [ip.c; zeros(nslacks)]
     nslacks, n = size(ip.G)
     # the new equality constraint matrix A enforces that ip.A * x = ip.b and ip.G * x + s = ip.h
-    A = blkdiag(ip.A, speye(nslacks)) 
+    A = blkdiag(ip.A, speye(nslacks))
     A[neq+1:end, 1:n] = ip.G
     b = [ip.b; ip.h]
     # then we simply require s \in cones, and leave x free

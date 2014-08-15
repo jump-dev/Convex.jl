@@ -63,11 +63,11 @@ function *(x::AbstractCvxExpr, y::Constant)
   end
 
   sz = (x.size[1], y.size[2])
-  vectorized_mul = kron(y.value', speye(sz[1]))
+  vectorized_mul = kron(y.value', -speye(sz[1]))
 
   this = CvxExpr(:*, [x, y], promote_vexity_multiply(y, x), promote_sign_multiply(y, x), sz)
 
-  coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
+  coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), vectorized_mul]
   vars = [this.uid, x.uid]
   constant = spzeros(get_vectorized_size(sz), 1)
   canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]

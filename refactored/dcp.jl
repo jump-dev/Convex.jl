@@ -1,4 +1,4 @@
-export Vexity, Constant, Affine, Convex, Concave, NoVexity
+export Vexity, ConstVexity, Affine, Convex, Concave, NoVexity
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign
 export -, +, *
@@ -7,7 +7,7 @@ abstract Vexity
 abstract Monotonicity
 abstract Sign
 
-type Constant <: Vexity
+type ConstantVexity <: Vexity
 end
 
 type Affine <: Vexity
@@ -29,6 +29,7 @@ type Nondecreasing <: Monotonicity
 end
 
 type NoMonotonicity <: Monotonicity
+end
 
 type Positive <: Sign
 end
@@ -58,8 +59,8 @@ end
 +(v::Affine, w::Vexity) = w
 +(v::Vexity, w::Affine) = v
 +(v::Affine, w::Affine) = v
-+(v::Affine, w::Constant) = v
-+(v::Constant, w::Affine) = w
++(v::Affine, w::ConstantVexity) = v
++(v::ConstantVexity, w::Affine) = w
 +(v::NoVexity, w::Vexity) = v
 +(v::Vexity, w::NoVexity) = w
 +(v::NoVexity, w::NoVexity) = v
@@ -72,13 +73,13 @@ end
 +(s::Sign, t::NoSign) = t
 +(s::NoSign, t::NoSign) = s
 
-*(s::Sign, t::Sign) = NoSign()
-*(s::Positive, t::Sign) = t
-*(s::Sign, s::Positive) = s
 *(s::Positive, t::Positive) = s
+*(s::Positive, t::Sign) = t
+*(s::Sign, t::Positive) = s
+*(s::Negative, t::Negative) = Positive()
 *(s::Negative, t::Sign) = -t
 *(s::Sign, t::Negative) = -s
-*(s::Negative, t::Negative) = Positive()
+*(s::Sign, t::Sign) = NoSign()
 
 *(s::Positive, m::Monotonicity) = m
 *(s::Negative, m::Monotonicity) = -m
