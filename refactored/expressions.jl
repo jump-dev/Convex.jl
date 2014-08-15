@@ -1,26 +1,16 @@
 import Base.size, Base.endof, Base.ndims
-export AbstractExpr, AbstractFunc, ConvexFunc, ConcaveFunc, AffineFunc, NoVexityFunc
-export Constant, Variable
-export vexity, sign, size, evaluate, cone_form
+export AbstractExpr, Constant, Variable
+export vexity, sign, size, evaluate
 export endof, ndims
-export VecOrMatOrSparse, VecOrMatOrSparseOrNothing, Value, ArrayFloat64OrNothing, ValueOrNothing
+export Value, ValueOrNothing
+export get_vectorized_size
 
-### Abstract types
+
+### Abstract type
 
 abstract AbstractExpr
-abstract AbstractFunc <: AbstractExpr
-abstract AffineFunc <: AbstractFunc
-abstract ConvexFunc <: AbstractFunc
-abstract ConcaveFunc <: AbstractFunc
-abstract NoVexityFunc <: AbstractFunc
-
-unique_id(x::AbstractExpr) = object_id(x)
 
 function vexity(x::AbstractExpr)
-  return x.vexity
-end
-
-function vexity(x::AbstractFunc)
   monotonicities = monotonicity(x)
   vexity = intrinsic_vexity(x)
   for i = 1:length(x.children)
@@ -29,7 +19,7 @@ function vexity(x::AbstractFunc)
   return vexity
 end
 
-function sign(x::AbstractExpr)
+function sign(x::AbstractExpr) # Constant & Vars
   return x.sign
 end
 
@@ -38,10 +28,6 @@ function size(x::AbstractExpr)
 end
 
 ### User-defined Unions
-
-VecOrMatOrSparse = Union(Vector, Matrix, SparseMatrixCSC)
-VecOrMatOrSparseOrNothing = Union(Vector, Matrix, SparseMatrixCSC, Nothing)
-ArrayFloat64OrNothing = Union(Array{Float64, }, Nothing)
 Value = Union(Number, AbstractArray)
 ValueOrNothing = Union(Value, Nothing)
 
@@ -50,14 +36,15 @@ ValueOrNothing = Union(Value, Nothing)
 
 type Constant <: AbstractExpr
   head::Symbol
+  id::Uint64
   value::Value
+  size::(Int64, Int64)
   vexity::Vexity
   sign::Sign
-  size::(Int64, Int64)
 
   function Constant(x::Value, sign::Sign=NoSign())
     sz = (size(x, 1), size(x, 2))
-    return new(:constant, x, Constant(), sign, sz)
+    return new(:constant, object_id(x), x, sz, Constant(), sign)
   end
 
   function Constant(x::Value, check_sign::Bool=true)
@@ -72,27 +59,34 @@ type Constant <: AbstractExpr
   end
 end
 
+function vexity(x::Constant)
+  return x.vexity
+end
+
 function evaluate(x::Constant)
   return x.value
 end
 
-function cone_form(x::Constant)
-  return ({:Constant, x.value}, ConeConstr[])
+function dual_conic_form(x::Constant)
+  var_to_coeff = Dict{Uint64, Value}
+  var_to_coeff[object_id(:Constant)] = vec(x.value)
+  return (ConicObj(var_to_coeff), ConeConstr[])
 end
+
+
 ### Variable Type
 
 type Variable <: AbstractExpr
   head::Symbol
+  id::Uint64
   value::ValueOrNothing
+  size::(Int64, Int64)
   vexity::Vexity
   sign::Sign
-  size::(Int64, Int64)
 
   function Variable(size::(Int64, Int64), sign::Sign=NoSign())
-    if length(size) == 1
-      size = (size[1], 1)
-    end
-    return new(:variable, nothing, Affine(), sign, size)
+    this = new(:variable, 0, nothing, size, Affine(), sign)
+    this.id = object_id(this)
   end
 
   Variable(m::Integer, n::Integer, sign::Sign=NoSign()) = Variable((m,n), sign)
@@ -100,13 +94,21 @@ type Variable <: AbstractExpr
   Variable(size::Integer, sign::Sign=NoSign()) = Variable((size, 1), sign)
 end
 
+function vexity(x::)
+  return x.vexity
+end
+
 function evaluate(x::Variable)
   return x.value == nothing ? error("Value of the variable is yet to be calculated") : x.value
 end
 
-function cone_form(x::Variable)
-  return ({unique_id(x), ones(get_vectorized_size(x))}, ConeConstr[])
+function dual_conic_form(x::Variable)
+  var_to_coeff = Dict{Uint64, Value}
+  var_to_coeff[x.id] = speye(get_vectorized_size(x))
+  # TODO add constraints for Variable sign when needed
+  return (ConicObj(var_to_coeff), ConeConstr[])
 end
+
 
 ### Indexing Utilities
 

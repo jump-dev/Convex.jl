@@ -1,10 +1,11 @@
 export *
-export sign, monotonicity, intrinsic_vexity
+export sign, monotonicity, intrinsic_vexity, evaluate
 
 ### Multiplication
 
 type MultiplyAtom <: AbstractExpr
   head::Symbol
+  id::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -18,7 +19,7 @@ type MultiplyAtom <: AbstractExpr
     else
       error("Cannot multiply two expressions of sizes $(x.size) and $(y.size)")
     end
-    return new(:*, (x, y), sz)
+    return new(:*, object_id(x) + object_id(y), (x, y), sz)
   end
 end
 
@@ -31,13 +32,16 @@ function monotonicity(x::MultiplyAtom)
 end
 
 function intrinsic_vexity(x::MultiplyAtom)
-  if vexity(x.children[1]) != Constant() && vexity(x.children[2]) != Constant()
+  if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
     return NoVexity()
   else
-    return Affine()
+    return ConstVexity()
   end
 end
 
-function dual_conic_form(x::MultiplyAtom)
+function evaluate(x::MultiplyAtom)
+  return evaluate(x.children[1]) * evaluate(x.children[2])
+end
 
+function dual_conic_form(x::MultiplyAtom)
 end

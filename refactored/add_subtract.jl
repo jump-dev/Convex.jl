@@ -1,15 +1,16 @@
 export +, -
-export sign, vexity, intrinsic_vexity, monotonicity, evaluate
+export sign, intrinsic_vexity, monotonicity, evaluate
 
 ### Unary Negation
 
-type NegateAtom <: AffineFunc
+type NegateAtom <: AbstractExpr
   head::Symbol
+  id::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
   function NegateAtom(x::AbstractExpr)
-    return new(:-, (x,), x.size)
+    return new(:-, object_id(x), (x,), x.size)
   end
 end
 
@@ -17,12 +18,12 @@ function sign(x::NegateAtom)
   return -sign(x.children[1])
 end
 
-function vexity(x::NegateAtom)
-  return -vexity(x.children[1])
-end
-
 function monotonicity(x::NegateAtom)
   return (Nonincreasing(),)
+end
+
+function intrinsic_vexity(x::NegateAtom)
+  return ConstVexity()
 end
 
 function evaluate(x::NegateAtom)
@@ -31,18 +32,16 @@ end
 
 -(x::AbstractExpr) = NegateAtom(x)
 
-function cone_form(e::NegateAtom)
-  objective, constraints = cone_form(e.children[1])
-  for var in keys(objective)
-    objective[var] *= -1
-  end
-  return (objective, constraints)
+function dual_conic_form(e::NegateAtom)
+  objective, constraints = dual_conic_form(e.children[1])
+  return (-objective, constraints)
 end
 
 ### Binary Addition/Subtraction
 
-type AdditionAtom <: AffineFunc
+type AdditionAtom <: AbstractExpr
   head::Symbol
+  id::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -54,7 +53,7 @@ type AdditionAtom <: AffineFunc
     else
       error("Cannot add expressions of sizes $(x.size) and $(y.size)")
     end
-    return new(:+, (x, y), sz)
+    return new(:+, object_id(x) + object_id(y), (x, y), sz)
   end
 end
 
@@ -63,26 +62,21 @@ function monotonicity(x::AdditionAtom)
 end
 
 function intrinsic_vexity(x::AdditionAtom)
-  return Affine()
+  return ConstVexity()
 end
 
 function evaluate(x::AdditionAtom)
   return evaluate(x.children[1]) + evaluate(x.children[2])
 end
 
-function cone_form(e::AdditionAtom)
-  nchildren = length(e.children)
-  childobjectives = Array(Dict, nchildren)
-  childconstraints = ConeConstr[]
-  for i=1:nchildren
-    childobjectives[i], childconstraints = cone_form(e.children[i])
-    append!(constraints,childconstraints)
-  end
-  objective = Dict()
-  for i=1:nchildren
-    for var in keys(childobjectives[i])
-      objective[var] = has(objective,var) ? childobjectives[i][var] : objective[var] + childobjectives[i][var]
-    end
+
+function dual_conic_form(x::AdditionAtom)
+  child_cones = map(dual_conic_form, x.children)
+  objective = Coefficients()
+  constraints = ConeContr[]
+  for (child_objective, child_constraints) in child_cones
+    append!(constraints, child_constraints)
+    objective += child_objective
   end
   return (objective, constraints)
 end

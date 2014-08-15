@@ -7,36 +7,31 @@ abstract Vexity
 abstract Monotonicity
 abstract Sign
 
-type ConstantVexity <: Vexity
-end
 
+type ConstVexity <: Vexity
+end
 type Affine <: Vexity
 end
-
 type Convex <: Vexity
 end
-
 type Concave <: Vexity
 end
-
 type NoVexity <: Vexity
 end
 
 type Nonincreasing <: Monotonicity
 end
-
 type Nondecreasing <: Monotonicity
 end
-
+type ConstMonotonicity <: Monotonicity
+end
 type NoMonotonicity <: Monotonicity
 end
 
 type Positive <: Sign
 end
-
 type Negative <: Sign
 end
-
 type NoSign <: Sign
 end
 
@@ -59,8 +54,8 @@ end
 +(v::Affine, w::Vexity) = w
 +(v::Vexity, w::Affine) = v
 +(v::Affine, w::Affine) = v
-+(v::Affine, w::ConstantVexity) = v
-+(v::ConstantVexity, w::Affine) = w
++(v::Affine, w::ConstVexity) = v
++(v::ConstVexity, w::Affine) = w
 +(v::NoVexity, w::Vexity) = v
 +(v::Vexity, w::NoVexity) = w
 +(v::NoVexity, w::NoVexity) = v
