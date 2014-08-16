@@ -37,15 +37,14 @@ ValueOrNothing = Union(Value, Nothing)
 
 type Constant <: AbstractExpr
   head::Symbol
-  id::Uint64
   value::Value
   size::(Int64, Int64)
   vexity::Vexity
   sign::Sign
 
-  function Constant(x::Value, sign::Sign=NoSign())
+  function Constant(x::Value, sign::Sign)
     sz = (size(x, 1), size(x, 2))
-    return new(:constant, object_id(x), x, sz, Constant(), sign)
+    return new(:constant, x, sz, ConstVexity(), sign)
   end
 
   function Constant(x::Value, check_sign::Bool=true)
@@ -70,7 +69,7 @@ end
 
 function dual_conic_form(x::Constant)
   var_to_coeff = Dict{Uint64, Value}()
-  var_to_coeff[object_id(:Constant)] = vec(x.value)
+  var_to_coeff[object_id(:constant)] = vec([x.value])
   return (ConicObj(var_to_coeff), ConicConstr[])
 end
 
@@ -88,6 +87,7 @@ type Variable <: AbstractExpr
   function Variable(size::(Int64, Int64), sign::Sign=NoSign())
     this = new(:variable, 0, nothing, size, Affine(), sign)
     this.id = object_id(this)
+    id_to_variables[this.id] = this
     return this
   end
 
@@ -95,6 +95,8 @@ type Variable <: AbstractExpr
   Variable(sign::Sign=NoSign()) = Variable((1, 1), sign)
   Variable(size::Integer, sign::Sign=NoSign()) = Variable((size, 1), sign)
 end
+
+id_to_variables = Dict{Uint64, Variable}()
 
 function vexity(x::Variable)
   return x.vexity

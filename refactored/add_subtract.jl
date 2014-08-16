@@ -5,12 +5,13 @@ export sign, intrinsic_vexity, monotonicity, evaluate
 
 type NegateAtom <: AbstractExpr
   head::Symbol
-  id::Uint64
+  children_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
   function NegateAtom(x::AbstractExpr)
-    return new(:-, object_id(x), (x,), x.size)
+    children = (x,)
+    return new(:-, hash(children), children, x.size)
   end
 end
 
@@ -41,7 +42,7 @@ end
 
 type AdditionAtom <: AbstractExpr
   head::Symbol
-  id::Uint64
+  children_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -53,7 +54,8 @@ type AdditionAtom <: AbstractExpr
     else
       error("Cannot add expressions of sizes $(x.size) and $(y.size)")
     end
-    return new(:+, object_id(x) + object_id(y), (x, y), sz)
+    children = (x, y)
+    return new(:+, hash(children), children, sz)
   end
 end
 
@@ -86,4 +88,4 @@ end
 +(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
 -(x::AbstractExpr, y::AbstractExpr) = x + (-y)
 -(x::Value, y::AbstractExpr) = Constant(x) + (-y)
--(x::AbstractExpr, y::Value) = x + (-Constant(y))
+-(x::AbstractExpr, y::Value) = x + Constant(-y)

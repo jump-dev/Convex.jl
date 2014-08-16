@@ -5,7 +5,7 @@ abstract Constraint
 
 type EqConstraint
   head::Symbol
-  id::Uint64
+  child_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -18,7 +18,7 @@ type EqConstraint
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(==), object_id(lhs) + object_id(rhs), lhs, rhs, sz)
+    return new(:(==), hash((lhs, rhs)), lhs, rhs, sz)
   end
 end
 
@@ -33,8 +33,9 @@ end
 function dual_conic_form(c::EqConstraint)
   expr = c.lhs - c.rhs
   objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr(objective, :Zero)
+  new_constraint = ConicConstr(objective.vars_to_coeffs, :Zero, c.size[1] * c.size[2])
   push!(constraints, new_constraint)
+  return (objective, constraints)
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
