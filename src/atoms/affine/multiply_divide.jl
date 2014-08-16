@@ -26,9 +26,9 @@ function *(x::Constant, y::AbstractCvxExpr)
     this = CvxExpr(:*, [x, y], promote_vexity_multiply(x, y), promote_sign_multiply(x, y), sz)
 
     # Kronecker product for vectorized multiplication
-    vectorized_mul = kron(speye(sz[2]), x.value)
+    vectorized_mul = kron(speye(sz[2]), -x.value)
 
-    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
+    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), vectorized_mul]
     vars = [this.uid, y.uid]
     constant = spzeros(get_vectorized_size(sz), 1)
     canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
@@ -41,7 +41,7 @@ function *(x::Constant, y::AbstractCvxExpr)
   elseif y.size == (1, 1)
     this = CvxExpr(:*, [x, y], promote_vexity_multiply(x, y), promote_sign_multiply(x, y), x.size)
 
-    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))]
+    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x.size)), sparse(vec(-x.value))]
     vars = [this.uid, y.uid]
     constant = spzeros(get_vectorized_size(x.size), 1)
     canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
