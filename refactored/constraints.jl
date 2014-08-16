@@ -3,7 +3,7 @@ export ==, <=, >=
 
 abstract Constraint
 
-type EqConstraint
+type EqConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
   lhs::AbstractExpr
@@ -39,6 +39,7 @@ function dual_conic_form(c::EqConstraint)
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
-
+==(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
+==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
 
 
