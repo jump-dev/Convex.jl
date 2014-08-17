@@ -10,7 +10,7 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-export Vexity, ConstVexity, Affine, Convex, Concave, NotDCP
+export Vexity, ConstVexity, Affine, Convex, Concave, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign
 export -, +, *
@@ -21,7 +21,7 @@ type ConstVexity <: Vexity              end
 type Affine <: Vexity                   end
 type Convex <: Vexity                   end
 type Concave <: Vexity                  end
-type NotDCP <: Vexity                 end
+type NotDcp <: Vexity                 end
 
 # Monotonocity subtypes
 abstract Monotonicity
@@ -49,13 +49,13 @@ type PSD <: Sign                        end
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
 
-+(v::NotDCP, w::NotDCP) = v
-+(v::NotDCP, w::Vexity) = v
-+(v::Vexity, w::NotDCP) = w
++(v::NotDcp, w::NotDcp) = v
++(v::NotDcp, w::Vexity) = v
++(v::Vexity, w::NotDcp) = w
 
 +(v::ConstVexity, w::ConstVexity) = v
-+(v::ConstVexity, w::NotDCP) = w
-+(v::NotDCP, w::ConstVexity) = v
++(v::ConstVexity, w::NotDcp) = w
++(v::NotDcp, w::ConstVexity) = v
 +(v::ConstVexity, w::Vexity) = w
 +(v::Vexity, w::ConstVexity) = v
 
@@ -67,8 +67,8 @@ type PSD <: Sign                        end
 
 +(v::Convex, w::Convex) = v
 +(v::Concave, w::Concave) = v
-+(v::Concave, w::Convex) = NotDCP()
-+(v::Convex, w::Concave) = NotDCP()
++(v::Concave, w::Convex) = NotDcp()
++(v::Convex, w::Concave) = NotDcp()
 
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
@@ -93,5 +93,5 @@ type PSD <: Sign                        end
 *(m::Nondecreasing, v::Vexity) = v
 *(m::Nonincreasing, v::Vexity) = -v
 *(m::NoMonotonicity, v::Vexity) = v
-*(m::NoMonotonicity, v::Convex) = NotDCP()
-*(m::NoMonotonicity, v::Concave) = NotDCP()
+*(m::NoMonotonicity, v::Convex) = NotDcp()
+*(m::NoMonotonicity, v::Concave) = NotDcp()

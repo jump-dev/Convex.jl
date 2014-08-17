@@ -28,6 +28,15 @@ function +(c::ConicObj, d::ConicObj)
   return new_obj
 end
 
+function *(v::Value, c::ConicObj)
+  new_obj = ConicObj(copy(c.vars_to_coeffs))
+  for var in keys(c.vars_to_coeffs)
+    println(size(v))
+    println(size(new_obj.vars_to_coeffs[var]))
+    new_obj.vars_to_coeffs[var] = v * new_obj.vars_to_coeffs[var]
+  end
+  return new_obj
+end
 
 type ConicConstr
   vars_to_coeffs::Dict{Uint64, Value}

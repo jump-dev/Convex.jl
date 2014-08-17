@@ -1,5 +1,5 @@
 export *
-export sign, monotonicity, curvature, evaluate
+export sign, monotonicity, curvature, evaluate, dual_conic_form
 
 ### Multiplication
 
@@ -9,7 +9,7 @@ type MultiplyAtom <: AbstractExpr
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
-  function MutiplyAtom(x::AbstractExpr, y::AbstractExpr)
+  function MultiplyAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == (1, 1)
       sz = y.size
     elseif y.size == (1, 1)
@@ -19,7 +19,8 @@ type MultiplyAtom <: AbstractExpr
     else
       error("Cannot multiply two expressions of sizes $(x.size) and $(y.size)")
     end
-    return new(:*, object_id(x) + object_id(y), (x, y), sz)
+    children = (x, y)
+    return new(:*, hash(children), children, sz)
   end
 end
 
@@ -44,4 +45,30 @@ function evaluate(x::MultiplyAtom)
 end
 
 function dual_conic_form(x::MultiplyAtom)
+  # scalar multiplication
+  if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
+    if x.children[1].head == :constant
+      const_child = x.children[1]
+      expr_child = x.children[2]
+    else
+      const_child = x.children[2]
+      expr_child = x.children[1]
+    end
+    objective, constraints = dual_conic_form(expr_child)
+    objective = reshape([const_child.value], get_vectorized_size(const_child), 1) * objective
+
+  # left matrix multiplication
+  elseif x.children[1].head == :constant
+    objective, constraints = dual_conic_form(x.children[2])
+    objective = kron(speye(x.size[2]), x.children[1].value) * objective
+  # right matrix multiplication
+  else
+    objective, constraints = dual_conic_form(x.children[2])
+    objective = kron(x.children[2].value', speye(x.size[1])) * objective
+  end
+  return (objective, constraints)
 end
+
+*(x::AbstractExpr, y::AbstractExpr) = MultiplyAtom(x, y)
+*(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
+*(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
