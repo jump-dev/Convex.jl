@@ -1,27 +1,75 @@
+#############################################################################
+# expressions.jl
+# Defines AbstractExpr, which is subtyped by all atoms
+# Each type which subtypes AbstractExpr (Variable and Constant being exceptions)
+# must have:
+#
+## head::Symbol                  -- a symbol such as :vecnorm, :+ etc
+## children::(AbstractExpr,)     -- The expressions on which the current expression
+##                               -- is operated
+## children_hash::Uint64         -- hash of all the children
+## size::(Int64, Int64)          -- size of the resulting expression
+#
+# To eliminate as many edge cases as possibles, Constant and Variables don't have
+# children, or children_hash as fields. They do have an id, value, size and vexity
+# as fields.
+#
+# In addition, each atom must implement the following functions:
+## sign: returns the sign of the result of the expression
+## monotonicity: The monotonicity of the arguments with respect to the function
+##      i.e if the argument is nondecreasing, will the function be nonincreasing
+##      or nondecreasing? eg. negate(x) will have Nonincreasing monotonicity
+## evaluate: Evaluates the value of the expression, assuming the problem has been
+##           solved.
+## curvature: If h(x)=f∘g(x), then (for single variable calculus)
+##      h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
+##      curvature refers to the curvature of the first term.
+##      We then use this curvature to find vexity of h (see vexity function below)
+## dual_conic_form: TODO: Fill this in after conic_form is stable
+#
+#############################################################################
+
 import Base.sign, Base.size, Base.endof, Base.ndims
-export AbstractExpr, Constant, Variable
-export vexity, sign, size, evaluate
+export AbstractExpr
+export vexity, sign, size, evaluate, monotonicity, curvature
 export dual_conic_form
 export endof, ndims
 export Value, ValueOrNothing
 export get_vectorized_size
 
-
 ### Abstract type
-
 abstract AbstractExpr
 
+# If h(x)=f∘g(x), then (for single variable calculus)
+# h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
+# We calculate the vexity according to this
 function vexity(x::AbstractExpr)
   monotonicities = monotonicity(x)
-  vexity = intrinsic_vexity(x)
+  vexity = curvature(x)
   for i = 1:length(x.children)
     vexity += monotonicities[i] * vexity(x.children[i])
   end
   return vexity
 end
 
-function sign(x::AbstractExpr) # Constant & Vars
-  return x.sign
+# This function should never be reached
+function monotonicity(x::AbstractExpr)
+  error("monotonicity not implemented for $(x.head).")
+end
+
+# This function should never be reached
+function curvature(x::AbstractExpr)
+  error("curvature not implemented for $(x.head).")
+end
+
+# This function should never be reached
+function evaluate(x::AbstractExpr)
+  error("evaluate not implemented for $(x.head).")
+end
+
+# This function should never be reached
+function sign(x::AbstractExpr)
+  error("sign not implemented for $(x.head).")
 end
 
 function size(x::AbstractExpr)
@@ -32,90 +80,7 @@ end
 Value = Union(Number, AbstractArray)
 ValueOrNothing = Union(Value, Nothing)
 
-
-### Constant Type
-
-type Constant <: AbstractExpr
-  head::Symbol
-  value::Value
-  size::(Int64, Int64)
-  vexity::Vexity
-  sign::Sign
-
-  function Constant(x::Value, sign::Sign)
-    sz = (size(x, 1), size(x, 2))
-    return new(:constant, x, sz, ConstVexity(), sign)
-  end
-
-  function Constant(x::Value, check_sign::Bool=true)
-    if check_sign
-      if all(x .>= 0)
-        return Constant(x, Positive())
-      elseif all(x .<= 0)
-        return Constant(x, Negative())
-      end
-    end
-    return Constant(x, NoSign())
-  end
-end
-
-function vexity(x::Constant)
-  return x.vexity
-end
-
-function evaluate(x::Constant)
-  return x.value
-end
-
-function dual_conic_form(x::Constant)
-  var_to_coeff = Dict{Uint64, Value}()
-  var_to_coeff[object_id(:constant)] = vec([x.value])
-  return (ConicObj(var_to_coeff), ConicConstr[])
-end
-
-
-### Variable Type
-
-type Variable <: AbstractExpr
-  head::Symbol
-  id::Uint64
-  value::ValueOrNothing
-  size::(Int64, Int64)
-  vexity::Vexity
-  sign::Sign
-
-  function Variable(size::(Int64, Int64), sign::Sign=NoSign())
-    this = new(:variable, 0, nothing, size, Affine(), sign)
-    this.id = object_id(this)
-    id_to_variables[this.id] = this
-    return this
-  end
-
-  Variable(m::Integer, n::Integer, sign::Sign=NoSign()) = Variable((m,n), sign)
-  Variable(sign::Sign=NoSign()) = Variable((1, 1), sign)
-  Variable(size::Integer, sign::Sign=NoSign()) = Variable((size, 1), sign)
-end
-
-id_to_variables = Dict{Uint64, Variable}()
-
-function vexity(x::Variable)
-  return x.vexity
-end
-
-function evaluate(x::Variable)
-  return x.value == nothing ? error("Value of the variable is yet to be calculated") : x.value
-end
-
-function dual_conic_form(x::Variable)
-  var_to_coeff = Dict{Uint64, Value}()
-  var_to_coeff[x.id] = speye(get_vectorized_size(x))
-  # TODO add constraints for Variable sign when needed
-  return (ConicObj(var_to_coeff), ConicConstr[])
-end
-
-
 ### Indexing Utilities
-
 endof(x::AbstractExpr) = x.size[1] * x.size[2]
 
 function size(x::AbstractExpr, dim::Integer)
@@ -130,4 +95,4 @@ end
 
 ndims(x::AbstractExpr) = 2
 
-get_vectorized_size(x::AbstractExpr) = reduce(*,size(x))
+get_vectorized_size(x::AbstractExpr) = reduce(*, size(x))

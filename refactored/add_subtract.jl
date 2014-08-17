@@ -1,5 +1,13 @@
+#############################################################################
+# add_subtract.jl
+# Handles unary negation, addition and subtraction of variables, constants
+# and expressions.
+# All expressions and atoms are subtpyes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
+
 export +, -
-export sign, intrinsic_vexity, monotonicity, evaluate
+export sign, curvature, monotonicity, evaluate
 
 ### Unary Negation
 
@@ -19,11 +27,13 @@ function sign(x::NegateAtom)
   return -sign(x.children[1])
 end
 
+# The monotonicity
 function monotonicity(x::NegateAtom)
   return (Nonincreasing(),)
 end
 
-function intrinsic_vexity(x::NegateAtom)
+# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)_T f''(g(x))g'(x)
+function curvature(x::NegateAtom)
   return ConstVexity()
 end
 
@@ -63,7 +73,7 @@ function monotonicity(x::AdditionAtom)
   return (Nondecreasing(), Nondecreasing())
 end
 
-function intrinsic_vexity(x::AdditionAtom)
+function curvature(x::AdditionAtom)
   return ConstVexity()
 end
 

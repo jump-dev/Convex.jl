@@ -1,39 +1,40 @@
+#############################################################################
+# dcp.jl
+# This file handles the basic rules on interactions of mathematical expressions
+# to create new expressions.
+#
+# For example: negative of a concave expression is convex, or multiplication
+# of two positive expressions continue to be positive.
+#
+# See: http://dcp.stanford.edu/rules or the original paper at
+# http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
+#############################################################################
+
 export Vexity, ConstVexity, Affine, Convex, Concave, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign
 export -, +, *
 
+# Vexity subtypes
 abstract Vexity
+type ConstVexity <: Vexity              end
+type Affine <: Vexity                   end
+type Convex <: Vexity                   end
+type Concave <: Vexity                  end
+type NotDcp <: Vexity                 end
+
+# Monotonocity subtypes
 abstract Monotonicity
+type Nonincreasing <: Monotonicity      end
+type Nondecreasing <: Monotonicity      end
+type ConstMonotonicity <: Monotonicity  end
+type NoMonotonicity <: Monotonicity     end
+
+# Sign subtypes
 abstract Sign
-
-
-type ConstVexity <: Vexity
-end
-type Affine <: Vexity
-end
-type Convex <: Vexity
-end
-type Concave <: Vexity
-end
-type NotDcp <: Vexity
-end
-
-type Nonincreasing <: Monotonicity
-end
-type Nondecreasing <: Monotonicity
-end
-type ConstMonotonicity <: Monotonicity
-end
-type NoMonotonicity <: Monotonicity
-end
-
-type Positive <: Sign
-end
-type Negative <: Sign
-end
-type NoSign <: Sign
-end
+type Positive <: Sign                   end
+type Negative <: Sign                   end
+type NoSign <: Sign                     end
 
 -(v::Vexity) = v
 -(v::Concave) = Convex()
@@ -67,7 +68,6 @@ end
 +(v::Concave, w::Concave) = v
 +(v::Concave, w::Convex) = NotDcp()
 +(v::Convex, w::Concave) = NotDcp()
-
 
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s

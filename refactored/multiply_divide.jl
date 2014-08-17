@@ -1,5 +1,5 @@
 export *
-export sign, monotonicity, intrinsic_vexity, evaluate, dual_conic_form
+export sign, monotonicity, curvature, evaluate, dual_conic_form
 
 ### Multiplication
 
@@ -32,7 +32,7 @@ function monotonicity(x::MultiplyAtom)
   return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
 end
 
-function intrinsic_vexity(x::MultiplyAtom)
+function curvature(x::MultiplyAtom)
   if x.children[1].head != :constant && x.children[2].head != :constant
     return NotDcp()
   else
