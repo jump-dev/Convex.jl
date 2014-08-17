@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export nuclear_norm
+export nuclear_norm, trace
 
 ### Unary Negation
 
@@ -47,6 +47,17 @@ nuclear_norm(x::AbstractExpr) = NuclearNormAtom(x)
 #   subject to
 #            [U A; A' V] is positive semidefinite
 function dual_conic_form(e::NuclearNormAtom)
-  objective, constraints = dual_conic_form(e.children[1])
-  return Error("Not implemented")
+  A = e.children[1]
+  m, n = size(A)
+  U = Variable(m,m)
+  V = Variable(n,n)
+  B = Semidefinite(m+n)
+  constraint = (B == [U A; A' V])
+  objective = .5*(trace(U) + trace(V))
+  p = minimize(objective, constraint)
+  return dual_conic_form(p)
+end
+
+function trace(e::AbstractExpr)
+  return sum(diag(e))
 end

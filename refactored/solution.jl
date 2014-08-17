@@ -1,7 +1,7 @@
 import MathProgBase, SCS
 export solve!
 
-function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel)
+function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProgBase.model(MathProgBase.defaultConicsolver))
 
   c, A, b, cones = dual_conic_problem(problem)
 

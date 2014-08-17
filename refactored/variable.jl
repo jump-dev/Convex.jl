@@ -3,7 +3,7 @@
 # Defines Variable, which is a subtype of AbstractExpr
 #############################################################################
 
-export Variable
+export Variable, Semidefinite
 export vexity, evaluate, sign, dual_conic_form
 
 type Variable <: AbstractExpr
@@ -25,6 +25,10 @@ type Variable <: AbstractExpr
   Variable(sign::Sign=NoSign()) = Variable((1, 1), sign)
   Variable(size::Integer, sign::Sign=NoSign()) = Variable((size, 1), sign)
 end
+
+# convenience semidefinite matrix constructor
+Semidefinite(m::Integer) = Variable((m,m), Semidefinite())
+Semidefinite(m::Integer, n::Integer) = (m==n ? return Variable((m,m), Semidefinite()) : error("Semidefinite matrices must be square"))
 
 # GLOBAL MAP
 # TODO: Comment David.
@@ -62,6 +66,6 @@ function sign_constraint(s::Negative, var_to_coeff, vec_size)
   return [ConicConstr(-var_to_coeff, :NonNeg, vec_size)]
 end
 
-function sign_constraint(s::PSD, var_to_coeff, vec_size)
-  return [ConicConstr(var_to_coeff, :PSD, vec_size)]
+function sign_constraint(s::Semidefinite, var_to_coeff, vec_size)
+  return [ConicConstr(var_to_coeff, :Semidefinite, vec_size)]
 end
