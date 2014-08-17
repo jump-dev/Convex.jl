@@ -1,5 +1,5 @@
 export *
-export sign, monotonicity, intrinsic_vexity, evaluate
+export sign, monotonicity, curvature, evaluate
 
 ### Multiplication
 
@@ -31,7 +31,7 @@ function monotonicity(x::MultiplyAtom)
   return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
 end
 
-function intrinsic_vexity(x::MultiplyAtom)
+function curvature(x::MultiplyAtom)
   if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
     return NoVexity()
   else

@@ -1,6 +1,6 @@
 import Base.reshape, Base.vec
 export reshape, vec
-export sign, intrinsic_vexity, monotonicity, evaluate
+export sign, curvature, monotonicity, evaluate
 
 
 type ReshapeAtom <: AbstractExpr
@@ -25,7 +25,7 @@ function monotonicity(x::ReshapeAtom)
   return (Nondecreasing(),)
 end
 
-function intrinsic_vexity(x::ReshapeAtom)
+function curvature(x::ReshapeAtom)
   return ConstVexity()
 end
 
