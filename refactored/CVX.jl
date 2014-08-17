@@ -8,6 +8,6 @@ include("add_subtract.jl")
 include("multiply_divide.jl")
 include("constraints.jl")
 include("problems.jl")
-
+include("solution.jl")
 
 end

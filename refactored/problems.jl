@@ -1,8 +1,22 @@
-export Problem
+export Problem, Solution
 export Float64OrNothing
 export dual_conic_problem
 
 Float64OrNothing = Union(Float64, Nothing)
+
+
+# TODO: Cleanup
+type Solution{T<:Number}
+  primal::Array{T, 1}
+  dual::Array{T, 1}
+  slack::Array{T, 1}
+  status::Symbol
+  optval::T
+  has_dual::Bool
+end
+
+Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], T[], status, optval, false)
+Solution{T}(x::Array{T, 1}, y::Array{T, 1}, z::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, z, status, optval, true)
 
 
 type Problem
@@ -11,6 +25,7 @@ type Problem
   constraints::Array{Constraint}
   status::Symbol
   optval::Float64OrNothing
+  solution::Solution
 
   function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[])
     return new(head, objective, constraints, "not yet solved", nothing)
