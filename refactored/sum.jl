@@ -7,8 +7,7 @@
 
 export sum
 
-### Sums
-
+### Sum Atom
 type SumAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -30,7 +29,8 @@ function monotonicity(x::SumAtom)
   return (Nondecreasing(),)
 end
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x); this represents the first term
+# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
+# this represents the first term
 function curvature(x::SumAtom)
   return ConstVexity()
 end

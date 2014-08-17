@@ -4,8 +4,7 @@ export ==, <=, >=
 
 abstract Constraint
 
-## Linear equality constraint
-
+### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
@@ -16,7 +15,7 @@ type EqConstraint <: Constraint
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
       sz = rhs.size
-    elseif rhs.size != (1, 1)
+    elseif rhs.size == (1, 1)
       sz = lhs.size
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
@@ -27,7 +26,8 @@ end
 
 function vexity(c::EqConstraint)
   vexity = vexity(lhs) + (-vexity(rhs))
-  if vexity == Convex() && vexity != Concave()
+  # You can't have equality constraints with concave/convex expressions
+  if vexity == Convex() || vexity == Concave()
     vexity = NotDcp()
   end
   return vexity
@@ -46,8 +46,7 @@ end
 ==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
 
 
-## Linear inequality constraints
-
+### Linear inequality constraints
 type LtConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
@@ -58,7 +57,7 @@ type LtConstraint <: Constraint
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
       sz = rhs.size
-    elseif rhs.size != (1, 1)
+    elseif rhs.size == (1, 1)
       sz = lhs.size
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
@@ -97,7 +96,7 @@ type GtConstraint <: Constraint
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
       sz = rhs.size
-    elseif rhs.size != (1, 1)
+    elseif rhs.size == (1, 1)
       sz = lhs.size
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
@@ -127,8 +126,7 @@ end
 >=(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
 
 
-## Positive semidefinite cone constraint
-
+### Positive semidefinite cone constraint
 type SDPConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
