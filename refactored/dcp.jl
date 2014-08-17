@@ -10,7 +10,7 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-export Vexity, ConstVexity, Affine, Convex, Concave, NoVexity
+export Vexity, ConstVexity, Affine, Convex, Concave, NotDCP
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign
 export -, +, *
@@ -21,7 +21,7 @@ type ConstVexity <: Vexity              end
 type Affine <: Vexity                   end
 type Convex <: Vexity                   end
 type Concave <: Vexity                  end
-type NoVexity <: Vexity                 end
+type NotDCP <: Vexity                 end
 
 # Monotonocity subtypes
 abstract Monotonicity
@@ -35,6 +35,7 @@ abstract Sign
 type Positive <: Sign                   end
 type Negative <: Sign                   end
 type NoSign <: Sign                     end
+type PSD <: Sign                        end
 
 -(v::Vexity) = v
 -(v::Concave) = Convex()
@@ -48,13 +49,13 @@ type NoSign <: Sign                     end
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
 
-+(v::NoVexity, w::NoVexity) = v
-+(v::NoVexity, w::Vexity) = v
-+(v::Vexity, w::NoVexity) = w
++(v::NotDCP, w::NotDCP) = v
++(v::NotDCP, w::Vexity) = v
++(v::Vexity, w::NotDCP) = w
 
 +(v::ConstVexity, w::ConstVexity) = v
-+(v::ConstVexity, w::NoVexity) = w
-+(v::NoVexity, w::ConstVexity) = v
++(v::ConstVexity, w::NotDCP) = w
++(v::NotDCP, w::ConstVexity) = v
 +(v::ConstVexity, w::Vexity) = w
 +(v::Vexity, w::ConstVexity) = v
 
@@ -66,8 +67,8 @@ type NoSign <: Sign                     end
 
 +(v::Convex, w::Convex) = v
 +(v::Concave, w::Concave) = v
-+(v::Concave, w::Convex) = NoVexity()
-+(v::Convex, w::Concave) = NoVexity()
++(v::Concave, w::Convex) = NotDCP()
++(v::Convex, w::Concave) = NotDCP()
 
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
@@ -92,5 +93,5 @@ type NoSign <: Sign                     end
 *(m::Nondecreasing, v::Vexity) = v
 *(m::Nonincreasing, v::Vexity) = -v
 *(m::NoMonotonicity, v::Vexity) = v
-*(m::NoMonotonicity, v::Convex) = NoVexity()
-*(m::NoMonotonicity, v::Concave) = NoVexity()
+*(m::NoMonotonicity, v::Convex) = NotDCP()
+*(m::NoMonotonicity, v::Concave) = NotDCP()

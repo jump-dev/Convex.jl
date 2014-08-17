@@ -25,7 +25,7 @@ end
 function vexity(c::EqConstraint)
   vexity = vexity(lhs) + (-vexity(rhs))
   if vexity == Convex() && vexity != Concave()
-    vexity = NoVexity()
+    vexity = NotDCP()
   end
   return vexity
 end

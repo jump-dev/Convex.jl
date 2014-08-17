@@ -33,7 +33,7 @@ end
 
 function curvature(x::MultiplyAtom)
   if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
-    return NoVexity()
+    return NotDCP()
   else
     return ConstVexity()
   end
