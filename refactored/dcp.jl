@@ -1,4 +1,4 @@
-export Vexity, ConstVexity, Affine, Convex, Concave, NoVexity
+export Vexity, ConstVexity, Affine, Convex, Concave, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign
 export -, +, *
@@ -16,7 +16,7 @@ type Convex <: Vexity
 end
 type Concave <: Vexity
 end
-type NoVexity <: Vexity
+type NotDcp <: Vexity
 end
 
 type Nonincreasing <: Monotonicity
@@ -47,13 +47,13 @@ end
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
 
-+(v::NoVexity, w::NoVexity) = v
-+(v::NoVexity, w::Vexity) = v
-+(v::Vexity, w::NoVexity) = w
++(v::NotDcp, w::NotDcp) = v
++(v::NotDcp, w::Vexity) = v
++(v::Vexity, w::NotDcp) = w
 
 +(v::ConstVexity, w::ConstVexity) = v
-+(v::ConstVexity, w::NoVexity) = w
-+(v::NoVexity, w::ConstVexity) = v
++(v::ConstVexity, w::NotDcp) = w
++(v::NotDcp, w::ConstVexity) = v
 +(v::ConstVexity, w::Vexity) = w
 +(v::Vexity, w::ConstVexity) = v
 
@@ -65,8 +65,8 @@ end
 
 +(v::Convex, w::Convex) = v
 +(v::Concave, w::Concave) = v
-+(v::Concave, w::Convex) = NoVexity()
-+(v::Convex, w::Concave) = NoVexity()
++(v::Concave, w::Convex) = NotDcp()
++(v::Convex, w::Concave) = NotDcp()
 
 
 +(s::Positive, t::Positive) = s
@@ -92,5 +92,5 @@ end
 *(m::Nondecreasing, v::Vexity) = v
 *(m::Nonincreasing, v::Vexity) = -v
 *(m::NoMonotonicity, v::Vexity) = v
-*(m::NoMonotonicity, v::Convex) = NoVexity()
-*(m::NoMonotonicity, v::Concave) = NoVexity()
+*(m::NoMonotonicity, v::Convex) = NotDcp()
+*(m::NoMonotonicity, v::Concave) = NotDcp()
