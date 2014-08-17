@@ -69,6 +69,10 @@ type AdditionAtom <: AbstractExpr
   end
 end
 
+function sign(x::AdditionAtom)
+  return sign(x.children[1]) + sign(x.children[2])
+end
+
 function monotonicity(x::AdditionAtom)
   return (Nondecreasing(), Nondecreasing())
 end
@@ -84,7 +88,7 @@ end
 
 function dual_conic_form(x::AdditionAtom)
   child_cones = map(dual_conic_form, x.children)
-  objective = ConicObj(Dict{Uint64, Value}())
+  objective = ConicObj()
   constraints = ConicConstr[]
   for (child_objective, child_constraints) in child_cones
     append!(constraints, child_constraints)

@@ -16,7 +16,7 @@ type EqConstraint <: Constraint
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
       sz = rhs.size
-    elseif rhs.size != (1, 1)
+    elseif rhs.size == (1, 1)
       sz = lhs.size
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
@@ -27,7 +27,7 @@ end
 
 function vexity(c::EqConstraint)
   vexity = vexity(lhs) + (-vexity(rhs))
-  if vexity == Convex() && vexity != Concave()
+  if vexity == Convex() || vexity == Concave()
     vexity = NotDcp()
   end
   return vexity
@@ -36,7 +36,7 @@ end
 function dual_conic_form(c::EqConstraint)
   expr = c.lhs - c.rhs
   objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr(objective.vars_to_coeffs, :Zero, c.size[1] * c.size[2])
+  new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
   push!(constraints, new_constraint)
   return (objective, constraints)
 end
@@ -58,7 +58,7 @@ type LtConstraint <: Constraint
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
       sz = rhs.size
-    elseif rhs.size != (1, 1)
+    elseif rhs.size == (1, 1)
       sz = lhs.size
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
@@ -78,7 +78,7 @@ end
 function dual_conic_form(c::LtConstraint)
   expr = c.rhs - c.lhs
   objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr(objective.vars_to_coeffs, :NonNeg, c.size[1] * c.size[2])
+  new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
   push!(constraints, new_constraint)
   return (objective, constraints)
 end
@@ -97,7 +97,7 @@ type GtConstraint <: Constraint
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
       sz = rhs.size
-    elseif rhs.size != (1, 1)
+    elseif rhs.size == (1, 1)
       sz = lhs.size
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
@@ -117,7 +117,7 @@ end
 function dual_conic_form(c::GtConstraint)
   expr = c.lhs - c.rhs
   objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr(objective.vars_to_coeffs, :NonNeg, c.size[1] * c.size[2])
+  new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
   push!(constraints, new_constraint)
   return (objective, constraints)
 end
@@ -125,7 +125,6 @@ end
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
 >=(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
 >=(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
-
 
 ## Positive semidefinite cone constraint
 
@@ -140,13 +139,13 @@ type SDPConstraint <: Constraint
     if sz[1] != sz[2]
       error("Positive semidefinite expressions must be square")
     end
-    return new(:(==), hash(lhs), lhs, sz)
+    return new(:sdp, hash(lhs), lhs, sz)
   end
 end
 
 function vexity(c::SDPConstraint)
   vexity = vexity(c.lhs)
-  if vexity == Affine() or vexity == ConstVexity()
+  if vexity == Affine() || vexity == ConstVexity()
     return Affine()
   else
     return NotDCP()
@@ -155,7 +154,7 @@ end
 
 function dual_conic_form(c::SDPConstraint)
   objective, constraints = dual_conic_form(c.lhs)
-  new_constraint = ConicConstr(objective.vars_to_coeffs, :SDP, c.size[1] * c.size[2])
+  new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
   push!(constraints, new_constraint)
   return (objective, constraints)
 end

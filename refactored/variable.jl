@@ -27,8 +27,8 @@ type Variable <: AbstractExpr
 end
 
 # convenience semidefinite matrix constructor
-Semidefinite(m::Integer) = Variable((m,m), Semidefinite())
-Semidefinite(m::Integer, n::Integer) = (m==n ? return Variable((m,m), Semidefinite()) : error("Semidefinite matrices must be square"))
+#Semidefinite(m::Integer) = Variable((m,m), Semidefinite())
+#Semidefinite(m::Integer, n::Integer) = (m==n ? return Variable((m,m), Semidefinite()) : error("Semidefinite matrices must be square"))
 
 # GLOBAL MAP
 # TODO: Comment David.
@@ -47,25 +47,25 @@ function sign(x::Variable)
 end
 
 function dual_conic_form(x::Variable)
-  var_to_coeff = Dict{Uint64, Value}()
+  objective = ConicObj()
   vec_size = get_vectorized_size(x)
-  var_to_coeff[x.id] = speye(vec_size)
-  constraints = sign_constraint(x.sign, var_to_coeff, vec_size)
-  return (ConicObj(var_to_coeff), constraints)
+  objective[x.id] = speye(vec_size)
+  constraints = sign_constraint(x.sign, objective, vec_size)
+  return (objective, constraints)
 end
 
-function sign_constraint(s::NoSign, var_to_coeff, vec_size)
+function sign_constraint(s::NoSign, objective, vec_size)
   return ConicConstr[]
 end
 
-function sign_constraint(s::Positive, var_to_coeff, vec_size)
-  return [ConicConstr(var_to_coeff, :NonNeg, vec_size)]
+function sign_constraint(s::Positive, objective, vec_size)
+  return [ConicConstr([objective], :NonNeg, [vec_size])]
 end
 
-function sign_constraint(s::Negative, var_to_coeff, vec_size)
-  return [ConicConstr(-var_to_coeff, :NonNeg, vec_size)]
+function sign_constraint(s::Negative, objective, vec_size)
+  return [ConicConstr([-objective], :NonNeg, [vec_size])]
 end
 
-function sign_constraint(s::Semidefinite, var_to_coeff, vec_size)
-  return [ConicConstr(var_to_coeff, :Semidefinite, vec_size)]
+function sign_constraint(s::Semidefinite, objective, vec_size)
+  return [ConicConstr([objective], :Semidefinite, [vec_size])]
 end

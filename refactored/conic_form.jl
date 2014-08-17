@@ -2,45 +2,42 @@ export ConicObj, ConicConstr
 export +
 
 # TODO: @david, just make ConicObj = Dict{Uint64, Value}
-type ConicObj
-  vars_to_coeffs::Dict{Uint64, Value}
-end
+ConicObj = Dict{Uint64, Value}
 
 function -(c::ConicObj)
-  new_obj = ConicObj(copy(c.vars_to_coeffs))
-  for var in keys(new_obj.vars_to_coeffs)
-    new_obj.vars_to_coeffs[var] *= -1
+  new_obj = copy(c)
+  for var in keys(new_obj)
+    new_obj[var] *= -1
   end
   return new_obj
 end
 
 function +(c::ConicObj, d::ConicObj)
-  new_obj = ConicObj(copy(c.vars_to_coeffs))
-  for var in keys(d.vars_to_coeffs)
-    if !haskey(new_obj.vars_to_coeffs, var)
-      new_obj.vars_to_coeffs[var] = d.vars_to_coeffs[var]
+  new_obj = copy(c)
+  for var in keys(d)
+    if !haskey(new_obj, var)
+      new_obj[var] = d[var]
     else
       # .+ does not behave properly for sparse matrices
       # need to override behavior
-      new_obj.vars_to_coeffs[var] .+= d.vars_to_coeffs[var]
+      new_obj[var] .+= d[var]
     end
   end
   return new_obj
 end
 
 function *(v::Value, c::ConicObj)
-  new_obj = ConicObj(copy(c.vars_to_coeffs))
-  for var in keys(c.vars_to_coeffs)
-    println(size(v))
-    println(size(new_obj.vars_to_coeffs[var]))
-    new_obj.vars_to_coeffs[var] = v * new_obj.vars_to_coeffs[var]
+  new_obj = copy(c)
+  for var in keys(new_obj)
+    new_obj[var] = v * new_obj[var]
   end
   return new_obj
 end
 
+
 type ConicConstr
-  vars_to_coeffs::Dict{Uint64, Value}
+  objs::Array{ConicObj}
   cone::Symbol
-  size::Int64
+  sizes::Array{Int64}
 end
 

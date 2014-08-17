@@ -1,7 +1,7 @@
 import Base.getindex
 export IndexAtom, getindex
 
-ArrayOrNothing = Union(AbstractArray{T, 1}, Nothing)
+ArrayOrNothing = Union(AbstractArray, Nothing)
 
 type IndexAtom <: AbstractExpr
   head::Symbol
@@ -12,13 +12,13 @@ type IndexAtom <: AbstractExpr
   cols::ArrayOrNothing
   inds::ArrayOrNothing
 
-  function IndexAtom(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1})
+  function IndexAtom(x::AbstractExpr, rows::AbstractArray, cols::AbstractArray)
     sz = (length(rows), length(cols))
     children = (x,)
     return new(:index, hash(children), children, sz, rows, cols, nothing)
   end
 
-  function IndexAtom(x::AbstractExpr, inds::AbstractArray{T, 1})
+  function IndexAtom(x::AbstractExpr, inds::AbstractArray)
     sz = (length(inds), 1)
     children = (x,)
     return new(:index, hash(children), children, sz, nothing, nothing, inds)
@@ -50,8 +50,8 @@ function dual_conic_form(x::IndexAtom)
   if x.inds == nothing
     index_matrix_row = 1
     num_rows = x.children[1].size[1]
-    for c in cols
-      for r in rows
+    for c in x.cols
+      for r in x.rows
         index_matrix_col = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
         index_matrix[index_matrix_row, index_matrix_col] = 1
         index_matrix_row += 1
@@ -59,7 +59,7 @@ function dual_conic_form(x::IndexAtom)
     end
   else
     index_matrix_row = 1
-    for i in inds
+    for i in x.inds
       index_matrix[index_matrix_row, i] = 1
       index_matrix_row += 1
     end
@@ -69,8 +69,8 @@ function dual_conic_form(x::IndexAtom)
   return (objective, constraints)
 end
 
-getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1})
-getindex{T <: Real}(x::AbstractExpr, inds::AbstractArray{T, 1})
+getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)
+getindex{T <: Real}(x::AbstractExpr, inds::AbstractArray{T, 1}) = IndexAtom(x, inds)
 getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
 getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
 getindex{T <: Real}(x::AbstractExpr, row::Real, cols::AbstractArray{T, 1}) = getindex(x, row:row, cols)

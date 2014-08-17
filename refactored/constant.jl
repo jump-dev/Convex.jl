@@ -42,7 +42,7 @@ function sign(x::Constant)
 end
 
 function dual_conic_form(x::Constant)
-  var_to_coeff = Dict{Uint64, Value}()
-  var_to_coeff[object_id(:constant)] = vec([x.value])
-  return (ConicObj(var_to_coeff), ConicConstr[])
+  objective = ConicObj()
+  objective[object_id(:constant)] = vec([x.value])
+  return (objective, ConicConstr[])
 end
