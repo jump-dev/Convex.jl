@@ -146,7 +146,7 @@ end
 
 function vexity(c::SDPConstraint)
   vexity = vexity(c.lhs)
-  if vexity == Affine() or vexity == ConstVexity()
+  if vexity == Affine() || vexity == ConstVexity()
     return Affine()
   else
     return NotDCP()

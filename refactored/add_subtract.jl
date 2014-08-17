@@ -27,12 +27,10 @@ function sign(x::NegateAtom)
   return -sign(x.children[1])
 end
 
-# The monotonicity
 function monotonicity(x::NegateAtom)
   return (Nonincreasing(),)
 end
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x); this represents the first term
 function curvature(x::NegateAtom)
   return ConstVexity()
 end
@@ -48,8 +46,8 @@ function dual_conic_form(e::NegateAtom)
   return (-objective, constraints)
 end
 
-### Binary Addition/Subtraction
 
+### Binary Addition/Subtraction
 type AdditionAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -80,7 +78,6 @@ end
 function evaluate(x::AdditionAtom)
   return evaluate(x.children[1]) + evaluate(x.children[2])
 end
-
 
 function dual_conic_form(x::AdditionAtom)
   child_cones = map(dual_conic_form, x.children)
