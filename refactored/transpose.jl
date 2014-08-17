@@ -1,6 +1,6 @@
 import Base.transpose, Base.ctranspose
 export transpose, ctranspose, TransposeAtom
-export sign, intrinsic_vexity, monotonicity, evaluate
+export sign, curvature, monotonicity, evaluate
 
 # Since everything is vectorized, the canonical form of x' is simply
 # multiplying x by a permutation matrix such that coeff * vectorized(x) - vectorized(x') = 0
@@ -23,7 +23,7 @@ function monotonicity(x::TransposeAtom)
   return (Nondecreasing(),)
 end
 
-function intrinsic_vexity(x::TransposeAtom)
+function curvature(x::TransposeAtom)
   return ConstVexity()
 end
 

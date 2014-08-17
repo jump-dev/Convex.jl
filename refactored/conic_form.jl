@@ -1,6 +1,7 @@
 export ConicObj, ConicConstr
 export +
 
+# TODO: @david, just make ConicObj = Dict{Uint64, Value}
 type ConicObj
   vars_to_coeffs::Dict{Uint64, Value}
 end
