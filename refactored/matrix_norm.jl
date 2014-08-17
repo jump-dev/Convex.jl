@@ -7,7 +7,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export nuclear_norm, operator_norm, trace
+export nuclear_norm, operator_norm, sigma_max, trace
 
 ### Nuclear norm
 
@@ -53,8 +53,7 @@ function dual_conic_form(e::NuclearNormAtom)
   m, n = size(A)
   U = Variable(m,m)
   V = Variable(n,n)
-  B = Semidefinite(m+n)
-  constraint = (B == [U A; A' V])
+  constraint = isposdef([U A; A' V])
   objective = .5*(trace(U) + trace(V))
   p = minimize(objective, constraint)
   return dual_conic_form(p)
@@ -99,6 +98,7 @@ function evaluate(x::OperatorNormAtom)
 end
 
 operator_norm(x::AbstractExpr) = OperatorNormAtom(x)
+sigma_max(x::AbstractExpr) = OperatorNormAtom(x)
 
 # Create the equivalent conic problem:
 #   minimize t
@@ -110,8 +110,7 @@ function dual_conic_form(e::OperatorNormAtom)
   A = e.children[1]
   m, n = size(A)
   t = Variable()
-  B = Semidefinite(m+n)
-  constraint = (B == [t*speye(m) A; A' t*speye(n)])
+  constraint = isposdef([t*speye(m) A; A' t*speye(n)])
   objective = t
   p = minimize(objective, constraint)
   return dual_conic_form(p)
