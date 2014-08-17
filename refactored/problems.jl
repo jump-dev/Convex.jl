@@ -1,9 +1,8 @@
-export Problem, Solution
+export Problem, Solution, minimize, maximize, satisfy, add_constraints
 export Float64OrNothing
 export dual_conic_problem
 
 Float64OrNothing = Union(Float64, Nothing)
-
 
 # TODO: Cleanup
 type Solution{T<:Number}
@@ -18,7 +17,6 @@ end
 Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], T[], status, optval, false)
 Solution{T}(x::Array{T, 1}, y::Array{T, 1}, z::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, z, status, optval, true)
 
-
 type Problem
   head::Symbol
   objective::AbstractExpr
@@ -31,7 +29,6 @@ type Problem
     return new(head, objective, constraints, "not yet solved", nothing)
   end
 end
-
 
 function find_variable_ranges(constraints)
   index = 0
@@ -81,3 +78,33 @@ function dual_conic_problem(p::Problem)
   end
   return c, A, b, cones
 end
+
+Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
+  Problem(head, objective, [constraints...])
+
+# Allow users to simply type minimize or maximize
+minimize(objective::AbstractExpr, constraints::Constraint...) =
+  Problem(:minimize, objective, [constraints...])
+minimize(objective::AbstractExpr, constraints::Array{Constraint}=Constraint[]) =
+  Problem(:minimize, objective, constraints)
+minimize(objective::Value, constraints::Constraint...) =
+  minimize(convert(CvxExpr, objective), constraints)
+minimize(objective::Value, constraints::Array{Constraint}=Constraint[]) =
+  minimize(convert(CvxExpr, objective), constraints)
+
+maximize(objective::AbstractExpr, constraints::Constraint...) =
+  Problem(:maximize, objective, [constraints...])
+maximize(objective::AbstractExpr, constraints::Array{Constraint}=Constraint[]) =
+  Problem(:maximize, objective, constraints)
+maximize(objective::Value, constraints::Constraint...) =
+  maximize(convert(CvxExpr, objective), constraints)
+maximize(objective::Value, constraints::Array{Constraint}=Constraint[]) =
+  maximize(convert(CvxExpr, objective), constraints)
+
+satisfy(constraints::Array{Constraint}=Constraint[]) =
+  Problem(:minimize, Constant(0), constraints)
+satisfy(constraint::Constraint) = satisfy([constraint])
+
+# +(constraints, constraints) is overwritten in constraints.jl
+add_constraints(p::Problem, constraints::Array{Constraint}) = +(p.constraints, constraints)
+add_constraints(p::Problem, constraint::Constraint) = add_constraints(p, [constraint])
