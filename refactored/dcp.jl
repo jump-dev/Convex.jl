@@ -21,7 +21,7 @@ type ConstVexity <: Vexity              end
 type Affine <: Vexity                   end
 type Convex <: Vexity                   end
 type Concave <: Vexity                  end
-type NotDcp <: Vexity                 end
+type NotDcp <: Vexity                   end
 
 # Monotonocity subtypes
 abstract Monotonicity

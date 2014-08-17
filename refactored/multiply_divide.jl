@@ -1,7 +1,15 @@
+#############################################################################
+# multiply_divide.jl
+# Handles scalar multiplication, maatrix multiplication, and scalar division
+# of variables, constants and expressions.
+# All expressions and atoms are subtpyes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
+
 export *
 export sign, monotonicity, curvature, evaluate, dual_conic_form
 
-### Multiplication
+### Scalar and matrix multiplication
 
 type MultiplyAtom <: AbstractExpr
   head::Symbol
@@ -32,6 +40,8 @@ function monotonicity(x::MultiplyAtom)
   return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
 end
 
+# Multiplication has an indefinite hessian, so if neither children are constants,
+# the curvature of the atom will violate DCP.
 function curvature(x::MultiplyAtom)
   if x.children[1].head != :constant && x.children[2].head != :constant
     return NotDcp()

@@ -1,17 +1,18 @@
 import Base.transpose, Base.ctranspose
 export transpose, ctranspose, TransposeAtom
-export sign, curvature, monotonicity, evaluate
+export sign, curvature, monotonicity, evaluate, dual_conic_form
 
 # Since everything is vectorized, the canonical form of x' is simply
 # multiplying x by a permutation matrix such that coeff * vectorized(x) - vectorized(x') = 0
 type TransposeAtom <: AbstractExpr
   head::Symbol
-  id::Uint64
+  children_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
   function TransposeAtom(x::AbstractExpr)
-    return new(:transpose, object_id(x), (x,), (x.size[2], x.size[1]))
+    children = (x,)
+    return new(:transpose, hash(children), children, (x.size[2], x.size[1]))
   end
 end
 
@@ -31,6 +32,23 @@ function evaluate(x::TransposeAtom)
   return evaluate(x.children[1])'
 end
 
+function dual_conic_form(x::TransposeAtom)
+  objective, constraints = dual_conic_form(x.children[1])
+  sz = get_vectorized_size(x.size)
+  transpose_matrix = spzeros(sz, sz)
+  num_rows = x.size[1]
+  num_cols = x.size[2]
+
+  for r = 1:num_rows
+    for c = 1:num_cols
+      i = (c - 1) * num_rows + r
+      j = (r - 1) * num_cols + c
+      transpose_matrix[i, j] = 1.0
+    end
+  end
+  objective = transpose_matrix * objective
+  return (objective, constraints)
+end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
 ctranspose(x::AbstractExpr) = transpose(x)
