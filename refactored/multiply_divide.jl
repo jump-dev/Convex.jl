@@ -43,8 +43,8 @@ end
 # Multiplication has an indefinite hessian, so if neither children are constants,
 # the curvature of the atom will violate DCP.
 function curvature(x::MultiplyAtom)
-  if x.children[1].head != :constant && x.children[2].head != :constant
-    return NotDcp()
+  if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
+    return NotDCP()
   else
     return ConstVexity()
   end

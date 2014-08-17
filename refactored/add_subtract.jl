@@ -32,7 +32,7 @@ function monotonicity(x::NegateAtom)
   return (Nonincreasing(),)
 end
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)_T f''(g(x))g'(x)
+# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x); this represents the first term
 function curvature(x::NegateAtom)
   return ConstVexity()
 end

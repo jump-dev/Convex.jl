@@ -1,4 +1,4 @@
-module CVX
+module CVX_refactor
 
 include("dcp.jl")
 include("expressions.jl")

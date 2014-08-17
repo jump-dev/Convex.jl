@@ -1,4 +1,5 @@
-export Constraint, EqConstraint, LtConstraint, GtConstraint
+import Base.isposdef
+export Constraint, EqConstraint, LtConstraint, GtConstraint, SDPConstraint, isposdef
 export ==, <=, >=
 
 abstract Constraint
@@ -25,7 +26,7 @@ end
 function vexity(c::EqConstraint)
   vexity = vexity(lhs) + (-vexity(rhs))
   if vexity == Convex() && vexity != Concave()
-    vexity = NoVexity()
+    vexity = NotDCP()
   end
   return vexity
 end
@@ -42,4 +43,35 @@ end
 ==(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
 ==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
 
+type SDPConstraint <: Constraint
+  head::Symbol
+  child_hash::Uint64
+  lhs::AbstractExpr
+  size::(Int64, Int64)
 
+  function SDPConstraint(lhs::AbstractExpr)
+    sz = lhs.size
+    if sz[1] != sz[2]
+      error("Positive semidefinite expressions must be square")
+    end
+    return new(:(==), hash(lhs), lhs, sz)
+  end
+end
+
+function vexity(c::SDPConstraint)
+  vexity = vexity(c.lhs)
+  if vexity == Affine() or vexity == ConstVexity()
+    return Affine()
+  else
+    return NotDCP()
+  end
+end
+
+function dual_conic_form(c::SDPConstraint)
+  objective, constraints = dual_conic_form(c.lhs)
+  new_constraint = ConicConstr(objective.vars_to_coeffs, :SDP, c.size[1] * c.size[2])
+  push!(constraints, new_constraint)
+  return (objective, constraints)
+end
+
+isposdef(x::AbstractExpr) = SDPConstraint(x)
