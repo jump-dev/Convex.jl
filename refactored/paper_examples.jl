@@ -1,6 +1,9 @@
+include("CVX.jl")
+using CVX_refactor
 using ECOS, SCS
 
 # Summation.
+println("Summation example")
 x = Variable();
 e = 0;
 @time begin
@@ -12,6 +15,7 @@ end
 @time solve!(p, ECOS.ECOSMathProgModel())
 
 # Indexing.
+println("Indexing example")
 x = Variable(1000, 1);
 e = 0;
 @time begin
@@ -23,6 +27,7 @@ end
 @time solve!(p, ECOS.ECOSMathProgModel())
 
 # Matrix constraints.
+println("Matrix constraint example")
 n, m, p = 100, 100, 100
 X = Variable(m, n)
 A = randn(p, m)
@@ -33,6 +38,7 @@ end
 @time solve!(p, ECOS.ECOSMathProgModel())
 
 # Transpose.
+println("Transpose example")
 X = Variable(1000, 1000)
 A = randn(1000, 1000)
 @time begin
