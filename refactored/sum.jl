@@ -5,6 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
+import Base.sum
 export sum
 
 ### Sum Atom
@@ -43,9 +44,9 @@ sum(x::AbstractExpr) = SumAtom(x)
 
 function dual_conic_form(e::SumAtom)
   objective, constraints = dual_conic_form(e.children[1])
-  new_obj = ConicObj(copy(objective.vars_to_coeffs))
-  for var in keys(new_obj.vars_to_coeffs)
-    new_obj.vars_to_coeffs[var] = sum(new_obj.vars_to_coeffs[var], 1)
+  new_obj = ConicObj(copy(objective))
+  for var in keys(new_obj)
+    new_obj[var] = sum(new_obj[var], 1)
   end
   return new_obj, constraints
 end

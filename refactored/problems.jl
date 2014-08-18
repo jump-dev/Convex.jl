@@ -49,6 +49,16 @@ function find_variable_ranges(constraints)
   return index, constr_size, var_to_ranges
 end
 
+function dual_conic_form(p::Problem)
+  objective_var = Variable()
+  objective, _ = dual_conic_form(objective_var)
+  constraints = dual_conic_form(p.objective - objective_var == 0)[2]
+  for constraint in p.constraints
+    append!(constraints, dual_conic_form(constraint)[2])
+  end
+  return objective, constraints
+end
+
 function dual_conic_problem(p::Problem)
   objective_var = Variable()
   constraints = dual_conic_form(p.objective - objective_var == 0)[2]
