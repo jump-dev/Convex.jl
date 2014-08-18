@@ -50,6 +50,7 @@ function dual_conic_form(x::Variable)
   objective = ConicObj()
   vec_size = get_vectorized_size(x)
   objective[x.id] = speye(vec_size)
+  objective[object_id(:constant)] = spzeros(vec_size, 1)
   constraints = sign_constraint(x.sign, objective, vec_size)
   return (objective, constraints)
 end
