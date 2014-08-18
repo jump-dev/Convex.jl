@@ -42,25 +42,27 @@ end
 function dual_conic_form(x::TransposeAtom)
   objective, constraints = dual_conic_form(x.children[1])
 
-  new_objective = ConicObj()
   sz = get_vectorized_size(x)
-  selector = Array(Int64, sz)
 
   num_rows = x.size[1]
   num_cols = x.size[2]
 
+  I = Array(Int64, sz)
+  J = Array(Int64, sz)
+
+  k = 1
   for r = 1:num_rows
     for c = 1:num_cols
-      i = (c - 1) * num_rows + r
-      j = (r - 1) * num_cols + c
-      selector[j] = i
+      I[k] = (c - 1) * num_rows + r
+      J[k] = (r - 1) * num_cols + c
+      k += 1
     end
   end
 
-  for (id, value) in objective
-    new_objective[id] = ([value])[selector, :]
-  end
-  return (new_objective, constraints)
+  transpose_matrix = sparse(I, J, 1.0)
+
+  objective = transpose_matrix * objective
+  return (objective, constraints)
 end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
