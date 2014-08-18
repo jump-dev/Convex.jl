@@ -41,8 +41,9 @@ end
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
 function dual_conic_form(x::TransposeAtom)
   objective, constraints = dual_conic_form(x.children[1])
-  sz = get_vectorized_size(x.size)
-  transpose_matrix = spzeros(sz, sz)
+  new_objective = ConicObj()
+  sz = get_vectorized_size(x)
+  selector = Array(Int64, sz)
   num_rows = x.size[1]
   num_cols = x.size[2]
 
@@ -50,11 +51,14 @@ function dual_conic_form(x::TransposeAtom)
     for c = 1:num_cols
       i = (c - 1) * num_rows + r
       j = (r - 1) * num_cols + c
-      transpose_matrix[i, j] = 1.0
+      selector[j] = i
     end
   end
-  objective = transpose_matrix * objective
-  return (objective, constraints)
+
+  for (id, value) in objective
+    new_objective[id] = ([value])[selector, :]
+  end
+  return (new_objective, constraints)
 end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
