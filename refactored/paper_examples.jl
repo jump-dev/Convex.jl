@@ -7,7 +7,7 @@ e = 0;
   for i = 1:1000
     e += x;
   end
-  p = minimize(e);
+  p = minimize(e, x>=1);
 end
 @time solve!(p, ECOS.ECOSMathProgModel())
 
@@ -18,7 +18,7 @@ e = 0;
   for i = 1:1000
     e += x[i];
   end
-  p = minimize(e);
+  p = minimize(e, x >= ones(1000, 1));
 end
 @time solve!(p, ECOS.ECOSMathProgModel())
 
