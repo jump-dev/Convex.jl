@@ -42,17 +42,24 @@ end
 function dual_conic_form(x::TransposeAtom)
   objective, constraints = dual_conic_form(x.children[1])
   sz = get_vectorized_size(x)
-  transpose_matrix = spzeros(sz, sz)
+
   num_rows = x.size[1]
   num_cols = x.size[2]
 
+  I = Array(Int64, sz)
+  J = Array(Int64, sz)
+
+  k = 1
   for r = 1:num_rows
     for c = 1:num_cols
-      i = (c - 1) * num_rows + r
-      j = (r - 1) * num_cols + c
-      transpose_matrix[i, j] = 1.0
+      I[k] = (c - 1) * num_rows + r
+      J[k] = (r - 1) * num_cols + c
+      k += 1
     end
   end
+
+  transpose_matrix = sparse(I, J, 1.0)
+
   objective = transpose_matrix * objective
   return (objective, constraints)
 end
