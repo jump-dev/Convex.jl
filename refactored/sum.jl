@@ -5,9 +5,11 @@
 # Please read expressions.jl first.
 #############################################################################
 
+import Base.sum
 export sum
 
 ### Sum Atom
+### ToDo: add support for sum(x, 1) and sum(x, 2)
 type SumAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -16,7 +18,7 @@ type SumAtom <: AbstractExpr
 
   function SumAtom(x::AbstractExpr)
     children = (x,)
-    return new(:sum, hash(children), children, x.size)
+    return new(:sum, hash(children), children, (1, 1))
   end
 end
 
@@ -43,9 +45,7 @@ sum(x::AbstractExpr) = SumAtom(x)
 
 function dual_conic_form(e::SumAtom)
   objective, constraints = dual_conic_form(e.children[1])
-  new_obj = ConicObj(copy(objective.vars_to_coeffs))
-  for var in keys(new_obj.vars_to_coeffs)
-    new_obj.vars_to_coeffs[var] = sum(new_obj.vars_to_coeffs[var], 1)
-  end
+  nterms_to_sum = get_vectorized_size(e.children[1])
+  new_obj = ones(1, nterms_to_sum) * objective
   return new_obj, constraints
 end
