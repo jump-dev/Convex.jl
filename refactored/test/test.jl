@@ -11,15 +11,21 @@ p = minimize(x+y,x==1)
 solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
 
-# inequality constraints
+# geq inequality constraints
 x = Variable()
 p = minimize(x, x>=1)
 solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
 
-# nonbinding inequality constraints
+# maximize, leq inequality constraints
 x = Variable()
-p = maximize(x, x>=1, x<=2)
+p = maximize(x, x<=2)
+solve!(p)
+@test_approx_eq_eps p.optval 2 TOL
+
+# nonbinding geq inequality constraints
+x = Variable()
+p = maximize(x, x<=2, x>=1)
 solve!(p)
 @test_approx_eq_eps p.optval 2 TOL
 
