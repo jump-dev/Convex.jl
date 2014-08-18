@@ -9,7 +9,6 @@ import Base.diag
 export diag
 
 ### Diagonal
-
 type DiagAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -21,7 +20,7 @@ type DiagAtom <: AbstractExpr
 
     if k >= num_cols || k <= -num_rows
       error("Bounds error in calling diag")
-    end    
+    end
 
     children = (x, k)
     return new(:sum, hash(children), children, x.size)
@@ -37,7 +36,8 @@ function monotonicity(x::DiagAtom)
   return (Nondecreasing(),)
 end
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x); this represents the first term
+# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
+# this represents the first term
 function curvature(x::DiagAtom)
   return ConstVexity()
 end

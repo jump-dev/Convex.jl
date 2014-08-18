@@ -1,6 +1,6 @@
 #############################################################################
 # constant.jl
-# Defines Variable, which is a subtype of AbstractExpr
+# Defines Constant, which is a subtype of AbstractExpr
 #############################################################################
 export Constant
 export vexity, evaluate, sign, dual_conic_form

@@ -27,8 +27,8 @@ type Variable <: AbstractExpr
 end
 
 # convenience semidefinite matrix constructor
-#Semidefinite(m::Integer) = Variable((m,m), Semidefinite())
-#Semidefinite(m::Integer, n::Integer) = (m==n ? return Variable((m,m), Semidefinite()) : error("Semidefinite matrices must be square"))
+Semidefinite(m::Integer) = Variable((m,m), Semidefinite())
+Semidefinite(m::Integer, n::Integer) = (m==n ? Variable((m,m), Semidefinite()) : error("Semidefinite matrices must be square"))
 
 # GLOBAL MAP
 # TODO: Comment David.

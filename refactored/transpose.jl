@@ -1,9 +1,14 @@
+#############################################################################
+# transpose.jl
+# Returns the transpose of a matrix
+# All expressions and atoms are subtpyes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
+
 import Base.transpose, Base.ctranspose
 export transpose, ctranspose, TransposeAtom
 export sign, curvature, monotonicity, evaluate, dual_conic_form
 
-# Since everything is vectorized, the canonical form of x' is simply
-# multiplying x by a permutation matrix such that coeff * vectorized(x) - vectorized(x') = 0
 type TransposeAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -32,6 +37,8 @@ function evaluate(x::TransposeAtom)
   return evaluate(x.children[1])'
 end
 
+# Since everything is vectorized, we simply need to multiply x by a permutation
+# matrix such that coeff * vectorized(x) - vectorized(x') = 0
 function dual_conic_form(x::TransposeAtom)
   objective, constraints = dual_conic_form(x.children[1])
   sz = get_vectorized_size(x.size)

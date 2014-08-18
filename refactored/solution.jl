@@ -1,7 +1,7 @@
-import MathProgBase, SCS
+import MathProgBase, SCS, ECOS
 export solve!
 
-function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProgBase.model(MathProgBase.defaultConicsolver))
+function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
 
   c, A, b, cones = dual_conic_problem(problem)
 
@@ -11,8 +11,13 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProg
 
   # TODO: Fix once MathProgBase has a loadineqproblem!
   # TODO: Get rid of full once c and b are not sparse
-  SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
-  SCS.optimize!(m)
+  if typeof(m) == ECOS.ECOSMathProgModel
+    ECOS.loadineqconicproblem!(m, full(c), A, full(b), cones)
+    ECOS.optimize!(m)
+  else
+    SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
+    SCS.optimize!(m)
+  end
 
   try
     y, z = MathProgBase.getconicdual(m)

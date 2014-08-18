@@ -4,8 +4,7 @@ export ==, <=, >=
 
 abstract Constraint
 
-## Linear equality constraint
-
+### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
@@ -27,6 +26,7 @@ end
 
 function vexity(c::EqConstraint)
   vexity = vexity(lhs) + (-vexity(rhs))
+  # You can't have equality constraints with concave/convex expressions
   if vexity == Convex() || vexity == Concave()
     vexity = NotDcp()
   end
@@ -46,8 +46,7 @@ end
 ==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
 
 
-## Linear inequality constraints
-
+### Linear inequality constraints
 type LtConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
@@ -126,8 +125,8 @@ end
 >=(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
 >=(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
 
-## Positive semidefinite cone constraint
 
+### Positive semidefinite cone constraint
 type SDPConstraint <: Constraint
   head::Symbol
   child_hash::Uint64
