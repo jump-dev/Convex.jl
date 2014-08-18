@@ -41,9 +41,11 @@ end
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
 function dual_conic_form(x::TransposeAtom)
   objective, constraints = dual_conic_form(x.children[1])
+
   new_objective = ConicObj()
   sz = get_vectorized_size(x)
   selector = Array(Int64, sz)
+
   num_rows = x.size[1]
   num_cols = x.size[2]
 
