@@ -2,7 +2,7 @@ import ECOS, MathProgBase
 
 export get_var_dict, solve!
 
-function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProgBase.model(MathProgBase.defaultConicsolver))
+function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
   # maximize -> minimize
   if problem.head == :maximize
     problem.objective = -problem.objective
@@ -10,7 +10,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=MathProg
 
   ecos_problem, variable_index, eq_constr_index, ineq_constr_index = ECOSConicProblem(problem)
   cp = IneqConicProblem(ecos_problem)
-  MathProgBase.loadineqconicproblem!(m, cp.c, cp.A, cp.b, cp.G, cp.h, cp.cones)
+  ECOS.loadineqconicproblem!(m, cp.c, cp.A, cp.b, cp.G, cp.h, cp.cones)
   MathProgBase.optimize!(m)
   try
     y, z = MathProgBase.getconicdual(m)
@@ -71,7 +71,7 @@ function ECOSConicProblem(problem::Problem)
     if objective.vexity != :constant
         uid = objective.uid
         c[variable_index[uid] : variable_index[uid] + objective.size[1] - 1] = 1
-    end  
+    end
     return ECOSConicProblem(n=n, m=m, p=p, l=l, ncones=ncones, q=q, G=G, c=c, h=h, A=A, b=b), variable_index, eq_constr_index, ineq_constr_index
 end
 function populate_constraints!(problem::Problem, eq_constr_index::Dict{Int64, Int64},

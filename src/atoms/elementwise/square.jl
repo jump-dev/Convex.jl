@@ -1,4 +1,3 @@
-import Base.square
 export square
 
 # By using qol_elementwise, square is implemented as x.^2 ./ ones(...)

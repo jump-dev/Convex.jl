@@ -39,6 +39,4 @@ include("atoms/quad_form.jl")
 include("atoms/sum_squares.jl")
 include("atoms/quad_over_lin.jl")
 
-include("macros/macro.jl")
-
 end # module
