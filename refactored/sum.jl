@@ -9,6 +9,7 @@ import Base.sum
 export sum
 
 ### Sum Atom
+### ToDo: add support for sum(x, 1) and sum(x, 2)
 type SumAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -17,7 +18,7 @@ type SumAtom <: AbstractExpr
 
   function SumAtom(x::AbstractExpr)
     children = (x,)
-    return new(:sum, hash(children), children, x.size)
+    return new(:sum, hash(children), children, (1, 1))
   end
 end
 

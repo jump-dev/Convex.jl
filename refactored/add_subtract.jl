@@ -43,7 +43,8 @@ end
 
 function dual_conic_form(e::NegateAtom)
   objective, constraints = dual_conic_form(e.children[1])
-  return (-objective, constraints)
+  objective = -objective
+  return (objective, constraints)
 end
 
 

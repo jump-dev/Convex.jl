@@ -4,6 +4,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
+import Base.vecnorm
 export EucNormAtom, norm2, vecnorm
 export sign, monotonicity, curvature, dual_conic_form
 
@@ -46,4 +47,4 @@ function dual_conic_form(x::EucNormAtom)
 end
 
 norm2(x::AbstractExpr) = EucNormAtom(x)
-vecnorm = norm2
+vecnorm(x::AbstractExpr) = EucNormAtom(x)

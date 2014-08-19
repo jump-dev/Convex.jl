@@ -9,6 +9,7 @@ import Base.diag
 export diag
 
 ### Diagonal
+### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 type DiagAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -23,7 +24,7 @@ type DiagAtom <: AbstractExpr
     end
 
     children = (x, k)
-    return new(:sum, hash(children), children, x.size)
+    return new(:sum, hash(children), children, (minimum(x.size) - k, 1))
   end
 end
 
@@ -72,7 +73,7 @@ function dual_conic_form(e::DiagAtom)
     sz_diag = Base.min(num_rows + k, num_cols)
   end
 
-  select_diag = spzeros(sz_diag, get_vectorized_size(x))
+  select_diag = spzeros(sz_diag, get_vectorized_size(e.children[1]))
   for i in 1:sz_diag
     select_diag[i, start_index] = 1
     start_index += num_rows + 1
