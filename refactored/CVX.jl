@@ -22,6 +22,7 @@ include("diag.jl")
 include("norm2.jl")
 
 ### SDP atoms
+include("matrix_norm.jl")
 
 ### exponential atoms
 

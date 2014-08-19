@@ -68,5 +68,5 @@ function sign_constraint(s::Negative, objective, vec_size)
 end
 
 function sign_constraint(s::Semidefinite, objective, vec_size)
-  return [ConicConstr([objective], :Semidefinite, [vec_size])]
+  return [ConicConstr([objective], :SDP, [vec_size])]
 end

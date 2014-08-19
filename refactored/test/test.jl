@@ -44,14 +44,12 @@ solve!(p)
 # sums
 x = Variable(2,2)
 p = minimize(sum(x), x>=1)
-println(dual_conic_problem(p))
 solve!(p)
 @test_approx_eq_eps p.optval 4 TOL
 
 # sums
 x = Variable(2,2)
 p = minimize(sum(x) - 2*x[1,1], x>=1, x[1,1]<=2)
-println(dual_conic_problem(p))
 solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
 
