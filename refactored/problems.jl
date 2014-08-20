@@ -56,19 +56,15 @@ function dual_conic_form(p::Problem)
   for constraint in p.constraints
     append!(constraints, dual_conic_form(constraint)[2])
   end
-  return objective, constraints
+  return objective, unique(constraints), objective_var.id
 end
 
 function dual_conic_problem(p::Problem)
-  objective_var = Variable()
-  constraints = dual_conic_form(p.objective - objective_var == 0)[2]
-  for constraint in p.constraints
-    append!(constraints, dual_conic_form(constraint)[2])
-  end
+  objective, constraints, objective_var_id = dual_conic_form(p)
   var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
 
   c = spzeros(var_size, 1)
-  objective_range = var_to_ranges[objective_var.id]
+  objective_range = var_to_ranges[objective_var_id]
   c[objective_range[1]:objective_range[2]] = 1
 
   A = spzeros(constr_size, var_size)

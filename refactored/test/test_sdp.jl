@@ -6,10 +6,18 @@ TOL = 1e-3
 
 # SDP variables
 y = Variable((2,2), Semidefinite())
-p = minimize(y[1,1], y[1,2]==1)
+p = minimize(y[1,1])
 println(dual_conic_problem(p))
 solve!(p)
-@test_approx_eq_eps p.optval 2 TOL
+@test_approx_eq_eps p.optval 0 TOL
+
+# SDP variables twice
+y = Variable((2,2), Semidefinite())
+p = minimize(y[1,1], y[2,1]==1)
+println(dual_conic_problem(p))
+solve!(p)
+@test_approx_eq_eps p.optval 1 TOL
+quit()
 
 # SDP variables
 y = Semidefinite(2)
