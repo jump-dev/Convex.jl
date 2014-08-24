@@ -51,7 +51,7 @@ end
 
 function dual_conic_form(p::Problem)
   objective, constraints = dual_conic_form(p.objective)
-  # objective must be linear in variables (not affine) in conic form, 
+  # objective must be linear in variables (not affine) in conic form,
   # so introduce new var for objective if objective has constant term
   if haskey(objective, object_id(:constant))
     objective_var = Variable()
@@ -129,18 +129,18 @@ minimize(objective::AbstractExpr, constraints::Constraint...) =
 minimize(objective::AbstractExpr, constraints::Array{Constraint}=Constraint[]) =
   Problem(:minimize, objective, constraints)
 minimize(objective::Value, constraints::Constraint...) =
-  minimize(convert(CvxExpr, objective), constraints)
+  minimize(convert(AbstractExpr, objective), constraints)
 minimize(objective::Value, constraints::Array{Constraint}=Constraint[]) =
-  minimize(convert(CvxExpr, objective), constraints)
+  minimize(convert(AbstractExpr, objective), constraints)
 
 maximize(objective::AbstractExpr, constraints::Constraint...) =
   Problem(:maximize, objective, [constraints...])
 maximize(objective::AbstractExpr, constraints::Array{Constraint}=Constraint[]) =
   Problem(:maximize, objective, constraints)
 maximize(objective::Value, constraints::Constraint...) =
-  maximize(convert(CvxExpr, objective), constraints)
+  maximize(convert(AbstractExpr, objective), constraints)
 maximize(objective::Value, constraints::Array{Constraint}=Constraint[]) =
-  maximize(convert(CvxExpr, objective), constraints)
+  maximize(convert(AbstractExpr, objective), constraints)
 
 satisfy(constraints::Array{Constraint}=Constraint[]) =
   Problem(:minimize, Constant(0), constraints)

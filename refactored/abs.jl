@@ -1,11 +1,11 @@
 #############################################################################
-# add_subtract.jl
-# Handles unary negation, addition and subtraction of variables, constants
-# and expressions.
+# abs.jl
+# Absolute value of an expression
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
+import Base.abs
 export abs
 export sign, curvature, monotonicity, evaluate
 
