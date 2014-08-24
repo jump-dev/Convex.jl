@@ -50,9 +50,14 @@ function find_variable_ranges(constraints)
 end
 
 function dual_conic_form(p::Problem)
-  objective_var = Variable()
-  objective, _ = dual_conic_form(objective_var)
-  constraints = dual_conic_form(p.objective - objective_var == 0)[2]
+  objective, constraints = dual_conic_form(p.objective)
+  # objective must be linear in variables (not affine) in conic form, 
+  # so introduce new var for objective if objective has constant term
+  if haskey(objective, object_id(:constant))
+    objective_var = Variable()
+    objective, _ = dual_conic_form(objective_var)
+    _, constraints = dual_conic_form(p.objective - objective_var == 0)
+  end
   for constraint in p.constraints
     append!(constraints, dual_conic_form(constraint)[2])
   end
@@ -77,10 +82,34 @@ function dual_conic_problem(p::Problem)
       sz = constraint.sizes[i]
       for (id, val) in constraint.objs[i]
         if id == object_id(:constant)
-          b[constr_index + 1 : constr_index + sz] = val
+          try
+            b[constr_index + 1 : constr_index + sz] = val
+          catch
+            if size(val) == (1,1)
+              v = val[1]
+              for i=1:sz
+                b[constr_index + i] = v
+              end
+            else
+              error("Sizes don't match: $sz vs $(size(val))")
+            end
+          end
         else
           var_range = var_to_ranges[id]
-          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val
+          try
+            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val
+          catch
+            if size(val) == (1,1)
+              v = -val[1]
+              for varidx in var_range[1]:var_range[2]
+                for i=1:sz
+                  A[constr_index + i, varidx] = v
+                end
+              end
+            else
+              error("Sizes don't match: $sz * $var_range vs $(size(val))")
+            end
+          end
         end
       end
       constr_index += sz
