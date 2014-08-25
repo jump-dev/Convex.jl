@@ -162,7 +162,7 @@ end
 
 function dual_conic_form(c::SDPConstraint, unique_constr)
   if !((c.head, c.children_hash) in unique_constr)
-    objective, constraints = dual_conic_form(c.lhs)
+    objective, constraints = dual_conic_form(c.lhs, unique_constr)
     new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
     push!(constraints, new_constraint)
     unique_constr[(c.head, c.children_hash)] = (objective, constraints)
