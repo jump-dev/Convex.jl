@@ -20,7 +20,11 @@ function +(c::ConicObj, d::ConicObj)
     else
       # .+ does not behave properly for sparse matrices
       # need to override behavior
-      new_obj[var] = broadcast(+, new_obj[var], d[var])
+      if size(new_obj[var]) == size(d[var])
+        new_obj[var] = new_obj[var] + d[var]
+      else
+        new_obj[var] = broadcast(+, new_obj[var], d[var])
+      end
     end
   end
   return new_obj
