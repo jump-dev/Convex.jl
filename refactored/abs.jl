@@ -44,6 +44,8 @@ abs(x::AbstractExpr) = AbsAtom(x)
 function dual_conic_form(e::AbsAtom)
   x = e.children[1]
   t = Variable(size(x))
-  p = Problem(:minimize, t, x<=t, x>=-t)
-  return dual_conic_form(p)
+  objective, constraints = dual_conic_form(t)
+  append!(constraints, dual_conic_form(x<=t)[2])
+  append!(constraints, dual_conic_form(x>=-t)[2])
+  return objective, constraints
 end
