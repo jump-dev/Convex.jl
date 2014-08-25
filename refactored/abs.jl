@@ -41,11 +41,14 @@ end
 
 abs(x::AbstractExpr) = AbsAtom(x)
 
-function dual_conic_form(e::AbsAtom)
-  x = e.children[1]
-  t = Variable(size(x))
-  objective, constraints = dual_conic_form(t)
-  append!(constraints, dual_conic_form(x<=t)[2])
-  append!(constraints, dual_conic_form(x>=-t)[2])
-  return objective, constraints
+function dual_conic_form(x::AbsAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    c = x.children[1]
+    t = Variable(size(c))
+    objective, constraints = dual_conic_form(t, unique_constr)
+    append!(constraints, dual_conic_form(c<=t, unique_constr)[2])
+    append!(constraints, dual_conic_form(c>=-t, unique_constr)[2])
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(x.head, x.children_hash)]
 end
