@@ -45,31 +45,33 @@ function evaluate(x::IndexAtom)
   end
 end
 
-function dual_conic_form(x::IndexAtom)
-  m = get_vectorized_size(x)
-  n = get_vectorized_size(x.children[1])
+function dual_conic_form(x::IndexAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    m = get_vectorized_size(x)
+    n = get_vectorized_size(x.children[1])
 
-  if x.inds == nothing
-    sz = length(x.cols) * length(x.rows)
-    J = Array(Int64, sz)
-    k = 1
+    if x.inds == nothing
+      sz = length(x.cols) * length(x.rows)
+      J = Array(Int64, sz)
+      k = 1
 
-    num_rows = x.children[1].size[1]
-    for c in x.cols
-      for r in x.rows
-        J[k] = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
-        k += 1
+      num_rows = x.children[1].size[1]
+      for c in x.cols
+        for r in x.rows
+          J[k] = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
+          k += 1
+        end
       end
+
+      index_matrix = sparse(1:sz, J, 1.0, m, n)
+    else
+      index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
     end
-
-    index_matrix = sparse(1:sz, J, 1.0, m, n)
-  else
-    index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
+    objective, constraints = dual_conic_form(x.children[1], unique_constr)
+    objective = index_matrix * objective
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  objective, constraints = dual_conic_form(x.children[1])
-  objective = index_matrix * objective
-
-  return (objective, constraints)
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)

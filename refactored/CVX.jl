@@ -18,6 +18,7 @@ include("abs.jl")
 include("transpose.jl")
 include("index.jl")
 include("diag.jl")
+include("stack.jl")
 
 ### SOC atoms
 include("norm2.jl")

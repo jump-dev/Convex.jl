@@ -15,7 +15,7 @@ type HcatAtom <: AbstractExpr
       if arg.size[1] != num_rows
         error("Cannot horizonatally stack expressions of varying number of rows")
       end
-      num_cols += args.size[2]
+      num_cols += arg.size[2]
     end
     children = tuple(args...)
     return new(:hcat, hash(children), children, (num_rows, num_cols))
@@ -23,7 +23,7 @@ type HcatAtom <: AbstractExpr
 end
 
 function sign(x::HcatAtom)
-  return sum(map(sign, x.children)))
+  return sum(map(sign, x.children))
 end
 
 function monotonicity(x::HcatAtom)
@@ -44,11 +44,11 @@ function dual_conic_form(x::HcatAtom)
   for child in x.children
     child_obj, child_constrs = dual_conic_form(child)
     push!(objectives, child_obj)
-    push!(constraints, child_constrs)
+    append!(constraints, child_constrs)
   end
 
   # build a dict from variable ids to coefficient values
-  variable_to_values = Dict{Uint64, Value[]}()
+  variable_to_values = Dict{Uint64, Array{Value}}()
   for objective in objectives
     for (id, value) in objective
       if !(id in variable_to_values)
@@ -57,7 +57,7 @@ function dual_conic_form(x::HcatAtom)
     end
   end
 
-  # Suppose the child objectives for two children c1 and c2 look something like
+  # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
   #  e1: x => 1 2 3
   #           4 5 6
   #      y => 2 4
@@ -88,7 +88,7 @@ function dual_conic_form(x::HcatAtom)
     var_size = get_vectorized_size(id_to_variables[id])
     for i in 1:length(objectives)
       if id in objectives[i]
-        push!(value_list, objectives[i][id]
+        push!(value_list, objectives[i][id])
       else
         push!(value_list, spzeros(num_rows * num_cols, var_size))
       end
@@ -97,6 +97,10 @@ function dual_conic_form(x::HcatAtom)
   end
   return (objective, constraints)
 end
+
+hcat(args::AbstractExpr...) = HcatAtom(args...)
+
+
 
 type VcatAtom <: AbstractExpr
   head::Symbol
@@ -119,7 +123,7 @@ type VcatAtom <: AbstractExpr
 end
 
 function sign(x::VcatAtom)
-  return sum(map(sign, x.children)))
+  return sum(map(sign, x.children))
 end
 
 function monotonicity(x::VcatAtom)
@@ -128,4 +132,54 @@ end
 
 function curvature(x::VcatAtom)
   return ConstVexity()
+end
+
+
+# TODO evaluate
+
+function dual_conic_form(x::VcatAtom)
+  # build a list of child conic objectives and constraints
+  constraints = ConicConstr[]
+  objectives = ConicObj[]
+  for child in x.children
+    child_obj, child_constrs = dual_conic_form(child)
+    push!(objectives, child_obj)
+    push!(constraints, child_constrs)
+  end
+
+  # build a dict from variable ids to coefficient values
+  variable_to_values = Dict{Uint64, Value[]}()
+  for objective in objectives
+    for (id, value) in objective
+      if !(id in variable_to_values)
+        variable_to_values[id] = Value[]
+      end
+    end
+  end
+
+  # Suppose the child objectives for two children e1 (1 x 2) and e2 (2 x 2) look something like
+  #  e1: x => 1 2 3
+  #           4 5 6
+  #      y => 2 4
+  #           7 8
+  #  e2: x => 1 1 1
+  #           2 2 2
+  #           3 3 3
+  #           4 4 4
+  # The objective of [e1, e2] will look like
+  #      x => 1 2 3
+  #           1 1 1
+  #           2 2 2
+  #           4 5 6
+  #           3 3 3
+  #           4 4 4
+  #      y => 2 4
+  #           0 0
+  #           0 0
+  #           7 8
+  #           0 0
+  #           0 0
+
+  # TODO how to best implement the above?
+
 end

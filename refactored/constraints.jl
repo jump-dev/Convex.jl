@@ -7,7 +7,7 @@ abstract Constraint
 ### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
-  child_hash::Uint64
+  children_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -33,12 +33,15 @@ function vexity(c::EqConstraint)
   return vexity
 end
 
-function dual_conic_form(c::EqConstraint)
-  expr = c.lhs - c.rhs
-  objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-  push!(constraints, new_constraint)
-  return (objective, constraints)
+function dual_conic_form(c::EqConstraint, unique_constr)
+  if !((c.head, c.children_hash) in unique_constr)
+    expr = c.lhs - c.rhs
+    objective, constraints = dual_conic_form(expr, unique_constr)
+    new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
+    push!(constraints, new_constraint)
+    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(c.head, c.children_hash)]
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
@@ -49,7 +52,7 @@ end
 ### Linear inequality constraints
 type LtConstraint <: Constraint
   head::Symbol
-  child_hash::Uint64
+  children_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -74,12 +77,15 @@ function vexity(c::LtConstraint)
   return vexity
 end
 
-function dual_conic_form(c::LtConstraint)
-  expr = c.rhs - c.lhs
-  objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-  push!(constraints, new_constraint)
-  return (objective, constraints)
+function dual_conic_form(c::LtConstraint, unique_constr)
+  if !((c.head, c.children_hash) in unique_constr)
+    expr = c.rhs - c.lhs
+    objective, constraints = dual_conic_form(expr, unique_constr)
+    new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
+    push!(constraints, new_constraint)
+    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(c.head, c.children_hash)]
 end
 
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
@@ -88,7 +94,7 @@ end
 
 type GtConstraint <: Constraint
   head::Symbol
-  child_hash::Uint64
+  children_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -113,12 +119,15 @@ function vexity(c::GtConstraint)
   return vexity
 end
 
-function dual_conic_form(c::GtConstraint)
-  expr = c.lhs - c.rhs
-  objective, constraints = dual_conic_form(expr)
-  new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-  push!(constraints, new_constraint)
-  return (objective, constraints)
+function dual_conic_form(c::GtConstraint, unique_constr)
+  if !((c.head, c.children_hash) in unique_constr)
+    expr = c.lhs - c.rhs
+    objective, constraints = dual_conic_form(expr, unique_constr)
+    new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
+    push!(constraints, new_constraint)
+    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(c.head, c.children_hash)]
 end
 
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
@@ -129,7 +138,7 @@ end
 ### Positive semidefinite cone constraint
 type SDPConstraint <: Constraint
   head::Symbol
-  child_hash::Uint64
+  children_hash::Uint64
   lhs::AbstractExpr
   size::(Int64, Int64)
 
@@ -151,6 +160,7 @@ function vexity(c::SDPConstraint)
   end
 end
 
+# TODO cache constraints
 function dual_conic_form(c::SDPConstraint)
   objective, constraints = dual_conic_form(c.lhs)
   new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])

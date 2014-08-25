@@ -49,23 +49,19 @@ function find_variable_ranges(constraints)
   return index, constr_size, var_to_ranges
 end
 
-function dual_conic_form(p::Problem)
-  objective, constraints = dual_conic_form(p.objective)
-  # objective must be linear in variables (not affine) in conic form,
-  # so introduce new var for objective if objective has constant term
-  if haskey(objective, object_id(:constant))
-    objective_var = Variable()
-    objective, _ = dual_conic_form(objective_var)
-    _, constraints = dual_conic_form(p.objective - objective_var == 0)
-  end
+function dual_conic_form(p::Problem, unique_constr)
+  objective_var = Variable()
+  objective, _ = dual_conic_form(objective_var, unique_constr)
+  _, constraints = dual_conic_form(p.objective - objective_var == 0, unique_constr)
   for constraint in p.constraints
-    append!(constraints, dual_conic_form(constraint)[2])
+    append!(constraints, dual_conic_form(constraint, unique_constr)[2])
   end
-  return objective, unique(constraints), objective_var.id
+  return objective, constraints, objective_var.id
 end
 
 function dual_conic_problem(p::Problem)
-  objective, constraints, objective_var_id = dual_conic_form(p)
+  unique_constr = Dict{(Symbol, Uint64), (ConicObj, Array{ConicConstr})}()
+  objective, constraints, objective_var_id = dual_conic_form(p, unique_constr)
   var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
 
   c = spzeros(var_size, 1)

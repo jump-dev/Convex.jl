@@ -41,8 +41,12 @@ function sign(x::Constant)
   return x.sign
 end
 
-function dual_conic_form(x::Constant)
-  objective = ConicObj()
-  objective[object_id(:constant)] = vec([x.value])
-  return (objective, ConicConstr[])
+function dual_conic_form(x::Constant, unique_constr)
+  id = object_id(x.value)
+  if !((x.head, id) in unique_constr)
+    objective = ConicObj()
+    objective[object_id(:constant)] = vec([x.value])
+    unique_constr[(x.head, id)] = (objective, ConicConstr[])
+  end
+  return unique_constr[(x.head, id)]
 end

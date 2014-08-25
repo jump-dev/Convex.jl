@@ -41,10 +41,13 @@ end
 
 -(x::AbstractExpr) = NegateAtom(x)
 
-function dual_conic_form(e::NegateAtom)
-  objective, constraints = dual_conic_form(e.children[1])
-  objective = -objective
-  return (objective, constraints)
+function dual_conic_form(x::NegateAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    objective, constraints = dual_conic_form(x.children[1], unique_constr)
+    objective = -objective
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 
@@ -84,15 +87,15 @@ function evaluate(x::AdditionAtom)
   return evaluate(x.children[1]) + evaluate(x.children[2])
 end
 
-function dual_conic_form(x::AdditionAtom)
-  child_cones = map(dual_conic_form, x.children)
-  objective = ConicObj()
-  constraints = ConicConstr[]
-  for (child_objective, child_constraints) in child_cones
-    append!(constraints, child_constraints)
-    objective += child_objective
+function dual_conic_form(x::AdditionAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    objective, constraints = dual_conic_form(x.children[1], unique_constr)
+    objective2, constraints2 = dual_conic_form(x.children[2], unique_constr)
+    append!(constraints, constraints2)
+    objective += objective2
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return (objective, constraints)
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)

@@ -6,7 +6,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-
+import Base.trace
 export nuclear_norm, operator_norm, sigma_max, trace
 
 ### Nuclear norm

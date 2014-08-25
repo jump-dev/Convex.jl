@@ -46,13 +46,16 @@ function sign(x::Variable)
   return x.sign
 end
 
-function dual_conic_form(x::Variable)
-  objective = ConicObj()
-  vec_size = get_vectorized_size(x)
-  objective[x.id] = speye(vec_size)
-  objective[object_id(:constant)] = spzeros(vec_size, 1)
-  constraints = sign_constraint(x.sign, objective, vec_size)
-  return (objective, constraints)
+function dual_conic_form(x::Variable, unique_constr)
+  if !((x.head, x.id) in unique_constr)
+    objective = ConicObj()
+    vec_size = get_vectorized_size(x)
+    objective[x.id] = speye(vec_size)
+    objective[object_id(:constant)] = spzeros(vec_size, 1)
+    constraints = sign_constraint(x.sign, objective, vec_size)
+    unique_constr[(x.head, x.id)] = (objective, constraints)
+  end
+  return unique_constr[(x.head, x.id)]
 end
 
 function sign_constraint(s::NoSign, objective, vec_size)
