@@ -58,12 +58,9 @@ function dual_conic_form(p::Problem)
     objective, _ = dual_conic_form(objective_var)
     _, constraints = dual_conic_form(p.objective - objective_var == 0)
   end
-  start = time()
   for constraint in p.constraints
     append!(constraints, dual_conic_form(constraint)[2])
   end
-  println("Done with dual_conic_form")
-  println(time() - start)
   return objective, unique(constraints), objective_var.id
 end
 
