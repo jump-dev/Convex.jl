@@ -61,25 +61,28 @@ diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function dual_conic_form(e::DiagAtom)
-  (num_rows, num_cols) = e.children[1].size
-  k = e.children[2]
+function dual_conic_form(x::DiagAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    (num_rows, num_cols) = x.children[1].size
+    k = x.children[2]
 
-  if k >= 0
-    start_index = k * num_rows + 1
-    sz_diag = Base.min(num_rows, num_cols - k)
-  else
-    start_index = -k + 1
-    sz_diag = Base.min(num_rows + k, num_cols)
+    if k >= 0
+      start_index = k * num_rows + 1
+      sz_diag = Base.min(num_rows, num_cols - k)
+    else
+      start_index = -k + 1
+      sz_diag = Base.min(num_rows + k, num_cols)
+    end
+
+    select_diag = spzeros(sz_diag, get_vectorized_size(x.children[1]))
+    for i in 1:sz_diag
+      select_diag[i, start_index] = 1
+      start_index += num_rows + 1
+    end
+
+    objective, constraints = dual_conic_form(x.children[1], unique_constr)
+    new_obj = select_diag * objective
+    unique_constr[(x.head, x.children_hash)] = (new_obj, constraints)
   end
-
-  select_diag = spzeros(sz_diag, get_vectorized_size(e.children[1]))
-  for i in 1:sz_diag
-    select_diag[i, start_index] = 1
-    start_index += num_rows + 1
-  end
-
-  objective, constraints = dual_conic_form(e.children[1])
-  new_obj = select_diag * objective
-  return new_obj, constraints
+  return unique_constr[(x.head, x.children_hash)]
 end

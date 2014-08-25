@@ -40,29 +40,32 @@ end
 # Since everything is vectorized, we simply need to multiply x by a permutation
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
 function dual_conic_form(x::TransposeAtom)
-  objective, constraints = dual_conic_form(x.children[1])
+  if !((x.head, x.children_hash) in unique_constr)
+    objective, constraints = dual_conic_form(x.children[1])
 
-  sz = get_vectorized_size(x)
+    sz = get_vectorized_size(x)
 
-  num_rows = x.size[1]
-  num_cols = x.size[2]
+    num_rows = x.size[1]
+    num_cols = x.size[2]
 
-  I = Array(Int64, sz)
-  J = Array(Int64, sz)
+    I = Array(Int64, sz)
+    J = Array(Int64, sz)
 
-  k = 1
-  for r = 1:num_rows
-    for c = 1:num_cols
-      I[k] = (c - 1) * num_rows + r
-      J[k] = (r - 1) * num_cols + c
-      k += 1
+    k = 1
+    for r = 1:num_rows
+      for c = 1:num_cols
+        I[k] = (c - 1) * num_rows + r
+        J[k] = (r - 1) * num_cols + c
+        k += 1
+      end
     end
+
+    transpose_matrix = sparse(I, J, 1.0)
+
+    objective = transpose_matrix * objective
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-
-  transpose_matrix = sparse(I, J, 1.0)
-
-  objective = transpose_matrix * objective
-  return (objective, constraints)
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)

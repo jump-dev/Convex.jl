@@ -13,7 +13,7 @@ export sign, monotonicity, curvature, evaluate, dual_conic_form
 
 type MultiplyAtom <: AbstractExpr
   head::Symbol
-  id::Uint64
+  children_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -54,29 +54,32 @@ function evaluate(x::MultiplyAtom)
   return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function dual_conic_form(x::MultiplyAtom)
-  # scalar multiplication
-  if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
-    if x.children[1].head == :constant
-      const_child = x.children[1]
-      expr_child = x.children[2]
-    else
-      const_child = x.children[2]
-      expr_child = x.children[1]
-    end
-    objective, constraints = dual_conic_form(expr_child)
-    objective = reshape([const_child.value], get_vectorized_size(const_child), 1) * objective
+function dual_conic_form(x::MultiplyAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    # scalar multiplication
+    if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
+      if x.children[1].head == :constant
+        const_child = x.children[1]
+        expr_child = x.children[2]
+      else
+        const_child = x.children[2]
+        expr_child = x.children[1]
+      end
+      objective, constraints = dual_conic_form(expr_child, unique_constr)
+      objective = reshape([const_child.value], get_vectorized_size(const_child), 1) * objective
 
-  # left matrix multiplication
-  elseif x.children[1].head == :constant
-    objective, constraints = dual_conic_form(x.children[2])
-    objective = kron(speye(x.size[2]), x.children[1].value) * objective
-  # right matrix multiplication
-  else
-    objective, constraints = dual_conic_form(x.children[2])
-    objective = kron(x.children[2].value', speye(x.size[1])) * objective
+    # left matrix multiplication
+    elseif x.children[1].head == :constant
+      objective, constraints = dual_conic_form(x.children[2], unique_constr)
+      objective = kron(speye(x.size[2]), x.children[1].value) * objective
+    # right matrix multiplication
+    else
+      objective, constraints = dual_conic_form(x.children[2], unique_constr)
+      objective = kron(x.children[2].value', speye(x.size[1])) * objective
+    end
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return (objective, constraints)
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 *(x::AbstractExpr, y::AbstractExpr) = MultiplyAtom(x, y)

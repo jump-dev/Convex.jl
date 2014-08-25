@@ -37,65 +37,68 @@ end
 # TODO: evaluate
 
 
-function dual_conic_form(x::HcatAtom)
-  # build a list of child conic objectives and constraints
-  constraints = ConicConstr[]
-  objectives = ConicObj[]
-  for child in x.children
-    child_obj, child_constrs = dual_conic_form(child)
-    push!(objectives, child_obj)
-    append!(constraints, child_constrs)
-  end
+function dual_conic_form(x::HcatAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    # build a list of child conic objectives and constraints
+    constraints = ConicConstr[]
+    objectives = ConicObj[]
+    for child in x.children
+      child_obj, child_constrs = dual_conic_form(child)
+      push!(objectives, child_obj)
+      append!(constraints, child_constrs)
+    end
 
-  # build a dict from variable ids to coefficient values
-  variable_to_values = Dict{Uint64, Array{Value}}()
-  for objective in objectives
-    for (id, value) in objective
-      if !(id in variable_to_values)
-        variable_to_values[id] = Value[]
+    # build a dict from variable ids to coefficient values
+    variable_to_values = Dict{Uint64, Array{Value}}()
+    for objective in objectives
+      for (id, value) in objective
+        if !(id in variable_to_values)
+          variable_to_values[id] = Value[]
+        end
       end
     end
-  end
 
-  # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
-  #  e1: x => 1 2 3
-  #           4 5 6
-  #      y => 2 4
-  #           7 8
-  #  e2: x => 1 1 1
-  #           2 2 2
-  #           3 3 3
-  #           4 4 4
-  # The objective of [e1 e2] will look like
-  #      x => 1 2 3
-  #           4 5 6
-  #           1 1 1
-  #           2 2 2
-  #           3 3 3
-  #           4 4 4
-  #      y => 2 4
-  #           7 8
-  #           0 0
-  #           0 0
-  #           0 0
-  #           0 0
-  # builds the objective by aggregating a list of coefficients for each variable
-  # from each child objective, and then vertically concatenating them
-  objective = ConicObj()
-  num_rows = x.size[1]
-  num_cols = x.size[2]
-  for (id, value_list) in variable_to_values
-    var_size = get_vectorized_size(id_to_variables[id])
-    for i in 1:length(objectives)
-      if id in objectives[i]
-        push!(value_list, objectives[i][id])
-      else
-        push!(value_list, spzeros(num_rows * num_cols, var_size))
+    # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
+    #  e1: x => 1 2 3
+    #           4 5 6
+    #      y => 2 4
+    #           7 8
+    #  e2: x => 1 1 1
+    #           2 2 2
+    #           3 3 3
+    #           4 4 4
+    # The objective of [e1 e2] will look like
+    #      x => 1 2 3
+    #           4 5 6
+    #           1 1 1
+    #           2 2 2
+    #           3 3 3
+    #           4 4 4
+    #      y => 2 4
+    #           7 8
+    #           0 0
+    #           0 0
+    #           0 0
+    #           0 0
+    # builds the objective by aggregating a list of coefficients for each variable
+    # from each child objective, and then vertically concatenating them
+    objective = ConicObj()
+    num_rows = x.size[1]
+    num_cols = x.size[2]
+    for (id, value_list) in variable_to_values
+      var_size = get_vectorized_size(id_to_variables[id])
+      for i in 1:length(objectives)
+        if id in objectives[i]
+          push!(value_list, objectives[i][id])
+        else
+          push!(value_list, spzeros(num_rows * num_cols, var_size))
+        end
       end
+      objective[id] = vcat(value_list...)
     end
-    objective[id] = vcat(value_list...)
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return (objective, constraints)
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 hcat(args::AbstractExpr...) = HcatAtom(args...)
@@ -137,7 +140,7 @@ end
 
 # TODO evaluate
 
-function dual_conic_form(x::VcatAtom)
+function dual_conic_form(x::VcatAtom, unique_constr)
   # build a list of child conic objectives and constraints
   constraints = ConicConstr[]
   objectives = ConicObj[]

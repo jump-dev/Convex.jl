@@ -160,12 +160,14 @@ function vexity(c::SDPConstraint)
   end
 end
 
-# TODO cache constraints
-function dual_conic_form(c::SDPConstraint)
-  objective, constraints = dual_conic_form(c.lhs)
-  new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
-  push!(constraints, new_constraint)
-  return (objective, constraints)
+function dual_conic_form(c::SDPConstraint, unique_constr)
+  if !((c.head, c.children_hash) in unique_constr)
+    objective, constraints = dual_conic_form(c.lhs)
+    new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
+    push!(constraints, new_constraint)
+    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(c.head, c.children_hash)]
 end
 
 isposdef(x::AbstractExpr) = SDPConstraint(x)

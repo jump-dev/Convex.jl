@@ -36,14 +36,17 @@ end
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
-function dual_conic_form(x::EucNormAtom)
-  euc_norm = Variable()
-  objective, constraints = dual_conic_form(euc_norm)
-  child_objective, child_constraints = dual_conic_form(x.children[1])
-  append!(constraints, child_constraints)
-  soc_constraint = ConicConstr([objective, child_objective], :SOC, [1, get_vectorized_size(x.children[1])])
-  push!(constraints, soc_constraint)
-  return objective, constraints
+function dual_conic_form(x::EucNormAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    euc_norm = Variable()
+    objective, constraints = dual_conic_form(euc_norm)
+    child_objective, child_constraints = dual_conic_form(x.children[1])
+    append!(constraints, child_constraints)
+    soc_constraint = ConicConstr([objective, child_objective], :SOC, [1, get_vectorized_size(x.children[1])])
+    push!(constraints, soc_constraint)
+    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+  end
+  return unique_constr[(x.head, x.children_hash)]
 end
 
 norm2(x::AbstractExpr) = EucNormAtom(x)

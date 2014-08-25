@@ -43,11 +43,14 @@ end
 
 sum(x::AbstractExpr) = SumAtom(x)
 
-function dual_conic_form(e::SumAtom)
-  objective, constraints = dual_conic_form(e.children[1])
-  new_obj = ConicObj(copy(objective))
-  for var in keys(new_obj)
-    new_obj[var] = sum(new_obj[var], 1)
+function dual_conic_form(x::SumAtom, unique_constr)
+  if !((x.head, x.children_hash) in unique_constr)
+    objective, constraints = dual_conic_form(x.children[1], unique_constr)
+    new_obj = ConicObj(copy(objective))
+    for var in keys(new_obj)
+      new_obj[var] = sum(new_obj[var], 1)
+    end
+    unique_constr[(x.head, x.children_hash)] = new_obj, constraints
   end
-  return new_obj, constraints
+  return unique_constr[(x.head, x.children_hash)]
 end
