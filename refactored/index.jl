@@ -46,26 +46,29 @@ function evaluate(x::IndexAtom)
 end
 
 function dual_conic_form(x::IndexAtom)
-  index_matrix = spzeros(get_vectorized_size(x), get_vectorized_size(x.children[1]))
+  m = get_vectorized_size(x)
+  n = get_vectorized_size(x.children[1])
+
   if x.inds == nothing
-    index_matrix_row = 1
+    sz = length(x.cols) * length(x.rows)
+    J = Array(Int64, sz)
+    k = 1
+
     num_rows = x.children[1].size[1]
     for c in x.cols
       for r in x.rows
-        index_matrix_col = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
-        index_matrix[index_matrix_row, index_matrix_col] = 1
-        index_matrix_row += 1
+        J[k] = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
+        k += 1
       end
     end
+
+    index_matrix = sparse(1:sz, J, 1.0, m, n)
   else
-    index_matrix_row = 1
-    for i in x.inds
-      index_matrix[index_matrix_row, i] = 1
-      index_matrix_row += 1
-    end
+    index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
   end
   objective, constraints = dual_conic_form(x.children[1])
   objective = index_matrix * objective
+
   return (objective, constraints)
 end
 
