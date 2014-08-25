@@ -1,7 +1,6 @@
 export ConicObj, ConicConstr
 export +
 
-# TODO: @david, just make ConicObj = Dict{Uint64, Value}
 ConicObj = Dict{Uint64, Value}
 
 function -(c::ConicObj)
@@ -18,7 +17,7 @@ function +(c::ConicObj, d::ConicObj)
     if !haskey(new_obj, var)
       new_obj[var] = d[var]
     else
-      # .+ does not behave properly for sparse matrices
+      # .+ does not preserve sparsity
       # need to override behavior
       if size(new_obj[var]) == size(d[var])
         new_obj[var] = new_obj[var] + d[var]
