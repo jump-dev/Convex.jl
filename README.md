@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/cvxgrp/CVX.jl.png)](https://travis-ci.org/cvxgrp/CVX.jl)
 -->
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
+Convex.jl (previously named CVX.jl) is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
