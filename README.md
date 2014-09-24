@@ -1,10 +1,10 @@
-# CVX.jl
+# Convex.jl
 
 <!--
 [![Build Status](https://travis-ci.org/cvxgrp/CVX.jl.png)](https://travis-ci.org/cvxgrp/CVX.jl)
 -->
 
-CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
+Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -22,10 +22,10 @@ CVX.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanfo
 
 
 ## Introduction
-CVX.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and CVX.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
+Convex.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and Convex.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
-using CVX
+using Convex
 
 # Generate problem data
 m = 4
@@ -37,7 +37,7 @@ b = randn(m, 1)
 # Matrix variables are also supported
 x = Variable(n)
 
-# The problem is to minimize ||Ax + b||^2 subject to x >= 1
+# The problem is to minimize ||Ax + b||^2 subject to x >= 0
 problem = minimize(sum_squares(A * x + b), [0 <= x])
 
 # Alternatively, we can add constraints at any time in the following way:
@@ -61,7 +61,7 @@ problem.constraints[1].dual_value
 
 ## Installation
 ```
-Pkg.clone("https://github.com/cvxgrp/CVX.jl.git")
+Pkg.clone("https://github.com/cvxgrp/Convex.jl.git")
 Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
 Pkg.build("ECOS")  
 ```
@@ -96,7 +96,7 @@ y = sum(x)
 z = 4 * x + y
 z_1 = z[1]
 ```
-CVX.jl allows the values of the expressions to be evaluated directly. 
+Convex.jl allows the values of the expressions to be evaluated directly. 
 ```
 x = Variable()
 y = Variable()
@@ -151,7 +151,7 @@ After the problem is solved, the status can be checked by `problem.status`, whic
 
 
 ## Supported operations
-CVX.jl currently supports the following operations. Except where explicitly noted below, they work seamlessly for scalars, vectors and matrices. These atomic operations ("atoms") may be composed according to the [DCP](dcp.stanford.edu) composition rules to form new convex, concave, or affine expressions.
+Convex.jl currently supports the following operations. Except where explicitly noted below, they work seamlessly for scalars, vectors and matrices. These atomic operations ("atoms") may be composed according to the [DCP](dcp.stanford.edu) composition rules to form new convex, concave, or affine expressions.
 
 ### Affine atoms
 
@@ -272,7 +272,7 @@ solve!(p)
 ```
 
 ## Credits
-Currently, CVX.jl is developed and maintained by:
+Currently, Convex.jl is developed and maintained by:
 - [Jenny Hong](http://www.stanford.edu/~jyunhong/)
 - [Karanveer Mohan](http://www.stanford.edu/~kvmohan/)
 - [Madeleine Udell](http://www.stanford.edu/~udell/)
@@ -280,4 +280,4 @@ Currently, CVX.jl is developed and maintained by:
 
 In addition to development, we'd like to give a huge thanks to:
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University. He is also the co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html). We thank Professor Boyd for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): CVX.jl started out as a wrapper around Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy) and its design has been inspired from CVXPY. We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote http://dcp.stanford.edu/ to teach disciplined convex programming, a useful resource for CVX.jl users.
+- [Steven Diamond](http://www.stanford.edu/~stevend2/): Convex.jl started out as a wrapper around Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy) and its design has been inspired from CVXPY. We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote http://dcp.stanford.edu/ to teach disciplined convex programming, a useful resource for Convex.jl users.
