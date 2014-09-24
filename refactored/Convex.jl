@@ -1,4 +1,4 @@
-module CVX_refactor
+module Convex_refactor
 
 ### modeling framework
 include("dcp.jl")

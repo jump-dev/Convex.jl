@@ -14,6 +14,6 @@ before_install:
   - sudo apt-get install libpcre3-dev julia -y
 script:
   - julia -e 'Pkg.clone("git@github.com:karanveerm/ECOS.jl.git"); Pkg.build("ECOS");'
-  - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("CVX"))`); Pkg.pin("CVX"); Pkg.resolve()'
-  - julia -e 'using CVX; @assert isdefined(:CVX); @assert typeof(CVX) === Module'
-  - julia -e 'using CVX; include("$(Pkg.dir("CVX"))/test/test.jl");'
+  - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("Convex"))`); Pkg.pin("Convex"); Pkg.resolve()'
+  - julia -e 'using Convex; @assert isdefined(:Convex); @assert typeof(Convex) === Module'
+  - julia -e 'using Convex; include("$(Pkg.dir("Convex"))/test/test.jl");'

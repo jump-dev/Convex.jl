@@ -1,5 +1,5 @@
-include("CVX.jl")
-using CVX_refactor
+include("Convex.jl")
+using Convex_refactor
 using ECOS, SCS
 
 # Summation.

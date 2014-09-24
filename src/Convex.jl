@@ -1,4 +1,4 @@
-module CVX
+module Convex
 
 include("union.jl")
 include("expressions/expressions.jl")

@@ -1,6 +1,6 @@
 using Base.Test
-include("../CVX.jl")
-using CVX_refactor
+include("../Convex.jl")
+using Convex_refactor
 
 TOL = 1e-3
 

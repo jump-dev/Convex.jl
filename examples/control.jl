@@ -1,11 +1,11 @@
 # Simple control problem
 # Code was initially written by Jenny Hong for EE103
 # Translated to lsqpy by Keegan Go
-# Written in CVX.jl by Karanveer Mohan and David Zeng
+# Written in Convex.jl by Karanveer Mohan and David Zeng
 #
 # In this control problem, the object starts from the origin
 
-using CVX
+using Convex
 
 # Some constraints on our motion
 # The object should start from the origin, and end at rest
