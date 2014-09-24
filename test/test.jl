@@ -1,4 +1,4 @@
-using CVX
+using Convex
 
 TOLERANCE = .0001
 

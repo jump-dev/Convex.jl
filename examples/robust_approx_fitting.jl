@@ -1,9 +1,9 @@
 # Section 6.4.2
 # Boyd & Vandenberghe "Convex Optimization"
 # Original by Lieven Vandenberghe
-# Adapted for CVX by Joelle Skaf - 10/03/05
+# Adapted for Convex by Joelle Skaf - 10/03/05
 #
-# Adapted for CVX.jl by Karanveer Mohan and David Zeng - 26/05/14
+# Adapted for Convex.jl by Karanveer Mohan and David Zeng - 26/05/14
 # Original cvx code and plots here:
 # http://web.cvxr.com/cvx/examples/cvxbook/Ch06_approx_fitting/html/fig6_15.html
 #
@@ -21,7 +21,7 @@
 #           minimize sup{-1<=u<=1} ||(A+tB)x - b||_2)
 #      (reduces to minimizing max{||(A-B)x - b||_2, ||(A+B)x - b||_2} )
 
-using CVX
+using Convex
 
 # Input Data
 m = 20;

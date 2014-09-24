@@ -1,10 +1,10 @@
 # Convex.jl
 
 <!--
-[![Build Status](https://travis-ci.org/cvxgrp/CVX.jl.png)](https://travis-ci.org/cvxgrp/CVX.jl)
+[![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.png)](https://travis-ci.org/cvxgrp/Convex.jl)
 -->
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
+Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called Convex.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -33,7 +33,7 @@ n = 5
 A = randn(m, n)
 b = randn(m, 1)
 
-# Create a variable of size n x 1. 
+# Create a variable of size n x 1.
 # Matrix variables are also supported
 x = Variable(n)
 
@@ -41,7 +41,7 @@ x = Variable(n)
 problem = minimize(sum_squares(A * x + b), [0 <= x])
 
 # Alternatively, we can add constraints at any time in the following way:
-problem.constraints += [x <= 1, 0.5 <= 2*x] 
+problem.constraints += [x <= 1, 0.5 <= 2*x]
 
 # Solve the problem by calling solve!
 solve!(problem)
@@ -63,7 +63,7 @@ problem.constraints[1].dual_value
 ```
 Pkg.clone("https://github.com/cvxgrp/Convex.jl.git")
 Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
-Pkg.build("ECOS")  
+Pkg.build("ECOS")
 ```
 You might have to restart Julia.
 This does not work on Windows yet but should work on Mac/ Linux. Please file an issue in case you run into problems during installation. We'll be glad to help!
@@ -96,7 +96,7 @@ y = sum(x)
 z = 4 * x + y
 z_1 = z[1]
 ```
-Convex.jl allows the values of the expressions to be evaluated directly. 
+Convex.jl allows the values of the expressions to be evaluated directly.
 ```
 x = Variable()
 y = Variable()
@@ -110,7 +110,7 @@ expr.evaluate()
 ```
 
 ### Constraints
-Constants, Variables and Expressions,  combined with <, >, <=, >= and == create Constraints. 
+Constants, Variables and Expressions,  combined with <, >, <=, >= and == create Constraints.
 ```
 x = Variable(5, 5)
 # Equality constraint
@@ -126,7 +126,7 @@ constraints = [x + slack >= 0, slack >= 1e-4]
 ```
 
 ### Objective
-The objective of the problem is a scalar expression to be maximized or minimized by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`. 
+The objective of the problem is a scalar expression to be maximized or minimized by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`.
 
 ### Problem
 A problem is an objective and a list of constraints. These are constructed using the form
@@ -226,10 +226,10 @@ N = 20
 x = Variable(1) # x is a scalar variable
 y = Variable(N, N) # y is a 20 x 20 matrix variavble
 c = ones(N, 1)
-# We can add scalar variables to matrix variables. 
+# We can add scalar variables to matrix variables.
 # The following line is equivalent to c' * (y + eye(N) * x) * c
 # Similar overloading is done in other cases
-objective = c' * (y + x) * c 
+objective = c' * (y + x) * c
 p = minimize(objective, [x >= 3, 2y >= 0, y <= x])
 solve!(p)
 ```
@@ -280,4 +280,4 @@ Currently, Convex.jl is developed and maintained by:
 
 In addition to development, we'd like to give a huge thanks to:
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University. He is also the co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html). We thank Professor Boyd for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): Convex.jl started out as a wrapper around Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy) and its design has been inspired from CVXPY. We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote http://dcp.stanford.edu/ to teach disciplined convex programming, a useful resource for Convex.jl users.
+- [Steven Diamond](http://www.stanford.edu/~stevend2/): Convex.jl started out as a wrapper around Steven Diamond's [ConvexPY](https://github.com/cvxgrp/cvxpy) and its design has been inspired from ConvexPY. We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote http://dcp.stanford.edu/ to teach disciplined convex programming, a useful resource for Convex.jl users.
