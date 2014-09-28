@@ -27,11 +27,9 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   problem.optval = problem.solution.optval
   problem.status = problem.solution.status
 
-  if problem.status == :Optimal
-    populate_variables!(problem, variable_index)
-    if problem.solution.dual
-      populate_constraints!(problem, eq_constr_index, ineq_constr_index)
-    end
+  populate_variables!(problem, variable_index)
+  if problem.solution.dual
+    populate_constraints!(problem, eq_constr_index, ineq_constr_index)
   end
 end
 
