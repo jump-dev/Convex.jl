@@ -1,44 +1,31 @@
 module Convex
 
-include("union.jl")
-include("expressions/expressions.jl")
-include("constraints/constraints.jl")
-include("problems/problems.jl")
-include("problems/conicproblem.jl")
+### modeling framework
+include("dcp.jl")
+include("expressions.jl")
+include("variable.jl")
+include("constant.jl")
+include("conic_form.jl")
+include("constraints.jl")
+include("problems.jl")
 include("solution.jl")
-include("solvers/ecos.jl")
-include("utilities/promotions.jl")
-include("utilities/utilities.jl")
-include("utilities/display.jl")
 
-# Atoms
-include("atoms/affine/add_subtract.jl")
-include("atoms/affine/dot.jl")
-include("atoms/affine/index.jl")
-include("atoms/affine/multiply_divide.jl")
-include("atoms/affine/stack.jl")
-include("atoms/affine/sum.jl")
-include("atoms/affine/reshape.jl")
-include("atoms/affine/transpose.jl")
-include("atoms/affine/diag.jl")
+### affine atoms
+include("add_subtract.jl")
+include("multiply_divide.jl")
+include("sum.jl")
+include("abs.jl")
+include("transpose.jl")
+include("index.jl")
+include("diag.jl")
+include("stack.jl")
 
-include("atoms/elementwise/min.jl")
-include("atoms/elementwise/max.jl")
-include("atoms/elementwise/pos.jl")
-include("atoms/elementwise/neg.jl")
-include("atoms/elementwise/abs.jl")
-include("atoms/elementwise/sqrt.jl")
-include("atoms/elementwise/square.jl")
-include("atoms/elementwise/square_pos.jl")
-include("atoms/elementwise/qol_elementwise.jl")
-include("atoms/elementwise/inv_pos.jl")
-include("atoms/elementwise/geo_mean.jl")
+### SOC atoms
+include("norm2.jl")
 
-include("atoms/norm.jl")
-include("atoms/quad_form.jl")
-include("atoms/sum_squares.jl")
-include("atoms/quad_over_lin.jl")
+### SDP atoms
+include("matrix_norm.jl")
 
-include("macros/macro.jl")
+### exponential atoms
 
-end # module
+end
