@@ -3,14 +3,14 @@
 # This file handles the basic rules on interactions of mathematical expressions
 # to create new expressions.
 #
-# For example: negative of a concave expression is convex, or multiplication
+# For example: negative of a concaveVexity expression is convexVexity, or multiplication
 # of two positive expressions continue to be positive.
 #
 # See: http://dcp.stanford.edu/rules or the original paper at
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-export Vexity, ConstVexity, Affine, Convex, Concave, NotDcp
+export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign, Semidefinite
 export -, +, *
@@ -18,9 +18,9 @@ export -, +, *
 # Vexity subtypes
 abstract Vexity
 type ConstVexity <: Vexity              end
-type Affine <: Vexity                   end
-type Convex <: Vexity                   end
-type Concave <: Vexity                  end
+type AffineVexity <: Vexity                   end
+type ConvexVexity <: Vexity                   end
+type ConcaveVexity <: Vexity                  end
 type NotDcp <: Vexity                   end
 
 # Monotonocity subtypes
@@ -38,8 +38,8 @@ type NoSign <: Sign                     end
 type Semidefinite <: Sign               end
 
 -(v::Vexity) = v
--(v::Concave) = Convex()
--(v::Convex) = Concave()
+-(v::ConcaveVexity) = ConvexVexity()
+-(v::ConvexVexity) = ConcaveVexity()
 
 -(m::Monotonicity) = m
 -(m::Nonincreasing) = Nondecreasing()
@@ -59,16 +59,16 @@ type Semidefinite <: Sign               end
 +(v::ConstVexity, w::Vexity) = w
 +(v::Vexity, w::ConstVexity) = v
 
-+(v::Affine, w::Affine) = v
-+(v::Affine, w::Convex) = w
-+(v::Convex, w::Affine) = v
-+(v::Affine, w::Concave) = w
-+(v::Concave, w::Affine) = v
++(v::AffineVexity, w::AffineVexity) = v
++(v::AffineVexity, w::ConvexVexity) = w
++(v::ConvexVexity, w::AffineVexity) = v
++(v::AffineVexity, w::ConcaveVexity) = w
++(v::ConcaveVexity, w::AffineVexity) = v
 
-+(v::Convex, w::Convex) = v
-+(v::Concave, w::Concave) = v
-+(v::Concave, w::Convex) = NotDcp()
-+(v::Convex, w::Concave) = NotDcp()
++(v::ConvexVexity, w::ConvexVexity) = v
++(v::ConcaveVexity, w::ConcaveVexity) = v
++(v::ConcaveVexity, w::ConvexVexity) = NotDcp()
++(v::ConvexVexity, w::ConcaveVexity) = NotDcp()
 
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
@@ -93,5 +93,5 @@ type Semidefinite <: Sign               end
 *(m::Nondecreasing, v::Vexity) = v
 *(m::Nonincreasing, v::Vexity) = -v
 *(m::NoMonotonicity, v::Vexity) = v
-*(m::NoMonotonicity, v::Convex) = NotDcp()
-*(m::NoMonotonicity, v::Concave) = NotDcp()
+*(m::NoMonotonicity, v::ConvexVexity) = NotDcp()
+*(m::NoMonotonicity, v::ConcaveVexity) = NotDcp()

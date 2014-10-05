@@ -15,7 +15,7 @@ type Variable <: AbstractExpr
   sign::Sign
 
   function Variable(size::(Int64, Int64), sign::Sign=NoSign())
-    this = new(:variable, 0, nothing, size, Affine(), sign)
+    this = new(:variable, 0, nothing, size, AffineVexity(), sign)
     this.id = object_id(this)
     id_to_variables[this.id] = this
     return this

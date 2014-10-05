@@ -1,6 +1,6 @@
 using Base.Test
 include("../Convex.jl")
-using Convex_refactor
+using Convex
 
 TOL = 1e-3
 

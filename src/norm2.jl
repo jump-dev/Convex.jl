@@ -31,7 +31,7 @@ function monotonicity(x::EucNormAtom)
 end
 
 function curvature(x::EucNormAtom)
-  return Convex()
+  return ConvexVexity()
 end
 
 ## Create a new variable euc_norm to represent the norm

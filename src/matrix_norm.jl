@@ -33,7 +33,7 @@ function monotonicity(x::NuclearNormAtom)
 end
 
 function curvature(x::NuclearNormAtom)
-  return Convex()
+  return ConvexVexity()
 end
 
 function evaluate(x::NuclearNormAtom)
@@ -92,7 +92,7 @@ function monotonicity(x::OperatorNormAtom)
 end
 
 function curvature(x::OperatorNormAtom)
-  return Convex()
+  return ConvexVexity()
 end
 
 # XXX verify this returns all the eigenvalues even in new versions of julia (>=3.0)

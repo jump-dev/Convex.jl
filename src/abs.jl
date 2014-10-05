@@ -32,7 +32,7 @@ function monotonicity(x::AbsAtom)
 end
 
 function curvature(x::AbsAtom)
-  return Convex()
+  return ConvexVexity()
 end
 
 function evaluate(x::AbsAtom)
