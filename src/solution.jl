@@ -1,7 +1,7 @@
-import MathProgBase, SCS, ECOS
+import MathProgBase, ECOS
 export solve!
 
-function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
+function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
 
   c, A, b, cones = conic_problem(problem)
 

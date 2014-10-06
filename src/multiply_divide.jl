@@ -66,7 +66,16 @@ function conic_form(x::MultiplyAtom, unique_constr)
         expr_child = x.children[1]
       end
       objective, constraints = conic_form(expr_child, unique_constr)
-      objective = reshape([const_child.value], get_vectorized_size(const_child), 1) * objective
+
+      # make sure all 1x1 sized objects are interpreted as scalars, since
+      # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
+      if const_child.size == (1, 1)
+        const_multiplier = const_child.value[1]
+      else
+        const_multiplier = reshape(const_child.value, get_vectorized_size(const_child), 1)
+      end
+
+      objective = const_multiplier * objective
 
     # left matrix multiplication
     elseif x.children[1].head == :constant
@@ -74,7 +83,7 @@ function conic_form(x::MultiplyAtom, unique_constr)
       objective = kron(speye(x.size[2]), x.children[1].value) * objective
     # right matrix multiplication
     else
-      objective, constraints = conic_form(x.children[2], unique_constr)
+      objective, constraints = conic_form(x.children[1], unique_constr)
       objective = kron(x.children[2].value', speye(x.size[1])) * objective
     end
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
