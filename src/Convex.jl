@@ -24,6 +24,8 @@ include("dot.jl")
 ### elementwise atoms
 include("maximum.jl")
 include("minimum.jl")
+include("max.jl")
+include("min.jl")
 
 ### SOC atoms
 include("norm2.jl")
