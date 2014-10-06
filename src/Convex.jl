@@ -11,27 +11,27 @@ include("problems.jl")
 include("solution.jl")
 
 ### affine atoms
-include("add_subtract.jl")
-include("multiply_divide.jl")
-include("sum.jl")
-include("abs.jl")
-include("transpose.jl")
-include("index.jl")
-include("diag.jl")
-include("stack.jl")
-include("dot.jl")
+include("atoms/affine/add_subtract.jl")
+include("atoms/affine/multiply_divide.jl")
+include("atoms/affine/sum.jl")
+include("atoms/affine/transpose.jl")
+include("atoms/affine/index.jl")
+include("atoms/affine/diag.jl")
+include("atoms/affine/stack.jl")
+include("atoms/affine/dot.jl")
 
 ### elementwise atoms
-include("maximum.jl")
-include("minimum.jl")
-include("max.jl")
-include("min.jl")
+include("atoms/abs.jl")
+include("atoms/maximum.jl")
+include("atoms/minimum.jl")
+include("atoms/max.jl")
+include("atoms/min.jl")
 
 ### SOC atoms
-include("norm2.jl")
+include("atoms/second_order_cone/norm2.jl")
 
 ### SDP atoms
-include("matrix_norm.jl")
+include("atoms/matrix_norm.jl")
 
 ### exponential atoms
 
