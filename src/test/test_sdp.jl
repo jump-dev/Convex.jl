@@ -16,6 +16,7 @@ y = Variable((2,2), Semidefinite())
 p = minimize(y[1,1], y[2,1]==1)
 println(conic_problem(p))
 solve!(p, SCS.SCSMathProgModel())
+println(p.solution)
 @test_approx_eq_eps p.optval 1 TOL
 
 # SDP variables twice

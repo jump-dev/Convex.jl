@@ -1,8 +1,14 @@
 import Base.isposdef
-export Constraint, EqConstraint, LtConstraint, GtConstraint, SDPConstraint, isposdef
+export EqConstraint, LtConstraint, GtConstraint, SDPConstraint, isposdef
 export ==, <=, >=
 
-abstract Constraint
+function conic_form(abstractconstr::Array{Constraint, 1}, unique_constr)
+  conicconstraints = ConicConstr[]
+  for constraint in abstractconstr
+    append!(conicconstraints, conic_form(constraint, unique_constr)[2])
+  end
+  return ConicObj(), conicconstraints
+end
 
 ### Linear equality constraint
 type EqConstraint <: Constraint

@@ -30,15 +30,16 @@
 #############################################################################
 
 import Base.sign, Base.size, Base.endof, Base.ndims
-export AbstractExpr
+export AbstractExpr, Constraint
 export vexity, sign, size, evaluate, monotonicity, curvature
 export conic_form
 export endof, ndims
 export Value, ValueOrNothing
 export get_vectorized_size
 
-### Abstract type
+### Abstract types
 abstract AbstractExpr
+abstract Constraint
 
 # If h(x)=f∘g(x), then (for single variable calculus)
 # h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)

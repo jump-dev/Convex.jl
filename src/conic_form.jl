@@ -50,4 +50,3 @@ type ConicConstr
   cone::Symbol
   sizes::Array{Int64}
 end
-

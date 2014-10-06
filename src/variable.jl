@@ -13,11 +13,21 @@ type Variable <: AbstractExpr
   size::(Int64, Int64)
   vexity::Vexity
   sign::Sign
+  implied_constraints::Array{Constraint, 1}
 
   function Variable(size::(Int64, Int64), sign::Sign=NoSign())
-    this = new(:variable, 0, nothing, size, AffineVexity(), sign)
+    this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[])
     this.id = object_id(this)
     id_to_variables[this.id] = this
+    if !(sign == NoSign())
+      if sign == Positive()
+        push!(this.implied_constraints, this >= 0)
+      elseif sign == Negative()
+        push!(this.implied_constraints, this <= 0)
+      elseif sign == Semidefinite()
+        push!(this.implied_constraints, SDPConstraint(this))
+      end
+    end
     return this
   end
 
@@ -54,24 +64,9 @@ function conic_form(x::Variable, unique_constr)
     vec_size = get_vectorized_size(x)
     objective[x.id] = speye(vec_size)
     objective[object_id(:constant)] = spzeros(vec_size, 1)
-    constraints = sign_constraint(x.sign, objective, vec_size)
+    unique_constr[(x.head, x.id)] = (objective, ConicConstr[])
+    _, constraints = conic_form(x.implied_constraints, unique_constr)
     unique_constr[(x.head, x.id)] = (objective, constraints)
   end
   return unique_constr[(x.head, x.id)]
-end
-
-function sign_constraint(s::NoSign, objective, vec_size)
-  return ConicConstr[]
-end
-
-function sign_constraint(s::Positive, objective, vec_size)
-  return [ConicConstr([objective], :NonNeg, [vec_size])]
-end
-
-function sign_constraint(s::Negative, objective, vec_size)
-  return [ConicConstr([-objective], :NonNeg, [vec_size])]
-end
-
-function sign_constraint(s::Semidefinite, objective, vec_size)
-  return [ConicConstr([objective], :SDP, [vec_size])]
 end
