@@ -13,7 +13,7 @@ solve!(p, SCS.SCSMathProgModel())
 
 # SDP variables twice
 y = Variable((2,2), Semidefinite())
-p = minimize(y[1,1], y[2,1]==1)
+p = minimize(y[1,1], y[1,2]==1)
 println(conic_problem(p))
 solve!(p, SCS.SCSMathProgModel())
 println(p.solution)

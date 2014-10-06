@@ -64,8 +64,10 @@ function conic_form(x::Variable, unique_constr)
     vec_size = get_vectorized_size(x)
     objective[x.id] = speye(vec_size)
     objective[object_id(:constant)] = spzeros(vec_size, 1)
+    # placeholder values in unique constraints prevent infinite recursion depth
     unique_constr[(x.head, x.id)] = (objective, ConicConstr[])
     _, constraints = conic_form(x.implied_constraints, unique_constr)
+    # now fill in the real constraints
     unique_constr[(x.head, x.id)] = (objective, constraints)
   end
   return unique_constr[(x.head, x.id)]
