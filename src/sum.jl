@@ -9,7 +9,6 @@ import Base.sum
 export sum
 
 ### Sum Atom
-### ToDo: add support for sum(x, 1) and sum(x, 2)
 type SumAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
@@ -37,7 +36,7 @@ function curvature(x::SumAtom)
   return ConstVexity()
 end
 
-function evaluate(x::NegateAtom)
+function evaluate(x::SumAtom)
   return sum(evaluate(x.children[1]))
 end
 

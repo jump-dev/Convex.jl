@@ -21,6 +21,10 @@ include("diag.jl")
 include("stack.jl")
 include("dot.jl")
 
+### elementwise atoms
+include("maximum.jl")
+include("minimum.jl")
+
 ### SOC atoms
 include("norm2.jl")
 
