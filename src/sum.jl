@@ -44,7 +44,7 @@ end
 # x = Ay where A was a coefficient. Then sum(x) can also be considered
 # sum(A, 1) * y
 function conic_form(x::SumAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     objective, constraints = conic_form(x.children[1], unique_constr)
     new_obj = ConicObj(copy(objective))
     for var in keys(new_obj)

@@ -37,7 +37,7 @@ end
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function conic_form(x::EucNormAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     euc_norm = Variable()
     objective, constraints = conic_form(euc_norm, unique_constr)
     child_objective, child_constraints = conic_form(x.children[1], unique_constr)

@@ -49,7 +49,7 @@ nuclear_norm(x::AbstractExpr) = NuclearNormAtom(x)
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
 # http://arxiv.org/pdf/0706.4138v1.pdf
 function conic_form(x::NuclearNormAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     A = x.children[1]
     m, n = size(A)
     U = Variable(m,m)
@@ -110,7 +110,7 @@ sigma_max(x::AbstractExpr) = OperatorNormAtom(x)
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
 # http://arxiv.org/pdf/0706.4138v1.pdf
 function conic_form(x::OperatorNormAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     A = x.children[1]
     m, n = size(A)
     t = Variable()

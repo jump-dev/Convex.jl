@@ -47,7 +47,9 @@ function sign(x::Variable)
 end
 
 function conic_form(x::Variable, unique_constr)
-  if !((x.head, x.id) in unique_constr)
+  #println("checking if $(x.head), $(hex(x.id)) in ", collect(keys(unique_constr)))
+  if !((x.head, x.id) in keys(unique_constr))
+    #println("putting $(x.head), $(hex(x.id)) in keys(unique_constr)")
     objective = ConicObj()
     vec_size = get_vectorized_size(x)
     objective[x.id] = speye(vec_size)

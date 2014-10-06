@@ -40,7 +40,7 @@ end
 # Since everything is vectorized, we simply need to multiply x by a permutation
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
 function conic_form(x::TransposeAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     objective, constraints = conic_form(x.children[1], unique_constr)
 
     sz = get_vectorized_size(x)

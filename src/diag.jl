@@ -62,7 +62,7 @@ diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
 # The canonical form will then be:
 # coeff * x - d = 0
 function conic_form(x::DiagAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     (num_rows, num_cols) = x.children[1].size
     k = x.children[2]
 

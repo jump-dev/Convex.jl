@@ -42,7 +42,7 @@ end
 # x >= this if minimum(x) = this
 # so, x - this will be in the :NonNeg cone
 function conic_form(x::MinimumAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     this = Variable()
     objective, constraints = conic_form(this, unique_constr)
     expr = x.children[1] - this

@@ -34,7 +34,7 @@ function vexity(c::EqConstraint)
 end
 
 function conic_form(c::EqConstraint, unique_constr)
-  if !((c.head, c.children_hash) in unique_constr)
+  if !((c.head, c.children_hash) in keys(unique_constr))
     expr = c.lhs - c.rhs
     objective, constraints = conic_form(expr, unique_constr)
     new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
@@ -78,7 +78,7 @@ function vexity(c::LtConstraint)
 end
 
 function conic_form(c::LtConstraint, unique_constr)
-  if !((c.head, c.children_hash) in unique_constr)
+  if !((c.head, c.children_hash) in keys(unique_constr))
     expr = c.rhs - c.lhs
     objective, constraints = conic_form(expr, unique_constr)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
@@ -120,7 +120,7 @@ function vexity(c::GtConstraint)
 end
 
 function conic_form(c::GtConstraint, unique_constr)
-  if !((c.head, c.children_hash) in unique_constr)
+  if !((c.head, c.children_hash) in keys(unique_constr))
     expr = c.lhs - c.rhs
     objective, constraints = conic_form(expr, unique_constr)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
@@ -161,7 +161,9 @@ function vexity(c::SDPConstraint)
 end
 
 function conic_form(c::SDPConstraint, unique_constr)
-  if !((c.head, c.children_hash) in unique_constr)
+  #println("checking if $((c.head, c.children_hash)) in $(keys(unique_constr))")
+  if !((c.head, c.children_hash) in keys(unique_constr))
+    #println("putting $((c.head, c.children_hash)) in keys(unique_constr)")
     objective, constraints = conic_form(c.lhs, unique_constr)
     new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
     push!(constraints, new_constraint)

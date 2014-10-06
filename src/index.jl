@@ -15,13 +15,13 @@ type IndexAtom <: AbstractExpr
   function IndexAtom(x::AbstractExpr, rows::AbstractArray, cols::AbstractArray)
     sz = (length(rows), length(cols))
     children = (x,)
-    return new(:index, hash(children), children, sz, rows, cols, nothing)
+    return new(:index, hash((children, rows, cols, nothing)), children, sz, rows, cols, nothing)
   end
 
   function IndexAtom(x::AbstractExpr, inds::AbstractArray)
     sz = (length(inds), 1)
     children = (x,)
-    return new(:index, hash(children), children, sz, nothing, nothing, inds)
+    return new(:index, hash((children, nothing, nothing, inds)), children, sz, nothing, nothing, inds)
   end
 end
 
@@ -46,7 +46,7 @@ function evaluate(x::IndexAtom)
 end
 
 function conic_form(x::IndexAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     m = get_vectorized_size(x)
     n = get_vectorized_size(x.children[1])
 

@@ -38,7 +38,7 @@ end
 
 
 function conic_form(x::HcatAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     # build a list of child conic objectives and constraints
     constraints = ConicConstr[]
     objectives = ConicObj[]

@@ -60,7 +60,7 @@ end
 
 # x >= this and y >= this if min(x, y) = this
 function conic_form(x::MinAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     this = Variable(x.size[1], x.size[2])
     objective, constraints = conic_form(this, unique_constr)
     for child in x.children

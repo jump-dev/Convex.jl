@@ -42,7 +42,7 @@ end
 abs(x::AbstractExpr) = AbsAtom(x)
 
 function conic_form(x::AbsAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     c = x.children[1]
     t = Variable(size(c))
     objective, constraints = conic_form(t, unique_constr)

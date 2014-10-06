@@ -1,4 +1,4 @@
-import MathProgBase, ECOS
+import MathProgBase, ECOS, SCS
 export solve!
 
 function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
@@ -14,9 +14,11 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   if typeof(m) == ECOS.ECOSMathProgModel
     ECOS.loadineqconicproblem!(m, full(c), A, full(b), cones)
     ECOS.optimize!(m)
-  else
+  elseif typeof(m) == SCS.SCSMathProgModel
     SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
     SCS.optimize!(m)
+  else
+    error("model type $(typeof(m)) not recognized")
   end
 
   try

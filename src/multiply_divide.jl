@@ -55,7 +55,7 @@ function evaluate(x::MultiplyAtom)
 end
 
 function conic_form(x::MultiplyAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
       if x.children[1].head == :constant

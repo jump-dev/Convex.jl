@@ -42,7 +42,7 @@ end
 -(x::AbstractExpr) = NegateAtom(x)
 
 function conic_form(x::NegateAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     objective, constraints = conic_form(x.children[1], unique_constr)
     objective = -objective
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
@@ -89,7 +89,7 @@ function evaluate(x::AdditionAtom)
 end
 
 function conic_form(x::AdditionAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     objective, constraints = conic_form(x.children[1], unique_constr)
     objective2, constraints2 = conic_form(x.children[2], unique_constr)
     if x.children[1].size != x.children[2].size

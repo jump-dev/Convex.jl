@@ -43,7 +43,7 @@ end
 
 function conic_form(x::Constant, unique_constr)
   id = object_id(x.value)
-  if !((x.head, id) in unique_constr)
+  if !((x.head, id) in keys(unique_constr))
     objective = ConicObj()
     objective[object_id(:constant)] = vec([x.value])
     unique_constr[(x.head, id)] = (objective, ConicConstr[])

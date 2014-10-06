@@ -42,7 +42,7 @@ end
 # x <= this if maximum(x) = this
 # so, this - x will be in the :NonNeg cone
 function conic_form(x::MaximumAtom, unique_constr)
-  if !((x.head, x.children_hash) in unique_constr)
+  if !((x.head, x.children_hash) in keys(unique_constr))
     this = Variable()
     objective, constraints = conic_form(this, unique_constr)
     expr = this - x.children[1]
