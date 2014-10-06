@@ -25,12 +25,12 @@ type EqConstraint <: Constraint
 end
 
 function vexity(c::EqConstraint)
-  vexity = vexity(lhs) + (-vexity(rhs))
+  vex = vexity(lhs) + (-vexity(rhs))
   # You can't have equality constraints with concave/convex expressions
-  if vexity == ConvexVexity() || vexity == ConcaveVexity()
-    vexity = NotDcp()
+  if vex == ConvexVexity() || vex == ConcaveVexity()
+    vex = NotDcp()
   end
-  return vexity
+  return vex
 end
 
 function conic_form(c::EqConstraint, unique_constr)
@@ -70,11 +70,11 @@ type LtConstraint <: Constraint
 end
 
 function vexity(c::LtConstraint)
-  vexity = vexity(lhs) + (-vexity(rhs))
-  if vexity == ConcaveVexity()
-    vexity = NotDcp()
+  vex = vexity(lhs) + (-vexity(rhs))
+  if vex == ConcaveVexity()
+    vex = NotDcp()
   end
-  return vexity
+  return vex
 end
 
 function conic_form(c::LtConstraint, unique_constr)
@@ -112,11 +112,11 @@ type GtConstraint <: Constraint
 end
 
 function vexity(c::GtConstraint)
-  vexity = vexity(lhs) + (-vexity(rhs))
-  if vexity == ConvexVexity()
-    vexity = NotDcp()
+  vex = vexity(lhs) + (-vexity(rhs))
+  if vex == ConvexVexity()
+    vex = NotDcp()
   end
-  return vexity
+  return vex
 end
 
 function conic_form(c::GtConstraint, unique_constr)
@@ -152,8 +152,8 @@ type SDPConstraint <: Constraint
 end
 
 function vexity(c::SDPConstraint)
-  vexity = vexity(c.lhs)
-  if vexity == AffineVexity() || vexity == ConstVexity()
+  vex = vexity(c.lhs)
+  if vex == AffineVexity() || vex == ConstVexity()
     return AffineVexity()
   else
     return NotDCP()

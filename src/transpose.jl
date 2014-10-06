@@ -70,3 +70,5 @@ end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
 ctranspose(x::AbstractExpr) = transpose(x)
+ctranspose(x::Constant) = Constant(x.value')
+ctranspose(x::Constant) = Constant(x.value')

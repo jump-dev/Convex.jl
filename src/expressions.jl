@@ -45,11 +45,11 @@ abstract AbstractExpr
 # We calculate the vexity according to this
 function vexity(x::AbstractExpr)
   monotonicities = monotonicity(x)
-  vexity = curvature(x)
+  vex = curvature(x)
   for i = 1:length(x.children)
-    vexity += monotonicities[i] * vexity(x.children[i])
+    vex += monotonicities[i] * vexity(x.children[i])
   end
-  return vexity
+  return vex
 end
 
 # This function should never be reached

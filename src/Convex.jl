@@ -19,6 +19,7 @@ include("transpose.jl")
 include("index.jl")
 include("diag.jl")
 include("stack.jl")
+include("dot.jl")
 
 ### SOC atoms
 include("norm2.jl")
@@ -28,4 +29,6 @@ include("matrix_norm.jl")
 
 ### exponential atoms
 
+### utilities
+include("utilities/show.jl")
 end

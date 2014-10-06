@@ -123,7 +123,7 @@ satisfy{T<:Constraint}(constraints::Array{T}=Constraint[]) =
   Problem(:minimize, Constant(0), constraints)
 satisfy(constraint::Constraint) = satisfy([constraint])
 
-# +(constraints, constraints) is overwritten in constraints.jl
+# +(constraints, constraints) is defined in constraints.jl
 add_constraints!{T<:Constraint}(p::Problem, constraints::Array{T}) = +(p.constraints, constraints)
 add_constraints!(p::Problem, constraint::Constraint) = add_constraints!(p, [constraint])
 add_constraint! = add_constraints!
