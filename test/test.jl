@@ -100,7 +100,7 @@ solve!(p)
 # Test 15
 x = Variable(1)
 c = ones(2, 1)
-p = minimize(c' * (x .+ eye(2)) * c, [x .+ eye(3) >= 2 * eye(3), -eye(4) < x])
+p = minimize(c' * (x .+ eye(2)) * c, [x .+ eye(3) >= 2 * eye(3), -eye(4) <= x])
 solve!(p)
 @assert abs(p.optval - 6) < TOLERANCE
 
@@ -162,7 +162,7 @@ solve!(p)
 # Test 22
 x = Variable(10)
 a = rand(10, 1)
-p = minimize(max(x), x >= a)
+p = minimize(maximum(x), x >= a)
 solve!(p)
 @assert abs(p.optval - Base.maximum(a)) < TOLERANCE
 
@@ -171,7 +171,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = minimize(max(max(x, y)), [x >= a, y >= b])
+p = minimize(maximum(max(x, y)), [x >= a, y >= b])
 solve!(p)
 max_a = Base.maximum(a)
 max_b = Base.maximum(b)
@@ -180,7 +180,7 @@ max_b = Base.maximum(b)
 # Test 24
 x = Variable(1)
 a = rand(10, 10)
-p = maximize(min(x), x <= a)
+p = maximize(minimum(x), x <= a)
 solve!(p)
 @assert abs(p.optval - Base.minimum(a)) < TOLERANCE
 
@@ -189,7 +189,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = maximize(min(min(x, y)), [x <= a, y <= b])
+p = maximize(minimum(min(x, y)), [x <= a, y <= b])
 solve!(p)
 min_a = Base.minimum(a)
 min_b = Base.minimum(b)

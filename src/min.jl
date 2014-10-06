@@ -4,15 +4,15 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.minimum
-export minimum
+import Base.min
+export min
 
 # TODO: This can easily be extended to work
 ### Min Atom
 type MinAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
-  children::(AbstractExpr,)
+  children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
   function MinAtom(x::AbstractExpr, y::AbstractExpr)
@@ -34,10 +34,10 @@ end
 function sign(x::MinAtom)
   sign_one = sign(x.children[1])
   sign_two = sign(x.children[2])
-  if sign_one == Positive() || sign_two == Positive()
-    return Positive()
-  elseif sign_one == Negative() && sign_two == Negative()
+  if sign_one == Negative() || sign_two == Negative()
     return Negative()
+  elseif sign_one == Positive() && sign_two == Positive()
+    return Positive()
   else
     return sign_one + sign_two
   end
@@ -45,13 +45,13 @@ end
 
 # The monotonicity
 function monotonicity(x::MinAtom)
-  return (Nondecreasing(),)
+  return (Nonincreasing(), Nonincreasing())
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
 # this represents the first term
 function curvature(x::MinAtom)
-  return ConvexVexity()
+  return ConcaveVexity()
 end
 
 function evaluate(x::MinAtom)
@@ -65,14 +65,14 @@ function conic_form(x::MinAtom, unique_constr)
     objective, constraints = conic_form(this, unique_constr)
     for child in x.children
       expr = child - this
-      _, expr_constraints = conic_form(expr, unique_constr)
+      expr_objective, expr_constraints = conic_form(expr, unique_constr)
       append!(constraints, expr_constraints)
+      new_constraint = ConicConstr([expr_objective], :NonNeg, [get_vectorized_size(expr)])
+      push!(constraints, new_constraint)
     end
-    new_constraint = ConicConstr([objective], :NonNeg, [get_vectorized_size(x)])
-    push!(constraints, new_constraint)
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
   return unique_constr[(x.head, x.children_hash)]
 end
 
-min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x)
+min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)

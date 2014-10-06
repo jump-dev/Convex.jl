@@ -97,6 +97,10 @@ end
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
 <=(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
 <=(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
+<(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
+<(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+
 
 type GtConstraint <: Constraint
   head::Symbol
@@ -139,7 +143,9 @@ end
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
 >=(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
 >=(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
-
+>(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
+>(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
+>(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
 
 ### Positive semidefinite cone constraint
 type SDPConstraint <: Constraint

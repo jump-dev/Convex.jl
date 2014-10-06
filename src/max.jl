@@ -12,7 +12,7 @@ export max
 type MaxAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
-  children::(AbstractExpr,)
+  children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
   function MaxAtom(x::AbstractExpr, y::AbstractExpr)
@@ -45,7 +45,7 @@ end
 
 # The monotonicity
 function monotonicity(x::MaxAtom)
-  return (Nondecreasing(),)
+  return (Nondecreasing(), Nondecreasing())
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
@@ -65,14 +65,14 @@ function conic_form(x::MaxAtom, unique_constr)
     objective, constraints = conic_form(this, unique_constr)
     for child in x.children
       expr = this - child
-      _, expr_constraints = conic_form(expr, unique_constr)
+      expr_objective, expr_constraints = conic_form(expr, unique_constr)
       append!(constraints, expr_constraints)
+      new_constraint = ConicConstr([expr_objective], :NonNeg, [get_vectorized_size(expr)])
+      push!(constraints, new_constraint)
     end
-    new_constraint = ConicConstr([objective], :NonNeg, [get_vectorized_size(x)])
-    push!(constraints, new_constraint)
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
   return unique_constr[(x.head, x.children_hash)]
 end
 
-max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x)
+max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)

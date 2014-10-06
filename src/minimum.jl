@@ -46,9 +46,9 @@ function conic_form(x::MinimumAtom, unique_constr)
     this = Variable()
     objective, constraints = conic_form(this, unique_constr)
     expr = x.children[1] - this
-    _, expr_constraints = conic_form(expr, unique_constr)
+    expr_objective, expr_constraints = conic_form(expr, unique_constr)
     append!(constraints, expr_constraints)
-    new_constraint = ConicConstr([objective], :NonNeg, [get_vectorized_size(x)])
+    new_constraint = ConicConstr([expr_objective], :NonNeg, [get_vectorized_size(expr)])
     push!(constraints, new_constraint)
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
