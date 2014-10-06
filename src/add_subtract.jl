@@ -61,12 +61,13 @@ type AdditionAtom <: AbstractExpr
   function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == y.size || y.size == (1, 1)
       sz = x.size
+      children = (x, y)
     elseif x.size == (1, 1)
       sz = y.size
+      children = (y, x)
     else
       error("Cannot add expressions of sizes $(x.size) and $(y.size)")
     end
-    children = (x, y)
     return new(:+, hash(children), children, sz)
   end
 end
@@ -91,6 +92,9 @@ function conic_form(x::AdditionAtom, unique_constr)
   if !((x.head, x.children_hash) in unique_constr)
     objective, constraints = conic_form(x.children[1], unique_constr)
     objective2, constraints2 = conic_form(x.children[2], unique_constr)
+    if x.children[1].size != x.children[2].size
+      objective2 = promote_size(objective2, get_vectorized_size(x.children[1]))
+    end
     append!(constraints, constraints2)
     objective += objective2
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)

@@ -1,5 +1,5 @@
 export ConicObj, ConicConstr
-export +
+export +, -, *, promote_size
 
 ConicObj = Dict{Uint64, Value}
 
@@ -37,6 +37,13 @@ function *(v::Value, c::ConicObj)
   return new_obj
 end
 
+function promote_size(c::ConicObj, vectorized_size::Int64)
+  new_obj = copy(c)
+  for var in keys(new_obj)
+    new_obj[var] = repmat(new_obj[var], vectorized_size, 1)
+  end
+  return new_obj
+end
 
 type ConicConstr
   objs::Array{ConicObj}
