@@ -122,7 +122,7 @@ end
 function conic_form(c::GtConstraint, unique_constr)
   if !((c.head, c.children_hash) in unique_constr)
     expr = c.lhs - c.rhs
-    objective, constraints = onic_form(expr, unique_constr)
+    objective, constraints = conic_form(expr, unique_constr)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
     push!(constraints, new_constraint)
     unique_constr[(c.head, c.children_hash)] = (objective, constraints)
@@ -171,3 +171,14 @@ function conic_form(c::SDPConstraint, unique_constr)
 end
 
 isposdef(x::AbstractExpr) = SDPConstraint(x)
+
+
+function +{T<:Constraint, T2<:Constraint}(constraints_one::Array{T}, constraints_two::Array{T2})
+  constraints = append!(Constraint[], constraints_one)
+  return append!(constraints, constraints_two)
+end
++(constraint_one::Constraint, constraint_two::Constraint) = [constraint_one] + [constraint_two]
++{T<:Constraint}(constraint_one::Constraint, constraints_two::Array{T}) =
+  [constraint_one] + constraints_two
++{T<:Constraint}(constraints_one::Array{T}, constraint_two::Constraint) =
+  constraints_one + [constraint_two]

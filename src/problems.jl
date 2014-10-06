@@ -1,4 +1,4 @@
-export Problem, Solution, minimize, maximize, satisfy, add_constraints
+export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
 export conic_problem
 
@@ -98,29 +98,32 @@ end
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
   Problem(head, objective, [constraints...])
 
-# Allow users to simply type minimize or maximize
+# Allow users to simply type minimize
 minimize(objective::AbstractExpr, constraints::Constraint...) =
   Problem(:minimize, objective, [constraints...])
-minimize(objective::AbstractExpr, constraints::Array{Constraint}=Constraint[]) =
+minimize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
   Problem(:minimize, objective, constraints)
 minimize(objective::Value, constraints::Constraint...) =
   minimize(convert(AbstractExpr, objective), constraints)
-minimize(objective::Value, constraints::Array{Constraint}=Constraint[]) =
+minimize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   minimize(convert(AbstractExpr, objective), constraints)
 
+# Allow users to simply type maximize
 maximize(objective::AbstractExpr, constraints::Constraint...) =
   Problem(:maximize, objective, [constraints...])
-maximize(objective::AbstractExpr, constraints::Array{Constraint}=Constraint[]) =
+maximize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
   Problem(:maximize, objective, constraints)
 maximize(objective::Value, constraints::Constraint...) =
   maximize(convert(AbstractExpr, objective), constraints)
-maximize(objective::Value, constraints::Array{Constraint}=Constraint[]) =
+maximize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   maximize(convert(AbstractExpr, objective), constraints)
 
-satisfy(constraints::Array{Constraint}=Constraint[]) =
+# Allow users to simply type satisfy (if there is no objective)
+satisfy{T<:Constraint}(constraints::Array{T}=Constraint[]) =
   Problem(:minimize, Constant(0), constraints)
 satisfy(constraint::Constraint) = satisfy([constraint])
 
 # +(constraints, constraints) is overwritten in constraints.jl
-add_constraints(p::Problem, constraints::Array{Constraint}) = +(p.constraints, constraints)
-add_constraints(p::Problem, constraint::Constraint) = add_constraints(p, [constraint])
+add_constraints!{T<:Constraint}(p::Problem, constraints::Array{T}) = +(p.constraints, constraints)
+add_constraints!(p::Problem, constraint::Constraint) = add_constraints!(p, [constraint])
+add_constraint! = add_constraints!
