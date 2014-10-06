@@ -76,7 +76,6 @@ solve!(p)
 p = maximize(c' * X * c, [X <= [1 2; 3 4]])
 solve!(p)
 @assert abs(p.optval - 10) < TOLERANCE
-quit()
 
 # Test 12
 X = Variable(2, 2)

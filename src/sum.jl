@@ -41,8 +41,9 @@ function evaluate(x::NegateAtom)
   return sum(evaluate(x.children[1]))
 end
 
-sum(x::AbstractExpr) = SumAtom(x)
-
+# Suppose x was of the form
+# x = Ay where A was a coefficient. Then sum(x) can also be considered
+# sum(A, 1) * y
 function conic_form(x::SumAtom, unique_constr)
   if !((x.head, x.children_hash) in unique_constr)
     objective, constraints = conic_form(x.children[1], unique_constr)
@@ -53,4 +54,16 @@ function conic_form(x::SumAtom, unique_constr)
     unique_constr[(x.head, x.children_hash)] = new_obj, constraints
   end
   return unique_constr[(x.head, x.children_hash)]
+end
+
+sum(x::AbstractExpr) = SumAtom(x)
+
+function sum(x::AbstractExpr, dimension::Int64)
+  if dimension == 1
+    return Constant(ones(1, x.size[1]), Positive()) * x
+  elseif dimension == 2
+    return x * Constant(ones(x.size[2], 1), Positive())
+  else
+    error("Sum not implemented for dimension $dimension")
+  end
 end
