@@ -3,7 +3,7 @@ export solve!
 
 function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
 
-  c, A, b, cones = conic_problem(problem)
+  c, A, b, cones, var_to_ranges = conic_problem(problem)
 
   if problem.head == :maximize
     c = -c
@@ -26,6 +26,9 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     problem.solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
   catch
     problem.solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
+    if typeof(m) == ECOS.ECOSMathProgModel
+      populate_variables!(problem, var_to_ranges)
+    end
   end
   # minimize -> maximize
   if (problem.head == :maximize) && (problem.solution.status == :Optimal)
@@ -35,4 +38,16 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   # Populate the problem with the solution
   problem.optval = problem.solution.optval
   problem.status = problem.solution.status
+end
+
+function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int64, Int64)})
+  x = problem.solution.primal
+  for (id, (start_index, end_index)) in var_to_ranges
+    var = id_to_variables[id]
+    sz = var.size
+    var.value = reshape(x[start_index:end_index], sz[1], sz[2])
+    if sz == (1, 1)
+      var.value = var.value[1]
+    end
+  end
 end

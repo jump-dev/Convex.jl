@@ -30,6 +30,12 @@ type Problem
   end
 end
 
+# If the problem constructed is of the form Ax=b where A is m x n
+# returns:
+# index: n
+# constr_size: m
+# var_to_ranges a dictionary mapping from variable id to (start_index, end_index)
+# where start_index and end_index are the start and end indexes of the variable in A
 function find_variable_ranges(constraints)
   index = 0
   constr_size = 0
@@ -92,7 +98,7 @@ function conic_problem(p::Problem)
     end
     push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
   end
-  return c, A, b, cones
+  return c, A, b, cones, var_to_ranges
 end
 
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
