@@ -47,7 +47,7 @@ function conic_form(c::EqConstraint, unique_constr)
     push!(constraints, new_constraint)
     unique_constr[(c.head, c.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(c.head, c.children_hash)]
+  return safe_copy(unique_constr[(c.head, c.children_hash)])
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
@@ -91,7 +91,7 @@ function conic_form(c::LtConstraint, unique_constr)
     push!(constraints, new_constraint)
     unique_constr[(c.head, c.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(c.head, c.children_hash)]
+  return safe_copy(unique_constr[(c.head, c.children_hash)])
 end
 
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
@@ -137,7 +137,7 @@ function conic_form(c::GtConstraint, unique_constr)
     push!(constraints, new_constraint)
     unique_constr[(c.head, c.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(c.head, c.children_hash)]
+  return safe_copy(unique_constr[(c.head, c.children_hash)])
 end
 
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
@@ -181,7 +181,7 @@ function conic_form(c::SDPConstraint, unique_constr)
     push!(constraints, new_constraint)
     unique_constr[(c.head, c.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(c.head, c.children_hash)]
+  return safe_copy(unique_constr[(c.head, c.children_hash)])
 end
 
 isposdef(x::AbstractExpr) = SDPConstraint(x)

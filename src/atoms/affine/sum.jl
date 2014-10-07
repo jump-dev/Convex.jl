@@ -52,7 +52,7 @@ function conic_form(x::SumAtom, unique_constr)
     end
     unique_constr[(x.head, x.children_hash)] = new_obj, constraints
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 sum(x::AbstractExpr) = SumAtom(x)

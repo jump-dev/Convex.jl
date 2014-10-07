@@ -47,7 +47,7 @@ function conic_form(x::NegateAtom, unique_constr)
     objective = -objective
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 
@@ -99,7 +99,7 @@ function conic_form(x::AdditionAtom, unique_constr)
     objective += objective2
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)

@@ -59,7 +59,7 @@ function conic_form(x::NuclearNormAtom, unique_constr)
     p = minimize(objective, constraint)
     unique_constr[(x.head, x.children_hash)] = conic_form(p)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 ### Trace
@@ -119,5 +119,5 @@ function conic_form(x::OperatorNormAtom, unique_constr)
     p = minimize(objective, constraint)
     unique_constr[(x.head, x.children_hash)] = conic_form(p)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end

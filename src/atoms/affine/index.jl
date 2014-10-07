@@ -71,7 +71,7 @@ function conic_form(x::IndexAtom, unique_constr)
     objective = index_matrix * objective
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)

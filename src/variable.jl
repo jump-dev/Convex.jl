@@ -70,5 +70,5 @@ function conic_form(x::Variable, unique_constr)
     # now fill in the real constraints
     unique_constr[(x.head, x.id)] = (objective, constraints)
   end
-  return unique_constr[(x.head, x.id)]
+  return safe_copy(unique_constr[(x.head, x.id)])
 end

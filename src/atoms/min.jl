@@ -72,7 +72,7 @@ function conic_form(x::MinAtom, unique_constr)
     end
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)

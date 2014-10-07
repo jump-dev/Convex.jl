@@ -48,5 +48,5 @@ function conic_form(x::Constant, unique_constr)
     objective[object_id(:constant)] = vec([x.value])
     unique_constr[(x.head, id)] = (objective, ConicConstr[])
   end
-  return unique_constr[(x.head, id)]
+  return safe_copy(unique_constr[(x.head, id)])
 end

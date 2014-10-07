@@ -1,5 +1,5 @@
 export ConicObj, ConicConstr
-export +, -, *, promote_size
+export +, -, *, promote_size, safe_copy
 
 ConicObj = Dict{Uint64, Value}
 
@@ -49,4 +49,8 @@ type ConicConstr
   objs::Array{ConicObj}
   cone::Symbol
   sizes::Array{Int64}
+end
+
+function safe_copy(c::(ConicObj, Array{ConicConstr}))
+  return c[1], copy(c[2])
 end

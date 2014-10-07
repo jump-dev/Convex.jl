@@ -85,5 +85,5 @@ function conic_form(x::DiagAtom, unique_constr)
     new_obj = select_diag * objective
     unique_constr[(x.head, x.children_hash)] = (new_obj, constraints)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end

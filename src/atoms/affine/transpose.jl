@@ -65,7 +65,7 @@ function conic_form(x::TransposeAtom, unique_constr)
     objective = transpose_matrix * objective
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
-  return unique_constr[(x.head, x.children_hash)]
+  return safe_copy(unique_constr[(x.head, x.children_hash)])
 end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
