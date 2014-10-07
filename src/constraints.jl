@@ -173,9 +173,7 @@ function vexity(c::SDPConstraint)
 end
 
 function conic_form(c::SDPConstraint, unique_constr)
-  #println("checking if $((c.head, c.children_hash)) in $(keys(unique_constr))")
   if !((c.head, c.children_hash) in keys(unique_constr))
-    #println("putting $((c.head, c.children_hash)) in keys(unique_constr)")
     objective, constraints = conic_form(c.lhs, unique_constr)
     new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
     push!(constraints, new_constraint)

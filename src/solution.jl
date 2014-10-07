@@ -1,7 +1,7 @@
 import MathProgBase, ECOS, SCS
 export solve!
 
-function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
+function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
 
   c, A, b, cones, var_to_ranges = conic_problem(problem)
 
@@ -26,9 +26,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     problem.solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
   catch
     problem.solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
-    if typeof(m) == ECOS.ECOSMathProgModel
-      populate_variables!(problem, var_to_ranges)
-    end
+    populate_variables!(problem, var_to_ranges)
   end
   # minimize -> maximize
   if (problem.head == :maximize) && (problem.solution.status == :Optimal)
