@@ -1,11 +1,11 @@
 #############################################################################
-# norm2.jl
+# norm_2.jl
 # Handles the euclidean norm (also called frobenius norm for matrices)
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 import Base.vecnorm
-export EucNormAtom, norm2, vecnorm
+export EucNormAtom, norm_2, vecnorm
 export sign, monotonicity, curvature, conic_form
 
 
@@ -17,9 +17,8 @@ type EucNormAtom <: AbstractExpr
 
   function EucNormAtom(x::AbstractExpr)
     children = (x,)
-    return new(:norm2, hash(children), children, (1, 1))
+    return new(:norm_2, hash(children), children, (1, 1))
   end
-
 end
 
 function sign(x::EucNormAtom)
@@ -49,5 +48,4 @@ function conic_form(x::EucNormAtom, unique_constr)
   return unique_constr[(x.head, x.children_hash)]
 end
 
-norm2(x::AbstractExpr) = EucNormAtom(x)
-vecnorm(x::AbstractExpr) = EucNormAtom(x)
+norm_2(x::AbstractExpr) = EucNormAtom(x)

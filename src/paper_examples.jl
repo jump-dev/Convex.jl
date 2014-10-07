@@ -42,6 +42,6 @@ println("Transpose example")
 X = Variable(1000, 1000);
 A = randn(1000, 1000);
 @time begin
-  p = minimize(norm2(X - A), X' == X);
+  p = minimize(norm_2(X - A), X' == X);
 end
 @time solve!(p, ECOS.ECOSMathProgModel())

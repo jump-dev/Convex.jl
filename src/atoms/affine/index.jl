@@ -46,7 +46,7 @@ function evaluate(x::IndexAtom)
 end
 
 function conic_form(x::IndexAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+  if !haskey(unique_constr, (x.head, x.children_hash))
     m = get_vectorized_size(x)
     n = get_vectorized_size(x.children[1])
 

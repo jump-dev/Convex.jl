@@ -28,7 +28,7 @@ function sign(x::AbsAtom)
 end
 
 function monotonicity(x::AbsAtom)
-  return (Nondecreasing()*sign(x.children[1]),)
+  return (Nondecreasing() * sign(x.children[1]),)
 end
 
 function curvature(x::AbsAtom)

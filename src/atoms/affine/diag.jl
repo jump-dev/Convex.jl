@@ -13,8 +13,9 @@ export diag
 type DiagAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
-  children::(AbstractExpr, Int64)
+  children::(AbstractExpr,)
   size::(Int64, Int64)
+  k::Int64
 
   function DiagAtom(x::AbstractExpr, k::Int64=0)
     (num_rows, num_cols) = x.size
@@ -23,8 +24,8 @@ type DiagAtom <: AbstractExpr
       error("Bounds error in calling diag")
     end
 
-    children = (x, k)
-    return new(:sum, hash(children), children, (minimum(x.size) - k, 1))
+    children = (x, )
+    return new(:sum, hash((children, k)), children, (minimum(x.size) - k, 1), k)
   end
 end
 
@@ -64,7 +65,7 @@ diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
 function conic_form(x::DiagAtom, unique_constr)
   if !((x.head, x.children_hash) in keys(unique_constr))
     (num_rows, num_cols) = x.children[1].size
-    k = x.children[2]
+    k = x.k
 
     if k >= 0
       start_index = k * num_rows + 1

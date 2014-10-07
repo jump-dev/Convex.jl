@@ -269,7 +269,7 @@ solve!(p)
 
 # Test 35
 x = Variable(3)
-p = minimize(sum(abs(x)), [-2 <= x, x <= 1])
+p = minimize(sum(abs(x)), [-2 <= x, x <= 1]);
 solve!(p)
 @assert abs(p.optval) < TOLERANCE
 

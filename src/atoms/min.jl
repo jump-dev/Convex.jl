@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 import Base.min
-export min
+export min, neg
 
 # TODO: This can easily be extended to work
 ### Min Atom
@@ -76,3 +76,6 @@ function conic_form(x::MinAtom, unique_constr)
 end
 
 min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
+min(x::AbstractExpr, y::Value) = min(x, Constant(y))
+min(x::Value, y::AbstractExpr) = min(Constant(x), y)
+neg(x::AbstractExpr) = min(x, Constant(0, Negative()))
