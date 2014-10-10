@@ -65,8 +65,7 @@ function conic_form(x::Variable, unique_constr)
     # placeholder values in unique constraints prevent infinite recursion depth
     unique_constr[(x.head, x.id)] = (objective, ConicConstr[])
     _, constraints = conic_form(x.implied_constraints, unique_constr)
-    # now fill in the real constraints
-    unique_constr[(x.head, x.id)] = (objective, constraints)
+    return safe_copy((objective, constraints))
   end
   return safe_copy(unique_constr[(x.head, x.id)])
 end
