@@ -12,11 +12,11 @@ solve!(p, SCS.SCSMathProgModel())
 
 # SDP variables twice
 y = Variable((2,2), Semidefinite())
-p = minimize(y[1,1], y[1,2]==1)
-println(conic_problem(p))
-solve!(p, SCS.SCSMathProgModel())
+p = minimize(y[1,1], y[2,2]==1)
+m = SCS.SCSMathProgModel()
+solve!(p, m)
 println(p.solution)
-@test_approx_eq_eps p.optval 1 TOL
+@test_approx_eq_eps p.optval 0 TOL
 
 # SDP variables twice
 y = Variable((2,2), Semidefinite())
@@ -29,7 +29,7 @@ solve!(p, SCS.SCSMathProgModel())
 y = Semidefinite(2)
 p = minimize(sum(diag(y)), y[1,2]==1)
 solve!(p, SCS.SCSMathProgModel())
-@test_approx_eq_eps p.optval 2 TOL
+@test_approx_eq_eps p.optval 1 TOL
 
 # SDP constraints
 x = Variable(Positive())
