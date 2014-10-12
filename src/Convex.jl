@@ -36,6 +36,8 @@ include("atoms/second_order_cone/norm_2.jl")
 include("atoms/matrix_norm.jl")
 
 ### exponential atoms
+include("atoms/exp_cone/exp.jl")
+include("atoms/exp_cone/log.jl")
 
 ### utilities
 include("utilities/show.jl")

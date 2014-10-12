@@ -1,5 +1,4 @@
 using Base.Test
-include("../Convex.jl")
 using Convex
 
 TOL = 1e-2

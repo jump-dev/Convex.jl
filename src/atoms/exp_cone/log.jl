@@ -47,8 +47,8 @@ function conic_form(e::LogAtom, unique_constr)
     x = e.children[1]
     t = Variable(size(x))
     objective, constraints = conic_form(x, unique_constr)
-    append!(constraints, conic_form(ExpConstraint(t,ones(size(e.x)),x), unique_constr)[2])
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    append!(constraints, conic_form(ExpConstraint(t,ones(size(x)),x), unique_constr)[2])
+    unique_constr[(e.head, e.children_hash)] = (objective, constraints)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return safe_copy(unique_constr[(e.head, e.children_hash)])
 end
