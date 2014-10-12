@@ -184,6 +184,43 @@ end
 
 isposdef(x::AbstractExpr) = SDPConstraint(x)
 
+### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z
+type ExpConstraint <: Constraint
+  head::Symbol
+  children_hash::Uint64
+  x::AbstractExpr
+  y::AbstractExpr
+  z::AbstractExpr
+  size::(Int64, Int64)
+
+  function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
+    assert(x.size==z.size && x.size==y.size, 
+           "Exponential constraint requires x, y, and z to be of same size")
+    sz = x.size
+    return new(:exp, hash((x,y,z)), x, y, z, sz)
+  end
+end
+
+function vexity(c::ExpConstraint)
+  if vexity(c.x) == ConcaveVexity()
+    error("Exponential constraint requires x to be convex")
+  end
+  if vexity(c.y)!=ConstVexity()
+    error("Exponential constraint requires y to be constant")
+  end
+
+end
+
+function conic_form(c::SDPConstraint, unique_constr)
+  if !((c.head, c.children_hash) in keys(unique_constr))
+    objective, constraints = conic_form(c.lhs, unique_constr)
+    new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
+    push!(constraints, new_constraint)
+    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+  end
+  return safe_copy(unique_constr[(c.head, c.children_hash)])
+end
+
 
 function +{T<:Constraint, T2<:Constraint}(constraints_one::Array{T}, constraints_two::Array{T2})
   constraints = append!(Constraint[], constraints_one)
