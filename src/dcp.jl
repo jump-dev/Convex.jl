@@ -89,6 +89,7 @@ type Semidefinite <: Sign               end
 *(s::Positive, m::Monotonicity) = m
 *(s::Negative, m::Monotonicity) = -m
 *(s::NoSign, m::Monotonicity) = NoMonotonicity()
+*(m::Monotonicity, s::Sign) = s * m
 
 *(m::Nondecreasing, v::Vexity) = v
 *(m::Nonincreasing, v::Vexity) = -v
