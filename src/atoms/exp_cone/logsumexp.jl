@@ -5,10 +5,12 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export logsumexp
+export logsumexp, logistic_loss
 export sign, curvature, monotonicity, evaluate
 
-### LogSumExparithm
+### LogSumExp
+
+# TODO: make this work for a *list* of inputs, rather than just for vector/matrix inputs
 
 type LogSumExpAtom <: AbstractExpr
   head::Symbol
@@ -52,3 +54,5 @@ function conic_form(e::LogSumExpAtom, unique_constr)
   end
   return safe_copy(unique_constr[(e.head, e.children_hash)])
 end
+
+logistic_loss(e::AbstractExpr) = logsumexp([e, 0])
