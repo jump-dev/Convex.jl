@@ -18,6 +18,9 @@ type ExpAtom <: AbstractExpr
   size::(Int64, Int64)
 
   function ExpAtom(x::AbstractExpr)
+    if (x.size != (1, 1))
+      error("TODO: Only scalar variables supported for exp as of now")
+    end
     children = (x,)
     return new(:exp, hash(children), children, x.size)
   end
@@ -43,12 +46,22 @@ exp(x::AbstractExpr) = ExpAtom(x)
 
 function conic_form(e::ExpAtom, unique_constr)
   if !((e.head, e.children_hash) in keys(unique_constr))
-    # exp(x) \leq t  <=>  (x,ones(),t) \in ExpCone
+    # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
     x = e.children[1]
-    t = Variable(size(x))
-    objective, constraints = conic_form(x, unique_constr)
-    append!(constraints, conic_form(ExpConstraint(x,ones(size(x)),t), unique_constr)[2])
-    unique_constr[(e.head, e.children_hash)] = (objective, constraints)
+    y = Constant(ones(size(x)))
+    z = Variable(size(x))
+
+    constraints = ConicConstr[]
+    objective_x, constraints_x = conic_form(x, unique_constr)
+    append!(constraints, constraints_x)
+    objective_y, constraints_y = conic_form(y, unique_constr)
+    append!(constraints, constraints_y)
+    objective_z, constraints_z = conic_form(z, unique_constr)
+    append!(constraints, constraints_z)
+    exp_constraint = ConicConstr([objective_x, objective_y, objective_z], :ExpPrimal, [1, 1, 1])
+    push!(constraints, exp_constraint)
+
+    unique_constr[(e.head, e.children_hash)] = (objective_z, constraints)
   end
   return safe_copy(unique_constr[(e.head, e.children_hash)])
 end
