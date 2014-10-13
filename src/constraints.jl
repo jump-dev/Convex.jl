@@ -188,19 +188,20 @@ isposdef(x::AbstractExpr) = SDPConstraint(x)
 type ExpConstraint <: Constraint
   head::Symbol
   children_hash::Uint64
-  x::AbstractExpr
-  y::AbstractExpr
-  z::AbstractExpr
+  objective::Integer # which of the children represents the objective
+  children::(AbstractExpr,AbstractExpr,AbstractExpr) # (x, y, z)
   size::(Int64, Int64)
 
-  function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
+  function ExpConstraint(objective::Integer, x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
     @assert(x.size==z.size && x.size==y.size, 
            "Exponential constraint requires x, y, and z to be of same size")
+    @assert(x.size==(1,1), 
+           "Exponential constraint requires x, y, and z to be scalar for now")
     sz = x.size
-    return new(:exp, hash((x,y,z)), x, y, z, sz)
+    return new(:exp, hash((x,y,z)), objective, (x, y, z), sz)
   end
 end
-ExpConstraint(x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(x, Constant(y), z)
+ExpConstraint(objective::Integer, x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(objective, x, Constant(y), z)
 
 function vexity(c::ExpConstraint)
   # XXX check these...
@@ -218,15 +219,14 @@ end
 function conic_form(c::ExpConstraint, unique_constr)
   if !((c.head, c.children_hash) in keys(unique_constr))
     constraints = ConicConstr[]
-    objective_x, constraints_x = conic_form(c.x, unique_constr)
-    append!(constraints, constraints_x)
-    objective_y, constraints_y = conic_form(c.y, unique_constr)
-    append!(constraints, constraints_y)
-    objective_z, constraints_z = conic_form(c.z, unique_constr)
-    append!(constraints, constraints_z)
-    exp_constraint = ConicConstr([objective_x, objective_y, objective_z], :exp, [c.size[1] * c.size[2]])
+    objectives = Array(ConicObj,3)
+    for i=1:3
+      objectives[i], new_constraints = conic_form(c.children[i], unique_constr)
+      append!(constraints, new_constraints)
+    end
+    exp_constraint = ConicConstr(objectives, :ExpPrimal, [1, 1, 1])
     push!(constraints, exp_constraint)
-    unique_constr[(c.head, c.children_hash)] = (ConicObj(), constraints)
+    unique_constr[(c.head, c.children_hash)] = (objectives[c.objective], constraints)
   end
   return safe_copy(unique_constr[(c.head, c.children_hash)])
 end

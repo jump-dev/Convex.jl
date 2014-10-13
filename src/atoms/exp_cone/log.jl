@@ -9,7 +9,7 @@ import Base.log
 export log
 export sign, curvature, monotonicity, evaluate
 
-### Logonential
+### Logarithm
 
 type LogAtom <: AbstractExpr
   head::Symbol
@@ -18,9 +18,6 @@ type LogAtom <: AbstractExpr
   size::(Int64, Int64)
 
   function LogAtom(x::AbstractExpr)
-    if (x.size != (1, 1))
-      error("TODO: Only scalar variables supported for log as of now")
-    end
     children = (x,)
     return new(:log, hash(children), children, x.size)
   end
@@ -51,17 +48,10 @@ function conic_form(e::LogAtom, unique_constr)
     y = Constant(ones(size(z)))
     x = Variable(size(z))
 
-    constraints = ConicConstr[]
-    objective_x, constraints_x = conic_form(x, unique_constr)
-    append!(constraints, constraints_x)
-    objective_y, constraints_y = conic_form(y, unique_constr)
-    append!(constraints, constraints_y)
-    objective_z, constraints_z = conic_form(z, unique_constr)
-    append!(constraints, constraints_z)
-    exp_constraint = ConicConstr([objective_x, objective_y, objective_z], :ExpPrimal, [1, 1, 1])
-    push!(constraints, exp_constraint)
-
-    unique_constr[(e.head, e.children_hash)] = (objective_x, constraints)
+    # x is the objective
+    objective, constraints = conic_form(ExpConstraint(1, x, y, z), unique_constr)
+    
+    unique_constr[(e.head, e.children_hash)] = (objective, constraints)
   end
   return safe_copy(unique_constr[(e.head, e.children_hash)])
 end
