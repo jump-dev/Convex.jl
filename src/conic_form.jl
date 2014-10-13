@@ -30,6 +30,7 @@ function +(c::ConicObj, d::ConicObj)
 end
 
 function *(v::Value, c::ConicObj)
+  # TODO: this part is time consuming, esp new_obj[var] = v * new_obj[var]...
   new_obj = copy(c)
   for var in keys(new_obj)
     new_obj[var] = v * new_obj[var]

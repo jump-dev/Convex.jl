@@ -71,12 +71,13 @@ type AdditionAtom <: AbstractExpr
     children = AbstractExpr[]
     if isa(x, AdditionAtom)
       append!(children, x.children)
-      push!(children, y)
-    elseif isa(y, AdditionAtom)
-      append!(children, y.children)
-      push!(children, x)
     else
-      children = [x, y]
+      push!(children, x)
+    end
+    if isa(y, AdditionAtom)
+      append!(children, y.children)
+    else
+      push!(children, y)
     end
     return new(:+, hash(children), children, sz)
   end
