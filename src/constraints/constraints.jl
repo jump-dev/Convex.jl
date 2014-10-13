@@ -1,14 +1,5 @@
-import Base.isposdef
-export EqConstraint, LtConstraint, GtConstraint, SDPConstraint, isposdef
+export EqConstraint, LtConstraint, GtConstraint
 export ==, <=, >=
-
-function conic_form(abstractconstr::Array{Constraint, 1}, unique_constr)
-  conicconstraints = ConicConstr[]
-  for constraint in abstractconstr
-    append!(conicconstraints, conic_form(constraint, unique_constr)[2])
-  end
-  return ConicObj(), conicconstraints
-end
 
 ### Linear equality constraint
 type EqConstraint <: Constraint
@@ -147,91 +138,6 @@ end
 >(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
 >(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
 
-### Positive semidefinite cone constraint
-type SDPConstraint <: Constraint
-  head::Symbol
-  children_hash::Uint64
-  lhs::AbstractExpr
-  size::(Int64, Int64)
-
-  function SDPConstraint(lhs::AbstractExpr)
-    sz = lhs.size
-    if sz[1] != sz[2]
-      error("Positive semidefinite expressions must be square")
-    end
-    return new(:sdp, hash(lhs), lhs, sz)
-  end
-end
-
-function vexity(c::SDPConstraint)
-  vex = vexity(c.lhs)
-  if vex == AffineVexity() || vex == ConstVexity()
-    return AffineVexity()
-  else
-    return NotDCP()
-  end
-end
-
-function conic_form(c::SDPConstraint, unique_constr)
-  if !((c.head, c.children_hash) in keys(unique_constr))
-    objective, constraints = conic_form(c.lhs, unique_constr)
-    new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
-    push!(constraints, new_constraint)
-    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
-  end
-  return safe_copy(unique_constr[(c.head, c.children_hash)])
-end
-
-isposdef(x::AbstractExpr) = SDPConstraint(x)
-
-### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z
-type ExpConstraint <: Constraint
-  head::Symbol
-  children_hash::Uint64
-  objective::Integer # which of the children represents the objective
-  children::(AbstractExpr,AbstractExpr,AbstractExpr) # (x, y, z)
-  size::(Int64, Int64)
-
-  function ExpConstraint(objective::Integer, x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
-    @assert(x.size==z.size && x.size==y.size, 
-           "Exponential constraint requires x, y, and z to be of same size")
-    @assert(x.size==(1,1), 
-           "Exponential constraint requires x, y, and z to be scalar for now")
-    sz = x.size
-    return new(:exp, hash((x,y,z)), objective, (x, y, z), sz)
-  end
-end
-ExpConstraint(objective::Integer, x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(objective, x, Constant(y), z)
-
-function vexity(c::ExpConstraint)
-  # XXX check these...
-  if vexity(c.x) == ConcaveVexity()
-    error("Exponential constraint requires x to be convex")
-  end
-  if vexity(c.y)!=ConstVexity()
-    error("Exponential constraint requires y to be constant")
-  end
-  if vexity(c.z) == ConvexVexity()
-    error("Exponential constraint requires z to be concave")
-  end
-end
-
-function conic_form(c::ExpConstraint, unique_constr)
-  if !((c.head, c.children_hash) in keys(unique_constr))
-    constraints = ConicConstr[]
-    objectives = Array(ConicObj,3)
-    for i=1:3
-      objectives[i], new_constraints = conic_form(c.children[i], unique_constr)
-      append!(constraints, new_constraints)
-    end
-    exp_constraint = ConicConstr(objectives, :ExpPrimal, [1, 1, 1])
-    push!(constraints, exp_constraint)
-    unique_constr[(c.head, c.children_hash)] = (objectives[c.objective], constraints)
-  end
-  return safe_copy(unique_constr[(c.head, c.children_hash)])
-end
-
-
 function +{T<:Constraint, T2<:Constraint}(constraints_one::Array{T}, constraints_two::Array{T2})
   constraints = append!(Constraint[], constraints_one)
   return append!(constraints, constraints_two)
@@ -241,3 +147,12 @@ end
   [constraint_one] + constraints_two
 +{T<:Constraint}(constraints_one::Array{T}, constraint_two::Constraint) =
   constraints_one + [constraint_two]
+
+# TODO: Is this still in use?
+function conic_form(abstractconstr::Array{Constraint, 1}, unique_constr)
+  conicconstraints = ConicConstr[]
+  for constraint in abstractconstr
+    append!(conicconstraints, conic_form(constraint, unique_constr)[2])
+  end
+  return ConicObj(), conicconstraints
+end

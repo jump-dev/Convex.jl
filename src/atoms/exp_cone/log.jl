@@ -48,9 +48,9 @@ function conic_form(e::LogAtom, unique_constr)
     y = Constant(ones(size(z)))
     x = Variable(size(z))
 
-    # x is the objective
+    # x is the objective, which is the first child of ExpConstraint
     objective, constraints = conic_form(ExpConstraint(1, x, y, z), unique_constr)
-    
+
     unique_constr[(e.head, e.children_hash)] = (objective, constraints)
   end
   return safe_copy(unique_constr[(e.head, e.children_hash)])
