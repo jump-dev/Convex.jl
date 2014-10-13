@@ -29,3 +29,9 @@ y = Variable()
 p = maximize(log(y), [y<=2, exp(y)<=10])
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval log(2) TOL
+
+# multidimensional exp
+y = Variable(5)
+p = minimize(sum(exp(y)), y>=0)
+solve!(p, SCS.SCSMathProgModel())
+@test_approx_eq_eps p.optval 5 TOL

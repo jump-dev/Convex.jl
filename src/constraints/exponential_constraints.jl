@@ -9,8 +9,8 @@ type ExpConstraint <: Constraint
   function ExpConstraint(objective::Integer, x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
     @assert(x.size == y.size == z.size,
            "Exponential constraint requires x, y, and z to be of same size")
-    @assert(x.size == (1,1),
-           "Exponential constraint requires x, y, and z to be scalar for now")
+    # @assert(x.size == (1,1),
+    #        "Exponential constraint requires x, y, and z to be scalar for now")
     sz = x.size
     return new(:exp, hash((x,y,z)), objective, (x, y, z), sz)
   end
@@ -28,19 +28,33 @@ function vexity(c::ExpConstraint)
   if vexity(c.z) == ConvexVexity()
     error("Exponential constraint requires z to be concave")
   end
+  return ConvexVexity()
 end
 
 function conic_form(c::ExpConstraint, unique_constr)
   if !((c.head, c.children_hash) in keys(unique_constr))
     constraints = ConicConstr[]
     objectives = Array(ConicObj, 3)
-    for i=1:3
-      objectives[i], new_constraints = conic_form(c.children[i], unique_constr)
+    for iobj=1:3
+      objectives[iobj], new_constraints = conic_form(c.children[iobj], unique_constr)
       append!(constraints, new_constraints)
     end
-    exp_constraint = ConicConstr(objectives, :ExpPrimal, [1, 1, 1])
-    push!(constraints, exp_constraint)
     unique_constr[(c.head, c.children_hash)] = (objectives[c.objective], constraints)
+    if c.size == (1, 1)
+      exp_constraint = ConicConstr(objectives, :ExpPrimal, [1, 1, 1])
+      push!(constraints, exp_constraint)
+    else
+      for i=1:c.size[1]
+        for j=1:c.size[2]
+          objectives = Array(ConicObj, 3)
+          for iobj=1:3
+            objectives[iobj], _ = conic_form(c.children[iobj][i,j], unique_constr)
+          end
+          exp_constraint = ConicConstr(objectives, :ExpPrimal, [1, 1, 1])
+          push!(constraints, exp_constraint)
+        end
+      end
+    end
   end
   return safe_copy(unique_constr[(c.head, c.children_hash)])
 end
