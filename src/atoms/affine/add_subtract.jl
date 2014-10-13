@@ -51,33 +51,39 @@ function conic_form(x::NegateAtom, unique_constr)
 end
 
 
-### Binary Addition/Subtraction
+### Addition
 type AdditionAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
-  children::(AbstractExpr, AbstractExpr)
+  children::Array{AbstractExpr, 1}
   size::(Int64, Int64)
 
   function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
+    # find the size of the expression = max of size of x and size of y
     if x.size == y.size || y.size == (1, 1)
       sz = x.size
-      children = (x, y)
     elseif x.size == (1, 1)
       sz = y.size
-      children = (y, x)
     else
       error("Cannot add expressions of sizes $(x.size) and $(y.size)")
+    end
+    # see if we're forming a sum of more than two terms and condense them
+    if isa(x, AdditionAtom)
+      children = push!(x.children, y)
+    elseif isa(y, AdditionAtom)
+      children = push!(y.children, x)
+    else children = [x, y]
     end
     return new(:+, hash(children), children, sz)
   end
 end
 
 function sign(x::AdditionAtom)
-  return sign(x.children[1]) + sign(x.children[2])
+  return sum(Sign[sign(child) for child in x.children])
 end
 
 function monotonicity(x::AdditionAtom)
-  return (Nondecreasing(), Nondecreasing())
+  return Monotonicity[Nondecreasing() for child in x.children]
 end
 
 function curvature(x::AdditionAtom)
@@ -85,18 +91,20 @@ function curvature(x::AdditionAtom)
 end
 
 function evaluate(x::AdditionAtom)
-  return evaluate(x.children[1]) + evaluate(x.children[2])
+  return sum([evaluate(child) for child in x.children])
 end
 
 function conic_form(x::AdditionAtom, unique_constr)
   if !((x.head, x.children_hash) in keys(unique_constr))
-    objective, constraints = conic_form(x.children[1], unique_constr)
-    objective2, constraints2 = conic_form(x.children[2], unique_constr)
-    if x.children[1].size != x.children[2].size
-      objective2 = promote_size(objective2, get_vectorized_size(x.children[1]))
+    objective, constraints = ConicObj(), ConicConstr[]
+    for child in x.children
+      child_objective, child_constraints = conic_form(child, unique_constr)
+      if x.size != child.size
+        child_objective = promote_size(child_objective, get_vectorized_size(x))
+      end
+      append!(constraints, child_constraints)
+      objective += child_objective
     end
-    append!(constraints, constraints2)
-    objective += objective2
     unique_constr[(x.head, x.children_hash)] = (objective, constraints)
   end
   return safe_copy(unique_constr[(x.head, x.children_hash)])

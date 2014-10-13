@@ -1,6 +1,6 @@
 using Convex
 
-TOLERANCE = .0001
+TOLERANCE = .001
 
 # Test 1
 x = Variable(1)
