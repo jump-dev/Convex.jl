@@ -33,6 +33,7 @@ include("atoms/norm.jl")
 
 ### SOC atoms
 include("atoms/second_order_cone/norm_2.jl")
+include("atoms/second_order_cone/quad_over_lin.jl")
 
 ### SDP atoms
 include("atoms/matrix_norm.jl")

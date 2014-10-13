@@ -21,21 +21,21 @@ function sign(q::QuadOverLinAtom)
 end
 
 function monotonicity(q::QuadOverLinAtom)
-  return (sign(x.children[1]) * Nondecreasing(), Nonincreasing())
+  return (sign(q.children[1]) * Nondecreasing(), Nonincreasing())
 end
 
 function curvature(q::QuadOverLinAtom)
   return ConvexVexity()
 end
 
-function conic_form(q::QuadOverLinAtom)
+function conic_form(q::QuadOverLinAtom, unique_constr)
   if !((q.head, q.children_hash) in keys(unique_constr))
     t = Variable()
     qol_objective, qol_constraints = conic_form(t, unique_constr)
     y_plus_t, y_plus_t_constr  = conic_form(q.children[2] + t, unique_constr)
     y_minus_t, y_minus_t_constr = conic_form(q.children[2] - t, unique_constr)
     x_obj, x_constr = conic_form(2*q.children[1], unique_constr)
-    y_pos, y_pos_cosntr = conic_form(q.children[2] >= 0, unique_constr)
+    y_pos, y_pos_constr = conic_form(q.children[2] >= 0, unique_constr)
     soc_constraint = ConicConstr([y_plus_t, y_minus_t, x_obj], :SOC, [1, 1, get_vectorized_size(q.children[1])])
     append!(qol_constraints, y_plus_t_constr)
     append!(qol_constraints, y_minus_t_constr)

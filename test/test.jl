@@ -305,6 +305,7 @@ c = [3 2 4]
 d = -3
 p = minimize(quad_over_lin(A*x + b, c*x + d))
 solve!(p)
+@assert abs(p.optval - 17.7831) < TOLERANCE
 
 # Test 40
 x = Variable(4, 4)
