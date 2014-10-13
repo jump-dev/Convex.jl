@@ -2,7 +2,7 @@
 # log.jl
 # natural logarithm of an logression
 # All expressions and atoms are subtpyes of AbstractExpr.
-# Please read logressions.jl first.
+# Please read expressions.jl first.
 #############################################################################
 
 import Base.log

@@ -43,6 +43,7 @@ include("atoms/matrix_norm.jl")
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")
 include("atoms/exp_cone/log.jl")
+include("atoms/exp_cone/logsumexp.jl")
 
 ### utilities
 include("utilities/show.jl")
