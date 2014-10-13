@@ -34,6 +34,8 @@ include("atoms/norm.jl")
 ### SOC atoms
 include("atoms/second_order_cone/norm_2.jl")
 include("atoms/second_order_cone/quad_over_lin.jl")
+include("atoms/second_order_cone/qol_elementwise.jl")
+include("atoms/second_order_cone/geo_mean.jl")
 
 ### SDP atoms
 include("atoms/matrix_norm.jl")
