@@ -299,12 +299,11 @@ solve!(p)
 
 # Test 39
 x = Variable(3, 1)
-y = Variable(1, 1)
 A = [2 -3 5; -2 9 -3; 5 -8 3]
 b = [-3; 9; 5]
 c = [3 2 4]
 d = -3
-p = minimize(quad_over_lin(A*x + b, y), (c*x + d)==y)
+p = minimize(quad_over_lin(A*x + b, c*x + d))
 solve!(p)
 @assert abs(p.optval - 17.7831) < TOLERANCE
 
