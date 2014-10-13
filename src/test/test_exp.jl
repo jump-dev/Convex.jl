@@ -17,12 +17,15 @@ solve!(p, SCS.SCSMathProgModel())
 # log
 y = Variable()
 p = maximize(log(y), y<=1)
-println(conic_problem(p))
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval 0 TOL
 
 y = Variable()
 p = maximize(log(y), y<=2)
-println(conic_problem(p))
+solve!(p, SCS.SCSMathProgModel())
+@test_approx_eq_eps p.optval log(2) TOL
+
+y = Variable()
+p = maximize(log(y), [y<=2, exp(y)<=10])
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval log(2) TOL
