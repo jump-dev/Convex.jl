@@ -52,5 +52,5 @@ type ConicConstr
 end
 
 function safe_copy(c::(ConicObj, Array{ConicConstr}))
-  return c[1], copy(c[2])
+  return deepcopy(c[1]), deepcopy(c[2])
 end

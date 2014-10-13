@@ -55,7 +55,8 @@ end
 type AdditionAtom <: AbstractExpr
   head::Symbol
   children_hash::Uint64
-  children::Array{AbstractExpr, 1}
+  # children::Array{AbstractExpr, 1}
+  children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
   function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
@@ -67,13 +68,15 @@ type AdditionAtom <: AbstractExpr
     else
       error("Cannot add expressions of sizes $(x.size) and $(y.size)")
     end
-    # see if we're forming a sum of more than two terms and condense them
-    if isa(x, AdditionAtom)
-      children = push!(x.children, y)
-    elseif isa(y, AdditionAtom)
-      children = push!(y.children, x)
-    else children = [x, y]
-    end
+    # TODO: Make condensing work
+    # # see if we're forming a sum of more than two terms and condense them
+    # if isa(x, AdditionAtom)
+    #   children = push!(x.children, y)
+    # elseif isa(y, AdditionAtom)
+    #   children = push!(y.children, x)
+    # else children = [x, y]
+    # end
+    children = (x, y)
     return new(:+, hash(children), children, sz)
   end
 end
