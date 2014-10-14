@@ -15,6 +15,7 @@ type ExpConstraint <: Constraint
     return new(:exp, hash((x,y,z)), objective, (x, y, z), sz)
   end
 end
+
 ExpConstraint(objective::Integer, x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(objective, x, Constant(y), z)
 
 function vexity(c::ExpConstraint)
