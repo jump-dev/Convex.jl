@@ -14,7 +14,7 @@ export sign, curvature, monotonicity, evaluate
 
 type LogSumExpAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -42,17 +42,16 @@ end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
-function conic_form(e::LogSumExpAtom, unique_constr)
-  if !((e.head, e.children_hash) in keys(unique_constr))
+function conic_form(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, e)
     # log(sum(exp(z))) <= t  <=>  sum(exp(z)) <= exp(t)
     t = Variable()
-    objective, constraints = conic_form(e.children[1], unique_constr)
-    _, new_constraints = conic_form(sum(exp(e.children[1])) <= exp(t), unique_constr)
-    append!(constraints, new_constraints)
+    objective = conic_form(t, unique_conic_forms)
+    conic_form(sum(exp(e.children[1])) <= exp(t), unique_conic_forms)
 
-    unique_constr[(e.head, e.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, e, objective)
   end
-  return safe_copy(unique_constr[(e.head, e.children_hash)])
+  return get_conic_form(unique_conic_forms, e)
 end
 
 logistic_loss(e::AbstractExpr) = logsumexp([e, 0])

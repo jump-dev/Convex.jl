@@ -4,7 +4,7 @@ export SDPConstraint, isposdef
 ### Positive semidefinite cone constraint
 type SDPConstraint <: Constraint
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   child::AbstractExpr
   size::(Int64, Int64)
   is_symmetric::Bool
@@ -27,20 +27,15 @@ function vexity(c::SDPConstraint)
   end
 end
 
-function conic_form(c::SDPConstraint, unique_constr)
-  if !((c.head, c.children_hash) in keys(unique_constr))
-    objective, constraints = conic_form(c.child, unique_constr)
-    new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
-    push!(constraints, new_constraint)
-
+function conic_form(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, c)
+    objective = conic_form(c.child, unique_conic_forms)
     if c.is_symmetric
-      _, new_constraints = conic_form(c.child == c.child', unique_constr)
-      append!(constraints, new_constraints)
+      conic_form(c.child == c.child', unique_conic_forms)
     end
-
-    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
   end
-  return safe_copy(unique_constr[(c.head, c.children_hash)])
+  return get_conic_form(unique_conic_forms, c)
 end
 
 isposdef(x::AbstractExpr; is_symmetric=true) = SDPConstraint(x, is_symmetric=is_symmetric)

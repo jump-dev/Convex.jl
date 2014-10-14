@@ -1,3 +1,4 @@
+# TODO: implement hcat/vcat first
 #############################################################################
 # matrix_norm.jl
 # Handles nuclear norm (the sum of the singular values of a matrix),

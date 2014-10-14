@@ -11,7 +11,7 @@ export max, pos, hinge_loss
 ### Max Atom
 type MaxAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -59,20 +59,16 @@ function evaluate(x::MaxAtom)
 end
 
 # x <= this and y <= this if max(x, y) = this
-function conic_form(x::MaxAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::MaxAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     this = Variable(x.size[1], x.size[2])
-    objective, constraints = conic_form(this, unique_constr)
+    objective = conic_form(this, unique_conic_forms)
     for child in x.children
-      expr = this - child
-      expr_objective, expr_constraints = conic_form(expr, unique_constr)
-      append!(constraints, expr_constraints)
-      new_constraint = ConicConstr([expr_objective], :NonNeg, [get_vectorized_size(expr)])
-      push!(constraints, new_constraint)
+      conic_form(this >= child, unique_conic_forms)
     end
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, this)
 end
 
 max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)

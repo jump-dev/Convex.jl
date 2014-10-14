@@ -7,12 +7,11 @@
 ## head::Symbol                  -- a symbol such as :vecnorm, :+ etc
 ## children::(AbstractExpr,)     -- The expressions on which the current expression
 ##                               -- is operated
-## children_hash::Uint64         -- hash of all the children
+## id_hash::Uint64               -- identifier hash, can be a hash of children
+##                                  or a unique identifier of the object
 ## size::(Int64, Int64)          -- size of the resulting expression
 #
-# To eliminate as many edge cases as possibles, Constant and Variables don't have
-# children, or children_hash as fields. They do have an id, value, size and vexity
-# as fields.
+# Constans and variables do not have children.
 #
 # In addition, each atom must implement the following functions:
 ## sign: returns the sign of the result of the expression

@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 
 type AbsAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -41,14 +41,14 @@ end
 
 abs(x::AbstractExpr) = AbsAtom(x)
 
-function conic_form(x::AbsAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::AbsAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     c = x.children[1]
     t = Variable(size(c))
-    objective, constraints = conic_form(t, unique_constr)
-    append!(constraints, conic_form(c<=t, unique_constr)[2])
-    append!(constraints, conic_form(c>=-t, unique_constr)[2])
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    objective = conic_form(t, unique_conic_forms)
+    conic_form(c<=t, unique_conic_forms)
+    conic_form(c>=-t, unique_conic_forms)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end

@@ -55,23 +55,23 @@ function find_variable_ranges(constraints)
   return index, constr_size, var_to_ranges
 end
 
-function conic_form(p::Problem, unique_constr)
+function conic_form(p::Problem, unique_conic_forms::UniqueConicForms)
   objective_var = Variable()
-  objective, _ = conic_form(objective_var, unique_constr)
-  _, constraints = conic_form(p.objective - objective_var == 0, unique_constr)
+  objective = conic_form(objective_var, unique_conic_forms)
+  conic_form(p.objective - objective_var == 0, unique_conic_forms)
   for constraint in p.constraints
-    append!(constraints, conic_form(constraint, unique_constr)[2])
+    conic_form(constraint, unique_conic_forms)
   end
-  return objective, constraints, objective_var.id
+  return objective, objective_var.id_hash
 end
 
 function conic_problem(p::Problem)
   # A map to hold unique constraints. Each constraint is keyed by a symbol
   # of which atom generated the constraints, and a integer hash of the child
   # expressions used by the atom
-  unique_constr = Dict{(Symbol, Uint64), (ConicObj, Array{ConicConstr})}()
-  objective, constraints, objective_var_id = conic_form(p, unique_constr)
-
+  unique_conic_forms = UniqueConicForms()
+  objective, objective_var_id = conic_form(p, unique_conic_forms)
+  constraints = unique_conic_forms.constr_list
   var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
   c = spzeros(var_size, 1)
   objective_range = var_to_ranges[objective_var_id]

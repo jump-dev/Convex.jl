@@ -5,7 +5,7 @@ ArrayOrNothing = Union(AbstractArray, Nothing)
 
 type IndexAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
   rows::ArrayOrNothing
@@ -45,8 +45,8 @@ function evaluate(x::IndexAtom)
   end
 end
 
-function conic_form(x::IndexAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::IndexAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     m = get_vectorized_size(x)
     n = get_vectorized_size(x.children[1])
 
@@ -67,11 +67,11 @@ function conic_form(x::IndexAtom, unique_constr)
     else
       index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
     end
-    objective, constraints = conic_form(x.children[1], unique_constr)
+    objective = conic_form(x.children[1], unique_conic_forms)
     objective = index_matrix * objective
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)

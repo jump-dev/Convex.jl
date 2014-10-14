@@ -8,7 +8,7 @@ export vexity, evaluate, sign, conic_form
 
 type Variable <: AbstractExpr
   head::Symbol
-  id::Uint64
+  id_hash::Uint64
   value::ValueOrNothing
   size::(Int64, Int64)
   vexity::Vexity
@@ -19,8 +19,8 @@ type Variable <: AbstractExpr
   # If you wish to force symmetricity for other variables, add x == x' as a constraint
   function Variable(size::(Int64, Int64), sign::Sign=NoSign(); is_symmetric=true)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[])
-    this.id = object_id(this)
-    id_to_variables[this.id] = this
+    this.id_hash = object_id(this)
+    id_to_variables[this.id_hash] = this
     if !(sign == NoSign())
       if sign == Positive()
         push!(this.implied_constraints, this >= 0)
@@ -60,16 +60,17 @@ function sign(x::Variable)
   return x.sign
 end
 
-function conic_form(x::Variable, unique_constr)
-  if !((x.head, x.id) in keys(unique_constr))
+function conic_form(x::Variable, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     objective = ConicObj()
     vec_size = get_vectorized_size(x)
-    objective[x.id] = speye(vec_size)
+    objective[x.id_hash] = speye(vec_size)
     objective[object_id(:constant)] = spzeros(vec_size, 1)
     # placeholder values in unique constraints prevent infinite recursion depth
-    unique_constr[(x.head, x.id)] = (objective, ConicConstr[])
-    _, constraints = conic_form(x.implied_constraints, unique_constr)
-    return safe_copy((objective, constraints))
+    add_conic_form!(unique_conic_forms, x, objective)
+    for constraint in x.implied_constraints
+      conic_form(constraint, unique_conic_forms)
+    end
   end
-  return safe_copy(unique_constr[(x.head, x.id)])
+  return get_conic_form(unique_conic_forms, x)
 end

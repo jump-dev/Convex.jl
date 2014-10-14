@@ -3,7 +3,7 @@ export sign, monotonicity, curvature, conic_form
 
 type GeoMeanAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -28,31 +28,18 @@ function curvature(q::GeoMeanAtom)
   return ConcaveVexity()
 end
 
-function conic_form(q::GeoMeanAtom, unique_constr)
-  if !((q.head, q.children_hash) in keys(unique_constr))
+function conic_form(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, q)
     sz = q.children[1].size
     t = Variable(sz[1], sz[2])
-    qol_objective, qol_constraints = conic_form(t, unique_constr)
+    qol_objective = conic_form(t, unique_conic_forms)
     x, y = q.children
-    for row in 1:sz[1]
-      for col in 1:sz[2]
-        y_plus_x, y_plus_x_constr  = conic_form(y[row, col] + x[row,col], unique_constr)
-        y_minus_x, y_minus_x_constr = conic_form(y[row, col] - x[row,col], unique_constr)
-        t_obj, t_constr = conic_form(2 * t[row, col], unique_constr)
-        soc_constraint = ConicConstr([y_plus_x, y_minus_x, t_obj], :SOC, [1, 1, 1])
-        append!(qol_constraints, y_plus_x_constr)
-        append!(qol_constraints, y_minus_x_constr)
-        append!(qol_constraints, t_constr)
-        push!(qol_constraints, soc_constraint)
-      end
-    end
-    x_pos, x_pos_constr = conic_form(x >= 0, unique_constr)
-    y_pos, y_pos_constr = conic_form(y >= 0, unique_constr)
-    append!(qol_constraints, x_pos_constr)
-    append!(qol_constraints, y_pos_constr)
-    unique_constr[(q.head, q.children_hash)] = (qol_objective, qol_constraints)
+    conic_form(SOCElemConstraint(y + x, y - x, 2 * t), unique_conic_forms)
+    conic_form(x >= 0, unique_conic_forms)
+    conic_form(y >= 0, unique_conic_forms)
+    add_conic_form!(unique_conic_forms, q, qol_objective)
   end
-  return safe_copy(unique_constr[(q.head, q.children_hash)])
+  return get_conic_form(unique_conic_forms, q)
 end
 
 geo_mean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)

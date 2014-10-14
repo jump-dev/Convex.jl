@@ -7,6 +7,7 @@ export vexity, evaluate, sign, conic_form
 
 type Constant <: AbstractExpr
   head::Symbol
+  id_hash::Uint64
   value::Value
   size::(Int64, Int64)
   vexity::Vexity
@@ -14,7 +15,7 @@ type Constant <: AbstractExpr
 
   function Constant(x::Value, sign::Sign)
     sz = (size(x, 1), size(x, 2))
-    return new(:constant, x, sz, ConstVexity(), sign)
+    return new(:constant, object_id(x), x, sz, ConstVexity(), sign)
   end
 
   function Constant(x::Value, check_sign::Bool=true)
@@ -41,12 +42,11 @@ function sign(x::Constant)
   return x.sign
 end
 
-function conic_form(x::Constant, unique_constr)
-  id = object_id(x.value)
-  if !((x.head, id) in keys(unique_constr))
+function conic_form(x::Constant, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     objective = ConicObj()
     objective[object_id(:constant)] = vec([x.value])
-    unique_constr[(x.head, id)] = (objective, ConicConstr[])
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, id)])
+  return get_conic_form(unique_conic_forms, x)
 end

@@ -11,7 +11,7 @@ export sum
 ### Sum Atom
 type SumAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -43,16 +43,16 @@ end
 # Suppose x was of the form
 # x = Ay where A was a coefficient. Then sum(x) can also be considered
 # sum(A, 1) * y
-function conic_form(x::SumAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
-    objective, constraints = conic_form(x.children[1], unique_constr)
-    new_obj = ConicObj(copy(objective))
+function conic_form(x::SumAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = conic_form(x.children[1], unique_conic_forms)
+    new_obj = copy(objective)
     for var in keys(new_obj)
       new_obj[var] = sum(new_obj[var], 1)
     end
-    unique_constr[(x.head, x.children_hash)] = new_obj, constraints
+    add_conic_form!(unique_conic_forms, x, new_obj)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 sum(x::AbstractExpr) = SumAtom(x)

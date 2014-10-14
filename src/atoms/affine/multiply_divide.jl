@@ -13,7 +13,7 @@ export sign, monotonicity, curvature, evaluate, conic_form
 
 type MultiplyAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
   size::(Int64, Int64)
 
@@ -54,8 +54,8 @@ function evaluate(x::MultiplyAtom)
   return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function conic_form(x::MultiplyAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
       if x.children[1].head == :constant
@@ -65,7 +65,7 @@ function conic_form(x::MultiplyAtom, unique_constr)
         const_child = x.children[2]
         expr_child = x.children[1]
       end
-      objective, constraints = conic_form(expr_child, unique_constr)
+      objective = conic_form(expr_child, unique_conic_forms)
 
       # make sure all 1x1 sized objects are interpreted as scalars, since
       # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
@@ -79,16 +79,16 @@ function conic_form(x::MultiplyAtom, unique_constr)
 
     # left matrix multiplication
     elseif x.children[1].head == :constant
-      objective, constraints = conic_form(x.children[2], unique_constr)
+      objective = conic_form(x.children[2], unique_conic_forms)
       objective = kron(speye(x.size[2]), x.children[1].value) * objective
     # right matrix multiplication
     else
-      objective, constraints = conic_form(x.children[1], unique_constr)
+      objective = conic_form(x.children[1], unique_conic_forms)
       objective = kron(x.children[2].value', speye(x.size[1])) * objective
     end
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 *(x::AbstractExpr, y::AbstractExpr) = MultiplyAtom(x, y)

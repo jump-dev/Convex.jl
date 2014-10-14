@@ -11,7 +11,7 @@ export sign, monotonicity, curvature, conic_form
 
 type EucNormAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -35,17 +35,14 @@ end
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
-function conic_form(x::EucNormAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     euc_norm = Variable()
-    objective, constraints = conic_form(euc_norm, unique_constr)
-    child_objective, child_constraints = conic_form(x.children[1], unique_constr)
-    append!(constraints, child_constraints)
-    soc_constraint = ConicConstr([objective, child_objective], :SOC, [1, get_vectorized_size(x.children[1])])
-    push!(constraints, soc_constraint)
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    objective = conic_form(euc_norm, unique_conic_forms)
+    conic_form(SOCConstraint(euc_norm, x.children[1]), unique_conic_forms)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 norm_2(x::AbstractExpr) = EucNormAtom(x)

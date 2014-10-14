@@ -4,7 +4,7 @@ export ==, <=, >=
 ### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -30,15 +30,14 @@ function vexity(c::EqConstraint)
   return vex
 end
 
-function conic_form(c::EqConstraint, unique_constr)
-  if !((c.head, c.children_hash) in keys(unique_constr))
+function conic_form(c::EqConstraint, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, c)
     expr = c.lhs - c.rhs
-    objective, constraints = conic_form(expr, unique_constr)
+    objective = conic_form(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-    push!(constraints, new_constraint)
-    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, c, new_constraint)
   end
-  return safe_copy(unique_constr[(c.head, c.children_hash)])
+  return get_conic_form(unique_conic_forms, c)
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
@@ -49,7 +48,7 @@ end
 ### Linear inequality constraints
 type LtConstraint <: Constraint
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -74,15 +73,14 @@ function vexity(c::LtConstraint)
   return vex
 end
 
-function conic_form(c::LtConstraint, unique_constr)
-  if !((c.head, c.children_hash) in keys(unique_constr))
+function conic_form(c::LtConstraint, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, c)
     expr = c.rhs - c.lhs
-    objective, constraints = conic_form(expr, unique_constr)
+    objective = conic_form(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-    push!(constraints, new_constraint)
-    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, c, new_constraint)
   end
-  return safe_copy(unique_constr[(c.head, c.children_hash)])
+  return get_conic_form(unique_conic_forms, c)
 end
 
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
@@ -95,7 +93,7 @@ end
 
 type GtConstraint <: Constraint
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int64, Int64)
@@ -120,15 +118,14 @@ function vexity(c::GtConstraint)
   return vex
 end
 
-function conic_form(c::GtConstraint, unique_constr)
-  if !((c.head, c.children_hash) in keys(unique_constr))
+function conic_form(c::GtConstraint, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, c)
     expr = c.lhs - c.rhs
-    objective, constraints = conic_form(expr, unique_constr)
+    objective = conic_form(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-    push!(constraints, new_constraint)
-    unique_constr[(c.head, c.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, c, new_constraint)
   end
-  return safe_copy(unique_constr[(c.head, c.children_hash)])
+  return get_conic_form(unique_conic_forms, c)
 end
 
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
@@ -147,12 +144,3 @@ end
   [constraint_one] + constraints_two
 +{T<:Constraint}(constraints_one::Array{T}, constraint_two::Constraint) =
   constraints_one + [constraint_two]
-
-# TODO: Is this still in use?
-function conic_form(abstractconstr::Array{Constraint, 1}, unique_constr)
-  conicconstraints = ConicConstr[]
-  for constraint in abstractconstr
-    append!(conicconstraints, conic_form(constraint, unique_constr)[2])
-  end
-  return ConicObj(), conicconstraints
-end

@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 
 type NegateAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -41,20 +41,20 @@ end
 
 -(x::AbstractExpr) = NegateAtom(x)
 
-function conic_form(x::NegateAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
-    objective, constraints = conic_form(x.children[1], unique_constr)
+function conic_form(x::NegateAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = conic_form(x.children[1], unique_conic_forms)
     objective = -objective
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 
 ### Addition
 type AdditionAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::Array{AbstractExpr, 1}
   size::(Int64, Int64)
 
@@ -99,20 +99,19 @@ function evaluate(x::AdditionAtom)
   return sum([evaluate(child) for child in x.children])
 end
 
-function conic_form(x::AdditionAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
-    objective, constraints = ConicObj(), ConicConstr[]
+function conic_form(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = ConicObj()
     for child in x.children
-      child_objective, child_constraints = conic_form(child, unique_constr)
+      child_objective = conic_form(child, unique_conic_forms)
       if x.size != child.size
         child_objective = promote_size(child_objective, get_vectorized_size(x))
       end
-      append!(constraints, child_constraints)
       objective += child_objective
     end
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)

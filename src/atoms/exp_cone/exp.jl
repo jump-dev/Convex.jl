@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 
 type ExpAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -41,17 +41,15 @@ end
 
 exp(x::AbstractExpr) = ExpAtom(x)
 
-function conic_form(e::ExpAtom, unique_constr)
-  if !((e.head, e.children_hash) in keys(unique_constr))
+function conic_form(e::ExpAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, e)
     # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
     x = e.children[1]
     y = Constant(ones(size(x)))
     z = Variable(size(x))
-
-    # z is the objective, which means the third child of ExpConstraint is the objective
-    objective, constraints = conic_form(ExpConstraint(3, x, y, z), unique_constr)
-
-    unique_constr[(e.head, e.children_hash)] = (objective, constraints)
+    objective = conic_form(z, unique_conic_forms)
+    conic_form(ExpConstraint(x, y, z), unique_conic_forms)
+    add_conic_form!(unique_conic_forms, e, objective)
   end
-  return safe_copy(unique_constr[(e.head, e.children_hash)])
+  return get_conic_form(unique_conic_forms, e)
 end

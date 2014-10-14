@@ -10,7 +10,7 @@ export minimum
 ### Minimum Atom
 type MinimumAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -41,18 +41,14 @@ end
 
 # x >= this if minimum(x) = this
 # so, x - this will be in the :NonNeg cone
-function conic_form(x::MinimumAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::MinimumAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     this = Variable()
-    objective, constraints = conic_form(this, unique_constr)
-    expr = x.children[1] - this
-    expr_objective, expr_constraints = conic_form(expr, unique_constr)
-    append!(constraints, expr_constraints)
-    new_constraint = ConicConstr([expr_objective], :NonNeg, [get_vectorized_size(expr)])
-    push!(constraints, new_constraint)
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    objective = conic_form(this, unique_conic_forms)
+    conic_form(this <= x.children[1], unique_conic_forms)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 minimum(x::AbstractExpr) = MinimumAtom(x)

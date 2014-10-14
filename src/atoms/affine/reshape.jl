@@ -5,7 +5,7 @@ export sign, curvature, monotonicity, evaluate, conic_form
 
 type ReshapeAtom <: AbstractExpr
   head::Symbol
-  id::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -33,8 +33,8 @@ function evaluate(x::ReshapeAtom)
   return reshape(evaluate(x.children[1]), x.size[1], x.size[2])
 end
 
-function conic_form(x::ReshapeAtom, unique_constr)
-  conic_form(x.children[1], unique_constr)
+function conic_form(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
+  return conic_form(x.children[1], unique_conic_forms)
 end
 
 

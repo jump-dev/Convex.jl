@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 
 type LogAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -41,17 +41,16 @@ end
 
 log(x::AbstractExpr) = LogAtom(x)
 
-function conic_form(e::LogAtom, unique_constr)
-  if !((e.head, e.children_hash) in keys(unique_constr))
+function conic_form(e::LogAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, e)
     # log(z) \geq x  <=>  (x,ones(),z) \in ExpCone
     z = e.children[1]
     y = Constant(ones(size(z)))
     x = Variable(size(z))
+    objective = conic_form(x, unique_conic_forms)
+    conic_form(ExpConstraint(x, y, z), unique_conic_forms)
 
-    # x is the objective, which is the first child of ExpConstraint
-    objective, constraints = conic_form(ExpConstraint(1, x, y, z), unique_constr)
-
-    unique_constr[(e.head, e.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, e, objective)
   end
-  return safe_copy(unique_constr[(e.head, e.children_hash)])
+  return get_conic_form(unique_conic_forms, e)
 end

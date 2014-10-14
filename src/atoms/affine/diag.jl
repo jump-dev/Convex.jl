@@ -12,7 +12,7 @@ export diag
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 type DiagAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
   k::Int64
@@ -62,8 +62,8 @@ diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form(x::DiagAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form(x::DiagAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
     (num_rows, num_cols) = x.children[1].size
     k = x.k
 
@@ -81,9 +81,9 @@ function conic_form(x::DiagAtom, unique_constr)
       start_index += num_rows + 1
     end
 
-    objective, constraints = conic_form(x.children[1], unique_constr)
+    objective = conic_form(x.children[1], unique_conic_forms)
     new_obj = select_diag * objective
-    unique_constr[(x.head, x.children_hash)] = (new_obj, constraints)
+    add_conic_form!(unique_conic_forms, x, new_obj)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end

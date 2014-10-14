@@ -11,7 +11,7 @@ export sign, curvature, monotonicity, evaluate, conic_form
 
 type TransposeAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
@@ -39,9 +39,9 @@ end
 
 # Since everything is vectorized, we simply need to multiply x by a permutation
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
-function conic_form(x::TransposeAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
-    objective, constraints = conic_form(x.children[1], unique_constr)
+function conic_form(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = conic_form(x.children[1], unique_conic_forms)
 
     sz = get_vectorized_size(x)
 
@@ -63,9 +63,9 @@ function conic_form(x::TransposeAtom, unique_constr)
     transpose_matrix = sparse(I, J, 1.0)
 
     objective = transpose_matrix * objective
-    unique_constr[(x.head, x.children_hash)] = (objective, constraints)
+    add_conic_form!(unique_conic_forms, x, objective)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
