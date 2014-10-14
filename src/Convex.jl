@@ -22,6 +22,7 @@ include("atoms/affine/diag.jl")
 include("atoms/affine/stack.jl")
 include("atoms/affine/dot.jl")
 include("atoms/affine/reshape.jl")
+include("atoms/affine/trace.jl")
 
 ### elementwise atoms
 include("atoms/abs.jl")

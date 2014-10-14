@@ -6,8 +6,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.trace
-export nuclear_norm, operator_norm, sigma_max, trace
+export nuclear_norm, operator_norm, sigma_max
 
 ### Nuclear norm
 
@@ -60,12 +59,6 @@ function conic_form(x::NuclearNormAtom, unique_constr)
     unique_constr[(x.head, x.children_hash)] = conic_form(p)
   end
   return safe_copy(unique_constr[(x.head, x.children_hash)])
-end
-
-### Trace
-
-function trace(e::AbstractExpr)
-  return sum(diag(e))
 end
 
 ### Operator norm

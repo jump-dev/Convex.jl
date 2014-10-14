@@ -42,7 +42,7 @@ end
 function show(io::IO, c::SDPConstraint)
   print(io, """Constraint:
     $(c.head) constraint
-    expression: $(c.lhs)
+    expression: $(c.child)
     """)
 end
 

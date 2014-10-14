@@ -15,7 +15,9 @@ type Variable <: AbstractExpr
   sign::Sign
   implied_constraints::Array{Constraint, 1}
 
-  function Variable(size::(Int64, Int64), sign::Sign=NoSign())
+  # is_symmetric is only needed for Semidefinite atoms. Value is ignored for everything else
+  # If you wish to force symmetricity for other variables, add x == x' as a constraint
+  function Variable(size::(Int64, Int64), sign::Sign=NoSign(); is_symmetric=true)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[])
     this.id = object_id(this)
     id_to_variables[this.id] = this
@@ -25,7 +27,7 @@ type Variable <: AbstractExpr
       elseif sign == Negative()
         push!(this.implied_constraints, this <= 0)
       elseif sign == Semidefinite()
-        push!(this.implied_constraints, SDPConstraint(this))
+        push!(this.implied_constraints, SDPConstraint(this, is_symmetric=is_symmetric))
       end
     end
     return this
@@ -37,8 +39,10 @@ type Variable <: AbstractExpr
 end
 
 # convenience semidefinite matrix constructor
-Semidefinite(m::Integer) = Variable((m,m), Semidefinite())
-Semidefinite(m::Integer, n::Integer) = (m==n ? Variable((m,m), Semidefinite()) : error("Semidefinite matrices must be square"))
+Semidefinite(m::Integer; is_symmetric=true) = Variable((m,m), Semidefinite(), is_symmetric=is_symmetric)
+Semidefinite(m::Integer, n::Integer; is_symmetric=true) = begin
+  m==n ? Variable((m,m), Semidefinite(); is_symmetric=is_symmetric) : error("Semidefinite matrices must be square")
+end
 
 # GLOBAL MAP
 # TODO: Comment David.
