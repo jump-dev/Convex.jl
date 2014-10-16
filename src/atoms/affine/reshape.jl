@@ -1,27 +1,42 @@
 import Base.reshape, Base.vec
 export reshape, vec
+export sign, curvature, monotonicity, evaluate, conic_form!
 
-# Creates a new expression, same as x, but updates the size
-function reshape(x::AbstractCvxExpr, m::Int64, n::Int64)
-  sz = get_vectorized_size(x.size)
-  if m * n != sz
-    error("Can't reshape expression with $sz entries into $(m * n)")
+
+type ReshapeAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(AbstractExpr,)
+  size::(Int64, Int64)
+
+  function ReshapeAtom(x::AbstractExpr, m::Int64, n::Int64)
+    if m * n != get_vectorized_size(x)
+      error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
+    end
+    return new(:reshape, object_id(x), (x,), (m, n))
   end
-
-  this = CvxExpr(:reshape, [x], x.vexity, x.sign, (m, n))
-  coeffs = VecOrMatOrSparse[speye(sz), -speye(sz)]
-  vars = [x.uid, this.uid]
-  canon_constr = CanonicalConstr(coeffs, vars, spzeros(sz, 1), true, false)
-
-  canon_constr_array = x.canon_form()
-  push!(canon_constr_array, canon_constr)
-
-  this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->Base.reshape(x.evaluate(), m, n)
-  return this
 end
 
-# Vectorizes `x`
-function vec(x::AbstractCvxExpr)
-  return reshape(x, get_vectorized_size(x), 1)
+function sign(x::ReshapeAtom)
+  return sign(x.children[1])
 end
+
+function monotonicity(x::ReshapeAtom)
+  return (Nondecreasing(),)
+end
+
+function curvature(x::ReshapeAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::ReshapeAtom)
+  return reshape(evaluate(x.children[1]), x.size[1], x.size[2])
+end
+
+function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
+  return conic_form!(x.children[1], unique_conic_forms)
+end
+
+
+reshape(x::AbstractExpr, m::Int64, n::Int64) = ReshapeAtom(x, m, n)
+vec(x::AbstractExpr) = reshape(x, get_vectorized_size(x), 1)

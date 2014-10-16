@@ -1,5 +1,54 @@
+#############################################################################
+# diag.jl
+# Returns the kth diagonal of a matrix expression
+# All expressions and atoms are subtpyes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
+
 import Base.diag
 export diag
+
+### Diagonal
+### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
+type DiagAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(AbstractExpr,)
+  size::(Int64, Int64)
+  k::Int64
+
+  function DiagAtom(x::AbstractExpr, k::Int64=0)
+    (num_rows, num_cols) = x.size
+
+    if k >= num_cols || k <= -num_rows
+      error("Bounds error in calling diag")
+    end
+
+    children = (x, )
+    return new(:sum, hash((children, k)), children, (minimum(x.size) - k, 1), k)
+  end
+end
+
+function sign(x::DiagAtom)
+  return sign(x.children[1])
+end
+
+# The monotonicity
+function monotonicity(x::DiagAtom)
+  return (Nondecreasing(),)
+end
+
+# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
+# this represents the first term
+function curvature(x::DiagAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::DiagAtom)
+  return diag(evaluate(x.children[1]), x.children[2])
+end
+
+diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
 
 # Finds the "k"-th diagonal of x as a column vector
 # If k == 0, it returns the main diagonal and so on
@@ -13,37 +62,28 @@ export diag
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function diag(x::AbstractCvxExpr, k::Int64=0)
-  (num_rows, num_cols) = x.size
+function conic_form!(x::DiagAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    (num_rows, num_cols) = x.children[1].size
+    k = x.k
 
-  if k >= num_cols || k <= -num_rows
-    error("Bounds error in calling diag")
+    if k >= 0
+      start_index = k * num_rows + 1
+      sz_diag = Base.min(num_rows, num_cols - k)
+    else
+      start_index = -k + 1
+      sz_diag = Base.min(num_rows + k, num_cols)
+    end
+
+    select_diag = spzeros(sz_diag, get_vectorized_size(x.children[1]))
+    for i in 1:sz_diag
+      select_diag[i, start_index] = 1
+      start_index += num_rows + 1
+    end
+
+    objective = conic_form!(x.children[1], unique_conic_forms)
+    new_obj = select_diag * objective
+    cache_conic_form!(unique_conic_forms, x, new_obj)
   end
-
-  if k >= 0
-    start_index = k * num_rows + 1
-    sz_diag = Base.min(num_rows, num_cols - k)
-  else
-    start_index = -k + 1
-    sz_diag = Base.min(num_rows + k, num_cols)
-  end
-
-  coeff = spzeros(sz_diag, get_vectorized_size(x))
-
-  for i in 1:sz_diag
-    coeff[i, start_index] = 1
-    start_index += num_rows + 1
-  end
-
-  this = CvxExpr(:diag, [x], x.vexity, x.sign, (sz_diag, 1))
-  coeffs = VecOrMatOrSparse[coeff, -speye(sz_diag)]
-  vars = [x.uid, this.uid]
-  constant = zeros(sz_diag, 1)
-
-  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-  append!(canon_constr_array, x.canon_form())
-  this.canon_form = ()->canon_constr_array
-
-  this.evaluate = ()->Base.diag(x.evaluate(), k)
-  return this
+  return get_conic_form(unique_conic_forms, x)
 end

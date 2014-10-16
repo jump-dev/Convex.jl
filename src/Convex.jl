@@ -1,42 +1,53 @@
 module Convex
 
-include("union.jl")
-include("expressions/expressions.jl")
+### modeling framework
+include("dcp.jl")
+include("expressions.jl")
+include("conic_form.jl")
+include("variable.jl")
+include("constant.jl")
 include("constraints/constraints.jl")
-include("problems/problems.jl")
-include("problems/conicproblem.jl")
+include("constraints/soc_constraints.jl")
+include("constraints/exp_constraints.jl")
+include("constraints/sdp_constraints.jl")
+include("problems.jl")
 include("solution.jl")
-include("solvers/ecos.jl")
-include("utilities/promotions.jl")
-include("utilities/utilities.jl")
-include("utilities/display.jl")
 
-# Atoms
+### affine atoms
 include("atoms/affine/add_subtract.jl")
-include("atoms/affine/dot.jl")
-include("atoms/affine/index.jl")
 include("atoms/affine/multiply_divide.jl")
-include("atoms/affine/stack.jl")
 include("atoms/affine/sum.jl")
-include("atoms/affine/reshape.jl")
 include("atoms/affine/transpose.jl")
+include("atoms/affine/index.jl")
 include("atoms/affine/diag.jl")
+include("atoms/affine/stack.jl")
+include("atoms/affine/dot.jl")
+include("atoms/affine/reshape.jl")
+include("atoms/affine/trace.jl")
 
-include("atoms/elementwise/min.jl")
-include("atoms/elementwise/max.jl")
-include("atoms/elementwise/pos.jl")
-include("atoms/elementwise/neg.jl")
-include("atoms/elementwise/abs.jl")
-include("atoms/elementwise/sqrt.jl")
-include("atoms/elementwise/square.jl")
-include("atoms/elementwise/square_pos.jl")
-include("atoms/elementwise/qol_elementwise.jl")
-include("atoms/elementwise/inv_pos.jl")
-include("atoms/elementwise/geo_mean.jl")
-
+### elementwise atoms
+include("atoms/abs.jl")
+include("atoms/maximum.jl")
+include("atoms/minimum.jl")
+include("atoms/max.jl")
+include("atoms/min.jl")
 include("atoms/norm.jl")
-include("atoms/quad_form.jl")
-include("atoms/sum_squares.jl")
-include("atoms/quad_over_lin.jl")
 
-end # module
+### SOC atoms
+include("atoms/second_order_cone/norm_2.jl")
+include("atoms/second_order_cone/quad_over_lin.jl")
+include("atoms/second_order_cone/qol_elementwise.jl")
+include("atoms/second_order_cone/geo_mean.jl")
+include("atoms/second_order_cone/quad_form.jl")
+
+### SDP atoms
+include("atoms/matrix_norm.jl")
+
+### exponential atoms
+include("atoms/exp_cone/exp.jl")
+include("atoms/exp_cone/log.jl")
+include("atoms/exp_cone/logsumexp.jl")
+
+### utilities
+include("utilities/show.jl")
+end

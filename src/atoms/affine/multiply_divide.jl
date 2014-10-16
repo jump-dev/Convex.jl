@@ -1,97 +1,96 @@
-export *, /
+#############################################################################
+# multiply_divide.jl
+# Handles scalar multiplication, maatrix multiplication, and scalar division
+# of variables, constants and expressions.
+# All expressions and atoms are subtpyes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
 
-# TODO: Handle .* and ./
+export *
+export sign, monotonicity, curvature, evaluate, conic_form!
 
-# For constants, just multiply their values
-function *(x::Constant, y::Constant)
-  return Constant(x.value * y.value)
+### Scalar and matrix multiplication
+
+type MultiplyAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(AbstractExpr, AbstractExpr)
+  size::(Int64, Int64)
+
+  function MultiplyAtom(x::AbstractExpr, y::AbstractExpr)
+    if x.size == (1, 1)
+      sz = y.size
+    elseif y.size == (1, 1)
+      sz = x.size
+    elseif x.size[2] ==  y.size[1]
+      sz = (x.size[1], y.size[2])
+    else
+      error("Cannot multiply two expressions of sizes $(x.size) and $(y.size)")
+    end
+    children = (x, y)
+    return new(:*, hash(children), children, sz)
+  end
 end
 
-# Multiplication of an AbstractCvxExpr `y` with a Constant `x` to the left
-# 1. If the constant is 1 x 1, we simply multiply it by ones(size of `y`)
-# 2. If the sizes are suitable for multiplication, we then need to handle matrix
-# variables. This is done using Kroneckor products. See details here:
-# http://en.wikipedia.org/wiki/Vectorization_(mathematics)
-# 3. If size of `y` is 1 x 1, we remember that x * y will ultimately be vectorized
-# This knowledge allows us to simply have the canonical form in this case as
-# If w = x * y, I * w - vectorized(x) * y = 0
-function *(x::Constant, y::AbstractCvxExpr)
+function sign(x::MultiplyAtom)
+  return sign(x.children[1]) * sign(x.children[2])
+end
 
-  if x.size[2] != y.size[1] && x.size == (1, 1)
-    x = Constant(speye(y.size[1]) * x.value[1], x.sign)
-  end
+function monotonicity(x::MultiplyAtom)
+  return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
+end
 
-  if x.size[2] == y.size[1]
-    sz = (x.size[1], y.size[2])
-    this = CvxExpr(:*, [x, y], promote_vexity_multiply(x, y), promote_sign_multiply(x, y), sz)
-
-    # Kronecker product for vectorized multiplication
-    vectorized_mul = kron(speye(sz[2]), x.value)
-
-    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
-    vars = [this.uid, y.uid]
-    constant = spzeros(get_vectorized_size(sz), 1)
-    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-
-    this.canon_form = ()->append!(canon_constr_array, y.canon_form())
-
-    this.evaluate = ()->x.evaluate() * y.evaluate()
-    return this
-
-  elseif y.size == (1, 1)
-    this = CvxExpr(:*, [x, y], promote_vexity_multiply(x, y), promote_sign_multiply(x, y), x.size)
-
-    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x.size)), -sparse(vec(x.value))]
-    vars = [this.uid, y.uid]
-    constant = spzeros(get_vectorized_size(x.size), 1)
-    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-
-    this.canon_form = ()->append!(canon_constr_array, y.canon_form())
-
-    this.evaluate = ()->x.evaluate() * y.evaluate()
-    return this
+# Multiplication has an indefinite hessian, so if neither children are constants,
+# the curvature of the atom will violate DCP.
+function curvature(x::MultiplyAtom)
+  if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
+    return NotDCP()
   else
-    error("Size of arguments cannot be multiplied; got $(x.size), $(y.size)")
+    return ConstVexity()
   end
 end
 
-# If either of `x` or `y` is 1 x 1, we simply return `y * x`, which has been
-# discussed above. Otherwise, we perform canonicalization similar to 2. above
-function *(x::AbstractCvxExpr, y::Constant)
-  if y.size == (1, 1) || x.size == (1, 1)
-    return y * x
+function evaluate(x::MultiplyAtom)
+  return evaluate(x.children[1]) * evaluate(x.children[2])
+end
+
+function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    # scalar multiplication
+    if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
+      if x.children[1].head == :constant
+        const_child = x.children[1]
+        expr_child = x.children[2]
+      else
+        const_child = x.children[2]
+        expr_child = x.children[1]
+      end
+      objective = conic_form!(expr_child, unique_conic_forms)
+
+      # make sure all 1x1 sized objects are interpreted as scalars, since
+      # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
+      if const_child.size == (1, 1)
+        const_multiplier = const_child.value[1]
+      else
+        const_multiplier = reshape(const_child.value, get_vectorized_size(const_child), 1)
+      end
+
+      objective = const_multiplier * objective
+
+    # left matrix multiplication
+    elseif x.children[1].head == :constant
+      objective = conic_form!(x.children[2], unique_conic_forms)
+      objective = kron(speye(x.size[2]), x.children[1].value) * objective
+    # right matrix multiplication
+    else
+      objective = conic_form!(x.children[1], unique_conic_forms)
+      objective = kron(x.children[2].value', speye(x.size[1])) * objective
+    end
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
-
-  sz = (x.size[1], y.size[2])
-  vectorized_mul = kron(y.value', speye(sz[1]))
-
-  this = CvxExpr(:*, [x, y], promote_vexity_multiply(y, x), promote_sign_multiply(y, x), sz)
-
-  coeffs = VecOrMatOrSparse[speye(get_vectorized_size(sz)), -vectorized_mul]
-  vars = [this.uid, x.uid]
-  constant = spzeros(get_vectorized_size(sz), 1)
-  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-
-  this.canon_form = ()->append!(canon_constr_array, x.canon_form())
-  this.evaluate = ()->x.evaluate() * y.evaluate()
-  return this
+  return get_conic_form(unique_conic_forms, x)
 end
 
-function *(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  error("Multiplication between two variable expressions is not DCP compliant. Perhaps
-        you want to look into norm, or quad_form?")
-end
-
-*(x::AbstractCvxExpr, y::Value) = *(x, convert(CvxExpr, y))
-*(x::Value, y::AbstractCvxExpr) = *(convert(CvxExpr, x), y)
-
-# Only division by constant scalars is allowed
-function inv(y::Constant)
-  if y.size != (1, 1)
-    error("Only division by constant scalars is allowed")
-  end
-  return Constant(1 / y.value)
-end
-
-/(x::AbstractCvxExpr, y::Constant) = *(x, inv(y))
-/(x::AbstractCvxExpr, y::Number) = *(x, 1 / y)
+*(x::AbstractExpr, y::AbstractExpr) = MultiplyAtom(x, y)
+*(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
+*(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))

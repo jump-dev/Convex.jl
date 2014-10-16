@@ -1,6 +1,6 @@
 using Convex
 
-TOLERANCE = .0001
+TOLERANCE = .01
 
 # Test 1
 x = Variable(1)
@@ -100,7 +100,7 @@ solve!(p)
 # Test 15
 x = Variable(1)
 c = ones(2, 1)
-p = minimize(c' * (x .+ eye(2)) * c, [x .+ eye(3) >= 2 * eye(3), -eye(4) < x])
+p = minimize(c' * (x .+ eye(2)) * c, [x .+ eye(3) >= 2 * eye(3), -eye(4) <= x])
 solve!(p)
 @assert abs(p.optval - 6) < TOLERANCE
 
@@ -109,9 +109,9 @@ N = 20
 x = Variable(1)
 y = Variable(N, N)
 c = ones(N, 1)
-p = minimize(c' * (y .+ x) * c, [x >= 3, 2y >= 0, y <= x])
+p = minimize(c' * (y .+ x) * (c / 100), [x >= 3, 2*y >= 0, y <= x])
 solve!(p)
-@assert abs(p.optval - 1200) < TOLERANCE
+@assert abs(p.optval - 12) < TOLERANCE
 
 # Test 17
 x = Variable(2)
@@ -162,7 +162,7 @@ solve!(p)
 # Test 22
 x = Variable(10)
 a = rand(10, 1)
-p = minimize(max(x), x >= a)
+p = minimize(maximum(x), x >= a)
 solve!(p)
 @assert abs(p.optval - Base.maximum(a)) < TOLERANCE
 
@@ -171,7 +171,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = minimize(max(max(x, y)), [x >= a, y >= b])
+p = minimize(maximum(max(x, y)), [x >= a, y >= b])
 solve!(p)
 max_a = Base.maximum(a)
 max_b = Base.maximum(b)
@@ -180,7 +180,7 @@ max_b = Base.maximum(b)
 # Test 24
 x = Variable(1)
 a = rand(10, 10)
-p = maximize(min(x), x <= a)
+p = maximize(minimum(x), x <= a)
 solve!(p)
 @assert abs(p.optval - Base.minimum(a)) < TOLERANCE
 
@@ -189,7 +189,7 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = maximize(min(min(x, y)), [x <= a, y <= b])
+p = maximize(minimum(min(x, y)), [x <= a, y <= b])
 solve!(p)
 min_a = Base.minimum(a)
 min_b = Base.minimum(b)
@@ -219,14 +219,14 @@ solve!(p)
 # Test 29
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = maximize(sum(x) + sum(y), [hcat(x, y) <= 2])
+p = maximize(sum(x) + sum(y), [ [x y] <= 2])
 solve!(p)
 @assert abs(p.optval - 80) < TOLERANCE
 
 # Test 30
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = maximize(sum(x) + sum(y), [vertcat(x, y') <= 2])
+p = maximize(sum(x) + sum(y), [ [x, y'] <= 2])
 solve!(p)
 @assert abs(p.optval - 80) < TOLERANCE
 
@@ -236,8 +236,8 @@ y = Variable(4, 6)
 z = Variable(1)
 c = ones(4, 1)
 d = 2 * ones(6, 1)
-constraints = [hcat(x, y) <= 2, z <= 0, z <= x, 2z >= -1]
-objective = sum(x .+ z) + min(y) + c' * y * d
+constraints = [[x y] <= 2, z <= 0, z <= x, 2z >= -1]
+objective = sum(x + z) + minimum(y) + c' * y * d
 p = maximize(objective, constraints)
 solve!(p)
 @assert abs(p.optval - 130) < TOLERANCE
@@ -269,7 +269,7 @@ solve!(p)
 
 # Test 35
 x = Variable(3)
-p = minimize(sum(abs(x)), [-2 <= x, x <= 1])
+p = minimize(sum(abs(x)), [-2 <= x, x <= 1]);
 solve!(p)
 @assert abs(p.optval) < TOLERANCE
 
@@ -305,6 +305,7 @@ c = [3 2 4]
 d = -3
 p = minimize(quad_over_lin(A*x + b, c*x + d))
 solve!(p)
+@assert abs(p.optval - 17.7831) < TOLERANCE
 
 # Test 40
 x = Variable(4, 4)

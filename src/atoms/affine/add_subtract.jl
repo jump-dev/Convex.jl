@@ -1,145 +1,129 @@
+#############################################################################
+# add_subtract.jl
+# Handles unary negation, addition and subtraction of variables, constants
+# and expressions.
+# All expressions and atoms are subtpyes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
+
 export +, -, .+, .-
+export sign, curvature, monotonicity, evaluate
 
 ### Unary Negation
 
-function -(x::Constant)
-  return Constant(-x.value)
-end
+type NegateAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(AbstractExpr,)
+  size::(Int64, Int64)
 
-# If the variable created for -x is w, then the canonical form is
-# - (I * w) + I * -x = 0
-function -(x::AbstractCvxExpr)
-  this = CvxExpr(:-, [x], reverse_vexity(x), reverse_sign(x), x.size)
-
-  if x.vexity == :constant
-    this.canon_form = ()->CanonicalConstr[]
-  else
-    coeffs = VecOrMatOrSparse[speye(get_vectorized_size(x)), speye(get_vectorized_size(x))]
-
-    vars = [this.uid, x.uid]
-    constant = zeros(get_vectorized_size(x))
-    canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-    append!(canon_constr_array, x.canon_form())
-
-    this.canon_form = ()->canon_constr_array
+  function NegateAtom(x::AbstractExpr)
+    children = (x,)
+    return new(:-, hash(children), children, x.size)
   end
-
-  this.evaluate = ()->-x.evaluate()
-
-  return this
 end
 
-### Binary Addition/Subtraction
+function sign(x::NegateAtom)
+  return -sign(x.children[1])
+end
 
-# Let w = x + y be the variable created
-# Addition if:
-#
-# 1. x and y are the same size
-# # Canonical form is - x - y + w = 0
-# 2. x is (1, 1) and y is a vector/ matrix of size m x n (Vectorized as of size mn x 1)
-# # Canonical form is -ones(mn, 1) * x - y + w = 0
-# 3. y is (1, 1). We just return y + x which then falls into case 2
-function .+(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.size != y.size
+function monotonicity(x::NegateAtom)
+  return (Nonincreasing(),)
+end
 
-    if x.size == (1, 1)
-      sz_y = get_vectorized_size(y)
-      this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
-      coeffs = VecOrMatOrSparse[-ones(sz_y, 1), -speye(sz_y), speye(sz_y)]
-      vars = [x.uid, y.uid, this.uid]
-      constant = zeros(sz_y)
-    elseif y.size == (1, 1)
-      return y .+ x
+function curvature(x::NegateAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::NegateAtom)
+  return -evaluate(x.children[1])
+end
+
+-(x::AbstractExpr) = NegateAtom(x)
+
+function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = conic_form!(x.children[1], unique_conic_forms)
+    objective = -objective
+    cache_conic_form!(unique_conic_forms, x, objective)
+  end
+  return get_conic_form(unique_conic_forms, x)
+end
+
+
+### Addition
+type AdditionAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::Array{AbstractExpr, 1}
+  size::(Int64, Int64)
+
+  function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
+    # find the size of the expression = max of size of x and size of y
+    if x.size == y.size || y.size == (1, 1)
+      sz = x.size
+    elseif x.size == (1, 1)
+      sz = y.size
     else
-      error("Can't add expressions of size $(x.size) and $(y.size)")
+      error("Cannot add expressions of sizes $(x.size) and $(y.size)")
     end
-  else
-    sz = get_vectorized_size(y)
-    this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
-    coeffs = VecOrMatOrSparse[-speye(sz), -speye(sz), speye(sz)]
-    vars = [x.uid, y.uid, this.uid]
-    constant = zeros(sz)
-  end
-
-  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-
-  append!(canon_constr_array, x.canon_form())
-  append!(canon_constr_array, y.canon_form())
-
-  this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->x.evaluate() .+ y.evaluate()
-
-  return this
-end
-
-# Same rules as above. Except that if y is a scalar, we can simply multiply it by
-# ones(...) to promote its size to what it should be
-function .+(x::AbstractCvxExpr, y::Constant)
-  if x.size != y.size && x.size == (1, 1)
-    sz_y = get_vectorized_size(y)
-    this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), y.size)
-    coeffs = VecOrMatOrSparse[-ones(sz_y, 1), speye(sz_y)]
-  elseif x.size != y.size && y.size != (1, 1)
-    error("Can't add expressions of size $(x.size) and $(y.size)")
-  else
-    if y.size == (1, 1)
-      y = Constant(y.value * ones(x.size...), y.sign)
+    # see if we're forming a sum of more than two terms and condense them
+    children = AbstractExpr[]
+    if isa(x, AdditionAtom)
+      append!(children, x.children)
+    else
+      push!(children, x)
     end
-    sz = get_vectorized_size(x)
-    this = CvxExpr(:+, [x, y], promote_vexity_add(x, y), promote_sign_add(x, y), x.size)
-    coeffs = VecOrMatOrSparse[-speye(sz), speye(sz)]
-  end
-
-  vars = [x.uid, this.uid]
-  constant = vec(y.value)
-  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-
-  append!(canon_constr_array, x.canon_form())
-  this.canon_form = ()->canon_constr_array
-  this.evaluate = ()->x.evaluate() .+ y.evaluate()
-  return this
-end
-
-# Adding two constants doesn't require canonicalization
-function .+(x::Constant, y::Constant)
-  this = Constant(x.value .+ y.value)
-  return this
-end
-
-# Override addition since julia doesn't allow things like [1] + eye(4)
-function +(x::Array{Number,}, y::Array{Number,})
-  if x.size == (1, 1)
-    return x[1] + y
-  elseif y.size == (1, 1)
-    return x + y[1]
-  else
-    return x + y
+    if isa(y, AdditionAtom)
+      append!(children, y.children)
+    else
+      push!(children, y)
+    end
+    return new(:+, hash(children), children, sz)
   end
 end
 
-.+(y::Constant, x::AbstractCvxExpr) = .+(x::AbstractCvxExpr, y::Constant)
-.+(x::AbstractCvxExpr, y::Value) = .+(x, convert(CvxExpr, y))
-.+(x::Value, y::AbstractCvxExpr) = .+(y, convert(CvxExpr, x))
-.-(x::AbstractCvxExpr, y::AbstractCvxExpr) = .+(x, -y)
-.-(x::AbstractCvxExpr, y::Value) = .+(x, -y)
-.-(x::Value, y::AbstractCvxExpr) = .+(-y, x)
-
-function +(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.size != y.size
-    warn("x + y is deprecated if sizes do not match. Use x .+ y instead.")
-  end
-  return x .+ y
+function sign(x::AdditionAtom)
+  return sum(Sign[sign(child) for child in x.children])
 end
 
-+(x::AbstractCvxExpr, y::Value) = +(x, convert(CvxExpr, y))
-+(x::Value, y::AbstractCvxExpr) = +(convert(CvxExpr, x), y)
-
-function -(x::AbstractCvxExpr, y::AbstractCvxExpr)
-  if x.size != y.size
-    warn("x - y is deprecated if sizes do not match. Use x .- y instead.")
-  end
-  return x .- y
+function monotonicity(x::AdditionAtom)
+  return Monotonicity[Nondecreasing() for child in x.children]
 end
 
--(x::AbstractCvxExpr, y::Value) = -(x, convert(CvxExpr, y))
--(x::Value, y::AbstractCvxExpr) = -(convert(CvxExpr, x), y)
+function curvature(x::AdditionAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::AdditionAtom)
+  return sum([evaluate(child) for child in x.children])
+end
+
+function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = ConicObj()
+    for child in x.children
+      child_objective = conic_form!(child, unique_conic_forms)
+      if x.size != child.size
+        child_objective = promote_size(child_objective, get_vectorized_size(x))
+      end
+      objective += child_objective
+    end
+    cache_conic_form!(unique_conic_forms, x, objective)
+  end
+  return get_conic_form(unique_conic_forms, x)
+end
+
++(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
++(x::Value, y::AbstractExpr) = AdditionAtom(Constant(x), y)
++(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
+-(x::AbstractExpr, y::AbstractExpr) = x + (-y)
+-(x::Value, y::AbstractExpr) = Constant(x) + (-y)
+-(x::AbstractExpr, y::Value) = x + Constant(-y)
+
+.+(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
+.+(x::Value, y::AbstractExpr) = AdditionAtom(Constant(x), y)
+.+(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
+.-(x::AbstractExpr, y::AbstractExpr) = x + (-y)
+.-(x::Value, y::AbstractExpr) = Constant(x) + (-y)
+.-(x::AbstractExpr, y::Value) = x + Constant(-y)

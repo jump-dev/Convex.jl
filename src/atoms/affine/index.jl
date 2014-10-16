@@ -1,66 +1,82 @@
-export getindex
+import Base.getindex
+export IndexAtom, getindex
 
-# Slice a variable or an expression to get only certain elements
-# The canonical form is straightforward:
-# 1. Calculate number of elements needed, call this num_e
-# 2. Create coefficient matrix, coeff, of size num_e * get_vectorized_size(x)
-# 3. Add 1's at the correct places of coeff to allow
-# coeff * vectorized(x) - vectorized(indexed_elements) = 0
-function getindex(x::AbstractCvxExpr, rows::AbstractArray, cols::AbstractArray=[1])
-  if size(rows, 1) != 1 && size(rows, 2) != 1
-    error("Expected a vector but got size $(size(rows))")
-  end
-  if size(cols, 1) != 1 && size(cols, 2) != 1
-    error("Expected a vector but got size $(size(cols))")
-  end
+ArrayOrNothing = Union(AbstractArray, Nothing)
 
-  # Get rid of duplicate elements
-  rows = unique(rows)
-  cols = unique(cols)
+type IndexAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(AbstractExpr,)
+  size::(Int64, Int64)
+  rows::ArrayOrNothing
+  cols::ArrayOrNothing
+  inds::ArrayOrNothing
 
-  # Number of rows/cols in the coefficient for x in our canonical form
-  num_rows_coeff = length(rows) * length(cols)
-  num_cols_coeff = get_vectorized_size(x)
-
-  coeff = spzeros(num_rows_coeff, num_cols_coeff)
-
-  # Create the coeff matrix such that coeff * vec(x) = vec(x[rows, cols])
-  k = 1
-  num_rows = x.size[1]
-  for c in cols
-    for r in rows
-      idx = num_rows * (c - 1) + r
-      coeff[k, idx] = 1
-      k += 1
-    end
+  function IndexAtom(x::AbstractExpr, rows::AbstractArray, cols::AbstractArray)
+    sz = (length(rows), length(cols))
+    children = (x,)
+    return new(:index, hash((children, rows, cols, nothing)), children, sz, rows, cols, nothing)
   end
 
-  this = CvxExpr(:index, [x], x.vexity, x.sign, (length(rows), length(cols)))
-  coeffs = VecOrMatOrSparse[coeff, -speye(num_rows_coeff)]
-  vars = [x.uid, this.uid]
-  constant = zeros(num_rows_coeff)
-
-  canon_constr_array = [CanonicalConstr(coeffs, vars, constant, true, false)]
-  append!(canon_constr_array, x.canon_form())
-  this.canon_form = ()->canon_constr_array
-
-  this.evaluate = ()->begin
-    x_val = x.evaluate()
-    if maximum(rows) > size(x_val, 1) && maximum(cols) == 1
-      return vec(x_val)[rows]
-    end
-    return x_val[rows, cols]
+  function IndexAtom(x::AbstractExpr, inds::AbstractArray)
+    sz = (length(inds), 1)
+    children = (x,)
+    return new(:index, hash((children, nothing, nothing, inds)), children, sz, nothing, nothing, inds)
   end
-  return this
 end
 
-getindex(x::AbstractCvxExpr, row::Int64, col::Int64=1) = getindex(x, row:row, col:col)
-getindex(x::AbstractCvxExpr, row::Number, col::Number=1) = getindex(x, row:row, col:col)
-getindex(x::AbstractCvxExpr, row::Int64, cols::AbstractArray) = getindex(x, row:row, cols)
-getindex(x::AbstractCvxExpr, rows::AbstractArray, col::Int64) = getindex(x, rows, col:col)
+function sign(x::IndexAtom)
+  return sign(x.children[1])
+end
 
-# If a non-Int64 is passed, we try to convert it into an Int64. For something like 1.0
-# this will work. For a float like 1.5, convert will throw an InexactError
-# Note that we don't use int(index) because `int` rounds the number whereas float
-# wil only convert floats of the form 5.0, 4.0 etc. and not 4.5
-getindex(x::AbstractCvxExpr, index::Number) = getindex(x, convert(Int64, index))
+function monotonicity(x::IndexAtom)
+  return (Nondecreasing(),)
+end
+
+function curvature(x::IndexAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::IndexAtom)
+  if x.inds == nothing
+    return getindex(evaluate(x.children[1]), rows, cols)
+  else
+    return getindex(evaluate(x.children[1]), inds)
+  end
+end
+
+function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    m = get_vectorized_size(x)
+    n = get_vectorized_size(x.children[1])
+
+    if x.inds == nothing
+      sz = length(x.cols) * length(x.rows)
+      J = Array(Int64, sz)
+      k = 1
+
+      num_rows = x.children[1].size[1]
+      for c in x.cols
+        for r in x.rows
+          J[k] = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
+          k += 1
+        end
+      end
+
+      index_matrix = sparse(1:sz, J, 1.0, m, n)
+    else
+      index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
+    end
+    objective = conic_form!(x.children[1], unique_conic_forms)
+    objective = index_matrix * objective
+    cache_conic_form!(unique_conic_forms, x, objective)
+  end
+  return get_conic_form(unique_conic_forms, x)
+end
+
+getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)
+getindex{T <: Real}(x::AbstractExpr, inds::AbstractArray{T, 1}) = IndexAtom(x, inds)
+getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
+getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
+getindex{T <: Real}(x::AbstractExpr, row::Real, cols::AbstractArray{T, 1}) = getindex(x, row:row, cols)
+getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, col::Real) = getindex(x, rows, col:col)
