@@ -125,6 +125,7 @@ maximize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   maximize(convert(AbstractExpr, objective), constraints)
 
 # Allow users to simply type satisfy (if there is no objective)
+satisfy(constraints::Constraint...) = Problem(:minimize, Constant(0), [constraints...])
 satisfy{T<:Constraint}(constraints::Array{T}=Constraint[]) =
   Problem(:minimize, Constant(0), constraints)
 satisfy(constraint::Constraint) = satisfy([constraint])
