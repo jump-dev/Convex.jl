@@ -49,7 +49,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     populate_variables!(problem, var_to_ranges)
   end
   # minimize -> maximize
-  if (problem.head == :maximize) && (problem.solution.status == :Optimal)
+  if (problem.head == :maximize)
     problem.solution.optval = -problem.solution.optval
   end
 
