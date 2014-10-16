@@ -35,7 +35,7 @@ function conic_form(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
     x, y = q.children
     conic_form(SOCConstraint(y + t, y - t, 2 * x), unique_conic_forms)
     conic_form(y >= 0, unique_conic_forms)
-    add_conic_form!(unique_conic_forms, q, qol_objective)
+    cache_conic_form!(unique_conic_forms, q, qol_objective)
   end
   return get_conic_form(unique_conic_forms, q)
 end

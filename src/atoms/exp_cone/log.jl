@@ -50,7 +50,7 @@ function conic_form(e::LogAtom, unique_conic_forms::UniqueConicForms)
     objective = conic_form(x, unique_conic_forms)
     conic_form(ExpConstraint(x, y, z), unique_conic_forms)
 
-    add_conic_form!(unique_conic_forms, e, objective)
+    cache_conic_form!(unique_conic_forms, e, objective)
   end
   return get_conic_form(unique_conic_forms, e)
 end

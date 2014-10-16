@@ -53,7 +53,7 @@ function conic_form(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
         end
       end
     end
-    add_conic_form!(unique_conic_forms, c, conic_constrs)
+    cache_conic_form!(unique_conic_forms, c, conic_constrs)
   end
   return get_conic_form(unique_conic_forms, c)
 end

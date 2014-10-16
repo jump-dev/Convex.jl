@@ -67,7 +67,7 @@ function conic_form(x::Variable, unique_conic_forms::UniqueConicForms)
     objective[x.id_hash] = speye(vec_size)
     objective[object_id(:constant)] = spzeros(vec_size, 1)
     # placeholder values in unique constraints prevent infinite recursion depth
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
     for constraint in x.implied_constraints
       conic_form(constraint, unique_conic_forms)
     end

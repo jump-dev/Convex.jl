@@ -49,7 +49,7 @@ function conic_form(e::ExpAtom, unique_conic_forms::UniqueConicForms)
     z = Variable(size(x))
     objective = conic_form(z, unique_conic_forms)
     conic_form(ExpConstraint(x, y, z), unique_conic_forms)
-    add_conic_form!(unique_conic_forms, e, objective)
+    cache_conic_form!(unique_conic_forms, e, objective)
   end
   return get_conic_form(unique_conic_forms, e)
 end

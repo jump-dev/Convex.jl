@@ -50,7 +50,7 @@ function conic_form(x::SumAtom, unique_conic_forms::UniqueConicForms)
     for var in keys(new_obj)
       new_obj[var] = sum(new_obj[var], 1)
     end
-    add_conic_form!(unique_conic_forms, x, new_obj)
+    cache_conic_form!(unique_conic_forms, x, new_obj)
   end
   return get_conic_form(unique_conic_forms, x)
 end

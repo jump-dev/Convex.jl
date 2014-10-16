@@ -216,31 +216,31 @@ p = minimize(4x1 + x2,
 solve!(p)
 @assert abs(p.optval - 3.6) < TOLERANCE
 
-# # Test 29
-# x = Variable(4, 4)
-# y = Variable(4, 6)
-# p = maximize(sum(x) + sum(y), [hcat(x, y) <= 2])
-# solve!(p)
-# @assert abs(p.optval - 80) < TOLERANCE
+# Test 29
+x = Variable(4, 4)
+y = Variable(4, 6)
+p = maximize(sum(x) + sum(y), [ [x y] <= 2])
+solve!(p)
+@assert abs(p.optval - 80) < TOLERANCE
 
-# # Test 30
-# x = Variable(4, 4)
-# y = Variable(4, 6)
-# p = maximize(sum(x) + sum(y), [vertcat(x, y') <= 2])
-# solve!(p)
-# @assert abs(p.optval - 80) < TOLERANCE
+# Test 30
+x = Variable(4, 4)
+y = Variable(4, 6)
+p = maximize(sum(x) + sum(y), [ [x, y'] <= 2])
+solve!(p)
+@assert abs(p.optval - 80) < TOLERANCE
 
-# # Test 31
-# x = Variable(4, 4)
-# y = Variable(4, 6)
-# z = Variable(1)
-# c = ones(4, 1)
-# d = 2 * ones(6, 1)
-# constraints = [hcat(x, y) <= 2, z <= 0, z <= x, 2z >= -1]
-# objective = sum(x .+ z) + min(y) + c' * y * d
-# p = maximize(objective, constraints)
-# solve!(p)
-# @assert abs(p.optval - 130) < TOLERANCE
+# Test 31
+x = Variable(4, 4)
+y = Variable(4, 6)
+z = Variable(1)
+c = ones(4, 1)
+d = 2 * ones(6, 1)
+constraints = [[x y] <= 2, z <= 0, z <= x, 2z >= -1]
+objective = sum(x + z) + minimum(y) + c' * y * d
+p = maximize(objective, constraints)
+solve!(p)
+@assert abs(p.optval - 130) < TOLERANCE
 
 # Test 32
 x = Variable(2, 1)
@@ -282,20 +282,20 @@ p = minimize(norm_2(A * x + b) + lambda * norm_1(x), x >= 1)
 solve!(p)
 @assert abs(p.optval - 15.4907) < TOLERANCE
 
-# # Test 37
-# x = Variable(3, 1)
-# A = [0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
-# p = minimize(quad_form(x, A), [x >= 1])
-# solve!(p)
-# @assert abs(p.optval - 6.1464) < TOLERANCE
+# Test 37
+x = Variable(3, 1)
+A = [0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
+p = minimize(quad_form(x, A), [x >= 1])
+solve!(p)
+@assert abs(p.optval - 6.1464) < TOLERANCE
 
-# # Test 38
-# x = Variable(3, 1)
-# A = -1.0*[0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
-# c = [3 2 4]
-# p = maximize(c*x , [quad_form(x, A) >= -1])
-# solve!(p)
-# @assert abs(p.optval - 3.7713) < TOLERANCE
+# Test 38
+x = Variable(3, 1)
+A = -1.0*[0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
+c = [3 2 4]
+p = maximize(c*x , [quad_form(x, A) >= -1])
+solve!(p)
+@assert abs(p.optval - 3.7713) < TOLERANCE
 
 # Test 39
 x = Variable(3, 1)

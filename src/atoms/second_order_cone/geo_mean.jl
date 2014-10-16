@@ -37,7 +37,7 @@ function conic_form(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
     conic_form(SOCElemConstraint(y + x, y - x, 2 * t), unique_conic_forms)
     conic_form(x >= 0, unique_conic_forms)
     conic_form(y >= 0, unique_conic_forms)
-    add_conic_form!(unique_conic_forms, q, qol_objective)
+    cache_conic_form!(unique_conic_forms, q, qol_objective)
   end
   return get_conic_form(unique_conic_forms, q)
 end

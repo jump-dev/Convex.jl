@@ -35,7 +35,7 @@ function conic_form(c::EqConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.lhs - c.rhs
     objective = conic_form(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-    add_conic_form!(unique_conic_forms, c, new_constraint)
+    cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
 end
@@ -78,7 +78,7 @@ function conic_form(c::LtConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.rhs - c.lhs
     objective = conic_form(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-    add_conic_form!(unique_conic_forms, c, new_constraint)
+    cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
 end
@@ -123,7 +123,7 @@ function conic_form(c::GtConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.lhs - c.rhs
     objective = conic_form(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-    add_conic_form!(unique_conic_forms, c, new_constraint)
+    cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
 end

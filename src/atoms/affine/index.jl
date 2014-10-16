@@ -69,7 +69,7 @@ function conic_form(x::IndexAtom, unique_conic_forms::UniqueConicForms)
     end
     objective = conic_form(x.children[1], unique_conic_forms)
     objective = index_matrix * objective
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

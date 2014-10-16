@@ -39,9 +39,17 @@ end
 
 # Transpose.
 println("Transpose example")
-X = Variable(1000, 1000);
-A = randn(1000, 1000);
+X = Variable(5, 5);
+A = randn(5, 5);
 @time begin
   p = minimize(norm_2(X - A), X' == X);
 end
 @time solve!(p, ECOS.ECOSMathProgModel())
+
+n = 3
+A = randn(n, n);
+#@time begin
+  X = Variable(n, n);
+  p = minimize(vecnorm(X' - A), X[1,1] == 1);
+  solve!(p, ECOS.ECOSMathProgModel())
+#end

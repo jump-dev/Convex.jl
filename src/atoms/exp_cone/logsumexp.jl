@@ -49,7 +49,7 @@ function conic_form(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
     objective = conic_form(t, unique_conic_forms)
     conic_form(sum(exp(e.children[1])) <= exp(t), unique_conic_forms)
 
-    add_conic_form!(unique_conic_forms, e, objective)
+    cache_conic_form!(unique_conic_forms, e, objective)
   end
   return get_conic_form(unique_conic_forms, e)
 end

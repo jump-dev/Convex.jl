@@ -48,7 +48,7 @@ function conic_form(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     objective = conic_form(t, unique_conic_forms)
     conic_form(c<=t, unique_conic_forms)
     conic_form(c>=-t, unique_conic_forms)
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

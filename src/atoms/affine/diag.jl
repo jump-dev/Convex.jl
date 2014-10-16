@@ -83,7 +83,7 @@ function conic_form(x::DiagAtom, unique_conic_forms::UniqueConicForms)
 
     objective = conic_form(x.children[1], unique_conic_forms)
     new_obj = select_diag * objective
-    add_conic_form!(unique_conic_forms, x, new_obj)
+    cache_conic_form!(unique_conic_forms, x, new_obj)
   end
   return get_conic_form(unique_conic_forms, x)
 end

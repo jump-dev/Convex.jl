@@ -86,7 +86,7 @@ function conic_form(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
       objective = conic_form(x.children[1], unique_conic_forms)
       objective = kron(x.children[2].value', speye(x.size[1])) * objective
     end
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

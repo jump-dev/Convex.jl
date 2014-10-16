@@ -33,7 +33,7 @@ function conic_form(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     if c.is_symmetric
       conic_form(c.child == c.child', unique_conic_forms)
     end
-    add_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
+    cache_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
   end
   return get_conic_form(unique_conic_forms, c)
 end

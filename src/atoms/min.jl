@@ -66,7 +66,7 @@ function conic_form(x::MinAtom, unique_conic_forms::UniqueConicForms)
     for child in x.children
       conic_form(this <= child, unique_conic_forms)
     end
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

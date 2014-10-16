@@ -63,7 +63,7 @@ function conic_form(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
     transpose_matrix = sparse(I, J, 1.0)
 
     objective = transpose_matrix * objective
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

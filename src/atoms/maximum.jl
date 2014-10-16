@@ -46,7 +46,7 @@ function conic_form(x::MaximumAtom, unique_conic_forms::UniqueConicForms)
     this = Variable()
     objective = conic_form(this, unique_conic_forms)
     conic_form(this >= x.children[1], unique_conic_forms)
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

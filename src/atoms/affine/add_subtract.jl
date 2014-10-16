@@ -45,7 +45,7 @@ function conic_form(x::NegateAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     objective = conic_form(x.children[1], unique_conic_forms)
     objective = -objective
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end
@@ -109,7 +109,7 @@ function conic_form(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
       end
       objective += child_objective
     end
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end

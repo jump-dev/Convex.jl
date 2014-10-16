@@ -1,6 +1,6 @@
 export ConicObj, ConicConstr, UniqueConicForms
 export +, -, *, promote_size, get_row
-export add_conic_form!, has_conic_form, get_conic_form
+export cache_conic_form!, has_conic_form, get_conic_form
 
 ConicObj = Dict{Uint64, Value}
 
@@ -89,16 +89,16 @@ function get_conic_form(conic_forms::UniqueConicForms, constr::Constraint)
   return conic_forms.constr_map[(constr.head, constr.id_hash)]
 end
 
-function add_conic_form!(conic_forms::UniqueConicForms, exp::AbstractExpr, new_conic_form::ConicObj)
+function cache_conic_form!(conic_forms::UniqueConicForms, exp::AbstractExpr, new_conic_form::ConicObj)
   conic_forms.exp_map[(exp.head, exp.id_hash)] = new_conic_form
 end
 
-function add_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_form::ConicConstr)
+function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_form::ConicConstr)
   conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
   push!(conic_forms.constr_list, new_conic_form)
 end
 
-function add_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_forms::UniqueConstrList)
+function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_forms::UniqueConstrList)
   conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
   append!(conic_forms.constr_list, new_conic_forms)
 end

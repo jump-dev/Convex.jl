@@ -40,7 +40,7 @@ function conic_form(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
     euc_norm = Variable()
     objective = conic_form(euc_norm, unique_conic_forms)
     conic_form(SOCConstraint(euc_norm, x.children[1]), unique_conic_forms)
-    add_conic_form!(unique_conic_forms, x, objective)
+    cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end
