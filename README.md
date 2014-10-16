@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.png)](https://travis-ci.org/cvxgrp/Convex.jl)
 -->
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. We'd love bug reports and feature requests!
+Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. Nevertheless, we try to fix problems that come up as swiftly as we can. We'd love bug reports and feature requests!
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -54,19 +54,22 @@ problem.optval
 
 # Optimal value of x
 x.value
-
-# The dual values are stored with the corresponding constraints
-problem.constraints[1].dual_value
 ```
 
 ## Installation
 ```
 Pkg.clone("https://github.com/cvxgrp/Convex.jl.git")
-Pkg.clone("git@github.com:karanveerm/ECOS.jl.git")
+Pkg.clone("https://github.com/karanveerm/ECOS.jl.git")
 Pkg.build("ECOS")
 ```
+If you're on OSX, then SCS.jl should also work. This can be used to solve problems involving exponential and semi-definite constraints.
+NOTE: SCS.jl ONLY works on OSX.
+```
+Pkg.clone("https://github.com/karanveerm/SCS.jl.git")
+Pkg.build("SCS")
+```
 You might have to restart Julia.
-This does not work on Windows yet but should work on Mac/ Linux. Please file an issue in case you run into problems during installation. We'll be glad to help!
+Please file an issue in case you run into problems during installation. We'll be glad to help!
 
 ## Basic Types
 
@@ -102,11 +105,11 @@ x = Variable()
 y = Variable()
 z = Variable()
 expr = x + y + z
-problem = minimize(expr, [ x >= 1, y >= x, 4 * z >= y]
+problem = minimize(expr, x >= 1, y >= x, 4 * z >= y)
 solve!(problem)
 
 # Once the problem is solved, we can call evaluate() on expr:
-expr.evaluate()
+evaluate(expr)
 ```
 
 ### Constraints
@@ -147,7 +150,7 @@ A problem can be solved by calling `solve!`:
 solve!(problem)
 ```
 
-After the problem is solved, the status can be checked by `problem.status`, which can be `solved`, `primal infeasible, `dual infeasible`, `max iterations reached` or `numerical problems in solver`. If the status is `solved`, `problem.optval` will have the optimum value of the problem. Each variable has a `value` that can be used to access the variables optimum value. The optimum value of expressions can also be found by calling the `evaluate()` function of the expression as follows: `expr.evaluate()`. The dual values are stored with the respective constraints and can be accessed as `problem.constraints[idx].dual_value`.
+After the problem is solved, the status can be checked by `problem.status`, which can be `:Optimal`, `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. If the status is `:Optimal`, `problem.optval` will have the optimum value of the problem. Each variable has a `value` that can be used to access the variables optimum value. The optimum value of expressions can also be found by calling the `evaluate()` function of the expression as follows: `evaluate(expr)`. <!--The dual values are stored with the respective constraints and can be accessed as `problem.constraints[idx].dual_value`.-->
 
 
 ## Supported operations
@@ -163,8 +166,8 @@ These atoms are affine in their arguments.
  - transpose: `x'`
  - dot product: `x' * y` or `dot(x, y)`
  - reshape, vec: `reshape(x, 2, 3)` or `vec(x)`
- - min, max element of a vector or matrix: `max(x)`
- - horizontal and vertical stacking: `hcat(x, y); vertcat(x, y)`
+ - minimum, maximum element of a vector or matrix: `maximum(x)`
+ - horizontal and vertical stacking: `hcat(x, y); vcat(x, y)`
 
 ### Elementwise atoms
 
@@ -205,7 +208,7 @@ Here are a few simple examples to start with:
 ```
 x = Variable(2)
 A = 1.5 * eye(2)
-p = minimize(dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
+p = minimize(dot([2.0; 2.0], x), A * x >= [1.1; 1.1])
 solve!(p)
 println(p.optval)
 println(x.value)
@@ -215,7 +218,7 @@ println(x.value)
 ```
 X = Variable(2, 2)
 c = ones(2, 1)
-p = minimize(c' * X * c, [X >= ones(2, 2)])
+p = minimize(c' * X * c, X >= ones(2, 2))
 solve!(p)
 println(X.value)
 ```
@@ -230,7 +233,7 @@ c = ones(N, 1)
 # The following line is equivalent to c' * (y + eye(N) * x) * c
 # Similar overloading is done in other cases
 objective = c' * (y + x) * c
-p = minimize(objective, [x >= 3, 2y >= 0, y <= x])
+p = minimize(objective, x >= 3, 2y >= 0, y <= x)
 solve!(p)
 ```
 
@@ -250,7 +253,7 @@ solve!(p)
 ```
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = maximize(sum(x) + sum(y), [hcat(x, y) <= 2])
+p = maximize(sum(x) + sum(y), hcat(x, y) <= 2)
 solve!(p)
 ```
 
@@ -260,14 +263,14 @@ x = Variable(10, 10)
 y = Variable(10, 10)
 a = rand(10, 10)
 b = rand(10, 10)
-p = maximize(min(min(x, y)), [x <= a, y <= b])
+p = maximize(minimum(min(x, y)), x <= a, y <= b)
 solve!(p)
 ```
 
 * Norm-Infinity
 ```
 x = Variable(3)
-p = minimize(norm(x, Inf), [-2 <= x, x <= 1])
+p = minimize(norm(x, Inf), -2 <= x, x <= 1)
 solve!(p)
 ```
 
