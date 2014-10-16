@@ -24,14 +24,14 @@
 ##      h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 ##      curvature refers to the curvature of the first term.
 ##      We then use this curvature to find vexity of h (see vexity function below)
-## conic_form: TODO: Fill this in after conic_form is stable
+## conic_form!: TODO: Fill this in after conic_form! is stable
 #
 #############################################################################
 
 import Base.sign, Base.size, Base.endof, Base.ndims
 export AbstractExpr, Constraint
 export vexity, sign, size, evaluate, monotonicity, curvature
-export conic_form
+export conic_form!
 export endof, ndims
 export Value, ValueOrNothing
 export get_vectorized_size

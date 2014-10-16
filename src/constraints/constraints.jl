@@ -30,10 +30,10 @@ function vexity(c::EqConstraint)
   return vex
 end
 
-function conic_form(c::EqConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
     expr = c.lhs - c.rhs
-    objective = conic_form(expr, unique_conic_forms)
+    objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
@@ -73,10 +73,10 @@ function vexity(c::LtConstraint)
   return vex
 end
 
-function conic_form(c::LtConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
     expr = c.rhs - c.lhs
-    objective = conic_form(expr, unique_conic_forms)
+    objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
@@ -118,10 +118,10 @@ function vexity(c::GtConstraint)
   return vex
 end
 
-function conic_form(c::GtConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
     expr = c.lhs - c.rhs
-    objective = conic_form(expr, unique_conic_forms)
+    objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end

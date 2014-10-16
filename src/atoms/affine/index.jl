@@ -45,7 +45,7 @@ function evaluate(x::IndexAtom)
   end
 end
 
-function conic_form(x::IndexAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     m = get_vectorized_size(x)
     n = get_vectorized_size(x.children[1])
@@ -67,7 +67,7 @@ function conic_form(x::IndexAtom, unique_conic_forms::UniqueConicForms)
     else
       index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
     end
-    objective = conic_form(x.children[1], unique_conic_forms)
+    objective = conic_form!(x.children[1], unique_conic_forms)
     objective = index_matrix * objective
     cache_conic_form!(unique_conic_forms, x, objective)
   end

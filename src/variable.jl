@@ -4,7 +4,7 @@
 #############################################################################
 
 export Variable, Semidefinite
-export vexity, evaluate, sign, conic_form
+export vexity, evaluate, sign, conic_form!
 
 type Variable <: AbstractExpr
   head::Symbol
@@ -60,7 +60,7 @@ function sign(x::Variable)
   return x.sign
 end
 
-function conic_form(x::Variable, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     objective = ConicObj()
     vec_size = get_vectorized_size(x)
@@ -69,7 +69,7 @@ function conic_form(x::Variable, unique_conic_forms::UniqueConicForms)
     # placeholder values in unique constraints prevent infinite recursion depth
     cache_conic_form!(unique_conic_forms, x, objective)
     for constraint in x.implied_constraints
-      conic_form(constraint, unique_conic_forms)
+      conic_form!(constraint, unique_conic_forms)
     end
   end
   return get_conic_form(unique_conic_forms, x)

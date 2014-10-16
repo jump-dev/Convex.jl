@@ -27,11 +27,11 @@ function vexity(c::SDPConstraint)
   end
 end
 
-function conic_form(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
-    objective = conic_form(c.child, unique_conic_forms)
+    objective = conic_form!(c.child, unique_conic_forms)
     if c.is_symmetric
-      conic_form(c.child == c.child', unique_conic_forms)
+      conic_form!(c.child == c.child', unique_conic_forms)
     end
     cache_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
   end

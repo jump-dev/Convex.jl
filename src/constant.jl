@@ -3,7 +3,7 @@
 # Defines Constant, which is a subtype of AbstractExpr
 #############################################################################
 export Constant
-export vexity, evaluate, sign, conic_form
+export vexity, evaluate, sign, conic_form!
 
 type Constant <: AbstractExpr
   head::Symbol
@@ -42,7 +42,7 @@ function sign(x::Constant)
   return x.sign
 end
 
-function conic_form(x::Constant, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     objective = ConicObj()
     objective[object_id(:constant)] = vec([x.value])

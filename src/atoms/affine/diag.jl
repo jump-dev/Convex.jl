@@ -62,7 +62,7 @@ diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form(x::DiagAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::DiagAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     (num_rows, num_cols) = x.children[1].size
     k = x.k
@@ -81,7 +81,7 @@ function conic_form(x::DiagAtom, unique_conic_forms::UniqueConicForms)
       start_index += num_rows + 1
     end
 
-    objective = conic_form(x.children[1], unique_conic_forms)
+    objective = conic_form!(x.children[1], unique_conic_forms)
     new_obj = select_diag * objective
     cache_conic_form!(unique_conic_forms, x, new_obj)
   end

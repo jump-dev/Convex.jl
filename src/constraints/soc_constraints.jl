@@ -1,4 +1,4 @@
-export SOCConstraint, SOCElemConstraint, conic_form
+export SOCConstraint, SOCElemConstraint, conic_form!
 
 type SOCConstraint <: Constraint
   head::Symbol
@@ -11,11 +11,11 @@ type SOCConstraint <: Constraint
   end
 end
 
-function conic_form(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
     objectives = Array(ConicObj, length(c.children))
     for iobj=1:length(c.children)
-      objectives[iobj] = conic_form(c.children[iobj], unique_conic_forms)
+      objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
     end
     cache_conic_form!(unique_conic_forms, c, ConicConstr(objectives, :SOC, [get_vectorized_size(x) for x in c.children]))
   end
@@ -33,14 +33,14 @@ type SOCElemConstraint <: Constraint
   end
 end
 
-function conic_form(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
     num_constrs = get_vectorized_size(c.children[1])
     num_children = length(c.children)
     conic_constrs = Array(ConicConstr, num_constrs)
     objectives = Array(ConicObj, num_children)
     for iobj = 1:num_children
-      objectives[iobj] = conic_form(c.children[iobj], unique_conic_forms)
+      objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
     end
     for row = 1:num_constrs
       objectives_by_row = [get_row(obj, row) for obj in objectives]

@@ -7,7 +7,7 @@
 #############################################################################
 
 export *
-export sign, monotonicity, curvature, evaluate, conic_form
+export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
 
@@ -54,7 +54,7 @@ function evaluate(x::MultiplyAtom)
   return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function conic_form(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
@@ -65,7 +65,7 @@ function conic_form(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
         const_child = x.children[2]
         expr_child = x.children[1]
       end
-      objective = conic_form(expr_child, unique_conic_forms)
+      objective = conic_form!(expr_child, unique_conic_forms)
 
       # make sure all 1x1 sized objects are interpreted as scalars, since
       # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
@@ -79,11 +79,11 @@ function conic_form(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
 
     # left matrix multiplication
     elseif x.children[1].head == :constant
-      objective = conic_form(x.children[2], unique_conic_forms)
+      objective = conic_form!(x.children[2], unique_conic_forms)
       objective = kron(speye(x.size[2]), x.children[1].value) * objective
     # right matrix multiplication
     else
-      objective = conic_form(x.children[1], unique_conic_forms)
+      objective = conic_form!(x.children[1], unique_conic_forms)
       objective = kron(x.children[2].value', speye(x.size[1])) * objective
     end
     cache_conic_form!(unique_conic_forms, x, objective)

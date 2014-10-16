@@ -1,4 +1,4 @@
-export ExpConstraint, conic_form, vexity
+export ExpConstraint, conic_form!, vexity
 
 ### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z
 type ExpConstraint <: Constraint
@@ -33,13 +33,13 @@ function vexity(c::ExpConstraint)
   return ConvexVexity()
 end
 
-function conic_form(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
     conic_constrs = ConicConstr[]
     if c.size == (1, 1)
       objectives = Array(ConicObj, 3)
       for iobj=1:3
-        objectives[iobj] = conic_form(c.children[iobj], unique_conic_forms)
+        objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
       end
       push!(conic_constrs, ConicConstr(objectives, :ExpPrimal, [1, 1, 1]))
     else
@@ -47,7 +47,7 @@ function conic_form(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
         for j=1:c.size[2]
           objectives = Array(ConicObj, 3)
           for iobj=1:3
-            objectives[iobj] = conic_form(c.children[iobj][i,j], unique_conic_forms)
+            objectives[iobj] = conic_form!(c.children[iobj][i,j], unique_conic_forms)
           end
           push!(conic_constrs, ConicConstr(objectives, :ExpPrimal, [1, 1, 1]))
         end

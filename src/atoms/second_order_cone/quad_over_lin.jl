@@ -1,5 +1,5 @@
 export QuadOverLinAtom, quad_over_lin
-export sign, monotonicity, curvature, conic_form
+export sign, monotonicity, curvature, conic_form!
 
 type QuadOverLinAtom <: AbstractExpr
   head::Symbol
@@ -28,13 +28,13 @@ function curvature(q::QuadOverLinAtom)
   return ConvexVexity()
 end
 
-function conic_form(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, q)
     t = Variable()
-    qol_objective = conic_form(t, unique_conic_forms)
+    qol_objective = conic_form!(t, unique_conic_forms)
     x, y = q.children
-    conic_form(SOCConstraint(y + t, y - t, 2 * x), unique_conic_forms)
-    conic_form(y >= 0, unique_conic_forms)
+    conic_form!(SOCConstraint(y + t, y - t, 2 * x), unique_conic_forms)
+    conic_form!(y >= 0, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, q, qol_objective)
   end
   return get_conic_form(unique_conic_forms, q)

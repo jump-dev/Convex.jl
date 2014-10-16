@@ -7,7 +7,7 @@
 
 import Base.transpose, Base.ctranspose
 export transpose, ctranspose, TransposeAtom
-export sign, curvature, monotonicity, evaluate, conic_form
+export sign, curvature, monotonicity, evaluate, conic_form!
 
 type TransposeAtom <: AbstractExpr
   head::Symbol
@@ -39,9 +39,9 @@ end
 
 # Since everything is vectorized, we simply need to multiply x by a permutation
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
-function conic_form(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
-    objective = conic_form(x.children[1], unique_conic_forms)
+    objective = conic_form!(x.children[1], unique_conic_forms)
 
     sz = get_vectorized_size(x)
 

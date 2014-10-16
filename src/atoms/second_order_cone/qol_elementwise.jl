@@ -1,5 +1,5 @@
 export QolElemAtom, qol_elementwise, square, sum_squares, inv_pos
-export sign, monotonicity, curvature, conic_form
+export sign, monotonicity, curvature, conic_form!
 
 type QolElemAtom <: AbstractExpr
   head::Symbol
@@ -28,14 +28,14 @@ function curvature(q::QolElemAtom)
   return ConvexVexity()
 end
 
-function conic_form(q::QolElemAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(q::QolElemAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, q)
     sz = q.children[1].size
     t = Variable(sz[1], sz[2])
-    qol_objective = conic_form(t, unique_conic_forms)
+    qol_objective = conic_form!(t, unique_conic_forms)
     x, y = q.children
-    conic_form(SOCElemConstraint(y + t, y - t, 2 * x), unique_conic_forms)
-    conic_form(y >= 0, unique_conic_forms)
+    conic_form!(SOCElemConstraint(y + t, y - t, 2 * x), unique_conic_forms)
+    conic_form!(y >= 0, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, q, qol_objective)
   end
   return get_conic_form(unique_conic_forms, q)

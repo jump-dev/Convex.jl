@@ -41,13 +41,13 @@ end
 
 abs(x::AbstractExpr) = AbsAtom(x)
 
-function conic_form(x::AbsAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     c = x.children[1]
     t = Variable(size(c))
-    objective = conic_form(t, unique_conic_forms)
-    conic_form(c<=t, unique_conic_forms)
-    conic_form(c>=-t, unique_conic_forms)
+    objective = conic_form!(t, unique_conic_forms)
+    conic_form!(c<=t, unique_conic_forms)
+    conic_form!(c>=-t, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)

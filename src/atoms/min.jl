@@ -59,12 +59,12 @@ function evaluate(x::MinAtom)
 end
 
 # x >= this and y >= this if min(x, y) = this
-function conic_form(x::MinAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::MinAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     this = Variable(x.size[1], x.size[2])
-    objective = conic_form(this, unique_conic_forms)
+    objective = conic_form!(this, unique_conic_forms)
     for child in x.children
-      conic_form(this <= child, unique_conic_forms)
+      conic_form!(this <= child, unique_conic_forms)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end

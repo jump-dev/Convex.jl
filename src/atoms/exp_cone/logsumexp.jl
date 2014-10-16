@@ -42,12 +42,12 @@ end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
-function conic_form(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, e)
     # log(sum(exp(z))) <= t  <=>  sum(exp(z)) <= exp(t)
     t = Variable()
-    objective = conic_form(t, unique_conic_forms)
-    conic_form(sum(exp(e.children[1])) <= exp(t), unique_conic_forms)
+    objective = conic_form!(t, unique_conic_forms)
+    conic_form!(sum(exp(e.children[1])) <= exp(t), unique_conic_forms)
 
     cache_conic_form!(unique_conic_forms, e, objective)
   end

@@ -1,6 +1,6 @@
 import Base.reshape, Base.vec
 export reshape, vec
-export sign, curvature, monotonicity, evaluate, conic_form
+export sign, curvature, monotonicity, evaluate, conic_form!
 
 
 type ReshapeAtom <: AbstractExpr
@@ -33,8 +33,8 @@ function evaluate(x::ReshapeAtom)
   return reshape(evaluate(x.children[1]), x.size[1], x.size[2])
 end
 
-function conic_form(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
-  return conic_form(x.children[1], unique_conic_forms)
+function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
+  return conic_form!(x.children[1], unique_conic_forms)
 end
 
 

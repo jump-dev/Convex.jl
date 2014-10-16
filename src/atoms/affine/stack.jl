@@ -1,6 +1,6 @@
 import Base.vcat, Base.hcat
 export vcat, hcat, VcatAtom, HcatAtom
-export sign, curvature, monotonicity, evaluate, conic_form
+export sign, curvature, monotonicity, evaluate, conic_form!
 
 type HcatAtom <: AbstractExpr
   head::Symbol
@@ -39,14 +39,13 @@ function evaluate(x::HcatAtom)
 end
 
 
-function conic_form(x::HcatAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     # build a list of child conic objectives and constraints
     objectives = ConicObj[]
     for child in x.children
-      push!(objectives, conic_form(child, unique_conic_forms))
+      push!(objectives, conic_form!(child, unique_conic_forms))
     end
-    println(objectives)
     # build a dict from variable ids to sizes
     variable_to_sizes = Dict{Uint64, Int64}()
     for objective in objectives
@@ -96,7 +95,6 @@ function conic_form(x::HcatAtom, unique_conic_forms::UniqueConicForms)
           push!(value_list, spzeros(row_size, col_size))
         end
       end
-      println(id, value_list)
       objective[id] = vcat(value_list...)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
