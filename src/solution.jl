@@ -32,7 +32,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     n = size(A, 2)
     var_cones = (Symbol, UnitRange{Int64})[]
     push!(var_cones, (:Free, 1:n))
-    ECOS.loadineqconicproblem!(m, full(c), A, full(b), cones)
+    ECOS.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
     ECOS.optimize!(m)
   elseif typeof(m) == SCS.SCSMathProgModel
     SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
