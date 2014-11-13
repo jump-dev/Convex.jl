@@ -297,7 +297,7 @@ Use the following BibTeX citation:
         author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
         year = {2014},
         archivePrefix = "arXiv",
-        eprint = {1410.0342},
+        eprint = {1410.4821},
         primaryClass = "math-oc",
-        journal={arXiv preprint arXiv:1410.0342},
+        journal={arXiv preprint arXiv:1410.4821},
     }
