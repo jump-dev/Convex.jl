@@ -283,4 +283,21 @@ Currently, Convex.jl is developed and maintained by:
 
 The Convex.jl developers also thank:
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University. He is also the co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html). We thank Professor Boyd for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): Convex.jl started out as a wrapper around Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy) and its design has been inspired from CVXPY. We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote http://dcp.stanford.edu/ to teach disciplined convex programming, a useful resource for Convex.jl users.
+- [Steven Diamond](http://www.stanford.edu/~stevend2/): many aspects of the design of Convex.jl were inspired Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy). We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote a [DCP tutorial website](http://dcp.stanford.edu/) to teach disciplined convex programming, a useful resource for Convex.jl users.
+
+## Citing this package
+
+If you use Convex.jl for published work, 
+we encourage you to cite the software.
+
+Use the following BibTeX citation:
+
+    @article{udell2014,
+        title = {Convex Optimization in Julia},
+        author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
+        year = {2014},
+        archivePrefix = "arXiv",
+        eprint = {1410.0342},
+        primaryClass = "math-oc",
+        journal={arXiv preprint arXiv:1410.0342},
+    }
