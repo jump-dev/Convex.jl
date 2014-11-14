@@ -27,7 +27,7 @@ type Variable <: AbstractExpr
   end
 
   Variable(m::Integer, n::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
-  Variable(sign::Sign=NoSign(), sets::Symbol...) = Variable((1, 1), sign, sets::Symbol...)
+  Variable(sign::Sign=NoSign(), sets::Symbol...) = Variable((1, 1), sign, sets...)
   Variable(size::(Int64, Int64), sets::Symbol...) = Variable(size::(Int64, Int64), NoSign(), sets...)
   Variable(size::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
 end
@@ -69,7 +69,7 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
     # placeholder values in unique constraints prevent infinite recursion depth
     cache_conic_form!(unique_conic_forms, x, objective)
     if !(x.sign == NoSign())
-      conic_form!(constraint_form(x.sign, x), unique_conic_forms)
+      conic_form!(x.sign, x, unique_conic_forms)
     end
     for set in x.sets
       conic_form!(set, x, unique_conic_forms)

@@ -21,7 +21,6 @@ end
 function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
 
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
-  @show var_to_ranges, vartypes
   if problem.head == :maximize
     c = -c
   end
