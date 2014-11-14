@@ -56,8 +56,7 @@ x.value
 
 ## Installation
 ```
-Pkg.add("ECOS")
-Pkg.clone("https://github.com/cvxgrp/Convex.jl.git")
+Pkg.add("Convex")
 ```
 If you're on OSX, then SCS.jl should also work. This can be used to solve problems involving exponential and semi-definite constraints.
 NOTE: SCS.jl ONLY works on OSX.
