@@ -105,14 +105,14 @@ function conic_problem(p::Problem)
     variable = id_to_variables[var_id]
     if :Int in variable.sets
       startidx, endidx = var_to_ranges[var_id]
-      for idx in startidx:endidx #range(var_to_ranges[var_id]...)
+      for idx in startidx:endidx
         vartypes[idx] = :Int
       end
     end
-    if :Bool in variable.sets
+    if :Bin in variable.sets
       startidx, endidx = var_to_ranges[var_id]
-      for idx in startidx:endidx #range(var_to_ranges[var_id]...)
-        vartypes[idx] = :Bool
+      for idx in startidx:endidx
+        vartypes[idx] = :Bin
       end
     end   
   end 

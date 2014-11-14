@@ -41,8 +41,6 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     end
   end
 
-  # @show c,A,b,cones,vartypes
-
   status = MathProgBase.optimize!(m)
 
   try

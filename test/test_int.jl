@@ -16,7 +16,6 @@ solve!(p, LPsolver())
 x = Variable(2)
 p = minimize(norm(x,1), x[1]>=4.3)
 solve!(p, LPsolver())
-@show x
 @test_approx_eq_eps p.optval 4.3 TOL
 
 # integer variables
@@ -44,23 +43,19 @@ solve!(p, MIPsolver())
 x = Variable(2, :Int)
 p = minimize(sum(x), x[1]>=4.3, x>=0)
 solve!(p, MIPsolver())
-@show x
 @test_approx_eq_eps p.optval 5 TOL
 
 x = Variable(2, :Int)
 p = minimize(sum(x), x>=.5)
 solve!(p, MIPsolver())
-@show x
 @test_approx_eq_eps p.optval 2 TOL
 
 x = Variable(2, :Bin)
 p = minimize(sum(x), x>=.5)
 solve!(p, MIPsolver())
-@show x
 @test_approx_eq_eps p.optval 2 TOL
 
 x = Variable(2, :Bin)
-p = minimize(sum(x), x[1]>=.5)
+p = minimize(sum(x), x[1]>=.5, x>=0)
 solve!(p, MIPsolver())
-@show x
 @test_approx_eq_eps p.optval 1 TOL
