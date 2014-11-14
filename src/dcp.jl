@@ -21,7 +21,12 @@ type ConstVexity <: Vexity              end
 type AffineVexity <: Vexity                   end
 type ConvexVexity <: Vexity                   end
 type ConcaveVexity <: Vexity                  end
-type NotDcp <: Vexity                   end
+
+type NotDcp <: Vexity
+	function NotDcp()
+		warn("Expression not DCP compliant")
+	end
+end
 
 # Monotonocity subtypes
 abstract Monotonicity

@@ -36,8 +36,14 @@ p = minimize(sum(exp(y)), y>=0)
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval 5 TOL
 
+
+y = Variable(5)
+p = minimize(sum(exp(y)), y>=0)
+solve!(p, SCS.SCSMathProgModel())
+@test_approx_eq_eps p.optval 5 TOL
+
 # logsumexp
-# y = Variable(5)
-# p = minimize(logsumexp(y), y>=0)
-# solve!(p, SCS.SCSMathProgModel())
-# @test_approx_eq_eps p.optval log(5) TOL
+y = Variable(5);
+p = minimize(logsumexp(y), y>=1);
+solve!(p, SCS.SCSMathProgModel())
+@test_approx_eq_eps p.optval log(exp(1)*5) TOL

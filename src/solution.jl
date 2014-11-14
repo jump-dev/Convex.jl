@@ -28,7 +28,22 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
 
   # TODO: Fix once MathProgBase has a loadineqproblem!
   # TODO: Get rid of full once c and b are not sparse
-  MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones)
+  # get rid of type checks
+  # MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones)
+  if typeof(m) == ECOS.ECOSMathProgModel
+    n = size(A, 2)
+    var_cones = (Symbol, UnitRange{Int64})[]
+    push!(var_cones, (:Free, 1:n))
+    ECOS.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
+    ECOS.optimize!(m)
+  elseif typeof(m) == SCS.SCSMathProgModel
+    SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
+    SCS.optimize!(m)
+  else
+    MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones)
+    # error("model type $(typeof(m)) not recognized")
+  end
+
   if !all(Bool[t==:Cont for t in vartypes])
     try
       MathProgBase.setvartype!(m, vartypes)

@@ -37,17 +37,19 @@ function curvature(x::LogSumExpAtom)
 end
 
 function evaluate(x::LogSumExpAtom)
-  return logsumexp(evaluate(x.children[1]))
+  return log(sum(exp(evaluate(x.children[1]))))
 end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
 function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, e)
-    # log(sum(exp(z))) <= t  <=>  sum(exp(z)) <= exp(t)
-    t = Variable()
+    # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
+    t = Variable(e.size)
+    z = sum(exp(e.children[1] - t))
     objective = conic_form!(t, unique_conic_forms)
-    conic_form!(sum(exp(e.children[1])) <= exp(t), unique_conic_forms)
+    conic_form!(z, unique_conic_forms)
+    conic_form!(z <= 1, unique_conic_forms)
 
     cache_conic_form!(unique_conic_forms, e, objective)
   end

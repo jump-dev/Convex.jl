@@ -13,7 +13,10 @@ before_install:
   - sudo apt-get update -qq -y
   - sudo apt-get install libpcre3-dev julia -y
 script:
-  - julia -e 'Pkg.clone("git@github.com:karanveerm/ECOS.jl.git"); Pkg.build("ECOS");'
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("Convex"))`); Pkg.pin("Convex"); Pkg.resolve()'
   - julia -e 'using Convex; @assert isdefined(:Convex); @assert typeof(Convex) === Module'
-  - julia -e 'using Convex; include("$(Pkg.dir("Convex"))/test/test.jl");'
+  - if [ $JULIAVERSION = "julianightlies" ]; then julia --code-coverage test/run_tests.jl; fi
+  - if [ $JULIAVERSION = "juliareleases" ]; then julia test/run_tests.jl; fi
+after_success:
+  - julia -e 'cd(Pkg.dir("Convex")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+

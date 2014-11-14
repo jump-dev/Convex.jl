@@ -1,8 +1,6 @@
 # Convex.jl
 
-<!--
-[![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.png)](https://travis-ci.org/cvxgrp/Convex.jl)
--->
+[![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.svg?branch=master)](https://travis-ci.org/cvxgrp/Convex.jl) [![Coverage Status](https://img.shields.io/coveralls/cvxgrp/Convex.jl.svg)](https://coveralls.io/r/cvxgrp/Convex.jl)
 
 Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. Nevertheless, we try to fix problems that come up as swiftly as we can. We'd love bug reports and feature requests!
 
@@ -58,9 +56,8 @@ x.value
 
 ## Installation
 ```
+Pkg.add("ECOS")
 Pkg.clone("https://github.com/cvxgrp/Convex.jl.git")
-Pkg.clone("https://github.com/karanveerm/ECOS.jl.git")
-Pkg.build("ECOS")
 ```
 If you're on OSX, then SCS.jl should also work. This can be used to solve problems involving exponential and semi-definite constraints.
 NOTE: SCS.jl ONLY works on OSX.
@@ -287,7 +284,7 @@ The Convex.jl developers also thank:
 
 ## Citing this package
 
-If you use Convex.jl for published work, 
+If you use Convex.jl for published work,
 we encourage you to cite the software.
 
 Use the following BibTeX citation:
