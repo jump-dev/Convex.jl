@@ -36,13 +36,14 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   if !all(Bool[t==:Cont for t in vartypes])
     try
       MathProgBase.setvartype!(m, vartypes)
-      @show vartypes
     catch
       error("model $(typeof(m)) does not support variables of some of the following types: $(unique(vartypes))")
     end
   end
 
-  MathProgBase.optimize!(m)
+  # @show c,A,b,cones,vartypes
+
+  status = MathProgBase.optimize!(m)
 
   try
     y, z = MathProgBase.getconicdual(m)
@@ -59,6 +60,10 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   # Populate the problem with the solution
   problem.optval = problem.solution.optval
   problem.status = problem.solution.status
+
+  if !(problem.status==:Optimal)
+    warn("Problem status $(problem.status); solution may be inaccurate.")
+  end
 end
 
 solve!(problem::Problem, m::MathProgBase.AbstractMathProgSolver) = 
