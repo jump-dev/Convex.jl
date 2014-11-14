@@ -5,7 +5,7 @@ using GLPKMathProgInterface
 TOL = 1e-2
 
 MIPsolver() = GLPKSolverMIP()
-LPsolver() = GLPKSolverMIP()
+LPsolver() = GLPKSolverLP()
 
 x = Variable()
 p = minimize(x, x>=4.3)
