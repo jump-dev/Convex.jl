@@ -41,6 +41,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   else
     # no conic constraints on variables => Tuple[]
     MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, Tuple[])
+    MathProgBase.optimize!(m)
     # error("model type $(typeof(m)) not recognized")
   end
 
