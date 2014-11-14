@@ -39,7 +39,8 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
     SCS.optimize!(m)
   else
-    MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones)
+    # no conic constraints on variables => Tuple[]
+    MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, Tuple[])
     # error("model type $(typeof(m)) not recognized")
   end
 
@@ -67,6 +68,9 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   problem.optval = problem.solution.optval
   problem.status = problem.solution.status
 end
+
+solve!(problem::Problem, m::MathProgBase.AbstractMathProgSolver) = 
+  solve!(problem, MathProgBase.model(m))
 
 function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int64, Int64)})
   x = problem.solution.primal

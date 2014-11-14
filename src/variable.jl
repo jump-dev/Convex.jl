@@ -27,7 +27,8 @@ type Variable <: AbstractExpr
   end
 
   Variable(m::Integer, n::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
-  Variable(sign::Sign=NoSign(), sets::Symbol...) = Variable((1, 1), sign, sets...)
+  Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
+  Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
   Variable(size::(Int64, Int64), sets::Symbol...) = Variable(size::(Int64, Int64), NoSign(), sets...)
   Variable(size::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
 end
