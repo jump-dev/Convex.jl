@@ -20,25 +20,21 @@ end
 # function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
 function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
 
-  c, A, b, cones, var_to_ranges = conic_problem(problem)
-
+  c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
+  @show var_to_ranges, vartypes
   if problem.head == :maximize
     c = -c
   end
 
   # TODO: Fix once MathProgBase has a loadineqproblem!
   # TODO: Get rid of full once c and b are not sparse
-  if typeof(m) == ECOS.ECOSMathProgModel
-    n = size(A, 2)
-    var_cones = (Symbol, UnitRange{Int64})[]
-    push!(var_cones, (:Free, 1:n))
-    ECOS.loadineqconicproblem!(m, full(c), A, full(b), cones)
-    ECOS.optimize!(m)
-  elseif typeof(m) == SCS.SCSMathProgModel
-    SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
-    SCS.optimize!(m)
-  else
-    error("model type $(typeof(m)) not recognized")
+  MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones)
+  if !all(Bool[t==:Cont for t in vartypes])
+    try
+      MathProgBase.setvartype!(m, vartypes)
+    catch
+      error("model $m does not support non-continuous variables")
+    end
   end
 
   try

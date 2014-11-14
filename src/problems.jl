@@ -56,7 +56,7 @@ function find_variable_ranges(constraints)
 end
 
 function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
-  objective_var = Variable()
+  objective_var = Variable((1,1), NoSign())
   objective = conic_form!(objective_var, unique_conic_forms)
   conic_form!(p.objective - objective_var == 0, unique_conic_forms)
   for constraint in p.constraints
@@ -98,7 +98,23 @@ function conic_problem(p::Problem)
     end
     push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
   end
-  return c, A, b, cones, var_to_ranges
+
+  # find integral and boolean variables
+  vartypes = fill(:Cont, length(c))
+  # for var_id in keys(var_to_ranges)
+  #   variable = id_to_variables[var_id]
+  #   if :Int in variable.sets
+  #     for idx in range(var_to_ranges[var_id]...)
+  #       vartypes[idx] = :Int
+  #     end
+  #   end
+  #   if :Bool in variable.sets
+  #     for idx in range(var_to_ranges[var_id]...)
+  #       vartypes[idx] = :Bool
+  #     end
+  #   end   
+  # end 
+  return c, A, b, cones, var_to_ranges, vartypes
 end
 
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =

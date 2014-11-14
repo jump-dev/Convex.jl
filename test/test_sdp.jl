@@ -4,20 +4,21 @@ using Convex
 TOL = 1e-2
 
 # SDP variables
-y = Variable((2,2), Semidefinite())
+y = Variable((2,2), :Semidefinite)
 p = minimize(y[1,1])
+println(conic_problem(p))
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval 0 TOL
 
 # SDP variables twice
-y = Variable((2,2), Semidefinite())
+y = Variable((2,2), :Semidefinite)
 p = minimize(y[1,1], y[2,2]==1)
 m = SCS.SCSMathProgModel()
 solve!(p, m)
 @test_approx_eq_eps p.optval 0 TOL
 
 # SDP variables twice
-y = Variable((2, 2), Semidefinite())
+y = Variable((2, 2), :Semidefinite)
 p = minimize(y[1, 1], y[1, 2] == 1, y == y')
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval 0 TOL

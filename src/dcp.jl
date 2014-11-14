@@ -12,7 +12,7 @@
 
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
-export Sign, Positive, Negative, NoSign, Semidefinite
+export Sign, Positive, Negative, NoSign
 export -, +, *
 
 # Vexity subtypes
@@ -35,7 +35,6 @@ abstract Sign
 type Positive <: Sign                   end
 type Negative <: Sign                   end
 type NoSign <: Sign                     end
-type Semidefinite <: Sign               end
 
 -(v::Vexity) = v
 -(v::ConcaveVexity) = ConvexVexity()
