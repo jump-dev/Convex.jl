@@ -23,7 +23,7 @@ function vexity(c::SDPConstraint)
   if vex == AffineVexity() || vex == ConstVexity()
     return AffineVexity()
   else
-    return NotDCP()
+    return NotDcp()
   end
 end
 

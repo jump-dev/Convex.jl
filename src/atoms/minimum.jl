@@ -26,7 +26,7 @@ end
 
 # The monotonicity
 function monotonicity(x::MinimumAtom)
-  return (Nonincreasing(),)
+  return (Nondecreasing(),)
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);

@@ -44,7 +44,7 @@ end
 # the curvature of the atom will violate DCP.
 function curvature(x::MultiplyAtom)
   if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
-    return NotDCP()
+    return NotDcp()
   else
     return ConstVexity()
   end

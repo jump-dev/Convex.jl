@@ -18,13 +18,14 @@ export -, +, *
 # Vexity subtypes
 abstract Vexity
 type ConstVexity <: Vexity              end
-type AffineVexity <: Vexity                   end
-type ConvexVexity <: Vexity                   end
-type ConcaveVexity <: Vexity                  end
+type AffineVexity <: Vexity             end
+type ConvexVexity <: Vexity             end
+type ConcaveVexity <: Vexity            end
 
 type NotDcp <: Vexity
 	function NotDcp()
 		warn("Expression not DCP compliant")
+    return new()
 	end
 end
 
