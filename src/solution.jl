@@ -25,33 +25,24 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     c = -c
   end
 
-  # TODO: Fix once MathProgBase has a loadineqproblem!
   # TODO: Get rid of full once c and b are not sparse
-  # get rid of type checks
-  # MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones)
-  if typeof(m) == ECOS.ECOSMathProgModel
-    n = size(A, 2)
-    var_cones = (Symbol, UnitRange{Int64})[]
-    push!(var_cones, (:Free, 1:n))
-    ECOS.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
-    ECOS.optimize!(m)
-  elseif typeof(m) == SCS.SCSMathProgModel
+  if typeof(m) == SCS.SCSMathProgModel
     SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
-    SCS.optimize!(m)
   else
     # no conic constraints on variables => Tuple[]
     MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, Tuple[])
-    MathProgBase.optimize!(m)
-    # error("model type $(typeof(m)) not recognized")
   end
 
   if !all(Bool[t==:Cont for t in vartypes])
     try
       MathProgBase.setvartype!(m, vartypes)
+      @show vartypes
     catch
-      error("model $m does not support non-continuous variables")
+      error("model $(typeof(m)) does not support variables of some of the following types: $(unique(vartypes))")
     end
   end
+
+  MathProgBase.optimize!(m)
 
   try
     y, z = MathProgBase.getconicdual(m)

@@ -101,19 +101,21 @@ function conic_problem(p::Problem)
 
   # find integral and boolean variables
   vartypes = fill(:Cont, length(c))
-  # for var_id in keys(var_to_ranges)
-  #   variable = id_to_variables[var_id]
-  #   if :Int in variable.sets
-  #     for idx in range(var_to_ranges[var_id]...)
-  #       vartypes[idx] = :Int
-  #     end
-  #   end
-  #   if :Bool in variable.sets
-  #     for idx in range(var_to_ranges[var_id]...)
-  #       vartypes[idx] = :Bool
-  #     end
-  #   end   
-  # end 
+  for var_id in keys(var_to_ranges)
+    variable = id_to_variables[var_id]
+    if :Int in variable.sets
+      startidx, endidx = var_to_ranges[var_id]
+      for idx in startidx:endidx #range(var_to_ranges[var_id]...)
+        vartypes[idx] = :Int
+      end
+    end
+    if :Bool in variable.sets
+      startidx, endidx = var_to_ranges[var_id]
+      for idx in startidx:endidx #range(var_to_ranges[var_id]...)
+        vartypes[idx] = :Bool
+      end
+    end   
+  end 
   return c, A, b, cones, var_to_ranges, vartypes
 end
 

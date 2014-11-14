@@ -33,3 +33,21 @@ x = Variable(2, :Int)
 p = minimize(norm(x,1), x[1]>=4.3)
 solve!(p, MIPsolver())
 @test_approx_eq_eps p.optval 5 TOL
+
+x = Variable(2, :Int)
+p = minimize(sum(x), x[1]>=.5)
+solve!(p, MIPsolver())
+@show x
+@test_approx_eq_eps p.optval 1 TOL
+
+x = Variable(2, :Bin)
+p = minimize(sum(x), x>=.5)
+solve!(p, MIPsolver())
+@show x
+@test_approx_eq_eps p.optval 2 TOL
+
+x = Variable(2, :Bin)
+p = minimize(sum(x), x[1]>=.5)
+solve!(p, MIPsolver())
+@show x
+@test_approx_eq_eps p.optval 1 TOL

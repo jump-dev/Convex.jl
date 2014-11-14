@@ -31,6 +31,7 @@ type Variable <: AbstractExpr
   Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
   Variable(size::(Int64, Int64), sets::Symbol...) = Variable(size::(Int64, Int64), NoSign(), sets...)
   Variable(size::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
+  Variable(size::Integer, sets::Symbol...) = Variable((size, 1), sets...)
 end
 
 # convenience semidefinite matrix constructor
