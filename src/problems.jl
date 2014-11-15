@@ -56,7 +56,7 @@ function find_variable_ranges(constraints)
 end
 
 function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
-  objective_var = Variable((1,1), NoSign())
+  objective_var = Variable()
   objective = conic_form!(objective_var, unique_conic_forms)
   conic_form!(p.objective - objective_var == 0, unique_conic_forms)
   for constraint in p.constraints

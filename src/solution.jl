@@ -29,8 +29,9 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   if typeof(m) == SCS.SCSMathProgModel
     SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
   else
-    # no conic constraints on variables => Tuple[]
-    MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, Tuple[])
+    # no conic constraints on variables
+    var_cones = fill((:Free, 1:size(A, 2)))
+    MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
   end
 
   if !all(Bool[t==:Cont for t in vartypes])
