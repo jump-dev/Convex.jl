@@ -25,14 +25,10 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     c = -c
   end
 
+  # no conic constraints on variables
+  var_cones = fill((:Free, 1:size(A, 2)))
   # TODO: Get rid of full once c and b are not sparse
-  if typeof(m) == SCS.SCSMathProgModel
-    SCS.loadineqconicproblem!(m, full(c), A, full(b), cones)
-  else
-    # no conic constraints on variables
-    var_cones = fill((:Free, 1:size(A, 2)))
-    MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
-  end
+  MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
 
   if !all(Bool[t==:Cont for t in vartypes])
     try

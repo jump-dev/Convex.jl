@@ -3,7 +3,7 @@
 # Defines Variable, which is a subtype of AbstractExpr
 #############################################################################
 
-export Variable, ConstraintSet
+export Variable, ConstraintSet, Semidefinite
 export vexity, evaluate, sign, conic_form!
 
 abstract ConstraintSet
