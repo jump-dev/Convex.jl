@@ -30,6 +30,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   # TODO: Get rid of full once c and b are not sparse
   MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
 
+  # add integer and binary constraints on variables
   if !all(Bool[t==:Cont for t in vartypes])
     try
       MathProgBase.setvartype!(m, vartypes)
@@ -38,6 +39,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
     end
   end
 
+  # optimize problem
   status = MathProgBase.optimize!(m)
 
   try
