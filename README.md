@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.svg?branch=master)](https://travis-ci.org/cvxgrp/Convex.jl) [![Coverage Status](https://img.shields.io/coveralls/cvxgrp/Convex.jl.svg)](https://coveralls.io/r/cvxgrp/Convex.jl)
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. Nevertheless, we try to fix problems that come up as swiftly as we can. We'd love bug reports and feature requests!
+Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer programs and dcp-compliant convex programs while supporting a variety of solvers ([Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/karanveerm/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl) etc.) through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
+
+Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. Nevertheless, we try to fix problems that come up as swiftly as we can. We'd love bug reports and feature requests!
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -20,7 +22,7 @@ Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.sta
 
 
 ## Introduction
-Convex.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and Convex.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
+Convex.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and Convex.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS. Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
 using Convex
@@ -44,6 +46,10 @@ problem.constraints += [x <= 1, 0.5 <= 2*x]
 # Solve the problem by calling solve!
 solve!(problem)
 
+# Alternatively, specify a solver yourself
+solver = ECOSSolver() # or SCSSolver() OR GurobiSolver() or GLPKSolverMIP() etc.
+solve!(problem, solver)
+
 # Status (solved, infeasible etc.)
 problem.status
 
@@ -58,6 +64,7 @@ x.value
 ```
 Pkg.add("Convex")
 ```
+By default, only ECOS is installed. If you wish to use another solver mentioned above, please refer to the documentation for that solver for installation instructions.
 If you're on OSX, then SCS.jl should also work. This can be used to solve problems involving exponential and semi-definite constraints.
 NOTE: SCS.jl ONLY works on OSX.
 ```
