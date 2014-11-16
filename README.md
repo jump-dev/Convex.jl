@@ -337,6 +337,24 @@ p = minimize(norm(x, Inf), -2 <= x, x <= 1)
 solve!(p)
 ```
 
+## Solvers
+
+By default, Convex.jl uses [ECOS](https://github.com/JuliaOpt/ECOS.jl) to solve SOCPs, 
+and [SCS](https://github.com/karanveerm/SCS.jl) to solve SDPs and exponential cone programs.
+SCS currently works only on OSX, so SDPs and exponential cone programs 
+are only supported on OSX for now. 
+Any other solver in [JuliaOpt](https://github.com/JuliaOpt) may also be used, so long as it supports
+the conic constraints used to express the problem. Currently,
+other solvers will be most useful in solving linear programs (LPs) 
+and mixed integer linear programs (MILPs).
+<!--Mosek can be used to solve QPs-->
+
+For example, we can use GLPK to solve a MILP `p`:
+```
+using GLPKMathProgInterface
+solve!(p, GLPKSolverMIP())
+```
+
 ## Credits
 Currently, Convex.jl is developed and maintained by:
 - [Jenny Hong](http://www.stanford.edu/~jyunhong/)
