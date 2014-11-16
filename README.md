@@ -79,7 +79,8 @@ Pkg.build("SCS")
 You might have to restart Julia.
 Please file an issue in case you run into problems during installation. We'll be glad to help!
 
-You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt)
+You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt),
+including GLPK, CPLEX, Gurobi, and MOSEK,
 for LPs or MILPs. For more information on solvers see the solvers section below.
 
 ## Basic Types
