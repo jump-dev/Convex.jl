@@ -28,6 +28,11 @@ function curvature(q::QuadOverLinAtom)
   return ConvexVexity()
 end
 
+function evaluate(q::QuadOverLinAtom)
+  x = evaluate(q.children[1])
+  return dot(x, x) / evaluate(q.children[2])
+end
+
 function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, q)
     t = Variable()

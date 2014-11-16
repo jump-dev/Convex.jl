@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.svg?branch=master)](https://travis-ci.org/cvxgrp/Convex.jl) [![Coverage Status](https://img.shields.io/coveralls/cvxgrp/Convex.jl.svg)](https://coveralls.io/r/cvxgrp/Convex.jl)
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests.
+Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and dcp-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/karanveerm/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
+
+Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests.
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -32,7 +34,6 @@ For a detailed discussion of how Convex.jl works, see
 [our paper](http://www.arxiv.org/abs/1410.4821).
 
 Here's a quick example of code that solves a least-squares problem with inequality constraints:
-
 ```
 using Convex
 
@@ -54,6 +55,10 @@ problem.constraints += [x <= 1, 0.5 <= 2*x]
 # Solve the problem by calling solve!
 solve!(problem)
 
+# Alternatively, specify a solver yourself
+solver = ECOSSolver() # or SCSSolver() or GurobiSolver() or GLPKSolverMIP() etc.
+solve!(problem, solver)
+
 # Status (optimal, infeasible, etc.)
 problem.status
 
@@ -65,23 +70,26 @@ x.value
 ```
 
 ## Installation
+Convex.jl can be installed using the command
 ```
 Pkg.add("Convex")
 ```
-By default, Convex.jl uses [ECOS]() to solve SOCPs, 
-and [SCS]() to solve SDPs and exponential cone programs.
-SCS currently works only on OSX, so SDPs and exponential cone programs 
-are only supported on OSX for now. 
+Only the solver ECOS is installed by default. 
+You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt),
+including GLPK, CPLEX, Gurobi, and MOSEK,
+for LPs or MILPs. For more information on solvers see the solvers section below,
+or refer to the documentation for that solver for installation instructions.
+
+Currently [SCS](www.github.com/karanveerm/SCS.jl) is the only solver that can be used
+to solve SDPs and exponential cone programs,
+and SCS currently works only on OSX, so SDPs and exponential cone programs 
+are only supported on OSX for now. SCS can be installed using the following commands:
 ```
 Pkg.clone("https://github.com/karanveerm/SCS.jl.git")
 Pkg.build("SCS")
 ```
 You might have to restart Julia.
 Please file an issue in case you run into problems during installation. We'll be glad to help!
-
-You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt),
-including GLPK, CPLEX, Gurobi, and MOSEK,
-for LPs or MILPs. For more information on solvers see the solvers section below.
 
 ## Basic Types
 
@@ -90,8 +98,8 @@ which can represent a variable, a constant, or a function of another expression.
 We discuss each kind of expression in turn.
 
 ### Variables
-The simplest kind of expression in \cvxjl is a variable.
-Variables in \cvxjl are declared using the `Variable`
+The simplest kind of expression in Convex.jl is a variable.
+Variables in Convex.jl are declared using the `Variable`
 keyword, along with the dimensions of the variable.
 ```
 # Scalar variable
@@ -114,18 +122,18 @@ Variables may also be declared as having special properties, such as being
 
 ### Constants
 Numbers, vectors, and matrices present in the Julia environment are wrapped
-automatically into a `Constant` expression when used in a \cvxjl expression.
+automatically into a `Constant` expression when used in a Convex.jl expression.
 
 ### Expressions
 Expressions in Convex.jl are formed by applying any *atom* (mathematical function 
 defined in Convex.jl) to variables, constants, and other expressions.
 For a list of these functions, see the section supported operations below.
-Atoms are applied to expressions using operator overloading. Hence, \verb|2+2|
-calls Julia's built-in addition operator, while \verb|2+x| calls the \cvxjl
-addition method and returns a \cvxjl expression.
+Atoms are applied to expressions using operator overloading. Hence, `2+2`
+calls Julia's built-in addition operator, while `2+x` calls the Convex.jl
+addition method and returns a Convex.jl expression.
 Many of the useful language
 features in Julia, such as arithmetic, array indexing, and matrix transpose are
-overloaded in \cvxjl so they may be used with variables and expressions 
+overloaded in Convex.jl so they may be used with variables and expressions 
 just as they are used with native Julia types.
 
 Expressions that are created must be DCP-compliant. 
@@ -151,9 +159,9 @@ evaluate(expr)
 ```
 
 ### Constraints
-\emph{Constraints} in \cvxjl are declared using the standard comparison
-operators \verb|<=|, \verb|>=|, and \verb|==|.  They specify relations that
-must hold between two expressions.  \cvxjl does not distinguish between strict
+*Constraints* in Convex.jl are declared using the standard comparison
+operators `<=`, `>=`, and `==`.  They specify relations that
+must hold between two expressions.  Convex.jl does not distinguish between strict
 and non-strict inequality constraints.
 ```
 x = Variable(5, 5)
@@ -175,7 +183,7 @@ constraint = isposdef([x y; y' z])
 The objective of the problem is a scalar expression to be maximized or minimized by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`.
 
 ### Problem
-A \emph{problem} in \cvxjl consists of a \emph{sense} (minimize, maximize,
+A *problem* in Convex.jl consists of a *sense* (minimize, maximize,
 or satisfy), an objective (an expression to which the sense verb is to be
 applied), and zero or more constraints which must be satisfied at the
 solution.
@@ -363,10 +371,11 @@ Currently, Convex.jl is developed and maintained by:
 - [Madeleine Udell](http://www.stanford.edu/~udell/)
 - [David Zeng](http://www.stanford.edu/~dzeng0/)
 
-The design of Convex.jl has also been inspired by
+The Convex.jl developers also thank:
+- the [JuliaOpt](http://www.juliaopt.org/) team: [Iain Dunning](http://iaindunning.com/), [Joey Huchette](http://www.mit.edu/~huchette/) and [Miles Lubin](http://www.mit.edu/~mlubin/)
 - [Stephen Boyd](http://www.stanford.edu/~boyd/), co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html)
 - [Steven Diamond](http://www.stanford.edu/~stevend2/), developer of [CVXPY](https://github.com/cvxgrp/cvxpy) and of a [DCP tutorial website](http://dcp.stanford.edu/) to teach disciplined convex programming.
-- [Michael Grant](http://www.cvxr.com), developer of [CVX](http://www.cvxr.com).
+- [Michael Grant](http://www.cvxr.com/bio), developer of [CVX](http://www.cvxr.com).
 
 ## Citing this package
 

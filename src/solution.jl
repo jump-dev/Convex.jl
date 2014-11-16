@@ -28,7 +28,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   # no conic constraints on variables
   var_cones = fill((:Free, 1:size(A, 2)))
   # TODO: Get rid of full once c and b are not sparse
-  MathProgBase.loadconicproblem!(m, full(c), A, full(b), cones, var_cones)
+  MathProgBase.loadconicproblem!(m, vec(full(c)), A, full(b), cones, var_cones)
 
   # add integer and binary constraints on variables
   if !all(Bool[t==:Cont for t in vartypes])
@@ -63,7 +63,7 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
   end
 end
 
-solve!(problem::Problem, m::MathProgBase.AbstractMathProgSolver) = 
+solve!(problem::Problem, m::MathProgBase.AbstractMathProgSolver) =
   solve!(problem, MathProgBase.model(m))
 
 function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int64, Int64)})

@@ -33,6 +33,11 @@ function curvature(x::EucNormAtom)
   return ConvexVexity()
 end
 
+function evaluate(x::EucNormAtom)
+  return norm(evaluate(x.children[1]))
+end
+
+
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
