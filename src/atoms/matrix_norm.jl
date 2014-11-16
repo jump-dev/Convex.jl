@@ -13,13 +13,13 @@ export nuclear_norm, operator_norm, sigma_max
 
 type NuclearNormAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
   function NuclearNormAtom(x::AbstractExpr)
     children = (x,)
-    return new(:nuclear_norm, hash(children), children, x.size)
+    return new(:nuclear_norm, hash(children), children, (1,1))
   end
 end
 
@@ -48,31 +48,29 @@ nuclear_norm(x::AbstractExpr) = NuclearNormAtom(x)
 #            [U A; A' V] is positive semidefinite
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
 # http://arxiv.org/pdf/0706.4138v1.pdf
-function conic_form!(x::NuclearNormAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form!(x::NuclearNormAtom, unique_conic_forms)
+  if !has_conic_form(unique_conic_forms, x)
     A = x.children[1]
     m, n = size(A)
     U = Variable(m,m)
     V = Variable(n,n)
-    constraint = isposdef([U A; A' V])
-    objective = .5*(trace(U) + trace(V))
-    p = minimize(objective, constraint)
-    unique_constr[(x.head, x.children_hash)] = conic_form!(p)
+    p = minimize(.5*(trace(U) + trace(V)), isposdef([U A; A' V]))
+    cache_conic_form!(unique_conic_forms, x, p)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end
 
 ### Operator norm
 
 type OperatorNormAtom <: AbstractExpr
   head::Symbol
-  children_hash::Uint64
+  id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int64, Int64)
 
   function OperatorNormAtom(x::AbstractExpr)
     children = (x,)
-    return new(:operator_norm, hash(children), children, x.size)
+    return new(:operator_norm, hash(children), children, (1,1))
   end
 end
 
@@ -103,15 +101,13 @@ sigma_max(x::AbstractExpr) = OperatorNormAtom(x)
 #            [tI_m A; A' tI_n] is positive semidefinite
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
 # http://arxiv.org/pdf/0706.4138v1.pdf
-function conic_form!(x::OperatorNormAtom, unique_constr)
-  if !((x.head, x.children_hash) in keys(unique_constr))
+function conic_form!(x::OperatorNormAtom, unique_conic_forms)
+  if !has_conic_form(unique_conic_forms, x)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    constraint = isposdef([t*speye(m) A; A' t*speye(n)])
-    objective = t
-    p = minimize(objective, constraint)
-    unique_constr[(x.head, x.children_hash)] = conic_form!(p)
+    p = minimize(t, isposdef([t*speye(m) A; A' t*speye(n)]))
+    cache_conic_form!(unique_conic_forms, x, p)
   end
-  return safe_copy(unique_constr[(x.head, x.children_hash)])
+  return get_conic_form(unique_conic_forms, x)
 end

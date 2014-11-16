@@ -54,12 +54,14 @@ p = minimize(trace(y), y[2,1]<=4, y[2,2]>=3)
 solve!(p, SCS.SCSMathProgModel())
 @test_approx_eq_eps p.optval 3 TOL
 
-# # nuclear norm XXX should work when hcat and vcat do
-# y = Variable((2, 2), Semidefinite())
-# p = minimize(nuclear_norm(y), y[2,1]<=4, y[2,2]>=3)
-# solve!(p, SCS.SCSMathProgModel())
+# nuclear norm XXX should work when hcat and vcat do
+y = Semidefinite(3)
+p = minimize(nuclear_norm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2)
+solve!(p, SCS.SCSMathProgModel())
+@test_approx_eq_eps p.optval 3 TOL
 
-# # operator norm XXX should work when hcat and vcat do
-# y = Variable((2,2))
-# p = minimize(operator_norm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
-# solve!(p, SCS.SCSMathProgModel())
+# operator norm XXX should work when hcat and vcat do
+y = Variable((3,3))
+p = minimize(operator_norm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+solve!(p, SCS.SCSMathProgModel())
+@test_approx_eq_eps p.optval 4 TOL
