@@ -18,8 +18,9 @@ Note that Convex.jl was previously called CVX.jl. This package is under active d
   - [Problem](#user-content-problem)
 - [Supported Operations](#user-content-supported-operations)
 - [Examples](#user-content-examples)
+- [Solvers](#user-content-solvers)
 - [Credits](#user-content-credits)
-
+- [Citing this package](#user-content-citing-this-package)
 
 ## Introduction
 Convex.jl allows you to model and solve optimization problems by expressing them 
@@ -77,7 +78,7 @@ Pkg.add("Convex")
 Only the solver ECOS is installed by default. 
 You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt),
 including GLPK, CPLEX, Gurobi, and MOSEK,
-for LPs or MILPs. For more information on solvers see the solvers section below,
+for LPs or MILPs. For more information on solvers see the [Solvers](#user-content-solvers) section below,
 or refer to the documentation for that solver for installation instructions.
 
 Currently [SCS](www.github.com/karanveerm/SCS.jl) is the only solver that can be used
@@ -127,7 +128,7 @@ automatically into a `Constant` expression when used in a Convex.jl expression.
 ### Expressions
 Expressions in Convex.jl are formed by applying any *atom* (mathematical function 
 defined in Convex.jl) to variables, constants, and other expressions.
-For a list of these functions, see the section supported operations below.
+For a list of these functions, see [Supported Operations](#user-content-supported-operations) below.
 Atoms are applied to expressions using operator overloading. Hence, `2+2`
 calls Julia's built-in addition operator, while `2+x` calls the Convex.jl
 addition method and returns a Convex.jl expression.
