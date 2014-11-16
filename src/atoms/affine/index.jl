@@ -39,9 +39,9 @@ end
 
 function evaluate(x::IndexAtom)
   if x.inds == nothing
-    return getindex(evaluate(x.children[1]), rows, cols)
+    return getindex(evaluate(x.children[1]), x.rows, x.cols)
   else
-    return getindex(evaluate(x.children[1]), inds)
+    return getindex(evaluate(x.children[1]), x.inds)
   end
 end
 

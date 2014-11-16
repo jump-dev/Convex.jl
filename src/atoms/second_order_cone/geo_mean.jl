@@ -1,3 +1,4 @@
+import Base.sqrt
 export GeoMeanAtom, geo_mean, sqrt
 export sign, monotonicity, curvature, conic_form!
 

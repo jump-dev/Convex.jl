@@ -36,7 +36,7 @@ solve!(p, MIPsolver())
 @test_approx_eq_eps p.optval 12 TOL
 
 x = Variable(2, :Int)
-p = minimize(norm(x,1), x[1]>=4.3)
+p = minimize(norm(x, 1), x[1]>=4.3)
 solve!(p, MIPsolver())
 @test_approx_eq_eps p.optval 5 TOL
 
