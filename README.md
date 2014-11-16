@@ -47,7 +47,7 @@ problem.constraints += [x <= 1, 0.5 <= 2*x]
 solve!(problem)
 
 # Alternatively, specify a solver yourself
-solver = ECOSSolver() # or SCSSolver() OR GurobiSolver() or GLPKSolverMIP() etc.
+solver = ECOSSolver() # or SCSSolver() or GurobiSolver() or GLPKSolverMIP() etc.
 solve!(problem, solver)
 
 # Status (solved, infeasible etc.)
@@ -285,6 +285,7 @@ Currently, Convex.jl is developed and maintained by:
 - [David Zeng](http://www.stanford.edu/~dzeng0/)
 
 The Convex.jl developers also thank:
+- [Iain Dunning](http://iaindunning.com/), [Joey Huchette](http://www.mit.edu/~huchette/) and [Miles Lubin](http://www.mit.edu/~mlubin/): of the [JuliaOpt](http://www.juliaopt.org/) team for MathProgBase, Julia interfaces to the solvers we use and continuous contributions.
 - [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University. He is also the co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html). We thank Professor Boyd for his continuous input and support.
 - [Steven Diamond](http://www.stanford.edu/~stevend2/): many aspects of the design of Convex.jl were inspired Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy). We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote a [DCP tutorial website](http://dcp.stanford.edu/) to teach disciplined convex programming, a useful resource for Convex.jl users.
 
