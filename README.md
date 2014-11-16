@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cvxgrp/Convex.jl.svg?branch=master)](https://travis-ci.org/cvxgrp/Convex.jl) [![Coverage Status](https://img.shields.io/coveralls/cvxgrp/Convex.jl.svg)](https://coveralls.io/r/cvxgrp/Convex.jl)
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; interfaces are not guaranteed to be stable, and bugs should be expected. Nevertheless, we try to fix problems that come up as swiftly as we can. We'd love bug reports and feature requests!
+Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests.
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -20,7 +20,18 @@ Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.sta
 
 
 ## Introduction
-Convex.jl allows you to express problems in simple, mathematical ways. All you need to worry about is the math, and Convex.jl will transform your problem into a standard form that is fed into a solver of your choice such as ECOS (and soon, SCS). Here's a quick example of code that solves a least-squares problem with inequality constraints:
+Convex.jl allows you to model and solve optimization problems by expressing them 
+in a simple, mathematical form. It is compatible with any solver in MathProgBase,
+and can solve LPs, MIPs, SOCPs, SDPs, and exponential cone programs,
+often, without the user needing to know what these are.
+If your problem can be expressed while following the rules of 
+[Disciplined Convex Programming](http://dcp.stanford.edu/),
+Convex.jl will transform your problem into a standard form that can be solved
+using a solver of your choice. 
+For a detailed discussion of how Convex.jl works, see 
+[our paper](http://www.arxiv.org/abs/1410.4821).
+
+Here's a quick example of code that solves a least-squares problem with inequality constraints:
 
 ```
 using Convex
@@ -31,23 +42,22 @@ n = 5
 A = randn(m, n)
 b = randn(m, 1)
 
-# Create a variable of size n x 1.
-# Matrix variables are also supported
+# Create a (column vector) variable of size n x 1.
 x = Variable(n)
 
 # The problem is to minimize ||Ax + b||^2 subject to x >= 0
-problem = minimize(sum_squares(A * x + b), [0 <= x])
+problem = minimize(sum_squares(A * x + b), [x >= 0])
 
-# Alternatively, we can add constraints at any time in the following way:
+# We can also add constraints after the problem is created in the following way:
 problem.constraints += [x <= 1, 0.5 <= 2*x]
 
 # Solve the problem by calling solve!
 solve!(problem)
 
-# Status (solved, infeasible etc.)
+# Status (optimal, infeasible, etc.)
 problem.status
 
-# Optimum value
+# Optimal value
 problem.optval
 
 # Optimal value of x
@@ -58,8 +68,10 @@ x.value
 ```
 Pkg.add("Convex")
 ```
-If you're on OSX, then SCS.jl should also work. This can be used to solve problems involving exponential and semi-definite constraints.
-NOTE: SCS.jl ONLY works on OSX.
+By default, Convex.jl uses [ECOS]() to solve SOCPs, 
+and [SCS]() to solve SDPs and exponential cone programs.
+SCS currently works only on OSX, so SDPs and exponential cone programs 
+are only supported on OSX for now. 
 ```
 Pkg.clone("https://github.com/karanveerm/SCS.jl.git")
 Pkg.build("SCS")
@@ -67,14 +79,22 @@ Pkg.build("SCS")
 You might have to restart Julia.
 Please file an issue in case you run into problems during installation. We'll be glad to help!
 
+You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt)
+for LPs or MILPs. For more information on solvers see the solvers section below.
+
 ## Basic Types
 
+The basic building block of Convex.jl is called an *expression*,
+which can represent a variable, a constant, or a function of another expression.
+We discuss each kind of expression in turn.
+
 ### Variables
-Variables represent the quantities that we want to find by solving the problem.
+The simplest kind of expression in \cvxjl is a variable.
+Variables in \cvxjl are declared using the `Variable`
+keyword, along with the dimensions of the variable.
 ```
 # Scalar variable
 x = Variable()
-y = Variable(1)
 
 # Column-vector variable
 x = Variable(5)
@@ -83,11 +103,32 @@ x = Variable(5)
 x = Variable(4, 6)
 ```
 
+Variables may also be declared as having special properties, such as being
+
+  * (entrywise) positive: `x = Variable(4, Positive())`,
+  * (entrywise) negative: `x = Variable(4, Negative())`,
+  * integral: `x = Variable(4, :Int)`,
+  * binary: `x = Variable(4, :Bin)`, or
+  * (for a matrix) being symmetric, with nonnegative eigenvalues (ie, positive semidefinite): `z = Semidefinite(4)`.
+
 ### Constants
-Use constants the way you would usually use them in Julia. They should work just fine. In case there are any problems, please report an issue and we will fix it as soon as we can.
+Numbers, vectors, and matrices present in the Julia environment are wrapped
+automatically into a `Constant` expression when used in a \cvxjl expression.
 
 ### Expressions
-Performing operations on Variables results in Expressions. As the name suggests, these are mathematical expressions. These expressions can be combined with other expressions and so on. Expressions that are created must be DCP-compliant (follow the rules of Disciplined Convex Programming (DCP)). More information on DCP can be found here: http://dcp.stanford.edu/.
+Expressions in Convex.jl are formed by applying any *atom* (mathematical function 
+defined in Convex.jl) to variables, constants, and other expressions.
+For a list of these functions, see the section supported operations below.
+Atoms are applied to expressions using operator overloading. Hence, \verb|2+2|
+calls Julia's built-in addition operator, while \verb|2+x| calls the \cvxjl
+addition method and returns a \cvxjl expression.
+Many of the useful language
+features in Julia, such as arithmetic, array indexing, and matrix transpose are
+overloaded in \cvxjl so they may be used with variables and expressions 
+just as they are used with native Julia types.
+
+Expressions that are created must be DCP-compliant. 
+More information on DCP can be found [here](http://dcp.stanford.edu/).
 ```
 x = Variable(5)
 # The following are all expressions
@@ -109,30 +150,42 @@ evaluate(expr)
 ```
 
 ### Constraints
-Constants, Variables and Expressions,  combined with <, >, <=, >= and == create Constraints.
+\emph{Constraints} in \cvxjl are declared using the standard comparison
+operators \verb|<=|, \verb|>=|, and \verb|==|.  They specify relations that
+must hold between two expressions.  \cvxjl does not distinguish between strict
+and non-strict inequality constraints.
 ```
 x = Variable(5, 5)
 # Equality constraint
-x == 0
-# Greater than/ equal to constraint
-x >= 1
+constraint = x == 0
+# Inequality constraint
+constraint = x >= 1
 ```
-If a constraint is specified as strictly greater than or less than, it will be converted to a >= or <= constraint respectively. If a strict inequality is needed, one way to do it would be as follows:
+Matrices can also be constrained to be positive semidefinite.
 ```
-x = Variable()
-slack = Variable()
-constraints = [x + slack >= 0, slack >= 1e-4]
+x = Variable(3, 3)
+y = Variable(3, 1)
+z = Variable()
+# constrain [x y; y' z] to be positive semidefinite
+constraint = isposdef([x y; y' z])
 ```
 
 ### Objective
 The objective of the problem is a scalar expression to be maximized or minimized by using `maximize` or `minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using `problem = satisfy(constraints)`.
 
 ### Problem
-A problem is an objective and a list of constraints. These are constructed using the form
+A \emph{problem} in \cvxjl consists of a \emph{sense} (minimize, maximize,
+or satisfy), an objective (an expression to which the sense verb is to be
+applied), and zero or more constraints which must be satisfied at the
+solution.
+Problems may be constructed as
 ```problem = minimize(objective, constraints)```
 or
 ```problem = maximize(objective, constraints)```
-The constraints can be added at any time before the problem is solved.
+or
+```problem = satisfy(constraints)```
+
+Constraints can be added at any time before the problem is solved.
 ```
 # No constraints given
 problem = minimize(objective)
@@ -145,12 +198,19 @@ A problem can be solved by calling `solve!`:
 ```
 solve!(problem)
 ```
-
-After the problem is solved, the status can be checked by `problem.status`, which can be `:Optimal`, `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. If the status is `:Optimal`, `problem.optval` will have the optimum value of the problem. Each variable has a `value` that can be used to access the variables optimum value. The optimum value of expressions can also be found by calling the `evaluate()` function of the expression as follows: `evaluate(expr)`. <!--The dual values are stored with the respective constraints and can be accessed as `problem.constraints[idx].dual_value`.-->
-
+After the problem is solved, `problem.status` records the status returned by the optimization solver,
+and can be `:Optimal`, `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. 
+If the status is `:Optimal`, `problem.optval` will record the optimum value of the problem. 
+The optimal value for each variable `x` participating in the problem
+can be found in `x.value`. 
+The optimal value of an expression can be found by calling the `evaluate()` function 
+on the expression as follows: `evaluate(expr)`. 
+<!--The dual values are stored with the respective constraints and can be accessed as `problem.constraints[idx].dual_value`.-->
 
 ## Supported operations
-Convex.jl currently supports the following operations. Except where explicitly noted below, they work seamlessly for scalars, vectors and matrices. These atomic operations ("atoms") may be composed according to the [DCP](dcp.stanford.edu) composition rules to form new convex, concave, or affine expressions.
+Convex.jl currently supports the following operations. 
+These functions ("atoms") may be composed according to the 
+[DCP](dcp.stanford.edu) composition rules to form new convex, concave, or affine expressions.
 
 ### Affine atoms
 
@@ -180,6 +240,8 @@ atom | description | vexity | slope | implicit constraint
 `square(x)`, `x^2` | $x^2$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
 `abs(x)` | $abs(x)$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
 `geo_mean(x, y)` | $\sqrt{xy}$ | concave | increasing | $x \ge 0$, $y \ge 0$
+`exp(x)` | $\exp(x)$ | convex | increasing | none
+`log(x)` | $\log(x)$ | concave | increasing | $x \gt 0$
 
 ### Vector and Matrix atoms
 
@@ -192,12 +254,17 @@ atom | description | vexity | slope | implicit constraint
 `quad_form(x,P)` | $x^T P x$ | convex in $X$, affine in $P$ | increasing on $x \ge 0$, decreasing on $x \le 0$, increasing in $P$ | either $x$ or $P$ must be constant
 `quad_over_lin(x, y)` | $x^T x/y$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$, decreasing in $y$ | $y > 0$
 `sum_squares(x)` | $\sum x_i^2$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
+`nuclear_norm(x)` | sum of singular values of $x$ | convex | not monotonic | none
+`operator_norm(x)` | maximum singular values of $x$ | convex | not monotonic | none
+`logsumexp(x)` | $\log(\sum_i \exp(x_i))$ | convex | increasing | none
+
 
 ### Promotion
 When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do `max(x, 0)` gives an expression with the shape of `x` whose elements are the maximum of the corresponding element of `x` and `0`.
 
 ## Examples
-A number of very simple can be found in test/test.jl. More sophisticated examples, along with plots can be found in the examples/ directory.
+A number of very simple examples can be found in the test/ directory. 
+More sophisticated examples, along with plots can be found in the examples/ directory.
 Here are a few simple examples to start with:
 
 * Dot Product
@@ -277,23 +344,22 @@ Currently, Convex.jl is developed and maintained by:
 - [Madeleine Udell](http://www.stanford.edu/~udell/)
 - [David Zeng](http://www.stanford.edu/~dzeng0/)
 
-The Convex.jl developers also thank:
-- [Stephen Boyd](http://www.stanford.edu/~boyd/): Professor of Electrical Engineering, Stanford University. He is also the co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html). We thank Professor Boyd for his continuous input and support.
-- [Steven Diamond](http://www.stanford.edu/~stevend2/): many aspects of the design of Convex.jl were inspired Steven Diamond's [CVXPY](https://github.com/cvxgrp/cvxpy). We greatly appreciate Steven Diamond's experienced and continual guidance. In addition, Steven Diamond also wrote a [DCP tutorial website](http://dcp.stanford.edu/) to teach disciplined convex programming, a useful resource for Convex.jl users.
+The design of Convex.jl has also been inspired by
+- [Stephen Boyd](http://www.stanford.edu/~boyd/), co-author of the book [Convex Optimization](http://www.stanford.edu/~boyd/books.html)
+- [Steven Diamond](http://www.stanford.edu/~stevend2/), developer of [CVXPY](https://github.com/cvxgrp/cvxpy) and of a [DCP tutorial website](http://dcp.stanford.edu/) to teach disciplined convex programming.
+- [Michael Grant](http://www.cvxr.com), developer of [CVX](http://www.cvxr.com).
 
 ## Citing this package
 
 If you use Convex.jl for published work,
-we encourage you to cite the software.
+we encourage you to cite the software using the following BibTeX citation:
 
-Use the following BibTeX citation:
-
-    @article{udell2014,
-        title = {Convex Optimization in Julia},
-        author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
-        year = {2014},
-        archivePrefix = "arXiv",
-        eprint = {1410.4821},
-        primaryClass = "math-oc",
-        journal={arXiv preprint arXiv:1410.4821},
+    @article{convexjl,
+     title = {Convex Optimization in {J}ulia},
+     author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
+     year = {2014},
+     journal = {SC14 Workshop on High Performance Technical Computing in Dynamic Languages},
+     archivePrefix = "arXiv",
+     eprint = {1410.4821},
+     primaryClass = "math-oc",
     }
