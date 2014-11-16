@@ -29,6 +29,10 @@ function curvature(q::GeoMeanAtom)
   return ConcaveVexity()
 end
 
+function evaluate(q::GeoMeanAtom)
+  return sqrt(evaluate(q.children[1]) .* evaluate(q.children[2]))
+end
+
 function conic_form!(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, q)
     sz = q.children[1].size

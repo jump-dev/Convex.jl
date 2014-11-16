@@ -22,7 +22,7 @@ type EqConstraint <: Constraint
 end
 
 function vexity(c::EqConstraint)
-  vex = vexity(lhs) + (-vexity(rhs))
+  vex = vexity(c.lhs) + (-vexity(c.rhs))
   # You can't have equality constraints with concave/convex expressions
   if vex == ConvexVexity() || vex == ConcaveVexity()
     vex = NotDcp()
@@ -66,7 +66,7 @@ type LtConstraint <: Constraint
 end
 
 function vexity(c::LtConstraint)
-  vex = vexity(lhs) + (-vexity(rhs))
+  vex = vexity(c.lhs) + (-vexity(c.rhs))
   if vex == ConcaveVexity()
     vex = NotDcp()
   end
@@ -111,7 +111,7 @@ type GtConstraint <: Constraint
 end
 
 function vexity(c::GtConstraint)
-  vex = vexity(lhs) + (-vexity(rhs))
+  vex = vexity(c.lhs) + (-vexity(c.rhs))
   if vex == ConvexVexity()
     vex = NotDcp()
   end

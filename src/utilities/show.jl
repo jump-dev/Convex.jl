@@ -32,7 +32,7 @@ function show(io::IO, c::Constraint)
     $(c.head) constraint
     lhs: $(c.lhs)
     rhs: $(c.rhs)
-    """)
+    vexity: $(vexity(c))""")
 end
 
 # SDP constraints are displayed as:
