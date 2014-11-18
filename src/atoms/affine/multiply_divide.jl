@@ -91,6 +91,12 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-*(x::AbstractExpr, y::AbstractExpr) = MultiplyAtom(x, y)
+function *(x::AbstractExpr, y::AbstractExpr)
+  if hash(x) == hash(y)
+    return square(x)
+  end
+  return MultiplyAtom(x, y)
+end
+
 *(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
