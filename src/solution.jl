@@ -18,7 +18,9 @@ if default_model == nothing
 end
 
 # function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
-function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel())
+function solve!(problem::Problem, 
+                m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel; 
+                warmstart=true)
 
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
   if problem.head == :maximize
@@ -36,6 +38,14 @@ function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=ECOS.ECO
       MathProgBase.setvartype!(m, vartypes)
     catch
       error("model $(typeof(m)) does not support variables of some of the following types: $(unique(vartypes))")
+    end
+  end
+
+  # see if we should warmstart
+  if warmstart && problem.status==:Optimal
+    try
+      println("Using warm start from previous solution")
+      MathProgBase.setwarmstart!(m, problem.solution.primal)
     end
   end
 
