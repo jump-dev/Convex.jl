@@ -8,14 +8,13 @@ Float64OrNothing = Union(Float64, Nothing)
 type Solution{T<:Number}
   primal::Array{T, 1}
   dual::Array{T, 1}
-  slack::Array{T, 1}
   status::Symbol
   optval::T
   has_dual::Bool
 end
 
-Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], T[], status, optval, false)
-Solution{T}(x::Array{T, 1}, y::Array{T, 1}, z::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, z, status, optval, true)
+Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], status, optval, false)
+Solution{T}(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, status, optval, true)
 
 type Problem
   head::Symbol

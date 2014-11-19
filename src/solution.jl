@@ -52,13 +52,17 @@ function solve!(problem::Problem,
   # optimize problem
   status = MathProgBase.optimize!(m)
 
+  # get the primal (and possibly dual) solution
   try
-    y, z = MathProgBase.getconicdual(m)
-    problem.solution = Solution(MathProgBase.getsolution(m), y, z, MathProgBase.status(m), MathProgBase.getobjval(m))
+    dual = MathProgBase.getconicdual(m)
+    problem.solution = Solution(MathProgBase.getsolution(m), dual, 
+                                MathProgBase.status(m), MathProgBase.getobjval(m))    
   catch
-    problem.solution = Solution(MathProgBase.getsolution(m), MathProgBase.status(m), MathProgBase.getobjval(m))
-    populate_variables!(problem, var_to_ranges)
+    problem.solution = Solution(MathProgBase.getsolution(m),
+                                MathProgBase.status(m), MathProgBase.getobjval(m))
   end
+  populate_variables!(problem, var_to_ranges)
+
   # minimize -> maximize
   if (problem.head == :maximize)
     problem.solution.optval = -problem.solution.optval
