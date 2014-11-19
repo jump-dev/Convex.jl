@@ -41,11 +41,11 @@ function solve!(problem::Problem,
     end
   end
 
-  # see if we should warmstart
+  # see if we should warmstart (as of 11/19/14, only MILP solvers support this)
   if warmstart && problem.status==:Optimal
     try
-      println("Using warm start from previous solution")
       MathProgBase.setwarmstart!(m, problem.solution.primal)
+      println("Using warm start from previous solution")
     end
   end
 
