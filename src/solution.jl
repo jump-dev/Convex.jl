@@ -19,7 +19,7 @@ end
 
 # function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
 function solve!(problem::Problem, 
-                m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel; 
+                m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel(); 
                 warmstart=true)
 
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
