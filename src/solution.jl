@@ -1,25 +1,8 @@
 import MathProgBase
 export solve!
 
-default_model = nothing
-if isdir(Pkg.dir("ECOS"))
-  using ECOS
-  default_model = ECOS.ECOSMathProgModel
-end
-if isdir(Pkg.dir("SCS"))
-  using SCS
-  if default_model == nothing
-    default_model = SCS.SCSMathProgModel
-  end
-end
-
-if default_model == nothing
-  error("You have neither ECOS.jl nor SCS.jl installed. Must have at least one of these solvers.")
-end
-
-# function solve!(problem::Problem, m::MathProgBase.AbstractMathProgModel=SCS.SCSMathProgModel())
-function solve!(problem::Problem, 
-                m::MathProgBase.AbstractMathProgModel=ECOS.ECOSMathProgModel(); 
+function solve!(problem::Problem,
+                m::MathProgBase.AbstractMathProgModel=DEFAULT_SOLVER();
                 warmstart=true)
 
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
@@ -55,8 +38,8 @@ function solve!(problem::Problem,
   # get the primal (and possibly dual) solution
   try
     dual = MathProgBase.getconicdual(m)
-    problem.solution = Solution(MathProgBase.getsolution(m), dual, 
-                                MathProgBase.status(m), MathProgBase.getobjval(m))    
+    problem.solution = Solution(MathProgBase.getsolution(m), dual,
+                                MathProgBase.status(m), MathProgBase.getobjval(m))
   catch
     problem.solution = Solution(MathProgBase.getsolution(m),
                                 MathProgBase.status(m), MathProgBase.getobjval(m))
