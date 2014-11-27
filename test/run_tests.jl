@@ -1,3 +1,5 @@
+using Convex
+
 tests = ["test.jl",
          "test2.jl"]
 tests_scs = ["test_exp.jl",
@@ -11,14 +13,18 @@ for curtest in tests
     include(curtest)
 end
 
-if isdir(Pkg.dir("SCS"))
+if can_solve_sdp(DEFAULT_SOLVER)
 	for curtest in tests_scs
     info(" Test: $(curtest)")
     include(curtest)
 	end
 end
 
-if isdir(Pkg.dir("GLPK")) && isdir(Pkg.dir("GLPKMathProgInterface"))
+# The following syntax can be used to solve it using other solvers
+# using Gurobi
+# set_default_solver(GurobiSolver)
+
+if can_solve_mip(DEFAULT_SOLVER)
 	for curtest in tests_glpk
     info(" Test: $(curtest)")
     include(curtest)

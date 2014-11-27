@@ -1,12 +1,15 @@
 using Base.Test
 using Convex
-using GLPKMathProgInterface
-# using Gurobi
-
 TOL = 1e-2
 
-MIPsolver() = GLPKSolverMIP() # or GurobiSolver()
-LPsolver() = GLPKSolverLP() # or GurobiSolver()
+LPsolver() = DEFAULT_SOLVER()
+
+if !can_solve_mip(DEFAULT_SOLVER)
+	using GLPKMathProgInterface
+	MIPsolver() = GLPKSolverMIP()
+else
+	MIPsolver() = DEFAULT_SOLVER()
+end
 
 # LP fallback interface
 x = Variable()
