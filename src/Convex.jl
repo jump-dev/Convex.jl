@@ -1,5 +1,6 @@
 module Convex
 
+global DEFAULT_SOLVER = nothing
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")

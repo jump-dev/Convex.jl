@@ -13,7 +13,7 @@ for curtest in tests
     include(curtest)
 end
 
-if can_solve_sdp(DEFAULT_SOLVER)
+if can_solve_sdp(get_default_solver())
 	for curtest in tests_scs
     info(" Test: $(curtest)")
     include(curtest)
@@ -22,9 +22,9 @@ end
 
 # The following syntax can be used to solve it using other solvers
 # using Gurobi
-# set_default_solver(GurobiSolver)
+# set_default_solver(GurobiSolver())
 
-if can_solve_mip(DEFAULT_SOLVER)
+if can_solve_mip(get_default_solver())
 	for curtest in tests_glpk
     info(" Test: $(curtest)")
     include(curtest)

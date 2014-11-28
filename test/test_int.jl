@@ -2,13 +2,13 @@ using Base.Test
 using Convex
 TOL = 1e-2
 
-LPsolver() = DEFAULT_SOLVER()
+LPsolver() = get_default_solver()
 
-if !can_solve_mip(DEFAULT_SOLVER)
+if !can_solve_mip(get_default_solver())
 	using GLPKMathProgInterface
 	MIPsolver() = GLPKSolverMIP()
 else
-	MIPsolver() = DEFAULT_SOLVER()
+	MIPsolver() = get_default_solver()
 end
 
 # LP fallback interface

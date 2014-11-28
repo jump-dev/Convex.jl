@@ -23,15 +23,15 @@ Note that Convex.jl was previously called CVX.jl. This package is under active d
 - [Citing this package](#user-content-citing-this-package)
 
 ## Introduction
-Convex.jl allows you to model and solve optimization problems by expressing them 
+Convex.jl allows you to model and solve optimization problems by expressing them
 in a simple, mathematical form. It is compatible with any solver in MathProgBase,
 and can solve LPs, MIPs, SOCPs, SDPs, and exponential cone programs,
 often, without the user needing to know what these are.
-If your problem can be expressed while following the rules of 
+If your problem can be expressed while following the rules of
 [Disciplined Convex Programming](http://dcp.stanford.edu/),
 Convex.jl will transform your problem into a standard form that can be solved
-using a solver of your choice. 
-For a detailed discussion of how Convex.jl works, see 
+using a solver of your choice.
+For a detailed discussion of how Convex.jl works, see
 [our paper](http://www.arxiv.org/abs/1410.4821).
 
 Here's a quick example of code that solves a least-squares problem with inequality constraints:
@@ -75,7 +75,7 @@ Convex.jl can be installed using the command
 ```
 Pkg.add("Convex")
 ```
-Only the solver ECOS is installed by default. 
+Only the solver ECOS is installed by default.
 You can also add and use any solver in [JuliaOpt](https://github.com/JuliaOpt),
 including GLPK, CPLEX, Gurobi, and MOSEK,
 for LPs or MILPs. For more information on solvers see the [Solvers](#user-content-solvers) section below,
@@ -83,7 +83,7 @@ or refer to the documentation for that solver for installation instructions.
 
 Currently [SCS](www.github.com/karanveerm/SCS.jl) is the only solver that can be used
 to solve SDPs and exponential cone programs,
-and SCS currently works only on OSX, so SDPs and exponential cone programs 
+and SCS currently works only on OSX, so SDPs and exponential cone programs
 are only supported on OSX for now. SCS can be installed using the following commands:
 ```
 Pkg.clone("https://github.com/karanveerm/SCS.jl.git")
@@ -126,7 +126,7 @@ Numbers, vectors, and matrices present in the Julia environment are wrapped
 automatically into a `Constant` expression when used in a Convex.jl expression.
 
 ### Expressions
-Expressions in Convex.jl are formed by applying any *atom* (mathematical function 
+Expressions in Convex.jl are formed by applying any *atom* (mathematical function
 defined in Convex.jl) to variables, constants, and other expressions.
 For a list of these functions, see [Supported Operations](#user-content-supported-operations) below.
 Atoms are applied to expressions using operator overloading. Hence, `2+2`
@@ -134,10 +134,10 @@ calls Julia's built-in addition operator, while `2+x` calls the Convex.jl
 addition method and returns a Convex.jl expression.
 Many of the useful language
 features in Julia, such as arithmetic, array indexing, and matrix transpose are
-overloaded in Convex.jl so they may be used with variables and expressions 
+overloaded in Convex.jl so they may be used with variables and expressions
 just as they are used with native Julia types.
 
-Expressions that are created must be DCP-compliant. 
+Expressions that are created must be DCP-compliant.
 More information on DCP can be found [here](http://dcp.stanford.edu/).
 ```
 x = Variable(5)
@@ -209,17 +209,17 @@ A problem can be solved by calling `solve!`:
 solve!(problem)
 ```
 After the problem is solved, `problem.status` records the status returned by the optimization solver,
-and can be `:Optimal`, `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. 
-If the status is `:Optimal`, `problem.optval` will record the optimum value of the problem. 
+and can be `:Optimal`, `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`.
+If the status is `:Optimal`, `problem.optval` will record the optimum value of the problem.
 The optimal value for each variable `x` participating in the problem
-can be found in `x.value`. 
-The optimal value of an expression can be found by calling the `evaluate()` function 
-on the expression as follows: `evaluate(expr)`. 
+can be found in `x.value`.
+The optimal value of an expression can be found by calling the `evaluate()` function
+on the expression as follows: `evaluate(expr)`.
 <!--The dual values are stored with the respective constraints and can be accessed as `problem.constraints[idx].dual_value`.-->
 
 ## Supported operations
-Convex.jl currently supports the following operations. 
-These functions ("atoms") may be composed according to the 
+Convex.jl currently supports the following operations.
+These functions ("atoms") may be composed according to the
 [DCP](dcp.stanford.edu) composition rules to form new convex, concave, or affine expressions.
 
 ### Affine atoms
@@ -273,7 +273,7 @@ atom | description | vexity | slope | implicit constraint
 When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do `max(x, 0)` gives an expression with the shape of `x` whose elements are the maximum of the corresponding element of `x` and `0`.
 
 ## Examples
-A number of very simple examples can be found in the test/ directory. 
+A number of very simple examples can be found in the test/ directory.
 More sophisticated examples, along with plots can be found in the examples/ directory.
 Here are a few simple examples to start with:
 
@@ -349,13 +349,13 @@ solve!(p)
 
 ## Solvers
 
-By default, Convex.jl uses [ECOS](https://github.com/JuliaOpt/ECOS.jl) to solve SOCPs, 
+By default, Convex.jl uses [ECOS](https://github.com/JuliaOpt/ECOS.jl) to solve SOCPs,
 and [SCS](https://github.com/karanveerm/SCS.jl) to solve SDPs and exponential cone programs.
-SCS currently works only on OSX, so SDPs and exponential cone programs 
-are only supported on OSX for now. 
+SCS currently works only on OSX, so SDPs and exponential cone programs
+are only supported on OSX for now.
 Any other solver in [JuliaOpt](https://github.com/JuliaOpt) may also be used, so long as it supports
 the conic constraints used to express the problem. Currently,
-other solvers will be most useful in solving linear programs (LPs) 
+other solvers will be most useful in solving linear programs (LPs)
 and mixed integer linear programs (MILPs). Mosek AND Gurobi can be used to solve QPs.
 
 For example, we can use GLPK to solve a MILP:
@@ -367,7 +367,7 @@ solve!(p, GLPKSolverMIP())
 You can set or see the current default solver by:
 ```
 get_default_solver()
-set_default_solver(GurobiSolver)
+set_default_solver(GurobiSolver()) # or set_default_solver(ECOSSolver(verbose=0))
 # Now Gurobi will be used by default as a solver
 ```
 

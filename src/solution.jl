@@ -2,7 +2,7 @@ import MathProgBase
 export solve!
 
 function solve!(problem::Problem,
-                m::MathProgBase.AbstractMathProgModel=DEFAULT_SOLVER();
+                m::MathProgBase.AbstractMathProgModel=get_default_solver();
                 warmstart=true)
 
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
