@@ -11,9 +11,9 @@ function solve!(problem::Problem,
   end
 
   # no conic constraints on variables
-  var_cones = fill((:Free, 1:size(A, 2)))
+  var_cones = fill((:Free, 1:size(A, 2)),1)
   # TODO: Get rid of full once c and b are not sparse
-  MathProgBase.loadconicproblem!(m, vec(full(c)), A, full(b), cones, var_cones)
+  MathProgBase.loadconicproblem!(m, vec(full(c)), A, vec(full(b)), cones, var_cones)
 
   # add integer and binary constraints on variables
   if !all(Bool[t==:Cont for t in vartypes])
