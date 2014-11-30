@@ -1,5 +1,5 @@
 using MathProgBase
-export can_solve_mip, can_solve_sdp
+export can_solve_mip, can_solve_sdp, can_solve_exp
 export set_default_solver, get_default_solver
 
 function set_default_solver(solver::MathProgBase.MathProgSolverInterface.AbstractMathProgSolver)
@@ -35,7 +35,7 @@ end
 
 function can_solve_mip(solver)
   name = typeof(solver).name.name
-  if name == :GurobiSolver || name == :MosekSolver || name == :GLPKSolverMIP
+  if name == :GurobiSolver || name == :MosekSolver || name == :GLPKSolverMIP || name == :CPLEXSolver || name == :CbcSolver
     return true
   else
     info("Only GurobiSolver, MosekSolver and GLPKSolverMIP can solve mixed integer programs")
@@ -56,11 +56,10 @@ end
 
 function can_solve_sdp(solver)
   name = typeof(solver).name.name
-  if name == :SCSSolver || name == :SCSMathProgModel #|| name == :MosekSolver
+  if name == :SCSSolver || name == :SCSMathProgModel || name == :MosekSolver
     return true
   else
-    info("Only SCSSolver and SCSMathProgModel can solve semidefinite programs")
-    # info("Only SCSSolver, MosekSolver and SCSMathProgModel can solve semidefinite programs")
+    info("Only SCSSolver, MosekSolver and SCSMathProgModel can solve semidefinite programs")
     return false
   end
 end

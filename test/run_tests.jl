@@ -2,11 +2,15 @@ using Convex
 
 tests = ["test.jl",
          "test2.jl"]
-tests_scs = ["test_exp.jl",
-         "test_sdp.jl"]
-tests_glpk = ["test_int.jl"]
+tests_sdp = ["test_sdp.jl"]
+tests_exp = ["test_exp.jl"]
+tests_int = ["test_int.jl"]
 
 println("Running tests:")
+
+# The following syntax can be used to solve it using other solvers
+# using Gurobi
+# set_default_solver(GurobiSolver())
 
 for curtest in tests
     info(" Test: $(curtest)")
@@ -14,18 +18,23 @@ for curtest in tests
 end
 
 if can_solve_sdp(get_default_solver())
-	for curtest in tests_scs
-    info(" Test: $(curtest)")
-    include(curtest)
-	end
+    for curtest in tests_sdp
+        info(" Test: $(curtest)")
+        include(curtest)
+    end
 end
 
-# The following syntax can be used to solve it using other solvers
-# using Gurobi
-# set_default_solver(GurobiSolver())
+if can_solve_exp(get_default_solver())
+    for curtest in tests_exp
+        info(" Test: $(curtest)")
+        include(curtest)
+    end
+end
+
+
 
 if can_solve_mip(get_default_solver())
-	for curtest in tests_glpk
+	for curtest in tests_int
     info(" Test: $(curtest)")
     include(curtest)
 	end
