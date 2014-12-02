@@ -28,7 +28,7 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.lenght, Base.endof, Base.ndims, Base.zero
+import Base.sign, Base.size, Base.length, Base.endof, Base.ndims, Base.zero
 export AbstractExpr, Constraint
 export vexity, sign, size, evaluate, monotonicity, curvature, zero, length
 export conic_form!

@@ -1,6 +1,7 @@
 using Convex
 
-tests = ["test.jl",
+tests = ["test_utilities.jl",
+         "test.jl",
          "test2.jl"]
 tests_sdp = ["test_sdp.jl"]
 tests_exp = ["test_exp.jl"]
