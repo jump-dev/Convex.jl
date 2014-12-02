@@ -1,12 +1,12 @@
 #############################################################################
 # multiply_divide.jl
-# Handles scalar multiplication, maatrix multiplication, and scalar division
+# Handles scalar multiplication, matrix multiplication, and scalar division
 # of variables, constants and expressions.
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
-export *
+export *, .*
 export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
@@ -58,10 +58,10 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
-      if x.children[1].head == :constant
+      if vexity(x.children[1]) == ConstVexity()
         const_child = x.children[1]
         expr_child = x.children[2]
-      elseif x.children[2].head == :constant
+      elseif vexity(x.children[2]) == ConstVexity()
         const_child = x.children[2]
         expr_child = x.children[1]
       else
@@ -102,3 +102,13 @@ end
 
 *(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
+
+### .*
+.*(x::AbstractExpr, y::Value) = .*(y, x)
+function .*(A::Value, X::AbstractExpr)
+    # TODO: implement broadcasting
+    if size(A)!==size(X)
+        error("arrays must be the same size")
+    end
+    return reshape(hcat([A[:][i]*X[:][i] for i=1:length(X)]...), size(X)...)
+end
