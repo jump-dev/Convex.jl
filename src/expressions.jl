@@ -28,9 +28,9 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.endof, Base.ndims
+import Base.sign, Base.size, Base.lenght, Base.endof, Base.ndims, Base.zero
 export AbstractExpr, Constraint
-export vexity, sign, size, evaluate, monotonicity, curvature
+export vexity, sign, size, evaluate, monotonicity, curvature, zero, length
 export conic_form!
 export endof, ndims
 export Value, ValueOrNothing
@@ -75,6 +75,12 @@ end
 function size(x::AbstractExpr)
   return x.size
 end
+
+function length(x::AbstractExpr)
+  return prod(x.size)
+end
+
+zero(x::AbstractExpr) = Constant(zeros(Float64, size(x)))
 
 ### User-defined Unions
 Value = Union(Number, AbstractArray)
