@@ -61,9 +61,11 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
       if x.children[1].head == :constant
         const_child = x.children[1]
         expr_child = x.children[2]
-      else
+      elseif x.children[2].head == :constant
         const_child = x.children[2]
         expr_child = x.children[1]
+      else
+        error("multiplication of two non-constant expressions is not DCP compliant")
       end
       objective = conic_form!(expr_child, unique_conic_forms)
 
