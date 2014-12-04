@@ -28,6 +28,6 @@ function quad_form(x::AbstractExpr, A::Value)
     error("Quadratic forms supported only for semidefinite matrices")
   end
 
-  P = sqrtm(full(factor * A))
+  P = real(sqrtm(full(factor * A)))
   return factor * square(norm_2(P * x))
 end
