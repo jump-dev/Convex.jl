@@ -102,13 +102,21 @@ end
 
 *(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
+/(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1./y))
 
 ### .*
-.*(x::AbstractExpr, y::Value) = .*(y, x)
 function .*(A::Value, X::AbstractExpr)
-    # TODO: implement broadcasting
     if size(A)!==size(X)
+      s = size(A)
+      if length(s)==1 && s[1] in size(X)
+          A = reshape(A, size(X))
+      else
         error("arrays must be the same size")
+      end
     end
     return reshape(hcat([A[:][i]*X[:][i] for i=1:length(X)]...), size(X)...)
 end
+
+.*(x::AbstractExpr, y::Value) = .*(y, x)
+./(x::AbstractExpr, y::Value) = .*(1./y, x)
+
