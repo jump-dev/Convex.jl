@@ -2,6 +2,8 @@ using Base.Test
 using Convex
 using SCS
 
+set_default_solver(SCSSolver())
+
 TOL = 1e-2
 
 # exp
@@ -48,3 +50,9 @@ y = Variable(5);
 p = minimize(logsumexp(y), y>=1);
 solve!(p)
 @test_approx_eq_eps p.optval log(exp(1)*5) TOL
+
+# entropy
+y = Variable(5, Positive());
+p = maximize(entropy(y), sum(y)<=1);
+solve!(p)
+@test_approx_eq_eps p.optval -log(1/5) TOL

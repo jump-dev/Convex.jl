@@ -18,6 +18,8 @@ type ExpConstraint <: Constraint
 end
 
 ExpConstraint(x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(x, Constant(y), z)
+ExpConstraint(x::AbstractExpr, y::AbstractExpr, z) = ExpConstraint(x, y, Constant(z))
+ExpConstraint(x, y::AbstractExpr, z::AbstractExpr) = ExpConstraint(Constant(x), y, z)
 
 function vexity(c::ExpConstraint)
   # TODO: check these...
