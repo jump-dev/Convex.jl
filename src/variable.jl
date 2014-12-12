@@ -17,8 +17,6 @@ type Variable <: AbstractExpr
   sign::Sign
   sets # ::Array{Symbol,1}
 
-  # is_symmetric is only needed for Semidefinite atoms. Value is ignored for everything else
-  # If you wish to force symmetricity for other variables, add x == x' as a constraint
   function Variable(size::(Int64, Int64), sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, sets)
     this.id_hash = object_id(this)
@@ -35,10 +33,10 @@ type Variable <: AbstractExpr
 end
 
 # convenience semidefinite matrix constructor
-Semidefinite(m::Integer; is_symmetric=true) = Variable((m,m), is_symmetric ? :Semidefinite : :AsymSemidefinite)
-function Semidefinite(m::Integer, n::Integer; is_symmetric=true)
+Semidefinite(m::Integer) = Variable((m,m), :Semidefinite)
+function Semidefinite(m::Integer, n::Integer)
   if m==n
-    return Variable((m,m), is_symmetric ? :Semidefinite : :AsymSemidefinite)
+    return Variable((m,m), :Semidefinite)
   else 
     error("Semidefinite matrices must be square")
   end

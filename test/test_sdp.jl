@@ -3,6 +3,9 @@ using Convex
 
 TOL = 1e-2
 
+using SCS
+set_default_solver(SCSSolver())
+
 # SDP variables
 y = Variable((2,2), :Semidefinite)
 p = minimize(y[1,1])
@@ -39,13 +42,6 @@ y = Semidefinite(3)
 p = minimize(y[1, 2], y[2, 1] == 1)
 solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
-
-# Not symmetric
-x = Variable(Positive())
-y = Semidefinite(3, is_symmetric=false)
-p = minimize(y[1, 2], y[2, 1] == 1, y[1, 2] >= -1000)
-solve!(p)
-@test_approx_eq_eps p.optval -1000 TOL
 
 # trace
 y = Variable((3, 3), :Semidefinite)
