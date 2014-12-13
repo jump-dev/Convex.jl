@@ -2,8 +2,6 @@ using Base.Test
 using Convex
 using SCS
 
-set_default_solver(SCSSolver())
-
 TOL = 1e-2
 
 # exp

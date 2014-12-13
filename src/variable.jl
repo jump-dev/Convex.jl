@@ -12,14 +12,14 @@ type Variable <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   value::ValueOrNothing
-  size::(Int64, Int64)
+  size::(Integer, Integer)
   vexity::Vexity
   sign::Sign
   sets # ::Array{Symbol,1}
 
   # is_symmetric is only needed for Semidefinite atoms. Value is ignored for everything else
   # If you wish to force symmetricity for other variables, add x == x' as a constraint
-  function Variable(size::(Int64, Int64), sign::Sign=NoSign(), sets::Symbol...)
+  function Variable(size::(Integer, Integer), sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, sets)
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
@@ -29,7 +29,7 @@ type Variable <: AbstractExpr
   Variable(m::Integer, n::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
   Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
   Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
-  Variable(size::(Int64, Int64), sets::Symbol...) = Variable(size::(Int64, Int64), NoSign(), sets...)
+  Variable(size::(Integer, Int64), sets::Symbol...) = Variable(size::(Int64, Int64), NoSign(), sets...)
   Variable(size::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
   Variable(size::Integer, sets::Symbol...) = Variable((size, 1), sets...)
 end

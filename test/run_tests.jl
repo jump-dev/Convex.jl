@@ -32,8 +32,6 @@ if can_solve_exp(get_default_solver())
     end
 end
 
-
-
 if can_solve_mip(get_default_solver())
 	for curtest in tests_int
     info(" Test: $(curtest)")
