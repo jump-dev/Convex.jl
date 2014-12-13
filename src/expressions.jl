@@ -9,7 +9,7 @@
 ##                               -- is operated
 ## id_hash::Uint64               -- identifier hash, can be a hash of children
 ##                                  or a unique identifier of the object
-## size::(Int64, Int64)          -- size of the resulting expression
+## size::(Int, Int)          -- size of the resulting expression
 #
 # Constans and variables do not have children.
 #

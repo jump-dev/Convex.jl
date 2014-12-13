@@ -15,7 +15,7 @@ type NegateAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function NegateAtom(x::AbstractExpr)
     children = (x,)
@@ -56,7 +56,7 @@ type AdditionAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::Array{AbstractExpr, 1}
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
     # find the size of the expression = max of size of x and size of y

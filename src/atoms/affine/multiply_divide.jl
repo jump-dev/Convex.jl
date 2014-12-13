@@ -15,7 +15,7 @@ type MultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function MultiplyAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == (1, 1)

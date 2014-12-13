@@ -15,7 +15,7 @@ type NuclearNormAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function NuclearNormAtom(x::AbstractExpr)
     children = (x,)
@@ -66,7 +66,7 @@ type OperatorNormAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function OperatorNormAtom(x::AbstractExpr)
     children = (x,)

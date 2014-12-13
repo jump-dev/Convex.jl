@@ -7,7 +7,7 @@ type EqConstraint <: Constraint
   id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -51,7 +51,7 @@ type LtConstraint <: Constraint
   id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -96,7 +96,7 @@ type GtConstraint <: Constraint
   id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)

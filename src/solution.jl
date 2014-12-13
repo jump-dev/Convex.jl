@@ -63,7 +63,7 @@ end
 solve!(problem::Problem, m::MathProgBase.AbstractMathProgSolver) =
   solve!(problem, MathProgBase.model(m))
 
-function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int64, Int64)})
+function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int, Int)})
   x = problem.solution.primal
   for (id, (start_index, end_index)) in var_to_ranges
     var = id_to_variables[id]

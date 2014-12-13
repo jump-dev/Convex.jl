@@ -13,7 +13,7 @@ type TransposeAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function TransposeAtom(x::AbstractExpr)
     children = (x,)
@@ -48,8 +48,8 @@ function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
     num_rows = x.size[1]
     num_cols = x.size[2]
 
-    I = Array(Int64, sz)
-    J = Array(Int64, sz)
+    I = Array(Int, sz)
+    J = Array(Int, sz)
 
     k = 1
     for r = 1:num_rows

@@ -6,7 +6,7 @@ type SDPConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   child::AbstractExpr
-  size::(Int64, Int64)
+  size::(Int, Int)
   is_symmetric::Bool
 
   function SDPConstraint(child::AbstractExpr; is_symmetric=true)

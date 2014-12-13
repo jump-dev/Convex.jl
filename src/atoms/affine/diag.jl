@@ -14,10 +14,10 @@ type DiagAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
-  k::Int64
+  size::(Int, Int)
+  k::Int
 
-  function DiagAtom(x::AbstractExpr, k::Int64=0)
+  function DiagAtom(x::AbstractExpr, k::Int=0)
     (num_rows, num_cols) = x.size
 
     if k >= num_cols || k <= -num_rows
@@ -48,7 +48,7 @@ function evaluate(x::DiagAtom)
   return diag(evaluate(x.children[1]), x.children[2])
 end
 
-diag(x::AbstractExpr, k::Int64=0) = DiagAtom(x, k)
+diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
 
 # Finds the "k"-th diagonal of x as a column vector
 # If k == 0, it returns the main diagonal and so on

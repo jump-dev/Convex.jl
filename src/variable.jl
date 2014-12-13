@@ -12,31 +12,31 @@ type Variable <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   value::ValueOrNothing
-  size::(Integer, Integer)
+  size::(Int, Int)
   vexity::Vexity
   sign::Sign
   sets # ::Array{Symbol,1}
 
   # is_symmetric is only needed for Semidefinite atoms. Value is ignored for everything else
   # If you wish to force symmetricity for other variables, add x == x' as a constraint
-  function Variable(size::(Integer, Integer), sign::Sign=NoSign(), sets::Symbol...)
+  function Variable(size::(Int, Int), sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, sets)
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
     return this
   end
 
-  Variable(m::Integer, n::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
+  Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
   Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
   Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
-  Variable(size::(Integer, Int64), sets::Symbol...) = Variable(size::(Int64, Int64), NoSign(), sets...)
-  Variable(size::Integer, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
-  Variable(size::Integer, sets::Symbol...) = Variable((size, 1), sets...)
+  Variable(size::(Int, Int), sets::Symbol...) = Variable(size::(Int, Int), NoSign(), sets...)
+  Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
+  Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
 end
 
 # convenience semidefinite matrix constructor
-Semidefinite(m::Integer; is_symmetric=true) = Variable((m,m), is_symmetric ? :Semidefinite : :AsymSemidefinite)
-function Semidefinite(m::Integer, n::Integer; is_symmetric=true)
+Semidefinite(m::Int; is_symmetric=true) = Variable((m,m), is_symmetric ? :Semidefinite : :AsymSemidefinite)
+function Semidefinite(m::Int, n::Int; is_symmetric=true)
   if m==n
     return Variable((m,m), is_symmetric ? :Semidefinite : :AsymSemidefinite)
   else 

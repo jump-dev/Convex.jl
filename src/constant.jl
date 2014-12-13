@@ -9,7 +9,7 @@ type Constant <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   value::Value
-  size::(Int64, Int64)
+  size::(Int, Int)
   vexity::Vexity
   sign::Sign
 

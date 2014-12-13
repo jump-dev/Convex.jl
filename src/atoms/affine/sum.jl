@@ -13,7 +13,7 @@ type SumAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function SumAtom(x::AbstractExpr)
     children = (x,)
@@ -57,7 +57,7 @@ end
 
 sum(x::AbstractExpr) = SumAtom(x)
 
-function sum(x::AbstractExpr, dimension::Int64)
+function sum(x::AbstractExpr, dimension::Int)
   if dimension == 1
     return Constant(ones(1, x.size[1]), Positive()) * x
   elseif dimension == 2

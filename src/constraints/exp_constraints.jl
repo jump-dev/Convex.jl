@@ -1,11 +1,11 @@
 export ExpConstraint, conic_form!, vexity
 
-### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z
+### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
 type ExpConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr, AbstractExpr) # (x, y, z)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
     @assert(x.size == y.size == z.size,

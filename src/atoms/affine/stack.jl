@@ -6,7 +6,7 @@ type HcatAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::Tuple
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function HcatAtom(args::AbstractExpr...)
     num_rows = args[1].size[1]
@@ -47,7 +47,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
       push!(objectives, conic_form!(child, unique_conic_forms))
     end
     # build a dict from variable ids to sizes
-    variable_to_sizes = Dict{Uint64, Int64}()
+    variable_to_sizes = Dict{Uint64, Int}()
     for objective in objectives
       for id in keys(objective)
         if !(id in variable_to_sizes)

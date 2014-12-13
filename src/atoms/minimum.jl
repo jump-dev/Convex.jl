@@ -12,7 +12,7 @@ type MinimumAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function MinimumAtom(x::AbstractExpr)
     children = (x,)

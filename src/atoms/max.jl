@@ -13,7 +13,7 @@ type MaxAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function MaxAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == y.size

@@ -38,7 +38,7 @@ end
 function find_variable_ranges(constraints)
   index = 0
   constr_size = 0
-  var_to_ranges = Dict{Uint64, (Int64, Int64)}()
+  var_to_ranges = Dict{Uint64, (Int, Int)}()
   for constraint in constraints
     for i = 1:length(constraint.objs)
       for (id, val) in constraint.objs[i]
@@ -78,7 +78,7 @@ function conic_problem(p::Problem)
 
   A = spzeros(constr_size, var_size)
   b = spzeros(constr_size, 1)
-  cones = (Symbol, UnitRange{Int64})[]
+  cones = (Symbol, UnitRange{Int})[]
   constr_index = 0
   for constraint in constraints
     total_constraint_size = 0
