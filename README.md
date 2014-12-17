@@ -4,7 +4,7 @@
 
 Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and dcp-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/karanveerm/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
 
-Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests.
+Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests. For usage questions, please contact us via the [JuliaOpt mailing list](https://groups.google.com/forum/#!forum/julia-opt).
 
 ## Table of Contents
 - [Introduction](#user-content-introduction)
@@ -57,6 +57,7 @@ problem.constraints += [x <= 1, 0.5 <= 2*x]
 solve!(problem)
 
 # Alternatively, specify a solver yourself
+using ECOS
 solver = ECOSSolver() # or SCSSolver() or GurobiSolver() or GLPKSolverMIP() etc.
 solve!(problem, solver)
 
