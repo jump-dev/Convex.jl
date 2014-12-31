@@ -266,7 +266,9 @@ atom | description | vexity | slope | implicit constraint
 `quad_over_lin(x, y)` | $x^T x/y$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$, decreasing in $y$ | $y > 0$
 `sum_squares(x)` | $\sum x_i^2$ | convex | increasing on $x \ge 0$, decreasing on $x \le 0$ | none
 `nuclear_norm(x)` | sum of singular values of $x$ | convex | not monotonic | none
-`operator_norm(x)` | maximum singular values of $x$ | convex | not monotonic | none
+`operator_norm(x)` | maximum singular value of $x$ | convex | not monotonic | none
+`lambda_max(x)` | maximum eigenvalue of $x$ | convex | increasing | x is positive semidefinite
+`lambda_min(x)` | minimum eigenvalue of $x$ | concave | increasing | x is positive semidefinite
 `logsumexp(x)` | $\log(\sum_i \exp(x_i))$ | convex | increasing | none
 
 
