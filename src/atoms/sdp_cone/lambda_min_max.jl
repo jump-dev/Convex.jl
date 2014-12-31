@@ -1,6 +1,7 @@
 #############################################################################
 # lambda_min_max.jl
 # Handles maximum and minimum eigenvalue of a symmetric positive definite matrix
+# (and imposes the constraint that its argument be PSD)
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
@@ -16,10 +17,11 @@ type LambdaMaxAtom <: AbstractExpr
 
   function LambdaMaxAtom(x::AbstractExpr)
     children = (x,)
-    if isposdef(x)
+    m,n = size(x)
+    if m==n
       return new(:lambda_max, hash(children), children, (1,1))
     else
-      error("lambda_max is not convex when applied to a matrix that is not positive definite. Try sigma_max instead.")
+      error("lambda_max can only be applied to a square matrix.")
     end
   end
 end
@@ -46,12 +48,13 @@ lambda_max(x::AbstractExpr) = LambdaMaxAtom(x)
 #   minimize t
 #   subject to
 #            tI - A is positive semidefinite
+#            A      is positive semidefinite
 function conic_form!(x::LambdaMaxAtom, unique_conic_forms)
   if !has_conic_form(unique_conic_forms, x)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = minimize(t, isposdef(t*eye(n) - A))
+    p = minimize(t, isposdef(t*eye(n) - A), isposdef(A))
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)
@@ -67,10 +70,11 @@ type LambdaMinAtom <: AbstractExpr
 
   function LambdaMinAtom(x::AbstractExpr)
     children = (x,)
-    if isposdef(x)
+    m,n = size(x)
+    if m==n
       return new(:lambda_min, hash(children), children, (1,1))
     else
-      error("lambda_min cannot be applied to a matrix that is not positive definite.")
+      error("lambda_min can only be applied to a square matrix.")
     end
   end
 end
@@ -87,7 +91,6 @@ function curvature(x::LambdaMinAtom)
   return ConcaveVexity()
 end
 
-# XXX verify this returns all the eigenvalues even in new versions of julia (>=3.0)
 function evaluate(x::LambdaMinAtom)
   eigvals(evaluate(x.children[1]))[1]
 end
@@ -98,12 +101,13 @@ lambda_min(x::AbstractExpr) = LambdaMinAtom(x)
 #   maximize t
 #   subject to
 #            A - tI is positive semidefinite
+#            A      is positive semidefinite
 function conic_form!(x::LambdaMinAtom, unique_conic_forms)
   if !has_conic_form(unique_conic_forms, x)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = minimize(t, isposdef(A - t*eye(n)))
+    p = minimize(t, isposdef(A - t*eye(n)), isposdef(A))
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)

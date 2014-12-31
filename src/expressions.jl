@@ -11,7 +11,7 @@
 ##                                  or a unique identifier of the object
 ## size::(Int, Int)          -- size of the resulting expression
 #
-# Constans and variables do not have children.
+# Constants and variables do not have children.
 #
 # In addition, each atom must implement the following functions:
 ## sign: returns the sign of the result of the expression
