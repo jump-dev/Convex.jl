@@ -53,14 +53,32 @@ p = minimize(trace(y), y[2,1]<=4, y[2,2]>=3)
 solve!(p)
 @test_approx_eq_eps p.optval 3 TOL
 
-# nuclear norm XXX should work when hcat and vcat do
+# nuclear norm
 y = Semidefinite(3)
 p = minimize(nuclear_norm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2)
 solve!(p)
 @test_approx_eq_eps p.optval 3 TOL
 
-# operator norm XXX should work when hcat and vcat do
+# operator norm
 y = Variable((3,3))
 p = minimize(operator_norm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
 solve!(p)
 @test_approx_eq_eps p.optval 4 TOL
+
+# sigma_max
+y = Variable((3,3))
+p = minimize(sigma_max(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+solve!(p)
+@test_approx_eq_eps p.optval 4 TOL
+
+# lambda_max
+y = Semidefinite(3)
+p = minimize(lambda_max(y), y[1,1]>=4)
+solve!(p)
+@test_approx_eq_eps p.optval 4 TOL
+
+# lambda_min
+y = Semidefinite(3)
+p = maximize(lambda_min(y), trace(y)<=6)
+solve!(p)
+@test_approx_eq_eps p.optval 2 TOL

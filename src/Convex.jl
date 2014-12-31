@@ -44,7 +44,9 @@ include("atoms/second_order_cone/geo_mean.jl")
 include("atoms/second_order_cone/quad_form.jl")
 
 ### SDP atoms
-include("atoms/matrix_norm.jl")
+include("atoms/sdp_cone/nuclear_norm.jl")
+include("atoms/sdp_cone/operator_norm.jl")
+include("atoms/sdp_cone/lambda_min_max.jl")
 
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")
