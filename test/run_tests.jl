@@ -6,12 +6,14 @@ tests = ["test_utilities.jl",
 tests_sdp = ["test_sdp.jl"]
 tests_exp = ["test_exp.jl"]
 tests_int = ["test_int.jl"]
+tests_other = ["test_other.jl"]
 
 println("Running tests:")
 
 # The following syntax can be used to solve it using other solvers
 # using Gurobi
-# set_default_solver(GurobiSolver())
+using SCS
+set_default_solver(SCSSolver())
 
 for curtest in tests
     info(" Test: $(curtest)")
@@ -27,6 +29,13 @@ end
 
 if can_solve_exp(get_default_solver())
     for curtest in tests_exp
+        info(" Test: $(curtest)")
+        include(curtest)
+    end
+end
+
+if can_solve_sdp(get_default_solver()) && can_solve_exp(get_default_solver())
+    for curtest in tests_other
         info(" Test: $(curtest)")
         include(curtest)
     end
