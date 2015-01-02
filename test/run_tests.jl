@@ -6,6 +6,7 @@ tests = ["test_utilities.jl",
 tests_sdp = ["test_sdp.jl"]
 tests_exp = ["test_exp.jl"]
 tests_int = ["test_int.jl"]
+tests_exp_and_sdp = ["test_exp_and_sdp.jl"]
 
 println("Running tests:")
 
@@ -27,6 +28,13 @@ end
 
 if can_solve_exp(get_default_solver())
     for curtest in tests_exp
+        info(" Test: $(curtest)")
+        include(curtest)
+    end
+end
+
+if can_solve_sdp(get_default_solver()) && can_solve_exp(get_default_solver())
+    for curtest in tests_exp_and_sdp
         info(" Test: $(curtest)")
         include(curtest)
     end
