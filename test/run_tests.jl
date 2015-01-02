@@ -12,8 +12,6 @@ println("Running tests:")
 
 # The following syntax can be used to solve it using other solvers
 # using Gurobi
-using SCS
-set_default_solver(SCSSolver())
 
 for curtest in tests
     info(" Test: $(curtest)")
