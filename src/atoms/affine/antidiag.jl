@@ -1,23 +1,22 @@
 #############################################################################
-# diag.jl
-# Returns the kth diagonal of a matrix expression
+# antidiag.jl
+# Returns the kth anti-diagonal (counterdiagonal, secondary diagonal, or minor diagonal) of a matrix expression
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.diag
-export diag
+export antidiag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
-type DiagAtom <: AbstractExpr
+type AntidiagAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int, Int)
   k::Int
 
-  function DiagAtom(x::AbstractExpr, k::Int=0)
+  function AntidiagAtom(x::AbstractExpr, k::Int=0)
     (num_rows, num_cols) = x.size
 
     if k >= num_cols || k <= -num_rows
@@ -25,30 +24,30 @@ type DiagAtom <: AbstractExpr
     end
 
     children = (x, )
-    return new(:diag, hash((children, k)), children, (minimum(x.size) - k, 1), k)
+    return new(:antidiag, hash((children, k)), children, (minimum(x.size) - k, 1), k)
   end
 end
 
-function sign(x::DiagAtom)
+function sign(x::AntidiagAtom)
   return sign(x.children[1])
 end
 
 # The monotonicity
-function monotonicity(x::DiagAtom)
+function monotonicity(x::AntidiagAtom)
   return (Nondecreasing(),)
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
 # this represents the first term
-function curvature(x::DiagAtom)
+function curvature(x::AntidiagAtom)
   return ConstVexity()
 end
 
-function evaluate(x::DiagAtom)
-  return diag(evaluate(x.children[1]), x.k)
+function evaluate(x::AntidiagAtom)
+  return diag(flipud(evaluate(x.children[1])), x.k)
 end
 
-diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
+antidiag(x::AbstractExpr, k::Int=0) = AntidiagAtom(x, k)
 
 # Finds the "k"-th diagonal of x as a column vector
 # If k == 0, it returns the main diagonal and so on
@@ -62,23 +61,23 @@ diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(x::DiagAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::AntidiagAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     (num_rows, num_cols) = x.children[1].size
     k = x.k
 
     if k >= 0
-      start_index = k * num_rows + 1
+      start_index = k * num_rows + num_rows
       sz_diag = Base.min(num_rows, num_cols - k)
     else
-      start_index = -k + 1
+      start_index = num_rows + k
       sz_diag = Base.min(num_rows + k, num_cols)
     end
 
     select_diag = spzeros(sz_diag, get_vectorized_size(x.children[1]))
     for i in 1:sz_diag
       select_diag[i, start_index] = 1
-      start_index += num_rows + 1
+      start_index += num_rows - 1
     end
 
     objective = conic_form!(x.children[1], unique_conic_forms)
