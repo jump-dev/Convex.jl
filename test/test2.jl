@@ -80,3 +80,9 @@ x = Variable(3, Positive())
 p = maximize(sum(x./[1,2,3]), x<=1)
 solve!(p)
 @test_approx_eq_eps p.optval 11/6 TOL
+
+# huber loss
+x = Variable(3)
+p = minimize(sum(huber(x, 1)), x >= 2)
+solve!(p)
+@test_approx_eq_eps p.optval 9 TOL

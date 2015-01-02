@@ -5,11 +5,6 @@ using Convex
 
 TOL = 1e-2
 
-x = Variable(3)
-p = minimize(sum(huber(x, 1)), x >= 2)
-solve!(p)
-@test_approx_eq_eps p.optval 9 TOL
-
 x = Variable(2, 2)
 p = maximize(logdet(x), [x[1, 1] == 1, x[2, 2] == 1])
 solve!(p)
