@@ -32,4 +32,4 @@ If you're running into bugs, please use the `Github Issue Tracker <https://githu
 
 Are there similar packages available for other languages?
 -----------------------------------------------------------
-You can use `CVXPY <http://www.cvxpy.org>`_ for Python or `cvx <http://cvxr.com/>`_ for Matlab.
+You can use `CVXPY <http://www.cvxpy.org>`_ for Python or `CVX <http://cvxr.com/>`_ for Matlab.

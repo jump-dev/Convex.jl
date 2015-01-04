@@ -19,6 +19,7 @@ The simplest kind of expression in Convex.jl is a variable. Variables in Convex.
 	x = Variable(4, 6)
 
 Variables may also be declared as having special properties, such as being
+
   * (entrywise) positive: :code:`x = Variable(4, Positive())`
   * (entrywise) negative: :code:`x = Variable(4, Negative())`
   * integral: :code:`x = Variable(4, :Int)`
@@ -114,4 +115,5 @@ After the problem is solved, :code:`problem.status` records the status returned 
 If the status is :code:`:Optimal`, :code:`problem.optval` will record the optimum value of the problem.
 The optimal value for each variable :code:`x` participating in the problem can be found in :code:`x.value`.
 The optimal value of an expression can be found by calling the :code:`evaluate()` function on the expression as follows: :code:`evaluate(expr)`.
+
 .. The dual values are stored with the respective constraints and can be accessed as :code:`problem.constraints[idx].dual_value`.

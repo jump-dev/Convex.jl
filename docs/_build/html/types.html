@@ -72,6 +72,8 @@
 <li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="operations.html#affine-atoms">Affine atoms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operations.html#elementwise-atoms">Elementwise atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#vector-and-matrix-atoms">Vector and Matrix atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#promotions">Promotions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -134,17 +136,16 @@
 <span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>Variables may also be declared as having special properties, such as being</dt>
-<dd><ul class="first last simple">
+<p>Variables may also be declared as having special properties, such as being</p>
+<blockquote>
+<div><ul class="simple">
 <li>(entrywise) positive: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">Positive())</span></tt></li>
 <li>(entrywise) negative: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">Negative())</span></tt></li>
 <li>integral: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">:Int)</span></tt></li>
 <li>binary: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">:Bin)</span></tt></li>
 <li>(for a matrix) being symmetric, with nonnegative eigenvalues (ie, positive semidefinite): <tt class="code docutils literal"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">Semidefinite(4)</span></tt></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </div>
 <div class="section" id="constants">
 <h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
@@ -227,8 +228,7 @@ Problems may be constructed as</p>
 <p>After the problem is solved, <tt class="code docutils literal"><span class="pre">problem.status</span></tt> records the status returned by the optimization solver, and can be <tt class="code docutils literal"><span class="pre">:Optimal</span></tt>, <tt class="code docutils literal"><span class="pre">:Infeasible</span></tt>, <tt class="code docutils literal"><span class="pre">:Unbounded</span></tt>, <tt class="code docutils literal"><span class="pre">:Indeterminate</span></tt> or <tt class="code docutils literal"><span class="pre">:Error</span></tt>.
 If the status is <tt class="code docutils literal"><span class="pre">:Optimal</span></tt>, <tt class="code docutils literal"><span class="pre">problem.optval</span></tt> will record the optimum value of the problem.
 The optimal value for each variable <tt class="code docutils literal"><span class="pre">x</span></tt> participating in the problem can be found in <tt class="code docutils literal"><span class="pre">x.value</span></tt>.
-The optimal value of an expression can be found by calling the <tt class="code docutils literal"><span class="pre">evaluate()</span></tt> function on the expression as follows: <tt class="code docutils literal"><span class="pre">evaluate(expr)</span></tt>.
-.. The dual values are stored with the respective constraints and can be accessed as <tt class="code docutils literal"><span class="pre">problem.constraints[idx].dual_value</span></tt>.</p>
+The optimal value of an expression can be found by calling the <tt class="code docutils literal"><span class="pre">evaluate()</span></tt> function on the expression as follows: <tt class="code docutils literal"><span class="pre">evaluate(expr)</span></tt>.</p>
 </div>
 </div>
 

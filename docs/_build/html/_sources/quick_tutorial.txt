@@ -2,7 +2,7 @@
 Quick Tutorial
 =====================================
 
-Consider a constrained least squares problem:
+Consider a constrained least squares problem
 
 .. math::
   \begin{array}{ll}

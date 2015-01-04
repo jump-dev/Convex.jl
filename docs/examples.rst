@@ -3,6 +3,7 @@ Examples
 =====================================
 
 TODO: add iJulia notebooks
+
 	* Basic usage examples
 	* Control (second-order cone program)
 	* Tomography (second-order cone program)

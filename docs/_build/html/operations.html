@@ -72,6 +72,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="">Supported Operations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#affine-atoms">Affine atoms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#elementwise-atoms">Elementwise atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vector-and-matrix-atoms">Vector and Matrix atoms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#promotions">Promotions</a></li>
 </ul>
 </li>
@@ -183,7 +184,7 @@
 <td>decreasing</td>
 <td>none</td>
 </tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">inv_pos(x,y)</span></tt></td>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">inv_pos(x)</span></tt></td>
 <td><span class="math">\(1/max(x,0)\)</span></td>
 <td>convex</td>
 <td>decreasing</td>
@@ -232,12 +233,135 @@ decreasing on
 <td>increasing</td>
 <td><span class="math">\(x&gt;0\)</span></td>
 </tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">huber(x)</span></tt>
+<tt class="code docutils literal"><span class="pre">huber(x,</span> <span class="pre">M)</span></tt></td>
+<td><span class="math">\(\begin{cases}
+x^2 &amp;|x| \leq
+M  \\
+2M|x| - M^2
+&amp;|x| &gt;
+M
+\end{cases}\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span></td>
+<td><span class="math">\(M&gt;=1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="vector-and-matrix-atoms">
+<h2>Vector and Matrix atoms<a class="headerlink" href="#vector-and-matrix-atoms" title="Permalink to this headline">¶</a></h2>
+<p>These atoms take vector or matrix arguments and return scalar expressions.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="31%" />
+<col width="10%" />
+<col width="13%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">atom</th>
+<th class="head">description</th>
+<th class="head">vexity</th>
+<th class="head">slope</th>
+<th class="head">implicit constraint</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">norm(x,</span> <span class="pre">p)</span></tt></td>
+<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span></td>
+<td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">vecnorm(x,</span> <span class="pre">p)</span></tt></td>
+<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span></td>
+<td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">quad_form(x,</span> <span class="pre">P)</span></tt></td>
+<td><span class="math">\(x^T P x\)</span></td>
+<td>convex in
+<span class="math">\(x\)</span>
+affine in
+<span class="math">\(P\)</span></td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span>
+increasing in
+<span class="math">\(P\)</span></td>
+<td>either <span class="math">\(x\)</span> or
+<span class="math">\(P\)</span> must be
+constant</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">quad_over_lin(x,</span> <span class="pre">y)</span></tt></td>
+<td><span class="math">\(x^T x/y\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span>
+decreasing in
+<span class="math">\(y\)</span></td>
+<td><span class="math">\(y &gt; 0\)</span></td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">sum_squares(x)</span></tt></td>
+<td><span class="math">\(\sum x_i^2\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span></td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">nuclear_norm(x)</span></tt></td>
+<td>sum of singular values of <span class="math">\(x\)</span></td>
+<td>convex</td>
+<td>not monotonic</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">operator_norm(x)</span></tt></td>
+<td>max of singular values of <span class="math">\(x\)</span></td>
+<td>convex</td>
+<td>not monotonic</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">lambda_max(x)</span></tt></td>
+<td>max eigenvalue of <span class="math">\(x\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>x is positive semidefinite</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">lambda_min(x)</span></tt></td>
+<td>min of singular values of <span class="math">\(x\)</span></td>
+<td>concave</td>
+<td>increasing</td>
+<td>x is positive semidefinite</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">logsumexp(x)</span></tt></td>
+<td><span class="math">\(\log(\sum_i \exp(x_i))\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="promotions">
 <h2>Promotions<a class="headerlink" href="#promotions" title="Permalink to this headline">¶</a></h2>
-<p>When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do <tt class="code docutils literal"><span class="pre">max(x,</span> <span class="pre">0)</span></tt> gives an expression with the shape of <tt class="code docutils literal"><span class="pre">x</span></tt> whose elements are the maximum of the corresponding element of <a href="#id1"><span class="problematic" id="id2">:cdoe:`x`</span></a> and <tt class="code docutils literal"><span class="pre">0</span></tt>.</p>
+<p>When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do <tt class="code docutils literal"><span class="pre">max(x,</span> <span class="pre">0)</span></tt> gives an expression with the shape of <tt class="code docutils literal"><span class="pre">x</span></tt> whose elements are the maximum of the corresponding element of <tt class="code docutils literal"><span class="pre">x</span></tt> and <tt class="code docutils literal"><span class="pre">0</span></tt>.</p>
 </div>
 </div>
 
