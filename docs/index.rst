@@ -1,31 +1,37 @@
 .. Convex.jl documentation master file, created by
-   sphinx-quickstart on Fri Jan  2 03:59:02 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+  sphinx-quickstart on Fri Jan  2 03:59:02 2015.
+  You can adapt this file completely to your liking, but it should at least
+  contain the root `toctree` directive.
 
-Welcome to Convex.jl's documentation!
-=====================================
+=========================================
+Convex.jl - Convex Optimization in Julia
+=========================================
 
-Contents:
+Convex.jl is a julia package for `Disciplined Convex Programming <http://dcp.stanford.edu/>`_. Convex.jl can solve
+
+  * linear programs
+  * mixed-integer programs
+  * dcp-compliant convex programs including
+
+    - second-order cone programs (SOCP)
+    - exponential cone programs
+    - semi-definite programs (SDP)
+
+Convex.jl supports a variety of solvers, including `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_, `Gurobi <https://github.com/JuliaOpt/gurobi.jl>`_, `ECOS <https://github.com/JuliaOpt/ECOS.jl>`_, `SCS <https://github.com/karanveerm/SCS.jl>`_ and `GLPK <https://github.com/JuliaOpt/GLPK.jl>`_ through the `MathProgBase <http://mathprogbasejl.readthedocs.org/en/latest/>`_ interface.
+
+Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests. For usage questions, please contact us via the `JuliaOpt mailing list <https://groups.google.com/forum/#!forum/julia-opt>`_.
+
+In Depth Docs:
+################
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   Installation <installation>
-   Quick Tutorial <tutorial>
-   Basic Types <types>
-   Supported Operations <operations>
-   Examples <examples>
-   Solvers <solvers>
-   FAQ <faq>
-
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+  Installation <installation>
+  Quick Tutorial <quick_tutorial>
+  Basic Types <types>
+  Supported Operations <operations>
+  Examples <examples>
+  Solvers <solvers>
+  FAQ <faq>
+  Credits <credits>

@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Solvers &mdash; Convex.jl 0.1 documentation</title>
+  <title>Credits &mdash; Convex.jl 0.1 documentation</title>
   
 
   
@@ -29,8 +29,7 @@
 
   
     <link rel="top" title="Convex.jl 0.1 documentation" href="index.html"/>
-        <link rel="next" title="FAQ" href="faq.html"/>
-        <link rel="prev" title="Examples" href="examples.html"/> 
+        <link rel="prev" title="FAQ" href="faq.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -71,7 +70,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Solvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solvers.html">Solvers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
@@ -79,7 +78,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Credits</a></li>
 </ul>
 
         
@@ -103,10 +102,10 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Solvers</li>
+    <li>Credits</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/solvers.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/credits.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -114,40 +113,26 @@
 </div>
           <div role="main">
             
-  <div class="section" id="solvers">
-<h1>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">¶</a></h1>
-<p>By default, Convex.jl uses <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a> to solve linear programs and second-order cone programs (SOCPs).</p>
-<p>If you wish to solve semi-definite programs (SDPs) or exponential programs, you will need to install <a class="reference external" href="https://github.com/JuliaOpt/SCS.jl">SCS</a>, which can be done by <tt class="code docutils literal"><span class="pre">Pkg.add(&quot;SCS&quot;)</span></tt>.</p>
-<p>Any other solver in <a class="reference external" href="http://www.juliaopt.org/">JuliaOpt</a> may also be used, so long as it supports the conic constraints used to express the problem. Currently, other solvers will be most useful in solving linear programs (LPs) and mixed integer linear programs (MILPs). Mosek and Gurobi can be used to solve SOCPs while Mosek can also solve SDPs.</p>
-<p>Installing these solvers is very simple. Just follow the instructions on the specific solver&#8217;s page.</p>
-<p>To use a specific solver, you can use the following syntax</p>
-<div class="highlight-python"><div class="highlight"><pre>solve!(p, GurobiSolver())
-solve!(p, MosekSolver())
-solve!(p, GLPKSolverMIP())
-solve!(p, GLPKSolverLP())
-solve!(p, ECOSSolver())
-solve!(p, SCSSolver())
-</pre></div>
-</div>
-<p>Of course, the solver must be installed first. For example, we can use GLPK to solve a MILP</p>
-<div class="highlight-python"><div class="highlight"><pre>using GLPKMathProgInterface
-solve!(p, GLPKSolverMIP())
-</pre></div>
-</div>
-<p>You can set or see the current default solver by</p>
-<div class="highlight-python"><div class="highlight"><pre>get_default_solver()
-using Gurobi
-set_default_solver(GurobiSolver()) # or set_default_solver(ECOSSolver(verbose=0))
-# Now Gurobi will be used by default as a solver
-</pre></div>
-</div>
-<p>Many of the solvers such as ECOS or SCS also allow options to be passed in. More details can be found on the specific solver&#8217;s page. For example, if we wish to increase the maximum number of iterations for ECOS or SCS, we can do so by</p>
-<div class="highlight-python"><div class="highlight"><pre>using ECOS
-solve!(p, ECOSSolver(maxit=10000))
-using SCS
-solve!(p, SCSSolver(max_iters=10000))
-</pre></div>
-</div>
+  <div class="section" id="credits">
+<h1>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">¶</a></h1>
+<p>Currently, Convex.jl is developed and maintained by:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://www.stanford.edu/~jyunhong/">Jenny Hong</a></li>
+<li><a class="reference external" href="http://www.stanford.edu/~kvmohan/">Karanveer Mohan</a></li>
+<li><a class="reference external" href="http://www.stanford.edu/~udell/">Madeleine Udell</a></li>
+<li><a class="reference external" href="http://www.stanford.edu/~dzeng0/">David Zeng</a></li>
+</ul>
+</div></blockquote>
+<p>The Convex.jl developers also thank:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the <a class="reference external" href="http://www.juliaopt.org/">JuliaOpt</a> team: <a class="reference external" href="http://iaindunning.com/">Iain Dunning</a>, <a class="reference external" href="http://www.mit.edu/~mlubin/">Joey Huchette &lt;http://www.mit.edu/~huchette/&gt;`_and `Miles Lubin</a></li>
+<li><a class="reference external" href="http://www.stanford.edu/~boyd/">Stephen Boyd</a>, co-author of the book <a class="reference external" href="http://www.stanford.edu/~boyd/books.html">Convex Optimization</a></li>
+<li><a class="reference external" href="http://www.stanford.edu/~stevend2/">Steven Diamond</a>, developer of <a class="reference external" href="https://github.com/cvxgrp/cvxpy">CVXPY</a> and of a <a class="reference external" href="http://dcp.stanford.edu/">DCP tutorial website</a> to teach disciplined convex programming.</li>
+<li><a class="reference external" href="http://www.cvxr.com/bio">Michael Grant</a>, developer of <a class="reference external" href="http://www.cvxr.com">CVX</a>.</li>
+</ul>
+</div></blockquote>
 </div>
 
 
@@ -156,10 +141,8 @@ solve!(p, SCSSolver(max_iters=10000))
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="faq.html" class="btn btn-neutral float-right" title="FAQ"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="examples.html" class="btn btn-neutral" title="Examples"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="faq.html" class="btn btn-neutral" title="FAQ"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

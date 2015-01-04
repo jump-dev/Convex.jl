@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Convex.jl'
-copyright = u'2015, Karanveer Mohan, Madeleine Udell, David Zeng, Jenny Hong, Steven Diamond and Stephen Boyd'
+copyright = u'2015, Karanveer Mohan, Madeleine Udell, David Zeng and Jenny Hong'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -258,3 +258,10 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# Added by Karanveer for the sphinx theme locally: https://github.com/snide/sphinx_rtd_theme
+import sphinx_rtd_theme
+
+html_theme = "sphinx_rtd_theme"
+
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

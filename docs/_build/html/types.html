@@ -1,111 +1,301 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Basic Types &mdash; Convex.jl 0.1 documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Convex.jl 0.1 documentation" href="index.html" />
-    <link rel="next" title="Supported Operations" href="operations.html" />
-    <link rel="prev" title="Quick Tutorial" href="tutorial.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="operations.html" title="Supported Operations"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="tutorial.html" title="Quick Tutorial"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Convex.jl 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Basic Types &mdash; Convex.jl 0.1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Convex.jl 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Operations" href="operations.html"/>
+        <link rel="prev" title="Quick Tutorial" href="quick_tutorial.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> Convex.jl</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_tutorial.html">Quick Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Basic Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#variables">Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#expressions">Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constraints">Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#objective">Objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem">Problem</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#affine-atoms">Affine atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#elementwise-atoms">Elementwise atoms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solvers.html">Solvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Convex.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Basic Types</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/types.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
             
   <div class="section" id="basic-types">
 <h1>Basic Types<a class="headerlink" href="#basic-types" title="Permalink to this headline">¶</a></h1>
+<p>The basic building block of Convex.jl is called an <em>expression</em>, which can represent a variable, a constant, or a function of another expression. We discuss each kind of expression in turn.</p>
+<div class="section" id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<p>The simplest kind of expression in Convex.jl is a variable. Variables in Convex.jl are declared using the <cite>Variable</cite> keyword, along with the dimensions of the variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Scalar variable</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">()</span>
+
+<span class="c"># Column-vector variable</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c"># Matrix variable</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Variables may also be declared as having special properties, such as being</dt>
+<dd><ul class="first last simple">
+<li>(entrywise) positive: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">Positive())</span></tt></li>
+<li>(entrywise) negative: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">Negative())</span></tt></li>
+<li>integral: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">:Int)</span></tt></li>
+<li>binary: <tt class="code docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Variable(4,</span> <span class="pre">:Bin)</span></tt></li>
+<li>(for a matrix) being symmetric, with nonnegative eigenvalues (ie, positive semidefinite): <tt class="code docutils literal"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">Semidefinite(4)</span></tt></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="constants">
+<h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
+<p>Numbers, vectors, and matrices present in the Julia environment are wrapped automatically into a <cite>Constant</cite> expression when used in a Convex.jl expression.</p>
+</div>
+<div class="section" id="expressions">
+<h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h2>
+<p>Expressions in Convex.jl are formed by applying any <em>atom</em> (mathematical function defined in Convex.jl) to variables, constants, and other expressions. For a list of these functions, see <a class="reference external" href="operations.html">operations</a>.
+Atoms are applied to expressions using operator overloading. Hence, <tt class="code docutils literal"><span class="pre">2+2</span></tt> calls Julia&#8217;s built-in addition operator, while <tt class="code docutils literal"><span class="pre">2+x</span></tt> calls the Convex.jl addition method and returns a Convex.jl expression. Many of the useful language features in Julia, such as arithmetic, array indexing, and matrix transpose are overloaded in Convex.jl so they may be used with variables and expressions just as they are used with native Julia types.</p>
+<p>Expressions that are created must be DCP-compliant.
+More information on DCP can be found <a class="reference external" href="http://dcp.stanford.edu/">here</a>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="c"># The following are all expressions</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">z</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+<span class="n">z_1</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Convex.jl allows the values of the expressions to be evaluated directly.</p>
+<div class="highlight-python"><div class="highlight"><pre>x = Variable()
+y = Variable()
+z = Variable()
+expr = x + y + z
+problem = minimize(expr, x &gt;= 1, y &gt;= x, 4 * z &gt;= y)
+solve!(problem)
+
+# Once the problem is solved, we can call evaluate() on expr:
+evaluate(expr)
+</pre></div>
+</div>
+</div>
+<div class="section" id="constraints">
+<h2>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h2>
+<p><em>Constraints</em> in Convex.jl are declared using the standard comparison operators <tt class="code docutils literal"><span class="pre">&lt;=</span></tt>, <tt class="code docutils literal"><span class="pre">&gt;=</span></tt>, and <tt class="code docutils literal"><span class="pre">==</span></tt>.  They specify relations that must hold between two expressions.  Convex.jl does not distinguish between strict and non-strict inequality constraints.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c"># Equality constraint</span>
+<span class="n">constraint</span> <span class="o">=</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="c"># Inequality constraint</span>
+<span class="n">constraint</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Matrices can also be constrained to be positive semidefinite.</p>
+<div class="highlight-python"><div class="highlight"><pre>x = Variable(3, 3)
+y = Variable(3, 1)
+z = Variable()
+# constrain [x y; y&#39; z] to be positive semidefinite
+constraint = isposdef([x y; y&#39; z])
+</pre></div>
+</div>
+</div>
+<div class="section" id="objective">
+<h2>Objective<a class="headerlink" href="#objective" title="Permalink to this headline">¶</a></h2>
+<p>The objective of the problem is a scalar expression to be maximized or minimized by using <tt class="code docutils literal"><span class="pre">maximize</span></tt> or <tt class="code docutils literal"><span class="pre">minimize</span></tt> respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using <tt class="code docutils literal"><span class="pre">problem</span> <span class="pre">=</span> <span class="pre">satisfy(constraints)</span></tt>.</p>
+</div>
+<div class="section" id="problem">
+<h2>Problem<a class="headerlink" href="#problem" title="Permalink to this headline">¶</a></h2>
+<p>A <em>problem</em> in Convex.jl consists of a <em>sense</em> (minimize, maximize, or satisfy), an objective (an expression to which the sense verb is to be
+applied), and zero or more constraints which must be satisfied at the solution.
+Problems may be constructed as</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">problem</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+<span class="c"># or</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">maximize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+<span class="c"># or</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">satisfy</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Constraints can be added at any time before the problem is solved.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># No constraints given</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
+<span class="c"># Add some constraint</span>
+<span class="n">problem</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="n">constraint</span>
+<span class="c"># Add many more constraints</span>
+<span class="n">problem</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">constraint1</span><span class="p">,</span> <span class="n">constraint2</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>A problem can be solved by calling <tt class="code docutils literal"><span class="pre">solve!</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>solve!(problem)
+</pre></div>
+</div>
+<p>After the problem is solved, <tt class="code docutils literal"><span class="pre">problem.status</span></tt> records the status returned by the optimization solver, and can be <tt class="code docutils literal"><span class="pre">:Optimal</span></tt>, <tt class="code docutils literal"><span class="pre">:Infeasible</span></tt>, <tt class="code docutils literal"><span class="pre">:Unbounded</span></tt>, <tt class="code docutils literal"><span class="pre">:Indeterminate</span></tt> or <tt class="code docutils literal"><span class="pre">:Error</span></tt>.
+If the status is <tt class="code docutils literal"><span class="pre">:Optimal</span></tt>, <tt class="code docutils literal"><span class="pre">problem.optval</span></tt> will record the optimum value of the problem.
+The optimal value for each variable <tt class="code docutils literal"><span class="pre">x</span></tt> participating in the problem can be found in <tt class="code docutils literal"><span class="pre">x.value</span></tt>.
+The optimal value of an expression can be found by calling the <tt class="code docutils literal"><span class="pre">evaluate()</span></tt> function on the expression as follows: <tt class="code docutils literal"><span class="pre">evaluate(expr)</span></tt>.
+.. The dual values are stored with the respective constraints and can be accessed as <tt class="code docutils literal"><span class="pre">problem.constraints[idx].dual_value</span></tt>.</p>
+</div>
 </div>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="tutorial.html"
-                        title="previous chapter">Quick Tutorial</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="operations.html"
-                        title="next chapter">Supported Operations</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/types.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="operations.html" class="btn btn-neutral float-right" title="Operations"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quick_tutorial.html" class="btn btn-neutral" title="Quick Tutorial"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karanveer Mohan, Madeleine Udell, David Zeng and Jenny Hong.
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="operations.html" title="Supported Operations"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="tutorial.html" title="Quick Tutorial"
-             >previous</a> |</li>
-        <li><a href="index.html">Convex.jl 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2015, Karanveer Mohan, Madeleine Udell, David Zeng, Jenny Hong, Steven Diamond and Stephen Boyd.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

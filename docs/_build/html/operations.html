@@ -1,111 +1,310 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Supported Operations &mdash; Convex.jl 0.1 documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Convex.jl 0.1 documentation" href="index.html" />
-    <link rel="next" title="Examples" href="examples.html" />
-    <link rel="prev" title="Basic Types" href="types.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="examples.html" title="Examples"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="types.html" title="Basic Types"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Convex.jl 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Operations &mdash; Convex.jl 0.1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Convex.jl 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Examples" href="examples.html"/>
+        <link rel="prev" title="Basic Types" href="types.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> Convex.jl</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_tutorial.html">Quick Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Basic Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="types.html#variables">Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#expressions">Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#constraints">Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#objective">Objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#problem">Problem</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Supported Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#affine-atoms">Affine atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#elementwise-atoms">Elementwise atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#promotions">Promotions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solvers.html">Solvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Convex.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Operations</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/operations.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
             
-  <div class="section" id="supported-operations">
-<h1>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="operations">
+<h1>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h1>
+<p>Convex.jl currently supports the following operations. These functions (&#8220;atoms&#8221;) may be composed according to the <a class="reference external" href="http://dcp.stanford.edu">DCP</a> composition rules to form new convex, concave, or affine expressions.</p>
+<div class="section" id="affine-atoms">
+<h2>Affine atoms<a class="headerlink" href="#affine-atoms" title="Permalink to this headline">¶</a></h2>
+<p>These atoms are affine in their arguments.</p>
+<blockquote>
+<div><ul class="simple">
+<li>addition, subtraction, multiplication, division: <tt class="code docutils literal"><span class="pre">+,</span> <span class="pre">-,</span> <span class="pre">/,</span> <span class="pre">*</span></tt></li>
+<li>indexing into vectors and matrices: <tt class="code docutils literal"><span class="pre">x[1:4,</span> <span class="pre">2:3]</span></tt></li>
+<li>k-th diagonal of a matrix: <tt class="code docutils literal"><span class="pre">diag(x,</span> <span class="pre">k)</span></tt></li>
+<li>transpose: <tt class="code docutils literal"><span class="pre">x'</span></tt></li>
+<li>dot product: <tt class="code docutils literal"><span class="pre">x'</span> <span class="pre">*</span> <span class="pre">y</span></tt> or <tt class="code docutils literal"><span class="pre">dot(x,</span> <span class="pre">y)</span></tt></li>
+<li>reshape, vec: <tt class="code docutils literal"><span class="pre">reshape(x,</span> <span class="pre">2,</span> <span class="pre">3)</span></tt> or <tt class="code docutils literal"><span class="pre">vec(x)</span></tt></li>
+<li>minimum, maximum element of a vector or matrix: <tt class="code docutils literal"><span class="pre">maximum(x)</span></tt></li>
+<li>horizontal and vertical stacking: <tt class="code docutils literal"><span class="pre">hcat(x,</span> <span class="pre">y);</span> <span class="pre">vcat(x,</span> <span class="pre">y)</span></tt></li>
+<li>trace: <tt class="code docutils literal"><span class="pre">trace(X)</span></tt></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="elementwise-atoms">
+<h2>Elementwise atoms<a class="headerlink" href="#elementwise-atoms" title="Permalink to this headline">¶</a></h2>
+<p>These atoms are applied elementwise to their arguments, returning an expression of the same size.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="25%" />
+<col width="12%" />
+<col width="15%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">atom</th>
+<th class="head">description</th>
+<th class="head">vexity</th>
+<th class="head">slope</th>
+<th class="head">implicit constraint</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">min(x,y)</span></tt></td>
+<td><span class="math">\(min(x,y)\)</span></td>
+<td>concave</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">max(x,y)</span></tt></td>
+<td><span class="math">\(max(x,y)\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">pos(x,y)</span></tt></td>
+<td><span class="math">\(max(x,0)\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">neg(x,y)</span></tt></td>
+<td><span class="math">\(max(-x,0)\)</span></td>
+<td>convex</td>
+<td>decreasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">inv_pos(x,y)</span></tt></td>
+<td><span class="math">\(1/max(x,0)\)</span></td>
+<td>convex</td>
+<td>decreasing</td>
+<td><span class="math">\(x&gt;0\)</span></td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">sqrt(x)</span></tt></td>
+<td><span class="math">\(\sqrt{x}\)</span></td>
+<td>convex</td>
+<td>decreasing</td>
+<td><span class="math">\(x&gt;0\)</span></td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">square(x),</span> <span class="pre">x^2</span></tt></td>
+<td><span class="math">\(x^2\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span></td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">abs(x)</span></tt></td>
+<td><span class="math">\(abs(x)\)</span></td>
+<td>convex</td>
+<td>increasing on
+<span class="math">\(x \ge 0\)</span>
+decreasing on
+<span class="math">\(x \le 0\)</span></td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">geo_mean(x,</span> <span class="pre">y)</span></tt></td>
+<td><span class="math">\(\sqrt{xy}\)</span></td>
+<td>concave</td>
+<td>increasing</td>
+<td><span class="math">\(x\ge0\)</span>,
+<span class="math">\(y\ge0\)</span></td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">exp(x)</span></tt></td>
+<td><span class="math">\(\exp(x)\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">log(x)</span></tt></td>
+<td><span class="math">\(\log(x)\)</span></td>
+<td>concave</td>
+<td>increasing</td>
+<td><span class="math">\(x&gt;0\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="promotions">
+<h2>Promotions<a class="headerlink" href="#promotions" title="Permalink to this headline">¶</a></h2>
+<p>When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do <tt class="code docutils literal"><span class="pre">max(x,</span> <span class="pre">0)</span></tt> gives an expression with the shape of <tt class="code docutils literal"><span class="pre">x</span></tt> whose elements are the maximum of the corresponding element of <a href="#id1"><span class="problematic" id="id2">:cdoe:`x`</span></a> and <tt class="code docutils literal"><span class="pre">0</span></tt>.</p>
+</div>
 </div>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="types.html"
-                        title="previous chapter">Basic Types</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="examples.html"
-                        title="next chapter">Examples</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/operations.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="types.html" class="btn btn-neutral" title="Basic Types"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Karanveer Mohan, Madeleine Udell, David Zeng and Jenny Hong.
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="examples.html" title="Examples"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="types.html" title="Basic Types"
-             >previous</a> |</li>
-        <li><a href="index.html">Convex.jl 0.1 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2015, Karanveer Mohan, Madeleine Udell, David Zeng, Jenny Hong, Steven Diamond and Stephen Boyd.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
