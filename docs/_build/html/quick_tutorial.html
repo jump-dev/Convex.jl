@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -130,7 +131,7 @@
 \end{array}\end{split}\]</div>
 <p>where the unknown variable <span class="math">\(x\)</span> is a vector of size <span class="math">\(n\)</span>. The values for <span class="math">\(A\)</span>, <span class="math">\(b\)</span> are given and have sizes <span class="math">\(m\times n\)</span>, <span class="math">\(m\)</span> respectively.</p>
 <div class="highlight-python"><div class="highlight"><pre># Let us first make the Convex.jl module available
-Pkg.add(&#39;Convex&#39;)
+using Convex
 
 # Generate random problem data
 m = 4;  n = 5

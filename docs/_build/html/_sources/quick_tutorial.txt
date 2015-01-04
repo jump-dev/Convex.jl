@@ -15,7 +15,7 @@ where the unknown variable :math:`x` is a vector of size :math:`n`. The values f
 ::
 
 	# Let us first make the Convex.jl module available
-	Pkg.add('Convex')
+	using Convex
 
 	# Generate random problem data
 	m = 4;	n = 5
