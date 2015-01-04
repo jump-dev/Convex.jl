@@ -69,12 +69,6 @@ p = minimize(sum(diag(x,1)), x>=1)
 solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
 
-# Antidiag
-x = Variable(2,2)
-p = minimize(sum(antidiag(x,1)), x>=1)
-solve!(p)
-@test_approx_eq_eps p.optval 1 TOL
-
 # .*
 x = Variable(3, Positive())
 p = maximize(sum(x.*[1,2,3]), x<=1)

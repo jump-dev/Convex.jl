@@ -1,3 +1,7 @@
+# How to create your own atom
+# This file is a good example of how a user can create his or her own atom
+# This antidiag atom is then included in n_queens.jl to solve the n queens problem
+
 #############################################################################
 # antidiag.jl
 # Returns the kth anti-diagonal (counterdiagonal, secondary diagonal, or minor diagonal) of a matrix expression
@@ -5,7 +9,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export antidiag
+import Convex.sign, Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
+export antidiag, sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector

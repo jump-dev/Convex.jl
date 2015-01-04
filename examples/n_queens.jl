@@ -1,4 +1,6 @@
 using Convex, GLPKMathProgInterface
+include("antidiag.jl")
+
 n = 8
 x = Variable((n, n), :Bin)
 # We can have at most one queen on any anti-diagonal
