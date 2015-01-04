@@ -11,7 +11,7 @@ Currently, Convex.jl is developed and maintained by:
 
 The Convex.jl developers also thank:
 
-	* the `JuliaOpt <http://www.juliaopt.org/>`_ team: `Iain Dunning <http://iaindunning.com/>`_, `Joey Huchette <http://www.mit.edu/~huchette/>`_and `Miles Lubin <http://www.mit.edu/~mlubin/>`_
+	* the `JuliaOpt <http://www.juliaopt.org/>`_ team: `Iain Dunning <http://iaindunning.com/>`_, `Joey Huchette <http://www.mit.edu/~huchette/>`_ and `Miles Lubin <http://www.mit.edu/~mlubin/>`_
 	* `Stephen Boyd <http://www.stanford.edu/~boyd/>`_, co-author of the book `Convex Optimization <http://www.stanford.edu/~boyd/books.html>`_
 	* `Steven Diamond <http://www.stanford.edu/~stevend2/>`_, developer of `CVXPY <https://github.com/cvxgrp/cvxpy>`_ and of a `DCP tutorial website <http://dcp.stanford.edu/>`_ to teach disciplined convex programming.
 	* `Michael Grant <http://www.cvxr.com/bio>`_, developer of `CVX <http://www.cvxr.com>`_.
