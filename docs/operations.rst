@@ -12,14 +12,19 @@ An optimization problem consisting of these operations can be solved by any LP s
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation               | description             | vexity     | slope         | implicit constraint / notes     |
 +========================+=========================+============+===============+=================================+
-|:code:`+, -, /, *, .*`  | arithmetic              | affine     |increasing     | :code:`x*y` allowed only if     |
+|:code:`x+y or x.+y`     | addition                | affine     |increasing     | none                            |
++------------------------+-------------------------+------------+---------------+---------------------------------+
+|:code:`x-y or x.-y`     | subtraction             | affine     |increasing in  | none                            |
+|                        |                         |            |:math:`x`      |                                 |
 |                        |                         |            |               |                                 |
-|                        |                         |            |decreasing for | one of the terms is constant    |
-|                        |                         |            |               |                                 |
-|                        |                         |            |:code:`y` in   |                                 |
-|                        |                         |            |:code:`x-y`    | :code:`x/y` allowed only if     |
-|                        |                         |            |               |                                 |
-|                        |                         |            |               | y is a scalar constant          |
+|                        |                         |            |decreasing in  | none                            |
+|                        |                         |            |:math:`y`      |                                 |
++------------------------+-------------------------+------------+---------------+---------------------------------+
+|:code:`x*y`             | multiplication          | affine     |increasing     | one term is constant            |
++------------------------+-------------------------+------------+---------------+---------------------------------+
+|:code:`x/y`             | division                | affine     |increasing     | :math:`y` is a scalar constant  |
++------------------------+-------------------------+------------+---------------+---------------------------------+
+|:code:`x .* y`          | elemwise multiplication | affine     |increasing     | one term is constant            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x[1:4, 2:3]`     | indexing and slicing    | affine     |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -28,7 +33,7 @@ An optimization problem consisting of these operations can be solved by any LP s
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x'`              | transpose               | affine     |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x'*y or dot(x,y)`| :math:`x' y`            | affine     |increasing     | one of the terms is constant    |
+|:code:`x'*y or dot(x,y)`| :math:`x' y`            | affine     |increasing     | one term is constant            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`vec(x)`          | vector representation   | affine     |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -39,9 +44,9 @@ An optimization problem consisting of these operations can be solved by any LP s
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`maximum(x)`      | :math:`\max(x)`         | convex     |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`[x y] or [x; y]` | horizontal and vertical | affine     |increasing     | none                            |
+|:code:`[x y] or [x; y]` | stacking                | affine     |increasing     | none                            |
 |                        |                         |            |               |                                 |
-|:code:`hcat(x, y)` or   | stacking                |            |               |                                 |
+|:code:`hcat(x, y)` or   |                         |            |               |                                 |
 |                        |                         |            |               |                                 |
 |:code:`vcat(x, y)`      |                         |            |               |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -59,11 +64,9 @@ An optimization problem consisting of these operations can be solved by any LP s
 |:code:`inv_pos(x)`      | :math:`1/\max(x,0)`     | convex     |decreasing     | :math:`x>0`                     |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`abs(x)`          | :math:`\left|x\right|`  | convex     |increasing on  | none                            |
-|                        |                         |            |               |                                 |
 |                        |                         |            |:math:`x \ge 0`|                                 |
 |                        |                         |            |               |                                 |
 |                        |                         |            |decreasing on  |                                 |
-|                        |                         |            |               |                                 |
 |                        |                         |            |:math:`x \le 0`|                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 
@@ -79,73 +82,59 @@ Of course, if an optimization problem has both LP and SOCP operations, any solve
 |operation                   | description                         | vexity     | slope         | implicit constraint      |
 +============================+=====================================+============+===============+==========================+
 |:code:`norm(x, p)`          | :math:`(\sum x_i^p)^{1/p}`          | convex     |increasing on  | :code:`p = 1, 2, Inf`    |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`vecnorm(x, p)`       | :math:`(\sum x_i^p)^{1/p}`          | convex     |increasing on  | :code:`p = 1, 2, Inf`    |
-|                            |                                     |            |               |                          |
+|:code:`vecnorm(x, p)`       | :math:`(\sum x_{ij}^p)^{1/p}`       | convex     |increasing on  | :code:`p = 1, 2, Inf`    |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`quad_form(x, P)`     | :math:`x^T P x`                     | convex in  |increasing on  | either :math:`x` or      |
+|                            |                                     | :math:`x`  |:math:`x \ge 0`| :math:`P`                |
 |                            |                                     |            |               |                          |
-|                            |                                     | :math:`x`  |:math:`x \ge 0`| :math:`P` must be        |
-|                            |                                     |            |               |                          |
-|                            |                                     | affine in  |decreasing on  | constant                 |
-|                            |                                     |            |               |                          |
+|                            |                                     | affine in  |decreasing on  | must be constant         |
 |                            |                                     | :math:`P`  |:math:`x \le 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |increasing in  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`P`      |                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`quad_over_lin(x, y)` | :math:`x^T x/y`                     | convex     |increasing on  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \ge 0`| :math:`y > 0`            |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing in  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`y`      |                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`sum_squares(x)`      | :math:`\sum x_i^2`                  | convex     |increasing on  | none                     |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`sqrt(x)`             | :math:`\sqrt{x}`                    | convex     |decreasing     | :math:`x>0`              |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`square(x), x^2`      | :math:`x^2`                         | convex     |increasing on  | none                     |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
-|                            |                                     |            |               |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`geo_mean(x, y)`      | :math:`\sqrt{xy}`                   | concave    |increasing     | :math:`x\ge0`,           |
 |                            |                                     |            |               | :math:`y\ge0`            |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`huber(x)`            | :math:`\begin{cases}                | convex     |increasing on  | :math:`M>=1`             |
-|                            | x^2 &|x| \leq                       |            |               |                          |
-|:code:`huber(x, M)`         | M  \\                               |            |:math:`x \ge 0`|                          |
+|                            | x^2 &|x| \leq                       |            |:math:`x \ge 0`|                          |
+|:code:`huber(x, M)`         | M  \\                               |            |               |                          |
 |                            | 2M|x| - M^2                         |            |               |                          |
 |                            | &|x| >  M                           |            |decreasing on  |                          |
-|                            | \end{cases}`                        |            |               |                          |
-|                            |                                     |            |:math:`x \le 0`|                          |
+|                            | \end{cases}`                        |            |:math:`x \le 0`|                          |
+|                            |                                     |            |               |                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |               |                          |
@@ -188,7 +177,7 @@ An optimization problem consisting of these operations can be solved by any SDP 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`lambda_max(x)`       | max eigenvalue of :math:`x`         | convex     |increasing     |x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`lambda_min(x)`       | min of singular values of :math:`x` | concave    |increasing     |x is positive semidefinite|
+|:code:`lambda_min(x)`       | min eigenvalue of :math:`x`         | concave    |increasing     |x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 Promotions

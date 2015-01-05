@@ -146,19 +146,41 @@
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">+,</span> <span class="pre">-,</span> <span class="pre">/,</span> <span class="pre">*,</span> <span class="pre">.*</span></tt></td>
-<td>arithmetic</td>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">x+y</span> <span class="pre">or</span> <span class="pre">x.+y</span></tt></td>
+<td>addition</td>
 <td>affine</td>
-<td><p class="first">increasing</p>
-<p>decreasing for</p>
-<p class="last"><tt class="code docutils literal"><span class="pre">y</span></tt> in
-<tt class="code docutils literal"><span class="pre">x-y</span></tt></p>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">x-y</span> <span class="pre">or</span> <span class="pre">x.-y</span></tt></td>
+<td>subtraction</td>
+<td>affine</td>
+<td><p class="first">increasing in
+<span class="math">\(x\)</span></p>
+<p class="last">decreasing in
+<span class="math">\(y\)</span></p>
 </td>
-<td><p class="first"><tt class="code docutils literal"><span class="pre">x*y</span></tt> allowed only if</p>
-<p>one of the terms is constant</p>
-<p><tt class="code docutils literal"><span class="pre">x/y</span></tt> allowed only if</p>
-<p class="last">y is a scalar constant</p>
+<td><p class="first">none</p>
+<p class="last">none</p>
 </td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">x*y</span></tt></td>
+<td>multiplication</td>
+<td>affine</td>
+<td>increasing</td>
+<td>one term is constant</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">x/y</span></tt></td>
+<td>division</td>
+<td>affine</td>
+<td>increasing</td>
+<td><span class="math">\(y\)</span> is a scalar constant</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">x</span> <span class="pre">.*</span> <span class="pre">y</span></tt></td>
+<td>elemwise multiplication</td>
+<td>affine</td>
+<td>increasing</td>
+<td>one term is constant</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">x[1:4,</span> <span class="pre">2:3]</span></tt></td>
 <td>indexing and slicing</td>
@@ -183,7 +205,7 @@ a matrix</td>
 <td><span class="math">\(x' y\)</span></td>
 <td>affine</td>
 <td>increasing</td>
-<td>one of the terms is constant</td>
+<td>one term is constant</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">vec(x)</span></tt></td>
 <td>vector representation</td>
@@ -214,9 +236,7 @@ a matrix</td>
 <p><tt class="code docutils literal"><span class="pre">hcat(x,</span> <span class="pre">y)</span></tt> or</p>
 <p class="last"><tt class="code docutils literal"><span class="pre">vcat(x,</span> <span class="pre">y)</span></tt></p>
 </td>
-<td><p class="first">horizontal and vertical</p>
-<p class="last">stacking</p>
-</td>
+<td>stacking</td>
 <td>affine</td>
 <td>increasing</td>
 <td>none</td>
@@ -261,10 +281,10 @@ a matrix</td>
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">abs(x)</span></tt></td>
 <td><span class="math">\(\left|x\right|\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p class="last"><span class="math">\(x \le 0\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p class="last">decreasing on
+<span class="math">\(x \le 0\)</span></p>
 </td>
 <td>none</td>
 </tr>
@@ -295,61 +315,61 @@ Of course, if an optimization problem has both LP and SOCP operations, any solve
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">norm(x,</span> <span class="pre">p)</span></tt></td>
 <td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p class="last"><span class="math">\(x \le 0\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p class="last">decreasing on
+<span class="math">\(x \le 0\)</span></p>
 </td>
 <td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">vecnorm(x,</span> <span class="pre">p)</span></tt></td>
-<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
+<td><span class="math">\((\sum x_{ij}^p)^{1/p}\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p class="last"><span class="math">\(x \le 0\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p class="last">decreasing on
+<span class="math">\(x \le 0\)</span></p>
 </td>
 <td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
 </tr>
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">quad_form(x,</span> <span class="pre">P)</span></tt></td>
 <td><span class="math">\(x^T P x\)</span></td>
-<td><p class="first">convex in</p>
-<p><span class="math">\(x\)</span></p>
-<p>affine in</p>
-<p class="last"><span class="math">\(P\)</span></p>
+<td><p class="first">convex in
+<span class="math">\(x\)</span></p>
+<p class="last">affine in
+<span class="math">\(P\)</span></p>
 </td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p><span class="math">\(x \le 0\)</span></p>
-<p>increasing in</p>
-<p class="last"><span class="math">\(P\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on
+<span class="math">\(x \le 0\)</span></p>
+<p class="last">increasing in
+<span class="math">\(P\)</span></p>
 </td>
-<td><p class="first">either <span class="math">\(x\)</span> or</p>
-<p><span class="math">\(P\)</span> must be</p>
-<p class="last">constant</p>
+<td><p class="first">either <span class="math">\(x\)</span> or
+<span class="math">\(P\)</span></p>
+<p class="last">must be constant</p>
 </td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">quad_over_lin(x,</span> <span class="pre">y)</span></tt></td>
 <td><span class="math">\(x^T x/y\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p><span class="math">\(x \le 0\)</span></p>
-<p>decreasing in</p>
-<p class="last"><span class="math">\(y\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on
+<span class="math">\(x \le 0\)</span></p>
+<p class="last">decreasing in
+<span class="math">\(y\)</span></p>
 </td>
 <td><span class="math">\(y &gt; 0\)</span></td>
 </tr>
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">sum_squares(x)</span></tt></td>
 <td><span class="math">\(\sum x_i^2\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p class="last"><span class="math">\(x \le 0\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p class="last">decreasing on
+<span class="math">\(x \le 0\)</span></p>
 </td>
 <td>none</td>
 </tr>
@@ -362,10 +382,10 @@ Of course, if an optimization problem has both LP and SOCP operations, any solve
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">square(x),</span> <span class="pre">x^2</span></tt></td>
 <td><span class="math">\(x^2\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p class="last"><span class="math">\(x \le 0\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p class="last">decreasing on
+<span class="math">\(x \le 0\)</span></p>
 </td>
 <td>none</td>
 </tr>
@@ -386,10 +406,10 @@ M  \\
 &amp;|x| &gt;  M
 \end{cases}\)</span></td>
 <td>convex</td>
-<td><p class="first">increasing on</p>
-<p><span class="math">\(x \ge 0\)</span></p>
-<p>decreasing on</p>
-<p class="last"><span class="math">\(x \le 0\)</span></p>
+<td><p class="first">increasing on
+<span class="math">\(x \ge 0\)</span></p>
+<p class="last">decreasing on
+<span class="math">\(x \le 0\)</span></p>
 </td>
 <td><span class="math">\(M&gt;=1\)</span></td>
 </tr>
@@ -441,6 +461,12 @@ M  \\
 <td>not monotonic</td>
 <td><span class="math">\(x&gt;0\)</span></td>
 </tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">logistic_loss(x)</span></tt></td>
+<td><span class="math">\(\log(1 + \exp(x_i))\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -483,7 +509,7 @@ M  \\
 <td>x is positive semidefinite</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">lambda_min(x)</span></tt></td>
-<td>min of singular values of <span class="math">\(x\)</span></td>
+<td>min eigenvalue of <span class="math">\(x\)</span></td>
 <td>concave</td>
 <td>increasing</td>
 <td>x is positive semidefinite</td>
