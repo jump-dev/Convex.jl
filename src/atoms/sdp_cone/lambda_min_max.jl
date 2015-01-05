@@ -31,7 +31,7 @@ function sign(x::LambdaMaxAtom)
 end
 
 function monotonicity(x::LambdaMaxAtom)
-  return (Increasing(),)
+  return (Nondecreasing(),)
 end
 
 function curvature(x::LambdaMaxAtom)
@@ -84,7 +84,7 @@ function sign(x::LambdaMinAtom)
 end
 
 function monotonicity(x::LambdaMinAtom)
-  return (Increasing(),)
+  return (Nondecreasing(),)
 end
 
 function curvature(x::LambdaMinAtom)
