@@ -81,7 +81,7 @@ Matrices can also be constrained to be positive semidefinite.
 
 Objective
 =========
-The objective of the problem is a scalar expression to be maximized or minimized by using :code:`maximize` or :code:`minimize` respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using :code:`problem = satisfy(constraints)`.
+The objective of the problem is a scalar expression to be maximized or minimized by using :code:`maximize` or :code:`minimize` respectively. Feasibility problems can be expressed by either giving a constant as the objective, or using :code:`problem = satisfy(constraints)`.
 
 Problem
 ========
