@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -161,31 +162,31 @@
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">min(x,y)</span></tt></td>
-<td><span class="math">\(min(x,y)\)</span></td>
+<td><span class="math">\(\min(x,y)\)</span></td>
 <td>concave</td>
 <td>increasing</td>
 <td>none</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">max(x,y)</span></tt></td>
-<td><span class="math">\(max(x,y)\)</span></td>
+<td><span class="math">\(\max(x,y)\)</span></td>
 <td>convex</td>
 <td>increasing</td>
 <td>none</td>
 </tr>
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">pos(x,y)</span></tt></td>
-<td><span class="math">\(max(x,0)\)</span></td>
+<td><span class="math">\(\max(x,0)\)</span></td>
 <td>convex</td>
 <td>increasing</td>
 <td>none</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">neg(x,y)</span></tt></td>
-<td><span class="math">\(max(-x,0)\)</span></td>
+<td><span class="math">\(\max(-x,0)\)</span></td>
 <td>convex</td>
 <td>decreasing</td>
 <td>none</td>
 </tr>
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">inv_pos(x)</span></tt></td>
-<td><span class="math">\(1/max(x,0)\)</span></td>
+<td><span class="math">\(1/\max(x,0)\)</span></td>
 <td>convex</td>
 <td>decreasing</td>
 <td><span class="math">\(x&gt;0\)</span></td>
@@ -206,7 +207,7 @@ decreasing on
 <td>none</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">abs(x)</span></tt></td>
-<td><span class="math">\(abs(x)\)</span></td>
+<td><span class="math">\(\left|x\right|\)</span></td>
 <td>convex</td>
 <td>increasing on
 <span class="math">\(x \ge 0\)</span>

@@ -7,7 +7,7 @@
 Convex.jl - Convex Optimization in Julia
 =========================================
 
-Convex.jl is a julia package for `Disciplined Convex Programming <http://dcp.stanford.edu/>`_. Convex.jl can solve
+Convex.jl is a Julia package for `Disciplined Convex Programming <http://dcp.stanford.edu/>`_. Convex.jl can solve
 
   * linear programs
   * mixed-integer programs
@@ -15,7 +15,7 @@ Convex.jl is a julia package for `Disciplined Convex Programming <http://dcp.sta
 
     - second-order cone programs (SOCP)
     - exponential cone programs
-    - semi-definite programs (SDP)
+    - semidefinite programs (SDP)
 
 Convex.jl supports a variety of solvers, including `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_, `Gurobi <https://github.com/JuliaOpt/gurobi.jl>`_, `ECOS <https://github.com/JuliaOpt/ECOS.jl>`_, `SCS <https://github.com/karanveerm/SCS.jl>`_ and `GLPK <https://github.com/JuliaOpt/GLPK.jl>`_ through the `MathProgBase <http://mathprogbasejl.readthedocs.org/en/latest/>`_ interface.
 

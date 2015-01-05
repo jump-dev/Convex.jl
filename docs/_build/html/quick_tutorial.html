@@ -127,10 +127,12 @@
 <div class="math">
 \[\begin{split}\begin{array}{ll}
   \mbox{minimize} &amp; \|Ax - b\|_2^2 \\
-  \mbox{subject to} &amp; x &gt;= 0
+  \mbox{subject to} &amp; x \geq 0
 \end{array}\end{split}\]</div>
-<p>where the unknown variable <span class="math">\(x\)</span> is a vector of size <span class="math">\(n\)</span>. The values for <span class="math">\(A\)</span>, <span class="math">\(b\)</span> are given and have sizes <span class="math">\(m\times n\)</span>, <span class="math">\(m\)</span> respectively.</p>
-<div class="highlight-python"><div class="highlight"><pre># Let us first make the Convex.jl module available
+<p>with variable <span class="math">\(x\in \mathbf{R}^{n}\)</span>,
+and problem data <span class="math">\(A \in \mathbf{R}^{m \times n}\)</span>, <span class="math">\(b \in \mathbf{R}^{m}\)</span>.</p>
+<p>This problem can be solved in Convex.jl as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre># Make the Convex.jl module available
 using Convex
 
 # Generate random problem data
@@ -138,14 +140,11 @@ m = 4;  n = 5
 A = randn(m, n); b = randn(m, 1)
 
 # Create a (column vector) variable of size n x 1.
-x = Variable(n) # or x = Variable(n, 1)
+x = Variable(n)
 
 # The problem is to minimize ||Ax - b||^2 subject to x &gt;= 0
 # This can be done by: minimize(objective, constraints)
 problem = minimize(sum_squares(A * x + b), [x &gt;= 0])
-
-# You can add more constraints at any time by
-problem.constraints += [x &lt;= 1, 0.5 &lt;= 2 * x]
 
 # Solve the problem by calling solve!
 solve!(problem)

@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -198,7 +199,7 @@ constraint = isposdef([x y; y&#39; z])
 </div>
 <div class="section" id="objective">
 <h2>Objective<a class="headerlink" href="#objective" title="Permalink to this headline">¶</a></h2>
-<p>The objective of the problem is a scalar expression to be maximized or minimized by using <tt class="code docutils literal"><span class="pre">maximize</span></tt> or <tt class="code docutils literal"><span class="pre">minimize</span></tt> respectively. Feasibility problems are also allowed by either giving a constant as the expression, or using <tt class="code docutils literal"><span class="pre">problem</span> <span class="pre">=</span> <span class="pre">satisfy(constraints)</span></tt>.</p>
+<p>The objective of the problem is a scalar expression to be maximized or minimized by using <tt class="code docutils literal"><span class="pre">maximize</span></tt> or <tt class="code docutils literal"><span class="pre">minimize</span></tt> respectively. Feasibility problems can be expressed by either giving a constant as the objective, or using <tt class="code docutils literal"><span class="pre">problem</span> <span class="pre">=</span> <span class="pre">satisfy(constraints)</span></tt>.</p>
 </div>
 <div class="section" id="problem">
 <h2>Problem<a class="headerlink" href="#problem" title="Permalink to this headline">¶</a></h2>

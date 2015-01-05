@@ -69,7 +69,13 @@
 <li class="toctree-l2"><a class="reference internal" href="types.html#problem">Problem</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#affine-atoms">Affine atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#elementwise-atoms">Elementwise atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#vector-and-matrix-atoms">Vector and Matrix atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#promotions">Promotions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solvers.html">Solvers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
@@ -77,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -121,7 +128,7 @@
 <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;Convex&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This also installs <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a> as a solver. If you wish to use other solvers, please read the section on <a class="reference external" href="solvers.html">solvers</a>.</p>
+<p>This also installs <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a> as a solver. To use certain functions (exponential functions like <tt class="code docutils literal"><span class="pre">exp</span></tt> and <tt class="code docutils literal"><span class="pre">log</span></tt>, and semidefinite functions like <tt class="code docutils literal"><span class="pre">operator_norm</span></tt> and <tt class="code docutils literal"><span class="pre">logdet</span></tt>) you will need to install another solver as well, such as <a class="reference external" href="https://github.com/JuliaOpt/SCS.jl">SCS</a>. If you wish to use other solvers, please read the section on <a class="reference external" href="solvers.html">solvers</a>.</p>
 </div>
 
 

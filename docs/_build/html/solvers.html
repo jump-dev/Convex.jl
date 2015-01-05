@@ -69,7 +69,13 @@
 <li class="toctree-l2"><a class="reference internal" href="types.html#problem">Problem</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">Supported Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#affine-atoms">Affine atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#elementwise-atoms">Elementwise atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#vector-and-matrix-atoms">Vector and Matrix atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#promotions">Promotions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Solvers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
@@ -77,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -117,7 +124,7 @@
   <div class="section" id="solvers">
 <h1>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">¶</a></h1>
 <p>By default, Convex.jl uses <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a> to solve linear programs and second-order cone programs (SOCPs).</p>
-<p>If you wish to solve semi-definite programs (SDPs) or exponential programs, you will need to install <a class="reference external" href="https://github.com/JuliaOpt/SCS.jl">SCS</a>, which can be done by <tt class="code docutils literal"><span class="pre">Pkg.add(&quot;SCS&quot;)</span></tt>.</p>
+<p>If you wish to solve semidefinite programs (SDPs) or exponential programs, you will need to install <a class="reference external" href="https://github.com/JuliaOpt/SCS.jl">SCS</a>, which can be done by <tt class="code docutils literal"><span class="pre">Pkg.add(&quot;SCS&quot;)</span></tt>.</p>
 <p>Any other solver in <a class="reference external" href="http://www.juliaopt.org/">JuliaOpt</a> may also be used, so long as it supports the conic constraints used to express the problem. Currently, other solvers will be most useful in solving linear programs (LPs) and mixed integer linear programs (MILPs). Mosek and Gurobi can be used to solve SOCPs while Mosek can also solve SDPs.</p>
 <p>Installing these solvers is very simple. Just follow the instructions on the specific solver&#8217;s page.</p>
 <p>To use a specific solver, you can use the following syntax</p>

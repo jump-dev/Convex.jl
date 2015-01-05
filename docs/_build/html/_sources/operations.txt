@@ -27,15 +27,15 @@ These atoms are applied elementwise to their arguments, returning an expression 
 +----------------------+-------------------------+------------+---------------+-------------------------+
 |atom                  | description             | vexity     | slope         | implicit constraint     |
 +======================+=========================+============+===============+=========================+
-|:code:`min(x,y)`      | :math:`min(x,y)`        | concave    |increasing     | none                    |
+|:code:`min(x,y)`      | :math:`\min(x,y)`       | concave    |increasing     | none                    |
 +----------------------+-------------------------+------------+---------------+-------------------------+
-|:code:`max(x,y)`      | :math:`max(x,y)`        | convex     |increasing     | none                    |
+|:code:`max(x,y)`      | :math:`\max(x,y)`       | convex     |increasing     | none                    |
 +----------------------+-------------------------+------------+---------------+-------------------------+
-|:code:`pos(x,y)`      | :math:`max(x,0)`        | convex     |increasing     | none                    |
+|:code:`pos(x,y)`      | :math:`\max(x,0)`       | convex     |increasing     | none                    |
 +----------------------+-------------------------+------------+---------------+-------------------------+
-|:code:`neg(x,y)`      | :math:`max(-x,0)`       | convex     |decreasing     | none                    |
+|:code:`neg(x,y)`      | :math:`\max(-x,0)`      | convex     |decreasing     | none                    |
 +----------------------+-------------------------+------------+---------------+-------------------------+
-|:code:`inv_pos(x)`    | :math:`1/max(x,0)`      | convex     |decreasing     | :math:`x>0`             |
+|:code:`inv_pos(x)`    | :math:`1/\max(x,0)`     | convex     |decreasing     | :math:`x>0`             |
 +----------------------+-------------------------+------------+---------------+-------------------------+
 |:code:`sqrt(x)`       | :math:`\sqrt{x}`        | convex     |decreasing     | :math:`x>0`             |
 +----------------------+-------------------------+------------+---------------+-------------------------+
@@ -44,7 +44,7 @@ These atoms are applied elementwise to their arguments, returning an expression 
 |                      |                         |            |decreasing on  |                         |
 |                      |                         |            |:math:`x \le 0`|                         |
 +----------------------+-------------------------+------------+---------------+-------------------------+
-|:code:`abs(x)`        | :math:`abs(x)`          | convex     |increasing on  | none                    |
+|:code:`abs(x)`        | :math:`\left|x\right|`  | convex     |increasing on  | none                    |
 |                      |                         |            |:math:`x \ge 0`|                         |
 |                      |                         |            |decreasing on  |                         |
 |                      |                         |            |:math:`x \le 0`|                         |
