@@ -70,9 +70,10 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Supported Operations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#affine-atoms">Affine atoms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#elementwise-atoms">Elementwise atoms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vector-and-matrix-atoms">Vector and Matrix atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#linear-program-operations">Linear Program Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#second-order-cone-operations">Second-Order Cone Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exponential-cone-operations">Exponential Cone Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#semidefinite-program-operations">Semidefinite Program Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#promotions">Promotions</a></li>
 </ul>
 </li>
@@ -125,36 +126,165 @@
   <div class="section" id="operations">
 <h1>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h1>
 <p>Convex.jl currently supports the following operations. These functions (&#8220;atoms&#8221;) may be composed according to the <a class="reference external" href="http://dcp.stanford.edu">DCP</a> composition rules to form new convex, concave, or affine expressions.</p>
-<div class="section" id="affine-atoms">
-<h2>Affine atoms<a class="headerlink" href="#affine-atoms" title="Permalink to this headline">¶</a></h2>
-<p>These atoms are affine in their arguments.</p>
-<blockquote>
-<div><ul class="simple">
-<li>addition, subtraction, multiplication, division: <tt class="code docutils literal"><span class="pre">+,</span> <span class="pre">-,</span> <span class="pre">/,</span> <span class="pre">*</span></tt></li>
-<li>indexing into vectors and matrices: <tt class="code docutils literal"><span class="pre">x[1:4,</span> <span class="pre">2:3]</span></tt></li>
-<li>k-th diagonal of a matrix: <tt class="code docutils literal"><span class="pre">diag(x,</span> <span class="pre">k)</span></tt></li>
-<li>transpose: <tt class="code docutils literal"><span class="pre">x'</span></tt></li>
-<li>dot product: <tt class="code docutils literal"><span class="pre">x'</span> <span class="pre">*</span> <span class="pre">y</span></tt> or <tt class="code docutils literal"><span class="pre">dot(x,</span> <span class="pre">y)</span></tt></li>
-<li>reshape, vec: <tt class="code docutils literal"><span class="pre">reshape(x,</span> <span class="pre">2,</span> <span class="pre">3)</span></tt> or <tt class="code docutils literal"><span class="pre">vec(x)</span></tt></li>
-<li>minimum, maximum element of a vector or matrix: <tt class="code docutils literal"><span class="pre">maximum(x)</span></tt></li>
-<li>horizontal and vertical stacking: <tt class="code docutils literal"><span class="pre">hcat(x,</span> <span class="pre">y);</span> <span class="pre">vcat(x,</span> <span class="pre">y)</span></tt></li>
-<li>trace: <tt class="code docutils literal"><span class="pre">trace(X)</span></tt></li>
-</ul>
-</div></blockquote>
-</div>
-<div class="section" id="elementwise-atoms">
-<h2>Elementwise atoms<a class="headerlink" href="#elementwise-atoms" title="Permalink to this headline">¶</a></h2>
-<p>These atoms are applied elementwise to their arguments, returning an expression of the same size.</p>
+<div class="section" id="linear-program-operations">
+<h2>Linear Program Operations<a class="headerlink" href="#linear-program-operations" title="Permalink to this headline">¶</a></h2>
+<p>An optimization problem consisting of these operations can be solved by any LP solver.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="22%" />
-<col width="25%" />
-<col width="12%" />
-<col width="15%" />
-<col width="25%" />
+<col width="23%" />
+<col width="11%" />
+<col width="14%" />
+<col width="30%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head">atom</th>
+<tr class="row-odd"><th class="head">operation</th>
+<th class="head">description</th>
+<th class="head">vexity</th>
+<th class="head">slope</th>
+<th class="head">implicit constraint / notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">+,</span> <span class="pre">-,</span> <span class="pre">/,</span> <span class="pre">*,</span> <span class="pre">.*</span></tt></td>
+<td>arithmetic</td>
+<td>affine</td>
+<td><p class="first">increasing</p>
+<p>decreasing for</p>
+<p class="last"><tt class="code docutils literal"><span class="pre">y</span></tt> in
+<tt class="code docutils literal"><span class="pre">x-y</span></tt></p>
+</td>
+<td><p class="first"><tt class="code docutils literal"><span class="pre">x*y</span></tt> allowed only if</p>
+<p>one of the terms is constant</p>
+<p><tt class="code docutils literal"><span class="pre">x/y</span></tt> allowed only if</p>
+<p class="last">y is a scalar constant</p>
+</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">x[1:4,</span> <span class="pre">2:3]</span></tt></td>
+<td>indexing and slicing</td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">diag(x,</span> <span class="pre">k)</span></tt></td>
+<td><span class="math">\(k\)</span>-th diagonal of
+a matrix</td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">x'</span></tt></td>
+<td>transpose</td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">x'*y</span> <span class="pre">or</span> <span class="pre">dot(x,y)</span></tt></td>
+<td><span class="math">\(x' y\)</span></td>
+<td>affine</td>
+<td>increasing</td>
+<td>one of the terms is constant</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">vec(x)</span></tt></td>
+<td>vector representation</td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">reshape(x,</span> <span class="pre">m,</span> <span class="pre">n)</span></tt></td>
+<td>reshape into
+<span class="math">\(m \times n\)</span></td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">minimum(x)</span></tt></td>
+<td><span class="math">\(\min(x)\)</span></td>
+<td>concave</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">maximum(x)</span></tt></td>
+<td><span class="math">\(\max(x)\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><p class="first"><tt class="code docutils literal"><span class="pre">[x</span> <span class="pre">y]</span> <span class="pre">or</span> <span class="pre">[x;</span> <span class="pre">y]</span></tt></p>
+<p><tt class="code docutils literal"><span class="pre">hcat(x,</span> <span class="pre">y)</span></tt> or</p>
+<p class="last"><tt class="code docutils literal"><span class="pre">vcat(x,</span> <span class="pre">y)</span></tt></p>
+</td>
+<td><p class="first">horizontal and vertical</p>
+<p class="last">stacking</p>
+</td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">trace(x)</span></tt></td>
+<td><span class="math">\(\mathrm{tr}
+\left(X \right)\)</span></td>
+<td>affine</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">min(x,y)</span></tt></td>
+<td><span class="math">\(\min(x,y)\)</span></td>
+<td>concave</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">max(x,y)</span></tt></td>
+<td><span class="math">\(\max(x,y)\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">pos(x,y)</span></tt></td>
+<td><span class="math">\(\max(x,0)\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">neg(x,y)</span></tt></td>
+<td><span class="math">\(\max(-x,0)\)</span></td>
+<td>convex</td>
+<td>decreasing</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">inv_pos(x)</span></tt></td>
+<td><span class="math">\(1/\max(x,0)\)</span></td>
+<td>convex</td>
+<td>decreasing</td>
+<td><span class="math">\(x&gt;0\)</span></td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">abs(x)</span></tt></td>
+<td><span class="math">\(\left|x\right|\)</span></td>
+<td>convex</td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p class="last"><span class="math">\(x \le 0\)</span></p>
+</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="second-order-cone-operations">
+<h2>Second-Order Cone Operations<a class="headerlink" href="#second-order-cone-operations" title="Permalink to this headline">¶</a></h2>
+<p>An optimization problem consisting of these operations can be solved by any SOCP solver (ECOS, SCS, Mosek, Gurobi, CPLEX).
+Of course, if an optimization problem has both LP and SOCP operations, any solver that can solve both LPs and SOCPs can solve the problem.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="31%" />
+<col width="10%" />
+<col width="13%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">operation</th>
 <th class="head">description</th>
 <th class="head">vexity</th>
 <th class="head">slope</th>
@@ -162,35 +292,66 @@
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">min(x,y)</span></tt></td>
-<td><span class="math">\(\min(x,y)\)</span></td>
-<td>concave</td>
-<td>increasing</td>
-<td>none</td>
-</tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">max(x,y)</span></tt></td>
-<td><span class="math">\(\max(x,y)\)</span></td>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">norm(x,</span> <span class="pre">p)</span></tt></td>
+<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
 <td>convex</td>
-<td>increasing</td>
-<td>none</td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p class="last"><span class="math">\(x \le 0\)</span></p>
+</td>
+<td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
 </tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">pos(x,y)</span></tt></td>
-<td><span class="math">\(\max(x,0)\)</span></td>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">vecnorm(x,</span> <span class="pre">p)</span></tt></td>
+<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
 <td>convex</td>
-<td>increasing</td>
-<td>none</td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p class="last"><span class="math">\(x \le 0\)</span></p>
+</td>
+<td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
 </tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">neg(x,y)</span></tt></td>
-<td><span class="math">\(\max(-x,0)\)</span></td>
-<td>convex</td>
-<td>decreasing</td>
-<td>none</td>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">quad_form(x,</span> <span class="pre">P)</span></tt></td>
+<td><span class="math">\(x^T P x\)</span></td>
+<td><p class="first">convex in</p>
+<p><span class="math">\(x\)</span></p>
+<p>affine in</p>
+<p class="last"><span class="math">\(P\)</span></p>
+</td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p><span class="math">\(x \le 0\)</span></p>
+<p>increasing in</p>
+<p class="last"><span class="math">\(P\)</span></p>
+</td>
+<td><p class="first">either <span class="math">\(x\)</span> or</p>
+<p><span class="math">\(P\)</span> must be</p>
+<p class="last">constant</p>
+</td>
 </tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">inv_pos(x)</span></tt></td>
-<td><span class="math">\(1/\max(x,0)\)</span></td>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">quad_over_lin(x,</span> <span class="pre">y)</span></tt></td>
+<td><span class="math">\(x^T x/y\)</span></td>
 <td>convex</td>
-<td>decreasing</td>
-<td><span class="math">\(x&gt;0\)</span></td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p><span class="math">\(x \le 0\)</span></p>
+<p>decreasing in</p>
+<p class="last"><span class="math">\(y\)</span></p>
+</td>
+<td><span class="math">\(y &gt; 0\)</span></td>
+</tr>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">sum_squares(x)</span></tt></td>
+<td><span class="math">\(\sum x_i^2\)</span></td>
+<td>convex</td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p class="last"><span class="math">\(x \le 0\)</span></p>
+</td>
+<td>none</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">sqrt(x)</span></tt></td>
 <td><span class="math">\(\sqrt{x}\)</span></td>
@@ -201,27 +362,65 @@
 <tr class="row-even"><td><tt class="code docutils literal"><span class="pre">square(x),</span> <span class="pre">x^2</span></tt></td>
 <td><span class="math">\(x^2\)</span></td>
 <td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span></td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p class="last"><span class="math">\(x \le 0\)</span></p>
+</td>
 <td>none</td>
 </tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">abs(x)</span></tt></td>
-<td><span class="math">\(\left|x\right|\)</span></td>
-<td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span></td>
-<td>none</td>
-</tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">geo_mean(x,</span> <span class="pre">y)</span></tt></td>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">geo_mean(x,</span> <span class="pre">y)</span></tt></td>
 <td><span class="math">\(\sqrt{xy}\)</span></td>
 <td>concave</td>
 <td>increasing</td>
 <td><span class="math">\(x\ge0\)</span>,
 <span class="math">\(y\ge0\)</span></td>
+</tr>
+<tr class="row-even"><td><p class="first"><tt class="code docutils literal"><span class="pre">huber(x)</span></tt></p>
+<p class="last"><tt class="code docutils literal"><span class="pre">huber(x,</span> <span class="pre">M)</span></tt></p>
+</td>
+<td><span class="math">\(\begin{cases}
+x^2 &amp;|x| \leq
+M  \\
+2M|x| - M^2
+&amp;|x| &gt;  M
+\end{cases}\)</span></td>
+<td>convex</td>
+<td><p class="first">increasing on</p>
+<p><span class="math">\(x \ge 0\)</span></p>
+<p>decreasing on</p>
+<p class="last"><span class="math">\(x \le 0\)</span></p>
+</td>
+<td><span class="math">\(M&gt;=1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="exponential-cone-operations">
+<h2>Exponential Cone Operations<a class="headerlink" href="#exponential-cone-operations" title="Permalink to this headline">¶</a></h2>
+<p>An optimization problem consisting of these operations can be solved by any exponential cone solver (SCS). Note that these solvers can also handle a mix of SDP and other supported operations.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="31%" />
+<col width="10%" />
+<col width="13%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">operation</th>
+<th class="head">description</th>
+<th class="head">vexity</th>
+<th class="head">slope</th>
+<th class="head">implicit constraint</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">logsumexp(x)</span></tt></td>
+<td><span class="math">\(\log(\sum_i \exp(x_i))\)</span></td>
+<td>convex</td>
+<td>increasing</td>
+<td>none</td>
 </tr>
 <tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">exp(x)</span></tt></td>
 <td><span class="math">\(\exp(x)\)</span></td>
@@ -235,28 +434,19 @@ decreasing on
 <td>increasing</td>
 <td><span class="math">\(x&gt;0\)</span></td>
 </tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">huber(x)</span></tt>
-<tt class="code docutils literal"><span class="pre">huber(x,</span> <span class="pre">M)</span></tt></td>
-<td><span class="math">\(\begin{cases}
-x^2 &amp;|x| \leq
-M  \\
-2M|x| - M^2
-&amp;|x| &gt;
-M
-\end{cases}\)</span></td>
-<td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span></td>
-<td><span class="math">\(M&gt;=1\)</span></td>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">entr(x)</span></tt></td>
+<td><span class="math">\(\sum_{ij}
+-x_{ij} \log (x_{ij})\)</span></td>
+<td>concave</td>
+<td>not monotonic</td>
+<td><span class="math">\(x&gt;0\)</span></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section" id="vector-and-matrix-atoms">
-<h2>Vector and Matrix atoms<a class="headerlink" href="#vector-and-matrix-atoms" title="Permalink to this headline">¶</a></h2>
-<p>These atoms take vector or matrix arguments and return scalar expressions.</p>
+<div class="section" id="semidefinite-program-operations">
+<h2>Semidefinite Program Operations<a class="headerlink" href="#semidefinite-program-operations" title="Permalink to this headline">¶</a></h2>
+<p>An optimization problem consisting of these operations can be solved by any SDP solver (SCS, Mosek). Note that these solvers can also handle a mix of SDP and other supported operations.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="24%" />
@@ -266,7 +456,7 @@ decreasing on
 <col width="22%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head">atom</th>
+<tr class="row-odd"><th class="head">operation</th>
 <th class="head">description</th>
 <th class="head">vexity</th>
 <th class="head">slope</th>
@@ -274,89 +464,29 @@ decreasing on
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">norm(x,</span> <span class="pre">p)</span></tt></td>
-<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
-<td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span></td>
-<td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
-</tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">vecnorm(x,</span> <span class="pre">p)</span></tt></td>
-<td><span class="math">\((\sum x_i^p)^{1/p}\)</span></td>
-<td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span></td>
-<td><tt class="code docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">Inf</span></tt></td>
-</tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">quad_form(x,</span> <span class="pre">P)</span></tt></td>
-<td><span class="math">\(x^T P x\)</span></td>
-<td>convex in
-<span class="math">\(x\)</span>
-affine in
-<span class="math">\(P\)</span></td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span>
-increasing in
-<span class="math">\(P\)</span></td>
-<td>either <span class="math">\(x\)</span> or
-<span class="math">\(P\)</span> must be
-constant</td>
-</tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">quad_over_lin(x,</span> <span class="pre">y)</span></tt></td>
-<td><span class="math">\(x^T x/y\)</span></td>
-<td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span>
-decreasing in
-<span class="math">\(y\)</span></td>
-<td><span class="math">\(y &gt; 0\)</span></td>
-</tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">sum_squares(x)</span></tt></td>
-<td><span class="math">\(\sum x_i^2\)</span></td>
-<td>convex</td>
-<td>increasing on
-<span class="math">\(x \ge 0\)</span>
-decreasing on
-<span class="math">\(x \le 0\)</span></td>
-<td>none</td>
-</tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">nuclear_norm(x)</span></tt></td>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">nuclear_norm(x)</span></tt></td>
 <td>sum of singular values of <span class="math">\(x\)</span></td>
 <td>convex</td>
 <td>not monotonic</td>
 <td>none</td>
 </tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">operator_norm(x)</span></tt></td>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">operator_norm(x)</span></tt></td>
 <td>max of singular values of <span class="math">\(x\)</span></td>
 <td>convex</td>
 <td>not monotonic</td>
 <td>none</td>
 </tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">lambda_max(x)</span></tt></td>
+<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">lambda_max(x)</span></tt></td>
 <td>max eigenvalue of <span class="math">\(x\)</span></td>
 <td>convex</td>
 <td>increasing</td>
 <td>x is positive semidefinite</td>
 </tr>
-<tr class="row-even"><td><tt class="code docutils literal"><span class="pre">lambda_min(x)</span></tt></td>
+<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">lambda_min(x)</span></tt></td>
 <td>min of singular values of <span class="math">\(x\)</span></td>
 <td>concave</td>
 <td>increasing</td>
 <td>x is positive semidefinite</td>
-</tr>
-<tr class="row-odd"><td><tt class="code docutils literal"><span class="pre">logsumexp(x)</span></tt></td>
-<td><span class="math">\(\log(\sum_i \exp(x_i))\)</span></td>
-<td>convex</td>
-<td>increasing</td>
-<td>none</td>
 </tr>
 </tbody>
 </table>
