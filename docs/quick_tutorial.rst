@@ -7,14 +7,16 @@ Consider a constrained least squares problem
 .. math::
   \begin{array}{ll}
     \mbox{minimize} & \|Ax - b\|_2^2 \\
-    \mbox{subject to} & x >= 0
+    \mbox{subject to} & x \geq 0
   \end{array}
 
-where the unknown variable :math:`x` is a vector of size :math:`n`. The values for :math:`A`, :math:`b` are given and have sizes :math:`m\times n`, :math:`m` respectively.
+with variable :math:`x\in \mathbf{R}^{n}`, 
+and problem data :math:`A \in \mathbf{R}^{m \times n}`, :math:`b \in \mathbf{R}^{m}`.
 
+This problem can be solved in Convex.jl as follows:
 ::
 
-	# Let us first make the Convex.jl module available
+	# Make the Convex.jl module available
 	using Convex
 
 	# Generate random problem data
