@@ -8,3 +8,4 @@ Examples
 	* `Time series <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/docs/examples/time_series/time_series.ipynb>`_
 	* `Section allocation <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/docs/examples/section_allocation/section_allocation.ipynb>`_
 	* `Binary knapsack <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/docs/examples/binary_knapsack.ipynb>`_
+	* `Entropy maximization <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/docs/examples/max_entropy.ipynb>`_
