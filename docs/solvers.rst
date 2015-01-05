@@ -6,7 +6,7 @@ By default, Convex.jl uses `ECOS <https://github.com/JuliaOpt/ECOS.jl>`_ to solv
 
 If you wish to solve semidefinite programs (SDPs) or exponential programs, you will need to install `SCS <https://github.com/JuliaOpt/SCS.jl>`_, which can be done by :code:`Pkg.add("SCS")`.
 
-Any other solver in `JuliaOpt <http://www.juliaopt.org/>`_ may also be used, so long as it supports the conic constraints used to express the problem. Currently, other solvers will be most useful in solving linear programs (LPs) and mixed integer linear programs (MILPs). Mosek and Gurobi can be used to solve SOCPs while Mosek can also solve SDPs. The JuliaOpt website mentioned above gives a detailed list of which solvers can solve what kind of problems.
+Any other solver in `JuliaOpt <http://www.juliaopt.org/>`_ may also be used, so long as it supports the conic constraints used to express the problem. Currently, other solvers will be most useful in solving linear programs (LPs) and mixed integer linear programs (MILPs). Mosek and Gurobi can be used to solve SOCPs while Mosek can also solve SDPs. A detailed table can be found `here <http://www.juliaopt.org/>`_ describing which solvers can solve which kind of problems.
 
 Installing these solvers is very simple. Just follow the instructions in each solver's documentation.
 
