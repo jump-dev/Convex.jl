@@ -78,11 +78,12 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solvers.html">Solvers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-get-help">Where can I get help?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-differ-from-jump">How does Convex.jl differ from JuMP?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-in-other-languages">Are there similar packages available in other languages?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -122,11 +123,14 @@
             
   <div class="section" id="convex-jl-convex-optimization-in-julia">
 <h1>Convex.jl - Convex Optimization in Julia<a class="headerlink" href="#convex-jl-convex-optimization-in-julia" title="Permalink to this headline">¶</a></h1>
-<p>Convex.jl is a Julia package for <a class="reference external" href="http://dcp.stanford.edu/">Disciplined Convex Programming</a>. Convex.jl can solve</p>
+<p>Convex.jl is a Julia package for <a class="reference external" href="http://dcp.stanford.edu/">Disciplined Convex Programming</a>.
+Convex.jl makes it easy to describe optimization problems in a natural, mathematical syntax,
+and to solve those problems using a variety of different (commercial and open-source) solvers.
+Convex.jl can solve</p>
 <blockquote>
 <div><ul class="simple">
 <li>linear programs</li>
-<li>mixed-integer programs</li>
+<li>mixed-integer linear programs</li>
 <li>dcp-compliant convex programs including<ul>
 <li>second-order cone programs (SOCP)</li>
 <li>exponential cone programs</li>
@@ -135,10 +139,10 @@
 </li>
 </ul>
 </div></blockquote>
-<p>Convex.jl supports a variety of solvers, including <a class="reference external" href="https://github.com/JuliaOpt/Mosek.jl">Mosek</a>, <a class="reference external" href="https://github.com/JuliaOpt/gurobi.jl">Gurobi</a>, <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a>, <a class="reference external" href="https://github.com/karanveerm/SCS.jl">SCS</a> and <a class="reference external" href="https://github.com/JuliaOpt/GLPK.jl">GLPK</a> through the <a class="reference external" href="http://mathprogbasejl.readthedocs.org/en/latest/">MathProgBase</a> interface.</p>
+<p>Convex.jl supports many solvers, including <a class="reference external" href="https://github.com/JuliaOpt/Mosek.jl">Mosek</a>, <a class="reference external" href="https://github.com/JuliaOpt/gurobi.jl">Gurobi</a>, <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a>, <a class="reference external" href="https://github.com/karanveerm/SCS.jl">SCS</a> and <a class="reference external" href="https://github.com/JuliaOpt/GLPK.jl">GLPK</a>, through the <a class="reference external" href="http://mathprogbasejl.readthedocs.org/en/latest/">MathProgBase</a> interface.</p>
 <p>Note that Convex.jl was previously called CVX.jl. This package is under active development; we welcome bug reports and feature requests. For usage questions, please contact us via the <a class="reference external" href="https://groups.google.com/forum/#!forum/julia-opt">JuliaOpt mailing list</a>.</p>
-<div class="section" id="in-depth-docs">
-<h2>In Depth Docs:<a class="headerlink" href="#in-depth-docs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="in-depth-documentation">
+<h2>In Depth Documentation:<a class="headerlink" href="#in-depth-documentation" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
@@ -162,11 +166,12 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solvers.html">Solvers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-get-help">Where can I get help?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-differ-from-jump">How does Convex.jl differ from JuMP?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#where-can-i-learn-more-about-convex-optimization">Where can I learn more about Convex Optimization?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#i-still-don-t-know-what-do-where-can-i-get-help">I still don&#8217;t know what do, where can I get help?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-for-other-languages">Are there similar packages available for other languages?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#are-there-similar-packages-available-in-other-languages">Are there similar packages available in other languages?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#how-does-convex-jl-work">How does Convex.jl work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#how-do-i-cite-this-package">How do I cite this package?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>

@@ -10,7 +10,7 @@ FAQ
 Where can I get help?
 --------------------------------------------------
 For usage questions, please contact us via the `JuliaOpt mailing list <https://groups.google.com/forum/#!forum/julia-opt>`_.
-If you're running into bugs or have feature requests, please use the `Github Issue Tracker <https://github.com/cvxgrp/Convex.jl/issues>`_. 
+If you're running into bugs or have feature requests, please use the `Github Issue Tracker <https://github.com/cvxgrp/Convex.jl/issues>`_.
 
 How does Convex.jl differ from JuMP?
 ------------------------------------
@@ -19,16 +19,16 @@ interface with solvers via the MathProgBase interface, so many of the same solve
 Convex.jl converts problems to a standard conic form. This approach requires (and certifies) that the problem
 is convex and DCP compliant, and guarantees global optimality of the resulting solution.
 JuMP allows nonlinear programming through an interface that learns about functions via their derivatives.
-This approach is more flexible (for example, you can optimize non-convex functions), but can't 
+This approach is more flexible (for example, you can optimize non-convex functions), but can't
 guarantee global optimality if your function is not convex, or warn you if you've entered a non-convex formulation.
-For linear programming, the difference is more stylistic: JuMP makes it easy and fast to create constraints by 
-indexing and summation (like `sum{x[i], i=1:numLocation}`), whereas Convex.jl prioritizes linear algebraic and 
-functional constructions (like `max(x,y) < A*z`); indexing and summation are also supported, but are somewhat slower.
+For linear programming, the difference is more stylistic: JuMP makes it easy and fast to create constraints by
+indexing and summation (like :code:`sum{x[i], i=1:numLocation}`), whereas Convex.jl prioritizes linear algebraic and
+functional constructions (like :code:`max(x,y) < A*z`); indexing and summation are also supported, but are somewhat slower.
 
 Where can I learn more about Convex Optimization?
 --------------------------------------------------
 See the freely available book `Convex Optimization <http://web.stanford.edu/~boyd/cvxbook/>`_ by Boyd and Vandenberghe for general background on convex optimization.
-For help understanding the rules of Disciplined Convex Programming, we recommend this [DCP tutorial website](http://dcp.stanford.edu/).
+For help understanding the rules of Disciplined Convex Programming, we recommend this `DCP tutorial website <http://dcp.stanford.edu/>`_.
 
 Are there similar packages available in other languages?
 -----------------------------------------------------------
