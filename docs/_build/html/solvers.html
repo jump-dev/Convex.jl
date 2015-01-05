@@ -126,8 +126,8 @@
 <h1>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">¶</a></h1>
 <p>By default, Convex.jl uses <a class="reference external" href="https://github.com/JuliaOpt/ECOS.jl">ECOS</a> to solve linear programs and second-order cone programs (SOCPs).</p>
 <p>If you wish to solve semidefinite programs (SDPs) or exponential programs, you will need to install <a class="reference external" href="https://github.com/JuliaOpt/SCS.jl">SCS</a>, which can be done by <tt class="code docutils literal"><span class="pre">Pkg.add(&quot;SCS&quot;)</span></tt>.</p>
-<p>Any other solver in <a class="reference external" href="http://www.juliaopt.org/">JuliaOpt</a> may also be used, so long as it supports the conic constraints used to express the problem. Currently, other solvers will be most useful in solving linear programs (LPs) and mixed integer linear programs (MILPs). Mosek and Gurobi can be used to solve SOCPs while Mosek can also solve SDPs.</p>
-<p>Installing these solvers is very simple. Just follow the instructions on the specific solver&#8217;s page.</p>
+<p>Any other solver in <a class="reference external" href="http://www.juliaopt.org/">JuliaOpt</a> may also be used, so long as it supports the conic constraints used to express the problem. Currently, other solvers will be most useful in solving linear programs (LPs) and mixed integer linear programs (MILPs). Mosek and Gurobi can be used to solve SOCPs while Mosek can also solve SDPs. The JuliaOpt website mentioned above gives a detailed list of which solvers can solve what kind of problems.</p>
+<p>Installing these solvers is very simple. Just follow the instructions in each solver&#8217;s documentation.</p>
 <p>To use a specific solver, you can use the following syntax</p>
 <div class="highlight-python"><div class="highlight"><pre>solve!(p, GurobiSolver())
 solve!(p, MosekSolver())

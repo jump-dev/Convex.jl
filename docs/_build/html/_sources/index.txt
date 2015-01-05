@@ -13,7 +13,7 @@ and to solve those problems using a variety of different (commercial and open-so
 Convex.jl can solve
 
   * linear programs
-  * mixed-integer linear programs
+  * mixed-integer linear programs and mixed-integer second-order cone programs
   * dcp-compliant convex programs including
 
     - second-order cone programs (SOCP)
