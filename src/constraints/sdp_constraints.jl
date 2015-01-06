@@ -7,14 +7,13 @@ type SDPConstraint <: Constraint
   id_hash::Uint64
   child::AbstractExpr
   size::(Int, Int)
-  is_symmetric::Bool
 
-  function SDPConstraint(child::AbstractExpr; is_symmetric=true)
+  function SDPConstraint(child::AbstractExpr)
     sz = child.size
     if sz[1] != sz[2]
       error("Positive semidefinite expressions must be square")
     end
-    return new(:sdp, hash(child), child, sz, is_symmetric)
+    return new(:sdp, hash(child), child, sz)
   end
 end
 
@@ -29,8 +28,7 @@ end
 
 function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
-    objective = conic_form!(c.child, unique_conic_forms)
-    if c.is_symmetric
+    if (isdefined(:SCSSolver) || (isdefined(:SCS) && get_default_solver() == SCS.SCSSolver()))
       n,m = size(c.child)
       for i=1:n
         for j=i+1:m
@@ -39,10 +37,11 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
         end
       end
     end
+    objective = conic_form!(c.child, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
   end
   return get_conic_form(unique_conic_forms, c)
 end
 
-isposdef(x::AbstractExpr; is_symmetric=true) = SDPConstraint(x, is_symmetric=is_symmetric)
+isposdef(x::AbstractExpr) = SDPConstraint(x)
 

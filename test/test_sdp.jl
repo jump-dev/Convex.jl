@@ -16,6 +16,8 @@ solve!(p)
 @test_approx_eq_eps p.optval 0 TOL
 
 # Solution is obtained as y[2,2] -> infinity
+# This test fails on Mosek. See
+# https://github.com/JuliaOpt/Mosek.jl/issues/29
 y = Variable((2, 2), :Semidefinite)
 p = minimize(y[1, 1], y[1, 2] == 1)
 solve!(p)
@@ -39,13 +41,6 @@ y = Semidefinite(3)
 p = minimize(y[1, 2], y[2, 1] == 1)
 solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
-
-# Not symmetric
-x = Variable(Positive())
-y = Semidefinite(3, is_symmetric=false)
-p = minimize(y[1, 2], y[2, 1] == 1, y[1, 2] >= -1000)
-solve!(p)
-@test_approx_eq_eps p.optval -1000 TOL
 
 # trace
 y = Variable((3, 3), :Semidefinite)
