@@ -2,10 +2,17 @@ import MathProgBase
 export solve!
 
 function solve!(problem::Problem,
-                m::MathProgBase.AbstractMathProgModel=get_default_solver();
+                s::MathProgBase.AbstractMathProgSolver=get_default_solver();
                 warmstart=true)
 
+  m = MathProgBase.model(s)
+  # TODO: This is a tiny, temporary hack that will be removed once SCS.jl or SCS
+  # starts to take care of symmetry constraints.
+  old_solver = get_default_solver()
+  set_default_solver(s)
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
+  set_default_solver(old_solver)
+
   if problem.head == :maximize
     c = -c
   end
@@ -59,9 +66,6 @@ function solve!(problem::Problem,
     warn("Problem status $(problem.status); solution may be inaccurate.")
   end
 end
-
-solve!(problem::Problem, m::MathProgBase.AbstractMathProgSolver) =
-  solve!(problem, MathProgBase.model(m))
 
 function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int64, Int64)})
   x = problem.solution.primal
