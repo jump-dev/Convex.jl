@@ -3,9 +3,6 @@ using Convex
 
 TOL = 1e-2
 
-using SCS
-set_default_solver(SCSSolver())
-
 # SDP variables
 y = Variable((2,2), :Semidefinite)
 p = minimize(y[1,1])
@@ -19,6 +16,8 @@ solve!(p)
 @test_approx_eq_eps p.optval 0 TOL
 
 # Solution is obtained as y[2,2] -> infinity
+# This test fails on Mosek. See
+# https://github.com/JuliaOpt/Mosek.jl/issues/29
 y = Variable((2, 2), :Semidefinite)
 p = minimize(y[1, 1], y[1, 2] == 1)
 solve!(p)
