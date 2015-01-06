@@ -2,12 +2,18 @@
 Operations
 =====================================
 
-Convex.jl currently supports the following operations. These functions ("atoms") may be composed according to the `DCP <http://dcp.stanford.edu>`_ composition rules to form new convex, concave, or affine expressions.
+Convex.jl currently supports the following functions. 
+These functions may be composed according to the `DCP <http://dcp.stanford.edu>`_ composition rules to form new convex, concave, or affine expressions.
+Convex.jl transforms each problem into an equivalent `cone program <http://mathprogbasejl.readthedocs.org/en/latest/conic.html>`_ in order to pass the problem to a specialized solver.
+Depending on the types of functions used in the problem, the conic constraints may include linear, second-order, exponential, or semidefinite constraints, as well as any binary or integer constraints placed on the variables.
+Below, we list each function available in Convex.jl organized by the (most complex) type of cone used to represent that function,
+and indicate which solvers may be used to solve problems with those cones. 
+Problems mixing many different conic constraints can be solved by any solver that supports every kind of cone present in the problem.
 
-Linear Program Operations
-**************************
+Linear Program Representable Functions
+**************************************
 
-An optimization problem consisting of these operations can be solved by any LP solver.
+An optimization problem using only these functions can be solved by any LP solver.
 
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation               | description             | vexity     | slope         | implicit constraint / notes     |
@@ -71,11 +77,11 @@ An optimization problem consisting of these operations can be solved by any LP s
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 
 
-Second-Order Cone Operations
-*************************************
+Second-Order Cone Representable Functions
+*****************************************
 
-An optimization problem consisting of these operations can be solved by any SOCP solver (ECOS, SCS, Mosek, Gurobi, CPLEX).
-Of course, if an optimization problem has both LP and SOCP operations, any solver that can solve both LPs and SOCPs can solve the problem.
+An optimization problem using these functions can be solved by any SOCP solver (including ECOS, SCS, Mosek, Gurobi, and CPLEX).
+Of course, if an optimization problem has both LP and SOCP representable functions, then any solver that can solve both LPs and SOCPs can solve the problem.
 
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
@@ -141,10 +147,10 @@ Of course, if an optimization problem has both LP and SOCP operations, any solve
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 
-Exponential Cone Operations
-*************************************
+Exponential Cone  Representable Functions
+****************************************
 
-An optimization problem consisting of these operations can be solved by any exponential cone solver (SCS). Note that these solvers can also handle a mix of SDP and other supported operations.
+An optimization problem using these functions can be solved by any exponential cone solver (SCS). 
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | implicit constraint      |
@@ -163,10 +169,10 @@ An optimization problem consisting of these operations can be solved by any expo
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 
-Semidefinite Program Operations
-*************************************
+Semidefinite Program  Representable Functions
+********************************************
 
-An optimization problem consisting of these operations can be solved by any SDP solver (SCS, Mosek). Note that these solvers can also handle a mix of SDP and other supported operations.
+An optimization problem using these functions can be solved by any SDP solver (including SCS and Mosek). 
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | implicit constraint      |
