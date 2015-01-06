@@ -169,7 +169,7 @@ An optimization problem using these functions can be solved by any exponential c
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 
-Semidefinite Program  Representable Functions
+Semidefinite Program Representable Functions
 ********************************************
 
 An optimization problem using these functions can be solved by any SDP solver (including SCS and Mosek). 
@@ -184,6 +184,17 @@ An optimization problem using these functions can be solved by any SDP solver (i
 |:code:`lambda_max(x)`       | max eigenvalue of :math:`x`         | convex     |increasing     |x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`lambda_min(x)`       | min eigenvalue of :math:`x`         | concave    |increasing     |x is positive semidefinite|
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+
+Exponential + SDP representable Functions
+********************************************
+
+An optimization problem using these functions can be solved by any solver that supporst exponential constraints *and* semidefinite constraints simultaneously (SCS). 
+
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|operation                   | description                         | vexity     | slope         | implicit constraint      |
++============================+=====================================+============+===============+==========================+
+|:code:`logdet(x)`           | log of determinant of :math:`x`     | concave    |increasing     |x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 Promotions
