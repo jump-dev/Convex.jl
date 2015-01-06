@@ -2,12 +2,12 @@
 Operations
 =====================================
 
-Convex.jl currently supports the following functions. 
+Convex.jl currently supports the following functions.
 These functions may be composed according to the `DCP <http://dcp.stanford.edu>`_ composition rules to form new convex, concave, or affine expressions.
 Convex.jl transforms each problem into an equivalent `cone program <http://mathprogbasejl.readthedocs.org/en/latest/conic.html>`_ in order to pass the problem to a specialized solver.
 Depending on the types of functions used in the problem, the conic constraints may include linear, second-order, exponential, or semidefinite constraints, as well as any binary or integer constraints placed on the variables.
 Below, we list each function available in Convex.jl organized by the (most complex) type of cone used to represent that function,
-and indicate which solvers may be used to solve problems with those cones. 
+and indicate which solvers may be used to solve problems with those cones.
 Problems mixing many different conic constraints can be solved by any solver that supports every kind of cone present in the problem.
 
 Linear Program Representable Functions
@@ -148,9 +148,9 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 
 
 Exponential Cone  Representable Functions
-****************************************
+******************************************
 
-An optimization problem using these functions can be solved by any exponential cone solver (SCS). 
+An optimization problem using these functions can be solved by any exponential cone solver (SCS).
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | implicit constraint      |
@@ -172,7 +172,7 @@ An optimization problem using these functions can be solved by any exponential c
 Semidefinite Program Representable Functions
 ********************************************
 
-An optimization problem using these functions can be solved by any SDP solver (including SCS and Mosek). 
+An optimization problem using these functions can be solved by any SDP solver (including SCS and Mosek).
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | implicit constraint      |
@@ -189,7 +189,7 @@ An optimization problem using these functions can be solved by any SDP solver (i
 Exponential + SDP representable Functions
 ********************************************
 
-An optimization problem using these functions can be solved by any solver that supporst exponential constraints *and* semidefinite constraints simultaneously (SCS). 
+An optimization problem using these functions can be solved by any solver that supports exponential constraints *and* semidefinite constraints simultaneously (SCS).
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | implicit constraint      |

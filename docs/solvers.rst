@@ -6,11 +6,11 @@ Convex.jl transforms each problem into an equivalent `cone program <http://mathp
 Depending on the types of functions used in the problem, the conic constraints may include linear, second-order, exponential, or semidefinite constraints, as well as any binary or integer constraints placed on the variables.
 
 By default, Convex.jl uses the solver `ECOS <https://github.com/JuliaOpt/ECOS.jl>`_, which is able to solve problems with linear and second-order cone constraints (SOCPs).
-If you wish to solve problems with semidefinite or exponential cone constraints, you will need to install `SCS <https://github.com/JuliaOpt/SCS.jl>`_, which can be done by :code:`Pkg.add("SCS")`.
-Any other solver in `JuliaOpt <http://www.juliaopt.org/>`_ may also be used, so long as it supports the conic constraints used to represent the problem. 
-Most solvers other solvers in the JuliaOpt ecosystem can be used to solve (mixed integer) linear programs (LPs and MILPs). 
-Mosek and Gurobi can be used to solve SOCPs (even with binary or integer constraints), and Mosek can also solve SDPs. 
-For up-to-date information about solver capabilities, please see the table `here <http://www.juliaopt.org/>`_ 
+If you wish to solve problems with semidefinite or exponential cone constraints, you will need to install `SCS <https://github.com/JuliaOpt/SCS.jl>`_.
+Any other solver in `JuliaOpt <http://www.juliaopt.org/>`_ may also be used, so long as it supports the conic constraints used to represent the problem.
+Most solvers other solvers in the JuliaOpt ecosystem can be used to solve (mixed integer) linear programs (LPs and MILPs).
+Mosek and Gurobi can be used to solve SOCPs (even with binary or integer constraints), and Mosek can also solve SDPs.
+For up-to-date information about solver capabilities, please see the table `here <http://www.juliaopt.org/>`_
 describing which solvers can solve which kind of problems.
 
 Installing these solvers is very simple. Just follow the instructions in the documentation for that solver.
@@ -39,7 +39,7 @@ You can set or see the current default solver by
 	set_default_solver(GurobiSolver()) # or set_default_solver(ECOSSolver(verbose=0))
 	# Now Gurobi will be used by default as a solver
 
-Many of the solvers also allow options to be passed in. More details can be found in each solver's documentation. 
+Many of the solvers also allow options to be passed in. More details can be found in each solver's documentation.
 For example, if we wish to increase the maximum number of iterations for ECOS or SCS, we can do so by
 ::
 
