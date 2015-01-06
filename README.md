@@ -45,4 +45,4 @@ Note that Convex.jl was previously called CVX.jl. If you're running into bugs or
 
 ## Examples
 A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). 
-The [basic usage notebook](http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/basic.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl
+The [basic usage notebook](http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl

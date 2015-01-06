@@ -2,7 +2,7 @@
 Examples
 =====================================
 
-	* `Basic usage <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/basic.ipynb>`_
+	* `Basic usage <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/basic_usage.ipynb>`_
 	* `Control <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/control.ipynb>`_
 	* `Tomography <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/tomography/tomography.ipynb>`_
 	* `Time series <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/time_series/time_series.ipynb>`_
