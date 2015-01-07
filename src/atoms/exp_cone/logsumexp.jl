@@ -57,3 +57,4 @@ function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
 end
 
 logistic_loss(e::AbstractExpr) = logsumexp([e, Constant(zeros(size(e)))])
+# logistic_loss(e::AbstractExpr) = size(e)==(1,1) ? logsumexp([e, 0]) : error("argument to logistic_loss must be a scalar")
