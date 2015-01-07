@@ -9,3 +9,4 @@ Examples
 	* `Section allocation <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/section_allocation/section_allocation.ipynb>`_
 	* `Binary knapsack <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/binary_knapsack.ipynb>`_
 	* `Entropy maximization <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/max_entropy.ipynb>`_
+	* `Logistic regression <http://nbviewer.ipython.org/github/cvxgrp/Convex.jl/blob/master/examples/logistic_regression.ipynb>`_
