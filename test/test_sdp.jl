@@ -41,7 +41,6 @@ solve!(p)
 @test_approx_eq_eps p.optval 1 TOL
 
 # Not symmetric
-x = Variable(Positive())
 y = Semidefinite(3, is_symmetric=false)
 p = minimize(y[1, 2], y[2, 1] == 1, y[1, 2] >= -1000)
 solve!(p)

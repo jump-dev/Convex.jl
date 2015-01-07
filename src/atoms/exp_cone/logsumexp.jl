@@ -20,7 +20,7 @@ type LogSumExpAtom <: AbstractExpr
 
   function LogSumExpAtom(x::AbstractExpr)
     children = (x,)
-    return new(:logsumexp, hash(children), children, x.size)
+    return new(:logsumexp, hash(children), children, (1,1))
   end
 end
 
@@ -56,4 +56,4 @@ function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, e)
 end
 
-logistic_loss(e::AbstractExpr) = logsumexp([e, 0])
+logistic_loss(e::AbstractExpr) = logsumexp([e, Constant(zeros(size(e)))])
