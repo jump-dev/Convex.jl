@@ -113,8 +113,8 @@ function conic_problem(p::Problem)
       for idx in startidx:endidx
         vartypes[idx] = :Bin
       end
-    end   
-  end 
+    end
+  end
   return c, A, b, cones, var_to_ranges, vartypes
 end
 

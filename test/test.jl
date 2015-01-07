@@ -219,16 +219,16 @@ solve!(p)
 # Test 29
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = maximize(sum(x) + sum(y), [ [x y] <= 2])
+p = maximize(sum(x) + sum([y 4*ones(4)]), [ [x y 2*ones(4, 2)] <= 2])
 solve!(p)
-@assert abs(p.optval - 80) < TOLERANCE
+@assert abs(p.optval - 96) < TOLERANCE
 
 # Test 30
 x = Variable(4, 4)
 y = Variable(4, 6)
-p = maximize(sum(x) + sum(y), [ [x, y'] <= 2])
+p = maximize(sum(x) + sum([y 4*eye(4); x -ones(4, 6)]), [ [x, y'] <= 2])
 solve!(p)
-@assert abs(p.optval - 80) < TOLERANCE
+@assert abs(p.optval - 104) < TOLERANCE
 
 # Test 31
 x = Variable(4, 4)

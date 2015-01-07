@@ -54,6 +54,10 @@ include("atoms/exp_cone/log.jl")
 include("atoms/exp_cone/logsumexp.jl")
 include("atoms/exp_cone/entropy.jl")
 
+### other elementwise atoms
+include("atoms/huber.jl")
+include("atoms/logdet.jl")
+
 ### utilities
 include("utilities/show.jl")
 end

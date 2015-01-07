@@ -103,8 +103,11 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
 end
 
 hcat(args::AbstractExpr...) = HcatAtom(args...)
+hcat(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr, arg) for arg in args]...)
+hcat(args::Value...) = Base.cat(2, args...)
+
 
 # TODO: implement vertical concatenation in a more efficient way
-function vcat(args::AbstractExpr...)
-  HcatAtom([arg' for arg in args]...)'
-end
+vcat(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
+vcat(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr, arg)' for arg in args]...)'
+vcat(args::Value...) = Base.cat(1, args...)
