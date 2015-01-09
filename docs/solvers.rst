@@ -40,7 +40,14 @@ You can set or see the current default solver by
 	# Now Gurobi will be used by default as a solver
 
 Many of the solvers also allow options to be passed in. More details can be found in each solver's documentation.
-For example, if we wish to increase the maximum number of iterations for ECOS or SCS, we can do so by
+
+For example, if we wish to turn off printing for the ECOS solver (ie, run in quiet mode), we can do so by
+::
+
+	using ECOS
+	solve!(p, ECOSSolver(verbose=false))
+
+If we wish to increase the maximum number of iterations for ECOS or SCS, we can do so by
 ::
 
 	using ECOS
