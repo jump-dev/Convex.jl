@@ -1,6 +1,10 @@
 export EqConstraint, LtConstraint, GtConstraint
 export ==, <=, >=
 
+# global map from unique constraint ids to constraints.
+# the expression tree will only utilize constraint ids during construction
+id_to_constraints = Dict{Uint64, Constraint}()
+
 ### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
@@ -18,7 +22,10 @@ type EqConstraint <: Constraint
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(==), hash((lhs, rhs, :(==))), lhs, rhs, sz, nothing)
+    id_hash = hash((lhs, rhs, :(==)))
+    this = new(:(==), id_hash, lhs, rhs, sz, nothing)
+    id_to_constraints[id_hash] = this
+    return this
   end
 end
 
@@ -53,6 +60,7 @@ type LtConstraint <: Constraint
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -62,7 +70,10 @@ type LtConstraint <: Constraint
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(<=), hash((lhs, rhs, :(<=))), lhs, rhs, sz)
+    id_hash = hash((lhs, rhs, :(<=)))
+    this = new(:(<=), id_hash, lhs, rhs, sz, nothing)
+    id_to_constraints[id_hash] = this
+    return this
   end
 end
 
@@ -98,6 +109,7 @@ type GtConstraint <: Constraint
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -107,7 +119,10 @@ type GtConstraint <: Constraint
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(>=), hash((lhs, rhs, :(>=))), lhs, rhs, sz)
+    id_hash = hash((lhs, rhs, :(>=)))
+    this = new(:(>=), id_hash, lhs, rhs, sz, nothing)
+    id_to_constraints[id_hash] = this
+    return this
   end
 end
 

@@ -2,6 +2,7 @@ export ConicObj, ConicConstr, UniqueConicForms
 export +, -, *, promote_size, get_row
 export cache_conic_form!, has_conic_form, get_conic_form
 
+# TODO: Comment every single line
 ConicObj = Dict{Uint64, Value}
 
 function -(c::ConicObj)

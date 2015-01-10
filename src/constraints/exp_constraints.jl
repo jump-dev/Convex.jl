@@ -6,6 +6,7 @@ type ExpConstraint <: Constraint
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr, AbstractExpr) # (x, y, z)
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
     @assert(x.size == y.size == z.size,
@@ -13,7 +14,10 @@ type ExpConstraint <: Constraint
     # @assert(x.size == (1,1),
     #        "Exponential constraint requires x, y, and z to be scalar for now")
     sz = x.size
-    return new(:exp, hash((x,y,z, :exp)), (x, y, z), sz)
+    id_hash = hash((x,y,z, :exp))
+    this = new(:exp, id_hash, (x, y, z), sz, nothing)
+    id_to_constraints[id_hash] = this
+    return this
   end
 end
 

@@ -1,19 +1,25 @@
-import Base.isposdef
-export SDPConstraint, isposdef
+import Base.isposdef, Base.in
+export SDPConstraint, isposdef, in
 
 ### Positive semidefinite cone constraint
+
+# TODO: Terrible documentation. Please fix.
 type SDPConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   child::AbstractExpr
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function SDPConstraint(child::AbstractExpr)
     sz = child.size
     if sz[1] != sz[2]
       error("Positive semidefinite expressions must be square")
     end
-    return new(:sdp, hash((child, :sdp)), child, sz)
+    id_hash = hash((child, :sdp))
+    this = new(:sdp, id_hash, child, sz, nothing)
+    id_to_constraints[id_hash] = this
+    return this
   end
 end
 
@@ -43,5 +49,12 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, c)
 end
 
+# TODO: Remove isposdef, change tests to use is. Update documentation and notebooks
 isposdef(x::AbstractExpr) = SDPConstraint(x)
 
+# TODO: Throw error if symbol is invalid.
+function in(x::AbstractExpr, y::Symbol)
+  if y == :semidefinite
+    SDPConstraint(x)
+  end
+end
