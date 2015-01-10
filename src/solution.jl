@@ -1,15 +1,27 @@
 import MathProgBase
 export solve!
 
+SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.AbstractMathProgModel)
+
 function solve!(problem::Problem,
-                s::MathProgBase.AbstractMathProgSolver=get_default_solver();
+                s::SolverOrModel=get_default_solver();
                 warmstart=true)
 
-  m = MathProgBase.model(s)
+  if isa(s, MathProgBase.AbstractMathProgSolver)
+    m = MathProgBase.model(s)
+  else # it is already a model
+    m = s
+  end
+
   # TODO: This is a tiny, temporary hack that will be removed once SCS.jl or SCS
   # starts to take care of symmetry constraints.
   old_solver = get_default_solver()
-  set_default_solver(s)
+  if typeof(s).name.name == :SCSSolver
+    set_default_solver(s)
+  elseif typeof(s).name.name == :SCSMathProgModel
+    set_default_solver(Main.SCS.SCSSolver())
+  end
+
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
   set_default_solver(old_solver)
 
