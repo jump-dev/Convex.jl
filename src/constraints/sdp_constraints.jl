@@ -17,9 +17,7 @@ type SDPConstraint <: Constraint
       error("Positive semidefinite expressions must be square")
     end
     id_hash = hash((child, :sdp))
-    this = new(:sdp, id_hash, child, sz, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:sdp, id_hash, child, sz, nothing)
   end
 end
 
@@ -44,7 +42,9 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
       end
     end
     objective = conic_form!(c.child, unique_conic_forms)
-    cache_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
+    new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
+    cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
 end

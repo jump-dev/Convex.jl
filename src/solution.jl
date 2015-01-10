@@ -14,21 +14,7 @@ function solve!(problem::Problem,
     m = s
   end
 
-  # TODO: This is a tiny, temporary hack that will be removed once SCS.jl or SCS
-  # starts to take care of symmetry constraints.
-  old_solver = get_default_solver()
-  if typeof(s).name.name == :SCSSolver
-    set_default_solver(s)
-  elseif typeof(s).name.name == :SCSMathProgModel
-    set_default_solver(Main.SCS.SCSSolver())
-  end
-
-  if check_vexity
-    vex = vexity(problem)
-  end
-
-  c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)
-  set_default_solver(old_solver)
+  c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
 
   if problem.head == :maximize
     c = -c
@@ -70,6 +56,10 @@ function solve!(problem::Problem,
   end
   populate_variables!(problem, var_to_ranges)
 
+  if problem.solution.has_dual
+    populate_duals!(conic_constraints, problem.solution.dual)
+  end
+
   # minimize -> maximize
   if (problem.head == :maximize)
     problem.solution.optval = -problem.solution.optval
@@ -92,6 +82,25 @@ function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int,
     var.value = reshape(x[start_index:end_index], sz[1], sz[2])
     if sz == (1, 1)
       var.value = var.value[1]
+    end
+  end
+end
+
+function populate_duals!{T}(constraints::Array{ConicConstr}, dual::Array{T, 1})
+  constr_index = 1
+  for constraint in constraints
+    # conic_constr_to_constr only has keys for conic constraints with a single objective
+    # so this will work
+    if haskey(conic_constr_to_constr, constraint)
+      sz = constraint.sizes[1]
+      c = conic_constr_to_constr[constraint]
+      c.dual = reshape(dual[constr_index:constr_index+sz-1], c.size)
+      constr_index += sz
+    else
+      for i = 1:length(constraint.objs)
+        sz = constraint.sizes[i]
+        constr_index += sz
+      end
     end
   end
 end

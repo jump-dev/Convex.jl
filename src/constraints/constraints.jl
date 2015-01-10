@@ -1,9 +1,7 @@
 export EqConstraint, LtConstraint, GtConstraint
 export ==, <=, >=
 
-# global map from unique constraint ids to constraints.
-# the expression tree will only utilize constraint ids during construction
-id_to_constraints = Dict{Uint64, Constraint}()
+conic_constr_to_constr = Dict{ConicConstr, Constraint}()
 
 ### Linear equality constraint
 type EqConstraint <: Constraint
@@ -23,9 +21,7 @@ type EqConstraint <: Constraint
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
     id_hash = hash((lhs, rhs, :(==)))
-    this = new(:(==), id_hash, lhs, rhs, sz, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:(==), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
@@ -43,6 +39,7 @@ function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.lhs - c.rhs
     objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
@@ -71,9 +68,7 @@ type LtConstraint <: Constraint
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
     id_hash = hash((lhs, rhs, :(<=)))
-    this = new(:(<=), id_hash, lhs, rhs, sz, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:(<=), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
@@ -90,6 +85,7 @@ function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.rhs - c.lhs
     objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
@@ -120,9 +116,7 @@ type GtConstraint <: Constraint
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
     id_hash = hash((lhs, rhs, :(>=)))
-    this = new(:(>=), id_hash, lhs, rhs, sz, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:(>=), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
@@ -139,6 +133,7 @@ function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.lhs - c.rhs
     objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)

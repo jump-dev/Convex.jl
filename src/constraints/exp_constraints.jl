@@ -15,9 +15,7 @@ type ExpConstraint <: Constraint
     #        "Exponential constraint requires x, y, and z to be scalar for now")
     sz = x.size
     id_hash = hash((x,y,z, :exp))
-    this = new(:exp, id_hash, (x, y, z), sz, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:exp, id_hash, (x, y, z), sz, nothing)
   end
 end
 

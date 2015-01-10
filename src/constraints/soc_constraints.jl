@@ -11,9 +11,7 @@ type SOCConstraint <: Constraint
   function SOCConstraint(args::AbstractExpr...)
     children = tuple(args...)
     id_hash = hash((children, :soc))
-    this = new(:soc, id_hash, children, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:soc, id_hash, children, nothing)
   end
 end
 
@@ -37,9 +35,7 @@ type SOCElemConstraint <: Constraint
   function SOCElemConstraint(args::AbstractExpr...)
     children = tuple(args...)
     id_hash = hash((children, :soc_elem))
-    this = new(:soc_elem, id_hash, children, nothing)
-    id_to_constraints[id_hash] = this
-    return this
+    return new(:soc_elem, id_hash, children, nothing)
   end
 end
 
