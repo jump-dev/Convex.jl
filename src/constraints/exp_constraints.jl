@@ -13,7 +13,7 @@ type ExpConstraint <: Constraint
     # @assert(x.size == (1,1),
     #        "Exponential constraint requires x, y, and z to be scalar for now")
     sz = x.size
-    return new(:exp, hash((x,y,z)), (x, y, z), sz)
+    return new(:exp, hash((x,y,z, :exp)), (x, y, z), sz)
   end
 end
 

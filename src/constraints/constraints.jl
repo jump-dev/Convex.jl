@@ -8,6 +8,7 @@ type EqConstraint <: Constraint
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -17,7 +18,7 @@ type EqConstraint <: Constraint
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(==), hash((lhs, rhs)), lhs, rhs, sz)
+    return new(:(==), hash((lhs, rhs, :(==))), lhs, rhs, sz, nothing)
   end
 end
 
@@ -61,7 +62,7 @@ type LtConstraint <: Constraint
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(<=), hash((lhs, rhs)), lhs, rhs, sz)
+    return new(:(<=), hash((lhs, rhs, :(<=))), lhs, rhs, sz)
   end
 end
 
@@ -106,7 +107,7 @@ type GtConstraint <: Constraint
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(>=), hash((lhs, rhs)), lhs, rhs, sz)
+    return new(:(>=), hash((lhs, rhs, :(>=))), lhs, rhs, sz)
   end
 end
 

@@ -7,7 +7,7 @@ type SOCConstraint <: Constraint
 
   function SOCConstraint(args::AbstractExpr...)
     children = tuple(args...)
-    return new(:soc, hash(children), children)
+    return new(:soc, hash((children, :soc)), children)
   end
 end
 

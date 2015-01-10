@@ -13,7 +13,7 @@ type SDPConstraint <: Constraint
     if sz[1] != sz[2]
       error("Positive semidefinite expressions must be square")
     end
-    return new(:sdp, hash(child), child, sz)
+    return new(:sdp, hash((child, :sdp)), child, sz)
   end
 end
 
