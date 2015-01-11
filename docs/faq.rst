@@ -21,9 +21,14 @@ is convex and DCP compliant, and guarantees global optimality of the resulting s
 JuMP allows nonlinear programming through an interface that learns about functions via their derivatives.
 This approach is more flexible (for example, you can optimize non-convex functions), but can't
 guarantee global optimality if your function is not convex, or warn you if you've entered a non-convex formulation.
-For linear programming, the difference is more stylistic: JuMP makes it easy and fast to create constraints by
-indexing and summation (like :code:`sum{x[i], i=1:numLocation}`), whereas Convex.jl prioritizes linear algebraic and
-functional constructions (like :code:`max(x,y) < A*z`); indexing and summation are also supported, but are somewhat slower.
+
+For linear programming, the difference is more stylistic. JuMP's syntax is scalar-based and similar to AMPL and GAMS
+making it easy and fast to create constraints by indexing and summation (like :code:`sum{x[i], i=1:numLocation}`).
+Convex.jl allows (and prioritizes) linear algebraic and functional constructions (like :code:`max(x,y) < A*z`);
+indexing and summation are also supported in Convex.jl, but are somewhat slower than in JuMP.
+JuMP also lets you efficiently solve a sequence of problems when new constraints are added 
+or when coefficients are modified, 
+whereas Convex.jl parses the problem again whenever the `solve!` method is called.
 
 Where can I learn more about Convex Optimization?
 --------------------------------------------------
