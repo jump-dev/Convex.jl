@@ -10,6 +10,7 @@ function solve!(problem::Problem,
   if isa(s, MathProgBase.AbstractMathProgSolver)
     m = MathProgBase.model(s)
   else # it is already a model
+    warn("deprecated syntax. Use AbstractMathProgSolver instead. eg ECOSSolver() or SCSSolver()")
     m = s
   end
 
