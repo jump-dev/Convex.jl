@@ -10,7 +10,7 @@ FAQ
 Where can I get help?
 --------------------------------------------------
 For usage questions, please contact us via the `JuliaOpt mailing list <https://groups.google.com/forum/#!forum/julia-opt>`_.
-If you're running into bugs or have feature requests, please use the `Github Issue Tracker <https://github.com/cvxgrp/Convex.jl/issues>`_.
+If you're running into bugs or have feature requests, please use the `Github Issue Tracker <https://github.com/JuliaOpt/Convex.jl/issues>`_.
 
 How does Convex.jl differ from JuMP?
 ------------------------------------
@@ -26,8 +26,8 @@ For linear programming, the difference is more stylistic. JuMP's syntax is scala
 making it easy and fast to create constraints by indexing and summation (like :code:`sum{x[i], i=1:numLocation}`).
 Convex.jl allows (and prioritizes) linear algebraic and functional constructions (like :code:`max(x,y) < A*z`);
 indexing and summation are also supported in Convex.jl, but are somewhat slower than in JuMP.
-JuMP also lets you efficiently solve a sequence of problems when new constraints are added 
-or when coefficients are modified, 
+JuMP also lets you efficiently solve a sequence of problems when new constraints are added
+or when coefficients are modified,
 whereas Convex.jl parses the problem again whenever the `solve!` method is called.
 
 Where can I learn more about Convex Optimization?
