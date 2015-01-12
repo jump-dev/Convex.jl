@@ -1,8 +1,9 @@
 using Convex
 
 tests = ["test_utilities.jl",
-         "test.jl",
-         "test2.jl"]
+         "test_affine.jl",
+         "test_lp.jl",
+         "test_socp.jl"]
 tests_sdp = ["test_sdp.jl"]
 tests_exp = ["test_exp.jl"]
 tests_int = ["test_int.jl"]

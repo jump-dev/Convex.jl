@@ -1,17 +1,22 @@
-using Base.Test
 using Convex
+using FactCheck
 
-# length and size
-x = Variable(2,3)
-@test length(x)==6
-@test size(x)==(2,3)
-@test size(x,1)==2
-@test size(x,2)==3
+facts("Utilities") do
 
-x = Variable(3)
-@test length(x)==3
-@test size(x)==(3,1)
+  context("length and size") do
+    x = Variable(2,3)
+    @fact length(x) => 6
+    @fact size(x) => (2,3)
+    @fact size(x,1) => 2
+    @fact size(x,2) => 3
 
-x = Variable()
-@test length(x)==1
-@test size(x)==(1,1)
+    x = Variable(3)
+    @fact length(x) => 3
+    @fact size(x) => (3,1)
+
+    x = Variable()
+    @fact length(x) => 1
+    @fact size(x) => (1,1)
+  end
+
+end
