@@ -55,7 +55,7 @@ function curvature(x::MaxAtom)
 end
 
 function evaluate(x::MaxAtom)
-  return Base.max([evaluate(x)], [evaluate(y)])
+  return max(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
 # x <= this and y <= this if max(x, y) = this

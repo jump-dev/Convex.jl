@@ -30,7 +30,7 @@ end
 
 function evaluate(q::QuadOverLinAtom)
   x = evaluate(q.children[1])
-  return dot(x, x) / evaluate(q.children[2])
+  return x'*x / evaluate(q.children[2])
 end
 
 function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
