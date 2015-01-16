@@ -18,10 +18,10 @@ if isdir(Pkg.dir("Gurobi"))
     push!(solvers, GurobiSolver())
 end
 
-if isdir(Pkg.dir("Mosek"))
-    using Mosek
-    push!(solvers, MosekSolver())
-end
+# if isdir(Pkg.dir("Mosek"))
+#     using Mosek
+#     push!(solvers, MosekSolver())
+# end
 
 if isdir(Pkg.dir("GLPK")) && isdir(Pkg.dir("GLPKMathProgInterface"))
     using GLPKMathProgInterface
@@ -33,7 +33,7 @@ for solver in solvers
     println("Running tests with $(solver):")
     set_default_solver(solver)
     println(get_default_solver())
-    include("run_tests.jl")
+    include("runtests_single_solver.jl")
 end
 
 FactCheck.exitstatus()
