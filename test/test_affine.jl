@@ -41,6 +41,11 @@ facts("Affine Atoms") do
     @fact vexity(p) => AffineVexity()
     solve!(p)
     @fact p.optval => roughly(3, TOL)
+
+    p = Problem(:minimize, o, c...)
+    @fact vexity(p) => AffineVexity()
+    solve!(p)
+    @fact p.optval => roughly(3, TOL)
   end
 
   context("dot atom") do
@@ -258,5 +263,22 @@ facts("Affine Atoms") do
     @fact p.optval => roughly(104, TOL)
     @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) => roughly(104, TOL)
     @fact evaluate([x, y']) => roughly(2*ones(10, 4), TOL)
+  end
+
+  context("satisfy problems") do
+    x = Variable()
+    p = satisfy(x >= 0)
+    add_constraints!(p, x >= 1)
+    add_constraints!(p, [x >= -1, x <= 4])
+    solve!(p)
+    @fact p.status => :Optimal
+
+    p = satisfy([x >= 0, x >= 1, x <= 2])
+    solve!(p)
+    @fact p.status => :Optimal
+
+    p = maximize(1, [x >= 1, x <= 2])
+    solve!(p)
+    @fact p.status => :Optimal
   end
 end

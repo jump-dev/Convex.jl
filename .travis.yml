@@ -14,6 +14,7 @@ before_install:
   - sudo apt-get install libpcre3-dev julia -y
 script:
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("Convex"))`); Pkg.pin("Convex"); Pkg.resolve()'
+  - julia -e 'Pkg.add("GLPK"); Pkg.add("GLPKMathProgInterface")'
   - julia -e 'using Convex; @assert isdefined(:Convex); @assert typeof(Convex) === Module'
   - if [ $JULIAVERSION = "julianightlies" ]; then julia --code-coverage test/run_tests_all_solvers.jl; fi
   - if [ $JULIAVERSION = "juliareleases" ]; then julia test/run_tests_all_solvers.jl; fi

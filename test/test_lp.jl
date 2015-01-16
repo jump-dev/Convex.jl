@@ -93,6 +93,12 @@ facts("LP Atoms") do
   end
 
   context("neg atom") do
+    x = Variable(3)
+    p = minimize(1, [x >= -2, x <= -2, neg(x) >= -3])
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(1, TOL)
+    @fact evaluate(sum(neg(x))) => roughly(-6, TOL)
   end
 
   context("hinge loss atom") do

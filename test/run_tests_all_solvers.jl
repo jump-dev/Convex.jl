@@ -1,4 +1,6 @@
 using Convex
+using FactCheck
+
 solvers = Any[]
 
 if isdir(Pkg.dir("ECOS"))
@@ -21,9 +23,17 @@ if isdir(Pkg.dir("Mosek"))
     push!(solvers, MosekSolver())
 end
 
+if isdir(Pkg.dir("GLPK")) && isdir(Pkg.dir("GLPKMathProgInterface"))
+    using GLPKMathProgInterface
+    push!(solvers, GLPKSolverMIP())
+end
+
+
 for solver in solvers
     println("Running tests with $(solver):")
     set_default_solver(solver)
     println(get_default_solver())
     include("run_tests.jl")
 end
+
+FactCheck.exitstatus()

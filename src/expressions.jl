@@ -28,9 +28,9 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.length, Base.endof, Base.ndims, Base.zero, Base.convert
+import Base.sign, Base.size, Base.length, Base.endof, Base.ndims, Base.convert
 export AbstractExpr, Constraint
-export vexity, sign, size, evaluate, monotonicity, curvature, zero, length, convert
+export vexity, sign, size, evaluate, monotonicity, curvature, length, convert
 export conic_form!
 export endof, ndims
 export Value, ValueOrNothing
@@ -80,8 +80,6 @@ function length(x::AbstractExpr)
   return prod(x.size)
 end
 
-zero(x::AbstractExpr) = Constant(zeros(Float64, size(x)))
-
 ### User-defined Unions
 Value = Union(Number, AbstractArray)
 ValueOrNothing = Union(Value, Nothing)
@@ -89,9 +87,6 @@ AbstractExprOrValue = Union(AbstractExpr, Value)
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x
-
-### Indexing Utilities
-endof(x::AbstractExpr) = x.size[1] * x.size[2]
 
 function size(x::AbstractExpr, dim::Integer)
   if dim < 1

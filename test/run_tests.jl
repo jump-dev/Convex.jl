@@ -55,5 +55,3 @@ if can_solve_mip(get_default_solver())
     include(curtest)
 	end
 end
-
-FactCheck.exitstatus()
