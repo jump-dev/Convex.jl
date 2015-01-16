@@ -284,8 +284,10 @@ facts("Affine Atoms") do
     constr = x >= 0
     constr += x >= 1
     constr += x <= 10
-    constr += [x >= 2, x <= 3]
+    constr2 = x >= 0
+    constr2 += [x >= 2, x <= 3] + constr
     p = satisfy(constr)
+    @show p
     solve!(p)
     @fact p.status => :Optimal
   end

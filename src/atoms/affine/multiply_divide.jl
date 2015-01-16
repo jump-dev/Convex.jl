@@ -116,7 +116,7 @@ type DotMultiplyAtom <: AbstractExpr
       error("Cannot dot multiply two expressions of sizes $(x.size) and $(y.size)")
     end
     children = (x, y)
-    return new(:*, hash(children), children, y.size)
+    return new(:.*, hash(children), children, y.size)
   end
 end
 
@@ -148,6 +148,8 @@ end
 function .*(x::Constant, y::AbstractExpr)
   if x.size == (1, 1) || y.size == (1, 1)
     return x * y
+  elseif hash(x) == hash(y)
+    return square(x)
   else
     return DotMultiplyAtom(x, y)
   end

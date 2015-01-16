@@ -59,9 +59,6 @@ facts("SOCP Atoms") do
     @fact evaluate(quad_over_lin(A*x + b, c*x + d))[1] => roughly(17.7831, TOL)
   end
 
-  context("qol elementwise atom") do
-  end
-
   context("sum squares atom") do
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
@@ -74,15 +71,59 @@ facts("SOCP Atoms") do
   end
 
   context("square atom") do
+    x = Variable(2, 1)
+    A = [1 2; 2 1; 3 4]
+    b = [2; 3; 4]
+    p = minimize(sum(square(A*x + b)))
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(0.42105, TOL)
+    @fact evaluate(sum(square(A*x + b))) => roughly(0.42105, TOL)
+
+
+    x = Variable(2, 1)
+    A = [1 2; 2 1; 3 4]
+    b = [2; 3; 4]
+    expr = A * x + b
+    p = minimize(sum(expr * expr))
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(0.42105, TOL)
+    @fact evaluate(sum(expr * expr)) => roughly(0.42105, TOL)
+
+    p = minimize(sum(expr .* expr))
+    solve!(p)
+    @fact p.optval => roughly(0.42105, TOL)
+    @fact evaluate(sum(expr .* expr)) => roughly(0.42105, TOL)
   end
 
   context("inv pos atom") do
+    x = Variable(4)
+    p = minimize(sum(inv_pos(x)), inv_pos(x) < 2, x > 1, x == 2, 2 == x)
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(2, TOL)
+    @fact evaluate(sum(inv_pos(x))) => roughly(2, TOL)
   end
 
   context("geo mean atom") do
+    x = Variable(2)
+    y = Variable(2)
+    p = minimize(geo_mean(x, y), x >= 1, y >= 2)
+    # not DCP compliant
+    @fact vexity(p) => ConcaveVexity()
+    p = maximize(geo_mean(x, y), 1 < x, x < 2, y < 2)
+    # Just gave it a vector as an objective, not okay
+    @fact_throws solve!(p)
+
+    p = maximize(sum(geo_mean(x, y)), 1 < x, x < 2, y < 2)
+    @fact p.optval => roughly(4, TOL)
+    @fact evaluate(sum(geo_mean(x, y))) => roughly(4, TOL)
   end
 
   context("sqrt atom") do
+    x = Variable()
+    p = maximize(sqrt(x), 1 >= x)
   end
 
   context("quad form atom") do
