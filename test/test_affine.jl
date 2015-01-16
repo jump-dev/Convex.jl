@@ -280,5 +280,13 @@ facts("Affine Atoms") do
     p = maximize(1, [x >= 1, x <= 2])
     solve!(p)
     @fact p.status => :Optimal
+
+    constr = x >= 0
+    constr += x >= 1
+    constr += x <= 10
+    constr += [x >= 2, x <= 3]
+    p = satisfy(constr)
+    solve!(p)
+    @fact p.status => :Optimal
   end
 end
