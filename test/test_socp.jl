@@ -90,11 +90,6 @@ facts("SOCP Atoms") do
     solve!(p)
     @fact p.optval => roughly(0.42105, TOL)
     @fact evaluate(sum(expr * expr)) => roughly(0.42105, TOL)
-
-    p = minimize(sum(expr .* expr))
-    solve!(p)
-    @fact p.optval => roughly(0.42105, TOL)
-    @fact evaluate(sum(expr .* expr)) => roughly(0.42105, TOL)
   end
 
   context("inv pos atom") do
@@ -117,6 +112,7 @@ facts("SOCP Atoms") do
     @fact_throws solve!(p)
 
     p = maximize(sum(geo_mean(x, y)), 1 < x, x < 2, y < 2)
+    solve!(p)
     @fact p.optval => roughly(4, TOL)
     @fact evaluate(sum(geo_mean(x, y))) => roughly(4, TOL)
   end

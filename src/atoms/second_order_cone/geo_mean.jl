@@ -48,4 +48,4 @@ function conic_form!(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
 end
 
 geo_mean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
-sqrt(x::AbstractExpr) = GeoMeanAtom(x, ones(x.size[1], x.size[2]))
+sqrt(x::AbstractExpr) = GeoMeanAtom(x, Constant(ones(x.size[1], x.size[2])))

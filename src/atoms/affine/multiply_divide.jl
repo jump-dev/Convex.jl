@@ -148,8 +148,6 @@ end
 function .*(x::Constant, y::AbstractExpr)
   if x.size == (1, 1) || y.size == (1, 1)
     return x * y
-  elseif hash(x) == hash(y)
-    return square(x)
   else
     return DotMultiplyAtom(x, y)
   end
