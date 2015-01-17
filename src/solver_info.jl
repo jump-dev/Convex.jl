@@ -1,5 +1,5 @@
 using MathProgBase
-export can_solve_mip, can_solve_sdp, can_solve_exp
+export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
 export set_default_solver, get_default_solver
 
 function set_default_solver(solver::MathProgBase.MathProgSolverInterface.AbstractMathProgSolver)
@@ -39,6 +39,16 @@ function can_solve_mip(solver)
     return true
   else
     info("Only GurobiSolver, MosekSolver and GLPKSolverMIP can solve mixed integer programs")
+    return false
+  end
+end
+
+function can_solve_socp(solver)
+  name = typeof(solver).name.name
+  if name == :ECOSSolver || name == :SCSSolver || name == :SCSMathProgModel || name == :MosekSolver || name == :GurobiSolver
+    return true
+  else
+    info("Only ECOSSolver, SCSSolver, MosekSolver, GurobiSolver and SCSMathProgModel can solve second order cone programs")
     return false
   end
 end

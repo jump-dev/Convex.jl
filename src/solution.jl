@@ -5,7 +5,7 @@ SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.Abstract
 
 function solve!(problem::Problem,
                 s::SolverOrModel=get_default_solver();
-                warmstart=true)
+                warmstart=true, check_vexity=false)
 
   if isa(s, MathProgBase.AbstractMathProgSolver)
     m = MathProgBase.model(s)
@@ -21,6 +21,10 @@ function solve!(problem::Problem,
     set_default_solver(s)
   elseif typeof(s).name.name == :SCSMathProgModel
     set_default_solver(Main.SCS.SCSSolver())
+  end
+
+  if check_vexity
+    vex = vexity(problem)
   end
 
   c, A, b, cones, var_to_ranges, vartypes = conic_problem(problem)

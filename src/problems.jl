@@ -54,6 +54,26 @@ function find_variable_ranges(constraints)
   return index, constr_size, var_to_ranges
 end
 
+function vexity(p::Problem)
+  obj_vex = vexity(p.objective)
+  if p.head == :maximize
+    obj_vex = -obj_vex
+  end
+  constr_vex = ConstVexity()
+  for constr in p.constraints
+    vex = vexity(constr)
+    if typeof(constr) == GtConstraint
+      constr_vex += -vex
+    else
+      constr_vex += vex
+    end
+  end
+  if typeof(obj_vex + constr_vex) == ConcaveVexity
+    warn("Expression not DCP compliant")
+  end
+  return obj_vex + constr_vex
+end
+
 function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
   objective_var = Variable()
   objective = conic_form!(objective_var, unique_conic_forms)
@@ -65,6 +85,9 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
 end
 
 function conic_problem(p::Problem)
+  if get_vectorized_size(p.objective) != 1
+    error("Objective must be a scalar")
+  end
   # A map to hold unique constraints. Each constraint is keyed by a symbol
   # of which atom generated the constraints, and a integer hash of the child
   # expressions used by the atom

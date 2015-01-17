@@ -1,5 +1,6 @@
-using Base.Test
 using Convex
+using FactCheck
+
 TOL = 1e-2
 
 LPsolver() = get_default_solver()
@@ -11,55 +12,73 @@ else
 	MIPsolver() = get_default_solver()
 end
 
-# LP fallback interface
-x = Variable()
-p = minimize(x, x>=4.3)
-solve!(p, LPsolver())
-@test_approx_eq_eps p.optval 4.3 TOL
+facts("Mixed Integer Programs") do
 
-x = Variable(2)
-p = minimize(norm(x,1), x[1]>=4.3)
-solve!(p, LPsolver())
-@test_approx_eq_eps p.optval 4.3 TOL
+  context("lp fallback interface") do
+    x = Variable()
+    p = minimize(x, x>=4.3)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, LPsolver())
+    @fact p.optval => roughly(4.3, TOL)
 
-# integer variables
-x = Variable(:Int)
-p = minimize(x, x>=4.3)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 5 TOL
+    x = Variable(2)
+    p = minimize(norm(x,1), x[1]>=4.3)
+    @fact vexity(p) => ConvexVexity()
+    solve!(p, LPsolver())
+    @fact p.optval => roughly(4.3, TOL)
+  end
 
-x = Variable(2, :Int)
-p = minimize(sum(x), x>=4.3)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 10 TOL
+  context("integer variables") do
+    x = Variable(:Int)
+    p = minimize(x, x>=4.3)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(5, TOL)
 
-x = Variable(:Int)
-y = Variable()
-p = minimize(sum(x + y), x>=4.3, y>=7)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 12 TOL
+    x = Variable(2, :Int)
+    p = minimize(sum(x), x>=4.3)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(10, TOL)
 
-x = Variable(2, :Int)
-p = minimize(norm(x, 1), x[1]>=4.3)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 5 TOL
+    x = Variable(:Int)
+    y = Variable()
+    p = minimize(sum(x + y), x>=4.3, y>=7)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(12, TOL)
 
-x = Variable(2, :Int)
-p = minimize(sum(x), x[1]>=4.3, x>=0)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 5 TOL
+    x = Variable(2, :Int)
+    p = minimize(norm(x, 1), x[1]>=4.3)
+    @fact vexity(p) => ConvexVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(5, TOL)
 
-x = Variable(2, :Int)
-p = minimize(sum(x), x>=.5)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 2 TOL
+    x = Variable(2, :Int)
+    p = minimize(sum(x), x[1]>=4.3, x>=0)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(5, TOL)
 
-x = Variable(2, :Bin)
-p = minimize(sum(x), x>=.5)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 2 TOL
+    x = Variable(2, :Int)
+    p = minimize(sum(x), x>=.5)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(2, TOL)
+  end
 
-x = Variable(2, :Bin)
-p = minimize(sum(x), x[1]>=.5, x>=0)
-solve!(p, MIPsolver())
-@test_approx_eq_eps p.optval 1 TOL
+  context("binary variables") do
+    x = Variable(2, :Bin)
+    p = minimize(sum(x), x>=.5)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(2, TOL)
+
+    x = Variable(2, :Bin)
+    p = minimize(sum(x), x[1]>=.5, x>=0)
+    @fact vexity(p) => AffineVexity()
+    solve!(p, MIPsolver())
+    @fact p.optval => roughly(1, TOL)
+  end
+
+end

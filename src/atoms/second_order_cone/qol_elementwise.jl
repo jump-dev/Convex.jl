@@ -48,4 +48,4 @@ end
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 square(x::AbstractExpr) = QolElemAtom(x, Constant(ones(x.size[1], x.size[2])))
 inv_pos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
-sum_squares(x::AbstractExpr) = square(norm_2(x))
+sum_squares(x::AbstractExpr) = sum(square(x))
