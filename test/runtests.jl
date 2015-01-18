@@ -18,10 +18,10 @@ if isdir(Pkg.dir("Gurobi"))
     push!(solvers, GurobiSolver())
 end
 
-# if isdir(Pkg.dir("Mosek"))
-#     using Mosek
-#     push!(solvers, MosekSolver())
-# end
+if isdir(Pkg.dir("Mosek"))
+    using Mosek
+    push!(solvers, MosekSolver())
+end
 
 if isdir(Pkg.dir("GLPK")) && isdir(Pkg.dir("GLPKMathProgInterface"))
     using GLPKMathProgInterface

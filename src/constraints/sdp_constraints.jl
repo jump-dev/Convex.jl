@@ -32,15 +32,6 @@ end
 
 function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
-    if (isdefined(:SCSSolver) || (isdefined(:SCS) && get_default_solver() == SCS.SCSSolver()))
-      n,m = size(c.child)
-      for i=1:n
-        for j=i+1:m
-          # it would be worthwhile to make this more efficient by vectorizing
-          conic_form!(c.child[i,j] - c.child[j,i]==0, unique_conic_forms)
-        end
-      end
-    end
     objective = conic_form!(c.child, unique_conic_forms)
     new_constraint = ConicConstr([objective], :SDP, [c.size[1] * c.size[2]])
     conic_constr_to_constr[new_constraint] = c
