@@ -287,8 +287,44 @@ facts("Affine Atoms") do
     constr2 = x >= 0
     constr2 += [x >= 2, x <= 3] + constr
     p = satisfy(constr)
-    @show p
     solve!(p)
     @fact p.status => :Optimal
+  end
+
+  context("dual") do
+    x = Variable()
+    p = minimize(x, x >= 0)
+    solve!(p)
+    if p.solution.has_dual
+        println("Solution object has dual value, checking for dual correctness.")
+        @fact p.constraints[1].dual => roughly(1, TOL)
+    end
+
+    x = Variable()
+    p = maximize(x, x <= 0)
+    solve!(p)
+    if p.solution.has_dual
+        println("Solution object has dual value, checking for dual correctness.")
+        @fact p.constraints[1].dual => roughly(1, TOL)
+    end
+
+    x = Variable()
+    p = minimize(x, x >= 0, x == 2)
+    solve!(p)
+    if p.solution.has_dual
+        println("Solution object has dual value, checking for dual correctness.")
+        @fact p.constraints[1].dual => roughly(0, TOL)
+        @fact abs(p.constraints[2].dual) => roughly(1, TOL)
+    end
+
+    x = Variable(2)
+    A = 1.5 * eye(2)
+    p = minimize(dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
+    solve!(p)
+    if p.solution.has_dual
+        println("Solution object has dual value, checking for dual correctness.")
+        dual = [4/3; 4/3]
+        @fact all(abs(p.constraints[1].dual - dual) .<= TOL) => true
+    end
   end
 end

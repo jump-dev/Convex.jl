@@ -138,7 +138,7 @@ function conic_problem(p::Problem)
       end
     end
   end
-  return c, A, b, cones, var_to_ranges, vartypes
+  return c, A, b, cones, var_to_ranges, vartypes, constraints
 end
 
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =

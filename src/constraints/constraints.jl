@@ -1,6 +1,8 @@
 export EqConstraint, LtConstraint, GtConstraint
 export ==, <=, >=
 
+conic_constr_to_constr = Dict{ConicConstr, Constraint}()
+
 ### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
@@ -18,7 +20,8 @@ type EqConstraint <: Constraint
     else
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(==), hash((lhs, rhs, :(==))), lhs, rhs, sz, nothing)
+    id_hash = hash((lhs, rhs, :(==)))
+    return new(:(==), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
@@ -36,6 +39,7 @@ function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.lhs - c.rhs
     objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
@@ -53,6 +57,7 @@ type LtConstraint <: Constraint
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -62,7 +67,8 @@ type LtConstraint <: Constraint
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(<=), hash((lhs, rhs, :(<=))), lhs, rhs, sz)
+    id_hash = hash((lhs, rhs, :(<=)))
+    return new(:(<=), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
@@ -79,6 +85,7 @@ function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.rhs - c.lhs
     objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
@@ -98,6 +105,7 @@ type GtConstraint <: Constraint
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::(Int, Int)
+  dual::ValueOrNothing
 
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -107,7 +115,8 @@ type GtConstraint <: Constraint
     else
       error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
-    return new(:(>=), hash((lhs, rhs, :(>=))), lhs, rhs, sz)
+    id_hash = hash((lhs, rhs, :(>=)))
+    return new(:(>=), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
@@ -124,6 +133,7 @@ function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
     expr = c.lhs - c.rhs
     objective = conic_form!(expr, unique_conic_forms)
     new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
+    conic_constr_to_constr[new_constraint] = c
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
