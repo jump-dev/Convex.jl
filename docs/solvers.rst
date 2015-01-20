@@ -5,7 +5,7 @@ Solvers
 Convex.jl transforms each problem into an equivalent `cone program <http://mathprogbasejl.readthedocs.org/en/latest/conic.html>`_ in order to pass the problem to a specialized solver.
 Depending on the types of functions used in the problem, the conic constraints may include linear, second-order, exponential, or semidefinite constraints, as well as any binary or integer constraints placed on the variables.
 
-By default, Convex.jl uses the solver `SCS <https://github.com/JuliaOpt/SCS.jl>`_, which is able to solve problems with linear, second-order cone constraints (SOCPs), exponential constraints and semidefinite constraints (SDPs).
+By default, Convex.jl does not install any solvers. Many users use the solver `SCS <https://github.com/JuliaOpt/SCS.jl>`_, which is able to solve problems with linear, second-order cone constraints (SOCPs), exponential constraints and semidefinite constraints (SDPs).
 Any other solver in `JuliaOpt <http://www.juliaopt.org/>`_ may also be used, so long as it supports the conic constraints used to represent the problem.
 Most other solvers in the JuliaOpt ecosystem can be used to solve (mixed integer) linear programs (LPs and MILPs).
 Mosek and Gurobi can be used to solve SOCPs (even with binary or integer constraints), and Mosek can also solve SDPs.

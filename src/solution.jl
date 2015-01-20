@@ -1,7 +1,7 @@
 import MathProgBase
 export solve!
 
-SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.AbstractMathProgModel)
+SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.AbstractMathProgModel, Nothing)
 
 function solve!(problem::Problem,
                 s::SolverOrModel=get_default_solver();
@@ -9,9 +9,17 @@ function solve!(problem::Problem,
 
   if isa(s, MathProgBase.AbstractMathProgSolver)
     m = MathProgBase.model(s)
-  else # it is already a model
+  elseif s != nothing # it is already a model
     warn("deprecated syntax. Use AbstractMathProgSolver instead. eg ECOSSolver() or SCSSolver()")
     m = s
+  end
+
+  if s == nothing
+    error("The default solver is set to `nothing`
+         You must have at least one solver installed.
+         You can install a solver such as SCS by running:
+         Pkg.add(\"SCS\").
+         You will have to restart Julia after that.")
   end
 
   if check_vexity
