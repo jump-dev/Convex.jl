@@ -14,6 +14,10 @@ function solve!(problem::Problem,
     m = s
   end
 
+  if check_vexity
+    vex = vexity(problem)
+  end
+
   c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
 
   if problem.head == :maximize

@@ -11,14 +11,13 @@ function get_default_solver()
   return DEFAULT_SOLVER
 end
 
-if isdir(Pkg.dir("ECOS"))
-  using ECOS
-  set_default_solver(ECOSSolver())
-end
-
 if isdir(Pkg.dir("SCS")) && DEFAULT_SOLVER == nothing
   using SCS
   set_default_solver(SCSSolver())
+end
+if isdir(Pkg.dir("ECOS"))
+  using ECOS
+  set_default_solver(ECOSSolver())
 end
 if isdir(Pkg.dir("Gurobi")) && DEFAULT_SOLVER == nothing
   using Gurobi
