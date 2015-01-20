@@ -8,28 +8,36 @@ function set_default_solver(solver::MathProgBase.MathProgSolverInterface.Abstrac
 end
 
 function get_default_solver()
+  if DEFAULT_SOLVER == nothing
+    warn("No default solver currently set.")
+  end
   return DEFAULT_SOLVER
 end
 
-if isdir(Pkg.dir("SCS")) && DEFAULT_SOLVER == nothing
-  using SCS
-  set_default_solver(SCSSolver())
-end
-if isdir(Pkg.dir("ECOS"))
-  using ECOS
-  set_default_solver(ECOSSolver())
-end
-if isdir(Pkg.dir("Gurobi")) && DEFAULT_SOLVER == nothing
-  using Gurobi
-  set_default_solver(GurobiSolver())
-end
-if isdir(Pkg.dir("Mosek")) && DEFAULT_SOLVER == nothing
-  using Mosek
-  set_default_solver(MosekSolver())
+# TODO: I have not listed solvers such as CPLEX etc because I have not tested Convex with them
+solvers = [("SCS", "SCSSolver"), ("ECOS", "ECOSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
+          ("GLPKMathProgInterface", "GLPKSolverMIP")]
+
+for (dir, solver) in solvers
+  if isdir(Pkg.dir(dir)) && DEFAULT_SOLVER == nothing
+    eval(parse("using "*dir))
+    eval(parse("set_default_solver("*solver*"())"))
+  end
 end
 
+
 if get_default_solver() == nothing
-  error("You have any of ECOS.jl, SCS.jl, Mosek.jl or Gurobi.jl installed. Must have at least one of these solvers.")
+  packages = ""
+  for (dir, solver) in solvers
+    packages = packages*dir*" | "
+  end
+  warn("***********************************************************************************************
+       You don't have any of
+       "*packages*" installed.
+       You must have at least one of these solvers. You can install a solver such as SCS by running:
+       Pkg.add(\"SCS\")
+       You will have to restart Julia after that.
+       ***********************************************************************************************")
 end
 
 function can_solve_mip(solver)
