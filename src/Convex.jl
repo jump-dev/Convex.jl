@@ -39,6 +39,8 @@ include("atoms/second_order_cone/quad_over_lin.jl")
 include("atoms/second_order_cone/qol_elementwise.jl")
 include("atoms/second_order_cone/geo_mean.jl")
 include("atoms/second_order_cone/quad_form.jl")
+include("atoms/second_order_cone/PowerSOCP.jl")
+include("atoms/second_order_cone/rational_norm.jl")
 
 ### SDP atoms
 include("atoms/matrix_norm.jl")

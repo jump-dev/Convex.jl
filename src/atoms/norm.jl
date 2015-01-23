@@ -15,7 +15,7 @@ function norm(x::AbstractExpr, p=2)
   elseif p == :fro
     return norm_2(vec(x))
   else
-    error("Norm $p not defined")
+    return rational_norm(convert(Rational, p))
   end
 end
 
