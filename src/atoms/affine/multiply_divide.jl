@@ -1,12 +1,12 @@
 #############################################################################
 # multiply_divide.jl
-# Handles scalar multiplication, maatrix multiplication, and scalar division
+# Handles scalar multiplication, matrix multiplication, and scalar division
 # of variables, constants and expressions.
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
-export *
+export *, .*
 export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
@@ -15,7 +15,7 @@ type MultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function MultiplyAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == (1, 1)
@@ -44,7 +44,7 @@ end
 # the curvature of the atom will violate DCP.
 function curvature(x::MultiplyAtom)
   if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
-    return NotDCP()
+    return NotDcp()
   else
     return ConstVexity()
   end
@@ -58,12 +58,14 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
-      if x.children[1].head == :constant
+      if vexity(x.children[1]) == ConstVexity()
         const_child = x.children[1]
         expr_child = x.children[2]
-      else
+      elseif vexity(x.children[2]) == ConstVexity()
         const_child = x.children[2]
         expr_child = x.children[1]
+      else
+        error("multiplication of two non-constant expressions is not DCP compliant")
       end
       objective = conic_form!(expr_child, unique_conic_forms)
 
@@ -91,6 +93,80 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-*(x::AbstractExpr, y::AbstractExpr) = MultiplyAtom(x, y)
+function *(x::AbstractExpr, y::AbstractExpr)
+  if hash(x) == hash(y)
+    return square(x)
+  end
+  return MultiplyAtom(x, y)
+end
+
 *(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
+/(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1./y))
+
+### .*
+type DotMultiplyAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(Constant, AbstractExpr)
+  size::(Int, Int)
+
+  function DotMultiplyAtom(x::Constant, y::AbstractExpr)
+    if x.size != y.size
+      error("Cannot dot multiply two expressions of sizes $(x.size) and $(y.size)")
+    end
+    children = (x, y)
+    return new(:.*, hash(children), children, y.size)
+  end
+end
+
+function sign(x::DotMultiplyAtom)
+  return sign(x.children[1]) * sign(x.children[2])
+end
+
+function monotonicity(x::DotMultiplyAtom)
+  return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
+end
+
+function curvature(x::DotMultiplyAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::DotMultiplyAtom)
+  return evaluate(x.children[1]) .* evaluate(x.children[2])
+end
+
+function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    const_multiplier = spdiagm((vec(x.children[1].value),), (0,))
+    objective = const_multiplier * conic_form!(x.children[2], unique_conic_forms)
+    cache_conic_form!(unique_conic_forms, x, objective)
+  end
+  return get_conic_form(unique_conic_forms, x)
+end
+
+function .*(x::Constant, y::AbstractExpr)
+  if x.size == (1, 1) || y.size == (1, 1)
+    return x * y
+  else
+    return DotMultiplyAtom(x, y)
+  end
+end
+
+.*(x::Value, y::AbstractExpr) = .*(Constant(x), y)
+.*(x::AbstractExpr, y::Value) = .*(Constant(y), x)
+./(x::AbstractExpr, y::Value) = .*(1./y, x)
+
+# Old implementation using hcat
+# function .*(A::Constant, X::AbstractExpr)
+#     if size(A)!==size(X)
+#       s = size(A)
+#       if length(s)==1 && s[1] in size(X)
+#           A = reshape(A, size(X))
+#       else
+#         error("arrays must be the same size")
+#       end
+#     end
+#     return reshape(hcat([A[:][i]*X[:][i] for i=1:length(X)]...), size(X)...)
+# end
+

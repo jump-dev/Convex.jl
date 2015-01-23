@@ -13,7 +13,7 @@ type EucNormAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function EucNormAtom(x::AbstractExpr)
     children = (x,)
@@ -32,6 +32,11 @@ end
 function curvature(x::EucNormAtom)
   return ConvexVexity()
 end
+
+function evaluate(x::EucNormAtom)
+  return norm(evaluate(x.children[1]))
+end
+
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC

@@ -5,7 +5,7 @@ type QuadOverLinAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function QuadOverLinAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size[2] != 1 && y.size != (1, 1)
@@ -26,6 +26,11 @@ end
 
 function curvature(q::QuadOverLinAtom)
   return ConvexVexity()
+end
+
+function evaluate(q::QuadOverLinAtom)
+  x = evaluate(q.children[1])
+  return x'*x / evaluate(q.children[2])
 end
 
 function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)

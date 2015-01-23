@@ -7,7 +7,7 @@ type IndexAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
   rows::ArrayOrNothing
   cols::ArrayOrNothing
   inds::ArrayOrNothing
@@ -39,9 +39,9 @@ end
 
 function evaluate(x::IndexAtom)
   if x.inds == nothing
-    return getindex(evaluate(x.children[1]), rows, cols)
+    return getindex(evaluate(x.children[1]), x.rows, x.cols)
   else
-    return getindex(evaluate(x.children[1]), inds)
+    return getindex(evaluate(x.children[1]), x.inds)
   end
 end
 
@@ -52,13 +52,13 @@ function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
 
     if x.inds == nothing
       sz = length(x.cols) * length(x.rows)
-      J = Array(Int64, sz)
+      J = Array(Int, sz)
       k = 1
 
       num_rows = x.children[1].size[1]
       for c in x.cols
         for r in x.rows
-          J[k] = num_rows * (convert(Int64, c) - 1) + convert(Int64, r)
+          J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
           k += 1
         end
       end

@@ -1,1 +1,2 @@
-ECOS
+julia 0.3
+MathProgBase 0.3.8

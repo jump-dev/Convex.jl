@@ -10,42 +10,39 @@ type Variable <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   value::ValueOrNothing
-  size::(Int64, Int64)
+  size::(Int, Int)
   vexity::Vexity
   sign::Sign
-  implied_constraints::Array{Constraint, 1}
+  sets # ::Array{Symbol,1}
 
-  # is_symmetric is only needed for Semidefinite atoms. Value is ignored for everything else
-  # If you wish to force symmetricity for other variables, add x == x' as a constraint
-  function Variable(size::(Int64, Int64), sign::Sign=NoSign(); is_symmetric=true)
-    this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[])
+  function Variable(size::(Int, Int), sign::Sign=NoSign(), sets::Symbol...)
+    this = new(:variable, 0, nothing, size, AffineVexity(), sign, sets)
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
-    if !(sign == NoSign())
-      if sign == Positive()
-        push!(this.implied_constraints, this >= 0)
-      elseif sign == Negative()
-        push!(this.implied_constraints, this <= 0)
-      elseif sign == Semidefinite()
-        push!(this.implied_constraints, SDPConstraint(this, is_symmetric=is_symmetric))
-      end
-    end
     return this
   end
 
-  Variable(m::Integer, n::Integer, sign::Sign=NoSign()) = Variable((m,n), sign)
-  Variable(sign::Sign=NoSign()) = Variable((1, 1), sign)
-  Variable(size::Integer, sign::Sign=NoSign()) = Variable((size, 1), sign)
+  Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
+  Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
+  Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
+  Variable(size::(Int, Int), sets::Symbol...) = Variable(size::(Int, Int), NoSign(), sets...)
+  Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
+  Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
 end
 
-# convenience semidefinite matrix constructor
-Semidefinite(m::Integer; is_symmetric=true) = Variable((m,m), Semidefinite(), is_symmetric=is_symmetric)
-Semidefinite(m::Integer, n::Integer; is_symmetric=true) = begin
-  m==n ? Variable((m,m), Semidefinite(); is_symmetric=is_symmetric) : error("Semidefinite matrices must be square")
+Semidefinite(m::Integer) = Variable((m,m), :Semidefinite)
+function Semidefinite(m::Integer, n::Integer)
+  if m==n
+    return Variable((m,m), :Semidefinite)
+  else
+    error("Semidefinite matrices must be square")
+  end
 end
 
-# GLOBAL MAP
-# TODO: Comment David.
+# global map from unique variable ids to variables.
+# the expression tree will only utilize variable ids during construction
+# full information of the variables will be needed during stuffing
+# and after solving to populate the variables with values
 id_to_variables = Dict{Uint64, Variable}()
 
 function vexity(x::Variable)
@@ -68,8 +65,11 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
     objective[object_id(:constant)] = spzeros(vec_size, 1)
     # placeholder values in unique constraints prevent infinite recursion depth
     cache_conic_form!(unique_conic_forms, x, objective)
-    for constraint in x.implied_constraints
-      conic_form!(constraint, unique_conic_forms)
+    if !(x.sign == NoSign())
+      conic_form!(x.sign, x, unique_conic_forms)
+    end
+    for set in x.sets
+      conic_form!(set, x, unique_conic_forms)
     end
   end
   return get_conic_form(unique_conic_forms, x)

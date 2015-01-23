@@ -13,7 +13,7 @@ type MinAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function MinAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == y.size
@@ -45,7 +45,7 @@ end
 
 # The monotonicity
 function monotonicity(x::MinAtom)
-  return (Nonincreasing(), Nonincreasing())
+  return (Nondecreasing(), Nondecreasing())
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
@@ -55,7 +55,7 @@ function curvature(x::MinAtom)
 end
 
 function evaluate(x::MinAtom)
-  return Base.min([evaluate(x)], [evaluate(y)])
+  return min(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
 # x >= this and y >= this if min(x, y) = this

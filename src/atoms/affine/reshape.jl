@@ -7,9 +7,9 @@ type ReshapeAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
-  function ReshapeAtom(x::AbstractExpr, m::Int64, n::Int64)
+  function ReshapeAtom(x::AbstractExpr, m::Int, n::Int)
     if m * n != get_vectorized_size(x)
       error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
     end
@@ -38,5 +38,5 @@ function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
 end
 
 
-reshape(x::AbstractExpr, m::Int64, n::Int64) = ReshapeAtom(x, m, n)
+reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
 vec(x::AbstractExpr) = reshape(x, get_vectorized_size(x), 1)

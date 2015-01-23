@@ -1,13 +1,17 @@
 export SOCConstraint, SOCElemConstraint, conic_form!
 
+# TODO: Document this. How is this different from SOCElemConstraint? Why do we need both. How does
+# conic form work for SOC constraints.
 type SOCConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   children::Tuple
+  dual::ValueOrNothing
 
   function SOCConstraint(args::AbstractExpr...)
     children = tuple(args...)
-    return new(:soc, hash(children), children)
+    id_hash = hash((children, :soc))
+    return new(:soc, id_hash, children, nothing)
   end
 end
 
@@ -26,10 +30,12 @@ type SOCElemConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   children::Tuple
+  dual::ValueOrNothing
 
   function SOCElemConstraint(args::AbstractExpr...)
     children = tuple(args...)
-    return new(:soc_elem, hash(children), children)
+    id_hash = hash((children, :soc_elem))
+    return new(:soc_elem, id_hash, children, nothing)
   end
 end
 

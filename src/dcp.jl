@@ -12,16 +12,22 @@
 
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
-export Sign, Positive, Negative, NoSign, Semidefinite
+export Sign, Positive, Negative, NoSign
 export -, +, *
 
 # Vexity subtypes
 abstract Vexity
 type ConstVexity <: Vexity              end
-type AffineVexity <: Vexity                   end
-type ConvexVexity <: Vexity                   end
-type ConcaveVexity <: Vexity                  end
-type NotDcp <: Vexity                   end
+type AffineVexity <: Vexity             end
+type ConvexVexity <: Vexity             end
+type ConcaveVexity <: Vexity            end
+
+type NotDcp <: Vexity
+	function NotDcp()
+		warn("Expression not DCP compliant")
+    return new()
+	end
+end
 
 # Monotonocity subtypes
 abstract Monotonicity
@@ -35,7 +41,6 @@ abstract Sign
 type Positive <: Sign                   end
 type Negative <: Sign                   end
 type NoSign <: Sign                     end
-type Semidefinite <: Sign               end
 
 -(v::Vexity) = v
 -(v::ConcaveVexity) = ConvexVexity()

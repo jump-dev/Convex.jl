@@ -5,7 +5,7 @@ type QolElemAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function QolElemAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size != y.size
@@ -28,6 +28,10 @@ function curvature(q::QolElemAtom)
   return ConvexVexity()
 end
 
+function evaluate(q::QolElemAtom)
+  return (evaluate(q.children[1]).^2) ./ evaluate(q.children[2])
+end
+
 function conic_form!(q::QolElemAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, q)
     sz = q.children[1].size
@@ -44,4 +48,4 @@ end
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 square(x::AbstractExpr) = QolElemAtom(x, Constant(ones(x.size[1], x.size[2])))
 inv_pos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
-sum_squares(x::AbstractExpr) = square(norm_2(x))
+sum_squares(x::AbstractExpr) = sum(square(x))

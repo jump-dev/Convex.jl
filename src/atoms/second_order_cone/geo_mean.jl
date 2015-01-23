@@ -1,3 +1,4 @@
+import Base.sqrt
 export GeoMeanAtom, geo_mean, sqrt
 export sign, monotonicity, curvature, conic_form!
 
@@ -5,7 +6,7 @@ type GeoMeanAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function GeoMeanAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size != y.size
@@ -28,6 +29,10 @@ function curvature(q::GeoMeanAtom)
   return ConcaveVexity()
 end
 
+function evaluate(q::GeoMeanAtom)
+  return sqrt(evaluate(q.children[1]) .* evaluate(q.children[2]))
+end
+
 function conic_form!(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, q)
     sz = q.children[1].size
@@ -43,4 +48,4 @@ function conic_form!(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
 end
 
 geo_mean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
-sqrt(x::AbstractExpr) = GeoMeanAtom(x, ones(x.size[1], x.size[2]))
+sqrt(x::AbstractExpr) = GeoMeanAtom(x, Constant(ones(x.size[1], x.size[2])))

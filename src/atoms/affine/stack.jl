@@ -6,14 +6,14 @@ type HcatAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::Tuple
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function HcatAtom(args::AbstractExpr...)
     num_rows = args[1].size[1]
     num_cols = 0
     for arg in args
       if arg.size[1] != num_rows
-        error("Cannot horizonatally stack expressions of varying number of rows")
+        error("Cannot horizontally stack expressions of varying number of rows")
       end
       num_cols += arg.size[2]
     end
@@ -47,7 +47,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
       push!(objectives, conic_form!(child, unique_conic_forms))
     end
     # build a dict from variable ids to sizes
-    variable_to_sizes = Dict{Uint64, Int64}()
+    variable_to_sizes = Dict{Uint64, Int}()
     for objective in objectives
       for id in keys(objective)
         if !(id in variable_to_sizes)
@@ -103,8 +103,11 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
 end
 
 hcat(args::AbstractExpr...) = HcatAtom(args...)
+hcat(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr, arg) for arg in args]...)
+hcat(args::Value...) = Base.cat(2, args...)
+
 
 # TODO: implement vertical concatenation in a more efficient way
-function vcat(args::AbstractExpr...)
-  HcatAtom([arg' for arg in args]...)'
-end
+vcat(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
+vcat(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr, arg)' for arg in args]...)'
+vcat(args::Value...) = Base.cat(1, args...)

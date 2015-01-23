@@ -13,7 +13,7 @@ type MaxAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function MaxAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == y.size
@@ -55,7 +55,7 @@ function curvature(x::MaxAtom)
 end
 
 function evaluate(x::MaxAtom)
-  return Base.max([evaluate(x)], [evaluate(y)])
+  return max(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
 # x <= this and y <= this if max(x, y) = this

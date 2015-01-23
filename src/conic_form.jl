@@ -2,6 +2,7 @@ export ConicObj, ConicConstr, UniqueConicForms
 export +, -, *, promote_size, get_row
 export cache_conic_form!, has_conic_form, get_conic_form
 
+# TODO: Comment every single line
 ConicObj = Dict{Uint64, Value}
 
 function -(c::ConicObj)
@@ -30,7 +31,7 @@ function +(c::ConicObj, d::ConicObj)
   return new_obj
 end
 
-function get_row(c::ConicObj, row::Int64)
+function get_row(c::ConicObj, row::Int)
   new_obj = ConicObj()
   for (var, coeff) in c
     new_obj[var] = coeff[row, :]
@@ -47,7 +48,7 @@ function *(v::Value, c::ConicObj)
   return new_obj
 end
 
-function promote_size(c::ConicObj, vectorized_size::Int64)
+function promote_size(c::ConicObj, vectorized_size::Int)
   new_obj = copy(c)
   for var in keys(new_obj)
     new_obj[var] = repmat(new_obj[var], vectorized_size, 1)
@@ -58,11 +59,11 @@ end
 type ConicConstr
   objs::Array{ConicObj}
   cone::Symbol
-  sizes::Array{Int64}
+  sizes::Array{Int}
 end
 
 UniqueExpMap = Dict{(Symbol, Uint64), ConicObj}
-UniqueConstrMap = Dict{(Symbol, Uint64), Int64}
+UniqueConstrMap = Dict{(Symbol, Uint64), Int}
 UniqueConstrList = Array{ConicConstr}
 
 type UniqueConicForms

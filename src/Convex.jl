@@ -1,5 +1,6 @@
 module Convex
 
+global DEFAULT_SOLVER = nothing
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
@@ -7,10 +8,12 @@ include("conic_form.jl")
 include("variable.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
+include("constraints/signs_and_sets.jl")
 include("constraints/soc_constraints.jl")
 include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
+include("solver_info.jl")
 include("solution.jl")
 
 ### affine atoms
@@ -43,12 +46,19 @@ include("atoms/second_order_cone/PowerSOCP.jl")
 include("atoms/second_order_cone/rational_norm.jl")
 
 ### SDP atoms
-include("atoms/matrix_norm.jl")
+include("atoms/sdp_cone/nuclear_norm.jl")
+include("atoms/sdp_cone/operator_norm.jl")
+include("atoms/sdp_cone/lambda_min_max.jl")
 
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")
 include("atoms/exp_cone/log.jl")
 include("atoms/exp_cone/logsumexp.jl")
+include("atoms/exp_cone/entropy.jl")
+
+### other elementwise atoms
+include("atoms/huber.jl")
+include("atoms/logdet.jl")
 
 ### utilities
 include("utilities/show.jl")

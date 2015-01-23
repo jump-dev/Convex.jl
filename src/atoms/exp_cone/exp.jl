@@ -15,7 +15,7 @@ type ExpAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr,)
-  size::(Int64, Int64)
+  size::(Int, Int)
 
   function ExpAtom(x::AbstractExpr)
     children = (x,)

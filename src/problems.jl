@@ -8,14 +8,13 @@ Float64OrNothing = Union(Float64, Nothing)
 type Solution{T<:Number}
   primal::Array{T, 1}
   dual::Array{T, 1}
-  slack::Array{T, 1}
   status::Symbol
   optval::T
   has_dual::Bool
 end
 
-Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], T[], status, optval, false)
-Solution{T}(x::Array{T, 1}, y::Array{T, 1}, z::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, z, status, optval, true)
+Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], status, optval, false)
+Solution{T}(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, status, optval, true)
 
 type Problem
   head::Symbol
@@ -39,7 +38,7 @@ end
 function find_variable_ranges(constraints)
   index = 0
   constr_size = 0
-  var_to_ranges = Dict{Uint64, (Int64, Int64)}()
+  var_to_ranges = Dict{Uint64, (Int, Int)}()
   for constraint in constraints
     for i = 1:length(constraint.objs)
       for (id, val) in constraint.objs[i]
@@ -55,6 +54,26 @@ function find_variable_ranges(constraints)
   return index, constr_size, var_to_ranges
 end
 
+function vexity(p::Problem)
+  obj_vex = vexity(p.objective)
+  if p.head == :maximize
+    obj_vex = -obj_vex
+  end
+  constr_vex = ConstVexity()
+  for constr in p.constraints
+    vex = vexity(constr)
+    if typeof(constr) == GtConstraint
+      constr_vex += -vex
+    else
+      constr_vex += vex
+    end
+  end
+  if typeof(obj_vex + constr_vex) == ConcaveVexity
+    warn("Expression not DCP compliant")
+  end
+  return obj_vex + constr_vex
+end
+
 function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
   objective_var = Variable()
   objective = conic_form!(objective_var, unique_conic_forms)
@@ -66,6 +85,9 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
 end
 
 function conic_problem(p::Problem)
+  if get_vectorized_size(p.objective) != 1
+    error("Objective must be a scalar")
+  end
   # A map to hold unique constraints. Each constraint is keyed by a symbol
   # of which atom generated the constraints, and a integer hash of the child
   # expressions used by the atom
@@ -79,7 +101,7 @@ function conic_problem(p::Problem)
 
   A = spzeros(constr_size, var_size)
   b = spzeros(constr_size, 1)
-  cones = (Symbol, UnitRange{Int64})[]
+  cones = (Symbol, UnitRange{Int})[]
   constr_index = 0
   for constraint in constraints
     total_constraint_size = 0
@@ -98,7 +120,25 @@ function conic_problem(p::Problem)
     end
     push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
   end
-  return c, A, b, cones, var_to_ranges
+
+  # find integral and boolean variables
+  vartypes = fill(:Cont, length(c))
+  for var_id in keys(var_to_ranges)
+    variable = id_to_variables[var_id]
+    if :Int in variable.sets
+      startidx, endidx = var_to_ranges[var_id]
+      for idx in startidx:endidx
+        vartypes[idx] = :Int
+      end
+    end
+    if :Bin in variable.sets
+      startidx, endidx = var_to_ranges[var_id]
+      for idx in startidx:endidx
+        vartypes[idx] = :Bin
+      end
+    end
+  end
+  return c, A, b, cones, var_to_ranges, vartypes, constraints
 end
 
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
@@ -134,3 +174,12 @@ satisfy(constraint::Constraint) = satisfy([constraint])
 add_constraints!{T<:Constraint}(p::Problem, constraints::Array{T}) = +(p.constraints, constraints)
 add_constraints!(p::Problem, constraint::Constraint) = add_constraints!(p, [constraint])
 add_constraint! = add_constraints!
+
+# caches conic form of x when x is the solution to the optimization problem p
+function cache_conic_form!(conic_forms::UniqueConicForms, x::AbstractExpr, p::Problem)
+  objective = conic_form!(p.objective, conic_forms)
+  for c in p.constraints
+    conic_form!(c, conic_forms)
+  end
+  cache_conic_form!(conic_forms, x, objective)
+end

@@ -1,11 +1,12 @@
 export ExpConstraint, conic_form!, vexity
 
-### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z
+### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
 type ExpConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   children::(AbstractExpr, AbstractExpr, AbstractExpr) # (x, y, z)
-  size::(Int64, Int64)
+  size::(Int, Int)
+  dual::ValueOrNothing
 
   function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
     @assert(x.size == y.size == z.size,
@@ -13,11 +14,14 @@ type ExpConstraint <: Constraint
     # @assert(x.size == (1,1),
     #        "Exponential constraint requires x, y, and z to be scalar for now")
     sz = x.size
-    return new(:exp, hash((x,y,z)), (x, y, z), sz)
+    id_hash = hash((x,y,z, :exp))
+    return new(:exp, id_hash, (x, y, z), sz, nothing)
   end
 end
 
 ExpConstraint(x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(x, Constant(y), z)
+ExpConstraint(x::AbstractExpr, y::AbstractExpr, z) = ExpConstraint(x, y, Constant(z))
+ExpConstraint(x, y::AbstractExpr, z::AbstractExpr) = ExpConstraint(Constant(x), y, z)
 
 function vexity(c::ExpConstraint)
   # TODO: check these...

@@ -9,9 +9,9 @@
 ##                               -- is operated
 ## id_hash::Uint64               -- identifier hash, can be a hash of children
 ##                                  or a unique identifier of the object
-## size::(Int64, Int64)          -- size of the resulting expression
+## size::(Int, Int)          -- size of the resulting expression
 #
-# Constans and variables do not have children.
+# Constants and variables do not have children.
 #
 # In addition, each atom must implement the following functions:
 ## sign: returns the sign of the result of the expression
@@ -28,9 +28,9 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.endof, Base.ndims
+import Base.sign, Base.size, Base.length, Base.endof, Base.ndims, Base.convert
 export AbstractExpr, Constraint
-export vexity, sign, size, evaluate, monotonicity, curvature
+export vexity, sign, size, evaluate, monotonicity, curvature, length, convert
 export conic_form!
 export endof, ndims
 export Value, ValueOrNothing
@@ -76,12 +76,17 @@ function size(x::AbstractExpr)
   return x.size
 end
 
+function length(x::AbstractExpr)
+  return prod(x.size)
+end
+
 ### User-defined Unions
 Value = Union(Number, AbstractArray)
 ValueOrNothing = Union(Value, Nothing)
+AbstractExprOrValue = Union(AbstractExpr, Value)
 
-### Indexing Utilities
-endof(x::AbstractExpr) = x.size[1] * x.size[2]
+convert(::Type{AbstractExpr}, x::Value) = Constant(x)
+convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
 function size(x::AbstractExpr, dim::Integer)
   if dim < 1
