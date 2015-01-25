@@ -163,6 +163,6 @@ facts("SOCP Atoms") do
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(13.218, TOL)
-    @fact evaluate(norm(A * x, p)) => roughly(10.9705, TOL)
+    @fact evaluate(norm(A * x, 4.5)) => roughly(10.9705, TOL)
   end
 end
