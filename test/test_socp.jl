@@ -150,4 +150,19 @@ facts("SOCP Atoms") do
     @fact evaluate(sum(huber(x, 1))) => roughly(9, TOL)
   end
 
+  context("rational norm atom") do
+    A = [-1.175 -1.753  -1.791;
+         -0.998 0.446   -0.130;
+         1.194  0.978   -1.175];
+    B = [0.089  0.617   0.527;
+         -0.422 0.596   -1.344;
+         -1.650 -0.618  -1.234];
+    b = A * ones(3);
+    x = Variable(3)
+    p = minimize(norm(A * x, 4.5), [B * x == b]);
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(13.218, TOL)
+    @fact evaluate(norm(A * x, p)) => roughly(10.9705, TOL)
+  end
 end

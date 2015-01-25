@@ -14,8 +14,10 @@ function norm(x::AbstractExpr, p=2)
     return norm_inf(x)
   elseif p == :fro
     return norm_2(vec(x))
+  elseif p > 1
+    return rational_norm(x, convert(Rational, p))
   else
-    return rational_norm(convert(Rational, p))
+    error("p-norms not defined for p < 1")
   end
 end
 
