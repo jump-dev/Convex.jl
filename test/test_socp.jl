@@ -151,18 +151,48 @@ facts("SOCP Atoms") do
   end
 
   context("rational norm atom") do
-    A = [-1.175 -1.753  -1.791;
-         -0.998 0.446   -0.130;
-         1.194  0.978   -1.175];
-    B = [0.089  0.617   0.527;
-         -0.422 0.596   -1.344;
-         -1.650 -0.618  -1.234];
+    A = [1 2 3; -1 2 3];
     b = A * ones(3);
-    x = Variable(3)
-    p = minimize(norm(A * x, 4.5), [B * x == b]);
+    x = Variable(3);
+    p = minimize(norm(x, 4.5), [A * x == b]);
     @fact vexity(p) => ConvexVexity()
+    # Solution is approximately x = [1, .93138, 1.04575]
     solve!(p)
-    @fact p.optval => roughly(13.218, TOL)
-    @fact evaluate(norm(A * x, 4.5)) => roughly(10.9705, TOL)
+    @fact p.optval => roughly(1.2717, TOL)
+    @fact evaluate(norm(x, 4.5)) => roughly(1.2717, TOL)
+  end
+
+  context("rational norm dual norm") do
+    v = [0.463339, 0.0216084, -2.07914, 0.99581, 0.889391];
+    x = Variable(5);
+    q = 1.73;  # q norm constraint
+    qs = q / (q - 1);  # Conjugate to q
+    p = minimize(x' * v);
+    p.constraints += (norm(x, q) <= 1);
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)  # Solution is -norm(v, q / (q - 1))
+    @fact p.optval => roughly(-2.35014, TOL)
+    @fact sum(evaluate(x' * v)) => roughly(-2.35014, TOL)
+    @fact evaluate(norm(x, q)) => roughly(1, TOL)
+  end
+  
+  context("rational norm atom sum") do
+    A = [-0.719255  -0.229089;
+         -1.33632   -1.37121;
+         0.703447  -1.4482];
+    b = [-1.82041, -1.67516, -0.866884];
+    q = 1.5;
+    xvar = Variable(2);
+    p = minimize(.5 * sum_squares(xvar) + norm(A * xvar - b, q));
+    @fact vexity(p) => ConvexVexity();
+    solve!(p)
+    # Compute gradient, check it is zero(ish)
+    x_opt = xvar.value;
+    margins = A * x_opt - b;
+    qs = q / (q - 1);  # Conjugate
+    denom = sum(abs(margins).^q)^(1/qs);
+    g = x_opt + A' * (abs(margins).^(q-1) .* sign(margins)) / denom;
+    @fact p.optval => roughly(1.7227, TOL);
+    @fact norm(g, 2) => roughly(0, TOL);
   end
 end
