@@ -4,8 +4,10 @@
 # Handles the k-norms for k > 1 where k is rational. Reduces the
 # k-norm constraint to at most 2d ceil(log2(n + m)) + O(d) second
 # order cone constraints. Here d is the dimension of the problem and k
-# is converted to a rational with value k = n / m. See Duchi &
-# Namkoong (2014)'s paper for details.
+# is converted to a rational with value k = n / m. The procedure for
+# this is based on the paper "Second-order cone programming" by
+# F. Alizadeh and D. Goldfarb, Mathematical Programming, Series B,
+# 95:3-51, 2001.
 #############################################################################
 
 export rational_norm
