@@ -387,6 +387,7 @@ function ReduceThirdTwo(curr_inequality::InequalityExpression,
       curr_inequality.power1 = (p1 - 1) / 2;
       curr_inequality.power2 = (p2 - 1) / 2;
       curr_inequality.power3 = 2;
+      curr_inequality.u_var_ind = new_y_ind;
       return ReducePowers(curr_inequality,
                           vcat(ineq_array, [new_y_ineq, new_w_ineq]),
                           vcat(var_array, [new_y_ind, new_w_ind]));
@@ -404,6 +405,7 @@ function ReduceThirdTwo(curr_inequality::InequalityExpression,
       curr_inequality.power1 = (p1 - 1) / 2;
       curr_inequality.power2 = p2 / 2;
       curr_inequality.power3 = 2;
+      curr_inequality.u_var_ind = new_y_ind;
       return ReducePowers(curr_inequality,
                           vcat(ineq_array, [new_y_ineq, new_w_ineq]),
                           vcat(var_array, [new_y_ind, new_w_ind]));
@@ -419,6 +421,7 @@ function ReduceThirdTwo(curr_inequality::InequalityExpression,
       curr_inequality.power1 = p1 / 2;
       curr_inequality.power2 = (p2 - 1) / 2;
       curr_inequality.power3 = 2;
+      curr_inequality.u_var_ind = new_y_ind;
       return ReducePowers(curr_inequality,
                           vcat(ineq_array, [new_y_ineq, new_w_ineq]),
                           vcat(var_array, [new_y_ind, new_w_ind]));

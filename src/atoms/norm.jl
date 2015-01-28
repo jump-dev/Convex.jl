@@ -15,7 +15,8 @@ function norm(x::AbstractExpr, p=2)
   elseif p == :fro
     return norm_2(vec(x))
   elseif p > 1
-    return rational_norm(x, convert(Rational, p))
+    # TODO: allow tolerance in the rationalize step
+    return rational_norm(x, rationalize(Int64, p))
   else
     error("p-norms not defined for p < 1")
   end

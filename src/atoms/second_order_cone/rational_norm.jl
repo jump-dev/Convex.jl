@@ -19,9 +19,9 @@ type RationalNormAtom <: AbstractExpr
   id_hash::Uint64
   children::(AbstractExpr,)
   size::(Int, Int)
-  k::Rational
+  k::Rational{Int64}
 
-  function RationalNormAtom(x::AbstractExpr, k::Rational)
+  function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})
     children = (x,)
     k >= 1 || error("p-norms not defined for p < 1")
     return new(:rational_norm, hash(children), children, (1,1), k)
@@ -45,7 +45,7 @@ function evaluate(x::RationalNormAtom)
   return sum(abs(evaluate(x.children[1])).^x.k)^(1/x.k);
 end
 
-rational_norm(x::AbstractExpr, k::Rational) = RationalNormAtom(x, k::Rational)
+rational_norm(x::AbstractExpr, k::Rational{Int64}) = RationalNormAtom(x, k::Rational{Int64})
 
 # conic_form!(x::RationalNormAtom, unique_conic_forms)
 #
@@ -86,7 +86,7 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
                                                    numerator - denominator);
     if (length(ineq_list) > 10)
       warn(string("Rational norm generating ", length(ineq_list),
-                  " intermediate constraints.\n\tResults may be innacurate"));
+                  " intermediate constraints.\n\tMay be slow"));
     end
     # u corresponds to "introduced" variables; make a matrix of them
     # and then add equality constraints for the first and second

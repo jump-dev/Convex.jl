@@ -165,15 +165,17 @@ facts("SOCP Atoms") do
   context("rational norm dual norm") do
     v = [0.463339, 0.0216084, -2.07914, 0.99581, 0.889391];
     x = Variable(5);
-    q = 1.72;  # q norm constraint
+    q = 1.379;  # q norm constraint that generates many inequalities
     qs = q / (q - 1);  # Conjugate to q
     p = minimize(x' * v);
     p.constraints += (norm(x, q) <= 1);
     @fact vexity(p) => ConvexVexity()
     solve!(p)  # Solution is -norm(v, q / (q - 1))
-    @fact p.optval => roughly(-2.34389, TOL)
-    @fact sum(evaluate(x' * v)) => roughly(-2.34389, TOL)
+    @fact p.optval => roughly(-2.144087, TOL)
+    @fact sum(evaluate(x' * v)) => roughly(-2.144087, TOL)
+    @fact sum(evaluate(x' * v)) => roughly(-2.144087, TOL)
     @fact evaluate(norm(x, q)) => roughly(1, TOL)
+    @fact sum(evaluate(x' * v)) => roughly(-sum(abs(v).^qs)^(1/qs), TOL);
   end
   
   context("rational norm atom sum") do
