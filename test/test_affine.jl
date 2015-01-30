@@ -265,6 +265,30 @@ facts("Affine Atoms") do
     @fact evaluate([x, y']) => roughly(2*ones(10, 4), TOL)
   end
 
+  context("diagm atom") do
+    x = Variable(2, 2)
+    @fact_throws diagm(x)
+
+    x = Variable(4)
+    p = minimize(sum(diagm(x)), x == [1; 2; 3; 4])
+    @fact vexity(p) => AffineVexity()
+    solve!(p)
+    @fact p.optval => roughly(10, TOL)
+    @fact all(abs(evaluate(diagm(x)) - diagm([1; 2; 3; 4])) .<= TOL) => true
+
+    x = Variable(3)
+    c = [1; 2; 3]
+    p = minimize(c' * diagm(x) * c, x >= 1, sum(x) == 10)
+    @fact vexity(p) => AffineVexity()
+    solve!(p)
+    @fact p.optval => roughly(21, TOL)
+
+    x = Variable(3)
+    p = minimize(sum(x), x >= 1, diagm(x)[1, 2] == 1)
+    @fact solve!(p) => nothing
+    @fact (p.status != :Optimal) => true
+  end
+
   context("satisfy problems") do
     x = Variable()
     p = satisfy(x >= 0)
