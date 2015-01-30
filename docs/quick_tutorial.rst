@@ -28,7 +28,7 @@ This problem can be solved in Convex.jl as follows:
 
 	# The problem is to minimize ||Ax - b||^2 subject to x >= 0
 	# This can be done by: minimize(objective, constraints)
-	problem = minimize(sum_squares(A * x + b), [x >= 0])
+	problem = minimize(sum_squares(A * x - b), [x >= 0])
 
 	# Solve the problem by calling solve!
 	solve!(problem)
@@ -42,6 +42,6 @@ This problem can be solved in Convex.jl as follows:
 .. Get the dual value
 .. problem.constraints[1].dual_value
 
-	# Optimal value of variable x or expression sum_squares(A * x + b)
+	# Optimal value of variable x or expression sum_squares(A * x - b)
 	evaluate(x)
-	evaluate(sum_squares(A * x + b))
+	evaluate(sum_squares(A * x - b))
