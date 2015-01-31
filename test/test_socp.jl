@@ -150,4 +150,55 @@ facts("SOCP Atoms") do
     @fact evaluate(sum(huber(x, 1))) => roughly(9, TOL)
   end
 
+  context("rational norm atom") do
+    A = [1 2 3; -1 2 3];
+    b = A * ones(3);
+    x = Variable(3);
+    p = minimize(norm(x, 4.5), [A * x == b]);
+    @fact vexity(p) => ConvexVexity()
+    # Solution is approximately x = [1, .93138, 1.04575]
+    solve!(p)
+    @fact p.optval => roughly(1.2717, TOL)
+    @fact evaluate(norm(x, 4.5)) => roughly(1.2717, TOL)
+  end
+
+  context("rational norm dual norm") do
+    # Hack to make sure that the SCS Solver runs for 10000 iterations.
+    s = get_default_solver()
+    if typeof(s).name.name == :SCSSolver
+      s = SCSSolver(verbose=0,max_iters=10000);
+    end
+    v = [0.463339, 0.0216084, -2.07914, 0.99581, 0.889391];
+    x = Variable(5);
+    q = 1.379;  # q norm constraint that generates many inequalities
+    qs = q / (q - 1);  # Conjugate to q
+    p = minimize(x' * v);
+    p.constraints += (norm(x, q) <= 1);
+    @fact vexity(p) => ConvexVexity()
+    solve!(p, s)  # Solution is -norm(v, q / (q - 1))
+    @fact p.optval => roughly(-2.144087, TOL)
+    @fact sum(evaluate(x' * v)) => roughly(-2.144087, TOL)
+    @fact evaluate(norm(x, q)) => roughly(1, TOL)
+    @fact sum(evaluate(x' * v)) => roughly(-sum(abs(v).^qs)^(1/qs), TOL);
+  end
+  
+  context("rational norm atom sum") do
+    A = [-0.719255  -0.229089;
+         -1.33632   -1.37121;
+         0.703447  -1.4482];
+    b = [-1.82041, -1.67516, -0.866884];
+    q = 1.5;
+    xvar = Variable(2);
+    p = minimize(.5 * sum_squares(xvar) + norm(A * xvar - b, q));
+    @fact vexity(p) => ConvexVexity();
+    solve!(p)
+    # Compute gradient, check it is zero(ish)
+    x_opt = xvar.value;
+    margins = A * x_opt - b;
+    qs = q / (q - 1);  # Conjugate
+    denom = sum(abs(margins).^q)^(1/qs);
+    g = x_opt + A' * (abs(margins).^(q-1) .* sign(margins)) / denom;
+    @fact p.optval => roughly(1.7227, TOL);
+    @fact norm(g, 2) => roughly(0, TOL);
+  end
 end
