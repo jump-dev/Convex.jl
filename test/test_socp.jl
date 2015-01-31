@@ -163,6 +163,11 @@ facts("SOCP Atoms") do
   end
 
   context("rational norm dual norm") do
+    # Hack to make sure that the SCS Solver runs for 10000 iterations.
+    s = get_default_solver()
+    if typeof(s).name.name == :SCSSolver
+      s = SCSSolver(verbose=0,max_iters=10000);
+    end
     v = [0.463339, 0.0216084, -2.07914, 0.99581, 0.889391];
     x = Variable(5);
     q = 1.379;  # q norm constraint that generates many inequalities
@@ -170,9 +175,8 @@ facts("SOCP Atoms") do
     p = minimize(x' * v);
     p.constraints += (norm(x, q) <= 1);
     @fact vexity(p) => ConvexVexity()
-    solve!(p)  # Solution is -norm(v, q / (q - 1))
+    solve!(p, s)  # Solution is -norm(v, q / (q - 1))
     @fact p.optval => roughly(-2.144087, TOL)
-    @fact sum(evaluate(x' * v)) => roughly(-2.144087, TOL)
     @fact sum(evaluate(x' * v)) => roughly(-2.144087, TOL)
     @fact evaluate(norm(x, q)) => roughly(1, TOL)
     @fact sum(evaluate(x' * v)) => roughly(-sum(abs(v).^qs)^(1/qs), TOL);
