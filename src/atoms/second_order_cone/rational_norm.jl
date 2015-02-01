@@ -7,7 +7,8 @@
 # is converted to a rational with value k = n / m. The procedure for
 # this is based on the paper "Second-order cone programming" by
 # F. Alizadeh and D. Goldfarb, Mathematical Programming, Series B,
-# 95:3-51, 2001.
+# 95:3-51, 2001, and is documented in the pdf available at
+# https://github.com/JuliaOpt/Convex.jl/docs/supplementary/rational_to_socp.pdf
 #############################################################################
 
 export rational_norm
