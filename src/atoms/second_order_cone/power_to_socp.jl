@@ -10,7 +10,7 @@
 # norm([2x, t - s]) <= t + s, t >= 0, s >= 0.
 #
 # This reduction is documented in the pdf available at
-# https://github.com/JuliaOpt/Convex.jl/docs/supplementary/rational_to_socp.pdf
+# https://github.com/JuliaOpt/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf
 
 module psocp
 
