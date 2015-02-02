@@ -4,7 +4,8 @@
 
 Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and dcp-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/karanveerm/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
 
-Detailed documentation, installation instructions and examples for Convex.jl can be found [here](http://convexjl.readthedocs.org/). Below, we give some basic usage guide.
+*Detailed documentation, installation instructions and examples for Convex.jl can be found [here](http://convexjl.readthedocs.org/).* 
+Below, we give a brief introduction to basic usage.
 
 
 ## Installation
@@ -36,7 +37,7 @@ solve!(problem)
 # Check the status of the problem
 problem.status # :Optimal, :Infeasible, :Unbounded etc.
 
-# Get the optimum value
+# Get the optimal value
 problem.optval
 ```
 
@@ -46,3 +47,19 @@ Note that Convex.jl was previously called CVX.jl. If you're running into bugs or
 ## Examples
 A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). 
 The [basic usage notebook](http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl
+
+
+## Citing this package
+
+If you use Convex.jl for published work, we encourage you to cite the software using the following BibTeX citation:
+```
+@article{convexjl,
+ title = {Convex Optimization in {J}ulia},
+ author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
+ year = {2014},
+ journal = {SC14 Workshop on High Performance Technical Computing in Dynamic Languages},
+ archivePrefix = "arXiv",
+ eprint = {1410.4821},
+ primaryClass = "math-oc",
+}
+```

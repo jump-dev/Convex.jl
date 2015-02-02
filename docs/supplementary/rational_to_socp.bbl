@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alizadeh and Goldfarb(2001)]{AlizadehGo01}
+F.~Alizadeh and D.~Goldfarb.
+\newblock Second-order cone programming.
+\newblock \emph{Mathematical Programming, Series B}, 95:\penalty0 3--51, 2001.
+
+\end{thebibliography}

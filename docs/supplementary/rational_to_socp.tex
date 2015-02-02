@@ -1,0 +1,276 @@
+\documentclass[11pt]{article}
+
+% \usepackage{statistics-macros}
+\usepackage{hyperref}
+\usepackage[numbers,square]{natbib}
+\usepackage[top=2.54cm,bottom=2.54cm,left=2.54cm,right=2.54cm]{geometry}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{xifthen}
+\usepackage{xspace}
+\usepackage{bbm}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\norm}[1]{\left\|{#1}\right\|} % A norm with 1 argument
+\newcommand{\lone}[1]{\norm{#1}_1} % l1 norm
+\newcommand{\ltwo}[1]{\norm{#1}_2} % l2 norm
+\newcommand{\linf}[1]{\norm{#1}_\infty} % l-infinity norm
+
+\begin{document}
+
+\begin{center}
+  {\LARGE $p$-norm cones and second-order cone representations} \\
+  \vspace{.2cm}
+  {\large John C.\ Duchi} \\
+\end{center}
+
+In this note, we review how a few power inequalities, and related $p$-norm
+constraints for (rational) $p \in (1, \infty)$, may be represented as second
+order cone programs. These results follow~\citet{AlizadehGo01}, who
+enumerate the reductions below and several more such inequalities.
+
+Our starting point is to note that given a vector $w \in \R^n$ and points
+$x, y \ge 0$, the constraint
+\begin{equation*}
+  \ltwo{w} \le xy
+\end{equation*}
+is equivalent to the constraint
+\begin{equation}
+  \label{eqn:rotated-cone}
+  \ltwo{\left[\begin{matrix} 2w \\ x - y \end{matrix}\right]}
+  \le x + y,
+  ~~ x \ge 0, y \ge 0,
+\end{equation}
+which is evident by squaring both sides and rearranging.  Thus, we also
+obtain that the set of $t, x, y$ such that $x, y \ge 0$ and $t^2 \le xy$ is
+representable as a second-order cone. This insight allows us to represent
+more complicated powers as second-order cones.
+
+\subsection*{Products as second order cones}
+
+Consider the set of $t \in \R, s \in \R^{2^k}_+$ such that
+\begin{equation}
+  \label{eqn:two-k-set}
+  t^{2^k} \le s_1 s_2 \cdots s_{2^k},
+  ~~ s_i \ge 0, ~ \mbox{all}~ s_i.
+\end{equation}
+We claim this set is SOCP representable. Indeed,
+introduce variables
+\begin{equation*}
+  \left\{u_{i,j} :
+  j \in \{1, \ldots, k-1\},
+  i \in \{1, \ldots, 2^j\},
+  u_{i,j} \ge 0\right\}.
+\end{equation*}
+Then it is clear that the constraint~\eqref{eqn:two-k-set}
+is equivalent to
+\begin{equation*}
+  t^{2^k} \le u_{1, k-1}^2 u_{2,k-1}^2 \cdots u_{2^{k-1}, k-1}^2,
+  ~~ u_{i, k-1}^2 \le s_{2i - 1} s_{2i},
+  ~~ \mbox{all~} i,
+\end{equation*}
+or
+\begin{equation*}
+  t^{2^{k-1}} \le u_{1, k-1} u_{2,k-1} \cdots u_{2^{k-1}, k-1},
+  ~~ u_{i, k-1}^2 \le s_{2i - 1} s_{2i},
+  ~~ \mbox{all~} i \in \{1, \ldots, 2^{k-1}\}.
+\end{equation*}
+Recursively applying this construction through levels $j = k-2, \ldots,
+1$, we obtain the set of inequalities
+\begin{align}
+  t^2 \le u_{1,1} u_{2,1},
+  & ~~ u_{i,j-1}^2 \le u_{2i-1, j} u_{2i,j}
+  ~ \mbox{for ~} j \in \{2, \ldots, k-2\}, i \in \{1, \ldots, 2^{j-1}\}
+  \nonumber \\
+  & ~~ u_{i, k-1}^2 \le s_{2i - 1} s_{2i}
+  ~~ \mbox{for~} i \in \{1, \ldots, 2^{k-1}\}, \label{eqn:socp-two-k-set}
+\end{align}
+where all $u_{i,j}$ are non-negative. Each of these inequalities, by the
+representation~\eqref{eqn:rotated-cone}, corresponds to a second-order
+cone in $\R_+^3$, and we have introduced $2^k - 1$ such inequalities.
+
+% Suppose we have the convex constraint $x^p \le t$, where
+
+\subsection*{Product inequalities as second order cones}
+
+We now provide reductions of inequalities of the more restrictive form
+\begin{equation}
+  \label{eqn:initial-power}
+  x^n \le t^{p_1} s^{p_2}, ~~ x, t, s \ge 0
+\end{equation}
+where $p_1 + p_2 = n$ and $p_1, p_2, n \in \N$, into a sequence of
+second-order cone-represented sets. This is the building block for
+representations of general $p$-norm inequalities to come. In particular, we
+develop a procedure that takes inequalities of one of the three forms
+\begin{subequations}
+  \label{eqn:power-recursions}
+  \begin{align}
+    \label{eqn:zero-power}
+    x^n & \le t^{p_1} s^{p_2} \\
+    \label{eqn:one-power}
+    x^n & \le t^{p_1} s^{p_2} u \\
+    \label{eqn:two-power}
+    x^n & \le t^{p_1} s^{p_2} u^2
+  \end{align}
+\end{subequations}
+and recurses with a power $\le (n + 1)/2$ on $x$ and one of the
+forms~\eqref{eqn:power-recursions}. Note that if $n = 2$, then we already
+have an immediate second order cone representation~\eqref{eqn:rotated-cone}.
+
+\begin{enumerate}[(1)]
+\item The case with $u^0$, inequality~\eqref{eqn:zero-power}.
+  We have two possibilities: either $n$ is even or $n$ is odd.
+  \begin{enumerate}[a.]
+  \item $n$ is even: we assume that $n \ge 4$, as otherwise we have
+    the inequality $x^2 \le ts$, which is trivial.
+    In this case, either both $p_1$ and $p_2$ are even or
+    both are is odd.  If they are even, inequality~\eqref{eqn:zero-power} is
+    equivalent to $x^{n/2} \le t^{p_1/2} s^{p_2 / 2}$, which gives us a
+    recursive step. If $p_1$ is odd, then $p_2$ is odd, and
+    inequality~\eqref{eqn:zero-power} is equivalent to the pair
+    \begin{equation*}
+      x^n \le t^{p_1 - 1} s^{p_2 - 1} u^2, ~~ u^2 \le ts,
+      ~~~ \mbox{or} ~~~
+      x^{n/2} \le t^{\frac{p_1 - 1}{2}} s^{\frac{p_2 - 1}{2}} u,
+      ~~ u^2 \le ts,
+    \end{equation*}
+    which allows us to recurse to case~\eqref{eqn:one-power} with lower
+    powers on $s$, $t$, and $x$.
+  \item $n$ is odd: In this case, we have exactly one of $p_1$ and $p_2$ is
+    odd; assume w.l.o.g.\ that $p_1$ is odd. Then
+    inequality~\eqref{eqn:zero-power} is equivalent to
+    $x^{n + 1} \le t^{p_1 - 1} s^{p_2} x t$, and introducing the variable
+    $u \ge 0$, we have the equivalent representation
+    \begin{equation*}
+      x^{n + 1} \le t^{p_1 - 1} s^{p_2} u^2, ~~ u^2 \le xt,
+      ~~~ \mbox{or} ~~~
+      x^{\frac{n + 1}{2}} \le t^{\frac{p_1 - 1}{2}} s^{\frac{p_2}{2}} u,
+      ~~ u^2 \le xt.
+    \end{equation*}
+    This allows us to recurse to case~\eqref{eqn:one-power}.
+  \end{enumerate}
+\item The case $u$, inequality~\eqref{eqn:one-power}. We again have
+  two possibilities: either $n$ is even or $n$ is odd.
+  \begin{enumerate}[a.]
+  \item $n$ is even: In this case, exactly one of $p_1$ and $p_2$ is odd;
+    assume w.l.o.g.\ that $p_1$ is odd. Then we have the equivalent
+    representation
+    \begin{equation*}
+      x^n \le t^{p_1 - 1} s^{p_2} w^2, ~~ w^2 \le tu,
+      ~~~ \mbox{or} ~~~
+      x^{\frac{n}{2}} \le t^{\frac{p_1 - 1}{2}} s^{\frac{p_2}{2}} w,
+      ~~ w^2 \le tu.
+    \end{equation*}
+    This is again an inequality of the form~\eqref{eqn:one-power}.
+  \item $n$ is odd: In this case, either both $p_1$ and $p_2$ are even
+    or they are both odd. If they are both even, then we have the equivalent
+    inequalities
+    \begin{equation*}
+      x^{n + 1} \le t^{p_1} s^{p_2} w^2, ~~ w^2 \le xu,
+      ~~~ \mbox{or} ~~~
+      x^{\frac{n + 1}{2}} \le t^{\frac{p_1}{2}} s^{\frac{p_2}{2}} w,
+      ~~ w^2 \le xu,
+    \end{equation*}
+    which is again of the form~\eqref{eqn:one-power}. If both $p_1$ and $p_2$
+    are odd, then we introduce a few more variables,
+    noting that inequality~\eqref{eqn:one-power} is equivalent to
+    \begin{equation*}
+      x^{n + 1} \le t^{p_1 - 1} s^{p_2 - 1} st ux,
+      ~~~ \mbox{or} ~~~
+      x^{n + 1} \le t^{p_1 - 1} s^{p_2 - 1} y^4,
+      ~~ y^2 \le w v, ~~ w^2 \le st, ~~ v^2 \le ux,
+    \end{equation*}
+    and raising the inequality involving $x^{n + 1}$ to the power $\half$
+    yields the four inequalities
+    \begin{equation*}
+      x^{\frac{n + 1}{2}} \le t^{\frac{p_1 - 1}{2}} s^{\frac{p_2 - 1}{2}} y^2,
+      ~~ y^2 \le w v, ~~ w^2 \le st, ~~ v^2 \le ux,
+    \end{equation*}
+    which is of the form~\eqref{eqn:two-power}.
+  \end{enumerate}
+\item The case $u^2$, inequality~\eqref{eqn:two-power}. We show that
+  we can always reduce this to one of the cases~\eqref{eqn:power-recursions}.
+  \begin{enumerate}[a.]
+  \item $n$ is even: In this case, either both $p_1$ and $p_2$ are both even
+    or they are both odd. If $p_1$ and $p_2$ are even, then
+    inequality~\eqref{eqn:two-power} is equivalent to $x^{n/2} \le
+    t^{p_1/2} s^{p_2/2} u$, which is of type~\eqref{eqn:one-power}.
+    If $p_1$ and $p_2$ are odd, then we have the equivalent representation
+    \begin{equation*}
+      x^n \le t^{p_1 - 1} s^{p_2 - 1} u^2 st, ~~~ \mbox{or} ~~~
+      x^n \le t^{p_1 - 1} s^{p_2 - 1} y^4, ~~ y^4 \le u^2 w^2,
+      ~~ w^2 \le st,
+    \end{equation*}
+    which (by inspection) is equivalent to the inequality of
+    type~\eqref{eqn:two-power} (along with an additional two SOCP inequalities)
+    \begin{equation*}
+      x^\frac{n}{2} \le t^\frac{p_1 - 1}{2} s^\frac{p_2 - 1}{2} y^2,
+      ~~ y^2 \le u w,
+      ~~ w^2 \le st.
+    \end{equation*}
+  \item $n$ is odd: In this case, exactly one of $p_1$ and $p_2$ is odd;
+    assume w.l.o.g.\ that $p_1$ is odd. Then inequality~\eqref{eqn:two-power}
+    is equivalent to
+    \begin{equation*}
+      x^{n + 1} \le t^{p_1 - 1} s^{p_2} u^2 t x,
+      ~~~ \mbox{or} ~~~
+      x^\frac{n + 1}{2} \le t^\frac{p_1 - 1}{2} s^\frac{p_2}{2}
+      y^2,
+      ~~ y^2 \le uw, ~~ w^2 \le tx.
+    \end{equation*}
+  \end{enumerate}
+\end{enumerate}
+
+The preceding enumerated steps suggest a recursive strategy, where at each
+step, we check which of the cases we are in, then perform a reduction to
+introduce at most three inequalities of the form $w^2 \le uv$, and reducing
+the powers on all other variables by a factor of $2$. The recursion halts as
+soon as we have an inequality of the form $x^n \le y^n$, or an inequality of
+the form $x^2 \le uv$, which is second-order-cone representable.
+Note that given an inequality of the form~\eqref{eqn:initial-power},
+we introduce at most $O(1) \ceil{\log_2( p_1 \vee p_2)}$ new
+inequalities via this recursion.
+
+\subsection*{General (rational) $p$-norm cones as second-order cones}
+
+Now we show how to represent the inequality
+\begin{equation}
+  \label{eqn:p-norm-cone}
+  \norm{x}_p \le t,
+  ~~~ \mbox{where~} p = \frac{n}{m}
+  ~ \mbox{for~some~} n, m \in \N, n \ge m
+\end{equation}
+for $x \in \R^d$
+as a collection of second-order cones and linear inequalities.
+First, note that the inequality
+\begin{equation*}
+  \bigg(\sum_{i=1}^d |x_i|^p \bigg)^{1/p} \le t
+  ~~ \equiv ~~
+  \bigg(\sum_{i=1}^d |x_i|^{n/m} \bigg)^{m/n} \le t
+  ~~ \equiv ~~
+  \sum_{i=1}^d t^{1 - n/m} |x_i|^{n/m} \le t
+\end{equation*}
+is equivalent to the collection of inequalities
+$s^\top 1 \le t$, $|x_i|^{n/m} \le s_i t^{n/m - 1}$ for all $i$,
+which in turn is equivalent to the set of inequalities
+\begin{equation*}
+  v_i \ge |x_i|, ~ t \ge 0, ~ s_i \ge 0, ~ v_i^n \le s_i^m t^{n - m},
+  ~ \sum_{i=1}^d s_i \le t.
+\end{equation*}
+We know this is SOCP representable by the
+recursions~\eqref{eqn:power-recursions}.
+
+\bibliographystyle{abbrvnat}
+\bibliography{bib}
+
+\end{document}
