@@ -1,20 +1,19 @@
 # Convex.jl
 
-[![Build Status](https://travis-ci.org/JuliaOpt/Convex.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/Convex.jl) [![Coverage Status](https://img.shields.io/coveralls/JuliaOpt/Convex.jl.svg)](https://coveralls.io/r/JuliaOpt/Convex.jl)
+[![Build Status](https://travis-ci.org/JuliaOpt/Convex.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/Convex.jl)
+[![Coverage Status](https://coveralls.io/repos/JuliaOpt/Convex.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaOpt/Convex.jl?branch=master)
+[![Convex](http://pkg.julialang.org/badges/Convex_release.svg)](http://pkg.julialang.org/?pkg=Convex&ver=release)
 
-Convex.jl is a julia package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and dcp-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/karanveerm/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
+**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
 
-*Detailed documentation, installation instructions and examples for Convex.jl can be found [here](http://convexjl.readthedocs.org/).* 
-Below, we give a brief introduction to basic usage.
+**Installation**: `julia> Pkg.add("Convex")`
 
-
-## Installation
-Convex.jl can be installed on Julia version 0.3 or above
-```
-Pkg.add("Convex")
-```
+- **Detailed documentation and examples** for Convex.jl can be found [here](http://convexjl.readthedocs.org/)
+- If you're running into **bugs or have feature requests**, please use the [Github Issue Tracker](https://github.com/JuliaOpt/Convex.jl/issues>).
+- For usage questions, please contact us via the [JuliaOpt mailing list](https://groups.google.com/forum/#!forum/julia-opt)
 
 ## Quick Example
+
 Here's a quick example of code that solves a least-squares problem with inequality constraints
 ```
 # Let us first make the Convex.jl module available
@@ -41,10 +40,7 @@ problem.status # :Optimal, :Infeasible, :Unbounded etc.
 problem.optval
 ```
 
-Note that Convex.jl was previously called CVX.jl. If you're running into bugs or have feature requests, please use the [Github Issue Tracker](https://github.com/JuliaOpt/Convex.jl/issues>). For usage questions, please contact us via the [JuliaOpt mailing list](https://groups.google.com/forum/#!forum/julia-opt>).
-
-
-## Examples
+## More Examples
 A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). 
 The [basic usage notebook](http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl
 
@@ -63,3 +59,5 @@ If you use Convex.jl for published work, we encourage you to cite the software u
  primaryClass = "math-oc",
 }
 ```
+
+> Convex.jl was previously called CVX.jl.
