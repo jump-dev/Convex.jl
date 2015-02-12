@@ -44,11 +44,8 @@ An optimization problem using only these functions can be solved by any LP solve
 |:code:`diag(x, k)`      | :math:`k`-th diagonal of| affine     |increasing     | none                            |
 |                        | a matrix                |            |               |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`diagm(x)`        | :math:`\begin{bmatrix}  | affine     |increasing     | :math:`x` is a vector           |
-|                        |    x_1 & & \\           |            |               |                                 |
-|                        |    & \ddots & \\        |            |               |                                 |
-|                        |    & & x_n              |            |               |                                 |
-|                        |    \end{bmatrix}`       |            |               |                                 |
+|:code:`diagm(x)`        |turn vector into diagonal| affine     |increasing     | :math:`x` is a vector           |
+|                        |matrix                   |            |               |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x'`              | transpose               | affine     |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -79,8 +76,8 @@ An optimization problem using only these functions can be solved by any LP solve
 |                        |                         |            |not monotonic  | length :math:`n`, then          |
 |                        |                         |            |otherwise      | :math:`h*x` has length          |
 |                        |                         |            |               | :math:`m+n-1` and               |
-|                        |                         |            |               | :math:`(h*x)_i = \sum_{j=1}^m   |
-|                        |                         |            |               |      h_jx_{i-j}`                |
+|                        |                         |            |               | entry :math:`i` is given by     |
+|                        |                         |            |               | :math:`\sum_{j=1}^m h_jx_{i-j}` |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`min(x,y)`        | :math:`\min(x,y)`       | concave    |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
