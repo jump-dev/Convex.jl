@@ -1,0 +1,64 @@
+#############################################################################
+# matrix_frac.jl
+# implements the atom for x^T*P^{-1}*x, where P is a positive semidefinite
+# matrix.
+# All expressions and atoms are subtypes of AbstractExpr.
+# Please read expressions.jl first.
+#############################################################################
+export matrix_frac
+
+type MatrixFracAtom <: AbstractExpr
+  head::Symbol
+  id_hash::Uint64
+  children::(AbstractExpr, AbstractExpr)
+  size::(Int, Int)
+
+  function MatrixFracAtom(x::Constant, P::AbstractExpr)
+    if x.size[2] != 1
+      error("first argument of matrix frac must be a vector")
+    elseif P.size[1] != P.size[2]
+      error("second argument of matrix frac must be square")
+    elseif x.size[1] != P.size[1]
+      error("sizes must agree for arguments of matrix frac")
+    end
+    children = (x, P)
+    return new(:matrix_frac, hash(children), children, (1,1))
+  end
+end
+
+function sign(m::MatrixFracAtom)
+  return Positive()
+end
+
+function monotonicity(m::MatrixFracAtom)
+  return (NoMonotonicity(), NoMonotonicity())
+end
+
+function curvature(m::MatrixFracAtom)
+  return ConvexVexity()
+end
+
+function evaluate(m::MatrixFracAtom)
+  x = evaluate(m.children[1])
+  return x'*inv(evaluate(m.children[2]))*x
+end
+
+matrix_frac(x::Value, P::AbstractExpr) = MatrixFracAtom(Constant(x), P)
+
+function conic_form!(m::MatrixFracAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, m)
+    x = m.children[1]
+    P = m.children[2]
+    n = size(P, 1)
+    t = Variable()
+    # M is a matrix with Schur complement t - x'*P*x
+    M = Variable(n+1, n+1)
+    obj = conic_form!(t, unique_conic_forms)
+    conic_form!(M[1:n, 1:n] == P, unique_conic_forms)
+    conic_form!(M[1:n, n+1] == x, unique_conic_forms)
+    conic_form!(M[n+1, n+1] == t, unique_conic_forms)
+    conic_form!(isposdef(M), unique_conic_forms)
+    cache_conic_form!(unique_conic_forms, m, obj)
+  end
+  return get_conic_form(unique_conic_forms, m)
+end

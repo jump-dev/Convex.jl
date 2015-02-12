@@ -99,5 +99,5 @@ function size(x::AbstractExpr, dim::Integer)
 end
 
 ndims(x::AbstractExpr) = 2
-
 get_vectorized_size(x::AbstractExpr) = reduce(*, size(x))
+endof(x::AbstractExpr) = get_vectorized_size(x)

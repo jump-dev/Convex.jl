@@ -28,6 +28,7 @@ include("atoms/affine/stack.jl")
 include("atoms/affine/dot.jl")
 include("atoms/affine/reshape.jl")
 include("atoms/affine/trace.jl")
+include("atoms/affine/conv.jl")
 
 ### elementwise atoms
 include("atoms/abs.jl")
@@ -50,6 +51,7 @@ include("atoms/second_order_cone/rational_norm.jl")
 include("atoms/sdp_cone/nuclear_norm.jl")
 include("atoms/sdp_cone/operator_norm.jl")
 include("atoms/sdp_cone/lambda_min_max.jl")
+include("atoms/sdp_cone/matrix_frac.jl")
 
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")
