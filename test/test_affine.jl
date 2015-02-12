@@ -289,6 +289,16 @@ facts("Affine Atoms") do
     @fact (p.status != :Optimal) => true
   end
 
+  context("conv atom") do
+    x = Variable(3)
+    h = [1, -1]
+    p = minimize(sum(conv(h, x)) + sum(x), x >= 1, x <= 2)
+    @fact vexity(p) => AffineVexity()
+    solve!(p)
+    @fact p.optval => roughly(3, TOL)
+    @fact evaluate(sum(conv(h, x))) => roughly(0, TOL)
+  end
+
   context("satisfy problems") do
     x = Variable()
     p = satisfy(x >= 0)

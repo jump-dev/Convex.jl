@@ -26,7 +26,14 @@ An optimization problem using only these functions can be solved by any LP solve
 |                        |                         |            |decreasing in  | none                            |
 |                        |                         |            |:math:`y`      |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x*y`             | multiplication          | affine     |increasing     | one term is constant            |
+|:code:`x*y`             | multiplication          | affine     |increasing if  | one term is constant            |
+|                        |                         |            |constant       |                                 |
+|                        |                         |            |:math:`\ge 0`, |                                 |
+|                        |                         |            |decreasing if  |                                 |
+|                        |                         |            |constant       |                                 |
+|                        |                         |            |:math:`\le 0`, |                                 |
+|                        |                         |            |not monotonic  |                                 |
+|                        |                         |            |otherwise      |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x/y`             | division                | affine     |increasing     | :math:`y` is a scalar constant  |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -36,6 +43,12 @@ An optimization problem using only these functions can be solved by any LP solve
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`diag(x, k)`      | :math:`k`-th diagonal of| affine     |increasing     | none                            |
 |                        | a matrix                |            |               |                                 |
++------------------------+-------------------------+------------+---------------+---------------------------------+
+|:code:`diagm(x)`        | :math:`\begin{bmatrix}  | affine     |increasing     | :math:`x` is a vector           |
+|                        |    x_1 & & \\           |            |               |                                 |
+|                        |    & \ddots & \\        |            |               |                                 |
+|                        |    & & x_n              |            |               |                                 |
+|                        |    \end{bmatrix}`       |            |               |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x'`              | transpose               | affine     |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -58,6 +71,16 @@ An optimization problem using only these functions can be solved by any LP solve
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`trace(x)`        | :math:`\mathrm{tr}      | affine     |increasing     | none                            |
 |                        | \left(X \right)`        |            |               |                                 |
++------------------------+-------------------------+------------+---------------+---------------------------------+
+|:code:`conv(h,x)`       | :math:`h*x`             | affine     |increasing if  | :math:`h` is a constant vector, |
+|                        |                         |            |:math:`h\ge 0`,| :math:`x` is a vector,          |
+|                        |                         |            |decreasing if  | if :math:`h` has length         |
+|                        |                         |            |:math:`h\le 0`,| :math:`m` and :math:`x` has     |
+|                        |                         |            |not monotonic  | length :math:`n`, then          |
+|                        |                         |            |otherwise      | :math:`h*x` has length          |
+|                        |                         |            |               | :math:`m+n-1` and               |
+|                        |                         |            |               | :math:`(h*x)_i = \sum_{j=1}^m   |
+|                        |                         |            |               |      h_jx_{i-j}`                |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`min(x,y)`        | :math:`\min(x,y)`       | concave    |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -184,6 +207,8 @@ An optimization problem using these functions can be solved by any SDP solver (i
 |:code:`lambda_max(x)`       | max eigenvalue of :math:`x`         | convex     |increasing     |x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`lambda_min(x)`       | min eigenvalue of :math:`x`         | concave    |increasing     |x is positive semidefinite|
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|:code:`matrix_frac(x, P)`   | :math:`x^TP^{-1}x`                  | convex     |not monotonic  |P is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 Exponential + SDP representable Functions

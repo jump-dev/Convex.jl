@@ -67,7 +67,7 @@ facts("SOCP Atoms") do
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(0.42105, TOL)
-    @fact evaluate(sum_squares(A*x + b)) => roughly(0.42105, TOL)
+    @fact evaluate(sum_squares(A*x + b))[1] => roughly(0.42105, TOL)
   end
 
   context("square atom") do
@@ -181,7 +181,7 @@ facts("SOCP Atoms") do
     @fact evaluate(norm(x, q)) => roughly(1, TOL)
     @fact sum(evaluate(x' * v)) => roughly(-sum(abs(v).^qs)^(1/qs), TOL);
   end
-  
+
   context("rational norm atom sum") do
     A = [-0.719255  -0.229089;
          -1.33632   -1.37121;
@@ -199,6 +199,6 @@ facts("SOCP Atoms") do
     denom = sum(abs(margins).^q)^(1/qs);
     g = x_opt + A' * (abs(margins).^(q-1) .* sign(margins)) / denom;
     @fact p.optval => roughly(1.7227, TOL);
-    @fact norm(g, 2) => roughly(0, TOL);
+    @fact norm(g, 2)^2 => roughly(0, TOL);
   end
 end
