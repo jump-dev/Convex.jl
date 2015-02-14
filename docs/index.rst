@@ -37,4 +37,5 @@ In Depth Documentation:
   Examples <examples>
   Solvers <solvers>
   FAQ <faq>
+  Advanced <advanced>
   Credits <credits>

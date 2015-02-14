@@ -27,12 +27,17 @@ An optimization problem using only these functions can be solved by any LP solve
 |                        |                         |            |:math:`y`      |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x*y`             | multiplication          | affine     |increasing if  | one term is constant            |
-|                        |                         |            |constant       |                                 |
-|                        |                         |            |:math:`\ge 0`, |                                 |
+|                        |                         |            |               |                                 |
+|                        |                         |            |constant term  |                                 |
+|                        |                         |            |:math:`\ge 0`  |                                 |
+|                        |                         |            |               |                                 |
 |                        |                         |            |decreasing if  |                                 |
-|                        |                         |            |constant       |                                 |
-|                        |                         |            |:math:`\le 0`, |                                 |
+|                        |                         |            |               |                                 |
+|                        |                         |            |constant term  |                                 |
+|                        |                         |            |:math:`\le 0`  |                                 |
+|                        |                         |            |               |                                 |
 |                        |                         |            |not monotonic  |                                 |
+|                        |                         |            |               |                                 |
 |                        |                         |            |otherwise      |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x/y`             | division                | affine     |increasing     | :math:`y` is a scalar constant  |
@@ -69,15 +74,24 @@ An optimization problem using only these functions can be solved by any LP solve
 |:code:`trace(x)`        | :math:`\mathrm{tr}      | affine     |increasing     | none                            |
 |                        | \left(X \right)`        |            |               |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`conv(h,x)`       | :math:`h*x`             | affine     |increasing if  | :math:`h` is a constant vector, |
-|                        |                         |            |:math:`h\ge 0`,| :math:`x` is a vector,          |
-|                        |                         |            |decreasing if  | if :math:`h` has length         |
-|                        |                         |            |:math:`h\le 0`,| :math:`m` and :math:`x` has     |
-|                        |                         |            |not monotonic  | length :math:`n`, then          |
-|                        |                         |            |otherwise      | :math:`h*x` has length          |
-|                        |                         |            |               | :math:`m+n-1` and               |
-|                        |                         |            |               | entry :math:`i` is given by     |
-|                        |                         |            |               | :math:`\sum_{j=1}^m h_jx_{i-j}` |
+|:code:`conv(h,x)`       |:math:`h \in             | affine     |increasing if  | :math:`h` is constant           |
+|                        |\mathbb{R}^m`            |            |:math:`h\ge 0` |                                 |
+|                        |                         |            |               |                                 |
+|                        |:math:`x \in             |            |               |                                 |
+|                        |\mathbb{R}^m`            |            |               |                                 |
+|                        |                         |            |               |                                 |
+|                        |:math:`h*x               |            |               |                                 |
+|                        |\in \mathbb{R}^{m+n-1}`  |            |               |                                 |
+|                        |                         |            |               |                                 |
+|                        |                         |            |               |                                 |
+|                        |                         |            |               |                                 |
+|                        |entry :math:`i` is       |            |decreasing if  |                                 |
+|                        |given by                 |            |:math:`h\le 0` |                                 |
+|                        |                         |            |               |                                 |
+|                        |:math:`\sum_{j=1}^m      |            |               |                                 |
+|                        |h_jx_{i-j}`              |            |not monotonic  |                                 |
+|                        |                         |            |               |                                 |
+|                        |                         |            |otherwise      |                                 |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`min(x,y)`        | :math:`\min(x,y)`       | concave    |increasing     | none                            |
 +------------------------+-------------------------+------------+---------------+---------------------------------+
