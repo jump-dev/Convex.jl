@@ -121,13 +121,13 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | implicit constraint      |
 +============================+=====================================+============+===============+==========================+
-|:code:`norm(x, p)`          | :math:`(\sum x_i^p)^{1/p}`          | convex     |increasing on  | :code:`p = 1, 2, Inf`    |
+|:code:`norm(x, p)`          | :math:`(\sum x_i^p)^{1/p}`          | convex     |increasing on  | :code:`p >= 1`           |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`vecnorm(x, p)`       | :math:`(\sum x_{ij}^p)^{1/p}`       | convex     |increasing on  | :code:`p = 1, 2, Inf`    |
+|:code:`vecnorm(x, p)`       | :math:`(\sum x_{ij}^p)^{1/p}`       | convex     |increasing on  | :code:`p >= 1`           |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
