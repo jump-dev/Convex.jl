@@ -122,6 +122,14 @@ facts("Affine Atoms") do
     @fact p.optval => roughly(2, TOL)
     @fact evaluate(x[1] + x[2])[1] => roughly(2, TOL)
 
+    x = Variable(3)
+    I = [true true false]
+    p = minimize(sum(x[I]), [x >= 1])
+    @fact vexity(p) => AffineVexity()
+    solve!(p)
+    @fact p.optval => roughly(2, TOL)
+    @fact evaluate(sum(x[I]))[1] => roughly(2, TOL)
+
     rows = 6
     cols = 8
     n = 2
