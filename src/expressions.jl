@@ -40,6 +40,22 @@ export get_vectorized_size
 abstract AbstractExpr
 abstract Constraint
 
+# Override hash function because of
+# https://github.com/JuliaLang/julia/issues/10267
+import Base.hash
+export hash
+
+const hashaa_seed = Uint === Uint64 ? 0x7f53e68ceb575e76 : 0xeb575e7
+function hash(a::Array{AbstractExpr}, h::Uint)
+  h += hashaa_seed
+  h += hash(size(a))
+  for x in a
+    h = hash(x, h)
+  end
+  return h
+end
+
+
 # If h(x)=f∘g(x), then (for single variable calculus)
 # h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 # We calculate the vexity according to this
