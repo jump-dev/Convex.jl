@@ -6,9 +6,7 @@ function is_symmetric(A::Matrix)
 end
 
 function quad_form(x::Value, A::AbstractExpr)
-  if x.head == :constant
-    return x' * A * x
-  end
+  return x' * A * x
 end
 
 function quad_form(x::AbstractExpr, A::Value)
