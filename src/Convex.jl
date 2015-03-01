@@ -37,6 +37,7 @@ include("atoms/minimum.jl")
 include("atoms/max.jl")
 include("atoms/min.jl")
 include("atoms/norm.jl")
+include("atoms/sum_largest.jl")
 
 ### SOC atoms
 include("atoms/second_order_cone/norm_2.jl")

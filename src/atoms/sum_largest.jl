@@ -32,7 +32,7 @@ function sign(x::SumLargestAtom)
 end
 
 function monotonicity(x::SumLargestAtom)
-  return Nondecreasing()
+  return (Nondecreasing(), )
 end
 
 function curvature(x::SumLargestAtom)
@@ -40,11 +40,8 @@ function curvature(x::SumLargestAtom)
 end
 
 function evaluate(x::SumLargestAtom)
-  return sum(sort(vec(x.value), rev=true)[1:x.k])
+  return sum(sort(vec(evaluate(x.children[1])), rev=true)[1:x.k])
 end
-
-sum_largest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
-sum_smallest(x::AbstractExpr, k::Int) = SumLargestAtom(-x, k)
 
 function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
@@ -61,3 +58,6 @@ function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
   end
   return get_conic_form(unique_conic_forms, x)
 end
+
+sum_largest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
+sum_smallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)
