@@ -68,7 +68,7 @@ function conic_form!(x::MaxAtom, unique_conic_forms::UniqueConicForms)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
-  return get_conic_form(unique_conic_forms, this)
+  return get_conic_form(unique_conic_forms, x)
 end
 
 max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
