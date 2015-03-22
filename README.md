@@ -15,7 +15,7 @@
 ## Quick Example
 
 Here's a quick example of code that solves a least-squares problem with inequality constraints
-```
+```julia
 # Let us first make the Convex.jl module available
 using Convex
 
