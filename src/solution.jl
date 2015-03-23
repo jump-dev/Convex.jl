@@ -9,6 +9,11 @@ function solve!(problem::Problem,
 
   if warmstart
     m = problem.model
+    @show size(m.primal_sol), size(m.dual_sol), size(m.slack)
+    m.options = s.options
+    # call setwarmstart explicitly to tell the solver to warmstart (eg, setting options)
+    MathProgBase.setwarmstart!(m, problem.solution.primal)
+    @show size(m.primal_sol), size(m.dual_sol), size(m.slack)
   else
     if isa(s, MathProgBase.AbstractMathProgSolver)
       m = MathProgBase.model(s)
@@ -24,6 +29,7 @@ function solve!(problem::Problem,
            You will have to restart Julia after that.")
     end
   end
+  problem.model = m
 
   if check_vexity
     vex = vexity(problem)
