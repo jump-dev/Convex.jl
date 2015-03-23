@@ -1,3 +1,5 @@
+import MathProgBase
+
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
 export conic_problem
@@ -22,11 +24,25 @@ type Problem
   constraints::Array{Constraint}
   status::Symbol
   optval::Float64OrNothing
+  model::MathProgBase.AbstractMathProgModel
   solution::Solution
 
-  function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[])
-    return new(head, objective, constraints, "not yet solved", nothing)
+  function Problem(head::Symbol, objective::AbstractExpr,  
+                   model::MathProgBase.AbstractMathProgModel, constraints::Array=Constraint[])
+    return new(head, objective, constraints, "not yet solved", nothing, model)
   end
+end
+# constructor if model is not specified
+function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[], 
+                 solver::MathProgBase.AbstractMathProgSolver = get_default_solver())
+  if solver == nothing
+    error("The default solver is set to `nothing`
+         You must have at least one solver installed.
+         You can install a solver such as SCS by running:
+         Pkg.add(\"SCS\").
+         You will have to restart Julia after that.")
+  end
+  Problem(head, objective, MathProgBase.model(solver), constraints)
 end
 
 # If the problem constructed is of the form Ax=b where A is m x n

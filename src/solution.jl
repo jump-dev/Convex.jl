@@ -5,21 +5,24 @@ SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.Abstract
 
 function solve!(problem::Problem,
                 s::SolverOrModel=get_default_solver();
-                warmstart=true, check_vexity=false)
+                warmstart=false, check_vexity=false)
 
-  if isa(s, MathProgBase.AbstractMathProgSolver)
-    m = MathProgBase.model(s)
-  elseif s != nothing # it is already a model
-    warn("deprecated syntax. Use AbstractMathProgSolver instead. eg ECOSSolver() or SCSSolver()")
-    m = s
-  end
-
-  if s == nothing
-    error("The default solver is set to `nothing`
-         You must have at least one solver installed.
-         You can install a solver such as SCS by running:
-         Pkg.add(\"SCS\").
-         You will have to restart Julia after that.")
+  if warmstart
+    m = problem.model
+  else
+    if isa(s, MathProgBase.AbstractMathProgSolver)
+      m = MathProgBase.model(s)
+    elseif s != nothing # it is already a model
+      warn("deprecated syntax. Use AbstractMathProgSolver instead. eg ECOSSolver() or SCSSolver()")
+      m = s
+    end
+    if s == nothing
+      error("The default solver is set to `nothing`
+           You must have at least one solver installed.
+           You can install a solver such as SCS by running:
+           Pkg.add(\"SCS\").
+           You will have to restart Julia after that.")
+    end
   end
 
   if check_vexity
@@ -43,14 +46,6 @@ function solve!(problem::Problem,
       MathProgBase.setvartype!(m, vartypes)
     catch
       error("model $(typeof(m)) does not support variables of some of the following types: $(unique(vartypes))")
-    end
-  end
-
-  # see if we should warmstart (as of 11/19/14, only MILP solvers support this)
-  if warmstart && problem.status==:Optimal
-    try
-      MathProgBase.setwarmstart!(m, problem.solution.primal)
-      println("Using warm start from previous solution")
     end
   end
 
