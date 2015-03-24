@@ -8,12 +8,14 @@ function solve!(problem::Problem,
                 warmstart=false, check_vexity=true)
 
   if warmstart
+    # use the model we used to solve the problem last time,
+    # in order to reuse cached (primal and dual) solution
     m = problem.model
-    @show size(m.primal_sol), size(m.dual_sol), size(m.slack)
-    m.options = s.options
-    # call setwarmstart explicitly to tell the solver to warmstart (eg, setting options)
+    # TODO: allow options from new model to be passed into old one 
+    # (currently this segfaults for eg SCS)
+    # m.options = s.options
+    # call setwarmstart explicitly to tell the solver to warmstart (eg, setting options if necessary)
     MathProgBase.setwarmstart!(m, problem.solution.primal)
-    @show size(m.primal_sol), size(m.dual_sol), size(m.slack)
   else
     if isa(s, MathProgBase.AbstractMathProgSolver)
       m = MathProgBase.model(s)
