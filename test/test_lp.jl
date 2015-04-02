@@ -133,14 +133,21 @@ facts("LP Atoms") do
     @fact evaluate(sum_smallest(x, 3)) => roughly(12, TOL)
   end
 
-  context("weighted_sum atom") do
+  context("dot_sort atom") do
     x = Variable(4, 1)
-    p = minimize(weighted_sum(x, [1,2,3,4]), sum(x)>=7, x>=0, x<=2, x[4]<=1)
+    p = minimize(dot_sort(x, [1,2,3,4]), sum(x)>=7, x>=0, x<=2, x[4]<=1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(19, TOL)
     @fact x.value => roughly([2,2,2,1], TOL)
-    @fact evaluate(weighted_sum(x, [1,2,3,4])) => roughly(19, TOL)
+    @fact evaluate(dot_sort(x, [1,2,3,4])) => roughly(19, TOL)
+
+    x = Variable(2, 2)
+    p = minimize(dot_sort(x, [1 2; 3 4]), sum(x)>=7, x>=0, x<=2, x[2, 2]<=1)
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(19, TOL)
+    @fact evaluate(dot_sort(x, [1,2,3,4])) => roughly(19, TOL)
   end
 
   context("hinge loss atom") do

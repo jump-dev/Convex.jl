@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export sum_largest, sum_smallest, weighted_sum
+export sum_largest, sum_smallest
 export sign, curvature, monotonicity, evaluate
 
 type SumLargestAtom <: AbstractExpr
@@ -61,71 +61,3 @@ end
 
 sum_largest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
 sum_smallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)
-
-# This atom computes sort(w)'*sort(x)
-# ie if w and x are sorted in decreasing order, then we return w'*x
-# If w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
-type WeightedSumAtom <: AbstractExpr
-  head::Symbol
-  id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
-  w::Vector
-
-  function WeightedSumAtom(x::AbstractExpr, w::Vector)
-    if !(length(w) == get_vectorized_size(x))
-      error("x and w must be the same size")
-    end
-    children = (x,)
-    return new(:weighted_sum, hash((children, w)), children, (1,1), w)
-  end
-end
-
-function sign(x::WeightedSumAtom)
-  if all(x.w.>=0)
-    return sign(x.children[1])
-  elseif all(x.w.<=0)
-    return sign(x.children[1])
-  else
-    return NoSign()
-  end
-end
-
-function monotonicity(x::WeightedSumAtom)
-  if all(x.w.>=0)
-    return (Nondecreasing(), )
-  else
-    return (NoMonotonicity(), )
-  end
-end
-
-function curvature(x::WeightedSumAtom)
-  return ConvexVexity()
-end
-
-function evaluate(x::WeightedSumAtom)
-  return sum(sort(vec(evaluate(x.children[1])), rev=true) .* sort(vec(x.w), rev=true))
-end
-
-function conic_form!(x::WeightedSumAtom, unique_conic_forms::UniqueConicForms)
-  if !has_conic_form(unique_conic_forms, x)
-    y = x.children[1]
-    if all(size(y)) > 1
-      y = vec(y)
-      w = vec(x.w)
-    else
-      w = x.w
-    end
-    mu = Variable(size(y))
-    nu = Variable(size(y))
-    onesvec = ones(size(y))
-    # given by the solution to
-    # minimize sum(mu) + sum(nu)
-    # subject to y*w' <= onesvec*nu' + mu*onesvec'
-    objective = conic_form!(sum(mu) + sum(nu), unique_conic_forms)
-    conic_form!(y*w' <= onesvec*nu' + mu*onesvec', unique_conic_forms)
-    cache_conic_form!(unique_conic_forms, x, objective)
-  end
-  return get_conic_form(unique_conic_forms, x)
-end
-weighted_sum(x::AbstractExpr, w::Vector) = WeightedSumAtom(x, w)

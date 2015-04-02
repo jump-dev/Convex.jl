@@ -29,6 +29,9 @@ include("atoms/affine/dot.jl")
 include("atoms/affine/reshape.jl")
 include("atoms/affine/trace.jl")
 include("atoms/affine/conv.jl")
+include("atoms/norm.jl")
+include("atoms/sum_largest.jl")
+include("atoms/dot_sort.jl")
 
 ### elementwise atoms
 include("atoms/abs.jl")
@@ -36,8 +39,6 @@ include("atoms/maximum.jl")
 include("atoms/minimum.jl")
 include("atoms/max.jl")
 include("atoms/min.jl")
-include("atoms/norm.jl")
-include("atoms/sum_largest.jl")
 
 ### SOC atoms
 include("atoms/second_order_cone/norm_2.jl")
