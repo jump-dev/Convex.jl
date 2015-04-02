@@ -101,6 +101,21 @@ function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, @comp
   end
 end
 
+# populates the solution vector from the .value fields of variables
+# for use in warmstarting
+function populate_solution!(problem::Problem, var_to_ranges::Dict{Uint64, (Int, Int)})
+  x = problem.solution.primal
+  for (id, (start_index, end_index)) in var_to_ranges
+    var = id_to_variables[id]
+    sz = size(var.value)
+    if length(sz) <= 1
+      vx[start_index:end_index] = var.value
+    else
+      x[start_index:end_index] = reshape(var.value, sz[1]*sz[2], 1)
+    end
+  end
+end
+
 function populate_duals!{T}(constraints::Array{ConicConstr}, dual::Array{T, 1})
   constr_index = 1
   for constraint in constraints
