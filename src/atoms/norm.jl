@@ -10,7 +10,7 @@ norm_fro(x::AbstractExpr) = norm_2(vec(x))
 # * operator norms for matrices
 # * norm(x, :fro) == vecnorm(x, 2)
 function norm(x::AbstractExpr, p=2)
-  if length(size(x)) <= 1 || any(size(x).==1)
+  if length(size(x)) <= 1 || minimum(size(x))==1
     # x is a vector
     if p == 1
       return norm_1(x)
@@ -24,7 +24,8 @@ function norm(x::AbstractExpr, p=2)
     else
       error("vector p-norms not defined for p < 1")
     end
-  else
+  else 
+    # x is a matrix
     if p == 1
       return sum(x, 1)
     elseif p == 2
@@ -40,6 +41,5 @@ function norm(x::AbstractExpr, p=2)
 end
 
 function vecnorm(x::AbstractExpr, p=2)
-  vec_x = vec(x)
-  return norm(vec_x, p)
+  return norm(vec(x), p)
 end

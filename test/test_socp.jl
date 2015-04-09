@@ -163,11 +163,6 @@ facts("SOCP Atoms") do
   end
 
   context("rational norm dual norm") do
-    # Hack to make sure that the SCS Solver runs for 10000 iterations.
-    s = get_default_solver()
-    if typeof(s).name.name == :SCSSolver
-      s = SCSSolver(verbose=0,max_iters=10000);
-    end
     v = [0.463339, 0.0216084, -2.07914, 0.99581, 0.889391];
     x = Variable(5);
     q = 1.379;  # q norm constraint that generates many inequalities
@@ -175,7 +170,7 @@ facts("SOCP Atoms") do
     p = minimize(x' * v);
     p.constraints += (norm(x, q) <= 1);
     @fact vexity(p) => ConvexVexity()
-    solve!(p, s)  # Solution is -norm(v, q / (q - 1))
+    solve!(p)  # Solution is -norm(v, q / (q - 1))
     @fact p.optval => roughly(-2.144087, TOL)
     @fact sum(evaluate(x' * v)) => roughly(-2.144087, TOL)
     @fact evaluate(norm(x, q)) => roughly(1, TOL)
@@ -200,5 +195,20 @@ facts("SOCP Atoms") do
     g = x_opt + A' * (abs(margins).^(q-1) .* sign(margins)) / denom;
     @fact p.optval => roughly(1.7227, TOL);
     @fact norm(g, 2)^2 => roughly(0, TOL);
+  end
+
+  context("norm consistent with Base") do
+    A = rand(4, 4)
+    x = Variable(4, 4)
+    x.value = A
+    @fact evaluate(norm(x)) => roughly(norm(A), TOL);
+    @fact evaluate(norm(x, 1)) => roughly(norm(A, 1), TOL);
+    @fact evaluate(norm(x, 2)) => roughly(norm(A, 2), TOL);
+    @fact evaluate(norm(x, Inf)) => roughly(norm(A, Inf), TOL);
+    @fact evaluate(norm(x, :fro)) => roughly(norm(A, :fro), TOL);
+    @fact evaluate(vecnorm(x, 1)) => roughly(norm(vec(A), 1), TOL);
+    @fact evaluate(vecnorm(x, 2)) => roughly(norm(vec(A), 2), TOL);
+    @fact evaluate(vecnorm(x, 7)) => roughly(norm(vec(A), 7), TOL);
+    @fact evaluate(vecnorm(x, Inf)) => roughly(norm(vec(A), Inf), TOL);
   end
 end
