@@ -34,9 +34,9 @@ function curvature(x::OperatorNormAtom)
   return ConvexVexity()
 end
 
-# XXX verify this returns all the eigenvalues even in new versions of julia (>=3.0)
+# in julia, `norm` on matrices is the operator norm
 function evaluate(x::OperatorNormAtom)
-  svdvals(evaluate(x.children[1]))[1]
+  norm(evaluate(x.children[1]), 2)
 end
 
 operator_norm(x::AbstractExpr) = OperatorNormAtom(x)

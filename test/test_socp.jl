@@ -198,14 +198,13 @@ facts("SOCP Atoms") do
   end
 
   context("norm consistent with Base") do
-    A = rand(4, 4)
+    A = randn(4, 4)
     x = Variable(4, 4)
     x.value = A
     @fact evaluate(norm(x)) => roughly(norm(A), TOL);
     @fact evaluate(norm(x, 1)) => roughly(norm(A, 1), TOL);
     @fact evaluate(norm(x, 2)) => roughly(norm(A, 2), TOL);
     @fact evaluate(norm(x, Inf)) => roughly(norm(A, Inf), TOL);
-    @fact evaluate(norm(x, :fro)) => roughly(norm(A, :fro), TOL);
     @fact evaluate(vecnorm(x, 1)) => roughly(norm(vec(A), 1), TOL);
     @fact evaluate(vecnorm(x, 2)) => roughly(norm(vec(A), 2), TOL);
     @fact evaluate(vecnorm(x, 7)) => roughly(norm(vec(A), 7), TOL);

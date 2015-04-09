@@ -139,7 +139,8 @@ facts("LP Atoms") do
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(19, TOL)
-    @fact x.value => roughly([2,2,2,1], TOL)
+    @fact x.value[1] => roughly(2, TOL)
+    @fact x.value[4] => roughly(1, TOL)
     @fact evaluate(dot_sort(x, [1,2,3,4])) => roughly(19, TOL)
 
     x = Variable(2, 2)
