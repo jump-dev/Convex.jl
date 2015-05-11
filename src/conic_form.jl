@@ -62,8 +62,8 @@ type ConicConstr
   sizes::Array{Int}
 end
 
-UniqueExpMap = Dict{(Symbol, Uint64), ConicObj}
-UniqueConstrMap = Dict{(Symbol, Uint64), Int}
+UniqueExpMap = Dict{@compat(Tuple{Symbol, Uint64}), ConicObj}
+UniqueConstrMap = Dict{@compat(Tuple{Symbol, Uint64}), Int}
 UniqueConstrList = Array{ConicConstr}
 
 type UniqueConicForms

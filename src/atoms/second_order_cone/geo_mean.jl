@@ -5,8 +5,8 @@ export sign, monotonicity, curvature, conic_form!
 type GeoMeanAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr, AbstractExpr)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr, AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function GeoMeanAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size != y.size

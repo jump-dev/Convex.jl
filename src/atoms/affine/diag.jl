@@ -13,8 +13,8 @@ export diag
 type DiagAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
   k::Int
 
   function DiagAtom(x::AbstractExpr, k::Int=0)

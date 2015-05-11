@@ -13,8 +13,8 @@ export sign, curvature, monotonicity, evaluate
 type DotSortAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
   w::Value
 
   function DotSortAtom(x::AbstractExpr, w::Value)

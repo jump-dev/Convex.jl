@@ -6,8 +6,8 @@ ArrayOrNothing = Union(AbstractArray, Nothing)
 type IndexAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
   rows::ArrayOrNothing
   cols::ArrayOrNothing
   inds::ArrayOrNothing

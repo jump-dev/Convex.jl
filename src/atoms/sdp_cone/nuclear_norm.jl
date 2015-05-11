@@ -11,8 +11,8 @@ export nuclear_norm
 type NuclearNormAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function NuclearNormAtom(x::AbstractExpr)
     children = (x,)

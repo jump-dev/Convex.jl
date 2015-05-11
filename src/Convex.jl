@@ -1,4 +1,5 @@
 module Convex
+using Compat
 
 global DEFAULT_SOLVER = nothing
 ### modeling framework
