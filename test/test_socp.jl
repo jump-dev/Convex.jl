@@ -39,11 +39,11 @@ facts("SOCP Atoms") do
   context("frobenius norm atom") do
     m = Variable(4, 5)
     c = [m[3, 3] == 4, m >= 1]
-    p = minimize(norm(m, :fro), c)
+    p = minimize(vecnorm(m, 2), c)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(sqrt(35), TOL)
-    @fact evaluate(norm(m, :fro)) => roughly(sqrt(35), TOL)
+    @fact evaluate(vecnorm(m, 2)) => roughly(sqrt(35), TOL)
   end
 
   context("quad over lin atom") do
