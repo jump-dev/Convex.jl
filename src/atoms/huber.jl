@@ -3,8 +3,8 @@ export huber
 type HuberAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
   M::Real
 
   function HuberAtom(x::AbstractExpr, M::Real)

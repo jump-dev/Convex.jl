@@ -12,8 +12,8 @@ export sum
 type SumAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function SumAtom(x::AbstractExpr)
     children = (x,)

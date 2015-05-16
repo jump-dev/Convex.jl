@@ -12,8 +12,8 @@ export operator_norm, sigma_max
 type OperatorNormAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function OperatorNormAtom(x::AbstractExpr)
     children = (x,)

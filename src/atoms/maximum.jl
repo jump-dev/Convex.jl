@@ -11,8 +11,8 @@ export maximum
 type MaximumAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function MaximumAtom(x::AbstractExpr)
     children = (x,)

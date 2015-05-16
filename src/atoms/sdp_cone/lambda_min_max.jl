@@ -12,8 +12,8 @@ export lambda_max, lambda_min
 type LambdaMaxAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function LambdaMaxAtom(x::AbstractExpr)
     children = (x,)
@@ -65,8 +65,8 @@ end
 type LambdaMinAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function LambdaMinAtom(x::AbstractExpr)
     children = (x,)

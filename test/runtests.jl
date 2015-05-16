@@ -10,7 +10,7 @@ end
 
 if isdir(Pkg.dir("SCS"))
     using SCS
-    push!(solvers, SCSSolver(verbose=0))
+    push!(solvers, SCSSolver(verbose=0, eps=1e-5))
 end
 
 if isdir(Pkg.dir("Gurobi"))

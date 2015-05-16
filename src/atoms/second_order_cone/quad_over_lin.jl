@@ -4,8 +4,8 @@ export sign, monotonicity, curvature, conic_form!
 type QuadOverLinAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr, AbstractExpr)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr, AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function QuadOverLinAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size[2] != 1 && y.size != (1, 1)
