@@ -34,7 +34,7 @@ function curvature(x::EucNormAtom)
 end
 
 function evaluate(x::EucNormAtom)
-  return norm(evaluate(x.children[1]))
+  return norm(vec(evaluate(x.children[1])))
 end
 
 

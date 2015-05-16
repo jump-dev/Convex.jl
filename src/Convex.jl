@@ -68,4 +68,5 @@ include("atoms/logdet.jl")
 
 ### utilities
 include("utilities/show.jl")
+include("utilities/deprecated.jl")
 end
