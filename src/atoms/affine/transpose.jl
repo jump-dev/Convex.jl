@@ -12,8 +12,8 @@ export sign, curvature, monotonicity, evaluate, conic_form!
 type TransposeAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function TransposeAtom(x::AbstractExpr)
     children = (x,)

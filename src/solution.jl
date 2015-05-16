@@ -81,7 +81,7 @@ function solve!(problem::Problem,
   end
 end
 
-function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, (Int, Int)})
+function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, @compat Tuple{Int, Int}})
   x = problem.solution.primal
   for (id, (start_index, end_index)) in var_to_ranges
     var = id_to_variables[id]

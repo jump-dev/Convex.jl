@@ -9,7 +9,7 @@ type EqConstraint <: Constraint
   id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
-  size::(Int, Int)
+  size::@compat Tuple{Int, Int}
   dual::ValueOrNothing
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
@@ -56,7 +56,7 @@ type LtConstraint <: Constraint
   id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
-  size::(Int, Int)
+  size::@compat Tuple{Int, Int}
   dual::ValueOrNothing
 
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
@@ -104,7 +104,7 @@ type GtConstraint <: Constraint
   id_hash::Uint64
   lhs::AbstractExpr
   rhs::AbstractExpr
-  size::(Int, Int)
+  size::@compat Tuple{Int, Int}
   dual::ValueOrNothing
 
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)

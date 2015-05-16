@@ -8,7 +8,7 @@ type SDPConstraint <: Constraint
   head::Symbol
   id_hash::Uint64
   child::AbstractExpr
-  size::(Int, Int)
+  size::@compat Tuple{Int, Int}
   dual::ValueOrNothing
 
   function SDPConstraint(child::AbstractExpr)

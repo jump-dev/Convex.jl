@@ -1,10 +1,10 @@
-export logdet
+import Base.logdet
 
 type LogDetAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
 
   function LogDetAtom(x::AbstractExpr)
     children = (x,)

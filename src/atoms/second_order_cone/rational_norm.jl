@@ -18,8 +18,8 @@ export rational_norm
 type RationalNormAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  children::@compat Tuple{AbstractExpr}
+  size::@compat Tuple{Int, Int}
   k::Rational{Int64}
 
   function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})

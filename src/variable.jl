@@ -10,12 +10,12 @@ type Variable <: AbstractExpr
   head::Symbol
   id_hash::Uint64
   value::ValueOrNothing
-  size::(Int, Int)
+  size::@compat Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
   sets # ::Array{Symbol,1}
 
-  function Variable(size::(Int, Int), sign::Sign=NoSign(), sets::Symbol...)
+  function Variable(size::@compat(Tuple{Int, Int}), sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, sets)
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
@@ -25,7 +25,7 @@ type Variable <: AbstractExpr
   Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
   Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
   Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
-  Variable(size::(Int, Int), sets::Symbol...) = Variable(size::(Int, Int), NoSign(), sets...)
+  Variable(size::@compat(Tuple{Int, Int}), sets::Symbol...) = Variable(size, NoSign(), sets...)
   Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
   Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
 end
