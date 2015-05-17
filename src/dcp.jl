@@ -24,7 +24,7 @@ type ConcaveVexity <: Vexity            end
 
 type NotDcp <: Vexity
 	function NotDcp()
-		warn("Expression not DCP compliant")
+		warn("Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior.")
     return new()
 	end
 end

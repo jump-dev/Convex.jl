@@ -5,7 +5,7 @@ SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.Abstract
 
 function solve!(problem::Problem,
                 s::SolverOrModel=get_default_solver();
-                warmstart=false, check_vexity=false)
+                warmstart=false, check_vexity=true)
 
   if warmstart
     m = problem.model
