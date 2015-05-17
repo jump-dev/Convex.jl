@@ -1,0 +1,19 @@
+/* override table width restrictions */
+.wy-table-responsive table td, .wy-table-responsive table th {
+    /* !important prevents the common CSS stylesheets from
+       overriding this as on RTD they are loaded after this stylesheet */
+    white-space: normal !important;
+}
+
+.wy-table-responsive {
+    overflow: visible !important;
+}
+
+.wy-table td p, .rst-content table.docutils td p, .rst-content table.field-list td p {
+		font-size: inherit !important;
+		margin-bottom: 0px !important;
+}
+
+.wy-nav-content {
+		max-width: 80% !important;
+}
