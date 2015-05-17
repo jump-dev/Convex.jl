@@ -22,9 +22,9 @@ An optimization problem using only these functions can be solved by any LP solve
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation                 | description             | vexity     | slope         | notes                           |
 +==========================+=========================+============+===============+=================================+
-|:code:`x+y` or `x.+y`       | addition                | affine     |increasing     | none                            |
+|:code:`x+y` or `x.+y`     | addition                | affine     |increasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x-y` or `x.-y`       | subtraction             | affine     |increasing in  | none                            |
+|:code:`x-y` or `x.-y`     | subtraction             | affine     |increasing in  | none                            |
 |                          |                         |            |:math:`x`      |                                 |
 |                          |                         |            |               |                                 |
 |                          |                         |            |decreasing in  | none                            |
@@ -53,12 +53,12 @@ An optimization problem using only these functions can be solved by any LP solve
 |:code:`diag(x, k)`        | :math:`k`-th diagonal of| affine     |increasing     | none                            |
 |                          | a matrix                |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`diagm(x)`          | construct diagonal    | affine     |increasing     | PR: :math:`x` is a vector       |
+|:code:`diagm(x)`          | construct diagonal      | affine     |increasing     | PR: :math:`x` is a vector       |
 |                          | matrix                  |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x'`                | transpose               | affine     |increasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x'*y` or `dot(x,y)`  | :math:`x' y`            | affine     |increasing     | PR: one argument is constant    |
+|:code:`x'*y` or `dot(x,y)`| :math:`x' y`            | affine     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`vec(x)`            | vector representation   | affine     |increasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -76,9 +76,7 @@ An optimization problem using only these functions can be solved by any LP solve
 |                          |                         |            |               |                                 |
 |                          |elements of :math:`x`    |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`dot_sort(a, b)`    |:math:`dot(sort(a),      | convex     |increasing     | PR: one argument is constant    |
-|                          |       sort(b)`          |            |               |                                 |
-|                          |                         |            |               |                                 |
+|:code:`dot_sort(a, b)`    | dot(sort(a),sort(b))    | convex     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`reshape(x, m, n)`  | reshape into            | affine     |increasing     | none                            |
 |                          | :math:`m \times n`      |            |               |                                 |
@@ -87,7 +85,7 @@ An optimization problem using only these functions can be solved by any LP solve
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`maximum(x)`        | :math:`\max(x)`         | convex     |increasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`[x y]` or `[x; y]`   | stacking                | affine     |increasing     | none                            |
+|:code:`[x y]` or `[x; y]` | stacking                | affine     |increasing     | none                            |
 |                          |                         |            |               |                                 |
 |:code:`hcat(x, y)` or     |                         |            |               |                                 |
 |                          |                         |            |               |                                 |
@@ -123,7 +121,7 @@ An optimization problem using only these functions can be solved by any LP solve
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`neg(x)`            | :math:`\max(-x,0)`      | convex     |decreasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`inv_pos(x)`        | :math:`1/x`     | convex     |decreasing     | IC: :math:`x>0`                 |
+|:code:`inv_pos(x)`        | :math:`1/x`             | convex     |decreasing     | IC: :math:`x>0`                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`abs(x)`            | :math:`\left|x\right|`  | convex     |increasing on  | none                            |
 |                          |                         |            |:math:`x \ge 0`|                                 |
