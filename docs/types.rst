@@ -12,7 +12,7 @@ The simplest kind of expression in Convex.jl is a variable. Variables in Convex.
 	# Scalar variable
 	x = Variable()
 
-	# Column-vector variable
+	# Column vector variable
 	x = Variable(5)
 
 	# Matrix variable
@@ -33,7 +33,7 @@ Numbers, vectors, and matrices present in the Julia environment are wrapped auto
 Expressions
 ============
 Expressions in Convex.jl are formed by applying any *atom* (mathematical function defined in Convex.jl) to variables, constants, and other expressions. For a list of these functions, see `operations <operations.html>`_.
-Atoms are applied to expressions using operator overloading. Hence, :code:`2+2` calls Julia's built-in addition operator, while :code:`2+x` calls the Convex.jl addition method and returns a Convex.jl expression. Many of the useful language features in Julia, such as arithmetic, array indexing, and matrix transpose are overloaded in Convex.jl so they may be used with variables and expressions just as they are used with native Julia types.
+Atoms are applied to expressions using operator overloading. For example, :code:`2+2` calls Julia's built-in addition operator, while :code:`2+x` calls the Convex.jl addition method and returns a Convex.jl expression. Many of the useful language features in Julia, such as arithmetic, array indexing, and matrix transpose are overloaded in Convex.jl so they may be used with variables and expressions just as they are used with native Julia types.
 
 Expressions that are created must be DCP-compliant.
 More information on DCP can be found `here <http://dcp.stanford.edu/>`_.
@@ -85,8 +85,8 @@ The objective of the problem is a scalar expression to be maximized or minimized
 
 Problem
 ========
-A *problem* in Convex.jl consists of a *sense* (minimize, maximize, or satisfy), an objective (an expression to which the sense verb is to be
-applied), and zero or more constraints which must be satisfied at the solution.
+A *problem* in Convex.jl consists of a *sense* (minimize, maximize, or satisfy), an *objective* (an expression to which the sense verb is to be
+applied), and zero or more *constraints* that must be satisfied at the solution.
 Problems may be constructed as
 ::
 

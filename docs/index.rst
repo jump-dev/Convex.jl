@@ -7,7 +7,7 @@
 Convex.jl - Convex Optimization in Julia
 =========================================
 
-Convex.jl is a Julia package for `Disciplined Convex Programming <http://dcp.stanford.edu/>`_.
+Convex.jl is a Julia package for `Disciplined Convex Programming <http://dcp.stanford.edu/>`_ (DCP).
 Convex.jl makes it easy to describe optimization problems in a natural, mathematical syntax,
 and to solve those problems using a variety of different (commercial and open-source) solvers.
 Convex.jl can solve

@@ -44,7 +44,7 @@ An optimization problem using only these functions can be solved by any LP solve
 |                          |                         |            |               |                                 |
 |                          |                         |            |otherwise      |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x/y`               | division                | affine     |increasing     | PR: :math:`y` is a scalar constant|
+|:code:`x/y`               | division                | affine     |increasing     | PR: :math:`y` is scalar constant|
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x .* y`            | elemwise multiplication | affine     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -230,30 +230,30 @@ Semidefinite Program Representable Functions
 
 An optimization problem using these functions can be solved by any SDP solver (including SCS and Mosek).
 
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|operation                   | description                         | vexity     | slope         | notes                    |
-+============================+=====================================+============+===============+==========================+
-|:code:`nuclear_norm(x)`     | sum of singular values of :math:`x` | convex     |not monotonic  | none                     |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`operator_norm(x)`    | max of singular values of :math:`x` | convex     |not monotonic  | none                     |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`lambda_max(x)`       | max eigenvalue of :math:`x`         | convex     |increasing     |IC: x is positive semidefinite|
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`lambda_min(x)`       | min eigenvalue of :math:`x`         | concave    |increasing     |IC: x is positive semidefinite|
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
+|operation                   | description                         | vexity     | slope         | notes                        |
++============================+=====================================+============+===============+==============================+
+|:code:`nuclear_norm(x)`     | sum of singular values of :math:`x` | convex     |not monotonic  | none                         |
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
+|:code:`operator_norm(x)`    | max of singular values of :math:`x` | convex     |not monotonic  | none                         |
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
+|:code:`lambda_max(x)`       | max eigenvalue of :math:`x`         | convex     |not monotonic  |IC: x is positive semidefinite|
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
+|:code:`lambda_min(x)`       | min eigenvalue of :math:`x`         | concave    |not monotonic  |IC: x is positive semidefinite|
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
 |:code:`matrix_frac(x, P)`   | :math:`x^TP^{-1}x`                  | convex     |not monotonic  |IC: P is positive semidefinite|
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
 
 Exponential + SDP representable Functions
 ********************************************
 
 An optimization problem using these functions can be solved by any solver that supports exponential constraints *and* semidefinite constraints simultaneously (SCS).
 
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|operation                   | description                         | vexity     | slope         | notes                    |
-+============================+=====================================+============+===============+==========================+
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
+|operation                   | description                         | vexity     | slope         | notes                        |
++============================+=====================================+============+===============+==============================+
 |:code:`logdet(x)`           | log of determinant of :math:`x`     | concave    |increasing     |IC: x is positive semidefinite|
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
++----------------------------+-------------------------------------+------------+---------------+------------------------------+
 
 Promotions
 ***********
