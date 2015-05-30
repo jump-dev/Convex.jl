@@ -16,7 +16,7 @@ function quad_form(x::AbstractExpr, A::Value)
   if !is_symmetric(A)
     error("Quadratic form only defined for symmetric matrices")
   end
-  V = real(eigvals(full(A)))
+  V = eigvals(Symmetric(full(A)))
 
   if all(V .>= 0)
     factor = 1
