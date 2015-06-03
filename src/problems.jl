@@ -67,6 +67,7 @@ function find_variable_ranges(constraints)
       constr_size += constraint.sizes[i]
     end
   end
+  @show map(x->x.cone, constraints), index, constr_size, var_to_ranges
   return index, constr_size, var_to_ranges
 end
 
