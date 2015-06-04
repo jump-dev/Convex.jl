@@ -37,6 +37,7 @@ end
 # which we enforce via equality constraints
 function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
+    n = c.size[1]
     # construct linear indices to pick out the lower triangular part (including diagonal),
     # the upper triangular part (not including diagonal)
     # and the corresponding entries in the lower triangular part, so
