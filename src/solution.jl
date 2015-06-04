@@ -101,9 +101,11 @@ function populate_duals!{T}(constraints::Array{ConicConstr}, dual::Array{T, 1})
     if haskey(conic_constr_to_constr, constraint)
       sz = constraint.sizes[1]
       c = conic_constr_to_constr[constraint]
-      c.dual = reshape(dual[constr_index:constr_index+sz-1], c.size)
-      if c.size == (1, 1)
-        c.dual = c.dual[1]
+      if !(c.head == :sdp)
+        c.dual = reshape(dual[constr_index:constr_index+sz-1], c.size)
+        if c.size == (1, 1)
+          c.dual = c.dual[1]
+        end
       end
       constr_index += sz
     else
