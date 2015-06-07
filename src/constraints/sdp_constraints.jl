@@ -46,8 +46,10 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     upperpart = Array(Int, int(n*(n-1)/2))
     diagandlowerpart = Array(Int, int(n*(n+1)/2))
     kdiag, klower = 0, 0
-    for i = 1:n
-      for j = 1:i
+    # diagandlowerpart in column-major order:
+    # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...
+    for j = 1:n
+      for i = j:n
         if j < i # on the strictly lower part
           klower += 1
           diagandlowerpart[kdiag + klower] = n*(j-1) + i
@@ -59,6 +61,7 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
         end
       end
     end
+    println(diagandlowerpart)
     objective = conic_form!(c.child[diagandlowerpart], unique_conic_forms)
     new_constraint = ConicConstr([objective], :SDP, [int(n*(n+1)/2)])
     conic_constr_to_constr[new_constraint] = c
