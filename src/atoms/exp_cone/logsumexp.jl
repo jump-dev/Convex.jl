@@ -56,4 +56,11 @@ function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, e)
 end
 
-logistic_loss(e::AbstractExpr) = logsumexp([e, Constant(zeros(size(e)))])
+function logistic_loss(e::AbstractExpr)
+  s = 0
+  length(e)==1 && return logsumexp([e, 1])
+  for i=1:length(e)
+    s += logsumexp([e[i], 1])
+  end
+  return s
+end

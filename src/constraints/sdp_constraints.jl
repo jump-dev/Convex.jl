@@ -40,7 +40,7 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, c)
 end
 
-# TODO: Remove isposdef, change tests to use is. Update documentation and notebooks
+# TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
 isposdef(x::AbstractExpr) = SDPConstraint(x)
 
 # TODO: Throw error if symbol is invalid.
