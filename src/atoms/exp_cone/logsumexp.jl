@@ -58,9 +58,9 @@ end
 
 function logistic_loss(e::AbstractExpr)
   s = 0
-  length(e)==1 && return logsumexp([e, 1])
+  length(e)==1 && return logsumexp([e, 0])
   for i=1:length(e)
-    s += logsumexp([e[i], 1])
+    s += logsumexp([e[i], 0])
   end
   return s
 end
