@@ -67,7 +67,7 @@ facts("Exp Atoms") do
     p = minimize(logistic_loss(y), y>=1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
-    @fact p.optval => roughly(log((exp(1)+1)*5), TOL)
+    @fact p.optval => roughly(log(exp(1)+1)*5, TOL)
   end
 
   context("entropy atom") do
