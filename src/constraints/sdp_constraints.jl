@@ -1,5 +1,5 @@
 import Base.isposdef, Base.in
-export SDPConstraint, isposdef, in
+export SDPConstraint, isposdef, in, ⪰, ⪯
 
 ### Positive semidefinite cone constraint
 
@@ -45,23 +45,18 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     # the upper triangular part (not including diagonal)
     # and the corresponding entries in the lower triangular part, so
     # symmetry => c.child[upperpart] 
+    diagandlowerpart = find(tril(ones(n,n)))
     lowerpart = Array(Int, int(n*(n-1)/2))
     upperpart = Array(Int, int(n*(n-1)/2))
-    diagandlowerpart = Array(Int, int(n*(n+1)/2))
-    kdiag, klower = 0, 0
+    klower = 0
     # diagandlowerpart in column-major order:
     # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...
+    # consider using  and find(triu(ones(3,3)))
     for j = 1:n
-      for i = j:n
-        if j < i # on the strictly lower part
-          klower += 1
-          diagandlowerpart[kdiag + klower] = n*(j-1) + i # (i,j)th element
-          upperpart[klower] = n*(i-1) + j # (j,i)th element
-          lowerpart[klower] = n*(j-1) + i # (i,j)th element
-        else # on the diagonal
-          kdiag += 1 
-          diagandlowerpart[kdiag + klower] = n*(j-1) + i
-        end
+      for i = j+1:n
+        klower += 1
+        upperpart[klower] = n*(i-1) + j # (j,i)th element
+        lowerpart[klower] = n*(j-1) + i # (i,j)th element
       end
     end
     objective = conic_form!(c.child[diagandlowerpart], unique_conic_forms)
@@ -89,4 +84,20 @@ function in(x::AbstractExpr, y::Symbol)
   if y == :semidefinite
     SDPConstraint(x)
   end
+end
+
+function ⪰(x::AbstractExpr, y::AbstractExpr)
+  SDPConstraint(x-y)
+end
+
+function ⪯(x::AbstractExpr, y::AbstractExpr)
+  SDPConstraint(y-x)
+end
+
+function ⪰(x::AbstractExpr, y::Value)
+  all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
+end
+
+function ⪯(x::Value, y::AbstractExpr)
+  all(x .== 0) ? SDPConstraint(y) : SDPConstraint(Constant(x) - y)
 end
