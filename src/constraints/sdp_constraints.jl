@@ -81,7 +81,7 @@ isposdef(x::AbstractExpr) = SDPConstraint(x)
 
 # TODO: Throw error if symbol is invalid.
 function in(x::AbstractExpr, y::Symbol)
-  if y == :semidefinite
+  if y == :semidefinite || y == :SDP
     SDPConstraint(x)
   end
 end
