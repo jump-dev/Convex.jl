@@ -51,7 +51,7 @@ function conic_form!(x::NuclearNormAtom, unique_conic_forms)
     m, n = size(A)
     U = Variable(m,m)
     V = Variable(n,n)
-    p = minimize(.5*(trace(U) + trace(V)), isposdef([U A; A' V]))
+    p = minimize(.5*(trace(U) + trace(V)), [U A; A' V] in :semidefinite)
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)
