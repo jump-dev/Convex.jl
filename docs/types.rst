@@ -77,7 +77,9 @@ Matrices can also be constrained to be positive semidefinite.
 	y = Variable(3, 1)
 	z = Variable()
 	# constrain [x y; y' z] to be positive semidefinite
-	constraint = isposdef([x y; y' z])
+	constraint = ([x y; y' z] in :SDP)
+	# or equivalently,
+	constraint = ([x y; y' z] ⪰ 0)
 
 Objective
 =========
