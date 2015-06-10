@@ -98,6 +98,14 @@ function ⪰(x::AbstractExpr, y::Value)
   all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
 end
 
+function ⪰(x::Value, y::AbstractExpr)
+  all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(Constant(x) - y)
+end
+
 function ⪯(x::Value, y::AbstractExpr)
-  all(x .== 0) ? SDPConstraint(y) : SDPConstraint(Constant(x) - y)
+  all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - Constant(x))
+end
+
+function ⪯(x::AbstractExpr, y::Value)
+  all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(Constant(y) - x)
 end
