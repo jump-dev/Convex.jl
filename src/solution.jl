@@ -29,10 +29,12 @@ function solve!(problem::Problem,
     vex = vexity(problem)
   end
 
-  c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
+  oc, oA, ob, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
+
+  c, A, b, cones, P, constrindices = MathProgBase.presolve(oc, oA, ob, cones, [])
 
   if problem.head == :maximize
-    c = -c
+    c, oc = -c, -oc
   end
 
   # no conic constraints on variables
@@ -53,13 +55,21 @@ function solve!(problem::Problem,
   status = MathProgBase.optimize!(m)
 
   # get the primal (and possibly dual) solution
+  primal = P*[MathProgBase.getsolution(m); 1]
+  optval = (oc'*primal)[1]
+  @show primal, optval
   try
-    dual = MathProgBase.getconicdual(m)
-    problem.solution = Solution(MathProgBase.getsolution(m), dual,
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+    # inflate the dual back to the (non-presolved) size
+    dual = Array(Float64, size(b))
+    dual[constrindices] = MathProgBase.getconicdual(m)
+    problem.solution = Solution(primal, 
+                                dual,
+                                MathProgBase.status(m), 
+                                optval)
   catch
-    problem.solution = Solution(MathProgBase.getsolution(m),
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+    problem.solution = Solution(primal,
+                                MathProgBase.status(m), 
+                                optval)
   end
   populate_variables!(problem, var_to_ranges)
 
