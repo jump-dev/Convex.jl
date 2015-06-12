@@ -75,6 +75,10 @@ function presolve(c, A, b, constrcones, varcones)
 			# which we could certainly do much more intelligently.
 			# also other cases would cause more fill in
 		end
+		# btw we can also delete all-zero rows in LP and SOC constraints.
+		# not in SDP constraints.
+		# and this process might introduce new all-zero rows.
+		# so we could check for them in a second loop at the end if that seemed important.
 	end
 
 	## Retain only the informative rows and columns of the new problem data
