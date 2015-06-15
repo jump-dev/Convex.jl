@@ -111,4 +111,14 @@ facts("SDP Atoms") do
     @fact p.optval => roughly(7, TOL)
     @fact evaluate(matrix_frac(x, P))[1] => roughly(7, TOL)
   end
+
+  context("matrix frac atom both arguments variable") do
+    x = Variable(3)
+    P = Variable(3, 3)
+    p = minimize(matrix_frac(x, P), lambda_max(P) <= 2, x[1] >= 1)
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(.5, TOL)
+    @fact evaluate(matrix_frac(x, P))[1] => roughly(.5, TOL)
+  end
 end

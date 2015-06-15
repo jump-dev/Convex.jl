@@ -13,7 +13,7 @@ type MatrixFracAtom <: AbstractExpr
   children::@compat Tuple{AbstractExpr, AbstractExpr}
   size::@compat Tuple{Int, Int}
 
-  function MatrixFracAtom(x::Constant, P::AbstractExpr)
+  function MatrixFracAtom(x::AbstractExpr, P::AbstractExpr)
     if x.size[2] != 1
       error("first argument of matrix frac must be a vector")
     elseif P.size[1] != P.size[2]
@@ -43,22 +43,19 @@ function evaluate(m::MatrixFracAtom)
   return x'*inv(evaluate(m.children[2]))*x
 end
 
+matrix_frac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
 matrix_frac(x::Value, P::AbstractExpr) = MatrixFracAtom(Constant(x), P)
+matrix_frac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, Constant(P))
 
 function conic_form!(m::MatrixFracAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, m)
     x = m.children[1]
     P = m.children[2]
-    n = size(P, 1)
     t = Variable()
-    # M is a matrix with Schur complement t - x'*P*x
-    M = Variable(n+1, n+1)
-    obj = conic_form!(t, unique_conic_forms)
-    conic_form!(M[1:n, 1:n] == P, unique_conic_forms)
-    conic_form!(M[1:n, n+1] == x, unique_conic_forms)
-    conic_form!(M[n+1, n+1] == t, unique_conic_forms)
-    conic_form!(isposdef(M), unique_conic_forms)
-    cache_conic_form!(unique_conic_forms, m, obj)
+    # the matrix [t x'; x P] has Schur complement t - x'*P^{-1}*x
+    # this matrix is PSD <=> t >= x'*P^{-1}*x
+    p = minimize(t, [t x'; x P] ⪰ 0)
+    cache_conic_form!(unique_conic_forms, m, p)
   end
   return get_conic_form(unique_conic_forms, m)
 end

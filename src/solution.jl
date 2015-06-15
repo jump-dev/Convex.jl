@@ -31,7 +31,7 @@ function solve!(problem::Problem,
 
   oc, oA, ob, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
 
-  c, A, b, cones, P, constrindices = presolve(oc, oA, ob, cones, [])
+  c, A, b, cones, P, constrindices = presolve(oc, oA, ob, cones, [], vartypes)
 
   if problem.head == :maximize
     c, oc = -c, -oc
@@ -57,7 +57,6 @@ function solve!(problem::Problem,
   # get the primal (and possibly dual) solution
   primal = P*[MathProgBase.getsolution(m); 1]
   optval = (oc'*primal)[1]
-  @show primal, optval
   try
     # inflate the dual back to the (non-presolved) size
     dual = Array(Float64, size(b))
