@@ -7,10 +7,6 @@
 # * don't give up on eliminating integer / boolean variables
 # * eliminate variables and constraints not connected to the objective
 
-# * integers
-# * frob norm
-# * inv_pos optval
-
 function presolve(c, A, b, constrcones, varcones, vartypes, verbose=false)
 	verbose && @show c, full(A), b, constrcones
 	m, n = size(A)
