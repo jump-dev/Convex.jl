@@ -31,7 +31,7 @@ function solve!(problem::Problem,
 
   oc, oA, ob, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
 
-  c, A, b, cones, P, constrindices = presolve(oc, oA, ob, cones, [], vartypes)
+  c, A, b, cones, vartypes, P, constrindices = presolve(oc, oA, ob, cones, [], vartypes)
 
   if problem.head == :maximize
     c, oc = -c, -oc

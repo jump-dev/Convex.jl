@@ -4,11 +4,14 @@
 # * allow users to specify which constraint can't be eliminated
 # * populate dual variables for SDPs
 # * stop committing crimes against sparse matrices
+# * don't give up on eliminating integer / boolean variables
+# * eliminate variables and constraints not connected to the objective
 
-# * integer variables
+# * integers
+# * frob norm
 # * inv_pos optval
 
-function presolve(c, A, b, constrcones, varcones, vartypes, verbose=true)
+function presolve(c, A, b, constrcones, varcones, vartypes, verbose=false)
 	verbose && @show c, full(A), b, constrcones
 	m, n = size(A)
 	tA = copy(A)
@@ -66,7 +69,7 @@ function presolve(c, A, b, constrcones, varcones, vartypes, verbose=true)
 				rownnz = find(tA[iconstr,:])
 				# with two constraints we can always eliminate one variable
 				if length(rownnz) == 2
-					# eliminate second variable if we can
+					# we'll eliminate variable with index iv2 and keep iv1
 					if rownnz[2] in keepme
 						if rownnz[1] in keepme
 							continue # don't eliminate either
@@ -90,7 +93,7 @@ function presolve(c, A, b, constrcones, varcones, vartypes, verbose=true)
 					P[iv2, iv2] = 0
 					P[iv2, iv1] = - Acv1/Acv2
 					# Av2*v2 = Av2*(bc/Acv2 - Acv1/Acv2*v1)
-					tb += Av2*(bc/Acv2)
+					tb -= Av2*(bc/Acv2)
 					tA[:,iv1] -= Av2*(Acv1/Acv2)
 					tA[:,iv2] = 0
 					# cv2*v2 = cv2*(bc/Acv2 - Acv1/Acv2*v1), but ignore the constant term
@@ -106,8 +109,8 @@ function presolve(c, A, b, constrcones, varcones, vartypes, verbose=true)
 	
 
 	# loop 3: delete all-zero rows
-	# we can delete all-zero rows in equality and LP constraints
-	# and SOC (as long as it's not the first index) constraints
+	# we can delete all-zero rows of A in equality and LP constraints
+	# and combine them in SOC (as long as it's not the first index) constraints
 	# but not in SDP constraints
 	# and not in exp constraints
 	for (cone, indices) in constrcones
@@ -116,10 +119,9 @@ function presolve(c, A, b, constrcones, varcones, vartypes, verbose=true)
 				tb[iconstr] >= 0 ? push!(eliminatedconstraints, iconstr) : warn("Infeasible")
 			end
 		elseif cone == :SOC
-			for (iconstr,_) in filter(t->length(t[2])==0, map(i->(i,find(tA[i,:])),indices[2:end]))
-				# ||[x y]||^2 <= p^2, x a constant <=> ||y||^2 <= p^2-x^2
-				newp = tb[indices[1]]^2 - tb[iconstr]^2
-				newp < 0 ? warn("Infeasible") : tb[indices[1]] = sqrt(newp)
+			zerorows = filter(t->length(t[2])==0, map(i->(i,find(tA[i,:])),indices[2:end-1]))
+			for (iconstr,_) in zerorows[2:end] 
+				tb[zerorows[1]] += tb[iconstr]
 				push!(eliminatedconstraints, iconstr)
 			end
 		end
@@ -142,11 +144,12 @@ function presolve(c, A, b, constrcones, varcones, vartypes, verbose=true)
 	newconstrindices(indices) = filter(x->x>0, constrmap[indices])
 	newconstrcones = (Symbol, Any)[]
 	for (cone,indices) in constrcones
-		push!(newconstrcones, (cone, newconstrindices(indices)) )		
+		newindices = newconstrindices(indices)
+		length(newindices) > 0 && push!(newconstrcones, (cone, newindices))		
 	end
 
 	verbose && @show tc[vars], full(tA[constrs, vars]), tb[constrs], newconstrcones, P[:, [vars..., n+1]]
-	return tc[vars], tA[constrs, vars], tb[constrs], newconstrcones, 
+	return tc[vars], tA[constrs, vars], tb[constrs], newconstrcones, vartypes[vars],
 		sparse(P[:, push!(vars, n+1)]), constrs
 end
 
