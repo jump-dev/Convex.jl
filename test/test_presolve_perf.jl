@@ -1,7 +1,8 @@
 using Convex
 import Distributions
 using FactCheck
-using SCS
+
+TOL = 1e-3
 
 facts("Presolve performance") do
   context("svm") do
@@ -29,35 +30,44 @@ facts("Presolve performance") do
         push!(problem.constraints, -1*(dot(w,neg[:,j]) - b) >= 1-ξneg[j])
         #problem.constraints += -1*(dot(w,neg[:,j]) - b) >= 1-ξneg[j]
       end
-      solve!(problem, SCSSolver(verbose=0), use_presolve=use_presolve)
+      solve!(problem, use_presolve=use_presolve)
       return evaluate(w), evaluate(b)
     end
 
     # initial compilation
     pos,neg = gen_data(10)
     svm(pos, neg, true)
-    # svm(pos, neg, false)
+    svm(pos, neg, false)
 
     pos,neg = gen_data(2000)
-    @time w, b = svm(pos, neg, true)
-    @show w,b
-    @time w, b = svm(pos, neg, false)
-    @show w,b
+    info("Using presolve")
+    @time w1, b1 = svm(pos, neg, true)
+
+    info("Not using presolve")
+    @time w2, b2 = svm(pos, neg, false)
+
+    @fact w1 => roughly(w2, TOL)
+    @fact b1 => roughly(b2, TOL)
   end
 
   context("variables to constants") do
     # warm up
     x = Variable()
     p = minimize(sum(x), [x == 1])
-    solve!(p, SCSSolver(verbose=0))
+    solve!(p, use_presolve=true)
+    solve!(p, use_presolve=false)
 
     x1 = Variable(1000)
     p1 = minimize(sum(x1), [x1 == [1:1000]])
-    @time solve!(p1, SCSSolver(verbose=0), use_presolve=false)
+    info("Using presolve")
+    @time solve!(p1, use_presolve=true)
 
     x2 = Variable(1000)
     p2 = minimize(sum(x2), [x2 == [1:1000]])
-    @time solve!(p2, SCSSolver(verbose=0), use_presolve=true)
+    info("Not using presolve")
+    @time solve!(p2, use_presolve=false)
+
+    # @fact evaluate(x1) => roughly(evaluate(x2), TOL)
   end
 end
 
