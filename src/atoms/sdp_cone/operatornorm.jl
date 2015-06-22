@@ -1,11 +1,11 @@
 #############################################################################
-# operator_norm.jl
+# operatornorm.jl
 # Handles matrix operator norm (the maximum singular value of a matrix)
-# and creates the alias sigma_max
+# and creates the alias sigmamax
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-export operator_norm, sigma_max
+export operatornorm, sigmamax
 
 ### Operator norm
 
@@ -17,7 +17,7 @@ type OperatorNormAtom <: AbstractExpr
 
   function OperatorNormAtom(x::AbstractExpr)
     children = (x,)
-    return new(:operator_norm, hash(children), children, (1,1))
+    return new(:operatornorm, hash(children), children, (1,1))
   end
 end
 
@@ -39,8 +39,8 @@ function evaluate(x::OperatorNormAtom)
   norm(evaluate(x.children[1]), 2)
 end
 
-operator_norm(x::AbstractExpr) = OperatorNormAtom(x)
-sigma_max(x::AbstractExpr) = OperatorNormAtom(x)
+operatornorm(x::AbstractExpr) = OperatorNormAtom(x)
+sigmamax(x::AbstractExpr) = OperatorNormAtom(x)
 
 # Create the equivalent conic problem:
 #   minimize t

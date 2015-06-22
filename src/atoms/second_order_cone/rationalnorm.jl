@@ -1,5 +1,5 @@
 #############################################################################
-# rational_norm.jl
+# rationalnorm.jl
 #
 # Handles the k-norms for k > 1 where k is rational. Reduces the
 # k-norm constraint to at most 2d ceil(log2(n + m)) + O(d) second
@@ -11,7 +11,7 @@
 # https://github.com/JuliaOpt/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf
 #############################################################################
 
-export rational_norm
+export rationalnorm
 
 ### k-norm for rational k
 
@@ -25,7 +25,7 @@ type RationalNormAtom <: AbstractExpr
   function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})
     children = (x,)
     k >= 1 || error("p-norms not defined for p < 1")
-    return new(:rational_norm, hash(children), children, (1,1), k)
+    return new(:rationalnorm, hash(children), children, (1,1), k)
   end
 end
 
@@ -46,7 +46,7 @@ function evaluate(x::RationalNormAtom)
   return sum(abs(evaluate(x.children[1])).^x.k)^(1/x.k);
 end
 
-rational_norm(x::AbstractExpr, k::Rational{Int64}) = RationalNormAtom(x, k::Rational{Int64})
+rationalnorm(x::AbstractExpr, k::Rational{Int64}) = RationalNormAtom(x, k::Rational{Int64})
 
 # conic_form!(x::RationalNormAtom, unique_conic_forms)
 #

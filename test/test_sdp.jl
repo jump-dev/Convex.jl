@@ -59,66 +59,66 @@ facts("SDP Atoms") do
 
   context("nuclear norm atom") do
     y = Semidefinite(3)
-    p = minimize(nuclear_norm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2)
+    p = minimize(nuclearnorm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(3, TOL)
-    @fact evaluate(nuclear_norm(y)) => roughly(3, TOL)
+    @fact evaluate(nuclearnorm(y)) => roughly(3, TOL)
   end
 
   context("operator norm atom") do
     y = Variable((3,3))
-    p = minimize(operator_norm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+    p = minimize(operatornorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(4, TOL)
-    @fact evaluate(operator_norm(y)) => roughly(4, TOL)
+    @fact evaluate(operatornorm(y)) => roughly(4, TOL)
   end
 
   context("sigma max atom") do
     y = Variable((3,3))
-    p = minimize(sigma_max(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+    p = minimize(sigmamax(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(4, TOL)
-    @fact evaluate(sigma_max(y)) => roughly(4, TOL)
+    @fact evaluate(sigmamax(y)) => roughly(4, TOL)
   end
 
   context("lambda max atom") do
     y = Semidefinite(3)
-    p = minimize(lambda_max(y), y[1,1]>=4)
+    p = minimize(lambdamax(y), y[1,1]>=4)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(4, TOL)
-    @fact evaluate(lambda_max(y)) => roughly(4, TOL)
+    @fact evaluate(lambdamax(y)) => roughly(4, TOL)
   end
 
   context("lambda min atom") do
     y = Semidefinite(3)
-    p = maximize(lambda_min(y), trace(y)<=6)
+    p = maximize(lambdamin(y), trace(y)<=6)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(2, TOL)
-    @fact evaluate(lambda_min(y)) => roughly(2, TOL)
+    @fact evaluate(lambdamin(y)) => roughly(2, TOL)
   end
 
   context("matrix frac atom") do
     x = [1, 2, 3]
     P = Variable(3, 3)
-    p = minimize(matrix_frac(x, P), P <= 2*eye(3), P >= 0.5 * eye(3))
+    p = minimize(matrixfrac(x, P), P <= 2*eye(3), P >= 0.5 * eye(3))
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(7, TOL)
-    @fact evaluate(matrix_frac(x, P))[1] => roughly(7, TOL)
+    @fact evaluate(matrixfrac(x, P))[1] => roughly(7, TOL)
   end
 
   context("matrix frac atom both arguments variable") do
     x = Variable(3)
     P = Variable(3, 3)
-    p = minimize(matrix_frac(x, P), lambda_max(P) <= 2, x[1] >= 1)
+    p = minimize(matrixfrac(x, P), lambdamax(P) <= 2, x[1] >= 1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(.5, TOL)
-    @fact evaluate(matrix_frac(x, P))[1] => roughly(.5, TOL)
+    @fact evaluate(matrixfrac(x, P))[1] => roughly(.5, TOL)
   end
 end

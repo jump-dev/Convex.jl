@@ -68,15 +68,15 @@ An optimization problem using only these functions can be solved by any LP solve
 |                          |                         |            |               |                                 |
 |                          | dimension :math:`k`     |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`sum_largest(x, k)` | sum of :math:`k` largest| convex     |increasing     | none                            |
+|:code:`sumlargest(x, k)` | sum of :math:`k` largest| convex     |increasing     | none                            |
 |                          |                         |            |               |                                 |
 |                          | elements of :math:`x`   |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`sum_smallest(x, k)`|sum of :math:`k` smallest| concave    |increasing     | none                            |
+|:code:`sumsmallest(x, k)`|sum of :math:`k` smallest| concave    |increasing     | none                            |
 |                          |                         |            |               |                                 |
 |                          |elements of :math:`x`    |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`dot_sort(a, b)`    | dot(sort(a),sort(b))    | convex     |increasing     | PR: one argument is constant    |
+|:code:`dotsort(a, b)`    | dot(sort(a),sort(b))    | convex     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`reshape(x, m, n)`  | reshape into            | affine     |increasing     | none                            |
 |                          | :math:`m \times n`      |            |               |                                 |
@@ -121,7 +121,7 @@ An optimization problem using only these functions can be solved by any LP solve
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`neg(x)`            | :math:`\max(-x,0)`      | convex     |decreasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`inv_pos(x)`        | :math:`1/x`             | convex     |decreasing     | IC: :math:`x>0`                 |
+|:code:`invpos(x)`        | :math:`1/x`             | convex     |decreasing     | IC: :math:`x>0`                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`abs(x)`            | :math:`\left|x\right|`  | convex     |increasing on  | none                            |
 |                          |                         |            |:math:`x \ge 0`|                                 |
@@ -153,7 +153,7 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 |                            |                                     |            |decreasing on  |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`quad_form(x, P)`     | :math:`x^T P x`                     | convex in  |increasing on  | PR: either :math:`x` or  |
+|:code:`quadform(x, P)`     | :math:`x^T P x`                     | convex in  |increasing on  | PR: either :math:`x` or  |
 |                            |                                     | :math:`x`  |:math:`x \ge 0`| :math:`P`                |
 |                            |                                     |            |               |                          |
 |                            |                                     | affine in  |decreasing on  | must be constant;        |
@@ -162,7 +162,7 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 |                            |                                     |            |increasing in  | must be symmetric and    |
 |                            |                                     |            |:math:`P`      | positive semidefinite    |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`quad_over_lin(x, y)` | :math:`x^T x/y`                     | convex     |increasing on  |                          |
+|:code:`quadoverlin(x, y)` | :math:`x^T x/y`                     | convex     |increasing on  |                          |
 |                            |                                     |            |:math:`x \ge 0`| IC: :math:`y > 0`        |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
@@ -171,7 +171,7 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 |                            |                                     |            |decreasing in  |                          |
 |                            |                                     |            |:math:`y`      |                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`sum_squares(x)`      | :math:`\sum x_i^2`                  | convex     |increasing on  | none                     |
+|:code:`sumsquares(x)`      | :math:`\sum x_i^2`                  | convex     |increasing on  | none                     |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
@@ -185,7 +185,7 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 |                            |                                     |            |decreasing on  |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`geo_mean(x, y)`      | :math:`\sqrt{xy}`                   | concave    |increasing     | IC: :math:`x\ge0`,       |
+|:code:`geomean(x, y)`      | :math:`\sqrt{xy}`                   | concave    |increasing     | IC: :math:`x\ge0`,       |
 |                            |                                     |            |               | :math:`y\ge0`            |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`huber(x)`            | :math:`\begin{cases}                | convex     |increasing on  | PR: :math:`M>=1`         |
@@ -206,23 +206,21 @@ Exponential Cone  Representable Functions
 
 An optimization problem using these functions can be solved by any exponential cone solver (SCS).
 
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|operation                    | description                             | vexity     | slope         | notes                    |
-+=============================+=========================================+============+===============+==========================+
-|:code:`logsumexp(x)`         | :math:`\log(\sum_i \exp(x_i))`          | convex     |increasing     |none                      |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|:code:`exp(x)`               | :math:`\exp(x)`                         | convex     |increasing     | none                     |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|:code:`log(x)`               | :math:`\log(x)`                         | concave    |increasing     | IC: :math:`x>0`          |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|:code:`entropy(x)`           | :math:`\sum_{i} -x_{i} \log (x_{i})`    | concave    |not monotonic  | IC: :math:`x>0`          |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|:code:`relative_entropy(x,y)`| :math:`\sum_{i} x_i \log (x_i/y_i)`     | convex     |not monotonic  | IC: :math:`x\geq0, y>0`  |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|:code:`log_perspective(x,y)` | :math:`\sum_{i}  y_i \log (x_i/y_i)`    | concave    |not monotonic  | IC: :math:`y\geq0, x>0`  |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
-|:code:`logistic_loss(x)`     | :math:`\log(1 + \exp(x_i))`             | convex     |increasing     | none                     |
-+-----------------------------+-----------------------------------------+------------+---------------+--------------------------+
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|operation                   | description                         | vexity     | slope         | notes                    |
++============================+=====================================+============+===============+==========================+
+|:code:`logsumexp(x)`        | :math:`\log(\sum_i \exp(x_i))`      | convex     |increasing     |none                      |
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|:code:`exp(x)`              | :math:`\exp(x)`                     | convex     |increasing     | none                     |
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|:code:`log(x)`              | :math:`\log(x)`                     | concave    |increasing     | IC: :math:`x>0`          |
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|:code:`entropy(x)`          | :math:`\sum_{ij}                    | concave    |not monotonic  | IC: :math:`x>0`          |
+|                            | -x_{ij} \log (x_{ij})`              |            |               |                          |
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|:code:`logisticloss(x)`    | :math:`\log(1 + \exp(x_i))`         | convex     |increasing     | none                     |
+|                            |                                     |            |               |                          |
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 
 Semidefinite Program Representable Functions
@@ -233,15 +231,15 @@ An optimization problem using these functions can be solved by any SDP solver (i
 +----------------------------+-------------------------------------+------------+---------------+------------------------------+
 |operation                   | description                         | vexity     | slope         | notes                        |
 +============================+=====================================+============+===============+==============================+
-|:code:`nuclear_norm(x)`     | sum of singular values of :math:`x` | convex     |not monotonic  | none                         |
+|:code:`nuclearnorm(x)`     | sum of singular values of :math:`x` | convex     |not monotonic  | none                         |
 +----------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`operator_norm(x)`    | max of singular values of :math:`x` | convex     |not monotonic  | none                         |
+|:code:`operatornorm(x)`    | max of singular values of :math:`x` | convex     |not monotonic  | none                         |
 +----------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`lambda_max(x)`       | max eigenvalue of :math:`x`         | convex     |not monotonic  |IC: x is positive semidefinite|
+|:code:`lambdamax(x)`       | max eigenvalue of :math:`x`         | convex     |not monotonic  |IC: x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`lambda_min(x)`       | min eigenvalue of :math:`x`         | concave    |not monotonic  |IC: x is positive semidefinite|
+|:code:`lambdamin(x)`       | min eigenvalue of :math:`x`         | concave    |not monotonic  |IC: x is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`matrix_frac(x, P)`   | :math:`x^TP^{-1}x`                  | convex     |not monotonic  |IC: P is positive semidefinite|
+|:code:`matrixfrac(x, P)`   | :math:`x^TP^{-1}x`                  | convex     |not monotonic  |IC: P is positive semidefinite|
 +----------------------------+-------------------------------------+------------+---------------+------------------------------+
 
 Exponential + SDP representable Functions
