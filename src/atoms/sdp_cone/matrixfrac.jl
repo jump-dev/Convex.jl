@@ -1,11 +1,11 @@
 #############################################################################
-# matrix_frac.jl
+# matrixfrac.jl
 # implements the atom for x^T*P^{-1}*x, where P is a positive semidefinite
 # matrix.
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-export matrix_frac
+export matrixfrac
 
 type MatrixFracAtom <: AbstractExpr
   head::Symbol
@@ -22,7 +22,7 @@ type MatrixFracAtom <: AbstractExpr
       error("sizes must agree for arguments of matrix frac")
     end
     children = (x, P)
-    return new(:matrix_frac, hash(children), children, (1,1))
+    return new(:matrixfrac, hash(children), children, (1,1))
   end
 end
 
@@ -43,9 +43,9 @@ function evaluate(m::MatrixFracAtom)
   return x'*inv(evaluate(m.children[2]))*x
 end
 
-matrix_frac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
-matrix_frac(x::Value, P::AbstractExpr) = MatrixFracAtom(Constant(x), P)
-matrix_frac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, Constant(P))
+matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
+matrixfrac(x::Value, P::AbstractExpr) = MatrixFracAtom(Constant(x), P)
+matrixfrac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, Constant(P))
 
 function conic_form!(m::MatrixFracAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, m)

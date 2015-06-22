@@ -1,11 +1,11 @@
 #############################################################################
-# dot_sort.jl
-# dot_sort(a,b) computes dot(sort(a), sort(b))
+# dotsort.jl
+# dotsort(a,b) computes dot(sort(a), sort(b))
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
-export dot_sort
+export dotsort
 export sign, curvature, monotonicity, evaluate
 
 # This atom computes dot(sort(x), sort(w)), where w is constant
@@ -23,7 +23,7 @@ type DotSortAtom <: AbstractExpr
     end
     children = (x,)
     vecw = reshape(w, get_vectorized_size(x))
-    return new(:dot_sort, hash((children, vecw)), children, (1,1), vecw)
+    return new(:dotsort, hash((children, vecw)), children, (1,1), vecw)
   end
 end
 
@@ -73,5 +73,5 @@ function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-dot_sort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)
-dot_sort(b::Value, a::AbstractExpr) = DotSortAtom(a, b)
+dotsort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)
+dotsort(b::Value, a::AbstractExpr) = DotSortAtom(a, b)

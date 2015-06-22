@@ -28,7 +28,7 @@ x = Variable(n)
 
 # The problem is to minimize ||Ax - b||^2 subject to x >= 0
 # This can be done by: minimize(objective, constraints)
-problem = minimize(sum_squares(A * x + b), [x >= 0])
+problem = minimize(sumsquares(A * x + b), [x >= 0])
 
 # Solve the problem by calling solve!
 solve!(problem)

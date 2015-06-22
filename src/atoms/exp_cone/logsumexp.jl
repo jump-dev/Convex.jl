@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export logsumexp, logistic_loss
+export logsumexp, logisticloss
 export sign, curvature, monotonicity, evaluate
 
 ### LogSumExp
@@ -56,7 +56,7 @@ function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, e)
 end
 
-function logistic_loss(e::AbstractExpr)
+function logisticloss(e::AbstractExpr)
   s = 0
   length(e)==1 && return logsumexp([e, 0])
   for i=1:length(e)

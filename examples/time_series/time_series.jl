@@ -13,8 +13,8 @@ for i in 365 + 1 : n
 end
 
 smoothing = 100
-smooth_objective = sum_squares(yearly[1 : n - 1] - yearly[2 : n])
-problem = minimize(sum_squares(temps - yearly) + smoothing * smooth_objective, eq_constraints)
+smooth_objective = sumsquares(yearly[1 : n - 1] - yearly[2 : n])
+problem = minimize(sumsquares(temps - yearly) + smoothing * smooth_objective, eq_constraints)
 solve!(problem, SCSSolver(max_iters=5000, verbose=0))
 residuals = temps - evaluate(yearly)
 
@@ -40,7 +40,7 @@ end
 
 # Solve autoregressive problem
 ar_coef = Variable(ar_len)
-problem = minimize(sum_squares(residuals_mat * ar_coef - residuals[ar_len + 1 : end]))
+problem = minimize(sumsquares(residuals_mat * ar_coef - residuals[ar_len + 1 : end]))
 solve!(problem, SCSSolver(max_iters=5000, verbose=0))
 
 # plot autoregressive fit of daily fluctuations for a few days

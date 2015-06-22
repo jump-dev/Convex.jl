@@ -1,5 +1,5 @@
 import Base.sqrt
-export GeoMeanAtom, geo_mean, sqrt
+export GeoMeanAtom, geomean, sqrt
 export sign, monotonicity, curvature, conic_form!
 
 type GeoMeanAtom <: AbstractExpr
@@ -13,7 +13,7 @@ type GeoMeanAtom <: AbstractExpr
       error("geo mean must take two arguments of the same size")
     end
     children = (x, y)
-    return new(:geo_mean, hash(children), children, x.size)
+    return new(:geomean, hash(children), children, x.size)
   end
 end
 
@@ -47,5 +47,5 @@ function conic_form!(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, q)
 end
 
-geo_mean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
+geomean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
 sqrt(x::AbstractExpr) = GeoMeanAtom(x, Constant(ones(x.size[1], x.size[2])))

@@ -1,11 +1,11 @@
 #############################################################################
-# sum_largest.jl
+# sumlargest.jl
 # The sum of the k largest/smallest elements of an expression
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
-export sum_largest, sum_smallest
+export sumlargest, sumsmallest
 export sign, curvature, monotonicity, evaluate
 
 type SumLargestAtom <: AbstractExpr
@@ -17,13 +17,13 @@ type SumLargestAtom <: AbstractExpr
 
   function SumLargestAtom(x::AbstractExpr, k::Int)
     if k <= 0
-      error("sum_largest and sum_smallest only support positive values of k")
+      error("sumlargest and sumsmallest only support positive values of k")
     end
     if k > get_vectorized_size(x)
       error("k cannot be larger than the number of entries in x")
     end
     children = (x,)
-    return new(:sum_largest, hash((children, k)), children, (1,1), k)
+    return new(:sumlargest, hash((children, k)), children, (1,1), k)
   end
 end
 
@@ -59,5 +59,5 @@ function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-sum_largest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
-sum_smallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)
+sumlargest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
+sumsmallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)

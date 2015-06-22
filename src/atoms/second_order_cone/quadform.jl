@@ -1,15 +1,15 @@
-export quad_form
+export quadform
 
 function is_symmetric(A::Matrix)
   TOLERANCE = 1e-6
   return all(A - A' .< TOLERANCE)
 end
 
-function quad_form(x::Value, A::AbstractExpr)
+function quadform(x::Value, A::AbstractExpr)
   return x' * A * x
 end
 
-function quad_form(x::AbstractExpr, A::Value)
+function quadform(x::AbstractExpr, A::Value)
   if length(size(A)) != 2 || size(A, 1) != size(A, 2)
     error("Quadratic form only takes square matrices")
   end
@@ -27,5 +27,5 @@ function quad_form(x::AbstractExpr, A::Value)
   end
 
   P = real(sqrtm(full(factor * A)))
-  return factor * square(norm_2(P * x))
+  return factor * square(norm2(P * x))
 end
