@@ -42,7 +42,7 @@ nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 # Create the equivalent conic problem:
 #   minimize (trace(U) + trace(V))/2
 #   subject to
-#            [U A; A' V] is positive semidefinite
+#            [U A; A' V] ⪰ 0
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
 # http://arxiv.org/pdf/0706.4138v1.pdf
 function conic_form!(x::NuclearNormAtom, unique_conic_forms)
