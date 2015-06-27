@@ -11,9 +11,7 @@ function solve!(problem::Problem,
     # use the model we used to solve the problem last time,
     # in order to reuse cached (primal and dual) solution
     m = problem.model
-    # TODO: allow options from new model to be passed into old one 
-    # (currently this segfaults for eg SCS)
-    # m.options = s.options
+    # TODO: allow user to change options for model based on those passed in argument s above
     # call setwarmstart explicitly to tell the solver to warmstart (eg, setting options if necessary)
     MathProgBase.setwarmstart!(m, problem.solution.primal)
   else
