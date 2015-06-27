@@ -13,8 +13,14 @@ function solve!(problem::Problem,
     m = problem.model
     # TODO: allow user to change options for model based on those passed in argument s above
     # call setwarmstart explicitly to tell the solver to warmstart (eg, setting options if necessary)
-    MathProgBase.setwarmstart!(m, problem.solution.primal)
-  else
+    try
+      MathProgBase.setwarmstart!(m, problem.solution.primal)
+    catch
+      warn("Unable to warmstart problem. Using a cold start instead.")
+      warmstart = false
+    end
+  end
+  if !warmstart
     if isa(s, MathProgBase.AbstractMathProgSolver)
       m = MathProgBase.model(s)
     elseif s != nothing # it is already a model
