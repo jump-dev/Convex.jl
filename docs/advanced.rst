@@ -47,4 +47,19 @@ pass the optional argument `warmstart=true` to the `solve!` method.
 	# this run will be faster
 	lambda = 105
 	@time solve!(problem, warmstart=true)
+
+
+Fixing and freeing variables
+****************************
+
+Convex.jl allows you to fix a variable `x` to a value by calling the `fix!` method. 
+Fixing the variable essentially turns it into a constant.
+Fixed variables are sometimes also called parameters.
+
+`fix(x, v)` fixes the variable `x` to the value `v`. 
+
+`fix(x)` fixes `x` to the value `x.value`, which might be the value
+obtained by solving another problem involving the variable `x`.
+
+To allow the variable `x` to vary again, call `free!(x)`.
 	

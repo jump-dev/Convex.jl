@@ -84,6 +84,7 @@ end
 
 # fix variables to hold them at their current value, and free them afterwards
 function fix!(x::Variable)
+  x.value == nothing && error("This variable has no value yet; cannot fix value to nothing!")
   push!(x.sets, :fixed)
   x.vexity = ConstVexity()
   x
