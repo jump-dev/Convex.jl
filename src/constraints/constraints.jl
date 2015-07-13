@@ -122,8 +122,8 @@ type GtConstraint <: Constraint
 end
 
 function vexity(c::GtConstraint)
-  vex = vexity(c.lhs) + (-vexity(c.rhs))
-  if vex == ConvexVexity()
+  vex = -vexity(c.lhs) + (vexity(c.rhs))
+  if vex == ConcaveVexity()
     vex = NotDcp()
   end
   return vex

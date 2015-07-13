@@ -71,23 +71,24 @@ function find_variable_ranges(constraints)
 end
 
 function vexity(p::Problem)
+  bad_vex = [ConcaveVexity, NotDcp]
+
   obj_vex = vexity(p.objective)
   if p.head == :maximize
     obj_vex = -obj_vex
   end
+  typeof(obj_vex) in bad_vex && warn("Problem not DCP compliant: objective is not DCP")
+
   constr_vex = ConstVexity()
-  for constr in p.constraints
-    vex = vexity(constr)
-    if typeof(constr) == GtConstraint
-      constr_vex += -vex
-    else
-      constr_vex += vex
-    end
+  for i in 1:length(p.constraints)
+    vex = vexity(p.constraints[i])
+    typeof(vex) in bad_vex && warn("Problem not DCP compliant: constraint $i is not DCP")
+    constr_vex += vex
   end
-  if typeof(obj_vex + constr_vex) == ConcaveVexity
-    warn("Expression not DCP compliant")
-  end
-  return obj_vex + constr_vex
+  problem_vex = obj_vex + constr_vex
+  # this check is redundant
+  # typeof(problem_vex) in bad_vex && warn("Problem not DCP compliant")
+  return problem_vex
 end
 
 function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)

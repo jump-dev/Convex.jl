@@ -73,9 +73,9 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
       # make sure all 1x1 sized objects are interpreted as scalars, since
       # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
       if const_child.size == (1, 1)
-        const_multiplier = const_child.value[1]
+        const_multiplier = evaluate(const_child)[1]
       else
-        const_multiplier = reshape(const_child.value, get_vectorized_size(const_child), 1)
+        const_multiplier = reshape(evaluate(const_child), get_vectorized_size(const_child), 1)
       end
 
       objective = const_multiplier * objective
