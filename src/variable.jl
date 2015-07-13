@@ -4,7 +4,7 @@
 #############################################################################
 
 export Variable, Semidefinite
-export vexity, evaluate, sign, conic_form!
+export vexity, evaluate, sign, conic_form!, fix!, free!
 
 type Variable <: AbstractExpr
   head::Symbol
@@ -13,10 +13,10 @@ type Variable <: AbstractExpr
   size::@compat Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
-  sets # ::Array{Symbol,1}
+  sets::Array{Symbol,1}
 
   function Variable(size::@compat(Tuple{Int, Int}), sign::Sign=NoSign(), sets::Symbol...)
-    this = new(:variable, 0, nothing, size, AffineVexity(), sign, sets)
+    this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
     return this
@@ -59,18 +59,44 @@ end
 
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
-    objective = ConicObj()
-    vec_size = get_vectorized_size(x)
-    objective[x.id_hash] = speye(vec_size)
-    objective[object_id(:constant)] = spzeros(vec_size, 1)
-    # placeholder values in unique constraints prevent infinite recursion depth
-    cache_conic_form!(unique_conic_forms, x, objective)
-    if !(x.sign == NoSign())
-      conic_form!(x.sign, x, unique_conic_forms)
-    end
-    for set in x.sets
-      conic_form!(set, x, unique_conic_forms)
+    if :fixed in x.sets
+      # do exactly what we would for a constant
+      objective = ConicObj()
+      objective[object_id(:constant)] = vec([x.value;])
+      cache_conic_form!(unique_conic_forms, x, objective)
+    else
+      objective = ConicObj()
+      vec_size = get_vectorized_size(x)
+      objective[x.id_hash] = speye(vec_size)
+      objective[object_id(:constant)] = spzeros(vec_size, 1)
+      # placeholder values in unique constraints prevent infinite recursion depth
+      cache_conic_form!(unique_conic_forms, x, objective)
+      if !(x.sign == NoSign())
+        conic_form!(x.sign, x, unique_conic_forms)
+      end
+      for set in x.sets
+        conic_form!(set, x, unique_conic_forms)
+      end
     end
   end
   return get_conic_form(unique_conic_forms, x)
+end
+
+# fix variables to hold them at their current value, and free them afterwards
+function fix!(x::Variable)
+  push!(x.sets, :fixed)
+  x.vexity = ConstVexity()
+  x
+end
+function fix!(x::Variable, v)
+  x.value = Array(Float64, size(x))
+  x.value[:] = v
+  fix!(x)
+end
+
+function free!(x::Variable)
+  # TODO this won't work if :fixed appears other than at the end of x.sets
+  x.sets[end] == :fixed && pop!(x.sets) 
+  x.vexity = AffineVexity()
+  x
 end
