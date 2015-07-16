@@ -63,3 +63,32 @@ obtained by solving another problem involving the variable `x`.
 
 To allow the variable `x` to vary again, call `free!(x)`.
 	
+Fixing and freeing variables can be particularly useful as a tool
+for performing alternating minimization on nonconvex problems.
+For example, we can find an approximate solution to a nonnegative matrix factorization problem
+with alternating minimization as follows.
+We use warmstarts to speed up the solution.
+::
+
+	# initialize nonconvex problem
+	n, k = 10, 1
+	A = rand(n, k) * rand(k, n)
+	x = Variable(n, k)
+	y = Variable(k, n)
+	problem = minimize(sum_squares(A - x*y), x>=0, y>=0)
+
+	# initialize value of y
+	y.value = rand(k, n)
+	# we'll do 10 iterations of alternating minimization
+	for i=1:10 
+		# first solve for x
+		# with y fixed, the problem is convex
+		fix!(y)
+		solve!(problem, warmstart = i > 1 ? true : false)
+		free!(y)
+
+		# now solve for y with x fixed at the previous solution
+		fix!(x)
+		solve!(problem, warmstart = true)
+		free!(x)
+	end

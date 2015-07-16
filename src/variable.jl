@@ -90,6 +90,7 @@ function fix!(x::Variable)
   x
 end
 function fix!(x::Variable, v)
+  # TODO: check sizes match
   x.value = Array(Float64, size(x))
   x.value[:] = v
   fix!(x)
