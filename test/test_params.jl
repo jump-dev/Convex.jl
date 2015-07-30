@@ -25,7 +25,7 @@ facts("Fixed and freed variables") do
 
   context("fix multiplication") do	
 	a = [1,2,3,2,1]
-	x = Variable()
+	x = Variable(length(a))
 	gamma = Variable(Positive())
 	fix!(gamma, 1)
 

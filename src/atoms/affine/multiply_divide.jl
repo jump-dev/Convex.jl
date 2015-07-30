@@ -154,20 +154,7 @@ function .*(x::Constant, y::AbstractExpr)
   end
 end
 
+.*(x::AbstractExpr, y::AbstractExpr) = .*(x, y)
 .*(x::Value, y::AbstractExpr) = .*(Constant(x), y)
 .*(x::AbstractExpr, y::Value) = .*(Constant(y), x)
 ./(x::AbstractExpr, y::Value) = .*(1./y, x)
-
-# Old implementation using hcat
-# function .*(A::Constant, X::AbstractExpr)
-#     if size(A)!==size(X)
-#       s = size(A)
-#       if length(s)==1 && s[1] in size(X)
-#           A = reshape(A, size(X))
-#       else
-#         error("arrays must be the same size")
-#       end
-#     end
-#     return reshape(hcat([A[:][i]*X[:][i] for i=1:length(X)]...), size(X)...)
-# end
-

@@ -1,41 +1,20 @@
 import MathProgBase
 export solve!
 
-SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.AbstractMathProgModel, Nothing)
+# semantics: 
+# * we *load* problem data from Convex into the MathProgBase model
+# * we *populate* objects in Convex with their optimal values
 
 function solve!(problem::Problem,
-                s::SolverOrModel=get_default_solver();
-                warmstart=false, check_vexity=true)
+                s::MathProgBase.AbstractMathProgSolver;
+                kwargs...)
+  # TODO: warn about wiping out old model if warmstart=true?
+  problem.model = MathProgBase.model(s)
+  return solve!(problem; kwargs...)
+end
 
-  if warmstart
-    # use the model we used to solve the problem last time,
-    # in order to reuse cached (primal and dual) solution
-    m = problem.model
-    # TODO: allow user to change options for model based on those passed in argument s above
-    # call setwarmstart explicitly to tell the solver to warmstart (eg, setting options if necessary)
-    try
-      MathProgBase.setwarmstart!(m, problem.solution.primal)
-    catch
-      warn("Unable to warmstart problem. Using a cold start instead.")
-      warmstart = false
-    end
-  end
-  if !warmstart
-    if isa(s, MathProgBase.AbstractMathProgSolver)
-      m = MathProgBase.model(s)
-    elseif s != nothing # it is already a model
-      warn("deprecated syntax. Use AbstractMathProgSolver instead. eg ECOSSolver() or SCSSolver()")
-      m = s
-    end
-    if s == nothing
-      error("The default solver is set to `nothing`
-           You must have at least one solver installed.
-           You can install a solver such as SCS by running:
-           Pkg.add(\"SCS\").
-           You will have to restart Julia after that.")
-    end
-  end
-  problem.model = m
+function solve!(problem::Problem;
+                warmstart=false, check_vexity=true)
 
   if check_vexity
     vex = vexity(problem)
@@ -43,10 +22,59 @@ function solve!(problem::Problem,
 
   c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
 
-  if problem.head == :maximize
-    c = -c
+  # load MPB conic problem
+  m = problem.model
+  load_problem!(m, c, A, b, cones, vartypes)
+  if warmstart
+    set_warmstart!(m, problem, length(c), var_to_ranges)
+  end
+  # optimize MPB conic problem
+  MathProgBase.optimize!(m)
+
+  # populate the status, the primal (and possibly dual) solution
+  # and the primal (and possibly dual) variables with values
+  populate_solution!(m, problem, var_to_ranges, conic_constraints)
+  if !(problem.status==:Optimal)
+    warn("Problem status $(problem.status); solution may be inaccurate.")
   end
 
+end
+
+function set_warmstart!(m::MathProgBase.AbstractMathProgModel, 
+                       problem::Problem, 
+                       n::Int, # length of primal (conic) solution
+                       var_to_ranges)
+    # use previously cached solution, if any, 
+    try
+      primal = problem.solution.primal
+    catch
+      warn("Unable to use cached solution to warmstart problem. 
+            (Perhaps this is the first time you're solving this problem?)
+            Warmstart may be ineffective.")
+      primal = zeros(n)
+    end
+    if !(length(primal) == n)
+      warn("Unable to use cached solution to warmstart problem. 
+            (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
+            Warmstart may be ineffective.")
+      primal = zeros(n)
+    end
+
+    # grab any variables whose values the user may be trying to set
+    load_primal_solution!(primal, var_to_ranges)
+
+    # notify the model that we're trying to warmstart
+    try
+      MathProgBase.setwarmstart!(m, primal)
+    catch
+      warn("Unable to warmstart solution. 
+        (Perhaps the solver doesn't support warm starts?)
+        Using a cold start instead.")
+    end
+    m
+end
+
+function load_problem!(m::MathProgBase.AbstractMathProgModel, c, A, b, cones, vartypes)
   # no conic constraints on variables
   var_cones = fill((:Free, 1:size(A, 2)),1)
   # TODO: Get rid of full once c and b are not sparse
@@ -60,11 +88,13 @@ function solve!(problem::Problem,
       error("model $(typeof(m)) does not support variables of some of the following types: $(unique(vartypes))")
     end
   end
+  m
+end
 
-  # optimize problem
-  status = MathProgBase.optimize!(m)
-
-  # get the primal (and possibly dual) solution
+function populate_solution!(m::MathProgBase.AbstractMathProgModel,
+                        problem::Problem,
+                        var_to_ranges,
+                        conic_constraints)
   try
     dual = MathProgBase.getconicdual(m)
     problem.solution = Solution(MathProgBase.getsolution(m), dual,
@@ -88,9 +118,7 @@ function solve!(problem::Problem,
   problem.optval = problem.solution.optval
   problem.status = problem.solution.status
 
-  if !(problem.status==:Optimal)
-    warn("Problem status $(problem.status); solution may be inaccurate.")
-  end
+  problem
 end
 
 function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, @compat Tuple{Int, Int}})
@@ -107,15 +135,19 @@ end
 
 # populates the solution vector from the .value fields of variables
 # for use in warmstarting
-function populate_solution!(problem::Problem, var_to_ranges::Dict{Uint64, (Int, Int)})
-  x = problem.solution.primal
+# TODO: it would be super cool to grab the other expressions that appear in the primal solution vector,
+# get their `expression_to_range`,
+# and populate them too using `evaluate`
+@compat function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{Uint64, Tuple{Int, Int}})
   for (id, (start_index, end_index)) in var_to_ranges
     var = id_to_variables[id]
-    sz = size(var.value)
-    if length(sz) <= 1
-      vx[start_index:end_index] = var.value
-    else
-      x[start_index:end_index] = reshape(var.value, sz[1]*sz[2], 1)
+    if var.value != nothing
+      sz = size(var.value)
+      if length(sz) <= 1
+        primal[start_index:end_index] = var.value
+      else
+        primal[start_index:end_index] = reshape(var.value, sz[1]*sz[2], 1)
+      end
     end
   end
 end

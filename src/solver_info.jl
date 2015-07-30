@@ -9,7 +9,11 @@ end
 
 function get_default_solver()
   if DEFAULT_SOLVER == nothing
-    warn("No default solver currently set.")
+    error("The default solver is set to `nothing`
+         You must have at least one solver installed to use Convex.
+         You can install a solver such as SCS by running:
+         Pkg.add(\"SCS\").
+         You will have to restart Julia after that.")
   end
   return DEFAULT_SOLVER
 end
