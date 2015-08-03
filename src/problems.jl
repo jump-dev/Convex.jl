@@ -166,7 +166,7 @@ minimize(objective::AbstractExpr, constraints::Constraint...) =
 minimize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
   Problem(:minimize, objective, constraints)
 minimize(objective::Value, constraints::Constraint...) =
-  minimize(convert(AbstractExpr, objective), constraints)
+  minimize(convert(AbstractExpr, objective), [constraints...])
 minimize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   minimize(convert(AbstractExpr, objective), constraints)
 
@@ -176,7 +176,7 @@ maximize(objective::AbstractExpr, constraints::Constraint...) =
 maximize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
   Problem(:maximize, objective, constraints)
 maximize(objective::Value, constraints::Constraint...) =
-  maximize(convert(AbstractExpr, objective), constraints)
+  maximize(convert(AbstractExpr, objective), [constraints...])
 maximize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   maximize(convert(AbstractExpr, objective), constraints)
 
