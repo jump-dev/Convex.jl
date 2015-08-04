@@ -44,7 +44,7 @@ x_nom = x.evaluate()
 
 # Case 2: Stochastic robust approximation
 P = 1 / 3 * B' * B;
-p = minimize(square_pos(norm(A * x - b)) + quad_form(x, P))
+p = minimize(square_pos(norm(A * x - b)) + quadform(x, P))
 solve!(p)
 x_stoch = x.evaluate()
 

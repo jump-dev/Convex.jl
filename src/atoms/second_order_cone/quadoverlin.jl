@@ -1,4 +1,4 @@
-export QuadOverLinAtom, quad_over_lin
+export QuadOverLinAtom, quadoverlin
 export sign, monotonicity, curvature, conic_form!
 
 type QuadOverLinAtom <: AbstractExpr
@@ -45,4 +45,4 @@ function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, q)
 end
 
-quad_over_lin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)
+quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)

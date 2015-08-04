@@ -1,11 +1,11 @@
 #############################################################################
-# lambda_min_max.jl
+# lambdamin_max.jl
 # Handles maximum and minimum eigenvalue of a symmetric positive definite matrix
 # (and imposes the constraint that its argument be PSD)
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-export lambda_max, lambda_min
+export lambdamax, lambdamin
 
 ### Lambda max
 
@@ -19,9 +19,9 @@ type LambdaMaxAtom <: AbstractExpr
     children = (x,)
     m,n = size(x)
     if m==n
-      return new(:lambda_max, hash(children), children, (1,1))
+      return new(:lambdamax, hash(children), children, (1,1))
     else
-      error("lambda_max can only be applied to a square matrix.")
+      error("lambdamax can only be applied to a square matrix.")
     end
   end
 end
@@ -42,7 +42,7 @@ function evaluate(x::LambdaMaxAtom)
   eigvals(evaluate(x.children[1]))[end]
 end
 
-lambda_max(x::AbstractExpr) = LambdaMaxAtom(x)
+lambdamax(x::AbstractExpr) = LambdaMaxAtom(x)
 
 # Create the equivalent conic problem:
 #   minimize t
@@ -72,9 +72,9 @@ type LambdaMinAtom <: AbstractExpr
     children = (x,)
     m,n = size(x)
     if m==n
-      return new(:lambda_min, hash(children), children, (1,1))
+      return new(:lambdamin, hash(children), children, (1,1))
     else
-      error("lambda_min can only be applied to a square matrix.")
+      error("lambdamin can only be applied to a square matrix.")
     end
   end
 end
@@ -95,7 +95,7 @@ function evaluate(x::LambdaMinAtom)
   eigvals(evaluate(x.children[1]))[1]
 end
 
-lambda_min(x::AbstractExpr) = LambdaMinAtom(x)
+lambdamin(x::AbstractExpr) = LambdaMinAtom(x)
 
 # Create the equivalent conic problem:
 #   maximize t

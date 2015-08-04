@@ -1,10 +1,10 @@
 #############################################################################
-# nuclear_norm.jl
+# nuclearnorm.jl
 # Handles nuclear norm (the sum of the singular values of a matrix),
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-export nuclear_norm
+export nuclearnorm
 
 ### Nuclear norm
 
@@ -16,7 +16,7 @@ type NuclearNormAtom <: AbstractExpr
 
   function NuclearNormAtom(x::AbstractExpr)
     children = (x,)
-    return new(:nuclear_norm, hash(children), children, (1,1))
+    return new(:nuclearnorm, hash(children), children, (1,1))
   end
 end
 
@@ -37,7 +37,7 @@ function evaluate(x::NuclearNormAtom)
   return sum(svdvals(evaluate(x.children[1])))
 end
 
-nuclear_norm(x::AbstractExpr) = NuclearNormAtom(x)
+nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 
 # Create the equivalent conic problem:
 #   minimize (trace(U) + trace(V))/2

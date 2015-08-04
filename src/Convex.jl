@@ -31,8 +31,8 @@ include("atoms/affine/reshape.jl")
 include("atoms/affine/trace.jl")
 include("atoms/affine/conv.jl")
 include("atoms/norm.jl")
-include("atoms/sum_largest.jl")
-include("atoms/dot_sort.jl")
+include("atoms/sumlargest.jl")
+include("atoms/dotsort.jl")
 
 ### elementwise atoms
 include("atoms/abs.jl")
@@ -42,19 +42,19 @@ include("atoms/max.jl")
 include("atoms/min.jl")
 
 ### SOC atoms
-include("atoms/second_order_cone/norm_2.jl")
-include("atoms/second_order_cone/quad_over_lin.jl")
+include("atoms/second_order_cone/norm2.jl")
+include("atoms/second_order_cone/quadoverlin.jl")
 include("atoms/second_order_cone/qol_elementwise.jl")
-include("atoms/second_order_cone/geo_mean.jl")
-include("atoms/second_order_cone/quad_form.jl")
+include("atoms/second_order_cone/geomean.jl")
+include("atoms/second_order_cone/quadform.jl")
 include("atoms/second_order_cone/power_to_socp.jl")
-include("atoms/second_order_cone/rational_norm.jl")
+include("atoms/second_order_cone/rationalnorm.jl")
 
 ### SDP atoms
-include("atoms/sdp_cone/nuclear_norm.jl")
-include("atoms/sdp_cone/operator_norm.jl")
+include("atoms/sdp_cone/nuclearnorm.jl")
+include("atoms/sdp_cone/operatornorm.jl")
 include("atoms/sdp_cone/lambda_min_max.jl")
-include("atoms/sdp_cone/matrix_frac.jl")
+include("atoms/sdp_cone/matrixfrac.jl")
 
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")

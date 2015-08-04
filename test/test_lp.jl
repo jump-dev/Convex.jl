@@ -101,53 +101,53 @@ facts("LP Atoms") do
     @fact evaluate(sum(neg(x))) => roughly(-6, TOL)
   end
 
-  context("sum_largest atom") do
+  context("sumlargest atom") do
     x = Variable(2)
-    p = minimize(sum_largest(x, 2), x >= [1; 1])
+    p = minimize(sumlargest(x, 2), x >= [1; 1])
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(2, TOL)
-    @fact evaluate(sum_largest(x, 2)) => roughly(2, TOL)
+    @fact evaluate(sumlargest(x, 2)) => roughly(2, TOL)
 
     x = Variable(4, 4)
-    p = minimize(sum_largest(x, 3), x >= eye(4), x[1, 1] >= 1.5, x[2, 3] >= 2.1)
+    p = minimize(sumlargest(x, 3), x >= eye(4), x[1, 1] >= 1.5, x[2, 3] >= 2.1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(4.6, TOL)
-    @fact evaluate(sum_largest(x, 2)) => roughly(3.6, TOL)
+    @fact evaluate(sumlargest(x, 2)) => roughly(3.6, TOL)
   end
 
-  context("sum_smallest atom") do
+  context("sumsmallest atom") do
     x = Variable(4, 4)
-    p = minimize(sum_largest(x, 2), sum_smallest(x, 4) >= 1)
+    p = minimize(sumlargest(x, 2), sumsmallest(x, 4) >= 1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(0.5, TOL)
-    @fact evaluate(sum_smallest(x, 4)) => roughly(1, TOL)
+    @fact evaluate(sumsmallest(x, 4)) => roughly(1, TOL)
 
     x = Variable(3, 2)
-    p = maximize(sum_smallest(x, 3), x >= 1, x <= 5, sum_largest(x, 3) <= 12)
+    p = maximize(sumsmallest(x, 3), x >= 1, x <= 5, sumlargest(x, 3) <= 12)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(12, TOL)
-    @fact evaluate(sum_smallest(x, 3)) => roughly(12, TOL)
+    @fact evaluate(sumsmallest(x, 3)) => roughly(12, TOL)
   end
 
-  context("dot_sort atom") do
+  context("dotsort atom") do
     x = Variable(4, 1)
-    p = minimize(dot_sort(x, [1, 2, 3, 4]), sum(x) >= 7, x >= 0, x <= 2, x[4] <= 1)
+    p = minimize(dotsort(x, [1, 2, 3, 4]), sum(x) >= 7, x >= 0, x <= 2, x[4] <= 1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(19, TOL)
     @fact vec(x.value) => roughly([2; 2; 2; 1], TOL)
-    @fact evaluate(dot_sort(x, [1, 2, 3, 4])) => roughly(19, TOL)
+    @fact evaluate(dotsort(x, [1, 2, 3, 4])) => roughly(19, TOL)
 
     x = Variable(2, 2)
-    p = minimize(dot_sort(x, [1 2; 3 4]), sum(x) >= 7, x >= 0, x <= 2, x[2, 2] <= 1)
+    p = minimize(dotsort(x, [1 2; 3 4]), sum(x) >= 7, x >= 0, x <= 2, x[2, 2] <= 1)
     @fact vexity(p) => ConvexVexity()
     solve!(p)
     @fact p.optval => roughly(19, TOL)
-    @fact evaluate(dot_sort(x, [1, 2, 3, 4])) => roughly(19, TOL)
+    @fact evaluate(dotsort(x, [1, 2, 3, 4])) => roughly(19, TOL)
   end
 
   context("hinge loss atom") do
