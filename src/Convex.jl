@@ -1,6 +1,8 @@
 module Convex
 using Compat
 
+importall Base.Operators
+
 global DEFAULT_SOLVER = nothing
 ### modeling framework
 include("dcp.jl")

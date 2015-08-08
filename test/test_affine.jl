@@ -243,7 +243,7 @@ facts("Affine Atoms") do
     x = Variable(4, 4)
     c = ones(16, 1)
     reshaped = reshape(x, 16, 1)
-    a = [1:16]
+    a = collect(1:16)
     p = minimize(c' * reshaped, reshaped >= a)
     @fact vexity(p) => AffineVexity()
     solve!(p)

@@ -50,7 +50,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
     variable_to_sizes = Dict{Uint64, Int}()
     for objective in objectives
       for id in keys(objective)
-        if !(id in variable_to_sizes)
+        if !(id in keys(variable_to_sizes))
           if id == object_id(:constant)
             variable_to_sizes[id] = 1
           else
