@@ -1,6 +1,5 @@
-include("Convex.jl")
 using Convex
-using ECOS, SCS
+using ECOS
 
 # Summation.
 println("Summation example")
@@ -12,7 +11,7 @@ e = 0;
   end
   p = minimize(e, x>=1);
 end
-@time solve!(p, ECOS.ECOSMathProgModel())
+@time solve!(p, ECOSSolver())
 
 # Indexing.
 println("Indexing example")
@@ -24,7 +23,7 @@ e = 0;
   end
   p = minimize(e, x >= ones(1000, 1));
 end
-@time solve!(p, ECOS.ECOSMathProgModel())
+@time solve!(p, ECOSSolver())
 
 # Matrix constraints.
 println("Matrix constraint example")
@@ -35,7 +34,7 @@ b = randn(p, n);
 @time begin
   p = minimize(vecnorm(X), A * X == b);
 end
-@time solve!(p, ECOS.ECOSMathProgModel())
+@time solve!(p, ECOSSolver())
 
 # Transpose.
 println("Transpose example")
@@ -44,12 +43,12 @@ A = randn(5, 5);
 @time begin
   p = minimize(norm_2(X - A), X' == X);
 end
-@time solve!(p, ECOS.ECOSMathProgModel())
+@time solve!(p, ECOSSolver())
 
 n = 3
 A = randn(n, n);
 #@time begin
   X = Variable(n, n);
   p = minimize(vecnorm(X' - A), X[1,1] == 1);
-  solve!(p, ECOS.ECOSMathProgModel())
+  solve!(p, ECOSSolver())
 #end
