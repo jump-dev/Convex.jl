@@ -86,3 +86,13 @@ end
 function getindex(x::AbstractExpr, I::AbstractVector{Bool})
     return [ x[i] for i in to_index(I) ]
 end
+# Colon methods
+# All rows and columns
+function getindex(x::AbstractExpr, cln_r::Colon, cln_c::Colon)
+  rows, cols = size(x)
+  getindex(x, 1:rows, 1:cols)
+end
+# All rows for this column(s)
+getindex(x::AbstractExpr, cln_r::Colon, col) = getindex(x, 1:size(x)[1], col)
+# All columns for this row(s)
+getindex(x::AbstractExpr, row, cln_c::Colon) = getindex(x, row, 1:size(x)[2])
