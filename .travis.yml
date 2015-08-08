@@ -19,5 +19,5 @@ script:
     - julia -e 'Pkg.clone(pwd())'
     - julia -e 'Pkg.test("Convex", coverage=true)'
 after_success:
-    - julia -e 'cd(Pkg.dir("Convex")); Pkg.add("Coverage")'
-    - julia -e 'using Coverage; Coveralls.submit(process_folder())'
+    - julia -e 'Pkg.add("Coverage")'
+    - julia -e 'cd(Pkg.dir("Convex")); using Coverage; Coveralls.submit(process_folder())'
