@@ -58,7 +58,7 @@ function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
     y = x.children[1]
     w = x.w
     sy = size(y)
-    if sy[1] > 1 && sy[2] > 1 && sy[1] == sy[2] 
+    if sy[1] > 1 && sy[2] > 1
       y = vec(y)
     end
     mu = Variable(size(y))
