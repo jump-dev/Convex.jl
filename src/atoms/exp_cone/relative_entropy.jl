@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export relative_entropy
+export relative_entropy, log_perspective
 export sign, curvature, monotonicity, evaluate
 
 ### Entropy: sum_i -x_i log (x_i)
@@ -75,4 +75,5 @@ function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForm
   return get_conic_form(unique_conic_forms, e)
 end
 
-relative_entropy(x::AbstractExpr, y::AbstractExpr) = sum(RelativeEntropyAtom(x))
+relative_entropy(x::AbstractExpr, y::AbstractExpr) = sum(RelativeEntropyAtom(x, y))
+log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy (x, y)
