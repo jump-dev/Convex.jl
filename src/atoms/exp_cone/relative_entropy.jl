@@ -1,6 +1,6 @@
 #############################################################################
-# entropy.jl
-# entropy (ie, sum_i( -x_i log (x_i) ) of an expression x
+# relative_entropy.jl
+# relative entropy (ie, sum_i( -x_i log (x_i/y_i) ) of expressions x and y
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
@@ -21,7 +21,6 @@ type RelativeEntropyAtom <: AbstractExpr
 
   function RelativeEntropyAtom(x::AbstractExpr, y::AbstractExpr)
     children = (x, y)
-    # TODO check or enforce x >=0, y > 0
     return new(:entropy, hash(children), children, size(x))
   end
 end
