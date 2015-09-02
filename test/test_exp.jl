@@ -78,4 +78,24 @@ facts("Exp Atoms") do
     @fact p.optval => roughly(-log(1/5), TOL)
   end
 
+  context("relative entropy atom") do
+    x = Variable(1);
+    y = Variable(1);
+    # x log (x/y)
+    p = minimize(relative_entropy(x,y), y==1, x >= 2)
+    @fact vexity(p) --> ConvexVexity()
+    solve!(p)
+    @fact p.optval --> roughly(2*log(2), TOL)
+  end
+
+  context("log perspective atom") do
+    x = Variable(1);
+    y = Variable(1);
+    # y log (x/y)
+    p = maximize(log_perspective(x,y), y==5, x <= 10)
+    @fact vexity(p) --> ConvexVexity()
+    solve!(p)
+    @fact p.optval --> roughly(5*log(2), TOL)
+  end
+
 end

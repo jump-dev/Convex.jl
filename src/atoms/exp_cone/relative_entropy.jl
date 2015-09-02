@@ -1,6 +1,6 @@
 #############################################################################
 # relative_entropy.jl
-# relative entropy (ie, sum_i( -x_i log (x_i/y_i) ) of expressions x and y
+# relative entropy (ie, sum_i( x_i log (x_i/y_i) ) of expressions x and y
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
@@ -8,15 +8,12 @@
 export relative_entropy, log_perspective
 export sign, curvature, monotonicity, evaluate
 
-### Entropy: sum_i -x_i log (x_i)
-
 # TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs
 
-# Entropy atom: -xlogx entrywise
 type RelativeEntropyAtom <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::@compat Tuple{AbstractExpr}
+  children::@compat Tuple{AbstractExpr,AbstractExpr}
   size::@compat Tuple{Int, Int}
 
   function RelativeEntropyAtom(x::AbstractExpr, y::AbstractExpr)
@@ -30,7 +27,7 @@ function sign(x::RelativeEntropyAtom)
 end
 
 function monotonicity(x::RelativeEntropyAtom)
-  return (NoMonotonicity(),)
+  return (NoMonotonicity(),NoMonotonicity())
 end
 
 function curvature(x::RelativeEntropyAtom)
@@ -76,4 +73,5 @@ function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForm
 end
 
 relative_entropy(x::AbstractExpr, y::AbstractExpr) = sum(RelativeEntropyAtom(x, y))
-log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy (x, y)
+# y*log(x/y)
+log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy(y, x)
