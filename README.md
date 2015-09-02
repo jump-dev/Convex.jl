@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/JuliaOpt/Convex.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/Convex.jl)
 [![Coverage Status](https://coveralls.io/repos/JuliaOpt/Convex.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaOpt/Convex.jl?branch=master)
-[![Convex](http://pkg.julialang.org/badges/Convex_release.svg)](http://pkg.julialang.org/?pkg=Convex&ver=release)
+
+[![Convex](http://pkg.julialang.org/badges/Convex_0.3.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.3)
+[![Convex](http://pkg.julialang.org/badges/Convex_0.4.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.4)
 
 **Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
 
