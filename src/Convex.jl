@@ -63,6 +63,7 @@ include("atoms/exp_cone/exp.jl")
 include("atoms/exp_cone/log.jl")
 include("atoms/exp_cone/logsumexp.jl")
 include("atoms/exp_cone/entropy.jl")
+include("atoms/exp_cone/relative_entropy.jl")
 
 ### other elementwise atoms
 include("atoms/huber.jl")
