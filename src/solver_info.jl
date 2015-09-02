@@ -1,4 +1,4 @@
-using MathProgBase
+import MathProgBase
 export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
 export set_default_solver, get_default_solver
 
@@ -45,38 +45,37 @@ function can_solve_mip(solver)
   if name == :GurobiSolver || name == :MosekSolver || name == :GLPKSolverMIP || name == :CPLEXSolver || name == :CbcSolver
     return true
   else
-    info("Only GurobiSolver, MosekSolver and GLPKSolverMIP can solve mixed integer programs")
+    info("$name cannot solve mixed integer programs. Consider using Gurobi, Mosek, or GLPK.")
     return false
   end
 end
 
 function can_solve_socp(solver)
-  name = typeof(solver).name.name
-  if name == :ECOSSolver || name == :SCSSolver || name == :SCSMathProgModel || name == :MosekSolver || name == :GurobiSolver
+  if :SOC in MathProgBase.supportedcones(solver)
     return true
   else
-    info("Only ECOSSolver, SCSSolver, MosekSolver, GurobiSolver and SCSMathProgModel can solve second order cone programs")
+    name = typeof(solver).name.name
+    info("$name cannot solve second order cone programs. Consider using SCS, ECOS, Mosek, or Gurobi.")
     return false
   end
 end
 
 function can_solve_exp(solver)
-  name = typeof(solver).name.name
-  if name == :SCSSolver || name == :SCSMathProgModel #|| name == :MosekSolver
+  if :ExpPrimal in MathProgBase.supportedcones(solver)
     return true
   else
-    info("Only SCSSolver and SCSMathProgModel can solve exponential programs")
-    # info("Only SCSSolver, MosekSolver and SCSMathProgModel can solve exponential programs")
+    name = typeof(solver).name.name
+    info("$name cannot solve exponential programs. Consider using SCS or ECOS.")
     return false
   end
 end
 
 function can_solve_sdp(solver)
-  name = typeof(solver).name.name
-  if name == :SCSSolver || name == :SCSMathProgModel || name == :MosekSolver
+  if :SDP in MathProgBase.supportedcones(solver)
     return true
   else
-    info("Only SCSSolver, MosekSolver and SCSMathProgModel can solve semidefinite programs")
+    name = typeof(solver).name.name
+    info("$name cannot solve semidefinite programs. Consider using SCS or Mosek.")
     return false
   end
 end
