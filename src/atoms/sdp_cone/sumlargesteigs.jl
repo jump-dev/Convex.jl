@@ -5,6 +5,7 @@
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
+import Base.eigvals
 export sumlargesteigs, schatten
 
 ### sumlargesteigs
@@ -12,10 +13,10 @@ export sumlargesteigs, schatten
 type SumLargestEigs <: AbstractExpr
   head::Symbol
   id_hash::Uint64
-  children::@compat Tuple{AbstractExpr}
+  children::@compat Tuple{AbstractExpr, AbstractExpr}
   size::@compat Tuple{Int, Int}
 
-  function SumLargestEigs(x::AbstractExpr, k::Int)
+  function SumLargestEigs(x::AbstractExpr, k::AbstractExpr)
     children = (x, k)
     m,n = size(x)
     if m==n
@@ -31,7 +32,7 @@ function sign(x::SumLargestEigs)
 end
 
 function monotonicity(x::SumLargestEigs)
-  return (Nondecreasing(),)
+  return (Nondecreasing(), NoMonotonicity())
 end
 
 function curvature(x::SumLargestEigs)
@@ -42,7 +43,7 @@ function evaluate(x::SumLargestEigs)
   eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
 end
 
-sumlargesteigs(x::AbstractExpr) = SumLargestEigs(x)
+sumlargesteigs(x::AbstractExpr, k::Int) = SumLargestEigs(x, Constant(k))
 
 # Create the equivalent conic problem:
 #   minimize sk + Tr(Z)
