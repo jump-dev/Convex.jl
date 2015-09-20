@@ -10,6 +10,7 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
+import Base.-, Base.+, Base.*
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign

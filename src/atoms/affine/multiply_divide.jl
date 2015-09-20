@@ -6,6 +6,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
+import Base.*, Base.(.*), Base./, Base.(./)
 export *, .*
 export sign, monotonicity, curvature, evaluate, conic_form!
 
