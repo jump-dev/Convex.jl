@@ -6,7 +6,7 @@
 # Please read expressions.jl first.
 #############################################################################
 import Base.eigvals
-export sumlargesteigs, schatten
+export sumlargesteigs
 
 ### sumlargesteigs
 
@@ -68,65 +68,3 @@ function conic_form!(x::SumLargestEigs, unique_conic_forms)
   end
   return get_conic_form(unique_conic_forms, x)
 end
-
-### eigvals, for use in computing spectral functions
-
-type EigAtom <: AbstractExpr
-  head::Symbol
-  id_hash::Uint64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
-
-  function EigAtom(x::AbstractExpr)
-    children = (x,)
-    m,n = size(x)
-    if m==n
-      return new(:eig, hash(children), children, (n,1))
-    else
-      error("eig can only be applied to a square matrix.")
-    end
-  end
-end
-
-function sign(x::EigAtom)
-  return Positive()
-end
-
-# The monotonicity
-function monotonicity(x::EigAtom)
-  return (NoMonotonicity(),)
-end
-
-# eigvals can be composed with any symmetric function to give the right thing
-# I guess we don't have a way to represent that...
-function curvature(x::EigAtom)
-  return AffineVexity()
-end
-
-function evaluate(x::EigAtom)
-  return eigvals(evaluate(x.children[1]))
-end
-
-eigvals(x::AbstractExpr) = EigAtom(x)
-
-# Create the equivalent conic constraints:
-function conic_form!(x::EigAtom, unique_conic_forms)
-  if !has_conic_form(unique_conic_forms, x)
-    A = x.children[1]
-    m, n = size(A)
-    l = Variable(n)
-    # monotonicity
-    constraints = Constraint[l[i] >= l[i]+1 for i=1:n-1]
-    # capture the right partial sums
-    for k=1:n
-      push!(constraints, sumlargesteigs(A,k) <= sum(l[1:k]))
-    end  
-    # and A had better be PSD
-    push!(constraints, A ⪰ 0)
-    conic_form!(constraints, unique_conic_forms)
-    cache_conic_form!(unique_conic_forms, x, l)
-  end
-  return get_conic_form(unique_conic_forms, x)
-end
-
-schatten(x::AbstractExpr, p) = norm(eigenvalues(x), p)
