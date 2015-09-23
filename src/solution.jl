@@ -5,7 +5,7 @@ SolverOrModel = Union(MathProgBase.AbstractMathProgSolver, MathProgBase.Abstract
 
 function solve!(problem::Problem,
                 s::SolverOrModel=get_default_solver();
-                warmstart=false, check_vexity=true)
+                warmstart=false, check_vexity=true, use_presolve=true)
 
   if warmstart
     m = problem.model
@@ -31,8 +31,16 @@ function solve!(problem::Problem,
 
   c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
 
+  if use_presolve
+    oc, oA, ob, cones, var_to_ranges, vartypes, conic_constraints = c, A, b, cones, var_to_ranges, vartypes, conic_constraints
+    c, A, b, cones, vartypes, P, constrindices = presolve(oc, oA, ob, cones, [], vartypes)
+  end
+
   if problem.head == :maximize
     c = -c
+    if use_presolve
+      oc = -oc
+    end
   end
 
   # no conic constraints on variables
@@ -52,14 +60,32 @@ function solve!(problem::Problem,
   # optimize problem
   status = MathProgBase.optimize!(m)
 
-  # get the primal (and possibly dual) solution
-  try
-    dual = MathProgBase.getconicdual(m)
-    problem.solution = Solution(MathProgBase.getsolution(m), dual,
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
-  catch
-    problem.solution = Solution(MathProgBase.getsolution(m),
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+  if use_presolve
+    # get the primal (and possibly dual) solution
+    primal = P*[MathProgBase.getsolution(m); 1]
+    optval = (oc'*primal)[1]
+    try
+      # inflate the dual back to the (non-presolved) size
+      dual = Array(Float64, size(b))
+      dual[constrindices] = MathProgBase.getconicdual(m)
+      problem.solution = Solution(primal, 
+                                  dual,
+                                  MathProgBase.status(m), 
+                                  optval)
+    catch
+      problem.solution = Solution(primal,
+                                  MathProgBase.status(m), 
+                                  optval)
+    end
+  else
+    try
+      dual = MathProgBase.getconicdual(m)
+      problem.solution = Solution(MathProgBase.getsolution(m), dual,
+                                  MathProgBase.status(m), MathProgBase.getobjval(m))
+    catch
+      problem.solution = Solution(MathProgBase.getsolution(m),
+                                  MathProgBase.status(m), MathProgBase.getobjval(m))
+    end
   end
   populate_variables!(problem, var_to_ranges)
 

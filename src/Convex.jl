@@ -74,4 +74,5 @@ include("atoms/logdet.jl")
 include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("utilities/deprecated.jl")
+include("presolve.jl")
 end
