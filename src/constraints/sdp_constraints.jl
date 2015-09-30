@@ -46,8 +46,8 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     # and the corresponding entries in the lower triangular part, so
     # symmetry => c.child[upperpart] 
     diagandlowerpart = find(tril(ones(n,n)))
-    lowerpart = Array(Int, int(n*(n-1)/2))
-    upperpart = Array(Int, int(n*(n-1)/2))
+    lowerpart = Array(Int, div(n*(n-1),2))
+    upperpart = Array(Int, div(n*(n-1),2))
     klower = 0
     # diagandlowerpart in column-major order:
     # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...
@@ -60,7 +60,7 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
       end
     end
     objective = conic_form!(c.child[diagandlowerpart], unique_conic_forms)
-    sdp_constraint = ConicConstr([objective], :SDP, [int(n*(n+1)/2)])
+    sdp_constraint = ConicConstr([objective], :SDP, [div(n*(n+1),2)])
     cache_conic_form!(unique_conic_forms, c, sdp_constraint)
     # make sure upper and lower triangular part match in the solution
     # note that this introduces all-zero rows into the constraint matrix
