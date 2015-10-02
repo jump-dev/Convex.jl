@@ -4,7 +4,7 @@ export SOCConstraint, SOCElemConstraint, conic_form!
 # conic form work for SOC constraints.
 type SOCConstraint <: Constraint
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::Tuple
   dual::ValueOrNothing
 
@@ -28,7 +28,7 @@ end
 
 type SOCElemConstraint <: Constraint
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::Tuple
   dual::ValueOrNothing
 

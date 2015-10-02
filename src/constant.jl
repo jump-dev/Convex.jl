@@ -7,7 +7,7 @@ export vexity, evaluate, sign, conic_form!
 
 type Constant <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   value::Value
   size::@compat Tuple{Int, Int}
   vexity::Vexity

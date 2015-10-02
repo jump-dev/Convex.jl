@@ -12,7 +12,7 @@ export diag
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 type DiagAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr}
   size::@compat Tuple{Int, Int}
   k::Int

@@ -12,7 +12,7 @@ export sign, curvature, monotonicity, evaluate
 # for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
 type DotSortAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr}
   size::@compat Tuple{Int, Int}
   w::Value

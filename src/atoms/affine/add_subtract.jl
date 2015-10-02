@@ -14,7 +14,7 @@ export sign, curvature, monotonicity, evaluate
 
 type NegateAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr}
   size::@compat Tuple{Int, Int}
 
@@ -55,7 +55,7 @@ end
 ### Addition
 type AdditionAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::Array{AbstractExpr, 1}
   size::@compat Tuple{Int, Int}
 

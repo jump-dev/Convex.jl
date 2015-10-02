@@ -4,7 +4,7 @@ export +, -, *, promote_size, get_row
 export cache_conic_form!, has_conic_form, get_conic_form
 
 # TODO: Comment every single line
-ConicObj = DataStructures.OrderedDict{Uint64, Value}
+ConicObj = DataStructures.OrderedDict{UInt64, Value}
 
 function -(c::ConicObj)
   new_obj = copy(c)
@@ -63,8 +63,8 @@ type ConicConstr
   sizes::Array{Int}
 end
 
-UniqueExpMap = DataStructures.OrderedDict{@compat(Tuple{Symbol, Uint64}), ConicObj}
-UniqueConstrMap = DataStructures.OrderedDict{@compat(Tuple{Symbol, Uint64}), Int}
+UniqueExpMap = DataStructures.OrderedDict{@compat(Tuple{Symbol, UInt64}), ConicObj}
+UniqueConstrMap = DataStructures.OrderedDict{@compat(Tuple{Symbol, UInt64}), Int}
 UniqueConstrList = Array{ConicConstr}
 
 type UniqueConicForms

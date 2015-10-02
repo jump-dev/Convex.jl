@@ -8,7 +8,7 @@ export vexity, evaluate, sign, conic_form!, fix!, free!
 
 type Variable <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   value::ValueOrNothing
   size::@compat Tuple{Int, Int}
   vexity::Vexity
@@ -43,7 +43,7 @@ end
 # the expression tree will only utilize variable ids during construction
 # full information of the variables will be needed during stuffing
 # and after solving to populate the variables with values
-id_to_variables = Dict{Uint64, Variable}()
+id_to_variables = Dict{UInt64, Variable}()
 
 function vexity(x::Variable)
   return x.vexity

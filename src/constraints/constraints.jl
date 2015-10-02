@@ -7,7 +7,7 @@ conic_constr_to_constr = Dict{ConicConstr, Constraint}()
 ### Linear equality constraint
 type EqConstraint <: Constraint
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::@compat Tuple{Int, Int}
@@ -54,7 +54,7 @@ end
 ### Linear inequality constraints
 type LtConstraint <: Constraint
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::@compat Tuple{Int, Int}
@@ -102,7 +102,7 @@ end
 
 type GtConstraint <: Constraint
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   lhs::AbstractExpr
   rhs::AbstractExpr
   size::@compat Tuple{Int, Int}

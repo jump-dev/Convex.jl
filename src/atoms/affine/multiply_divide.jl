@@ -14,7 +14,7 @@ export sign, monotonicity, curvature, evaluate, conic_form!
 
 type MultiplyAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr, AbstractExpr}
   size::@compat Tuple{Int, Int}
 
@@ -108,7 +108,7 @@ end
 ### .*
 type DotMultiplyAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{Constant, AbstractExpr}
   size::@compat Tuple{Int, Int}
 
