@@ -4,7 +4,7 @@ export sign, curvature, monotonicity, evaluate, conic_form!
 
 type HcatAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::Tuple
   size::@compat Tuple{Int, Int}
 
@@ -47,7 +47,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
       push!(objectives, conic_form!(child, unique_conic_forms))
     end
     # build a dict from variable ids to sizes
-    variable_to_sizes = Dict{Uint64, Int}()
+    variable_to_sizes = Dict{UInt64, Int}()
     for objective in objectives
       for id in keys(objective)
         if !(id in keys(variable_to_sizes))

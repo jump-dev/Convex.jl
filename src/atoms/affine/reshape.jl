@@ -5,7 +5,7 @@ export sign, curvature, monotonicity, evaluate, conic_form!
 
 type ReshapeAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr}
   size::@compat Tuple{Int, Int}
 

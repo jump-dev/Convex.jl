@@ -121,7 +121,7 @@ function populate_solution!(m::MathProgBase.AbstractMathProgModel,
   problem
 end
 
-function populate_variables!(problem::Problem, var_to_ranges::Dict{Uint64, @compat Tuple{Int, Int}})
+function populate_variables!(problem::Problem, var_to_ranges::Dict{UInt64, @compat Tuple{Int, Int}})
   x = problem.solution.primal
   for (id, (start_index, end_index)) in var_to_ranges
     var = id_to_variables[id]
@@ -138,7 +138,7 @@ end
 # TODO: it would be super cool to grab the other expressions that appear in the primal solution vector,
 # get their `expression_to_range`,
 # and populate them too using `evaluate`
-@compat function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{Uint64, Tuple{Int, Int}})
+@compat function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UInt64, Tuple{Int, Int}})
   for (id, (start_index, end_index)) in var_to_ranges
     var = id_to_variables[id]
     if var.value != nothing

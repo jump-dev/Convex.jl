@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 
 type ExpAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr}
   size::@compat Tuple{Int, Int}
 

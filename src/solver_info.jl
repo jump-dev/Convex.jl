@@ -2,7 +2,7 @@ import MathProgBase
 export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
 export set_default_solver, get_default_solver
 
-function set_default_solver(solver::MathProgBase.MathProgSolverInterface.AbstractMathProgSolver)
+function set_default_solver(solver::MathProgBase.AbstractMathProgSolver)
   global DEFAULT_SOLVER
   DEFAULT_SOLVER = solver
 end

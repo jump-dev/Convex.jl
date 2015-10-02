@@ -12,7 +12,7 @@ export sign, curvature, monotonicity, evaluate
 
 type RelativeEntropyAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   children::@compat Tuple{AbstractExpr,AbstractExpr}
   size::@compat Tuple{Int, Int}
 

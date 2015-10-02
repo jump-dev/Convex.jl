@@ -7,7 +7,7 @@
 ## head::Symbol                  -- a symbol such as :vecnorm, :+ etc
 ## children::(AbstractExpr,)     -- The expressions on which the current expression
 ##                               -- is operated
-## id_hash::Uint64               -- identifier hash, can be a hash of children
+## id_hash::UInt64               -- identifier hash, can be a hash of children
 ##                                  or a unique identifier of the object
 ## size::(Int, Int)          -- size of the resulting expression
 #
@@ -45,8 +45,8 @@ abstract Constraint
 import Base.hash
 export hash
 
-const hashaa_seed = Uint === Uint64 ? 0x7f53e68ceb575e76 : 0xeb575e7
-function hash(a::Array{AbstractExpr}, h::Uint)
+const hashaa_seed = UInt === UInt64 ? 0x7f53e68ceb575e76 : 0xeb575e7
+function hash(a::Array{AbstractExpr}, h::UInt)
   h += hashaa_seed
   h += hash(size(a))
   for x in a
@@ -97,9 +97,9 @@ function length(x::AbstractExpr)
 end
 
 ### User-defined Unions
-Value = Union(Number, AbstractArray)
-ValueOrNothing = Union(Value, Nothing)
-AbstractExprOrValue = Union(AbstractExpr, Value)
+@compat typealias Value Union{Number, AbstractArray}
+@compat typealias ValueOrNothing Union{Value, Void}
+@compat typealias AbstractExprOrValue Union{AbstractExpr, Value}
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x

@@ -6,7 +6,7 @@ export SDPConstraint, isposdef, in, ⪰, ⪯
 # TODO: Terrible documentation. Please fix.
 type SDPConstraint <: Constraint
   head::Symbol
-  id_hash::Uint64
+  id_hash::UInt64
   child::AbstractExpr
   size::@compat Tuple{Int, Int}
   dual::ValueOrNothing
