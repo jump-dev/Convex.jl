@@ -25,6 +25,13 @@ facts("SOCP Atoms") do
     @fact p.optval => roughly(14.9049, TOL)
     @fact evaluate(norm2(A * x + b) + lambda * norm2(x)) => roughly(14.9049, TOL)
 
+    x = Variable(2)
+    p = minimize(norm2([x[1] + 2x[2] + 2, 2x[1] + x[2] + 3, 3x[1]+4x[2] + 4]) + lambda * norm2(x), x >= 1)
+    @fact vexity(p) => ConvexVexity()
+    solve!(p)
+    @fact p.optval => roughly(14.9049, TOL)
+    @fact evaluate(norm2(A * x + b) + lambda * norm2(x)) => roughly(14.9049, TOL)
+
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
