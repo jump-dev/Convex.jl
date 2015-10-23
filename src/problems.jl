@@ -161,21 +161,21 @@ Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
 
 # Allow users to simply type minimize
 minimize(objective::AbstractExpr, constraints::Constraint...) =
-  Problem(:minimize, objective, [constraints...])
+  Problem(:minimize, objective, collect(constraints))
 minimize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
   Problem(:minimize, objective, constraints)
 minimize(objective::Value, constraints::Constraint...) =
-  minimize(convert(AbstractExpr, objective), [constraints...])
+  minimize(convert(AbstractExpr, objective), collect(constraints))
 minimize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   minimize(convert(AbstractExpr, objective), constraints)
 
 # Allow users to simply type maximize
 maximize(objective::AbstractExpr, constraints::Constraint...) =
-  Problem(:maximize, objective, [constraints...])
+  Problem(:maximize, objective, collect(constraints))
 maximize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
   Problem(:maximize, objective, constraints)
 maximize(objective::Value, constraints::Constraint...) =
-  maximize(convert(AbstractExpr, objective), [constraints...])
+  maximize(convert(AbstractExpr, objective), collect(constraints))
 maximize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
   maximize(convert(AbstractExpr, objective), constraints)
 
