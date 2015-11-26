@@ -13,8 +13,8 @@ export sign, curvature, monotonicity, evaluate
 type RelativeEntropyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr,AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr,AbstractExpr}
+  size::Tuple{Int, Int}
 
   function RelativeEntropyAtom(x::AbstractExpr, y::AbstractExpr)
     children = (x, y)

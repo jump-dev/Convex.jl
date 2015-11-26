@@ -11,8 +11,8 @@ export diagm
 type DiagMatrixAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
 
   function DiagMatrixAtom(x::AbstractExpr)
     (num_rows, num_cols) = x.size

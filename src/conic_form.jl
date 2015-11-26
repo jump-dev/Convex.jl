@@ -63,8 +63,8 @@ type ConicConstr
   sizes::Array{Int}
 end
 
-UniqueExpMap = DataStructures.OrderedDict{@compat(Tuple{Symbol, UInt64}), ConicObj}
-UniqueConstrMap = DataStructures.OrderedDict{@compat(Tuple{Symbol, UInt64}), Int}
+UniqueExpMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, ConicObj}
+UniqueConstrMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, Int}
 UniqueConstrList = Array{ConicConstr}
 
 type UniqueConicForms

@@ -4,8 +4,8 @@ export sign, monotonicity, curvature, conic_form!
 type QolElemAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr, AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr, AbstractExpr}
+  size::Tuple{Int, Int}
 
   function QolElemAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size != y.size

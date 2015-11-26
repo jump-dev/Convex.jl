@@ -1,5 +1,4 @@
 module Convex
-using Compat
 import DataStructures
 
 importall Base.Operators

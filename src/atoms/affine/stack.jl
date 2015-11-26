@@ -6,7 +6,7 @@ type HcatAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple
-  size::@compat Tuple{Int, Int}
+  size::Tuple{Int, Int}
 
   function HcatAtom(args::AbstractExpr...)
     num_rows = args[1].size[1]
