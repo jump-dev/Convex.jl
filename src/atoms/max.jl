@@ -12,8 +12,8 @@ export max, pos, hinge_loss
 type MaxAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr, AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr, AbstractExpr}
+  size::Tuple{Int, Int}
 
   function MaxAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == y.size

@@ -15,8 +15,8 @@ export sign, monotonicity, curvature, evaluate, conic_form!
 type MultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr, AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr, AbstractExpr}
+  size::Tuple{Int, Int}
 
   function MultiplyAtom(x::AbstractExpr, y::AbstractExpr)
     if x.size == (1, 1)
@@ -109,8 +109,8 @@ end
 type DotMultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{Constant, AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{Constant, AbstractExpr}
+  size::Tuple{Int, Int}
 
   function DotMultiplyAtom(x::Constant, y::AbstractExpr)
     if x.size != y.size

@@ -11,8 +11,8 @@ export sign, curvature, monotonicity, evaluate
 type SumLargestAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
   k::Int
 
   function SumLargestAtom(x::AbstractExpr, k::Int)

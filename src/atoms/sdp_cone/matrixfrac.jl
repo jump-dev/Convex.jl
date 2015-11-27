@@ -10,8 +10,8 @@ export matrixfrac
 type MatrixFracAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr, AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr, AbstractExpr}
+  size::Tuple{Int, Int}
 
   function MatrixFracAtom(x::AbstractExpr, P::AbstractExpr)
     if x.size[2] != 1

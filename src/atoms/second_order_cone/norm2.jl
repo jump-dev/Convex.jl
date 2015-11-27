@@ -12,8 +12,8 @@ export sign, monotonicity, curvature, conic_form!
 type EucNormAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
 
   function EucNormAtom(x::AbstractExpr)
     children = (x,)

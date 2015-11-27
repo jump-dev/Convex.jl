@@ -15,8 +15,8 @@ export sign, curvature, monotonicity, evaluate
 type NegateAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
 
   function NegateAtom(x::AbstractExpr)
     children = (x,)
@@ -57,7 +57,7 @@ type AdditionAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Array{AbstractExpr, 1}
-  size::@compat Tuple{Int, Int}
+  size::Tuple{Int, Int}
 
   function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
     # find the size of the expression = max of size of x and size of y

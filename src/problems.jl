@@ -4,7 +4,7 @@ export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_cons
 export Float64OrNothing
 export conic_problem
 
-@compat typealias Float64OrNothing Union{Float64, Void}
+typealias Float64OrNothing Union{Float64, Void}
 
 # TODO: Cleanup
 type Solution{T<:Number}
@@ -47,7 +47,7 @@ end
 function find_variable_ranges(constraints)
   index = 0
   constr_size = 0
-  var_to_ranges = Dict{UInt64, @compat Tuple{Int, Int}}()
+  var_to_ranges = Dict{UInt64, Tuple{Int, Int}}()
   for constraint in constraints
     for i = 1:length(constraint.objs)
       for (id, val) in constraint.objs[i]
@@ -111,7 +111,7 @@ function conic_problem(p::Problem)
 
   A = spzeros(constr_size, var_size)
   b = spzeros(constr_size, 1)
-  cones = (@compat Tuple{Symbol, UnitRange{Int}})[]
+  cones = Tuple{Symbol, UnitRange{Int}}[]
   constr_index = 0
   for constraint in constraints
     total_constraint_size = 0

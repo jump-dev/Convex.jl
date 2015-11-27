@@ -97,9 +97,9 @@ function length(x::AbstractExpr)
 end
 
 ### User-defined Unions
-@compat typealias Value Union{Number, AbstractArray}
-@compat typealias ValueOrNothing Union{Value, Void}
-@compat typealias AbstractExprOrValue Union{AbstractExpr, Value}
+typealias Value Union{Number, AbstractArray}
+typealias ValueOrNothing Union{Value, Void}
+typealias AbstractExprOrValue Union{AbstractExpr, Value}
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x

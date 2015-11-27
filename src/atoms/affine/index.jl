@@ -1,13 +1,13 @@
 import Base: getindex, to_index
 export IndexAtom, getindex
 
-@compat typealias ArrayOrNothing Union{AbstractArray, Void}
+typealias ArrayOrNothing Union{AbstractArray, Void}
 
 type IndexAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
   rows::ArrayOrNothing
   cols::ArrayOrNothing
   inds::ArrayOrNothing

@@ -6,8 +6,8 @@ export sign, curvature, monotonicity, evaluate, conic_form!
 type ReshapeAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr}
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
 
   function ReshapeAtom(x::AbstractExpr, m::Int, n::Int)
     if m * n != get_vectorized_size(x)

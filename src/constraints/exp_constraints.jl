@@ -4,8 +4,8 @@ export ExpConstraint, conic_form!, vexity
 type ExpConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
-  children::@compat Tuple{AbstractExpr, AbstractExpr, AbstractExpr} # (x, y, z)
-  size::@compat Tuple{Int, Int}
+  children::Tuple{AbstractExpr, AbstractExpr, AbstractExpr} # (x, y, z)
+  size::Tuple{Int, Int}
   dual::ValueOrNothing
 
   function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
