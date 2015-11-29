@@ -24,18 +24,18 @@ type Problem
   constraints::Array{Constraint}
   status::Symbol
   optval::Float64OrNothing
-  model::MathProgBase.AbstractMathProgModel
+  model::MathProgBase.AbstractConicModel
   solution::Solution
 
   function Problem(head::Symbol, objective::AbstractExpr,  
-                   model::MathProgBase.AbstractMathProgModel, constraints::Array=Constraint[])
+                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])
     return new(head, objective, constraints, "not yet solved", nothing, model)
   end
 end
 # constructor if model is not specified
 function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[], 
                  solver::MathProgBase.AbstractMathProgSolver = get_default_solver())
-  Problem(head, objective, MathProgBase.model(solver), constraints)
+  Problem(head, objective, MathProgBase.ConicModel(solver), constraints)
 end
 
 # If the problem constructed is of the form Ax=b where A is m x n
