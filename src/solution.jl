@@ -9,7 +9,7 @@ function solve!(problem::Problem,
                 s::MathProgBase.AbstractMathProgSolver;
                 kwargs...)
   # TODO: warn about wiping out old model if warmstart=true?
-  problem.model = MathProgBase.model(s)
+  problem.model = MathProgBase.ConicModel(s)
   return solve!(problem; kwargs...)
 end
 
@@ -40,7 +40,7 @@ function solve!(problem::Problem;
 
 end
 
-function set_warmstart!(m::MathProgBase.AbstractMathProgModel, 
+function set_warmstart!(m::MathProgBase.AbstractConicModel,
                        problem::Problem, 
                        n::Int, # length of primal (conic) solution
                        var_to_ranges)
@@ -74,11 +74,11 @@ function set_warmstart!(m::MathProgBase.AbstractMathProgModel,
     m
 end
 
-function load_problem!(m::MathProgBase.AbstractMathProgModel, c, A, b, cones, vartypes)
+function load_problem!(m::MathProgBase.AbstractConicModel, c, A, b, cones, vartypes)
   # no conic constraints on variables
   var_cones = fill((:Free, 1:size(A, 2)),1)
   # TODO: Get rid of full once c and b are not sparse
-  MathProgBase.loadconicproblem!(m, vec(full(c)), A, vec(full(b)), cones, var_cones)
+  MathProgBase.loadproblem!(m, vec(full(c)), A, vec(full(b)), cones, var_cones)
 
   # add integer and binary constraints on variables
   if !all(Bool[t==:Cont for t in vartypes])
@@ -91,12 +91,12 @@ function load_problem!(m::MathProgBase.AbstractMathProgModel, c, A, b, cones, va
   m
 end
 
-function populate_solution!(m::MathProgBase.AbstractMathProgModel,
+function populate_solution!(m::MathProgBase.AbstractConicModel,
                         problem::Problem,
                         var_to_ranges,
                         conic_constraints)
   try
-    dual = MathProgBase.getconicdual(m)
+    dual = MathProgBase.getdual(m)
     problem.solution = Solution(MathProgBase.getsolution(m), dual,
                                 MathProgBase.status(m), MathProgBase.getobjval(m))
   catch
