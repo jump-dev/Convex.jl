@@ -74,4 +74,13 @@ include("atoms/logdet.jl")
 include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("utilities/deprecated.jl")
+
+#Temporary workaround for memory leak (https://github.com/JuliaOpt/Convex.jl/issues/83)
+function clearmemory()
+    global id_to_variables = Dict{UInt64, Variable}()
+    global var_to_ranges = Dict{UInt64, Tuple{Int, Int}}()
+    global conic_constr_to_constr = Dict{ConicConstr, Constraint}()
+    gc()
+end
+
 end
