@@ -130,7 +130,7 @@ facts("SDP Atoms") do
     @fact evaluate(x) => roughly(ones(3, 3), TOL)
 
     x = Semidefinite(3)
-    p = minimize(sumlargesteigs(x, 2), [x[i,:] >= i for i=1:3])
+    p = minimize(sumlargesteigs(x, 2), [x[i,:] >= i for i=1:3]...)
     solve!(p)
     @fact p.optval => roughly(8.4853, TOL)
 
@@ -145,11 +145,11 @@ facts("SDP Atoms") do
     @fact p1.optval => roughly(p2.optval, TOL)
 
     x1 = Semidefinite(3)
-    p1 = minimize(lambdamax(x1), [x1[i,:] >= i for i=1:3])
+    p1 = minimize(lambdamax(x1), [x1[i,:] >= i for i=1:3]...)
     solve!(p1)
 
     x2 = Semidefinite(3)
-    p2 = minimize(sumlargesteigs(x2, 1), [x2[i,:] >= i for i=1:3])
+    p2 = minimize(sumlargesteigs(x2, 1), [x2[i,:] >= i for i=1:3]...)
     solve!(p2)
 
     @fact p1.optval => roughly(p2.optval, TOL)
