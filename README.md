@@ -6,7 +6,7 @@
 [![Convex](http://pkg.julialang.org/badges/Convex_0.3.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.3)
 [![Convex](http://pkg.julialang.org/badges/Convex_0.4.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.4)
 
-**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
+**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), [GLPK](https://github.com/JuliaOpt/GLPK.jl) through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
 
 **Installation**: `julia> Pkg.add("Convex")`
 
