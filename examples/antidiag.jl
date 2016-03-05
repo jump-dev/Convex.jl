@@ -16,9 +16,9 @@ export antidiag, sign, monotonicity, curvature, evaluate, conic_form!
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 type AntidiagAtom <: AbstractExpr
   head::Symbol
-  id_hash::Uint64
-  children::(AbstractExpr,)
-  size::(Int, Int)
+  id_hash::UInt64
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
   k::Int
 
   function AntidiagAtom(x::AbstractExpr, k::Int=0)
@@ -49,7 +49,7 @@ function curvature(x::AntidiagAtom)
 end
 
 function evaluate(x::AntidiagAtom)
-  return diag(flipud(evaluate(x.children[1])), x.k)
+  return diag(flipdim(evaluate(x.children[1]),1), x.k)
 end
 
 antidiag(x::AbstractExpr, k::Int=0) = AntidiagAtom(x, k)
