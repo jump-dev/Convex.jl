@@ -53,3 +53,8 @@ If we wish to increase the maximum number of iterations for ECOS or SCS, we can 
 	solve!(p, ECOSSolver(maxit=10000))
 	using SCS
 	solve!(p, SCSSolver(max_iters=10000))
+
+To turn off the problem status warning issued by Convex when a solver is not able to solve a problem to optimality, use the keyword argument `verbose=false` of the solve method, along with any desired solver parameters:
+::
+
+	solve!(p, SCSSolver(verbose=false), verbose=false)
