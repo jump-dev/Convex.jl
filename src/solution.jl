@@ -14,7 +14,9 @@ function solve!(problem::Problem,
 end
 
 function solve!(problem::Problem;
-                warmstart=false, check_vexity=true)
+                warmstart=false, 
+                check_vexity=true,
+                verbose=true)
 
   if check_vexity
     vex = vexity(problem)
@@ -34,7 +36,7 @@ function solve!(problem::Problem;
   # populate the status, the primal (and possibly dual) solution
   # and the primal (and possibly dual) variables with values
   populate_solution!(m, problem, var_to_ranges, conic_constraints)
-  if !(problem.status==:Optimal)
+  if !(problem.status==:Optimal) && verbose
     warn("Problem status $(problem.status); solution may be inaccurate.")
   end
 
