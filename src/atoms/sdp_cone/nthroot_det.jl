@@ -1,41 +1,43 @@
-import Base.logdet
+export geomean_eig, nthroot_det
 
-type LogDetAtom <: AbstractExpr
+type NthRootDetAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
   size::Tuple{Int, Int}
 
-  function LogDetAtom(x::AbstractExpr)
+  function NthRootDetAtom(x::AbstractExpr)
     children = (x,)
-    return new(:logdet, hash(children), children, (1, 1))
+    return new(:nthrootdet, hash(children), children, (1, 1))
   end
 end
 
-function sign(x::LogDetAtom)
-  return NoSign()
+function sign(x::NthRootDetAtom)
+  return Pos()
 end
 
-function monotonicity(x::LogDetAtom)
+function monotonicity(x::NthRootDetAtom)
   return (NoMonotonicity(),)
 end
 
-function curvature(x::LogDetAtom)
+function curvature(x::NthRootDetAtom)
   return ConcaveVexity()
 end
 
-function evaluate(x::LogDetAtom)
-  return log(det(evaluate(x.children[1])))
+function evaluate(x::NthRootDetAtom)
+  n = size(x,1)
+  return (det(evaluate(x.children[1])))^(1/n)
 end
 
-function conic_form!(x::LogDetAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::NthRootDetAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     A = x.children[1]
     D = Variable(size(A)) # diagonal matrix
     U = Variable(size(A)) # upper triangular matrix
 
-    # objective given by the sum of the log of diagonal matrix D
-    objective = conic_form!(sum(log(diag(D))), unique_conic_forms)
+    # objective given by the geometric mean of the eigenvalues,
+    # represented by the diagonal of diagonal matrix D
+    objective = conic_form!(geo_mean(diag(D))), unique_conic_forms)
 
     # force D to be diagonal; for U to be upper triangular
     for i in 1:A.size[1]
@@ -61,4 +63,5 @@ function conic_form!(x::LogDetAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-logdet(x::AbstractExpr) = LogDetAtom(x)
+geomean_eig(x::AbstractExpr) = NthRootDetAtom(x)
+nthroot_det(x::AbstractExpr) = NthRootDetAtom(x)
