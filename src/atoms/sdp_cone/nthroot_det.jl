@@ -1,5 +1,9 @@
 export geomean_eig, nthroot_det
 
+## to do: need a geomean function that takes vectors of length n
+# and computes the nth root of the product of their entries
+# we only have this for n=2
+
 type NthRootDetAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
@@ -37,7 +41,7 @@ function conic_form!(x::NthRootDetAtom, unique_conic_forms::UniqueConicForms)
 
     # objective given by the geometric mean of the eigenvalues,
     # represented by the diagonal of diagonal matrix D
-    objective = conic_form!(geo_mean(diag(D))), unique_conic_forms)
+    objective = conic_form!(geomean(diag(D)), unique_conic_forms)
 
     # force D to be diagonal; for U to be upper triangular
     for i in 1:A.size[1]

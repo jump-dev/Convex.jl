@@ -1,5 +1,5 @@
 import Base.sqrt
-export GeoMeanAtom, geomean, sqrt
+export GeoMeanAtom, geomean, sqrt, sgeomean
 export sign, monotonicity, curvature, conic_form!
 
 type GeoMeanAtom <: AbstractExpr
@@ -49,3 +49,31 @@ end
 
 geomean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
 sqrt(x::AbstractExpr) = GeoMeanAtom(x, Constant(ones(x.size[1], x.size[2])))
+
+# (almost) extend geometric mean to vectors of length n via recursion
+# geomean(x) = prod(x)^(1/\bar n)
+# where \bar n is the smallest power of 2 bigger than n
+
+function power_of_2_gt(n::Int)
+  Int(2^ceil(log(2,n)))
+end
+
+function sgeomean(x::AbstractExpr)
+  if length(x) > 2
+    nbar = power_of_2_gt(length(x))
+    half_nbar = Int(nbar/2)
+    first_half = x[1:half_nbar]
+    # append ones to last half until it's a power of 2
+    last_half = vcat(vec(x[half_nbar+1:end]), ones(nbar - length(x)))
+    return geomean(sgeomean(first_half), 
+                 sgeomean(last_half))
+  elseif length(x) == 2  
+    return geomean(x[1],x[2])
+  else
+    return x
+  end
+end
+
+# a test for sgeomean
+# p = maximize(sgeomean(x), x<= 2, x[1]<=1); solve!(p);
+# @assert p.optval == prod(x.value)^(1/16)
