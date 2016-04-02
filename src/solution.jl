@@ -97,14 +97,30 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
                         problem::Problem,
                         var_to_ranges,
                         conic_constraints)
-  try
-    dual = MathProgBase.getdual(m)
-    problem.solution = Solution(MathProgBase.getsolution(m), dual,
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+  dual = try 
+    MathProgBase.getdual(m)
   catch
-    problem.solution = Solution(MathProgBase.getsolution(m),
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+    fill(NaN, MathProgBase.numconstr(m))
   end
+
+  solution = try 
+    MathProgBase.getsolution(m)
+  catch
+    fill(NaN, MathProgBase.numvar(m))
+  end
+
+  objective = try
+    MathProgBase.getobjval(m)
+  catch
+    NaN
+  end
+  
+  if any(isnan(dual))
+    problem.solution = Solution(solution, MathProgBase.status(m), objective)
+  else
+    problem.solution = Solution(solution, dual, MathProgBase.status(m), objective)
+  end
+
   populate_variables!(problem, var_to_ranges)
 
   if problem.solution.has_dual
