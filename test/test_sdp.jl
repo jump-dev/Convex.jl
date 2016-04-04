@@ -156,4 +156,11 @@ facts("SDP Atoms") do
 
     println(p1.optval)
   end
+
+  context("sgeomean_eig") do
+    n = 5
+    X = Variable(n)
+    p = maximize(sgeomean_eig(X), I - X in :sdp); solve!(p)
+    @fact vecnorm(X.value - eye(n)) => roughly(0, TOL*n^2)
+  end
 end
