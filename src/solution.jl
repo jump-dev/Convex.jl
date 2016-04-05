@@ -14,7 +14,9 @@ function solve!(problem::Problem,
 end
 
 function solve!(problem::Problem;
-                warmstart=false, check_vexity=true)
+                warmstart=false, 
+                check_vexity=true,
+                verbose=true)
 
   if check_vexity
     vex = vexity(problem)
@@ -34,7 +36,7 @@ function solve!(problem::Problem;
   # populate the status, the primal (and possibly dual) solution
   # and the primal (and possibly dual) variables with values
   populate_solution!(m, problem, var_to_ranges, conic_constraints)
-  if !(problem.status==:Optimal)
+  if !(problem.status==:Optimal) && verbose
     warn("Problem status $(problem.status); solution may be inaccurate.")
   end
 
@@ -95,14 +97,30 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
                         problem::Problem,
                         var_to_ranges,
                         conic_constraints)
-  try
-    dual = MathProgBase.getdual(m)
-    problem.solution = Solution(MathProgBase.getsolution(m), dual,
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+  dual = try 
+    MathProgBase.getdual(m)
   catch
-    problem.solution = Solution(MathProgBase.getsolution(m),
-                                MathProgBase.status(m), MathProgBase.getobjval(m))
+    fill(NaN, MathProgBase.numconstr(m))
   end
+
+  solution = try 
+    MathProgBase.getsolution(m)
+  catch
+    fill(NaN, MathProgBase.numvar(m))
+  end
+
+  objective = try
+    MathProgBase.getobjval(m)
+  catch
+    NaN
+  end
+  
+  if any(isnan(dual))
+    problem.solution = Solution(solution, MathProgBase.status(m), objective)
+  else
+    problem.solution = Solution(solution, dual, MathProgBase.status(m), objective)
+  end
+
   populate_variables!(problem, var_to_ranges)
 
   if problem.solution.has_dual
