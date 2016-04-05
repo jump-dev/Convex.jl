@@ -37,5 +37,6 @@ In Depth Documentation:
   Examples <examples>
   Solvers <solvers>
   FAQ <faq>
+  Optimizing in a Loop <loop>
   Advanced <advanced>
   Credits <credits>
