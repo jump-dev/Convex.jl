@@ -153,14 +153,41 @@ facts("SDP Atoms") do
     solve!(p2)
 
     @fact p1.optval => roughly(p2.optval, TOL)
-
-    println(p1.optval)
   end
 
-  context("sgeomean_eig") do
+  context("sgeomean_eig atom") do
     n = 5
-    X = Variable(n)
-    p = maximize(sgeomean_eig(X), I - X in :sdp); solve!(p)
+    X = Variable(n,n)
+    p = maximize(sgeomean_eig(X), eye(n) - X in :sdp); solve!(p)
     @fact vecnorm(X.value - eye(n)) => roughly(0, TOL*n^2)
+  end
+
+  context("equivalence of sgeomean_eig and logdet atoms") do
+    #example is d-optimal design from CVX
+    #web.cvxr.com/cvx/examples/cvxbook/Ch07_statistical_estim/html/expdesign.html
+    M = 10
+    angles1 = linspace(3*pi/4, pi, M)
+    angles2 = linspace(0, -pi/2, M)
+    V = [3.*cos(angles1)' 1.5.*cos(angles2)';
+       3.*sin(angles1)' 1.5.*sin(angles2)']
+    P = 2*M
+
+    lam1 = Variable(P)
+    p1 = maximize(sgeomean_eig(V * diagm(lam1) * V'), sum(lam1) == 1, lam1 >= 0)
+    solve!(p1)
+
+    @fact evaluate(sgeomean_eig(V * diagm(lam1) * V')) => roughly(p1.optval, TOL)
+    @fact p1.optval => roughly(3.182, TOL)
+
+    lam2 = Variable(P)
+    p2 = maximize(logdet(V * diagm(lam2) * V'), sum(lam2) == 1, lam2 >= 0)
+    solve!(p2)
+
+    @fact evaluate(logdet(V * diagm(lam2) * V')) => roughly(p2.optval, TOL)
+    @fact p2.optval => roughly(2.315, TOL)
+
+    @fact lam1.value => roughly(lam2.value, TOL)
+    @fact lam1.value[1] => roughly(0.5, TOL)
+    @fact lam1.value[10] => roughly(0.5, TOL)
   end
 end
