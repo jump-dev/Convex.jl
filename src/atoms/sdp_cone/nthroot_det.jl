@@ -31,8 +31,8 @@ function curvature(x::NthRootDetAtom)
 end
 
 function evaluate(x::NthRootDetAtom)
-  n = size(x,1)
-  return (det(evaluate(x.children[1])))^(1/n)
+  n = size(x.children[1],1)
+  return (det(evaluate(x.children[1])))^(1/Int(2^ceil(log(2,n))))
 end
 
 function conic_form!(x::NthRootDetAtom, unique_conic_forms::UniqueConicForms)
