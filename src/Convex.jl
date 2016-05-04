@@ -58,6 +58,7 @@ include("atoms/sdp_cone/operatornorm.jl")
 include("atoms/sdp_cone/lambda_min_max.jl")
 include("atoms/sdp_cone/matrixfrac.jl")
 include("atoms/sdp_cone/sumlargesteigs.jl")
+include("atoms/sdp_cone/schatten.jl")
 
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")

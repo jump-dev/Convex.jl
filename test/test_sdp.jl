@@ -156,4 +156,25 @@ facts("SDP Atoms") do
 
     println(p1.optval)
   end
+
+  context("schatten") do
+    n = 5
+    A = randn(n,n)
+    U,S,V = svd(A)
+    d = rand(n)
+    M = U*diagm(d)*U'
+
+    X = Semidefinite(n)
+    p = maximize(sum(log(eig(X))), M - X in :SDP)
+    solve!(p)
+
+    # @fact p.optval --> roughly(sum(log(d)), TOL)
+    # @fact evaluate(X) --> roughly(M, TOL)
+
+    # p = minimize(sum(exp(eig(X))), M - X in :SDP)
+    # solve!(p)
+
+    # @fact p.optval --> roughly(sum(exp(d)), TOL)
+    # @fact evaluate(X) --> roughly(M, TOL)
+  end
 end
