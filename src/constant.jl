@@ -3,7 +3,7 @@
 # Defines Constant, which is a subtype of AbstractExpr
 #############################################################################
 export Constant
-export vexity, evaluate, sign, conic_form!
+export vexity, evaluate, sign, domain, conic_form!
 
 type Constant <: AbstractExpr
   head::Symbol
@@ -14,9 +14,9 @@ type Constant <: AbstractExpr
   sign::Sign
   domain::Domain
 
-  function Constant(x::Value, sign::Sign)
+  function Constant(x::Value, sign::Sign, domain::Domain)
     sz = (size(x, 1), size(x, 2))
-    return new(:constant, object_id(x), x, sz, ConstVexity(), sign)
+    return new(:constant, object_id(x), x, sz, ConstVexity(), sign, domain)
   end
 
   function Constant(x::Value, check_sign::Bool=true)
@@ -42,6 +42,12 @@ end
 
 function sign(x::Constant)
   return x.sign
+end
+
+# New Code
+# A function to return domain
+function domain(x::Constant)
+  return x.domain
 end
 
 function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
