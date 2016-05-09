@@ -20,7 +20,7 @@ type Variable <: AbstractExpr
 
 
   function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), domain::Domain=Real(), sets::Symbol...)
-    this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
+    this = new(:variable, 0, nothing, size, AffineVexity(), sign, domain, Symbol[sets...])
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
     return this
