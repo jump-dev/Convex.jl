@@ -133,13 +133,13 @@ type ComplexVariable <: AbstractExpr
   function ComplexVariable(size::Tuple{Int, Int}, sign::Sign=NotDefined(), domain::Domain=Complex(), sets::Symbol...)
     this = new(:complex_variable, 0, nothing, size, AffineVexity(), sign, domain, Symbol[sets...])
     this.id_hash = object_id(this)
-    id_to_variables[this.id_hash] = this
+    id_to_complex_variables[this.id_hash] = this
     return this
   end
 
   ComplexVariable(m::Int, n::Int, sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((m,n), sign, domain, sets...)
   ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), domain, sets...)
-  ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), Complex(), sets...)
+  ComplexVariable(sign::Sign=NoteDefined(), sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), Complex(), sets...)
   ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = ComplexVariable(size, NotDefined(), Complex(), sets...)
   ComplexVariable(size::Int, sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((size, 1), sign, sets...)
   ComplexVariable(size::Int, sets::Symbol...) = ComplexVariable((size, 1), sets...)
@@ -158,7 +158,7 @@ end
 # the expression tree will only utilize variable ids during construction
 # full information of the variables will be needed during stuffing
 # and after solving to populate the variables with values
-id_to_variables = Dict{UInt64, Variable}()
+id_to_complex_variables = Dict{UInt64, ComplexVariable}()
 
 function vexity(x::Variable)
   return x.vexity
