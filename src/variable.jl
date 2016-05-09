@@ -13,7 +13,11 @@ type Variable <: AbstractExpr
   size::Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
+  # New code
+  # New field called domain
+  domain::Domain
   sets::Array{Symbol,1}
+
 
   function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
@@ -137,7 +141,7 @@ function HermitianSemidefinite(m::Integer, n::Integer)
   if m==n
     return Variable((m,m), :HermitianSemidefinite)
   else
-    error("Semidefinite matrices must be square")
+    error("HermitianSemidefinite matrices must be square")
   end
 end
 

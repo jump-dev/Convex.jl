@@ -43,6 +43,17 @@ type Positive <: Sign                   end
 type Negative <: Sign                   end
 type NoSign <: Sign                     end
 
+# New code
+# Also create a new subtype of Sign "NotDefined to handle the complex case"
+type NotDefined <: Sign                 end
+
+# New code
+# Domain Subtypes
+abstract Domain
+type Real <: Domain                    end
+type Complex <: Domain                 end
+
+
 -(v::Vexity) = v
 -(v::ConcaveVexity) = ConvexVexity()
 -(v::ConvexVexity) = ConcaveVexity()

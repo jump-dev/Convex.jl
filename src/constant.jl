@@ -12,6 +12,7 @@ type Constant <: AbstractExpr
   size::Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
+  domain::Domain
 
   function Constant(x::Value, sign::Sign)
     sz = (size(x, 1), size(x, 2))
