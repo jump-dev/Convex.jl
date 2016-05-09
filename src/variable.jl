@@ -102,3 +102,35 @@ function free!(x::Variable)
   x.vexity = AffineVexity()
   x
 end
+
+########## END OF DEFINITION OF REAL VARIABLE ###################
+
+
+
+############# BEGINNING OF DEFINITION OF COMPLEX VARIABLE ##############
+type ComplexVariable <: AbstractExpr
+  head::Symbol
+  id_hash::UInt64
+  value::ValueOrNothing
+  size::Tuple{Int, Int}
+  vexity::Vexity
+  sign::Sign
+  sets::Array{Symbol,1}
+
+  function ComplexVariable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
+    this = new(:complex_variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
+    this.id_hash = object_id(this)
+    id_to_variables[this.id_hash] = this
+    return this
+  end
+
+  ComplexVariable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = ComplexVariable((m,n), sign, sets...)
+  ComplexVariable(sign::Sign, sets::Symbol...) = ComplexVariable((1, 1), sign, sets...)
+  ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NoSign(), sets...)
+  ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = ComplexVariable(size, NoSign(), sets...)
+  ComplexVariable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = ComplexVariable((size, 1), sign, sets...)
+  ComplexVariable(size::Int, sets::Symbol...) = ComplexVariable((size, 1), sets...)
+end
+
+
+############# END OF DEFINITION OF COMPLEX VARIABLE ##############
