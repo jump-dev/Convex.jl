@@ -132,5 +132,31 @@ type ComplexVariable <: AbstractExpr
   ComplexVariable(size::Int, sets::Symbol...) = ComplexVariable((size, 1), sets...)
 end
 
+HermitianSemidefinite(m::Integer) = Variable((m,m), :HermitianSemidefinite)
+function HermitianSemidefinite(m::Integer, n::Integer)
+  if m==n
+    return Variable((m,m), :HermitianSemidefinite)
+  else
+    error("Semidefinite matrices must be square")
+  end
+end
+
+# global map from unique variable ids to variables.
+# the expression tree will only utilize variable ids during construction
+# full information of the variables will be needed during stuffing
+# and after solving to populate the variables with values
+id_to_variables = Dict{UInt64, Variable}()
+
+function vexity(x::Variable)
+  return x.vexity
+end
+
+function evaluate(x::Variable)
+  return x.value == nothing ? error("Value of the variable is yet to be calculated") : x.value
+end
+
+function sign(x::Variable)
+  return x.sign
+end
 
 ############# END OF DEFINITION OF COMPLEX VARIABLE ##############
