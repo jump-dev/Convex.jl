@@ -139,7 +139,7 @@ type ComplexVariable <: AbstractExpr
 
   ComplexVariable(m::Int, n::Int, sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((m,n), sign, domain, sets...)
   ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), domain, sets...)
-  ComplexVariable(sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), Complex(), sets...)
+  ComplexVariable(sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((1, 1), sign, Complex(), sets...)
   ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = ComplexVariable(size, NotDefined(), Complex(), sets...)
   ComplexVariable(size::Int, sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((size, 1), sign, sets...)
   ComplexVariable(size::Int, sets::Symbol...) = ComplexVariable((size, 1), sets...)
