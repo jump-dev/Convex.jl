@@ -30,6 +30,7 @@ type Constant <: AbstractExpr
     return Constant(x, NoSign())
   end
 end
+#### Constant Definition end   ##### 
 
 function vexity(x::Constant)
   return x.vexity
