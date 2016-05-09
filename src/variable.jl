@@ -26,10 +26,10 @@ type Variable <: AbstractExpr
     return this
   end
 
-  Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
-  Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
-  Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
-  Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), sets...)
+  Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, domain, sets...)
+  Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, domain, sets...)
+  Variable(sets::Symbol...) = Variable((1, 1), NoSign(), Real(), sets...)
+  Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), Real(), sets...)
   Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
   Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
 end
