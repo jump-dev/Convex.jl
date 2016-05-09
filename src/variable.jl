@@ -131,7 +131,7 @@ type ComplexVariable <: AbstractExpr
 
 
   function ComplexVariable(size::Tuple{Int, Int}, sign::Sign=NotDefined(), domain::Domain=Complex(), sets::Symbol...)
-    this = new(:complex_variable, 0, nothing, size, AffineVexity(), sign, domain, Symbol[sets...])
+    this = new(:complexvariable, 0, nothing, size, AffineVexity(), sign, domain, Symbol[sets...])
     this.id_hash = object_id(this)
     id_to_complex_variables[this.id_hash] = this
     return this
