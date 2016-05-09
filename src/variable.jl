@@ -3,7 +3,7 @@
 # Defines Variable, which is a subtype of AbstractExpr
 #############################################################################
 
-export Variable, Semidefinite, ComplexVariable
+export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
 type Variable <: AbstractExpr
@@ -19,7 +19,7 @@ type Variable <: AbstractExpr
   sets::Array{Symbol,1}
 
 
-  function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
+  function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), domain::Domain=Real(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
