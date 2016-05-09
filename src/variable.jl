@@ -61,6 +61,11 @@ function sign(x::Variable)
   return x.sign
 end
 
+# Added new method to display domain of the variable
+function domain(x::Variable)
+  return x.domain
+end
+
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     if :fixed in x.sets
@@ -115,31 +120,35 @@ end
 type ComplexVariable <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  value::ValueOrNothing
+  value::ValueOrNothing     #ValueorNothing should support data of type 5+4im # We would need to redefine this
   size::Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
+  # New code
+  # New field called domain
+  domain::Domain
   sets::Array{Symbol,1}
 
-  function ComplexVariable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
-    this = new(:complex_variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
+
+  function ComplexVariable(size::Tuple{Int, Int}, sign::Sign=NotDefined(), domain::Domain=Complex(), sets::Symbol...)
+    this = new(:variable, 0, nothing, size, AffineVexity(), sign, domain, Symbol[sets...])
     this.id_hash = object_id(this)
     id_to_variables[this.id_hash] = this
     return this
   end
 
-  ComplexVariable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = ComplexVariable((m,n), sign, sets...)
-  ComplexVariable(sign::Sign, sets::Symbol...) = ComplexVariable((1, 1), sign, sets...)
-  ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NoSign(), sets...)
-  ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = ComplexVariable(size, NoSign(), sets...)
-  ComplexVariable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = ComplexVariable((size, 1), sign, sets...)
+  ComplexVariable(m::Int, n::Int, sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((m,n), sign, domain, sets...)
+  ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), domain, sets...)
+  ComplexVariable(sets::Symbol...) = ComplexVariable((1, 1), NotDefined(), Complex(), sets...)
+  ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = ComplexVariable(size, NotDefined(), Complex(), sets...)
+  ComplexVariable(size::Int, sign::Sign=NotDefined(), sets::Symbol...) = ComplexVariable((size, 1), sign, sets...)
   ComplexVariable(size::Int, sets::Symbol...) = ComplexVariable((size, 1), sets...)
 end
 
-HermitianSemidefinite(m::Integer) = Variable((m,m), :HermitianSemidefinite)
+HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :HermitianSemidefinite)
 function HermitianSemidefinite(m::Integer, n::Integer)
   if m==n
-    return Variable((m,m), :HermitianSemidefinite)
+    return ComplexVariable((m,m), :HermitianSemidefinite)
   else
     error("HermitianSemidefinite matrices must be square")
   end
@@ -161,6 +170,11 @@ end
 
 function sign(x::Variable)
   return x.sign
+end
+
+# Added new method to display domain of the variable
+function domain(x::Variable)
+  return x.domain
 end
 
 ############# END OF DEFINITION OF COMPLEX VARIABLE ##############
