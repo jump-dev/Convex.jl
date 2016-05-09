@@ -3,7 +3,7 @@
 # Defines Variable, which is a subtype of AbstractExpr
 #############################################################################
 
-export Variable, Semidefinite
+export Variable, Semidefinite, ComplexVariable
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
 type Variable <: AbstractExpr
