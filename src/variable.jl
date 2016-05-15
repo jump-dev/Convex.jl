@@ -51,7 +51,7 @@ ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexValued(
   #ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexValued(), sets...)
 
 HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :Semidefinite)
-function Semidefinite(m::Integer, n::Integer)
+function HermitianSemidefinite(m::Integer, n::Integer)
   if m==n
     return ComplexVariable((m,m), :Semidefinite)
   else
