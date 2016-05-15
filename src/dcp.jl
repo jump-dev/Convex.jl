@@ -13,7 +13,7 @@
 import Base.-, Base.+, Base.*
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
-export Sign, Positive, Negative, NoSign, Complex
+export Sign, Positive, Negative, NoSign, ComplexValued
 export -, +, *
 
 # Vexity subtypes
@@ -44,14 +44,14 @@ type Negative <: Sign                   end
 type NoSign <: Sign                     end
 
 # New code
-# Also create a new subtype of Sign "NotDefined to handle the complex case"
-type Complex <: Sign                 end
+# Also create a new subtype of Sign "NotDefined to handle the ComplexValued case"
+type ComplexValued <: Sign                 end
 
 # # New code
 # # Domain Subtypes
 # abstract Domain
 # type Real <: Domain                    end
-# type Complex <: Domain                 end
+# type ComplexValued <: Domain                 end
 
 
 -(v::Vexity) = v
@@ -66,7 +66,7 @@ type Complex <: Sign                 end
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
 # New code
--(s::Complex) = Complex()
+-(s::ComplexValued) = ComplexValued()
 
 # # New Code
 # # Adding rule for Domain
@@ -101,8 +101,8 @@ type Complex <: Sign                 end
 +(s::NoSign, t::Positive) = s
 +(s::NoSign, t::Negative) = s
 # New code
-# Any sign + Complex = Complex
-+(s::Sign, t::Complex) = t
+# Any sign + ComplexValued = ComplexValued
++(s::Sign, t::ComplexValued) = t
 
 
 *(s::NoSign, t::NoSign) = s
@@ -115,17 +115,17 @@ type Complex <: Sign                 end
 *(s::Negative, t::Positive) = s
 *(s::Negative, t::Negative) = Positive()
 # New code 
-# Complex * Any Sign = NotDefined(Though complex and its conjugate is real but we ignore that case)
-*(t::Complex, s::Complex) = t
-*(t::Complex, s::Sign) = t
-*(s::Sign, t::Complex) = t
+# ComplexValued * Any Sign = NotDefined(Though ComplexValued and its conjugate is real but we ignore that case)
+*(t::ComplexValued, s::ComplexValued) = t
+*(t::ComplexValued, s::Sign) = t
+*(s::Sign, t::ComplexValued) = t
 
 *(s::Positive, m::Monotonicity) = m
 *(s::Negative, m::Monotonicity) = -m
 *(s::NoSign, m::Monotonicity) = NoMonotonicity()
 # New Code
-# Complex * Any monotonivity = NoMonotonicity
-*(s::Complex, m::Monotonicity) = NoMonotonicity()
+# ComplexValued * Any monotonivity = NoMonotonicity
+*(s::ComplexValued, m::Monotonicity) = NoMonotonicity()
 *(m::Monotonicity, s::Sign) = s * m
 
 *(m::Nondecreasing, v::Vexity) = v
@@ -135,13 +135,13 @@ type Complex <: Sign                 end
 *(m::NoMonotonicity, v::ConcaveVexity) = NotDcp()
 
 # New Code
-# Complex * Affine = Affine
-# Complex * Concave = NotDcp
-# Complex * NotDcp = NotDcp
-# Complex * NotDcp = NotDcp
-*(s::Complex, v::ConstVexity) = v
-*(s::Complex, v::AffineVexity) = v
-*(s::Complex, v::ConvexVexity) = NotDcp()
-*(s::Complex, v::ConcaveVexity) = NotDcp()
-#*(s::Complex, v::NotDcp()) = v
-*(v::Vexity, s::Complex) = s*v
+# ComplexValued * Affine = Affine
+# ComplexValued * Concave = NotDcp
+# ComplexValued * NotDcp = NotDcp
+# ComplexValued * NotDcp = NotDcp
+*(s::ComplexValued, v::ConstVexity) = v
+*(s::ComplexValued, v::AffineVexity) = v
+*(s::ComplexValued, v::ConvexVexity) = NotDcp()
+*(s::ComplexValued, v::ConcaveVexity) = NotDcp()
+#*(s::ComplexValued, v::NotDcp()) = v
+*(v::Vexity, s::ComplexValued) = s*v

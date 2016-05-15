@@ -35,7 +35,7 @@ type Constant <: AbstractExpr
         end
       end
       if temp == true 
-        return Constant(x, Complex())
+        return Constant(x, ComplexValued())
       else
         return Constant(x, NoSign())
       end
