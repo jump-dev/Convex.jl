@@ -13,9 +13,7 @@
 import Base.-, Base.+, Base.*
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
-export Sign, Positive, Negative, NoSign, NotDefined
-# exported Doamin and its subtypes
-export Domain, Real, Complex
+export Sign, Positive, Negative, NoSign, Complex
 export -, +, *
 
 # Vexity subtypes
