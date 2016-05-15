@@ -12,11 +12,10 @@ type Constant <: AbstractExpr
   size::Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
-  domain::Domain
 
-  function Constant(x::Value, sign::Sign, domain::Domain)
+  function Constant(x::Value, sign::Sign)
     sz = (size(x, 1), size(x, 2))
-    return new(:constant, object_id(x), x, sz, ConstVexity(), sign, domain)
+    return new(:constant, object_id(x), x, sz, ConstVexity(), sign)
   end
 
   function Constant(x::Value, check_sign::Bool=true)
@@ -44,11 +43,6 @@ function sign(x::Constant)
   return x.sign
 end
 
-# New Code
-# A function to return domain
-function domain(x::Constant)
-  return x.domain
-end
 
 function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
