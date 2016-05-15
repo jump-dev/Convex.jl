@@ -29,6 +29,14 @@ type Variable <: AbstractExpr
   Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), sets...)
   Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
   Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
+  
+  ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m,n), ComplexValued(), sets...)
+  ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexValued(), sets...)
+  #ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexValued(), sets...)
+  ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexValued(), sets...)
+  ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexValued(), sets...)
+  #ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexValued(), sets...)
+
 end
 
 Semidefinite(m::Integer) = Variable((m,m), :Semidefinite)
@@ -37,6 +45,15 @@ function Semidefinite(m::Integer, n::Integer)
     return Variable((m,m), :Semidefinite)
   else
     error("Semidefinite matrices must be square")
+  end
+end
+
+HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :Semidefinite)
+function Semidefinite(m::Integer, n::Integer)
+  if m==n
+    return ComplexVariable((m,m), :Semidefinite)
+  else
+    error("HermitianSemidefinite matrices must be square")
   end
 end
 
