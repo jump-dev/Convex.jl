@@ -41,6 +41,7 @@ type Constant <: AbstractExpr
       end
     end
   end
+end
 #### Constant Definition end   ##### 
 
 function vexity(x::Constant)
