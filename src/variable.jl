@@ -13,9 +13,6 @@ type Variable <: AbstractExpr
   size::Tuple{Int, Int}
   vexity::Vexity
   sign::Sign
-  # New code
-  # New field called domain
-  domain::Domain
   sets::Array{Symbol,1}
 
 

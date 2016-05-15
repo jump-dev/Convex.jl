@@ -116,6 +116,7 @@ type Complex <: Sign                 end
 *(s::Negative, t::Negative) = Positive()
 # New code 
 # Complex * Any Sign = NotDefined(Though complex and its conjugate is real but we ignore that case)
+*(t::Complex, s::Complex) = t
 *(t::Complex, s::Sign) = t
 *(s::Sign, t::Complex) = t
 
@@ -142,6 +143,5 @@ type Complex <: Sign                 end
 *(s::Complex, v::AffineVexity) = v
 *(s::Complex, v::ConvexVexity) = NotDcp()
 *(s::Complex, v::ConcaveVexity) = NotDcp()
-*(s::Complex, v::NotDcp()) = v
+#*(s::Complex, v::NotDcp()) = v
 *(v::Vexity, s::Complex) = s*v
-
