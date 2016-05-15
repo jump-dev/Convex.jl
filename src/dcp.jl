@@ -72,7 +72,6 @@ type Complex <: Sign                 end
 # # Adding rule for Domain
 # -(d::Domain) = d
 
-
 +(v::NotDcp, w::NotDcp) = v
 +(v::NotDcp, w::Vexity) = v
 +(v::Vexity, w::NotDcp) = w
@@ -99,16 +98,18 @@ type Complex <: Sign                 end
 +(s::Positive, t::Negative) = NoSign()
 +(s::Negative, t::Positive) = NoSign()
 +(s::NoSign, t::NoSign) = s
-+(s::NoSign, t::Sign) = s
-+(s::Sign, t::NoSign) = t
++(s::NoSign, t::Positive) = s
++(s::NoSign, t::Negative) = s
 # New code
 # Any sign + Complex = Complex
 +(s::Sign, t::Complex) = t
 
 
 *(s::NoSign, t::NoSign) = s
-*(s::NoSign, t::Sign) = s
-*(s::Sign, t::NoSign) = t
+*(s::NoSign, t::Positive) = s
+*(s::Positive, t::NoSign) = t
+*(s::NoSign, t::Negative) = s
+*(s::Negative, t::NoSign) = t
 *(s::Positive, t::Positive) = s
 *(s::Positive, t::Negative) = t
 *(s::Negative, t::Positive) = s
