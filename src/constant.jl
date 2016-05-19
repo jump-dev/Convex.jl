@@ -24,7 +24,7 @@ type Constant <: AbstractExpr
         return Constant(x, ComplexSign())
       else if all(x .>= 0)
         return Constant(x, Positive())
-      elseif all(x .<= 0)
+      else if all(x .<= 0)
         return Constant(x, Negative())
       end
     end
