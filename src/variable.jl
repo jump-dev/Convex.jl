@@ -43,12 +43,12 @@ function Semidefinite(m::Integer, n::Integer)
   end
 end
 
-ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m,n), ComplexValued(), sets...)
-ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexValued(), sets...)
-  #ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexValued(), sets...)
-ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexValued(), sets...)
-ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexValued(), sets...)
-  #ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexValued(), sets...)
+ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m,n), ComplexSign(), sets...)
+ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
+  #ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
+ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexSign(), sets...)
+ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
+  #ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
 
 HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :Semidefinite)
 function HermitianSemidefinite(m::Integer, n::Integer)

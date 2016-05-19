@@ -18,28 +18,29 @@ type Constant <: AbstractExpr
     return new(:constant, object_id(x), x, sz, ConstVexity(), sign)
   end
 
-  function Constant(x::Value, check_sign::Bool=false)
+  function Constant(x::Value, check_sign::Bool=true)
     if check_sign
-      if all(x .>= 0)
+      if is_complex(x)
+        return Constant(x, ComplexSign())
+      else if all(x .>= 0)
         return Constant(x, Positive())
       elseif all(x .<= 0)
         return Constant(x, Negative())
       end
-    else
-      temp = false
-      y = x + 0im
-      for z in y
-        if z.im != 0
-          temp = true
-          break
-        end
-      end
-      if temp == true 
-        return Constant(x, ComplexValued())
-      else
-        return Constant(x, NoSign())
+    end
+    return Constant(x, NoSign())
+  end
+
+  function is_complex(x::Value)
+    temp = false
+    y = x + 0im
+    for z in y
+      if z.im != 0
+        temp = true
+        break
       end
     end
+    return temp    
   end
 end
 #### Constant Definition end   ##### 
