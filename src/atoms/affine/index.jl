@@ -25,6 +25,8 @@ type IndexAtom <: AbstractExpr
   end
 end
 
+## Type definition ends here
+
 function sign(x::IndexAtom)
   return sign(x.children[1])
 end
@@ -74,6 +76,8 @@ function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
+## API Definition begins
+
 getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)
 getindex{T <: Real}(x::AbstractExpr, inds::AbstractArray{T, 1}) = IndexAtom(x, inds)
 getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
@@ -96,3 +100,6 @@ end
 getindex(x::AbstractExpr, cln_r::Colon, col) = getindex(x, 1:size(x)[1], col)
 # All columns for this row(s)
 getindex(x::AbstractExpr, row, cln_c::Colon) = getindex(x, row, 1:size(x)[2])
+
+
+## API Definition ends
