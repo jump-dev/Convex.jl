@@ -104,7 +104,7 @@ type ComplexSign <: Sign                 end
 # New code
 # Any sign + ComplexSign = ComplexSign
 +(s::Sign, t::ComplexSign) = t
-+(t::ComplexSign, s::Sign) = t
++(t::ComplexSign, s::Sign) = s+t
 
 *(s::NoSign, t::NoSign) = s
 *(s::NoSign, t::Positive) = s
