@@ -4,8 +4,17 @@ export +, -, *, promote_size, get_row
 export cache_conic_form!, has_conic_form, get_conic_form
 
 # TODO: Comment every single line
+
+# ConicObj represents an affine function of the variables
+# it is stored as a disctionary of (key, value) pairs
+# keys are unique ids of variables
+# values are their coefficients in the affine function
+# so for example, {unique_id(x)=>5, unique_id(y)=>6} represents the function 5x + 6y
+# we store the affine functions in this form for efficient manipulation of sparse affine functions
 ConicObj = DataStructures.OrderedDict{UInt64, Value}
 
+# helper function to negate conic objectives
+# works by changing each (key, val) pair to (key, -val)
 function -(c::ConicObj)
   new_obj = copy(c)
   for var in keys(new_obj)
@@ -57,16 +66,26 @@ function promote_size(c::ConicObj, vectorized_size::Int)
   return new_obj
 end
 
+# A conic constraint is of the form [affine_expr1, affine_expr2, ..., affine_exprk] \in cone
+# we represent each affine expressions as a ConicObj
+# we represent the cone as a Symbol (defined in MathProgBase), like :SOC, :LP, etc
+# and we record the sizes of the affine expressions (XXX check...)
+# XXX might it be better to represent objs as a single ConicObj rather than an array of them?
 type ConicConstr
   objs::Array{ConicObj}
   cone::Symbol
   sizes::Array{Int}
 end
 
+# in conic form, every expression e is represented by a ConicObj together with a collection of ConicConstrs
+# for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to that expression's ConicObj 
 UniqueExpMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, ConicObj}
+# for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to the index of expression's ConicConstr in UniqueConstrList
 UniqueConstrMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, Int}
+# records each ConicConstr created
 UniqueConstrList = Array{ConicConstr}
 
+# UniqueConicForms caches all the conic forms of expressions we've parsed so far
 type UniqueConicForms
   exp_map::UniqueExpMap
   constr_map::UniqueConstrMap
