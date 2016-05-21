@@ -145,5 +145,5 @@ type ComplexSign <: Sign                 end
 *(s::ComplexSign, v::AffineVexity) = v
 *(s::ComplexSign, v::ConvexVexity) = NotDcp()
 *(s::ComplexSign, v::ConcaveVexity) = NotDcp()
-#*(s::ComplexSign, v::NotDcp()) = v
+*(s::ComplexSign, v::NotDcp()) = v
 *(v::Vexity, s::ComplexSign) = s*v
