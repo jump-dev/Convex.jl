@@ -28,10 +28,15 @@ type Problem
   solution::Solution
 
   function Problem(head::Symbol, objective::AbstractExpr,  
-                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])
-    return new(head, objective, constraints, "not yet solved", nothing, model)
+                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])  
+    if sign(objective)== Convex.ComplexSign()
+      error("Objective can not be a complex expression")
+    else
+      return new(head, objective, constraints, "not yet solved", nothing, model)
+    end
   end
 end
+
 # constructor if model is not specified
 function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[], 
                  solver::MathProgBase.AbstractMathProgSolver = get_default_solver())

@@ -61,12 +61,16 @@ type LtConstraint <: Constraint
   dual::ValueOrNothing
 
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if lhs.size == rhs.size || lhs.size == (1, 1)
-      sz = rhs.size
-    elseif rhs.size == (1, 1)
-      sz = lhs.size
+    if sign(lhs)==Convex.ComplexSign() || sign(rhs)==Convex.ComplexSign()
+      error("Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
     else
-      error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      if lhs.size == rhs.size || lhs.size == (1, 1)
+        sz = rhs.size
+      elseif rhs.size == (1, 1)
+        sz = lhs.size
+      else
+        error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      end
     end
     id_hash = hash((lhs, rhs, :(<=)))
     return new(:(<=), id_hash, lhs, rhs, sz, nothing)
@@ -109,12 +113,16 @@ type GtConstraint <: Constraint
   dual::ValueOrNothing
 
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if lhs.size == rhs.size || lhs.size == (1, 1)
-      sz = rhs.size
-    elseif rhs.size == (1, 1)
-      sz = lhs.size
+    if sign(lhs)==Convex.ComplexSign() || sign(rhs)==Convex.ComplexSign()
+      error("Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
     else
-      error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      if lhs.size == rhs.size || lhs.size == (1, 1)
+        sz = rhs.size
+      elseif rhs.size == (1, 1)
+        sz = lhs.size
+      else
+        error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      end
     end
     id_hash = hash((lhs, rhs, :(>=)))
     return new(:(>=), id_hash, lhs, rhs, sz, nothing)
