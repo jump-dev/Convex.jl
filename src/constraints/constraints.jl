@@ -14,8 +14,8 @@ type EqConstraint <: Constraint
   dual::ValueOrNothing
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
-      error("Cannot create equality constraint between expressions of sign $(sign(lhs) and $(sign(rhs)")
+    if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign() 
+      error("Cannot create equality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
     else
       if lhs.size == rhs.size || lhs.size == (1, 1)
         sz = rhs.size
