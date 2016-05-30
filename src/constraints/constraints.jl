@@ -27,7 +27,7 @@ type EqConstraint <: Constraint
       error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
     id_hash = hash((lhs, rhs, :(==)))
-    eturn new(:(==), id_hash, lhs, rhs, sz, nothing)
+    return new(:(==), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
