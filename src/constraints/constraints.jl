@@ -14,7 +14,7 @@ type EqConstraint <: Constraint
   dual::ValueOrNothing
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if (sign(lhs) == Convex.ComplexSign() || sign(lhs) == Convex.ComplexSign()) && (sign(lhs)!=sign(rhs))
+    if (sign(lhs) == Convex.ComplexSign() || sign(lhs) == Convex.ComplexSign()) && (sign(lhs) != sign(rhs))
       error("Cannot create equality constraint between expressions of size $(sign(lhs) and $(sign(rhs)")
     else
       if lhs.size == rhs.size || lhs.size == (1, 1)
