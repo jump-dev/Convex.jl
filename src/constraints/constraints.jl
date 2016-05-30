@@ -14,21 +14,20 @@ type EqConstraint <: Constraint
   dual::ValueOrNothing
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    statement1 = sign(lhs) == Convex.ComplexSign() || sign(lhs) == Convex.ComplexSign()
-    statement2 = sign(lhs) != sign(rhs)
-    if statement1 && statement2 
-      error("Cannot create equality constraint between expressions of size $(sign(lhs) and $(sign(rhs)")
+    #statement1 = sign(lhs) == Convex.ComplexSign() || sign(lhs) == Convex.ComplexSign()
+    #statement2 = sign(lhs) != sign(rhs)
+    #if statement1 && statement2 
+     # error("Cannot create equality constraint between expressions of size $(sign(lhs) and $(sign(rhs)")
+    #else
+    if lhs.size == rhs.size || lhs.size == (1, 1)
+      sz = rhs.size
+    elseif rhs.size == (1, 1)
+      sz = lhs.size
     else
-      if lhs.size == rhs.size || lhs.size == (1, 1)
-        sz = rhs.size
-      elseif rhs.size == (1, 1)
-        sz = lhs.size
-      else
-        error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
-      end
+      error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
     id_hash = hash((lhs, rhs, :(==)))
-    return new(:(==), id_hash, lhs, rhs, sz, nothing)
+    eturn new(:(==), id_hash, lhs, rhs, sz, nothing)
   end
 end
 
