@@ -5,6 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
+# k >= min(num_cols, num_rows) || k <= -min(num_rows, num_cols)
 import Base.diag
 export diag
 
