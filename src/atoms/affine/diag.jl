@@ -20,7 +20,7 @@ type DiagAtom <: AbstractExpr
   function DiagAtom(x::AbstractExpr, k::Int=0)
     (num_rows, num_cols) = x.size
 
-    if k >= num_cols || k <= -num_rows
+    if k >= min(num_rows, num_cols) || k <= -min(num_rows, num_cols)
       error("Bounds error in calling diag")
     end
 
