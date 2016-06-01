@@ -19,8 +19,12 @@ type LogSumExpAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function LogSumExpAtom(x::AbstractExpr)
-    children = (x,)
-    return new(:logsumexp, hash(children), children, (1,1))
+    if sign(x)==ComplexSign()
+      error("The argument should be real but it's instead complex")
+    else 
+      children = (x,)
+      return new(:logsumexp, hash(children), children, (1,1))
+    end
   end
 end
 
