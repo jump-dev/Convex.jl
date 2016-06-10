@@ -17,29 +17,20 @@ type RealAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function RealAtom(x::AbstractExpr)
-    # see if we're forming a sum of more than two terms and condense them
-    children = AbstractExpr[]
-    if isa(x, AdditionAtom)
-      append!(children, x.children)
-    else
-      push!(children, x)
-    end
-    if isa(y, AdditionAtom)
-      append!(children, y.children)
-    else
-      push!(children, y)
-    end
-    return new(:+, hash(children), children, sz)
+    children = (x,)
+    return new(:real, hash(children), children, x.size)
+  end
+
+function sign(x::RealAtom)
+  if sign(x.children[1]) == ComplexSign()
+    return NoSign()
+  else 
+    return sign(x.children[1])
   end
 end
 
-function sign(x::RealAtom)
-  return sum(Sign[sign(child) for child in x.children])
-  # Creating an array of type Sign and adding all the sign of xhildren of x so if anyone is complex the resultant sign would be complex.
-end
-
 function monotonicity(x::RealAtom)
-  return Monotonicity[Nondecreasing() for child in x.children]
+  return monotonicity(x.children[1])
 end
 
 function curvature(x::RealAtom)
@@ -47,7 +38,7 @@ function curvature(x::RealAtom)
 end
 
 function evaluate(x::RealAtom)
-  return sum([evaluate(child) for child in x.children])
+  return real(evaluate(x.children[1]))
 end
 
 function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
