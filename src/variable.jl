@@ -94,6 +94,7 @@ function imag_conic_form(x::Variable)
     return speye(vec_size)
   else
     return spzeros(vec_size, vec_size)
+  end
 end
 
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
