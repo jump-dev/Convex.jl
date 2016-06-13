@@ -59,11 +59,11 @@ end
 
 
 function real_conic_form(x::Constant)
-  return real(x)
+  return real(x.value)
 end
 
 function imag_conic_form(x::Constant)
-  imag(x)
+  imag(x.value)
 end
 
 
