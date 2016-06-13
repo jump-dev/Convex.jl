@@ -63,7 +63,7 @@ function real_conic_form(x::Constant)
 end
 
 function imag_conic_form(x::Constant)
-  vec([imag(x.value);])
+  return vec([imag(x.value);])
 end
 
 

@@ -106,7 +106,7 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
       cache_conic_form!(unique_conic_forms, x, objective)
     else
       objective = ConicObj()
-      #vec_size = get_vectorized_size(x)
+      vec_size = get_vectorized_size(x)
 
       objective[x.id_hash] = (real_conic_form(x), real_conic_form(x))
       objective[object_id(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
