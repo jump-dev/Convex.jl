@@ -82,6 +82,20 @@ end
 #   return x.domain
 # end
 
+
+function real_conic_form(x::Variable)
+  vec_size = get_vectorized_size(x)
+  return speye(vec_size)
+end
+
+function imag_conic_form(x::Variable)
+  vec_size = get_vectorized_size(x)
+  if x.sign == ComplexSign()
+    return speye(vec_size)
+  else
+    return spzeros(vec_size, vec_size)
+end
+
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     if :fixed in x.sets
@@ -91,12 +105,13 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
       cache_conic_form!(unique_conic_forms, x, objective)
     else
       objective = ConicObj()
-      vec_size = get_vectorized_size(x)
-      objective[x.id_hash] = speye(vec_size)
-      objective[object_id(:constant)] = spzeros(vec_size, 1)
+      #vec_size = get_vectorized_size(x)
+
+      objective[x.id_hash] = (real_conic_form(x), real_conic_form(x))
+      objective[object_id(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
       # placeholder values in unique constraints prevent infinite recursion depth
       cache_conic_form!(unique_conic_forms, x, objective)
-      if !(x.sign == NoSign())
+      if !(x.sign == NoSign() || x.sign == ComplexSign())
         conic_form!(x.sign, x, unique_conic_forms)
       end
       for set in x.sets
