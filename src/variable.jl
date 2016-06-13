@@ -102,7 +102,7 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
     if :fixed in x.sets
       # do exactly what we would for a constant
       objective = ConicObj()
-      objective[object_id(:constant)] = vec([x.value;])
+      objective[object_id(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
       cache_conic_form!(unique_conic_forms, x, objective)
     else
       objective = ConicObj()
