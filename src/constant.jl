@@ -58,10 +58,22 @@ function sign(x::Constant)
 end
 
 
+function real_conic_form(x::Constant)
+  return real(x)
+end
+
+function imag_conic_form(x::Constant)
+  imag(x)
+end
+
+
+  
 function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
+    real_Value = real_conic_form(x)
+    imag_Value = imag_conic_form(x) 
     objective = ConicObj()
-    objective[object_id(:constant)] = vec([x.value;])
+    objective[object_id(:constant)] = sign(x)==ComplexSign()?(vec(real_Value),vec(imag_Value)):(vec(real_Value),)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)

@@ -11,7 +11,7 @@ export cache_conic_form!, has_conic_form, get_conic_form
 # values are their coefficients in the affine function
 # so for example, {unique_id(x)=>5, unique_id(y)=>6} represents the function 5x + 6y
 # we store the affine functions in this form for efficient manipulation of sparse affine functions
-ConicObj = DataStructures.OrderedDict{UInt64, Value}
+ConicObj = DataStructures.OrderedDict{UInt64, Tuple{Value,Value}}
 
 # helper function to negate conic objectives
 # works by changing each (key, val) pair to (key, -val)
