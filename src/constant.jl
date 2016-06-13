@@ -73,7 +73,7 @@ function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
     #real_Value = real_conic_form(x)
     #imag_Value = imag_conic_form(x) 
     objective = ConicObj()
-    objective[object_id(:constant)] = sign(x)==ComplexSign()? (real_conic_form(x), imag_conic_form(x)) : (real_conic_form(x),)
+    objective[object_id(:constant)] = (real_conic_form(x), imag_conic_form(x))
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
