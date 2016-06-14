@@ -31,10 +31,12 @@ function +(c::ConicObj, d::ConicObj)
     else
       # .+ does not preserve sparsity
       # need to override behavior
-      if size(new_obj[var]) == size(d[var])
-        new_obj[var] = new_obj[var] + d[var]
-      else
-        new_obj[var] = broadcast(+, new_obj[var], d[var])
+      for i in 1:2
+        if size(new_obj[var][i]) == size(d[var][i])
+          new_obj[var][i] = new_obj[var][i] + d[var][i]
+        else
+          new_obj[var][i] = broadcast(+, new_obj[var][i], d[var][i])
+        end
       end
     end
   end
@@ -61,7 +63,9 @@ end
 function promote_size(c::ConicObj, vectorized_size::Int)
   new_obj = copy(c)
   for var in keys(new_obj)
-    new_obj[var] = repmat(new_obj[var], vectorized_size, 1)
+    for i in 1:2
+      new_obj[var][i] = repmat(new_obj[var][i], vectorized_size, 1)
+    end
   end
   return new_obj
 end
