@@ -29,8 +29,7 @@ function +(c::ConicObj, d::ConicObj)
     if !haskey(new_obj, var)
       new_obj[var] = d[var]
     else
-      # .+ does not preserve sparsity
-      # need to override behavior
+      # .+ does not preserve sparsity # need to override behavior
       for i in 1:2
         if size(new_obj[var][i]) == size(d[var][i])
           new_obj[var][i] = new_obj[var][i] + d[var][i]
