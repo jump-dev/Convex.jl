@@ -61,7 +61,9 @@ function *(v::Value, c::ConicObj)
   # TODO: this part is time consuming, esp new_obj[var] = v * new_obj[var]...
   new_obj = copy(c)
   for var in keys(new_obj)
-    new_obj[var] = v * new_obj[var]
+    x = v * new_obj[var][1]
+    y = v * new_obj[var][2]
+    new_obj[var] = (x,y)
   end
   return new_obj
 end
