@@ -6,7 +6,7 @@
 
 import Base.real, Base.imag
 export real, imag
-export sign, curvature, monotonicity, evaluate
+export sign, monotonicity, curvature, evaluate, conic_form!
 
 
 ### Real
@@ -20,6 +20,7 @@ type RealAtom <: AbstractExpr
     children = (x,)
     return new(:real, hash(children), children, x.size)
   end
+end
 
 function sign(x::RealAtom)
   if sign(x.children[1]) == ComplexSign()
@@ -71,6 +72,7 @@ type ImaginaryAtom <: AbstractExpr
     children = (x,)
     return new(:imag, hash(children), children, x.size)
   end
+end
 
 function sign(x::ImaginaryAtom)
   if sign(x.children[1]) == ComplexSign()
