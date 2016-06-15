@@ -44,8 +44,11 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     # construct linear indices to pick out the lower triangular part (including diagonal),
     # the upper triangular part (not including diagonal)
     # and the corresponding entries in the lower triangular part, so
-    # symmetry => c.child[upperpart] 
-    diagandlowerpart = find(tril(ones(n,n)))
+    # symmetry => c.child[upperpart]
+    # scale off-diagonal elements by sqrt(2)
+    rescale = sqrt(2)*tril(ones(n,n))
+    rescale[find(diagm(ones(n)))] = 1.0
+    diagandlowerpart = find(rescale)
     lowerpart = Array(Int, div(n*(n-1),2))
     upperpart = Array(Int, div(n*(n-1),2))
     klower = 0
@@ -59,7 +62,7 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
         lowerpart[klower] = n*(j-1) + i # (i,j)th element
       end
     end
-    objective = conic_form!(c.child[diagandlowerpart], unique_conic_forms)
+    objective = conic_form!((rescale.*c.child)[diagandlowerpart], unique_conic_forms)
     sdp_constraint = ConicConstr([objective], :SDP, [div(n*(n+1),2)])
     cache_conic_form!(unique_conic_forms, c, sdp_constraint)
     # make sure upper and lower triangular part match in the solution
