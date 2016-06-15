@@ -75,11 +75,8 @@ type ImaginaryAtom <: AbstractExpr
 end
 
 function sign(x::ImaginaryAtom)
-  if sign(x.children[1]) == ComplexSign()
-    return NoSign()
-  else 
-    return sign(Constant(0))
-  end
+  sign(x.children[1]) == ComplexSign()
+  return NoSign()
 end
 
 function monotonicity(x::ImaginaryAtom)
