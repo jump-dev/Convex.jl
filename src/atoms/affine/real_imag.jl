@@ -31,7 +31,7 @@ function sign(x::RealAtom)
 end
 
 function monotonicity(x::RealAtom)
-  return monotonicity(Nondecreasing(),)
+  return (Nondecreasing(),)
 end
 
 function curvature(x::RealAtom)
@@ -83,7 +83,7 @@ function sign(x::ImaginaryAtom)
 end
 
 function monotonicity(x::ImaginaryAtom)
-  return monotonicity(Nondecreasing(),)
+  return (Nondecreasing(),)
 end
 
 function curvature(x::ImaginaryAtom)
