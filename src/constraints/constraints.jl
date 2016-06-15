@@ -40,14 +40,32 @@ function vexity(c::EqConstraint)
 end
 
 function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
-  if !has_conic_form(unique_conic_forms, c)
-    expr = c.lhs - c.rhs
-    objective = conic_form!(expr, unique_conic_forms)
-    new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-    conic_constr_to_constr[new_constraint] = c
-    cache_conic_form!(unique_conic_forms, c, new_constraint)
+  if !(sign(c.lhs) == ComplexSign() || sign(c.rhs) == ComplexSign())
+    if !has_conic_form(unique_conic_forms, c)
+      expr = c.lhs - c.rhs
+      objective = conic_form!(expr, unique_conic_forms)
+      new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
+      conic_constr_to_constr[new_constraint] = c
+      cache_conic_form!(unique_conic_forms, c, new_constraint)
+    end
+    return get_conic_form(unique_conic_forms, c)
+  else
+    if !has_conic_form(unique_conic_forms, c)
+      real_expr = real(c.lhs) - real(c.rhs)
+      real_expr = imag(c.lhs) - imag(c.rhs)
+      real_objective = conic_form!(real_expr, unique_conic_forms)
+      imag_objective = conic_form!(imag_expr, unique_conic_forms)
+
+      real_new_constraint = ConicConstr([real_objective], :Zero, [c.size[1] * c.size[2]])
+      imag_new_constraint = ConicConstr([imag_objective], :Zero, [c.size[1] * c.size[2]])
+
+      real_conic_constr_to_constr[real_new_constraint] = c
+      imag_conic_constr_to_constr[imag_new_constraint] = c
+      cache_conic_form!(unique_conic_forms, c, real_new_constraint)
+      cache_conic_form!(unique_conic_forms, c, imag_new_constraint)
+    end
+    return get_conic_form(unique_conic_forms, c)
   end
-  return get_conic_form(unique_conic_forms, c)
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
