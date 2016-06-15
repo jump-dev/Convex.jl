@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 type RealAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::Array{AbstractExpr, 1}
+  children::Tuple{AbstractExpr}
   size::Tuple{Int, Int}
 
   function RealAtom(x::AbstractExpr)
@@ -43,13 +43,12 @@ end
 
 function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
-    objective = ConicObj()
-    for child in x.children
-      child_objective = conic_form!(child, unique_conic_forms)
-      if x.size != child.size
-        child_objective = promote_size(child_objective, get_vectorized_size(x))
-      end
-      objective += child_objective
+    objective = conic_form!(x.children[1], unique_conic_forms)
+
+    for var in keys(objective)
+      x = real(objective[var][1])
+      y = real(objective[var][2])
+      objective[var] = (x,y)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
@@ -58,3 +57,54 @@ end
 
 real(x::AbstractExpr) = RealAtom(x)
 real(x::Value) = RealAtom(Constant(x))
+
+
+
+### Imaginary
+type ImaginaryAtom <: AbstractExpr
+  head::Symbol
+  id_hash::UInt64
+  children::Tuple{AbstractExpr}
+  size::Tuple{Int, Int}
+
+  function ImaginaryAtom(x::AbstractExpr)
+    children = (x,)
+    return new(:imag, hash(children), children, x.size)
+  end
+
+function sign(x::ImaginaryAtom)
+  if sign(x.children[1]) == ComplexSign()
+    return NoSign()
+  else 
+    return sign(Constant(0))
+  end
+end
+
+function monotonicity(x::ImaginaryAtom)
+  return monotonicity(x.children[1])
+end
+
+function curvature(x::ImaginaryAtom)
+  return ConstVexity()
+end
+
+function evaluate(x::ImaginaryAtom)
+  return imag(evaluate(x.children[1]))
+end
+
+function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, x)
+    objective = conic_form!(x.children[1], unique_conic_forms)
+
+    for var in keys(objective)
+      x = imag(objective[var][1])
+      y = imag(objective[var][2])
+      objective[var] = (x,y)
+    end
+    cache_conic_form!(unique_conic_forms, x, objective)
+  end
+  return get_conic_form(unique_conic_forms, x)
+end
+
+imag(x::AbstractExpr) = ImaginaryAtom(x)
+imag(x::Value) = ImaginaryAtom(Constant(x))
