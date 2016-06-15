@@ -47,9 +47,9 @@ function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
     objective = conic_form!(x.children[1], unique_conic_forms)
 
     for var in keys(objective)
-      x = real(objective[var][1])
-      y = real(objective[var][2])
-      objective[var] = (x,y)
+      re = real(objective[var][1])
+      im = real(objective[var][2])
+      objective[var] = (re,im)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
