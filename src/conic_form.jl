@@ -18,7 +18,9 @@ ConicObj = DataStructures.OrderedDict{UInt64, Tuple{Value,Value}}
 function -(c::ConicObj)
   new_obj = copy(c)
   for var in keys(new_obj)
-    new_obj[var] *= -1
+    x = new_obj[var][1]*(-1)
+    y =  new_obj[var][2]*(-1)
+    new_obj[var] = (x,y)
   end
   return new_obj
 end
