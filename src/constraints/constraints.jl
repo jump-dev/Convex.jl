@@ -52,7 +52,7 @@ function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
       real_objective = conic_form!(real_expr, unique_conic_forms)
       imag_objective = conic_form!(imag_expr, unique_conic_forms)
       new_constraint = ConicConstr([real_objective, imag_objective], :Zero, [c.size[1] * c.size[2], c.size[1] * c.size[2]])
-      real_conic_constr_to_constr[new_constraint] = c
+      conic_constr_to_constr[new_constraint] = c
     end
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
