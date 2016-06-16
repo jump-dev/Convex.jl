@@ -57,6 +57,15 @@ facts("Affine Atoms") do
     @fact evaluate(dot([2.0; 2.0], x))[1] => roughly(4.4, TOL)
   end
 
+  context("vecdot atom") do
+    x = Variable(2,2)
+    p = minimize(vecdot(2*ones(2,2), x), x >= 1.1)
+    @fact vexity(p) => AffineVexity()
+    solve!(p)
+    @fact p.optval => roughly(8.8, TOL)
+    @fact evaluate(vecdot(2*ones(2,2), x))[1] => roughly(8.8, TOL)
+  end
+
   context("add atom") do
     x = Variable(1)
     y = Variable(1)

@@ -106,16 +106,20 @@ end
 /(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1./y))
 
 ### .*
+# All constructors of this check (and so this function requires)
+# that the first child be constant to have the expression be DCP
 type DotMultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
-  children::Tuple{Constant, AbstractExpr}
+  children::Tuple{AbstractExpr, AbstractExpr}
   size::Tuple{Int, Int}
 
-  function DotMultiplyAtom(x::Constant, y::AbstractExpr)
-    if x.size != y.size
-      error("Cannot dot multiply two expressions of sizes $(x.size) and $(y.size)")
-    end
+  function DotMultiplyAtom(x::AbstractExpr, y::AbstractExpr)
+    # we don't explictly check, yet, that the sizes of x and y are compatible
+    # if they're not, we'll get a DimensionMismatch error when we promote
+    # the size of the coefficient matrix below
+    # to check here, just run 
+    # coeff = x.value .* ones(size(y))
     children = (x, y)
     return new(:.*, hash(children), children, y.size)
   end
@@ -130,7 +134,11 @@ function monotonicity(x::DotMultiplyAtom)
 end
 
 function curvature(x::DotMultiplyAtom)
-  return ConstVexity()
+  if vexity(x.children[1]) == ConstVexity()
+    return ConstVexity()
+  else
+    return NotDcp()
+  end
 end
 
 function evaluate(x::DotMultiplyAtom)
@@ -139,7 +147,14 @@ end
 
 function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
-    const_multiplier = spdiagm((vec(x.children[1].value),), (0,))
+    if vexity(x.children[1]) != ConstVexity()
+      error("multiplication of two non-constant expressions is not DCP compliant")
+    end    
+    # promote the size of the coefficient matrix, so eg
+    # 3 .* x 
+    # works regardless of the size of x
+    coeff = x.children[1].value .* ones(size(x.children[2]))
+    const_multiplier = spdiagm(vec(coeff)) # used to be spdiagm((vec(coeff),), (0,)), not sure why
     objective = const_multiplier * conic_form!(x.children[2], unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
@@ -154,7 +169,7 @@ function .*(x::Constant, y::AbstractExpr)
   end
 end
 
-.*(x::AbstractExpr, y::AbstractExpr) = .*(x, y)
-.*(x::Value, y::AbstractExpr) = .*(Constant(x), y)
-.*(x::AbstractExpr, y::Value) = .*(Constant(y), x)
-./(x::AbstractExpr, y::Value) = .*(1./y, x)
+.*(x::AbstractExpr, y::AbstractExpr) = vexity(x) == ConstVexity() ? DotMultiplyAtom(x, y) : DotMultiplyAtom(y, x)
+.*(x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
+.*(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
+./(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
