@@ -45,6 +45,7 @@ end
 function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     objective = conic_form!(x.children[1], unique_conic_forms)
+    # Special case for constants
     if x.children[1].head == :constant
       for var in keys(objective)
         re = real(objective[var][1])
