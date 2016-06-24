@@ -100,7 +100,7 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
 end
 
 function conic_problem(p::Problem)
-  if  (p.objective) != 1
+  if  get_vectorized_size(p.objective) != 1
     error("Objective must be a scalar")
   end
   
