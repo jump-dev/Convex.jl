@@ -8,7 +8,7 @@
 # k >= min(num_cols, num_rows) || k <= -min(num_rows, num_cols)
 import Base.diag
 export diag
-
+export sign, curvature, monotonicity, evaluate
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 type DiagAtom <: AbstractExpr

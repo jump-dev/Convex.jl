@@ -6,7 +6,7 @@
 
 import Base.real, Base.imag
 export real, imag
-export sign, monotonicity, curvature, evaluate, conic_form!
+export sign, monotonicity, curvature, evaluate
 
 
 ### Real
@@ -106,7 +106,7 @@ function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
       for var in keys(objective)
         re = real(objective[var][2])
         im = zeros(size(re))
-        objective[var] = (re,im)
+        objective[var] = (re, im)
       end
     else
       for var in keys(objective)
