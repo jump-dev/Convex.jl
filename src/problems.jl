@@ -2,7 +2,7 @@ import MathProgBase
 
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
-export conic_problem, find_variable_ranges, conic_problem
+export conic_problem, find_variable_ranges
 
 typealias Float64OrNothing Union{Float64, Void}
 
