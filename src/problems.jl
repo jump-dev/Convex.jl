@@ -141,7 +141,7 @@ function conic_problem(p::Problem)
           b[constr_index + 1 : constr_index + sz] = val
         else
           var_range = var_to_ranges[id]
-          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val #Error line
+          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1] #Error line
         end
       end
       constr_index += sz
