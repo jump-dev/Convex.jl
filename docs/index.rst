@@ -39,4 +39,5 @@ In Depth Documentation:
   FAQ <faq>
   Optimizing in a Loop <loop>
   Advanced <advanced>
+  Contributing <contributing>
   Credits <credits>
