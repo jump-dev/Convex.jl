@@ -70,7 +70,7 @@ function find_variable_ranges(constraints)
       constr_size += constraint.sizes[i]
     end
   end
-  return index, constr_size, var_to_ranges
+  return index, 2*constr_size, var_to_ranges
 end
 
 function vexity(p::Problem)
