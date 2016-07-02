@@ -92,7 +92,7 @@ end
 function imag_conic_form(x::Variable)
   vec_size = get_vectorized_size(x)
   if x.sign == ComplexSign()
-    return speye(vec_size)
+    return im*speye(vec_size)
   else
     return spzeros(vec_size, vec_size)
   end
