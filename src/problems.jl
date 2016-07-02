@@ -58,7 +58,7 @@ function find_variable_ranges(constraints)
       for (id, val) in constraint.objs[i]
         if !haskey(var_to_ranges, id) && id != object_id(:constant)
           var = id_to_variables[id]
-          if var.sign == ComplexSign():
+          if var.sign == ComplexSign()
             var_to_ranges[id] = (index + 1, index + 2*get_vectorized_size(var))
             index += 2*get_vectorized_size(var)
           else 
