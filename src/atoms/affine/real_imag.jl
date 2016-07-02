@@ -47,19 +47,26 @@ function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
     new_objective = ConicObj()
     objective = conic_form!(x.children[1], unique_conic_forms)
     # Special case for constants
-    if x.children[1].head == :constant
-      for var in keys(objective)
-        re = real(objective[var][1])
-        im = zeros(size(re))
-        new_objective[var] = (re,im)
-      end
-    else 
-      for var in keys(objective)
-        re = real(objective[var][1])
-        im = real(objective[var][2])
-        new_objective[var] = (re,im)
-      end
+    # if x.children[1].head == :constant
+    #   for var in keys(objective)
+    #     re = real(objective[var][1])
+    #     im = zeros(size(re))
+    #     new_objective[var] = (re,im)
+    #   end
+    # else 
+    #   for var in keys(objective)
+    #     re = real(objective[var][1])
+    #     im = real(objective[var][2])
+    #     new_objective[var] = (re,im)
+    #   end
+    # end
+
+    for var in keys(objective)
+      re = real(objective[var][1])
+      im = real(objective[var][2])
+      new_objective[var] = (re,im)
     end
+
     cache_conic_form!(unique_conic_forms, x, new_objective)
   end
   return get_conic_form(unique_conic_forms, x)
@@ -104,18 +111,24 @@ function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     new_objective = ConicObj()
     objective = conic_form!(x.children[1], unique_conic_forms)
-    if x.children[1].head == :constant
-      for var in keys(objective)
-        re = real(objective[var][2])
-        im = zeros(size(re))
-        new_objective[var] = (re, im)
-      end
-    else
-      for var in keys(objective)
-        re = imag(objective[var][1])
-        im = imag(objective[var][2])
-        new_objective[var] = (re,im)
-      end
+    # if x.children[1].head == :constant
+    #   for var in keys(objective)
+    #     re = real(objective[var][2])
+    #     im = zeros(size(re))
+    #     new_objective[var] = (re, im)
+    #   end
+    # else
+    #   for var in keys(objective)
+    #     re = imag(objective[var][1])
+    #     im = imag(objective[var][2])
+    #     new_objective[var] = (re,im)
+    #   end
+    # end
+
+    for var in keys(objective)
+      re = imag(objective[var][1])
+      im = imag(objective[var][2])
+      new_objective[var] = (re,im)
     end
     cache_conic_form!(unique_conic_forms, x, new_objective)
   end
