@@ -58,8 +58,13 @@ function find_variable_ranges(constraints)
       for (id, val) in constraint.objs[i]
         if !haskey(var_to_ranges, id) && id != object_id(:constant)
           var = id_to_variables[id]
-          var_to_ranges[id] = (index + 1, index + get_vectorized_size(var))
-          index += get_vectorized_size(var)
+          if var.sign == ComplexSign():
+            var_to_ranges[id] = (index + 1, index + 2*get_vectorized_size(var))
+            index += 2*get_vectorized_size(var)
+          else 
+            var_to_ranges[id] = (index + 1, index + get_vectorized_size(var))
+            index += get_vectorized_size(var)
+          end
         end
       end
       constr_size += constraint.sizes[i]
@@ -139,13 +144,17 @@ function conic_problem(p::Problem)
       for (id, val) in constraint.objs[i]
         if id == object_id(:constant)
           b[constr_index + 1 : constr_index + sz] = val[1]
+          b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
+
+
         else
           var_range = var_to_ranges[id]
-          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1] #Error line
+          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
+          A[constr_index + sz + 1 : constr_index + 2*sz, var_range[1] : var_range[2]] = -val[2]
         end
       end
-      constr_index += sz
-      total_constraint_size += sz
+      constr_index += 2*sz
+      total_constraint_size += 2*sz
     end
     push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
   end
