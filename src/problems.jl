@@ -152,6 +152,7 @@ function conic_problem(p::Problem)
             A[constr_index + 1 : constr_index + sz, var_range[1] + get_vectorized_size(id_to_variables[id]): var_range[2]] = -val[2]
           else
             A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
+          end
         end
       end
       constr_index += sz
