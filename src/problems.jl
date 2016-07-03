@@ -70,7 +70,7 @@ function find_variable_ranges(constraints)
       constr_size += constraint.sizes[i]
     end
   end
-  return index, 2*constr_size, var_to_ranges
+  return index, constr_size, var_to_ranges
 end
 
 function vexity(p::Problem)
@@ -143,18 +143,19 @@ function conic_problem(p::Problem)
       sz = constraint.sizes[i]
       for (id, val) in constraint.objs[i]
         if id == object_id(:constant)
-          b[constr_index + 1 : constr_index + sz] = val[1]
-          b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
-
-
+          b[constr_index + 1 : constr_index + sz] = val[1] == zeros(size(val[1]))? val[2]:val[1]
+          #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
         else
           var_range = var_to_ranges[id]
-          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
-          A[constr_index + sz + 1 : constr_index + 2*sz, var_range[1] : var_range[2]] = -val[2]
+          if id_to_variables[id].sign == ComplexSign()
+            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + get_vectorized_size(id_to_variables[id]) -1] = -val[1]
+            A[constr_index + 1 : constr_index + sz, var_range[1] + get_vectorized_size(id_to_variables[id]): var_range[2]] = -val[2]
+          else
+            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
         end
       end
-      constr_index += 2*sz
-      total_constraint_size += 2*sz
+      constr_index += sz
+      total_constraint_size += sz
     end
     push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
   end
