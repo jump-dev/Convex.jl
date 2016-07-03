@@ -148,8 +148,8 @@ function conic_problem(p::Problem)
         else
           var_range = var_to_ranges[id]
           if id_to_variables[id].sign == ComplexSign()
-            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + get_vectorized_size(id_to_variables[id]) -1] = -val[1]
-            A[constr_index + 1 : constr_index + sz, var_range[1] + get_vectorized_size(id_to_variables[id]): var_range[2]] = -val[2]
+            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + get_vectorized_size(id_to_variables[id])-1] = -val[1]
+            A[constr_index + 1 : constr_index + sz, var_range[1] + get_vectorized_size(id_to_variables[id]) : var_range[2]] = -val[2]
           else
             A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
           end
