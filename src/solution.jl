@@ -150,8 +150,8 @@ function populate_variables!(problem::Problem, var_to_ranges::Dict{UInt64, Tuple
         var.value = var.value[1]
       end
     else
-      real_value = reshape(x[start_index:(end_index-start_index)/2-1], sz[1], sz[2])
-      imag_value = reshape(x[(end_index-start_index)/2:end_index], sz[1], sz[2])
+      real_value = reshape(x[start_index:(end_index-start_index+1)/2-1], sz[1], sz[2])
+      imag_value = reshape(x[(end_index-start_index+1)/2:end_index], sz[1], sz[2])
       var.value = real_value + im*imag_value
       if sz == (1, 1)
         var.value = var.value[1]
