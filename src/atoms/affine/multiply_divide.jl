@@ -95,7 +95,7 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
 end
 
 function *(x::AbstractExpr, y::AbstractExpr)
-  if hash(x) == hash(y)
+  if hash(x) == hash(y) && x.size == (1, 1)
     return square(x)
   end
   return MultiplyAtom(x, y)
