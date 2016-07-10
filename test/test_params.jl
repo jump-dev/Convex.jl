@@ -11,16 +11,16 @@ facts("Fixed and freed variables") do
 
 	p = minimize(x+y, x>=0, y>=0)
 	solve!(p)
-	@fact p.optval => roughly(0, TOL)
+	@fact p.optval --> roughly(0, TOL)
 
 	y.value = 4
 	fix!(y)
 	solve!(p)
-	@fact p.optval => roughly(4, TOL)
+	@fact p.optval --> roughly(4, TOL)
 
 	free!(y)
 	solve!(p)
-	@fact p.optval => roughly(0, TOL)	
+	@fact p.optval --> roughly(0, TOL)	
   end
 
   context("fix multiplication") do	
@@ -38,6 +38,6 @@ facts("Fixed and freed variables") do
 	solve!(p)
 	o2 = p.optval
 
-	@fact o1 < o2 => true
+	@fact o1 < o2 --> true
   end  
 end

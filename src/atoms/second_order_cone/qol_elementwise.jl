@@ -1,4 +1,4 @@
-export QolElemAtom, qol_elementwise, square, sumsquares, invpos
+export QolElemAtom, qol_elementwise, square, sumsquares, invpos, ./, /
 export sign, monotonicity, curvature, conic_form!
 
 type QolElemAtom <: AbstractExpr
@@ -39,6 +39,7 @@ function conic_form!(q::QolElemAtom, unique_conic_forms::UniqueConicForms)
     qol_objective = conic_form!(t, unique_conic_forms)
     x, y = q.children
     conic_form!(SOCElemConstraint(y + t, y - t, 2 * x), unique_conic_forms)
+    # add implicit constraint y >= 0
     conic_form!(y >= 0, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, q, qol_objective)
   end
@@ -48,4 +49,6 @@ end
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 square(x::AbstractExpr) = QolElemAtom(x, Constant(ones(x.size[1], x.size[2])))
 invpos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
+./(x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), invpos(y))
+/(x::Value, y::AbstractExpr) = size(y) == (1,1) ? MultiplyAtom(Constant(x), invpos(y)) : error("cannot divide by a variable of size $(size(y))")
 sumsquares(x::AbstractExpr) = square(norm2(x))

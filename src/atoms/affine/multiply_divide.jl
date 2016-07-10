@@ -173,4 +173,4 @@ end
 .*(x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
 .*(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
 ./(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
-# x ./ y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl
+# x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl
