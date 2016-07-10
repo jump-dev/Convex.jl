@@ -1,6 +1,6 @@
 export quadform
 
-function is_symmetric(A::Matrix)
+function is_symmetric(A::AbstractArray)
   TOLERANCE = 1e-6
   return all(A - A' .< TOLERANCE)
 end
