@@ -97,6 +97,16 @@ facts("SOCP Atoms") do
     solve!(p)
     @fact p.optval --> roughly(0.42105, TOL)
     @fact evaluate(sum(expr * expr)) --> roughly(0.42105, TOL)
+
+    x = Variable(2, 1)
+    A = [1 2; 2 1; 3 4]
+    b = [2; 3; 4]
+    expr = A * x + b
+    p = minimize(sum(expr.^2))
+    @fact vexity(p) --> ConvexVexity()
+    solve!(p)
+    @fact p.optval --> roughly(0.42105, TOL)
+    @fact evaluate(sum(expr.^2)) --> roughly(0.42105, TOL)
   end
 
   context("inv pos atom") do

@@ -185,7 +185,7 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`sqrt(x)`             | :math:`\sqrt{x}`                    | concave    |decreasing     | IC: :math:`x>0`          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`square(x), x^2`      | :math:`x^2`                         | convex     |increasing on  | none                     |
+|:code:`square(x), x.^2, x^2`| :math:`x^2`                         | convex     |increasing on  | elementwise              |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |
