@@ -110,7 +110,7 @@ facts("SOCP Atoms") do
     x = Variable(3)
     p = minimize(sum([3,6,9]./x), x<=3)
     solve!(p)
-    @fact x.value --> roughly([3,3,3], TOL)
+    @fact x.value --> roughly(3*ones(3,1), TOL)
     @fact p.optval --> roughly(6, TOL)
     @fact evaluate(sum([3,6,9]./x)) --> roughly(6, TOL)
 
