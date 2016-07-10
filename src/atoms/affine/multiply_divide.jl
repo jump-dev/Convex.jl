@@ -95,7 +95,7 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
 end
 
 function *(x::AbstractExpr, y::AbstractExpr)
-  if hash(x) == hash(y)
+  if hash(x) == hash(y) && x.size == (1, 1)
     return square(x)
   end
   return MultiplyAtom(x, y)
@@ -169,7 +169,15 @@ function .*(x::Constant, y::AbstractExpr)
   end
 end
 
-.*(x::AbstractExpr, y::AbstractExpr) = vexity(x) == ConstVexity() ? DotMultiplyAtom(x, y) : DotMultiplyAtom(y, x)
+function .*(x::AbstractExpr, y::AbstractExpr)
+  if vexity(x) == ConstVexity()
+    return DotMultiplyAtom(x, y)
+  elseif hash(x) == hash(y)
+    return square(x)
+  else
+    return DotMultiplyAtom(y, x)
+  end
+end
 .*(x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
 .*(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
 ./(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
