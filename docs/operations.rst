@@ -13,6 +13,8 @@ Problems mixing many different conic constraints can be solved by any solver tha
 In the notes column in the tables below, we denote implicit constraints imposed on the arguments to the function by IC,
 and parameter restrictions that the arguments must obey by PR.
 (Convex.jl will automatically impose ICs; the user must make sure to satisfy PRs.)
+Elementwise means that the function operates elementwise on vector arguments, returning
+a vector of the same size.
 
 Linear Program Representable Functions
 **************************************
@@ -46,7 +48,9 @@ An optimization problem using only these functions can be solved by any LP solve
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`x/y`                | division                   | affine     |increasing     | PR: :math:`y` is scalar constant|
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
-|:code:`x .* y`             | elemwise multiplication    | affine     |increasing     | PR: one argument is constant    |
+|:code:`x .* y`             | elementwise multiplication | affine     |increasing     | PR: one argument is constant    |
++---------------------------+----------------------------+------------+---------------+---------------------------------+
+|:code:`x ./ y`             | elementwise division       | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`x[1:4, 2:3]`        | indexing and slicing       | affine     |increasing     | none                            |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
@@ -181,7 +185,7 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`sqrt(x)`             | :math:`\sqrt{x}`                    | concave    |decreasing     | IC: :math:`x>0`          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`square(x), x^2`      | :math:`x^2`                         | convex     |increasing on  | none                     |
+|:code:`square(x), x.^2, x^2`| :math:`x^2`                         | convex     |increasing on  | elementwise              |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
 |                            |                                     |            |decreasing on  |                          |

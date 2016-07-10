@@ -32,18 +32,17 @@ include("atoms/affine/dot.jl")
 include("atoms/affine/reshape.jl")
 include("atoms/affine/trace.jl")
 include("atoms/affine/conv.jl")
-include("atoms/norm.jl")
-include("atoms/sumlargest.jl")
-include("atoms/dotsort.jl")
-
-### elementwise atoms
-include("atoms/abs.jl")
-include("atoms/maximum.jl")
-include("atoms/minimum.jl")
-include("atoms/max.jl")
-include("atoms/min.jl")
+### lp atoms
+include("atoms/lp_cone/abs.jl")
+include("atoms/lp_cone/maximum.jl")
+include("atoms/lp_cone/minimum.jl")
+include("atoms/lp_cone/max.jl")
+include("atoms/lp_cone/min.jl")
+include("atoms/lp_cone/sumlargest.jl")
+include("atoms/lp_cone/dotsort.jl")
 
 ### SOC atoms
+include("atoms/second_order_cone/norm.jl") # also includes some lp atoms
 include("atoms/second_order_cone/norm2.jl")
 include("atoms/second_order_cone/quadoverlin.jl")
 include("atoms/second_order_cone/qol_elementwise.jl")
@@ -51,6 +50,7 @@ include("atoms/second_order_cone/geomean.jl")
 include("atoms/second_order_cone/quadform.jl")
 include("atoms/second_order_cone/power_to_socp.jl")
 include("atoms/second_order_cone/rationalnorm.jl")
+include("atoms/second_order_cone/huber.jl")
 
 ### SDP atoms
 include("atoms/sdp_cone/nuclearnorm.jl")
@@ -66,9 +66,8 @@ include("atoms/exp_cone/logsumexp.jl")
 include("atoms/exp_cone/entropy.jl")
 include("atoms/exp_cone/relative_entropy.jl")
 
-### other elementwise atoms
-include("atoms/huber.jl")
-include("atoms/logdet.jl")
+### exp + sdp atoms
+include("atoms/exp_+_sdp_cone/logdet.jl")
 
 ### utilities
 include("utilities/show.jl")
