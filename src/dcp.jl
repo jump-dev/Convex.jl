@@ -94,13 +94,17 @@ type ComplexSign <: Sign                 end
 +(v::ConcaveVexity, w::ConvexVexity) = NotDcp()
 +(v::ConvexVexity, w::ConcaveVexity) = NotDcp()
 
+#+(::Convex.Positive, ::Convex.NoSign)
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
 +(s::Positive, t::Negative) = NoSign()
 +(s::Negative, t::Positive) = NoSign()
 +(s::NoSign, t::NoSign) = s
 +(s::NoSign, t::Positive) = s
++(t::Positive, s::NoSign) = s+t
 +(s::NoSign, t::Negative) = s
++(t::Negative, s::NoSign) = s+t
+
 # New code
 # Any sign + ComplexSign = ComplexSign
 +(s::ComplexSign, t::ComplexSign) = s
