@@ -8,9 +8,11 @@
 # k >= min(num_cols, num_rows) || k <= -min(num_rows, num_cols)
 import Base.diag
 export diag
-export sign, curvature, monotonicity, evaluate
+#export sign, curvature, monotonicity, evaluate
+
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
+
 type DiagAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
@@ -29,6 +31,7 @@ type DiagAtom <: AbstractExpr
     return new(:diag, hash((children, k)), children, (min(num_rows, num_cols) - k, 1), k)
   end
 end
+
 ## Type Definition Ends
 
 
