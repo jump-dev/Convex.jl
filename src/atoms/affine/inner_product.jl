@@ -7,11 +7,14 @@ function inner_product(x::AbstractExpr,y::AbstractExpr)
                 return(trace(y*x))
             else 
                 error("Second argument must be a square matrix")
+            end
         else 
             error("First argument must be a square matrix")
+        end
 
     else 
         error("Dimension of both the matrix must be same")
+    end
 end
 
 #inner_product(x::AbstractExpr, y::AbstractExpr) = transpose(x) * y
