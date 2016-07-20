@@ -423,10 +423,11 @@ facts("Affine Atoms") do
     p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0)
     solve!(p2)
     #x2 = xr.value + im*xi.value
-    real_diff = real(x1) - xr.value 
-    @fact real_diff => roughly(0, TOL)
+    real_diff = real(x1) - xr.value
+
+    @fact real_diff => roughly(zeros(10,1), TOL)
     imag_diff = imag(x1) - xi.value 
-    @fact imag_diff => roughly(0, TOL)
+    @fact imag_diff => roughly(zeros(10,1), TOL)
     #@fact x1==x2 => true
   end
 
