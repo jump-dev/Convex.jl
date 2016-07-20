@@ -34,7 +34,7 @@ function curvature(x::TransposeAtom)
 end
 
 function evaluate(x::TransposeAtom)
-  return evaluate(x.children[1])'
+  return transpose(evaluate(x.children[1]))
 end
 
 # Since everything is vectorized, we simply need to multiply x by a permutation
@@ -128,14 +128,13 @@ function conic_form!(x::CTransposeAtom, unique_conic_forms::UniqueConicForms)
     end
 
     transpose_matrix = sparse(I, J, 1.0)
+    objective = transpose_matrix * objective
 
     for var in keys(objective)
-      x1 = transpose_matrix * objective[var][1]'
-      x2 = transpose_matrix * objective[var][2]'
+      x1 = objective[var][1]'
+      x2 = objective[var][2]'
       objective[var] = (x1,x2)
     end
-
-    #objective = transpose_matrix * objective
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
