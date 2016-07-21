@@ -87,7 +87,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
     objective = ConicObj()
     for (id, col_size) in variable_to_sizes
       temp_tuple = Tuple{Value,Value}
-      value_list = Array{temp_tuple,1}
+      value_list = temp_tuple[]
       for i in 1:length(objectives)
         row_size = get_vectorized_size(x.children[i])
         if haskey(objectives[i], id)
