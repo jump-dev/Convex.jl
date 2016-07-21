@@ -131,8 +131,8 @@ function conic_form!(x::CTransposeAtom, unique_conic_forms::UniqueConicForms)
     objective = transpose_matrix * objective
 
     for var in keys(objective)
-      x1 = objective[var][1]'
-      x2 = objective[var][2]'
+      x1 = conj(objective[var][1])
+      x2 = conj(objective[var][2])
       objective[var] = (x1,x2)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
