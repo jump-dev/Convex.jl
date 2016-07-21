@@ -92,7 +92,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
         if haskey(objectives[i], id)
           push!(value_list, objectives[i][id])
         else
-          push!(value_list, (spzeros(row_size, col_size),spzeros(row_size, col_size))
+          push!(value_list, (spzeros(row_size, col_size),spzeros(row_size, col_size)))
         end
       end
       objective[id] = vcat(value_list...)
