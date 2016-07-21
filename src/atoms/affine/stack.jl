@@ -86,7 +86,8 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
     # from each child objective, and then vertically concatenating them
     objective = ConicObj()
     for (id, col_size) in variable_to_sizes
-      value_list = Array[{Value,Value}]
+      temp_tuple = Tuple{Value,Value}
+      value_list = Array{temp_tuple,1}
       for i in 1:length(objectives)
         row_size = get_vectorized_size(x.children[i])
         if haskey(objectives[i], id)
