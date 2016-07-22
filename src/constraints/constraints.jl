@@ -14,16 +14,12 @@ type EqConstraint <: Constraint
   dual::ValueOrNothing
 
   function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if (sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()) && (sign(lhs)!=sign(rhs))
-      error("Cannot create equality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
+    if lhs.size == rhs.size || lhs.size == (1, 1)
+      sz = rhs.size
+    elseif rhs.size == (1, 1)
+      sz = lhs.size
     else
-      if lhs.size == rhs.size || lhs.size == (1, 1)
-        sz = rhs.size
-      elseif rhs.size == (1, 1)
-        sz = lhs.size
-      else
-        error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
-      end
+      error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
     end
     id_hash = hash((lhs, rhs, :(==)))
     return new(:(==), id_hash, lhs, rhs, sz, nothing)
