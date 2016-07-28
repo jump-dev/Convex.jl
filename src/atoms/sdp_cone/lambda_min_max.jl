@@ -54,7 +54,7 @@ function conic_form!(x::LambdaMaxAtom, unique_conic_forms)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = minimize(t, t*eye(n) - A ⪰ 0, A ⪰ 0)
+    p = minimize(t, t*eye(n) - A ⪰ 0)
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)
@@ -107,7 +107,7 @@ function conic_form!(x::LambdaMinAtom, unique_conic_forms)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = maximize(t, A - t*eye(n) ⪰ 0, A ⪰ 0)
+    p = maximize(t, A - t*eye(n) ⪰ 0)
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)
