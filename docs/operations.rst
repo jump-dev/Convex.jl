@@ -241,9 +241,9 @@ An optimization problem using these functions can be solved by any SDP solver (i
 +---------------------------+-------------------------------------+------------+---------------+------------------------------+
 |:code:`operatornorm(x)`    | max of singular values of :math:`x` | convex     |not monotonic  | none                         |
 +---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`lambdamax(x)`       | max eigenvalue of :math:`x`         | convex     |not monotonic  |IC: x is positive semidefinite|
+|:code:`lambdamax(x)`       | max eigenvalue of :math:`x`         | convex     |not monotonic  | none                         |
 +---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`lambdamin(x)`       | min eigenvalue of :math:`x`         | concave    |not monotonic  |IC: x is positive semidefinite|
+|:code:`lambdamin(x)`       | min eigenvalue of :math:`x`         | concave    |not monotonic  | none                         |
 +---------------------------+-------------------------------------+------------+---------------+------------------------------+
 |:code:`matrixfrac(x, P)`   | :math:`x^TP^{-1}x`                  | convex     |not monotonic  |IC: P is positive semidefinite|
 +---------------------------+-------------------------------------+------------+---------------+------------------------------+
