@@ -16,14 +16,18 @@ type SumLargestAtom <: AbstractExpr
   k::Int
 
   function SumLargestAtom(x::AbstractExpr, k::Int)
-    if k <= 0
-      error("sumlargest and sumsmallest only support positive values of k")
+    if sign(x)==ComplexSign()
+      error("Argument should be real instead it is $(sign(x))")
+    else
+      if k <= 0
+        error("sumlargest and sumsmallest only support positive values of k")
+      end
+      if k > get_vectorized_size(x)
+        error("k cannot be larger than the number of entries in x")
+      end
+      children = (x,)
+      return new(:sumlargest, hash((children, k)), children, (1,1), k)
     end
-    if k > get_vectorized_size(x)
-      error("k cannot be larger than the number of entries in x")
-    end
-    children = (x,)
-    return new(:sumlargest, hash((children, k)), children, (1,1), k)
   end
 end
 
