@@ -18,12 +18,16 @@ type DotSortAtom <: AbstractExpr
   w::Value
 
   function DotSortAtom(x::AbstractExpr, w::Value)
-    if !(length(w) == get_vectorized_size(x))
-      error("x and w must be the same size")
+    if sign(x)==ComplexSign()
+      error("Argument should be real instead it is $(sign(x))")
+    else
+      if !(length(w) == get_vectorized_size(x))
+        error("x and w must be the same size")
+      end
+      children = (x,)
+      vecw = reshape(w, get_vectorized_size(x))
+      return new(:dotsort, hash((children, vecw)), children, (1,1), vecw)
     end
-    children = (x,)
-    vecw = reshape(w, get_vectorized_size(x))
-    return new(:dotsort, hash((children, vecw)), children, (1,1), vecw)
   end
 end
 
