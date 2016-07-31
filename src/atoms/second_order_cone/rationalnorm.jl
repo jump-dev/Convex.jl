@@ -23,9 +23,13 @@ type RationalNormAtom <: AbstractExpr
   k::Rational{Int64}
 
   function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})
-    children = (x,)
-    k >= 1 || error("p-norms not defined for p < 1")
-    return new(:rationalnorm, hash(children), children, (1,1), k)
+    if sign(x)==ComplexSign() || sign(y)==ComplexSign()
+      error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
+    else
+      children = (x,)
+      k >= 1 || error("p-norms not defined for p < 1")
+      return new(:rationalnorm, hash(children), children, (1,1), k)
+    end
   end
 end
 

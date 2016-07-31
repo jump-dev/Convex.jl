@@ -16,8 +16,12 @@ type EucNormAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function EucNormAtom(x::AbstractExpr)
-    children = (x,)
-    return new(:norm2, hash(children), children, (1, 1))
+    if sign(x)==ComplexSign()
+      error("Argument should be real instead it is $(sign(x))")
+    else
+      children = (x,)
+      return new(:norm2, hash(children), children, (1, 1))
+    end
   end
 end
 
