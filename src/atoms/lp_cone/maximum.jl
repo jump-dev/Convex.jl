@@ -15,8 +15,12 @@ type MaximumAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function MaximumAtom(x::AbstractExpr)
-    children = (x,)
-    return new(:maximum, hash(children), children, (1, 1))
+    if sign(x)==ComplexSign()
+      error("Arguments should be real instead it is $(sign(x))")
+    else 
+      children = (x,)
+      return new(:maximum, hash(children), children, (1, 1))
+    end
   end
 end
 

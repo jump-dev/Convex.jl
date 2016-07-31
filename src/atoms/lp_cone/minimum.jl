@@ -15,8 +15,12 @@ type MinimumAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function MinimumAtom(x::AbstractExpr)
-    children = (x,)
-    return new(:minimum, hash(children), children, (1, 1))
+    if sign(x)==ComplexSign()
+      error("Arguments should be real instead it is $(sign(x))")
+    else
+      children = (x,)
+      return new(:minimum, hash(children), children, (1, 1))
+    end
   end
 end
 
