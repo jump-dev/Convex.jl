@@ -194,9 +194,9 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 |:code:`geomean(x, y)`       | :math:`\sqrt{xy}`                   | concave    |increasing     | IC: :math:`x\ge0`,       |
 |                            |                                     |            |               | :math:`y\ge0`            |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`huber(x)`            | :math:`\begin{cases}                | convex     |increasing on  | PR: :math:`M>=1`         |
+|:code:`huber(x, M=1)`       | :math:`\begin{cases}                | convex     |increasing on  | PR: :math:`M>=1`         |
 |                            | x^2 &|x| \leq                       |            |:math:`x \ge 0`|                          |
-|:code:`huber(x, M)`         | M  \\                               |            |               |                          |
+|                            | M  \\                               |            |               |                          |
 |                            | 2M|x| - M^2                         |            |               |                          |
 |                            | &|x| >  M                           |            |decreasing on  |                          |
 |                            | \end{cases}`                        |            |:math:`x \le 0`|                          |
