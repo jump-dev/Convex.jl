@@ -16,12 +16,8 @@ type EucNormAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function EucNormAtom(x::AbstractExpr)
-    if sign(x)==ComplexSign()
-      error("Argument should be real instead it is $(sign(x))")
-    else
-      children = (x,)
-      return new(:norm2, hash(children), children, (1, 1))
-    end
+    children = (x,)
+    return new(:norm2, hash(children), children, (1, 1))
   end
 end
 
@@ -46,7 +42,11 @@ end
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
-    euc_norm = Variable()
+    if sign(x.children[1]) == ComplexSign()
+      euc_norm = ComplexVariable()
+    else 
+      euc_norm = Variable()
+    end
     objective = conic_form!(euc_norm, unique_conic_forms)
     conic_form!(SOCConstraint(euc_norm, x.children[1]), unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, objective)
