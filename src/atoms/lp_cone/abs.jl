@@ -55,7 +55,12 @@ end
 
 function abs(x::AbstractExpr)
   if sign(x) == ComplexSign()
-    return sqrt(square(real(x))+square(imag(x)))
+    elements = EucNormAtom[]
+    row,col = size(x)
+    for i in 1:length(vec(x))
+      push!(elements,norm2([real(x[i]);imag(x[i])]))
+    end
+    return reshape(elements,row,col)
   else 
     return AbsAtom(x)
   end
