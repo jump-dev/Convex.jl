@@ -42,11 +42,7 @@ end
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
-    if sign(x.children[1]) == ComplexSign()
-      euc_norm = ComplexVariable()
-    else 
-      euc_norm = Variable()
-    end
+    euc_norm = Variable()
     objective = conic_form!(euc_norm, unique_conic_forms)
     conic_form!(SOCConstraint(euc_norm, x.children[1]), unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, objective)
@@ -54,4 +50,11 @@ function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-norm2(x::AbstractExpr) = EucNormAtom(x)
+function norm2(x::AbstractExpr)
+  if sign(x) == ComplexSign()
+    return norm2([real(x),imag(x)])
+  else 
+    return EucNormAtom(x)
+  end
+end
+
