@@ -55,7 +55,7 @@ end
 
 function abs(x::AbstractExpr)
   if sign(x) == ComplexSign()
-    elements = EucNormAtom[]
+    elements = AbstractExpr[]
     row,col = size(x)
     for i in 1:length(vec(x))
       push!(elements,norm2([real(x[i]);imag(x[i])]))
