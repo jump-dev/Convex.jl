@@ -39,7 +39,7 @@ function evaluate(x::AbsAtom)
   return abs(evaluate(x.children[1]))
 end
 
-abs(x::AbstractExpr) = AbsAtom(x)
+
 
 function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
@@ -51,4 +51,12 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
+end
+
+function abs(x::AbstractExpr)
+  if sign(x) == ComplexSign()
+    return sqrt(square(real(x))+square(imag(x)))
+  else 
+    return AbsAtom(x)
+  end
 end
