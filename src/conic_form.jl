@@ -54,7 +54,9 @@ end
 function get_row(c::ConicObj, row::Int)
   new_obj = ConicObj()
   for (var, coeff) in c
-    new_obj[var] = coeff[row, :]
+    x1 = coeff[1][row, :]
+    x2 = coeff[2][row, :]
+    new_obj[var] = (x1,x2)
   end
   return new_obj
 end
