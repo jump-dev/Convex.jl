@@ -1,19 +1,10 @@
 export inner_product
 
 function inner_product(x::AbstractExpr,y::AbstractExpr)
-    if x.size==y.size
-        if x.size[1] == x.size[2]
-            if y.size[1] == y.size[2]
-                return(trace(y*x))
-            else 
-                error("Second argument must be a square matrix")
-            end
-        else 
-            error("First argument must be a square matrix")
-        end
-
+    if x.size==y.size && x.size[1] == x.size[2]
+        return(real(trace(x'*y)))
     else 
-        error("Dimension of both the matrix must be same")
+        error("Arguments must be square matrix of same dimension")
     end
 end
 
