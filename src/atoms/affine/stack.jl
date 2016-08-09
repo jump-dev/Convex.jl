@@ -111,14 +111,15 @@ hcat(args::Value...) = Base.cat(2, args...)
 vcat(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
 vcat(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr, arg)' for arg in args]...)'
 vcat(args::Value...) = Base.cat(1, args...) # Note: this makes general vcat slower for anyone using Convex...
-if VERSION >= v"0.4.0"
-    Base.vect{T<:AbstractExpr}(args::T...) = HcatAtom([arg' for arg in args]...)'
-    Base.vect(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
-    Base.vect(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr,arg)' for arg in args]...)'
-    if Base._oldstyle_array_vcat_
-        # This is ugly, because the method redefines simple cases like [1,2,3]
-        Base.vect(args::Value...) = Base.vcat(args...)
-    else
-        error("FIXME")
+Base.vect{T<:AbstractExpr}(args::T...) = HcatAtom([arg' for arg in args]...)'
+Base.vect(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
+Base.vect(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr,arg)' for arg in args]...)'
+if Base._oldstyle_array_vcat_
+    # This is ugly, because the method redefines simple cases like [1,2,3]
+    Base.vect(args::Value...) = Base.vcat(args...)
+else
+    function Base.vect(args::Value...)
+        T = Base.promote_typeof(args...)
+        return copy!(Array{T}(length(args)), args)
     end
 end
