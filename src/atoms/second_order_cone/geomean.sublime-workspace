@@ -1,0 +1,326 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"sig",
+				"sign"
+			],
+			[
+				"domain",
+				"Domain"
+			],
+			[
+				"c",
+				"cout"
+			],
+			[
+				"s",
+				"squareroot"
+			],
+			[
+				"in",
+				"include"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"Apply Julia Syntax to .jl Files"
+			],
+			[
+				"Package Control: I",
+				"Package Control: Install Package"
+			],
+			[
+				"Open IJulia",
+				"Sublime-IJulia: Open New IJulia Console"
+			],
+			[
+				"Install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 364.0
+	},
+	"console":
+	{
+		"height": 114.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/hduser/Desktop/Placements/Hackerrank/Implementation/newYearChaos.cpp",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/stories/index.md",
+		"/home/hduser/Desktop/GSoc'16/Julia/julialang.github.com/blog/_posts/2016-07-26-announcing-support-for-complex-domain-linear-programs-in-Convex.jl.md",
+		"/home/hduser/Desktop/Placements/Hackerrank/Implementation/bomberMan.cpp",
+		"/home/hduser/Desktop/Placements/Hackerrank/Implementation/absolutePermutation.cpp",
+		"/home/hduser/Desktop/Placements/Hackerrank/Implementation/flatSpaceStation.cpp",
+		"/home/hduser/Desktop/GSoc'16/Julia/julialang.github.com/blog/_posts/2016-04-30-biojulia2016.md",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/stories/juliacon-2016-talk.rst",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/conf.py",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/stories/juliacon-2016-talk.md",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/posts/a-month-of-excitement.md",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/posts/exciting-summers-ahead.md",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/posts/announcing-support-for-complex-domain-linear-programs-in-convexjl.md",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/themes/material-theme/templates/post.tmpl",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/themes/material-theme/templates/index.tmpl",
+		"/home/hduser/.julia/v0.5/Convex/src/solution.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/conic_form.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/conic_form example",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/index.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/dot.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/diagm.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/add_subtract.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/real_imag.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/multiply_divide.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/problems.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/transpose.jl",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/stories/gsoc16-proposal.ipynb",
+		"/home/hduser/.julia/v0.5/Convex/src/constraints/constraints.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/variable.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/constraints/sdp_constraints.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/constraints/exp_constraints.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/abs.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/stack.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/conv.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/diag.jl",
+		"/home/hduser/Desktop/Ayush-iitkgp.github.io/stories/GSoC16-Proposal.ipynb",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/exp_cone/relative_entropy.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/exp_cone/logsumexp.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/exp_cone/log.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/exp_cone/exp.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/exp_cone/entropy.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/dotsort.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/sdp_cone/lambda_min_max.jl",
+		"/home/hduser/Desktop/NewWebsite/conf.py",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/trace.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/expressions.jl",
+		"/home/hduser/Desktop/GSoc'16/JuliaGSoc /testcases",
+		"/home/hduser/.julia/v0.5/Convex/src/constant.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/second_order_cone/norm2.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/second_order_cone/quadform.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/second_order_cone/quadoverlin.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/max.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/sdp_cone/operatornorm.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/sdp_cone/nuclearnorm.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/sdp_cone/matrixfrac.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/second_order_cone/geomean.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/second_order_cone/power_to_socp.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/Convex.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/dcp.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/atoms/affine/sum.jl",
+		"/home/hduser/Desktop/3.cpp",
+		"/home/hduser/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/hduser/.julia/v0.5/Convex/src/solver_info.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/utilities/iteration.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/utilities/show.jl",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Banker.cpp",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Philosopher.c",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Error.cpp",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Spooling.cpp",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Barber.c",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Barber.cpp",
+		"/home/hduser/.julia/v0.5/Convex/src/constraints/signs_and_sets.jl",
+		"/home/hduser/.julia/v0.5/Convex/src/constraints/soc_constraints.jl",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Assignement3.cpp",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Final/Codes/Spooling.c",
+		"/home/hduser/Desktop/8th Sem/OS Lab/Untitled Document",
+		"/home/hduser/Desktop/GSoc'16/Julia/Convex.jl/GSoc-Proposal/GSoC 2016 Application Ayush Pandey- Support for complex numbers within Convex.jl.tex",
+		"/home/hduser/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/hduser/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/hduser/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/hduser/.config/sublime-text-3/Packages/IJulia/Sublime-IJulia.sublime-settings",
+		"/home/hduser/.config/sublime-text-3/Packages/User/Sublime-IJulia.sublime-settings"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"source-",
+			"source",
+			"i",
+			"contents",
+			"credits",
+			"contents",
+			".\n",
+			"slide",
+			"slideshow",
+			"slide",
+			"demo",
+			"render_galler",
+			"render_galleries",
+			"email",
+			"Footer",
+			"social",
+			"STRIP_INDEXES",
+			"THEME",
+			"Theme",
+			"pdf",
+			"INDEX_PATH",
+			"new_post",
+			"re",
+			"find_variable_ranges",
+			"id_to_variables",
+			"start",
+			"1",
+			"a",
+			"objective<:",
+			"objective::",
+			"diag",
+			"-9",
+			"ComplexSign",
+			"ComplexValued",
+			"ComplexSign",
+			"ComplexValued",
+			"Complex",
+			"ComplexVariable",
+			"END",
+			"end",
+			"HermitianSemidefinite",
+			"verbose"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"ComplexSign",
+			"ComplexValued"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "geomean.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 364.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 215.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
