@@ -46,22 +46,17 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     c = x.children[1]
     t = Variable(size(c))
     objective = conic_form!(t, unique_conic_forms)
-    conic_form!(c<=t, unique_conic_forms)
-    conic_form!(c>=-t, unique_conic_forms)
+    if sign(x.children) == ComplexSign()
+      for i in length(vec(t))
+        conic_form(t[i]>=norm2([real(x[i]);imag(x[i])]), unique_conic_forms)
+      end
+    else 
+      conic_form!(c<=t, unique_conic_forms)
+      conic_form!(c>=-t, unique_conic_forms)
+    end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end
 
-function abs(x::AbstractExpr)
-  if sign(x) == ComplexSign()
-    elements = AbstractExpr[]
-    row,col = size(x)
-    for i in 1:length(vec(x))
-      push!(elements,norm2([real(x[i]);imag(x[i])]))
-    end
-    return reshape(elements,row,col)
-  else 
-    return AbsAtom(x)
-  end
-end
+function abs(x::AbstractExpr) = AbsAtom(x)
