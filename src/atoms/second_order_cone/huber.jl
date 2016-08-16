@@ -8,7 +8,9 @@ type HuberAtom <: AbstractExpr
   M::Real
 
   function HuberAtom(x::AbstractExpr, M::Real)
-    if M <= 0
+    if sign(x) == ComplexSign()
+      error("Arguemt must be real")
+    elseif M <= 0
       error("Huber parameter must by a positive scalar")
     end
     children = (x,)
