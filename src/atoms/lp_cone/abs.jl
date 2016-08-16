@@ -6,7 +6,7 @@
 #############################################################################
 
 import Base.abs
-export abs
+export abs, square_modulus
 export sign, curvature, monotonicity, evaluate
 
 ### Absolute Value
