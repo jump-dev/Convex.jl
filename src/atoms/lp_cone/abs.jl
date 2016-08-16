@@ -59,4 +59,4 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-function abs(x::AbstractExpr) = AbsAtom(x)
+abs(x::AbstractExpr) = AbsAtom(x)
