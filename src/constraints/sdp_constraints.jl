@@ -80,35 +80,70 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
 end
 
 # TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
-isposdef(x::AbstractExpr) = SDPConstraint(x)
-
-# TODO: Throw error if symbol is invalid.
-function in(x::AbstractExpr, y::Symbol)
-  if y == :semidefinite || y == :SDP
+function isposdef(x::AbstractExpr)
+  if sign(x) == ComplexSign()
+    SDPConstraint([real(x) -imag(x); imag(x) real(x)])
+  else
     SDPConstraint(x)
   end
 end
 
+# TODO: Throw error if symbol is invalid.
+function in(x::AbstractExpr, y::Symbol)
+  if y == :semidefinite || y == :SDP
+    if sign(x) == ComplexSign()
+      SDPConstraint([real(x) -imag(x);imag(x) real(x)])
+    else
+      SDPConstraint(x)
+    end
+  end
+end
+
 function ⪰(x::AbstractExpr, y::AbstractExpr)
-  SDPConstraint(x-y)
+  if sign(x) == ComplexSign() || sign(y) == ComplexSign()
+    SDPConstraint([real(x-y) -imag(x-y);imag(x-y) real(x-y)])
+  else
+    SDPConstraint(x-y)
+  end
 end
 
 function ⪯(x::AbstractExpr, y::AbstractExpr)
-  SDPConstraint(y-x)
+  if sign(x) == ComplexSign() || sign(y) == ComplexSign()
+    SDPConstraint([real(y-x) -imag(y-x);imag(y-x) real(y-x)])
+  else
+    SDPConstraint(y-x)
+  end
 end
 
 function ⪰(x::AbstractExpr, y::Value)
-  all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
+  if sign(x) == ComplexSign()
+    all(y .== 0) ? SDPConstraint([real(x) -imag(x);imag(x) real(x)]) : SDPConstraint([real(x-Constant(y)) -imag(x-Constant(y));imag(x-Constant(y)) real(x-Constant(y))])
+  else
+    all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
+  end
+  
 end
 
 function ⪰(x::Value, y::AbstractExpr)
-  all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(Constant(x) - y)
+  if sign(y) == ComplexSign()
+    all(x .== 0) ? SDPConstraint([real(-y) -imag(-y);imag(-y) real(-y)]) : SDPConstraint([real(Constant(x)-y) -imag(Constant(x)-y);imag(Constant(x)-y) real(Constant(x)-y)])
+  else
+    all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(Constant(x) - y)
+  end
 end
 
 function ⪯(x::Value, y::AbstractExpr)
-  all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - Constant(x))
+  if sign(y) == ComplexSign()
+    all(x .== 0) ? SDPConstraint([real(y) -imag(y);imag(y) real(y)]) : SDPConstraint([real(y-Constant(x)) -imag(y-Constant(x));imag(y-Constant(x)) real(y-Constant(x))])
+  else
+    all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - Constant(x))
+  end
 end
 
 function ⪯(x::AbstractExpr, y::Value)
-  all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(Constant(y) - x)
+  if sign(x) == ComplexSign()
+    all(y .== 0) ? SDPConstraint([real(-x) -imag(-x);imag(-x) real(-x)]) : SDPConstraint([real(Constant(y)-x) -imag(Constant(y)-x);imag(Constant(y)-x) real(Constant(y)-x)])
+  else
+    all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(Constant(y) - x)
+  end
 end
