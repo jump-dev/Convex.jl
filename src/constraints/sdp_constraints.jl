@@ -82,7 +82,7 @@ end
 # TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
 function isposdef(x::AbstractExpr)
   if sign(x) == ComplexSign()
-    SDPConstraint([real(x) -imag(x); imag(x) real(x)])
+    SDPConstraint([real(x) -imag(x);imag(x) real(x)])
   else
     SDPConstraint(x)
   end
