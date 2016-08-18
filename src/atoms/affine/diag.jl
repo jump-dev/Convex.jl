@@ -25,7 +25,7 @@ type DiagAtom <: AbstractExpr
     end
 
     children = (x, )
-    return new(:diag, hash((children, k)), children, (minimum(x.size) - k, 1), k)
+    return new(:diag, hash((children, k)), children, (min(x.size) - k, 1), k)
   end
 end
 
