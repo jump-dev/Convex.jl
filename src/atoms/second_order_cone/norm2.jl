@@ -52,7 +52,7 @@ end
 
 function norm2(x::AbstractExpr)
   if sign(x) == ComplexSign()
-    return EucNormAtom([real(x);imag(x)])
+    return norm2(vec([real(x);imag(x)]))
   else 
     return EucNormAtom(x)
   end
