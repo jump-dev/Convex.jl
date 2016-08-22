@@ -4,7 +4,8 @@ Complex-domain Optimization
 
 Convex.jl also supports optimization over the complex domain.
 The idea is to transform the complex-domain problem to the corresponding real-domain problem using a bijective mapping and then use the existing machinery to solve the reduced real-domain problem and then combine the result to return the complex solution.
-We support the conic constraints such as linear, second-order, or semidefinite constraints.
+We support the all the conic constraints such as linear, second-order, or semidefinite constraints for complex variables as well.
+
 Below, we present a quick start guide on how to use Convex.jl for complex-domain optimization and then list the operation supported on complex variables in Convex.jl organized by the (most complex) type of cone used to represent that operation.
 
 Complex Variables
@@ -28,125 +29,26 @@ Complex Variables in Convex.jl are declared in the same way as the variables are
 Linear Program Representable Functions
 **************************************
 
-An optimization problem using only these functions can be solved by any LP solver.
+Apart from all the linear functions that are listed `here <http://convexjl.readthedocs.io/en/latest/operations.html#linear-program-representable-functionsl>`_, we have added new functions:
 
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation                 | description             | vexity     | slope         | notes                           |
 +==========================+=========================+============+===============+=================================+
-|:code:`x+y` or `x.+y`     | addition                | affine     |increasing     | none                            |
+|:code:`real(z)`           | real part of complex    | affine     |increasing     | none                            |
+|                          | variable                |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x-y` or `x.-y`     | subtraction             | affine     |increasing in  | none                            |
-|                          |                         |            |:math:`x`      |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |decreasing in  | none                            |
-|                          |                         |            |:math:`y`      |                                 |
+|:code:`imag(z)`           | imaginary part of       | affine     |increasing in  | none                            |
+|                          | complex variable        |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x*y`               | multiplication          | affine     |increasing if  | PR: one argument is constant    |
-|                          |                         |            |               |                                 |
-|                          |                         |            |constant term  |                                 |
-|                          |                         |            |:math:`\ge 0`  |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |decreasing if  |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |constant term  |                                 |
-|                          |                         |            |:math:`\le 0`  |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |not monotonic  |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |otherwise      |                                 |
+|:code:`x'`                | ctranspose              | affine     |increasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x/y`               | division                | affine     |increasing     | PR: :math:`y` is scalar constant|
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x .* y`            | elemwise multiplication | affine     |increasing     | PR: one argument is constant    |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x[1:4, 2:3]`       | indexing and slicing    | affine     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`diag(x, k)`        | :math:`k`-th diagonal of| affine     |increasing     | none                            |
-|                          | a matrix                |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`diagm(x)`          | construct diagonal      | affine     |increasing     | PR: :math:`x` is a vector       |
-|                          | matrix                  |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x'`                | transpose               | affine     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x'*y` or `dot(x,y)`| :math:`x' y`            | affine     |increasing     | PR: one argument is constant    |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`vec(x)`            | vector representation   | affine     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`sum(x)`            | :math:`\sum_{ij} x_{ij}`| affine     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`sum(x, k)`         | sum elements across     | affine     |increasing     | none                            |
-|                          |                         |            |               |                                 |
-|                          | dimension :math:`k`     |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`sumlargest(x, k)`  | sum of :math:`k` largest| convex     |increasing     | none                            |
-|                          |                         |            |               |                                 |
-|                          | elements of :math:`x`   |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`sumsmallest(x, k)` |sum of :math:`k` smallest| concave    |increasing     | none                            |
-|                          |                         |            |               |                                 |
-|                          |elements of :math:`x`    |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`dotsort(a, b)`     | dot(sort(a),sort(b))    | convex     |increasing     | PR: one argument is constant    |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`reshape(x, m, n)`  | reshape into            | affine     |increasing     | none                            |
-|                          | :math:`m \times n`      |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`minimum(x)`        | :math:`\min(x)`         | concave    |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`maximum(x)`        | :math:`\max(x)`         | convex     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`[x y]` or `[x; y]` | stacking                | affine     |increasing     | none                            |
-|                          |                         |            |               |                                 |
-|:code:`hcat(x, y)` or     |                         |            |               |                                 |
-|                          |                         |            |               |                                 |
-|:code:`vcat(x, y)`        |                         |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`trace(x)`          | :math:`\mathrm{tr}      | affine     |increasing     | none                            |
-|                          | \left(X \right)`        |            |               |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`conv(h,x)`         |:math:`h \in             | affine     |increasing if  | PR: :math:`h` is constant       |
-|                          |\mathbb{R}^m`            |            |:math:`h\ge 0` |                                 |
-|                          |                         |            |               |                                 |
-|                          |:math:`x \in             |            |               |                                 |
-|                          |\mathbb{R}^m`            |            |               |                                 |
-|                          |                         |            |               |                                 |
-|                          |:math:`h*x               |            |               |                                 |
-|                          |\in \mathbb{R}^{m+n-1}`  |            |               |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |               |                                 |
-|                          |entry :math:`i` is       |            |decreasing if  |                                 |
-|                          |given by                 |            |:math:`h\le 0` |                                 |
-|                          |                         |            |               |                                 |
-|                          |:math:`\sum_{j=1}^m      |            |               |                                 |
-|                          |h_jx_{i-j}`              |            |not monotonic  |                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |otherwise      |                                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`min(x,y)`          | :math:`\min(x,y)`       | concave    |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`max(x,y)`          | :math:`\max(x,y)`       | convex     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`pos(x)`            | :math:`\max(x,0)`       | convex     |increasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`neg(x)`            | :math:`\max(-x,0)`      | convex     |decreasing     | none                            |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`invpos(x)`         | :math:`1/x`             | convex     |decreasing     | IC: :math:`x>0`                 |
-+--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`abs(x)`            | :math:`\left|x\right|`  | convex     |increasing on  | none                            |
-|                          |                         |            |:math:`x \ge 0`|                                 |
-|                          |                         |            |               |                                 |
-|                          |                         |            |decreasing on  |                                 |
-|                          |                         |            |:math:`x \le 0`|                                 |
+|:code:`innerproduct(x,y)` | real(trace(x'*y))       | affine     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 
 
 Second-Order Cone Representable Functions
 *****************************************
 
-An optimization problem using these functions can be solved by any SOCP solver (including ECOS, SCS, Mosek, Gurobi, and CPLEX).
-Of course, if an optimization problem has both LP and SOCP representable functions, then any solver that can solve both LPs and SOCPs can solve the problem.
 
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
