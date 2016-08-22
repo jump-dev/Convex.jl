@@ -7,7 +7,7 @@ The idea is to transform the complex-domain problem to the corresponding real-do
 
 We support the all the conic constraints such as linear, second-order, or semidefinite constraints for complex variables as well.
 
-Below, we present a quick start guide on how to use Convex.jl for complex-domain optimization and then list the operation supported on complex variables in Convex.jl organized by the (most complex) type of cone used to represent that operation.
+Below, we present a quick start guide on how to use Convex.jl for complex-domain optimization and then list the operation supported on complex variables in Convex.jl organized by the type of cone used to represent that operation.
 
 Complex Variables
 *****************
