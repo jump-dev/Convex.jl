@@ -22,14 +22,14 @@ Complex Variables in Convex.jl are declared in the same way as the variables are
     # Matrix variable
     z = ComplexVariable(4, 6)
 
-    # Complex Positive Semidefinite matrix
+    # Complex Positive Semidefinite variable
     z = HermitianSemidefinite(4)
 
 
 Linear Program Representable Functions
 **************************************
 
-Apart from all the linear functions that are listed `here <http://convexjl.readthedocs.io/en/latest/operations.html#linear-program-representable-functionsl>`_, we have added new functions:
+Apart from all the linear functions that are listed `here <operations.html#linear-program-representable-functionsl>`_, we have added new functions:
 
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation                 | description             | vexity     | slope         | notes                           |
@@ -37,7 +37,7 @@ Apart from all the linear functions that are listed `here <http://convexjl.readt
 |:code:`real(z)`           | real part of complex    | affine     |increasing     | none                            |
 |                          | variable                |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`imag(z)`           | imaginary part of       | affine     |increasing in  | none                            |
+|:code:`imag(z)`           | imaginary part of       | affine     |increasing     | none                            |
 |                          | complex variable        |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`x'`                | ctranspose              | affine     |increasing     | none                            |
@@ -114,59 +114,16 @@ Second-Order Cone Representable Functions
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 
-Exponential Cone  Representable Functions
-******************************************
-
-An optimization problem using these functions can be solved by any exponential cone solver (SCS).
-
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|operation                   | description                         | vexity     | slope         | notes                    |
-+============================+=====================================+============+===============+==========================+
-|:code:`logsumexp(x)`        | :math:`\log(\sum_i \exp(x_i))`      | convex     |increasing     |none                      |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`exp(x)`              | :math:`\exp(x)`                     | convex     |increasing     | none                     |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`log(x)`              | :math:`\log(x)`                     | concave    |increasing     | IC: :math:`x>0`          |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`entropy(x)`          | :math:`\sum_{ij}                    | concave    |not monotonic  | IC: :math:`x>0`          |
-|                            | -x_{ij} \log (x_{ij})`              |            |               |                          |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`logisticloss(x)`     | :math:`\log(1 + \exp(x_i))`         | convex     |increasing     | none                     |
-|                            |                                     |            |               |                          |
-+----------------------------+-------------------------------------+------------+---------------+--------------------------+
 
 
 Semidefinite Program Representable Functions
 ********************************************
 
-An optimization problem using these functions can be solved by any SDP solver (including SCS and Mosek).
+Complex variables support all the semidefinite functions same as real variables listed `here <operations.html#semidefinite-program-representable-functions>`_.
 
-+---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|operation                  | description                         | vexity     | slope         | notes                        |
-+===========================+=====================================+============+===============+==============================+
-|:code:`nuclearnorm(x)`     | sum of singular values of :math:`x` | convex     |not monotonic  | none                         |
-+---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`operatornorm(x)`    | max of singular values of :math:`x` | convex     |not monotonic  | none                         |
-+---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`lambdamax(x)`       | max eigenvalue of :math:`x`         | convex     |not monotonic  |IC: x is positive semidefinite|
-+---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`lambdamin(x)`       | min eigenvalue of :math:`x`         | concave    |not monotonic  |IC: x is positive semidefinite|
-+---------------------------+-------------------------------------+------------+---------------+------------------------------+
-|:code:`matrixfrac(x, P)`   | :math:`x^TP^{-1}x`                  | convex     |not monotonic  |IC: P is positive semidefinite|
-+---------------------------+-------------------------------------+------------+---------------+------------------------------+
 
 Exponential + SDP representable Functions
 ********************************************
 
-An optimization problem using these functions can be solved by any solver that supports exponential constraints *and* semidefinite constraints simultaneously (SCS).
+Complex variables also support logdet function.
 
-+----------------------------+-------------------------------------+------------+---------------+------------------------------+
-|operation                   | description                         | vexity     | slope         | notes                        |
-+============================+=====================================+============+===============+==============================+
-|:code:`logdet(x)`           | log of determinant of :math:`x`     | concave    |increasing     |IC: x is positive semidefinite|
-+----------------------------+-------------------------------------+------------+---------------+------------------------------+
-
-Promotions
-***********
-
-When an atom or constraint is applied to a scalar and a higher dimensional variable, the scalars are promoted. For example, we can do :code:`max(x, 0)` gives an expression with the shape of :code:`x` whose elements are the maximum of the corresponding element of :code:`x` and :code:`0`.
