@@ -35,7 +35,7 @@ In Depth Documentation:
   Basic Types <types>
   Supported Operations <operations>
   Examples <examples>
-  Complex-domain Optimization <complex-domain optimization>
+  Complex-domain Optimization <complex-domain_optimization>
   Solvers <solvers>
   FAQ <faq>
   Optimizing in a Loop <loop>
