@@ -1,13 +1,10 @@
 =====================================
-Complex-domain Optimization
+Optimization with Complex Variables
 =====================================
 
-Convex.jl also supports optimization over the complex domain.
-The idea is to transform the complex-domain problem to the corresponding real-domain problem using a bijective mapping and then use the existing machinery to solve the reduced real-domain problem and then combine the result to return the complex solution.
+Convex.jl also supports optimization with complex variables. Below, we present a quick start guide on how to use Convex.jl for optimization with complex variables, and then list the operations supported on complex variables in Convex.jl. In general, any operation available in Convex.jl that is well defined and DCP compliant on complex variables should be available. We list these functions below. organized by the type of cone (linear, second-order, or semidefinite) used to represent that operation.
 
-We support the all the conic constraints such as linear, second-order, or semidefinite constraints for complex variables as well.
-
-Below, we present a quick start guide on how to use Convex.jl for complex-domain optimization and then list the operation supported on complex variables in Convex.jl organized by the type of cone used to represent that operation.
+Internally, Convex.jl transforms the complex-domain problem to a larger real-domain problem using a bijective mapping. It then solves the real-domain problem and transforms the solution back to the complex domain.
 
 Complex Variables
 *****************
@@ -30,7 +27,7 @@ Complex Variables in Convex.jl are declared in the same way as the variables are
 Linear Program Representable Functions
 **************************************
 
-Apart from all the linear functions that are listed `here <operations.html#linear-program-representable-functionsl>`_, we have added new functions:
+Apart from all the linear functions that are listed `here <operations.html#linear-program-representable-functions>`_, we have added new functions:
 
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation                 | description             | vexity     | slope         | notes                           |
