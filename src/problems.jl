@@ -143,7 +143,9 @@ function conic_problem(p::Problem)
       sz = constraint.sizes[i]
       for (id, val) in constraint.objs[i]
         if id == object_id(:constant)
-          b[constr_index + 1 : constr_index + sz] = val[1] == zeros(size(val[1]))? val[2]:val[1]
+          for l in 1:sz
+            b[constr_index + l] = val[1][l]==0 ? val[2][l]:val[1][l]
+          end
           #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
         else
           var_range = var_to_ranges[id]
