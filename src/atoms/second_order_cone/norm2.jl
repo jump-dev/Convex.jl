@@ -57,4 +57,3 @@ function norm2(x::AbstractExpr)
     return EucNormAtom(x)
   end
 end
-
