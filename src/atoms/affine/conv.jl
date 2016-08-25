@@ -18,5 +18,3 @@ function conv(x::Value, y::AbstractExpr)
   end
   return X*y
 end
-
-conv(y::AbstractExpr, x::Value) = conv(x,y)
