@@ -23,8 +23,8 @@ type RationalNormAtom <: AbstractExpr
   k::Rational{Int64}
 
   function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})
-    if sign(x)==ComplexSign() || sign(y)==ComplexSign()
-      error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
+    if sign(x)==ComplexSign()
+      error("First arguments should be real instead it is $(sign(x))")
     else
       children = (x,)
       k >= 1 || error("p-norms not defined for p < 1")
