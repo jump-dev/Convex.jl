@@ -316,6 +316,15 @@ facts("Affine Atoms") do
     solve!(p)
     @fact p.optval --> roughly(3, TOL)
     @fact evaluate(sum(conv(h, x))) --> roughly(0, TOL)
+
+    x = Variable(3)
+    h = [1, -1]
+    p = minimize(sum(conv(x, h)) + sum(x), x >= 1, x <= 2)
+    @fact vexity(p) --> AffineVexity()
+    solve!(p)
+    @fact p.optval --> roughly(3, TOL)
+    @fact evaluate(sum(conv(h, x))) --> roughly(0, TOL)
+
   end
 
   context("satisfy problems") do
