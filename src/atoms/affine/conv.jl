@@ -7,7 +7,7 @@ import Base.conv
 export conv
 
 function conv(x::Value, y::AbstractExpr)
-  if length(size(x)) != 1 || y.size[2] != 1
+  if (size(x,2) != 1 && length(size(x)) != 1) || size(y,2) != 1
     error("convolution only supported between two vectors")
   end
   m = length(x)
@@ -18,3 +18,5 @@ function conv(x::Value, y::AbstractExpr)
   end
   return X*y
 end
+
+conv(x::AbstractExpr, y::Value) = conv(y, x)

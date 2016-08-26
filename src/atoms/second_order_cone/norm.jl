@@ -37,7 +37,7 @@ function norm(x::AbstractExpr, p::Number=2)
   end
 end
 
-function vecnorm(x::AbstractExpr, p::Number=2)
+function vecnorm(x::AbstractExpr, p::Real=2)
   return norm(vec(x), p)
 end
 
