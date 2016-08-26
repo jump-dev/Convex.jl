@@ -236,4 +236,54 @@ facts("SOCP Atoms") do
     @fact evaluate(vecnorm(x, 7)) --> roughly(norm(vec(A), 7), TOL);
     @fact evaluate(vecnorm(x, Inf)) --> roughly(norm(vec(A), Inf), TOL);
   end
+
+  context("norm2 with Complex Variable") do
+    a = 2+4im
+    x = ComplexVariable()
+    objective = norm2(a-x)
+    c1 = real(x)>=0
+    p = minimize(objective,c1)
+    solve!(p)
+    @fact p.optval => roughly(0, TOL)
+    @fact evaluate(objective) => roughly(0, TOL)
+    real_diff = real(x.value) - real(a);
+    imag_diff = imag(x.value) - imag(a);
+    @fact real_diff => roughly(0, TOL)
+    @fact imag_diff => roughly(0, TOL)
+    end
+
+    context("sumsquares with Complex Variable") do
+    a = [2+4im;4+6im]
+    x = ComplexVariable(2)
+    objective = sumsquares(a-x)
+    c1 = real(x)>=0
+    p = minimize(objective,c1)
+    solve!(p)
+    @fact p.optval => roughly(0, TOL)
+    @fact evaluate(objective) => roughly(zeros(1,1), TOL)
+    real_diff = real(x.value) - real(a);
+    imag_diff = imag(x.value) - imag(a);
+    @fact real_diff => roughly(zeros(2,1), TOL)
+    @fact imag_diff => roughly(zeros(2,1), TOL)
+    end
+
+    context("abs with Complex Variable") do
+    a = [5-4im]
+    x = ComplexVariable()
+    objective = abs(a-x)
+    c1 = real(x)>=0
+    p = minimize(objective,c1)
+    solve!(p)
+    @fact p.optval => roughly(0, TOL)
+    @fact evaluate(objective) => roughly(zeros(1), TOL)
+    real_diff = real(x.value) - real(a);
+    imag_diff = imag(x.value) - imag(a);
+    @fact real_diff => roughly(zeros(1), TOL)
+    @fact imag_diff => roughly(zeros(1), TOL)
+    end
+
+
+
+
+
 end
