@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/JuliaOpt/Convex.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/Convex.jl)
 [![Coverage Status](https://coveralls.io/repos/JuliaOpt/Convex.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaOpt/Convex.jl?branch=master)
 
-[![Convex](http://pkg.julialang.org/badges/Convex_0.3.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.3)
 [![Convex](http://pkg.julialang.org/badges/Convex_0.4.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.4)
 [![Convex](http://pkg.julialang.org/badges/Convex_0.5.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.5)
 
