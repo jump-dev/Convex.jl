@@ -116,7 +116,7 @@ function ⪯(x::AbstractExpr, y::AbstractExpr)
 end
 
 function ⪰(x::AbstractExpr, y::Value)
-  if sign(x) == ComplexSign()
+  if sign(x) == ComplexSign() || !isreal(y)
     all(y .== 0) ? SDPConstraint([real(x) -imag(x);imag(x) real(x)]) : SDPConstraint([real(x-Constant(y)) -imag(x-Constant(y));imag(x-Constant(y)) real(x-Constant(y))])
   else
     all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
@@ -125,7 +125,7 @@ function ⪰(x::AbstractExpr, y::Value)
 end
 
 function ⪰(x::Value, y::AbstractExpr)
-  if sign(y) == ComplexSign()
+  if sign(y) == ComplexSign() || !isreal(x)
     all(x .== 0) ? SDPConstraint([real(-y) -imag(-y);imag(-y) real(-y)]) : SDPConstraint([real(Constant(x)-y) -imag(Constant(x)-y);imag(Constant(x)-y) real(Constant(x)-y)])
   else
     all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(Constant(x) - y)
@@ -133,7 +133,7 @@ function ⪰(x::Value, y::AbstractExpr)
 end
 
 function ⪯(x::Value, y::AbstractExpr)
-  if sign(y) == ComplexSign()
+  if sign(y) == ComplexSign() || !isreal(x)
     all(x .== 0) ? SDPConstraint([real(y) -imag(y);imag(y) real(y)]) : SDPConstraint([real(y-Constant(x)) -imag(y-Constant(x));imag(y-Constant(x)) real(y-Constant(x))])
   else
     all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - Constant(x))
@@ -141,7 +141,7 @@ function ⪯(x::Value, y::AbstractExpr)
 end
 
 function ⪯(x::AbstractExpr, y::Value)
-  if sign(x) == ComplexSign()
+  if sign(x) == ComplexSign() || !isreal(y)
     all(y .== 0) ? SDPConstraint([real(-x) -imag(-x);imag(-x) real(-x)]) : SDPConstraint([real(Constant(y)-x) -imag(Constant(y)-x);imag(Constant(y)-x) real(Constant(y)-x)])
   else
     all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(Constant(y) - x)
