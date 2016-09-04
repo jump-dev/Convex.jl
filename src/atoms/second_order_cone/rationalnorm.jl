@@ -123,7 +123,7 @@ function rationalnorm(x::AbstractExpr, k::Rational{Int})
   if sign(x) == ComplexSign()
     row,col = size(x)
     if row == 1 || col == 1
-      return RationalNormAtom(abs(x.children[1]),k)
+      return RationalNormAtom(abs(x),k)
     end
   else
     return RationalNormAtom(x,k)
