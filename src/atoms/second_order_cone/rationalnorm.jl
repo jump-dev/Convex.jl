@@ -118,7 +118,7 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-function rationalnorm(x::AbstractExpr, k::Rational{Int})
+function rationalnorm(x::AbstractExpr, k::Rational{Int32})
   if sign(x) == ComplexSign()
     error("error")
   else
