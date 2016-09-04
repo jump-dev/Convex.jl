@@ -121,11 +121,9 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
 end
 function rationalnorm(x::AbstractExpr, k::Rational{Int})
   if sign(x) == ComplexSign()
-    elements = AbstractExpr[]
     row,col = size(x)
-    for i in 1:length(vec(x))
-      push!(elements,abs(x[i]))
-      return RationalNormAtom(reshape(elements,row,col),k)
+    if row == 1 || col == 1
+      return RationalNormAtom(abx(x.children[1]),k)
     end
   else
     return RationalNormAtom(x,k)
