@@ -121,10 +121,7 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
 end
 function rationalnorm(x::AbstractExpr, k::Rational{Int})
   if sign(x) == ComplexSign()
-    rows, cols = size(x)
-    for i in 1:row
-      for j in 1:cols
-        x[]
+    error("hhf")
   else
     RationalNormAtom(x,k)
   end
