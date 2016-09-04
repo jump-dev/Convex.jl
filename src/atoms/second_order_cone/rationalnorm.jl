@@ -23,13 +23,9 @@ type RationalNormAtom <: AbstractExpr
   k::Rational{Int64}
 
   function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})
-    if sign(x)==ComplexSign()
-      error("First arguments should be real instead it is $(sign(x))")
-    else
-      children = (x,)
-      k >= 1 || error("p-norms not defined for p < 1")
-      return new(:rationalnorm, hash(children), children, (1,1), k)
-    end
+    children = (x,)
+    k >= 1 || error("p-norms not defined for p < 1")
+    return new(:rationalnorm, hash(children), children, (1,1), k)
   end
 end
 
@@ -50,7 +46,13 @@ function evaluate(x::RationalNormAtom)
   return sum(abs(evaluate(x.children[1])).^x.k)^(1/x.k);
 end
 
-rationalnorm(x::AbstractExpr, k::Rational{Int64}) = RationalNormAtom(x, k::Rational{Int64})
+function rationalnorm(x::AbstractExpr, k::Rational{Int64})
+  if sign(x) == ComplexSign()
+    error("error")
+  else
+    RationalNormAtom(x,k)
+  end
+end
 
 # conic_form!(x::RationalNormAtom, unique_conic_forms)
 #
