@@ -24,18 +24,18 @@ type InequalityExpression
   # enumeration of inequalities.
 
   # The powers p_1, p_2, p_3
-  power1::Int64
-  power2::Int64
-  power3::Int64
+  power1::Int
+  power2::Int
+  power3::Int
 
   # Index for variable represented by x in the above equation
-  left_var_ind::Int64
+  left_var_ind::Int
   # Index for variable represented by t
-  t_var_ind::Int64
+  t_var_ind::Int
   # Index for variable represented by s
-  s_var_ind::Int64
+  s_var_ind::Int
   # Index for variable represented by u (may be -1 if power3 == 0).
-  u_var_ind::Int64
+  u_var_ind::Int
 end
 
 type SimpleInequalityExpression
@@ -48,11 +48,11 @@ type SimpleInequalityExpression
   # ProductToSimpleInequalities.
 
   # Index for variable represented by x in the above equation
-  left_var_ind::Int64
+  left_var_ind::Int
   # Index for variable represented by t
-  t_var_ind::Int64
+  t_var_ind::Int
   # Index for variable represented by s
-  s_var_ind::Int64
+  s_var_ind::Int
 end
 
 # ProductToSimpleInequalities(first_power, second_power)
@@ -69,7 +69,7 @@ end
 # SimpleInequalityExpressions that consists of all the variable
 # inequalities, the second of the tuple (the array vars) is an array
 # of all the variable indices in the inequalities.
-function ProductToSimpleInequalities(first_power::Int64, second_power::Int64)
+function ProductToSimpleInequalities(first_power::Int, second_power::Int)
   # Construct the first InequalityExpression, which is an inequality
   # of the form x^n <= t^p1 s^p2.
   assert(first_power > 0 && second_power > 0);
@@ -101,7 +101,7 @@ end
 # once both are fully populated.
 function ReducePowers(curr_inequality::InequalityExpression,
                       ineq_array::Array{SimpleInequalityExpression, 1},
-                      variable_array::Array{Int64, 1})
+                      variable_array::Array{Int, 1})
   ReArrangePowers!(curr_inequality);
   p1 = curr_inequality.power1;
   p2 = curr_inequality.power2;
@@ -175,7 +175,7 @@ end
 # curr_inequality is equal to 1.
 function ReduceThirdZero(curr_inequality::InequalityExpression,
                          ineq_array::Array{SimpleInequalityExpression, 1},
-                         var_array::Array{Int64, 1})
+                         var_array::Array{Int, 1})
   p1 = curr_inequality.power1;
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
@@ -255,7 +255,7 @@ end
 # curr_inequality is equal to 1.
 function ReduceThirdOne(curr_inequality::InequalityExpression,
                         ineq_array::Array{SimpleInequalityExpression, 1},
-                        var_array::Array{Int64, 1})
+                        var_array::Array{Int, 1})
   p1 = curr_inequality.power1;
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
@@ -361,7 +361,7 @@ end
 # curr_inequality is equal to 2.
 function ReduceThirdTwo(curr_inequality::InequalityExpression,
                         ineq_array::Array{SimpleInequalityExpression, 1},
-                        var_array::Array{Int64, 1})
+                        var_array::Array{Int, 1})
   p1 = curr_inequality.power1;
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
