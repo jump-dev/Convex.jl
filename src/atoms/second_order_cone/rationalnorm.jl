@@ -46,6 +46,8 @@ function evaluate(x::RationalNormAtom)
   return sum(abs(evaluate(x.children[1])).^x.k)^(1/x.k);
 end
 
+
+
 # conic_form!(x::RationalNormAtom, unique_conic_forms)
 #
 # Formulate the conic constraint
@@ -117,8 +119,7 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
   end
   return get_conic_form(unique_conic_forms, x)
 end
-
-function rationalnorm(x::AbstractExpr, k::Rational{Int32})
+function rationalnorm(x::AbstractExpr, k::Rational{Int64})
   if sign(x) == ComplexSign()
     error("error")
   else
