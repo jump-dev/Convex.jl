@@ -78,8 +78,8 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
     conic_form!(sum(s) <= t, unique_conic_forms)
 
     # Reduce to SOC constraints (get powers for each element)
-    numerator = num(x.k);
-    denominator = den(x.k);
+    numerator = Int(num(x.k));
+    denominator = Int(den(x.k));
     # Construct list of inequalities of form u^2 <= vw, where the list
     # is given by triples in ineq_list.
     (ineq_list,
