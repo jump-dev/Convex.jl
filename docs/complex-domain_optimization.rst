@@ -38,7 +38,7 @@ Apart from all the linear functions that are listed `here <operations.html#linea
 |:code:`imag(z)`           | imaginary part of       | affine     |increasing     | none                            |
 |                          | complex variable        |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`x'`                | ctranspose              | affine     |increasing     | none                            |
+|:code:`conj(x)'`          | complex conjugate       | affine     |increasing     | none                            |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`innerproduct(x,y)` | real(trace(x'*y))       | affine     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
@@ -47,7 +47,8 @@ Apart from all the linear functions that are listed `here <operations.html#linea
 Second-Order Cone Representable Functions
 *****************************************
 
-Most of the second order cone function listed here operate on complex variables as well except few listed below:
+Most of the second order cone function listed `here <operations.html#second-order-cone-representable-functions>`_ operate on
+complex variables as well. Notable exceptions include:
 
   * inverse 
   * square 
@@ -56,7 +57,7 @@ Most of the second order cone function listed here operate on complex variables 
   * geomean
   * huber
 
-We added a new function  
+One new function is available:  
 
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |operation                   | description                         | vexity     | slope         | notes                    |
@@ -68,7 +69,7 @@ We added a new function
 Semidefinite Program Representable Functions
 ********************************************
 
-Complex variables support all the semidefinite functions same as real variables listed `here <operations.html#semidefinite-program-representable-functions>`_.
+All SDP-representable functions listed `here <operations.html#semidefinite-program-representable-functions>`_ work for complex variables.
 
 
 Exponential + SDP representable Functions
