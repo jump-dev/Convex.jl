@@ -157,22 +157,5 @@ facts("SDP Atoms") do
     println(p1.optval)
   end
   
-  context("SDP with Complex Variables") do
-    n = 10
-    A = rand(n,n) + im*rand(n,n)
-    A = A + A' # now A is hermitian
-    x = ComplexVariable(n,n) 
-    objective = sumsquares(A - x)
-    c1 = x in :SDP
-    p = minimize(objective, c1)
-    solve!(p)
-    # test that X is approximately equal to posA:
-    l,v = eig(A)
-    posA = v*diagm(max(l,0))*v'
-
-    real_diff = real(x.value) - real(posA);
-    imag_diff = imag(x.value) - imag(posA);
-    @fact real_diff => roughly(zeros(n,n), TOL)
-    @fact imag_diff => roughly(zeros(n,n), TOL)
-    end
+  
 end

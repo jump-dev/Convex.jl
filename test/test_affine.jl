@@ -400,46 +400,7 @@ facts("Affine Atoms") do
     end
   end
 
-  context("Real and Complex Equality Constraint give same solution. For real Variable") do
-    n = 10 # variable dimension (parameter)
-    m = 5 # number of constraints (parameter)
-    xo = rand(n)
-    A = randn(m,n) + im*randn(m,n)
-    b = A * xo
-    x = Variable(n)
-    p1 = minimize(sum(x), A*x == b, x>=0)
-    solve!(p1)
-    x1 = x.value
-    
-    p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0)
-    solve!(p2)
-    x2 = x.value
-    @fact x1==x2 => true
-  end
-
-  context("For Complex Variable") do 
-    n = 10 # variable dimension (parameter)
-    m = 5 # number of constraints (parameter)
-    xo = rand(n)+im*rand(n)
-    A = randn(m,n) + im*randn(m,n)
-    b = A * xo
-    x = ComplexVariable(n)
-    p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0)
-    solve!(p1)
-    x1 = x.value
-    
-    xr = Variable(n)
-    xi = Variable(n)
-    p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0)
-    solve!(p2)
-    #x2 = xr.value + im*xi.value
-    real_diff = real(x1) - xr.value
-
-    @fact real_diff => roughly(zeros(10,1), TOL)
-    imag_diff = imag(x1) - xi.value 
-    @fact imag_diff => roughly(zeros(10,1), TOL)
-    #@fact x1==x2 => true
-  end
+  
 
 
 end
