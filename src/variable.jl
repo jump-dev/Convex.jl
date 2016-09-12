@@ -45,11 +45,8 @@ end
 
 ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m,n), ComplexSign(), sets...)
 ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
-  #ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
 ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexSign(), sets...)
 ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
-  #ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
-
 HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :Semidefinite)
 function HermitianSemidefinite(m::Integer, n::Integer)
   if m==n
@@ -76,11 +73,6 @@ end
 function sign(x::Variable)
   return x.sign
 end
-
-# # Added new method to display domain of the variable
-# function domain(x::Variable)
-#   return x.domain
-# end
 
 
 function real_conic_form(x::Variable)

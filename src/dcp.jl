@@ -48,12 +48,6 @@ type NoSign <: Sign                     end
 # Also create a new subtype of Sign "NotDefined to handle the ComplexSign case"
 type ComplexSign <: Sign                 end
 
-# # New code
-# # Domain Subtypes
-# abstract Domain
-# type Real <: Domain                    end
-# type ComplexSign <: Domain                 end
-
 
 -(v::Vexity) = v
 -(v::ConcaveVexity) = ConvexVexity()
@@ -66,12 +60,9 @@ type ComplexSign <: Sign                 end
 -(s::Sign) = s
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
-# New code
 -(s::ComplexSign) = ComplexSign()
 
-# # New Code
-# # Adding rule for Domain
-# -(d::Domain) = d
+
 
 +(v::NotDcp, w::NotDcp) = v
 +(v::NotDcp, w::Vexity) = v
@@ -105,7 +96,6 @@ type ComplexSign <: Sign                 end
 +(s::NoSign, t::Negative) = s
 +(t::Negative, s::NoSign) = s+t
 
-# New code
 # Any sign + ComplexSign = ComplexSign
 +(s::ComplexSign, t::ComplexSign) = s
 +(s::Sign, t::ComplexSign) = t
@@ -120,7 +110,7 @@ type ComplexSign <: Sign                 end
 *(s::Positive, t::Negative) = t
 *(s::Negative, t::Positive) = s
 *(s::Negative, t::Negative) = Positive()
-# New code 
+
 # ComplexSign * Any Sign = NotDefined(Though ComplexSign and its conjugate is real but we ignore that case)
 *(t::ComplexSign, s::ComplexSign) = t
 *(t::ComplexSign, s::Sign) = t
@@ -129,7 +119,7 @@ type ComplexSign <: Sign                 end
 *(s::Positive, m::Monotonicity) = m
 *(s::Negative, m::Monotonicity) = -m
 *(s::NoSign, m::Monotonicity) = NoMonotonicity()
-# New Code
+
 # ComplexSign * Any monotonivity = NoMonotonicity
 *(s::ComplexSign, m::Monotonicity) = NoMonotonicity()
 *(m::Monotonicity, s::Sign) = s * m
@@ -140,7 +130,7 @@ type ComplexSign <: Sign                 end
 *(m::NoMonotonicity, v::ConvexVexity) = NotDcp()
 *(m::NoMonotonicity, v::ConcaveVexity) = NotDcp()
 
-# New Code
+
 # ComplexSign * Affine = Affine
 # ComplexSign * Concave = NotDcp
 # ComplexSign * NotDcp = NotDcp

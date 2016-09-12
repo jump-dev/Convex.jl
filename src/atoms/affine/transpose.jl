@@ -70,10 +70,6 @@ end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
 
-#ctranspose(x::AbstractExpr) = transpose(x)
-#ctranspose(x::Constant) = Constant(x.value')
-#ctranspose(x::Constant) = Constant(x.value')
-
 
 
 type CTransposeAtom <: AbstractExpr
@@ -140,7 +136,6 @@ function conic_form!(x::CTransposeAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-#transpose(x::AbstractExpr) = TransposeAtom(x)
+
 ctranspose(x::AbstractExpr) = CTransposeAtom(x)
 ctranspose(x::Constant) = Constant(x.value')
-#ctranspose(x::Constant) = Constant(x.value')
