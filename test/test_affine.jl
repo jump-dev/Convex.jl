@@ -275,15 +275,7 @@ facts("Affine Atoms") do
   context("vcat atom") do
     x = Variable(4, 4)
     y = Variable(4, 6)
-<<<<<<< HEAD
-    p = maximize(sum(x) + sum([y 4*eye(4); x -ones(4, 6)]), [x, y'] <= 2)
-    @fact vexity(p) --> AffineVexity()
-    solve!(p)
-    # TODO: why is accuracy lower here?
-    @fact p.optval --> roughly(104, 10*TOL)
-    @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) --> roughly(104, 10*TOL)
-    @fact evaluate([x, y']) --> roughly(2*ones(10, 4), TOL)
-=======
+
     p = maximize(sum(x) + sum([y 4*eye(4); x -ones(4, 6)]), [x;y'] <= 2)
     @fact vexity(p) => AffineVexity()
     solve!(p)
@@ -291,7 +283,7 @@ facts("Affine Atoms") do
     @fact p.optval => roughly(104, 10*TOL)
     @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) => roughly(104, 10*TOL)
     @fact evaluate([x; y']) => roughly(2*ones(10, 4), TOL)
->>>>>>> Making tests work for julia 0.5
+
   end
 
   context("diagm atom") do
