@@ -9,6 +9,7 @@ tests_sdp = ["test_sdp.jl"]
 tests_exp = ["test_exp.jl"]
 tests_int = ["test_int.jl"]
 tests_exp_and_sdp = ["test_exp_and_sdp.jl"]
+tests_complex = ["test_complex.jl"]
 
 println("Running tests:")
 
