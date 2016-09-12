@@ -120,7 +120,7 @@ vcat(args::AbstractExpr...) = transpose(HcatAtom([transpose(arg) for arg in args
 vcat(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(AbstractExpr, arg)) for arg in args]...))
 vcat(args::Value...) = Base.cat(1, args...) # Note: this makes general vcat slower for anyone using Convex...
 
-<<<<<<< HEAD
+
 Base.vect{T<:AbstractExpr}(args::T...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
 Base.vect(args::AbstractExpr...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
 Base.vect(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(AbstractExpr,arg)) for arg in args]...))
@@ -135,5 +135,3 @@ else
 
     end
 end
-=======
->>>>>>> Making tests work for julia 0.5
