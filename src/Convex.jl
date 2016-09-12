@@ -34,6 +34,7 @@ include("atoms/affine/trace.jl")
 include("atoms/affine/conv.jl")
 include("atoms/affine/real_imag.jl")
 include("atoms/affine/inner_product.jl")
+include("atoms/affine/conjugate.jl")
 
 ### lp atoms
 include("atoms/lp_cone/abs.jl")
