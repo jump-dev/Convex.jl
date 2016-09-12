@@ -60,3 +60,4 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
 end
 
 abs(x::AbstractExpr) = AbsAtom(x)
+square_modulus(x::AbstractExpr) = square(abs(x))
