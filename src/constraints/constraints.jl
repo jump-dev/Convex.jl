@@ -42,6 +42,7 @@ function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
       expr = c.lhs - c.rhs
       objective = conic_form!(expr, unique_conic_forms)
       new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
+      conic_constr_to_constr[new_constraint] = c
     else
       real_expr = real(c.lhs - c.rhs)
       imag_expr = imag(c.lhs - c.rhs)
