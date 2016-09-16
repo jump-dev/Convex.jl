@@ -27,7 +27,8 @@ Complex Variables in Convex.jl are declared in the same way as the variables are
 Linear Program Representable Functions
 **************************************
 
-Apart from all the linear functions that are listed `here <operations.html#linear-program-representable-functions>`_, we have added new functions:
+All of the linear functions that are listed `here <operations.html#linear-program-representable-functions>`_ operate on
+complex variables as well. In addition, several specialized functions for complex variables are available:
 
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |operation                 | description             | vexity     | slope         | notes                           |
