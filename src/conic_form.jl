@@ -33,7 +33,6 @@ function +(c::ConicObj, d::ConicObj)
     else
       # .+ does not preserve sparsity 
       # need to override behavior
-      #for i in 1:2
       if size(new_obj[var][1]) == size(d[var][1])
         x1 = new_obj[var][1] + d[var][1]
       else
@@ -45,7 +44,6 @@ function +(c::ConicObj, d::ConicObj)
         x2 = broadcast(+, new_obj[var][2], d[var][2])
       end
       new_obj[var] = (x1,x2)
-      #end
     end
   end
   return new_obj
