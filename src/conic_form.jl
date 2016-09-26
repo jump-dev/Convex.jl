@@ -35,16 +35,16 @@ function +(c::ConicObj, d::ConicObj)
       # need to override behavior
       #for i in 1:2
       if size(new_obj[var][1]) == size(d[var][1])
-        x = new_obj[var][1] + d[var][1]
+        x1 = new_obj[var][1] + d[var][1]
       else
-        x = broadcast(+, new_obj[var][1], d[var][1])
+        x1 = broadcast(+, new_obj[var][1], d[var][1])
       end
       if size(new_obj[var][2]) == size(d[var][2])
-        y = new_obj[var][2] + d[var][2]
+        x2 = new_obj[var][2] + d[var][2]
       else
-        y = broadcast(+, new_obj[var][2], d[var][2])
+        x2 = broadcast(+, new_obj[var][2], d[var][2])
       end
-      new_obj[var] = (x,y)
+      new_obj[var] = (x1,x2)
       #end
     end
   end
