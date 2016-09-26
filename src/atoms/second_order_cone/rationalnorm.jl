@@ -22,7 +22,7 @@ type RationalNormAtom <: AbstractExpr
   size::Tuple{Int, Int}
   k::Rational{Int64}
 
-  function RationalNormAtom(x::AbstractExpr, k::Rational{Int64})
+  function RationalNormAtom(x::AbstractExpr, k::Rational{Int})
     children = (x,)
     k >= 1 || error("p-norms not defined for p < 1")
     return new(:rationalnorm, hash(children), children, (1,1), k)
@@ -46,7 +46,7 @@ function evaluate(x::RationalNormAtom)
   return sum(abs(evaluate(x.children[1])).^x.k)^(1/x.k);
 end
 
-rationalnorm(x::AbstractExpr, k::Rational{Int64}) = RationalNormAtom(x, k::Rational{Int64})
+
 
 # conic_form!(x::RationalNormAtom, unique_conic_forms)
 #
@@ -78,8 +78,8 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
     conic_form!(sum(s) <= t, unique_conic_forms)
 
     # Reduce to SOC constraints (get powers for each element)
-    numerator = num(x.k);
-    denominator = den(x.k);
+    numerator = Int(num(x.k));
+    denominator = Int(den(x.k));
     # Construct list of inequalities of form u^2 <= vw, where the list
     # is given by triples in ineq_list.
     (ineq_list,
@@ -118,4 +118,14 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, obj)
   end
   return get_conic_form(unique_conic_forms, x)
+end
+function rationalnorm(x::AbstractExpr, k::Rational{Int})
+  if sign(x) == ComplexSign()
+    row,col = size(x)
+    if row == 1 || col == 1
+      return RationalNormAtom(abs(x),k)
+    end
+  else
+    return RationalNormAtom(x,k)
+  end
 end

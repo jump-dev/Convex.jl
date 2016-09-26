@@ -86,16 +86,24 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
     # from each child objective, and then vertically concatenating them
     objective = ConicObj()
     for (id, col_size) in variable_to_sizes
-      value_list = Value[]
+      #temp_tuple = Tuple{Value,Value}
+      x1_value_list = Value[]
+      x2_value_list = Value[]
+
       for i in 1:length(objectives)
         row_size = get_vectorized_size(x.children[i])
         if haskey(objectives[i], id)
-          push!(value_list, objectives[i][id])
+          push!(x1_value_list, objectives[i][id][1])
+          push!(x2_value_list, objectives[i][id][2])
         else
-          push!(value_list, spzeros(row_size, col_size))
+          push!(x1_value_list, spzeros(row_size, col_size))
+          push!(x2_value_list, spzeros(row_size, col_size))
         end
       end
-      objective[id] = vcat(value_list...)
+      x1 = vcat(x1_value_list...)
+      x2 = vcat(x2_value_list...)
+      objective[id] = (x1,x2)
+
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
@@ -108,18 +116,22 @@ hcat(args::Value...) = Base.cat(2, args...)
 
 
 # TODO: implement vertical concatenation in a more efficient way
-vcat(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
-vcat(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr, arg)' for arg in args]...)'
+vcat(args::AbstractExpr...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
+vcat(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(AbstractExpr, arg)) for arg in args]...))
 vcat(args::Value...) = Base.cat(1, args...) # Note: this makes general vcat slower for anyone using Convex...
-Base.vect{T<:AbstractExpr}(args::T...) = HcatAtom([arg' for arg in args]...)'
-Base.vect(args::AbstractExpr...) = HcatAtom([arg' for arg in args]...)'
-Base.vect(args::AbstractExprOrValue...) = HcatAtom([convert(AbstractExpr,arg)' for arg in args]...)'
+
+
+Base.vect{T<:AbstractExpr}(args::T...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
+Base.vect(args::AbstractExpr...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
+Base.vect(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(AbstractExpr,arg)) for arg in args]...))
 if Base._oldstyle_array_vcat_
-    # This is ugly, because the method redefines simple cases like [1,2,3]
-    Base.vect(args::Value...) = Base.vcat(args...)
+  Base.vect(args::Value...) = Base.vcat(args...)
+  # This is ugly, because the method redefines simple cases like [1,2,3]
+        
 else
     function Base.vect(args::Value...)
         T = Base.promote_typeof(args...)
         return copy!(Array{T}(length(args)), args)
+
     end
 end

@@ -1,4 +1,5 @@
 export SOCConstraint, SOCElemConstraint, conic_form!
+export socp
 
 # TODO: Document this. How is this different from SOCElemConstraint? Why do we need both. How does
 # conic form work for SOC constraints.
@@ -25,6 +26,9 @@ function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
   end
   return get_conic_form(unique_conic_forms, c)
 end
+
+# For debugging created this constraint
+socp(args::AbstractExpr...) = SOCConstraint(args::AbstractExpr...)
 
 type SOCElemConstraint <: Constraint
   head::Symbol

@@ -50,4 +50,10 @@ function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-norm2(x::AbstractExpr) = EucNormAtom(x)
+function norm2(x::AbstractExpr)
+  if sign(x) == ComplexSign()
+    return EucNormAtom([real(x);imag(x)])
+  else 
+    return EucNormAtom(x)
+  end
+end

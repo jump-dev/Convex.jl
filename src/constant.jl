@@ -3,7 +3,7 @@
 # Defines Constant, which is a subtype of AbstractExpr
 #############################################################################
 export Constant
-export vexity, evaluate, sign, conic_form!
+export vexity, evaluate, sign, domain, conic_form!
 
 type Constant <: AbstractExpr
   head::Symbol
@@ -20,7 +20,9 @@ type Constant <: AbstractExpr
 
   function Constant(x::Value, check_sign::Bool=true)
     if check_sign
-      if all(x .>= 0)
+      if is_complex(x)
+        return Constant(x, ComplexSign())
+      elseif all(x .>= 0)
         return Constant(x, Positive())
       elseif all(x .<= 0)
         return Constant(x, Negative())
@@ -28,7 +30,20 @@ type Constant <: AbstractExpr
     end
     return Constant(x, NoSign())
   end
+
+  function is_complex(x::Value)
+    temp = false
+    y = x + 0im
+    for z in y
+      if z.im != 0
+        temp = true
+        break
+      end
+    end
+    return temp    
+  end
 end
+#### Constant Definition end   ##### 
 
 function vexity(x::Constant)
   return x.vexity
@@ -42,10 +57,23 @@ function sign(x::Constant)
   return x.sign
 end
 
+
+function real_conic_form(x::Constant)
+  return vec([real(x.value);])
+end
+
+function imag_conic_form(x::Constant)
+  return im*vec([imag(x.value);])
+end
+
+
+  
 function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
+    #real_Value = real_conic_form(x)
+    #imag_Value = imag_conic_form(x) 
     objective = ConicObj()
-    objective[object_id(:constant)] = vec([x.value;])
+    objective[object_id(:constant)] = (real_conic_form(x), imag_conic_form(x))
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)

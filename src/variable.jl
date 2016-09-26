@@ -3,7 +3,7 @@
 # Defines Variable, which is a subtype of AbstractExpr
 #############################################################################
 
-export Variable, Semidefinite
+export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
 type Variable <: AbstractExpr
@@ -14,6 +14,7 @@ type Variable <: AbstractExpr
   vexity::Vexity
   sign::Sign
   sets::Array{Symbol,1}
+
 
   function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
@@ -28,6 +29,9 @@ type Variable <: AbstractExpr
   Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), sets...)
   Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
   Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
+  
+  
+
 end
 
 Semidefinite(m::Integer) = Variable((m,m), :Semidefinite)
@@ -36,6 +40,19 @@ function Semidefinite(m::Integer, n::Integer)
     return Variable((m,m), :Semidefinite)
   else
     error("Semidefinite matrices must be square")
+  end
+end
+
+ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m,n), ComplexSign(), sets...)
+ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
+ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexSign(), sets...)
+ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
+HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :Semidefinite)
+function HermitianSemidefinite(m::Integer, n::Integer)
+  if m==n
+    return ComplexVariable((m,m), :Semidefinite)
+  else
+    error("HermitianSemidefinite matrices must be square")
   end
 end
 
@@ -57,21 +74,37 @@ function sign(x::Variable)
   return x.sign
 end
 
+
+function real_conic_form(x::Variable)
+  vec_size = get_vectorized_size(x)
+  return speye(vec_size)
+end
+
+function imag_conic_form(x::Variable)
+  vec_size = get_vectorized_size(x)
+  if x.sign == ComplexSign()
+    return im*speye(vec_size)
+  else
+    return spzeros(vec_size, vec_size)
+  end
+end
+
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     if :fixed in x.sets
       # do exactly what we would for a constant
       objective = ConicObj()
-      objective[object_id(:constant)] = vec([x.value;])
+      objective[object_id(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
       cache_conic_form!(unique_conic_forms, x, objective)
     else
       objective = ConicObj()
       vec_size = get_vectorized_size(x)
-      objective[x.id_hash] = speye(vec_size)
-      objective[object_id(:constant)] = spzeros(vec_size, 1)
+
+      objective[x.id_hash] = (real_conic_form(x), imag_conic_form(x))
+      objective[object_id(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
       # placeholder values in unique constraints prevent infinite recursion depth
       cache_conic_form!(unique_conic_forms, x, objective)
-      if !(x.sign == NoSign())
+      if !(x.sign == NoSign() || x.sign == ComplexSign())
         conic_form!(x.sign, x, unique_conic_forms)
       end
       for set in x.sets
@@ -102,3 +135,4 @@ function free!(x::Variable)
   x.vexity = AffineVexity()
   x
 end
+

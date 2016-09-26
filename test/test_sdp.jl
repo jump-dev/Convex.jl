@@ -156,4 +156,6 @@ facts("SDP Atoms") do
 
     println(p1.optval)
   end
+  
+  
 end

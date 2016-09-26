@@ -20,9 +20,13 @@ type EntropyAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function EntropyAtom(x::AbstractExpr)
-    children = (x,)
-    # TODO check positivity or enforce it
-    return new(:entropy, hash(children), children, size(x))
+    if sign(x)==ComplexSign()
+      error("The argument should be real but it's instead complex")
+    else
+      children = (x,)
+      # TODO check positivity or enforce it
+      return new(:entropy, hash(children), children, size(x))
+    end
   end
 end
 

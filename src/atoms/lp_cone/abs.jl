@@ -6,7 +6,7 @@
 #############################################################################
 
 import Base.abs
-export abs
+export abs, square_modulus
 export sign, curvature, monotonicity, evaluate
 
 ### Absolute Value
@@ -39,16 +39,25 @@ function evaluate(x::AbsAtom)
   return abs(evaluate(x.children[1]))
 end
 
-abs(x::AbstractExpr) = AbsAtom(x)
+
 
 function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     c = x.children[1]
     t = Variable(size(c))
     objective = conic_form!(t, unique_conic_forms)
-    conic_form!(c<=t, unique_conic_forms)
-    conic_form!(c>=-t, unique_conic_forms)
+    if sign(x.children[1]) == ComplexSign()
+      for i in length(vec(t))
+        conic_form!(t[i]>=norm2([real(c[i]);imag(c[i])]), unique_conic_forms)
+      end
+    else 
+      conic_form!(c<=t, unique_conic_forms)
+      conic_form!(c>=-t, unique_conic_forms)
+    end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
 end
+
+abs(x::AbstractExpr) = AbsAtom(x)
+square_modulus(x::AbstractExpr) = square(abs(x))

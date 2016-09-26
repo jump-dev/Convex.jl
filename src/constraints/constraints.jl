@@ -37,10 +37,20 @@ end
 
 function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, c)
-    expr = c.lhs - c.rhs
-    objective = conic_form!(expr, unique_conic_forms)
-    new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-    conic_constr_to_constr[new_constraint] = c
+    if !(sign(c.lhs) == ComplexSign() || sign(c.rhs) == ComplexSign())
+    
+      expr = c.lhs - c.rhs
+      objective = conic_form!(expr, unique_conic_forms)
+      new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
+      conic_constr_to_constr[new_constraint] = c
+    else
+      real_expr = real(c.lhs - c.rhs)
+      imag_expr = imag(c.lhs - c.rhs)
+      real_objective = conic_form!(real_expr, unique_conic_forms)
+      imag_objective = conic_form!(imag_expr, unique_conic_forms)
+      new_constraint = ConicConstr([real_objective, imag_objective], :Zero, [c.size[1] * c.size[2], c.size[1] * c.size[2]])
+      conic_constr_to_constr[new_constraint] = c
+    end
     cache_conic_form!(unique_conic_forms, c, new_constraint)
   end
   return get_conic_form(unique_conic_forms, c)
@@ -61,12 +71,16 @@ type LtConstraint <: Constraint
   dual::ValueOrNothing
 
   function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if lhs.size == rhs.size || lhs.size == (1, 1)
-      sz = rhs.size
-    elseif rhs.size == (1, 1)
-      sz = lhs.size
+    if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
+      error("Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
     else
-      error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      if lhs.size == rhs.size || lhs.size == (1, 1)
+        sz = rhs.size
+      elseif rhs.size == (1, 1)
+        sz = lhs.size
+      else
+        error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      end
     end
     id_hash = hash((lhs, rhs, :(<=)))
     return new(:(<=), id_hash, lhs, rhs, sz, nothing)
@@ -109,12 +123,16 @@ type GtConstraint <: Constraint
   dual::ValueOrNothing
 
   function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
-    if lhs.size == rhs.size || lhs.size == (1, 1)
-      sz = rhs.size
-    elseif rhs.size == (1, 1)
-      sz = lhs.size
+    if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
+      error("Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
     else
-      error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      if lhs.size == rhs.size || lhs.size == (1, 1)
+        sz = rhs.size
+      elseif rhs.size == (1, 1)
+        sz = lhs.size
+      else
+        error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+      end
     end
     id_hash = hash((lhs, rhs, :(>=)))
     return new(:(>=), id_hash, lhs, rhs, sz, nothing)

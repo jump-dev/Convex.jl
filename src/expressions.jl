@@ -68,6 +68,8 @@ function vexity(x::AbstractExpr)
   return vex
 end
 
+
+
 # This function should never be reached
 function monotonicity(x::AbstractExpr)
   error("monotonicity not implemented for $(x.head).")
