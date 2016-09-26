@@ -2,7 +2,6 @@ import MathProgBase
 
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
-export conic_problem
 
 typealias Float64OrNothing Union{Float64, Void}
 
@@ -28,10 +27,15 @@ type Problem
   solution::Solution
 
   function Problem(head::Symbol, objective::AbstractExpr,  
-                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])
-    return new(head, objective, constraints, "not yet solved", nothing, model)
+                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])  
+    if sign(objective)== Convex.ComplexSign()
+      error("Objective can not be a complex expression")
+    else
+      return new(head, objective, constraints, "not yet solved", nothing, model)
+    end
   end
 end
+
 # constructor if model is not specified
 function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[], 
                  solver::MathProgBase.AbstractMathProgSolver = get_default_solver())
@@ -53,8 +57,13 @@ function find_variable_ranges(constraints)
       for (id, val) in constraint.objs[i]
         if !haskey(var_to_ranges, id) && id != object_id(:constant)
           var = id_to_variables[id]
-          var_to_ranges[id] = (index + 1, index + get_vectorized_size(var))
-          index += get_vectorized_size(var)
+          if var.sign == ComplexSign()
+            var_to_ranges[id] = (index + 1, index + 2*get_vectorized_size(var))
+            index += 2*get_vectorized_size(var)
+          else 
+            var_to_ranges[id] = (index + 1, index + get_vectorized_size(var))
+            index += get_vectorized_size(var)
+          end
         end
       end
       constr_size += constraint.sizes[i]
@@ -95,20 +104,34 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
 end
 
 function conic_problem(p::Problem)
-  if get_vectorized_size(p.objective) != 1
+  if  get_vectorized_size(p.objective) != 1
     error("Objective must be a scalar")
   end
+  
+  # conic problems have the form 
+  # minimize c'*x
+  # st       b - Ax \in cones
+  # our job is to take the conic forms of the objective and constraints
+  # and convert them into vectors b and c and a matrix A
+  # one chunk of rows in b and in A corresponds to each constraint,
+  # and one chunk of columns in b and A corresponds to each variable,
+  # with the size of the chunk determined by the size of the constraint or of the variable
+  
   # A map to hold unique constraints. Each constraint is keyed by a symbol
   # of which atom generated the constraints, and a integer hash of the child
   # expressions used by the atom
   unique_conic_forms = UniqueConicForms()
   objective, objective_var_id = conic_form!(p, unique_conic_forms)
   constraints = unique_conic_forms.constr_list
+  # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
+  # var_size is the sum of the lengths of all variables in the problem
+  # constr_size is the sum of the lengths of all constraints in the problem
   var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
   c = spzeros(var_size, 1)
   objective_range = var_to_ranges[objective_var_id]
   c[objective_range[1]:objective_range[2]] = 1
 
+  # slot in all of the coefficients in the conic forms into A and b
   A = spzeros(constr_size, var_size)
   b = spzeros(constr_size, 1)
   cones = Tuple{Symbol, UnitRange{Int}}[]
@@ -119,10 +142,18 @@ function conic_problem(p::Problem)
       sz = constraint.sizes[i]
       for (id, val) in constraint.objs[i]
         if id == object_id(:constant)
-          b[constr_index + 1 : constr_index + sz] = val
+          for l in 1:sz
+            b[constr_index + l] = val[1][l]==0 ? val[2][l]:val[1][l]
+          end
+          #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
         else
           var_range = var_to_ranges[id]
-          A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val
+          if id_to_variables[id].sign == ComplexSign()
+            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + get_vectorized_size(id_to_variables[id])-1] = -val[1]
+            A[constr_index + 1 : constr_index + sz, var_range[1] + get_vectorized_size(id_to_variables[id]) : var_range[2]] = -val[2]
+          else
+            A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
+          end
         end
       end
       constr_index += sz

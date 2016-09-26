@@ -1,6 +1,7 @@
 import Base.dot, Base.vecdot
 export vecdot, dot
 
+
 vecdot(x::AbstractExpr, y::AbstractExpr) = sum(x .* y)
 vecdot(x::Value, y::AbstractExpr) = sum(Constant(x) .* y)
 vecdot(x::AbstractExpr, y::Value) = sum(x .* Constant(y))
@@ -23,3 +24,4 @@ function ismatrix(x)
 	end
 	return true
 end
+

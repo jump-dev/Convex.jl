@@ -19,7 +19,7 @@ function norm(x::AbstractExpr, p::Number=2)
       return norm_inf(x)
     elseif p > 1
       # TODO: allow tolerance in the rationalize step
-      return rationalnorm(x, rationalize(Int64, float(p)))
+      return rationalnorm(x, rationalize(Int, float(p)))
     else
       error("vector p-norms not defined for p < 1")
     end

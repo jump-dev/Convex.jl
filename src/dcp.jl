@@ -13,7 +13,7 @@
 import Base.-, Base.+, Base.*
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
-export Sign, Positive, Negative, NoSign
+export Sign, Positive, Negative, NoSign, ComplexSign
 export -, +, *
 
 # Vexity subtypes
@@ -43,6 +43,12 @@ type Positive <: Sign                   end
 type Negative <: Sign                   end
 type NoSign <: Sign                     end
 
+# New coded
+
+# Also create a new subtype of Sign "NotDefined to handle the ComplexSign case"
+type ComplexSign <: Sign                 end
+
+
 -(v::Vexity) = v
 -(v::ConcaveVexity) = ConvexVexity()
 -(v::ConvexVexity) = ConcaveVexity()
@@ -54,6 +60,9 @@ type NoSign <: Sign                     end
 -(s::Sign) = s
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
+-(s::ComplexSign) = ComplexSign()
+
+
 
 +(v::NotDcp, w::NotDcp) = v
 +(v::NotDcp, w::Vexity) = v
@@ -76,25 +85,43 @@ type NoSign <: Sign                     end
 +(v::ConcaveVexity, w::ConvexVexity) = NotDcp()
 +(v::ConvexVexity, w::ConcaveVexity) = NotDcp()
 
+#+(::Convex.Positive, ::Convex.NoSign)
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
 +(s::Positive, t::Negative) = NoSign()
 +(s::Negative, t::Positive) = NoSign()
 +(s::NoSign, t::NoSign) = s
-+(s::NoSign, t::Sign) = s
-+(s::Sign, t::NoSign) = t
++(s::NoSign, t::Positive) = s
++(t::Positive, s::NoSign) = s+t
++(s::NoSign, t::Negative) = s
++(t::Negative, s::NoSign) = s+t
+
+# Any sign + ComplexSign = ComplexSign
++(s::ComplexSign, t::ComplexSign) = s
++(s::Sign, t::ComplexSign) = t
++(t::ComplexSign, s::Sign) = s+t
 
 *(s::NoSign, t::NoSign) = s
-*(s::NoSign, t::Sign) = s
-*(s::Sign, t::NoSign) = t
+*(s::NoSign, t::Positive) = s
+*(s::Positive, t::NoSign) = t
+*(s::NoSign, t::Negative) = s
+*(s::Negative, t::NoSign) = t
 *(s::Positive, t::Positive) = s
 *(s::Positive, t::Negative) = t
 *(s::Negative, t::Positive) = s
 *(s::Negative, t::Negative) = Positive()
 
+# ComplexSign * Any Sign = NotDefined(Though ComplexSign and its conjugate is real but we ignore that case)
+*(t::ComplexSign, s::ComplexSign) = t
+*(t::ComplexSign, s::Sign) = t
+*(s::Sign, t::ComplexSign) = t
+
 *(s::Positive, m::Monotonicity) = m
 *(s::Negative, m::Monotonicity) = -m
 *(s::NoSign, m::Monotonicity) = NoMonotonicity()
+
+# ComplexSign * Any monotonivity = NoMonotonicity
+*(s::ComplexSign, m::Monotonicity) = NoMonotonicity()
 *(m::Monotonicity, s::Sign) = s * m
 
 *(m::Nondecreasing, v::Vexity) = v
@@ -102,3 +129,15 @@ type NoSign <: Sign                     end
 *(m::NoMonotonicity, v::Vexity) = v
 *(m::NoMonotonicity, v::ConvexVexity) = NotDcp()
 *(m::NoMonotonicity, v::ConcaveVexity) = NotDcp()
+
+
+# ComplexSign * Affine = Affine
+# ComplexSign * Concave = NotDcp
+# ComplexSign * NotDcp = NotDcp
+# ComplexSign * NotDcp = NotDcp
+*(s::ComplexSign, v::ConstVexity) = v
+*(s::ComplexSign, v::AffineVexity) = v
+*(s::ComplexSign, v::ConvexVexity) = NotDcp()
+*(s::ComplexSign, v::ConcaveVexity) = NotDcp()
+*(s::ComplexSign, v::NotDcp) = v
+*(v::Vexity, s::ComplexSign) = s*v

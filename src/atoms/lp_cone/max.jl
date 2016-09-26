@@ -16,16 +16,20 @@ type MaxAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function MaxAtom(x::AbstractExpr, y::AbstractExpr)
-    if x.size == y.size
-      sz = x.size
-    elseif x.size == (1, 1)
-      sz = y.size
-    elseif y.size == (1, 1)
-      sz = x.size
-    else
-      error("Got different sizes for x as $(x.size) and y as $(y.size)")
+    if sign(x)==ComplexSign() || sign(y)==ComplexSign()
+      error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
+    else 
+      if x.size == y.size
+        sz = x.size
+      elseif x.size == (1, 1)
+        sz = y.size
+      elseif y.size == (1, 1)
+        sz = x.size
+      else
+        error("Got different sizes for x as $(x.size) and y as $(y.size)")
+      end
     end
-
+    
     children = (x, y)
     return new(:max, hash(children), children, sz)
   end

@@ -7,7 +7,7 @@
 #############################################################################
 
 import Base.*, Base.(.*), Base./, Base.(./)
-export *, .*
+export *, .*, /, ./
 export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication

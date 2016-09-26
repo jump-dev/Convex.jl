@@ -18,8 +18,12 @@ type LogAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function LogAtom(x::AbstractExpr)
-    children = (x,)
-    return new(:log, hash(children), children, x.size)
+    if sign(x)==ComplexSign()
+      error("The argument should be real but it's instead complex")
+    else 
+      children = (x,)
+      return new(:log, hash(children), children, x.size)
+    end
   end
 end
 

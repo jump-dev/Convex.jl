@@ -86,6 +86,7 @@ end
 
 function sign(x::AdditionAtom)
   return sum(Sign[sign(child) for child in x.children])
+  # Creating an array of type Sign and adding all the sign of xhildren of x so if anyone is complex the resultant sign would be complex.
 end
 
 function monotonicity(x::AdditionAtom)

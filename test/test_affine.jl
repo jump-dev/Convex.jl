@@ -275,13 +275,15 @@ facts("Affine Atoms") do
   context("vcat atom") do
     x = Variable(4, 4)
     y = Variable(4, 6)
-    p = maximize(sum(x) + sum([y 4*eye(4); x -ones(4, 6)]), [x, y'] <= 2)
-    @fact vexity(p) --> AffineVexity()
+
+    p = maximize(sum(x) + sum([y 4*eye(4); x -ones(4, 6)]), [x;y'] <= 2)
+    @fact vexity(p) => AffineVexity()
     solve!(p)
     # TODO: why is accuracy lower here?
-    @fact p.optval --> roughly(104, 10*TOL)
-    @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) --> roughly(104, 10*TOL)
-    @fact evaluate([x, y']) --> roughly(2*ones(10, 4), TOL)
+    @fact p.optval => roughly(104, 10*TOL)
+    @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) => roughly(104, 10*TOL)
+    @fact evaluate([x; y']) => roughly(2*ones(10, 4), TOL)
+
   end
 
   context("diagm atom") do
@@ -389,4 +391,8 @@ facts("Affine Atoms") do
         @fact all(abs(p.constraints[1].dual - dual) .<= TOL) --> true
     end
   end
+
+  
+
+
 end
