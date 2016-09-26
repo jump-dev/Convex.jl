@@ -68,10 +68,6 @@ function vexity(x::AbstractExpr)
   return vex
 end
 
-# function real_or_complex(x::AbstractExpr)
-  
-# end
-
 
 
 # This function should never be reached
