@@ -18,9 +18,9 @@ ConicObj = DataStructures.OrderedDict{UInt64, Tuple{Value,Value}}
 function -(c::ConicObj)
   new_obj = copy(c)
   for var in keys(new_obj)
-    x = new_obj[var][1]*(-1)
-    y =  new_obj[var][2]*(-1)
-    new_obj[var] = (x,y)
+    x1 = new_obj[var][1]*(-1)
+    x2 =  new_obj[var][2]*(-1)
+    new_obj[var] = (x1,x2)
   end
   return new_obj
 end
@@ -63,9 +63,9 @@ function *(v::Value, c::ConicObj)
   # TODO: this part is time consuming, esp new_obj[var] = v * new_obj[var]...
   new_obj = copy(c)
   for var in keys(new_obj)
-    x = v * new_obj[var][1]
-    y = v * new_obj[var][2]
-    new_obj[var] = (x,y)
+    x1 = v * new_obj[var][1]
+    x2 = v * new_obj[var][2]
+    new_obj[var] = (x1,x2)
   end
   return new_obj
 end
@@ -73,11 +73,9 @@ end
 function promote_size(c::ConicObj, vectorized_size::Int)
   new_obj = copy(c)
   for var in keys(new_obj)
-    #for i in 1:2
-      x = repmat(new_obj[var][1], vectorized_size, 1)
-      y = repmat(new_obj[var][2], vectorized_size, 1)
-      new_obj[var] = (x,y)
-    #end
+      x1 = repmat(new_obj[var][1], vectorized_size, 1)
+      x2 = repmat(new_obj[var][2], vectorized_size, 1)
+      new_obj[var] = (x1,x2)
   end
   return new_obj
 end
