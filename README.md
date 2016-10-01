@@ -6,7 +6,7 @@
 [![Convex](http://pkg.julialang.org/badges/Convex_0.4.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.4)
 [![Convex](http://pkg.julialang.org/badges/Convex_0.5.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.5)
 
-**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface.
+**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface. It also supports optimization with complex variables and coefficients.
 
 **Installation**: `julia> Pkg.add("Convex")`
 
@@ -45,6 +45,7 @@ problem.optval
 ## More Examples
 A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). 
 The [basic usage notebook](http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl
+A use case of the package in complex-domain optimization can be found [here](https://github.com/JuliaOpt/Convex.jl/tree/master/examples/optimization_with_complex_variables).
 
 
 ## Citing this package
