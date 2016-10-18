@@ -40,11 +40,3 @@ end
 function vecnorm(x::AbstractExpr, p::Real=2)
   return norm(vec(x), p)
 end
-
-function norm(x::AbstractExpr, p::Symbol)
-  if p == :fro
-    return norm(vec(x), 2)
-  else
-    error("$p norm is not defined")
-  end
-end
