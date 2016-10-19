@@ -28,7 +28,7 @@ facts("SOCP Atoms") do
     x = Variable(2)
 
     p = minimize(norm2([x[1] + 2x[2] + 2; 2x[1] + x[2] + 3; 3x[1]+4x[2] + 4]) + lambda * norm2(x), x >= 1)
-    @fact vexity(p) => ConvexVexity()
+    @fact vexity(p) --> ConvexVexity()
 
     solve!(p)
     @fact p.optval --> roughly(14.9049, TOL)
@@ -100,10 +100,10 @@ facts("SOCP Atoms") do
     @fact evaluate(sum(expr.^2)) --> roughly(0.42105, TOL)
 
     p = minimize(sum(expr .* expr))
-    @fact vexity(p) => ConvexVexity()
+    @fact vexity(p) --> ConvexVexity()
     solve!(p)
-    @fact p.optval => roughly(0.42105, TOL)
-    @fact evaluate(sum(expr .* expr)) => roughly(0.42105, TOL)
+    @fact p.optval --> roughly(0.42105, TOL)
+    @fact evaluate(sum(expr .* expr)) --> roughly(0.42105, TOL)
   end
 
   context("inv pos atom") do
@@ -125,8 +125,8 @@ facts("SOCP Atoms") do
     p = minimize(sum([3,6,9]/x), x<=3)
     solve!(p)
     @fact x.value --> roughly(3, TOL)
-    @fact p.optval --> roughly(6, TOL)    
-    @fact evaluate(sum([3,6,9]/x)) --> roughly(6, TOL)    
+    @fact p.optval --> roughly(6, TOL)
+    @fact evaluate(sum([3,6,9]/x)) --> roughly(6, TOL)
   end
 
   context("geo mean atom") do
@@ -239,5 +239,5 @@ facts("SOCP Atoms") do
     @fact evaluate(vecnorm(x, Inf)) --> roughly(norm(vec(A), Inf), TOL);
   end
 
-  
+
 end

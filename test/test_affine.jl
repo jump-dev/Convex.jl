@@ -224,6 +224,20 @@ facts("Affine Atoms") do
     @fact p.optval --> roughly(1, TOL)
     @fact evaluate(x[1, 1])[1] --> roughly(1, TOL)
 
+    x = Variable(3,1)
+    p = minimize(sum(ones(3,3).*x), x>=1)
+    @fact vexity(p) --> AffineVexity()
+    solve!(p)
+    @fact p.optval --> roughly(9, TOL)
+    @fact evaluate(x[1, 1])[1] --> roughly(1, TOL)
+
+    x = Variable(1,3)
+    p = minimize(sum(ones(3,3).*x), x>=1)
+    @fact vexity(p) --> AffineVexity()
+    solve!(p)
+    @fact p.optval --> roughly(9, TOL)
+    @fact evaluate(x[1, 1])[1] --> roughly(1, TOL)
+
     x = Variable(1, 3, Positive())
     p = maximize(sum(x./[1 2 3]), x<=1)
     @fact vexity(p) --> AffineVexity()
@@ -277,12 +291,12 @@ facts("Affine Atoms") do
     y = Variable(4, 6)
 
     p = maximize(sum(x) + sum([y 4*eye(4); x -ones(4, 6)]), [x;y'] <= 2)
-    @fact vexity(p) => AffineVexity()
+    @fact vexity(p) --> AffineVexity()
     solve!(p)
     # TODO: why is accuracy lower here?
-    @fact p.optval => roughly(104, 10*TOL)
-    @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) => roughly(104, 10*TOL)
-    @fact evaluate([x; y']) => roughly(2*ones(10, 4), TOL)
+    @fact p.optval --> roughly(104, 10*TOL)
+    @fact evaluate(sum(x) + sum([y 4*eye(4); x -ones(4, 6)])) --> roughly(104, 10*TOL)
+    @fact evaluate([x; y']) --> roughly(2*ones(10, 4), TOL)
 
   end
 
@@ -392,7 +406,7 @@ facts("Affine Atoms") do
     end
   end
 
-  
+
 
 
 end
