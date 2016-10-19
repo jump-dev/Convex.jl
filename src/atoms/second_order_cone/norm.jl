@@ -1,6 +1,7 @@
 import Base.norm, Base.vecnorm
 export norm_inf, norm, norm_1, vecnorm
 
+# deprecate these soon
 norm_inf(x::AbstractExpr) = maximum(abs(x))
 norm_1(x::AbstractExpr) = sum(abs(x))
 norm_fro(x::AbstractExpr) = norm2(vec(x))
@@ -23,7 +24,7 @@ function norm(x::AbstractExpr, p::Number=2)
     else
       error("vector p-norms not defined for p < 1")
     end
-  else 
+  else
     # x is a matrix
     if p == 1
       return maximum(sum(abs(x), 1))
@@ -39,12 +40,4 @@ end
 
 function vecnorm(x::AbstractExpr, p::Real=2)
   return norm(vec(x), p)
-end
-
-function norm(x::AbstractExpr, p::Symbol)
-  if p == :fro
-    return norm(vec(x), 2)
-  else
-    error("$p norm is not defined")
-  end
 end
