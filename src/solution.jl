@@ -26,6 +26,15 @@ function solve!(problem::Problem;
 
   # load MPB conic problem
   m = problem.model
+  if !verbose
+    if length(m.options) == 0
+      m.options = Dict{Symbol,Any}(:verbose => false)
+    elseif isa(m.options, Dict)
+      m.options[:verbose] = false
+    else
+      warn("Don't know how to turn of verbosity of SCS")
+    end
+  end
   load_problem!(m, c, A, b, cones, vartypes)
   if warmstart
     set_warmstart!(m, problem, length(c), var_to_ranges)
