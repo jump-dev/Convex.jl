@@ -16,7 +16,12 @@
 
 ## Quick Example
 
-Here's a quick example of code that solves a least-squares problem with inequality constraints
+To run this example, first install Convex and at least one solver, such as SCS:
+```julia
+Pkg.add("Convex")
+Pkg.add("SCS")
+```
+Now let's solve a least-squares problem with inequality constraints. 
 ```julia
 # Let us first make the Convex.jl module available
 using Convex
