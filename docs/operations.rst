@@ -66,7 +66,7 @@ An optimization problem using only these functions can be solved by any LP solve
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`dot(x,y)`           | :math:`\sum_i x_i y_i`     | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
-|:code:`kron(x,y)`          | `Kronecker product <https://en.wikipedia.org/wiki/Kronecker_product>`_         | affine     |increasing     | PR: one argument is constant    |
+|:code:`kron(x,y)`          | Kronecker product          | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`vecdot(x,y)`        |:code:`dot(vec(x),vec(y))`  | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
