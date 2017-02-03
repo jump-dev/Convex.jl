@@ -343,6 +343,17 @@ facts("Affine Atoms") do
 
   end
 
+  context("kron atom") do
+    id = eye(4)
+    X = Semidefinite(4)
+    W = kron(id, X)
+    p = maximize(trace(W), trace(X) ≤ 1)
+    @fact vexity(p) --> AffineVexity()
+    solve!(p)
+    @fact p.optval --> roughly(4, TOL)
+  end
+
+
   context("satisfy problems") do
     x = Variable()
     p = satisfy(x >= 0)
