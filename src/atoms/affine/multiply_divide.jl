@@ -171,7 +171,6 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
       var = var*ones(1,size(coeff,1))
     end
 
-    @show size(coeff), size(var)
     const_multiplier = spdiagm(vec(coeff)) # used to be spdiagm((vec(coeff),), (0,)), not sure why
     objective = const_multiplier * conic_form!(var, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, objective)
