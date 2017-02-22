@@ -156,6 +156,15 @@ facts("SDP Atoms") do
 
     println(p1.optval)
   end
-  
-  
+
+  context("kron atom") do
+    id = eye(4)
+    X = Semidefinite(4)
+    W = kron(id, X)
+    p = maximize(trace(W), trace(X) ≤ 1)
+    @fact vexity(p) --> AffineVexity()
+    solve!(p)
+    @fact p.optval --> roughly(4, TOL)
+  end
+
 end
