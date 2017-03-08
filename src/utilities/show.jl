@@ -78,7 +78,7 @@ function show(io::IO, p::Problem)
     $(p.head) $(p.objective)
     subject to
     """)
-  print_joined(io, p.constraints, "\n\t\t")
+  join(io, p.constraints, "\n\t\t")
   print(io, "\ncurrent status: $(p.status)")
   if p.status == "solved"
     print(io, " with optimal value of $(round(p.optval, 4))")
