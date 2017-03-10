@@ -47,7 +47,7 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     t = Variable(size(c))
     objective = conic_form!(t, unique_conic_forms)
     if sign(x.children[1]) == ComplexSign()
-      for i in length(vec(t))
+      for i in 1:length(vec(t))
         conic_form!(t[i]>=norm2([real(c[i]);imag(c[i])]), unique_conic_forms)
       end
     else 
