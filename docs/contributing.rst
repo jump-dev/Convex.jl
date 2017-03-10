@@ -19,8 +19,6 @@ Adding examples
 Adding  atoms
 *************************************
 
-To understand the internal of Covex.jl, have a look at the `JuliaCon 2014 talk <https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s>`_, also find the ipython notebook of the talk `here <https://github.com/JuliaCon/presentations/tree/master/CVX>`_.
-
 Here are the steps to add a new function or operation (atom) to Convex.jl. Let's say you're
 adding the new function :math:`f`.
 
@@ -38,6 +36,8 @@ Fixing the guts
 If you want to do a more major bug fix, you may need to understand how Convex.jl 
 thinks about conic form. To do this, start by reading 
 `the Convex.jl paper <http://arxiv.org/pdf/1410.4821.pdf>`_.
+You may find our `JuliaCon 2014 talk <https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s>`_ helpful as well; you can find the ipython notebook presented in the talk `here <https://github.com/JuliaCon/presentations/tree/master/CVX>`_.
+
 Then read the conic form code: 
 
 	* We define data structures for conic objectives and conic constraints, and simple ways of combining them, in `conic_form.jl <https://github.com/JuliaOpt/Convex.jl/blob/master/src/conic_form.jl>`_
