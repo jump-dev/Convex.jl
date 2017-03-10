@@ -1,6 +1,6 @@
 import Base.sign
 export partialtrace
-export sign, curvature, monotonicity
+export sign, curvature, monotonicity, evaluate
 
 type PartialTraceAtom <: AbstractExpr
     head::Symbol
@@ -38,7 +38,7 @@ function monotonicity(x::PartialTraceAtom)
     return (Nondecreasing(),)
 end
 
-function monotonicity(x::PartialTraceAtom)
+function evaluate(x::PartialTraceAtom)
     ρ = evaluate(x.children[1])
 
     subsystem = function(sys)
@@ -65,8 +65,6 @@ function monotonicity(x::PartialTraceAtom)
     end
     sub_systems = [subsystem(i) for i in 1:length(dims)]
 end
-
-sub_systems = [tmp_fun(i) for i in 1:length(dims)]
 
 
 function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms)
