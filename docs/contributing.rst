@@ -19,7 +19,7 @@ Adding examples
 Adding  atoms
 *************************************
 
-To understand the internal ofCovex.jl, have a look at the `JuliaCon 2014 talk <https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s>`_, also find the ipython notebook of the talk `here <https://github.com/JuliaCon/presentations/tree/master/CVX>`_.
+To understand the internal of Covex.jl, have a look at the `JuliaCon 2014 talk <https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s>`_, also find the ipython notebook of the talk `here <https://github.com/JuliaCon/presentations/tree/master/CVX>`_.
 
 Here are the steps to add a new function or operation (atom) to Convex.jl. Let's say you're
 adding the new function :math:`f`.
