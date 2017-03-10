@@ -65,6 +65,11 @@ function evaluate(x::PartialTraceAtom)
         return sum([term(ρ, j) for j in 1:dims[sys]])
     end
     sub_systems = [subsystem(i) for i in 1:length(dims)]
+    a = eye(1)
+    for i in 1:lenght(dims) & i!= x.sys
+        a = kron(a,sub_systems[i])
+    end
+    return trace(sub_systems[x.sys])*a
 end
 
 
