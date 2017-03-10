@@ -40,6 +40,7 @@ end
 
 function evaluate(x::PartialTraceAtom)
     ρ = evaluate(x.children[1])
+    dims = x.dims
 
     subsystem = function(sys)
         function term(ρ, j::Int)
