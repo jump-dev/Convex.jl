@@ -1,5 +1,6 @@
 import Base.sign
 export partialtrace
+export sign, curvature, monotonicity
 
 type PartialTraceAtom <: AbstractExpr
     head::Symbol
@@ -37,9 +38,9 @@ function monotonicity(x::PartialTraceAtom)
     return (Nondecreasing(),)
 end
 
-function evaluate(x::PartialTraceAtom)
-    return (Nondecreasing(),)
-end
+# function evaluate(x::PartialTraceAtom)
+#     return (Nondecreasing(),)
+# end
 
 
 function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms)
@@ -52,23 +53,23 @@ function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms)
         # in the system we want to trace out
         # This function returns every term in the sum
         function term(ρ, j::Int)
-            bra = speye(1)
-            ket = speye(1)
+            a = speye(1)
+            b = speye(1)
             i_sys = 1
             for dim in dims
                 if i_sys == sys
                     # create a vector that is only 1 at its jth component
                     v = spzeros(dim, 1);
                     v[j] = 1;
-                    bra = kron(bra, v')
-                    ket = kron(ket, v)
+                    a = kron(a, v')
+                    b = kron(b, v)
                 else
-                    bra = kron(bra, speye(dim))
-                    ket = kron(ket, speye(dim))
+                    a = kron(a, speye(dim))
+                    b = kron(b, speye(dim))
                 end
                 i_sys += 1
             end
-            return bra * ρ * ket
+            return a * ρ * b
         end
 
         # sum all terms described above for all j's
