@@ -167,4 +167,13 @@ facts("SDP Atoms") do
     @fact p.optval --> roughly(4, TOL)
   end
 
+  context("Partial trace") do
+    A = Semidefinite(2)
+    B = [1 0; 0 0]
+    ρ = kron(B, A)
+    constraints = [partialtrace(ρ, 1, [2; 2]) == [0.09942819 0.29923607; 0.29923607 0.90057181], ρ in :SDP]
+    p = satisfy(constraints)
+    solve!(p)
+    @fact evaluate(ρ) --> roughly([0.09942819 0.29923607 0 0; 0.299237 0.900572 0 0;0 0 0 0;0 0 0 0], TOL)
+  end
 end

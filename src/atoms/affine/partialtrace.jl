@@ -38,11 +38,6 @@ function monotonicity(x::PartialTraceAtom)
     return (Nondecreasing(),)
 end
 
-# function evaluate(x::PartialTraceAtom)
-#     return (Nondecreasing(),)
-# end
-
-
 function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         sys = x.sys

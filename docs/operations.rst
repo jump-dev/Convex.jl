@@ -66,7 +66,7 @@ An optimization problem using only these functions can be solved by any LP solve
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`dot(x,y)`           | :math:`\sum_i x_i y_i`     | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
-|:code:`kron(x,y)`          | Kronecker product          | affine     |increasing     | PR: one argument is constant    |
+|:code:`kron(x,y)`          | Kronecker product          | affine     |increasing     | PR: First argument is constant  |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`vecdot(x,y)`        |:code:`dot(vec(x),vec(y))`  | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
@@ -101,6 +101,9 @@ An optimization problem using only these functions can be solved by any LP solve
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`trace(x)`           | :math:`\mathrm{tr}         | affine     |increasing     | none                            |
 |                           | \left(X \right)`           |            |               |                                 |
++---------------------------+----------------------------+------------+---------------+---------------------------------+
+|:code:`partialtrace(x,sys, | Partial Trace              | affine     |increasing     | none                            |
+|                     dims)`|                            |            |               |                                 |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`conv(h,x)`          |:math:`h \in                | affine     |increasing if  | PR: :math:`h` is constant       |
 |                           |\mathbb{R}^m`               |            |:math:`h\ge 0` |                                 |
