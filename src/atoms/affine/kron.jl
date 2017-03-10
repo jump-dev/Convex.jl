@@ -21,7 +21,7 @@ function kron(a::Convex.Variable, b::Union{AbstractArray, Convex.Constant})
     for j in 1:size(b)[2]
       push!(row, b[i, j] * a)
     end
-    push!(rows, foldl(hcat, row))
+    push!(rows, foldl(vcat, row))
   end
-  return foldl(vcat, rows)
+  return foldl(hcat, rows)
 end
