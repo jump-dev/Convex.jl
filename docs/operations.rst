@@ -102,8 +102,8 @@ An optimization problem using only these functions can be solved by any LP solve
 |:code:`trace(x)`           | :math:`\mathrm{tr}         | affine     |increasing     | none                            |
 |                           | \left(X \right)`           |            |               |                                 |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
-|:code:`partialtrace(x,sys, | Partial trace              | affine     |increasing     | none                            |
-|                     dims)`|                            |            |               |                                 |
+|partialtrace(x,sys,dims)   | Partial trace              | affine     |increasing     | none                            |
+|                           |                            |            |               |                                 |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`conv(h,x)`          |:math:`h \in                | affine     |increasing if  | PR: :math:`h` is constant       |
 |                           |\mathbb{R}^m`               |            |:math:`h\ge 0` |                                 |
