@@ -66,7 +66,7 @@ function evaluate(x::PartialTraceAtom)
     end
     sub_systems = [subsystem(i) for i in 1:length(dims)]
     a = eye(1)
-    for i in 1:lenght(dims)
+    for i in 1:length(dims)
         if i == x.sys
             continue
         else
