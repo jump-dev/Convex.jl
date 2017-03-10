@@ -38,6 +38,37 @@ function monotonicity(x::PartialTraceAtom)
     return (Nondecreasing(),)
 end
 
+function monotonicity(x::PartialTraceAtom)
+    ρ = evaluate(x.children[1])
+
+    subsystem = function(sys)
+        function term(ρ, j::Int)
+            a = speye(1)
+            b = speye(1)
+            i_sys = 1
+            for dim in dims
+                if i_sys == sys
+                # create a vector that is only 1 at its jth component
+                v = spzeros(dim, 1);
+                v[j] = 1;
+                a = kron(a, v')
+                b = kron(b, v)
+                else
+                    a = kron(a, speye(dim))
+                    b = kron(b, speye(dim))
+                end
+                i_sys += 1
+            end
+            return a * ρ * b
+        end
+        return sum([term(ρ, j) for j in 1:dims[sys]])
+    end
+    sub_systems = [subsystem(i) for i in 1:length(dims)]
+end
+
+sub_systems = [tmp_fun(i) for i in 1:length(dims)]
+
+
 function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         sys = x.sys
