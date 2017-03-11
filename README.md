@@ -12,7 +12,7 @@
 
 - **Detailed documentation and examples** for Convex.jl ([stable](http://convexjl.readthedocs.io/en/stable) | [latest](http://convexjl.readthedocs.io/en/latest)).
 - If you're running into **bugs or have feature requests**, please use the [Github Issue Tracker](https://github.com/JuliaOpt/Convex.jl/issues>).
-- For usage questions, please contact us via [Discourse](https://discourse.julialang.org/c/domain/opt)
+- For usage questions, please contact us via [Discourse](https://discourse.julialang.org/c/domain/opt).
 
 ## Quick Example
 

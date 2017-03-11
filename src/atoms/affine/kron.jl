@@ -1,5 +1,4 @@
 import Base.kron
-
 export kron
 
 function kron(a::Union{AbstractArray, Convex.Constant}, b::Convex.Variable)
@@ -13,6 +12,3 @@ function kron(a::Union{AbstractArray, Convex.Constant}, b::Convex.Variable)
   end
   return foldl(vcat, rows)
 end
-
-
-kron(a::Convex.Variable, b::Union{AbstractArray, Convex.Constant}) = kron(b, a)
