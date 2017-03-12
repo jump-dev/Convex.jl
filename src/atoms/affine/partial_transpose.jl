@@ -21,7 +21,6 @@ type PartialTransposeAtom <: AbstractExpr
             error("Dimension of system doesn't correspond to dimension of subsystems")
         end
         children = (x, )
-        #newsize = (round(Int, x.size[2]/dims[sys]), round(Int, x.size[1]/dims[sys]))
         return new(:partialtranspose, hash(children), children, x.size, sys, dims)
     end
 end
@@ -107,7 +106,7 @@ function conic_form!(x::PartialTransposeAtom, unique_conic_forms::UniqueConicFor
         end
 
         # sum all terms described above for all j's
-        objective = conic_form!(transpose(sum([term(x.children[1], j) for j in 1:dims[sys]])), unique_conic_forms)
+        objective = conic_form!(transpose([term(x.children[1], j) for j in 1:dims[sys]]), unique_conic_forms)
         cache_conic_form!(unique_conic_forms, x, objective)
     end
     return get_conic_form(unique_conic_forms, x)
