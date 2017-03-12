@@ -12,7 +12,7 @@
 
 - **Detailed documentation and examples** for Convex.jl ([stable](http://convexjl.readthedocs.io/en/stable) | [latest](http://convexjl.readthedocs.io/en/latest)).
 - If you're running into **bugs or have feature requests**, please use the [Github Issue Tracker](https://github.com/JuliaOpt/Convex.jl/issues>).
-- For usage questions, please contact us via the [JuliaOpt mailing list](https://groups.google.com/forum/#!forum/julia-opt)
+- For usage questions, please contact us via [Discourse](https://discourse.julialang.org/c/domain/opt).
 
 ## Quick Example
 
@@ -48,8 +48,8 @@ problem.optval
 ```
 
 ## More Examples
-A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). 
-The [basic usage notebook](http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl. The use cases of the package in complex-domain optimization can be found [here](https://github.com/JuliaOpt/Convex.jl/tree/master/examples/optimization_with_complex_variables).
+A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). The [basic usage notebook](http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl. Many use cases of the package in complex-domain optimization can be found [here](https://github.com/JuliaOpt/Convex.jl/tree/master/examples/optimization_with_complex_variables).
+>>>>>>> 6f80ae15e683aedfdb3613cb8fcae42de4deba57
 
 
 ## Citing this package

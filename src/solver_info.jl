@@ -22,8 +22,16 @@ end
 solvers = [("SCS", "SCSSolver"), ("ECOS", "ECOSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
           ("GLPKMathProgInterface", "GLPKSolverMIP")]
 
+function isinstalled(pkg)
+    if isdir(Pkg.dir(pkg)); return true; end
+    for path in Base.LOAD_PATH
+        if isdir(joinpath(path, pkg)); return true; end
+    end
+    return false
+end
+
 for (dir, solver) in solvers
-  if isdir(Pkg.dir(dir)) && DEFAULT_SOLVER == nothing
+  if isinstalled(dir) && DEFAULT_SOLVER == nothing
     eval(parse("using "*dir))
     eval(parse("set_default_solver("*solver*"())"))
   end
