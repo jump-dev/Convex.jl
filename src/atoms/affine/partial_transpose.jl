@@ -22,7 +22,7 @@ type PartialTransposeAtom <: AbstractExpr
         end
         children = (x, )
         #newsize = (round(Int, x.size[2]/dims[sys]), round(Int, x.size[1]/dims[sys]))
-        return new(:partialtrace, hash(children), children, x.size, sys, dims)
+        return new(:partialtranspose, hash(children), children, x.size, sys, dims)
     end
 end
 
