@@ -51,7 +51,6 @@ problem.optval
 A number of examples can be found [here](http://convexjl.readthedocs.org/en/latest/examples.html). The [basic usage notebook](http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl. Many use cases of the package in complex-domain optimization can be found [here](https://github.com/JuliaOpt/Convex.jl/tree/master/examples/optimization_with_complex_variables).
 
 
-
 ## Citing this package
 
 If you use Convex.jl for published work, we encourage you to cite the software using the following BibTeX citation:
