@@ -38,6 +38,6 @@ facts("Fixed and freed variables") do
 	solve!(p)
 	o2 = p.optval
 
-	@fact o1 < o2 --> true
+	@fact o1 <= o2 --> true
   end  
 end
