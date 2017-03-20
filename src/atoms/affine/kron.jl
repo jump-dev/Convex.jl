@@ -1,7 +1,7 @@
 import Base.kron
 export kron
 
-function kron(a::Union{AbstractArray, Convex.Constant}, b::Convex.Variable)
+function kron(a::Union{Value, Convex.Constant}, b::Convex.Variable)
   rows = Convex.AbstractExpr[]
   for i in 1:size(a)[1]
     row = Convex.AbstractExpr[]
