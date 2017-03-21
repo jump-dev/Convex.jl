@@ -9,7 +9,7 @@ type KronAtom <: AbstractExpr
   size::Tuple{Int, Int}
 
   function KronAtom(x::AbstractExpr, y::AbstractExpr)
-    if vexity(x.children[1]) != ConstVexity() && vexity(x.children[1]) != ConstVexity()
+    if vexity(x) != ConstVexity() && vexity(y) != ConstVexity()
         error("Kron of two non-constant expressions is not DCP compliant")
     else
         sz = (size(x)[1]*size(y)[1], size(x)[2]*size(y)[2])
