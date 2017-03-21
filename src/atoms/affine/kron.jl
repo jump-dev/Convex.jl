@@ -62,13 +62,23 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
       objective = const_multiplier * objective
 
     # left matrix multiplication
-    elseif x.children[1].head == :constant
+    else x.children[1].head == :constant
       objective = conic_form!(x.children[2], unique_conic_forms)
-      objective = kron(x.children[1].value,ones(x.size[2])) * objective
+      rows = DataStructures.OrderedDict{UInt64,Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}}}[]
+      for i in 1:size(x.children[1])[1]
+        row = DataStructures.OrderedDict{UInt64,Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}}}[]
+        for j in 1:size(x.children[1])[2]
+          push!(row, a[i, j] * objective)
+        end
+        push!(rows, foldl(hcat, row))
+      end
+      objective = foldl(vcat, rows)
+
+      #objective = kron(x.children[1].value,ones(x.size[2])) * objective
     # right matrix multiplication
-    else
-      objective = conic_form!(x.children[1], unique_conic_forms)
-      objective = kron(x.children[2].value', speye(x.size[1])) * objective
+    #else   when second argumet is constant
+     # objective = conic_form!(x.children[1], unique_conic_forms)
+      #objective = kron(x.children[2].value', speye(x.size[1])) * objective
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
