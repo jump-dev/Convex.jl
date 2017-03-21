@@ -1,6 +1,6 @@
 import Base.kron
 export kron
-
+export sign, monotonicity, curvature, evaluate, conic_form!
 
 type KronAtom <: AbstractExpr
   head::Symbol
@@ -75,5 +75,5 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-
+kron(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
 
