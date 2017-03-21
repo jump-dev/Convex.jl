@@ -66,17 +66,22 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
       objective = conic_form!(x.children[2], unique_conic_forms)
       a = evaluate(x.children[1])
       for key in objective.keys
-        rows = Tuple{SparseMatrixCSC{Float64,Int32},SparseMatrixCSC{Float64,Int32}}[]
+        rows1 = SparseMatrixCSC{Float64,Int32}
+        rows2 = SparseMatrixCSC{Float64,Int32}
         for i in 1:size(x.children[1])[1]
-          row = Tuple{SparseMatrixCSC{Float64,Int32},SparseMatrixCSC{Float64,Int32}}[]
+          row1 = SparseMatrixCSC{Float64,Int32}
+          rows2 = SparseMatrixCSC{Float64,Int32}
           for j in 1:size(x.children[1])[2]
             x = objective[key][1]*a[i,j]
             y = objective[key][2]*a[i,j]
-            push!(row, (x,y))
+            push!(row1,x)
+            push!(row2,y)
           end
-          push!(rows, foldl(hcat, row))
+          push!(rows1, foldl(hcat, row1))
+          push!(rows2, foldl(hcat, row2))
         end
-        objective[key] = foldl(vcat, rows)
+        objective[key][1] = foldl(vcat, rows1)
+        objective[key][2] = foldl(vcat, rows2)
       end
 
       #objective = kron(x.children[1].value,ones(x.size[2])) * objective
