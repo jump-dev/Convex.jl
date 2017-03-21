@@ -48,7 +48,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
         row2 = SparseMatrixCSC{Float64,Int32}[]
         for j in 1:size(a)[2]
           xx = objective[key][1]*a[i,j]
-          y = objective[key][1]*a[i,j]
+          y = objective[key][2]*a[i,j]
           push!(row1,xx)
           push!(row2,y)
         end
