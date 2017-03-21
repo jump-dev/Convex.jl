@@ -10,12 +10,13 @@ type KronAtom <: AbstractExpr
 
   function KronAtom(x::AbstractExpr, y::AbstractExpr)
     if vexity(x) != ConstVexity() && vexity(y) != ConstVexity()
-        error("Kron of two non-constant expressions is not DCP compliant")
+      error("Kron of two non-constant expressions is not DCP compliant")
     else
-        sz = (size(x)[1]*size(y)[1], size(x)[2]*size(y)[2])
-        children = (x, y)
-        return new(:kron, hash(children), children, sz)
+      sz = (size(x)[1]*size(y)[1], size(x)[2]*size(y)[2])
+      children = (x, y)
+      return new(:kron, hash(children), children, sz)
     end
+  end
 end
 
 function sign(x::KronAtom)
