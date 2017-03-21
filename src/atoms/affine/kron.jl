@@ -69,7 +69,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
       for i in 1:size(x.children[1])[1]
         row = DataStructures.OrderedDict{UInt64,Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}}}[]
         for j in 1:size(x.children[1])[2]
-          push!(row, a[i, j] * objective)
+          push!(row, a[i, j] * objective.vals)
         end
         push!(rows, foldl(hcat, row))
       end
