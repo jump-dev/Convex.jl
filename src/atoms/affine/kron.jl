@@ -39,30 +39,30 @@ end
 function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     # scalar multiplication
-    if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
-      if vexity(x.children[1]) == ConstVexity()
-        const_child = x.children[1]
-        expr_child = x.children[2]
-      elseif vexity(x.children[2]) == ConstVexity()
-        const_child = x.children[2]
-        expr_child = x.children[1]
-      else
-        error("multiplication of two non-constant expressions is not DCP compliant")
-      end
-      objective = conic_form!(expr_child, unique_conic_forms)
+    # if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
+    #   if vexity(x.children[1]) == ConstVexity()
+    #     const_child = x.children[1]
+    #     expr_child = x.children[2]
+    #   elseif vexity(x.children[2]) == ConstVexity()
+    #     const_child = x.children[2]
+    #     expr_child = x.children[1]
+    #   else
+    #     error("multiplication of two non-constant expressions is not DCP compliant")
+    #   end
+    #   objective = conic_form!(expr_child, unique_conic_forms)
 
-      # make sure all 1x1 sized objects are interpreted as scalars, since
-      # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
-      if const_child.size == (1, 1)
-        const_multiplier = evaluate(const_child)[1]
-      else
-        const_multiplier = reshape(evaluate(const_child), get_vectorized_size(const_child), 1)
-      end
+    #   # make sure all 1x1 sized objects are interpreted as scalars, since
+    #   # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
+    #   if const_child.size == (1, 1)
+    #     const_multiplier = evaluate(const_child)[1]
+    #   else
+    #     const_multiplier = reshape(evaluate(const_child), get_vectorized_size(const_child), 1)
+    #   end
 
-      objective = const_multiplier * objective
+    #   objective = const_multiplier * objective
 
-    # left matrix multiplication
-    else x.children[1].head == :constant
+    # # left matrix multiplication
+    # else x.children[1].head == :constant
       objective = conic_form!(x.children[2], unique_conic_forms)
       rows = DataStructures.OrderedDict{UInt64,Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}}}[]
       for i in 1:size(x.children[1])[1]
@@ -79,7 +79,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     #else   when second argumet is constant
      # objective = conic_form!(x.children[1], unique_conic_forms)
       #objective = kron(x.children[2].value', speye(x.size[1])) * objective
-    end
+    #end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
