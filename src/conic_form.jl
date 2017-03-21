@@ -6,7 +6,7 @@ export cache_conic_form!, has_conic_form, get_conic_form
 # TODO: Comment every single line
 
 # ConicObj represents an affine function of the variables
-# it is stored as a disctionary of (key, value) pairs
+# it is stored as a dictionary of (key, value) pairs
 # keys are unique ids of variables
 # values are their coefficients in the affine function
 # so for example, {unique_id(x)=>5, unique_id(y)=>6} represents the function 5x + 6y
@@ -31,7 +31,7 @@ function +(c::ConicObj, d::ConicObj)
     if !haskey(new_obj, var)
       new_obj[var] = d[var]
     else
-      # .+ does not preserve sparsity 
+      # .+ does not preserve sparsity
       # need to override behavior
       if size(new_obj[var][1]) == size(d[var][1])
         x1 = new_obj[var][1] + d[var][1]
@@ -92,7 +92,7 @@ type ConicConstr
 end
 
 # in conic form, every expression e is represented by a ConicObj together with a collection of ConicConstrs
-# for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to that expression's ConicObj 
+# for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to that expression's ConicObj
 UniqueExpMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, ConicObj}
 # for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to the index of expression's ConicConstr in UniqueConstrList
 UniqueConstrMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, Int}
