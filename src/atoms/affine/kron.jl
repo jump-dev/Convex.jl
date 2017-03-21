@@ -65,15 +65,19 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     # else x.children[1].head == :constant
       objective = conic_form!(x.children[2], unique_conic_forms)
       a = evaluate(x.children[1])
-      rows = Array{Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}},1}[]
-      for i in 1:size(x.children[1])[1]
-        row = Array{Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}},1}[]
-        for j in 1:size(x.children[1])[2]
-          push!(row, a[i, j] * objective.vals)
+      for key in objective.keys
+        rows = Tuple{SparseMatrixCSC{Float64,Int32},SparseMatrixCSC{Float64,Int32}}[]
+        for i in 1:size(x.children[1])[1]
+          row = Tuple{SparseMatrixCSC{Float64,Int32},SparseMatrixCSC{Float64,Int32}}[]
+          for j in 1:size(x.children[1])[2]
+            x = objective[key][1]*a[i,j]
+            y = objective[key][2]*a[i,j]
+            push!(row, (x,y))
+          end
+          push!(rows, foldl(hcat, row))
         end
-        push!(rows, foldl(hcat, row))
+        objective[key] = foldl(vcat, rows)
       end
-      objective.vals = foldl(vcat, rows)
 
       #objective = kron(x.children[1].value,ones(x.size[2])) * objective
     # right matrix multiplication
