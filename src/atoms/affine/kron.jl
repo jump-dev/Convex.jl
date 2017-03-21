@@ -64,7 +64,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     # left matrix multiplication
     elseif x.children[1].head == :constant
       objective = conic_form!(x.children[2], unique_conic_forms)
-      objective = kron(speye(x.size[2]), x.children[1].value) * objective
+      objective = kron(x.children[1].value,ones(x.size[2])) * objective
     # right matrix multiplication
     else
       objective = conic_form!(x.children[1], unique_conic_forms)
