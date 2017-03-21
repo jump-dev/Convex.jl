@@ -64,6 +64,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     # # left matrix multiplication
     # else x.children[1].head == :constant
       objective = conic_form!(x.children[2], unique_conic_forms)
+      a = evaluate(x.children[1])
       rows = DataStructures.OrderedDict{UInt64,Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}}}[]
       for i in 1:size(x.children[1])[1]
         row = DataStructures.OrderedDict{UInt64,Tuple{Union{AbstractArray,Number},Union{AbstractArray,Number}}}[]
