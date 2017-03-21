@@ -19,7 +19,7 @@ type KronAtom <: AbstractExpr
 end
 
 function sign(x::KronAtom)
-  return sign(x.children[1]) * sign(x.children[2])
+    return sign(x.children[1]) * sign(x.children[2])
 end
 
 function monotonicity(x::KronAtom)
@@ -29,7 +29,6 @@ end
 
 function curvature(x::KronAtom)
     return ConstVexity()
-  end
 end
 
 function evaluate(x::KronAtom)
