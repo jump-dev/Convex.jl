@@ -45,7 +45,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
       rows2 = SparseMatrixCSC{Float64,Int32}[]
       for i in 1:size(x.children[1])[1]
         row1 = SparseMatrixCSC{Float64,Int32}[]
-        rows2 = SparseMatrixCSC{Float64,Int32}[]
+        row2 = SparseMatrixCSC{Float64,Int32}[]
         for j in 1:size(x.children[1])[2]
           x = objective[key][1]*a[i,j]
           y = objective[key][1]*a[i,j]
