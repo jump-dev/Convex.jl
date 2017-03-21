@@ -43,13 +43,13 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     for key in objective.keys
       rows1 = SparseMatrixCSC{Float64,Int32}[]
       rows2 = SparseMatrixCSC{Float64,Int32}[]
-      for i in 1:size(x.children[1])[1]
+      for i in 1:size(a)[1]
         row1 = SparseMatrixCSC{Float64,Int32}[]
         row2 = SparseMatrixCSC{Float64,Int32}[]
-        for j in 1:size(x.children[1])[2]
-          x = objective[key][1]*a[i,j]
+        for j in 1:size(a)[2]
+          xx = objective[key][1]*a[i,j]
           y = objective[key][1]*a[i,j]
-          push!(row1,x)
+          push!(row1,xx)
           push!(row2,y)
         end
         push!(rows1, foldl(hcat, row1))
