@@ -57,7 +57,7 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
-end
+end 
 
 abs(x::AbstractExpr) = AbsAtom(x)
 abs2(x::AbstractExpr) = square(abs(x))
