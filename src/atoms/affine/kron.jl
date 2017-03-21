@@ -55,7 +55,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
         push!(rows1, foldl(hcat, row1))
         push!(rows2, foldl(hcat, row2))
       end
-      objective[key] = (foldl(vcat, rows1),foldl(vcat, rows2)
+      objective[key] = (foldl(vcat, rows1),foldl(vcat, rows2))
       
     end
     cache_conic_form!(unique_conic_forms, x, objective)
