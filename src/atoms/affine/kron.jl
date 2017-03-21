@@ -85,5 +85,5 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-kron(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
+kron(x::Value, y::AbstractExpr) = KronAtom(Constant(x), y)
 
