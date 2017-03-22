@@ -49,8 +49,8 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
         for j in 1:size(a)[2]
           xx = objective[key][1]*a[i,j]
           y = objective[key][2]*a[i,j]
-          push!(row1,xx)
-          push!(row2,y)
+          hcat(row1,xx)
+          hcat(row2,y)
         end
         vcat(rows1, row1)
         vcat(rows2, row2)
