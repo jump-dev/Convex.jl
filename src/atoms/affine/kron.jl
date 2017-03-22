@@ -40,22 +40,22 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     objective = conic_form!(x.children[2], unique_conic_forms)
     a = evaluate(x.children[1])
-    for key in objective.keys
+    for var in keys(objective)
       rows1 = SparseMatrixCSC{Float64,Int32}[]
       rows2 = SparseMatrixCSC{Float64,Int32}[]
       for i in 1:size(a)[1]
         row1 = SparseMatrixCSC{Float64,Int32}[]
         row2 = SparseMatrixCSC{Float64,Int32}[]
         for j in 1:size(a)[2]
-          xx = objective[key][1]*a[i,j]
-          yy = objective[key][2]*a[i,j]
+          xx = objective[var][1].*a[i,j]
+          yy = objective[var][2].*a[i,j]
           push!(row1,xx)
           push!(row2,yy)
         end
         push!(rows1, foldl(hcat, row1))
         push!(rows2, foldl(hcat, row2))
       end
-      objective[key] = (foldl(vcat, rows1),foldl(vcat, rows2))
+      objective[var] = (foldl(vcat, rows1),foldl(vcat, rows2))
     end
 
     cache_conic_form!(unique_conic_forms, x, objective)
@@ -64,4 +64,3 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
 end
 
 kron(x::Value, y::AbstractExpr) = KronAtom(Constant(x), y)
-
