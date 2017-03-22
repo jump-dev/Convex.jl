@@ -52,8 +52,8 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
           push!(row1,xx)
           push!(row2,y)
         end
-        vcat(rows1, row1))
-        vcat(rows2, row2))
+        vcat(rows1, row1)
+        vcat(rows2, row2)
       end
       objective[key] = (rows1,rows2)
     end
