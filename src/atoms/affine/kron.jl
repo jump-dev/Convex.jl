@@ -43,7 +43,7 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     for key in objective.keys
       xx = kron(a,objective[key][1])
       yy = kron(a,objective[key][2])
-      objective[key] = (rows1,rows2)
+      objective[key] = (xx,yy)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
