@@ -41,8 +41,8 @@ function conic_form!(x::KronAtom, unique_conic_forms::UniqueConicForms)
     objective = conic_form!(x.children[2], unique_conic_forms)
     a = evaluate(x.children[1])
     for key in objective.keys
-      xx = kron(a,objective[key][1])
-      yy = kron(a,objective[key][2])
+      xx = kron(objective[key][1],a)
+      yy = kron(objective[key][2],a)
       objective[key] = (xx,yy)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
