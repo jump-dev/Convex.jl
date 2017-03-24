@@ -10,3 +10,4 @@ Examples
 	* `Binary knapsack <http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/binary_knapsack.ipynb>`_
 	* `Entropy maximization <http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/max_entropy.ipynb>`_
 	* `Logistic regression <http://nbviewer.ipython.org/github/JuliaOpt/Convex.jl/blob/master/examples/logistic_regression.ipynb>`_
+    * `Optimization with Complex Variables <http://nbviewer.jupyter.org/github/JuliaOpt/Convex.jl/tree/master/examples/optimization_with_complex_variables/>`_

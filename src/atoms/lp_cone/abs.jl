@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.abs
+import Base.abs, Base.abs2
 export abs, abs2
 export sign, curvature, monotonicity, evaluate
 
