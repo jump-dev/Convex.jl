@@ -49,6 +49,7 @@ facts("SDP Atoms") do
   end
 
   context("sdp constraints") do
+    # This test fails on Mosek
     x = Variable(Positive())
     y = Variable((3, 3))
     p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1)

@@ -56,3 +56,10 @@ if can_solve_mip(get_default_solver())
     include(curtest)
 	end
 end
+
+if can_solve_sdp(get_default_solver())
+    for curtest in tests_complex
+        info(" Test: $(curtest)")
+        include(curtest)
+    end
+end
