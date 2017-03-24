@@ -4,10 +4,10 @@ export kron
 
 #### TODO: wite the conic_form implemenatatioo
 
-function kron(a::Value, b::Convex.Variable)
-  rows = Convex.AbstractExpr[]
+function kron(a::Value, b::AbstractExpr)
+  rows = AbstractExpr[]
   for i in 1:size(a)[1]
-    row = Convex.AbstractExpr[]
+    row = AbstractExpr[]
     for j in 1:size(a)[2]
       if isreal(a[i,j])
         push!(row, real(a[i, j]) * b)
@@ -21,11 +21,11 @@ function kron(a::Value, b::Convex.Variable)
 end
 
 
-function kron(a::Convex.Variable, b::Union{AbstractArray, Convex.Constant})
-  rows = Convex.AbstractExpr[]
-  b = Constant(b)
+function kron(a::Convex.Variable, b::Value)
+  rows = AbstractExpr[]
+  #b = Constant(b)
   for i in 1:size(a)[1]
-    row = Convex.AbstractExpr[]
+    row = AbstractExpr[]
     for j in 1:size(a)[2]
       push!(row, a[i, j] * b)
     end
