@@ -20,7 +20,7 @@ type Constant <: AbstractExpr
 
   function Constant(x::Value, check_sign::Bool=true)
     if check_sign
-      if is_complex(x)
+      if !isreal(x)
         return Constant(x, ComplexSign())
       elseif all(x .>= 0)
         return Constant(x, Positive())
@@ -29,18 +29,6 @@ type Constant <: AbstractExpr
       end
     end
     return Constant(x, NoSign())
-  end
-
-  function is_complex(x::Value)
-    temp = false
-    y = x + 0im
-    for z in y
-      if z.im != 0
-        temp = true
-        break
-      end
-    end
-    return temp    
   end
 end
 #### Constant Definition end   ##### 

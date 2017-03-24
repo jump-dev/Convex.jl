@@ -4,13 +4,16 @@ export kron
 
 #### TODO: wite the conic_form implemenatatioo
 
-function kron(a::Union{AbstractArray, Convex.Constant}, b::Convex.Variable)
+function kron(a::Value, b::Convex.Variable)
   rows = Convex.AbstractExpr[]
-  a = Constant(a)
   for i in 1:size(a)[1]
     row = Convex.AbstractExpr[]
     for j in 1:size(a)[2]
-      push!(row, a[i, j] * b)
+      if isreal(a[i,j])
+        push!(row, real(a[i, j]) * b)
+      else
+        push!(row, a[i, j] * b)
+      end        
     end
     push!(rows, foldl(hcat, row))
   end
