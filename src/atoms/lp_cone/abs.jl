@@ -5,8 +5,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.abs
-export abs, square_modulus
+import Base.abs, Base.abs2
+export abs, abs2
 export sign, curvature, monotonicity, evaluate
 
 ### Absolute Value
@@ -47,7 +47,7 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     t = Variable(size(c))
     objective = conic_form!(t, unique_conic_forms)
     if sign(x.children[1]) == ComplexSign()
-      for i in length(vec(t))
+      for i in 1:length(vec(t))
         conic_form!(t[i]>=norm2([real(c[i]);imag(c[i])]), unique_conic_forms)
       end
     else 
@@ -57,7 +57,7 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
-end
+end 
 
 abs(x::AbstractExpr) = AbsAtom(x)
-square_modulus(x::AbstractExpr) = square(abs(x))
+abs2(x::AbstractExpr) = square(abs(x))

@@ -8,7 +8,7 @@ function quadform(x::AbstractExpr, A::Value)
   if length(size(A)) != 2 || size(A, 1) != size(A, 2)
     error("Quadratic form only takes square matrices")
   end
-  if !issym(A)
+  if !issymmetric(A)
     error("Quadratic form only defined for symmetric matrices")
   end
   V = eigvals(Symmetric(full(A)))

@@ -49,6 +49,7 @@ facts("SDP Atoms") do
   end
 
   context("sdp constraints") do
+    # This test fails on Mosek
     x = Variable(Positive())
     y = Variable((3, 3))
     p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1)
@@ -156,6 +157,25 @@ facts("SDP Atoms") do
 
     println(p1.optval)
   end
-  
-  
+
+  context("kron atom") do
+    id = eye(4)
+    X = Semidefinite(4)
+    W = kron(id, X)
+    p = maximize(trace(W), trace(X) ≤ 1)
+    @fact vexity(p) --> AffineVexity()
+    solve!(p)
+    @fact p.optval --> roughly(4, TOL)
+  end
+
+  context("Partial trace") do
+    A = Semidefinite(2)
+    B = [1 0; 0 0]
+    ρ = kron(B, A)
+    constraints = [partialtrace(ρ, 1, [2; 2]) == [0.09942819 0.29923607; 0.29923607 0.90057181], ρ in :SDP]
+    p = satisfy(constraints)
+    solve!(p)
+    @fact evaluate(ρ) --> roughly([0.09942819 0.29923607 0 0; 0.299237 0.900572 0 0;0 0 0 0;0 0 0 0], TOL)
+    @fact evaluate(partialtrace(ρ, 1, [2; 2])) -->roughly([1.0 0;0 0], TOL)
+  end
 end
