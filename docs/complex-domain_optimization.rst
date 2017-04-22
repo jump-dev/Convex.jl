@@ -39,7 +39,8 @@ complex variables as well. In addition, several specialized functions for comple
 |:code:`imag(z)`           | imaginary part of       | affine     |increasing     | none                            |
 |                          | complex variable        |            |               |                                 |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
-|:code:`conj(x)'`          | complex conjugate       | affine     |increasing     | none                            |
+|:code:`conj(x)`           | element-wise complex    | affine     |increasing     | none                            |
+|                          | conjugate               |            |               |                             |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
 |:code:`innerproduct(x,y)` | real(trace(x'*y))       | affine     |increasing     | PR: one argument is constant    |
 +--------------------------+-------------------------+------------+---------------+---------------------------------+
