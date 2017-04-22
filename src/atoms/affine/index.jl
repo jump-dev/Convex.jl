@@ -84,11 +84,12 @@ getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
 getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
 getindex{T <: Real}(x::AbstractExpr, row::Real, cols::AbstractArray{T, 1}) = getindex(x, row:row, cols)
 getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, col::Real) = getindex(x, rows, col:col)
+# XXX todo: speed test; there are lots of possible solutions for this
 function getindex(x::AbstractExpr, I::AbstractArray{Bool,2})
-    return [ x[i] for i in to_index(I) ]
+    return [xi for (xi,ii) in zip(x,I) if ii]
 end
 function getindex(x::AbstractExpr, I::AbstractVector{Bool})
-    return [ x[i] for i in to_index(I) ]
+    return [xi for (xi,ii) in zip(x,I) if ii]
 end
 # Colon methods
 # All rows and columns
