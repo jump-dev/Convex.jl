@@ -9,6 +9,7 @@ Base.@deprecate quad_form quadform
 Base.@deprecate quad_over_lin quadoverlin
 Base.@deprecate rational_norm rationalnorm
 Base.@deprecate sum_squares sumsquares
+Base.@deprecate square_modulus squaremodulus
 
 # SDP atoms
 Base.@deprecate lambda_max lambdamax

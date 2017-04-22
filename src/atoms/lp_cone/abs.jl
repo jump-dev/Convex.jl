@@ -5,8 +5,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.abs
-export abs, square_modulus
+import Base.abs, Base.abs2
+export abs, abs2
 export sign, curvature, monotonicity, evaluate
 
 ### Absolute Value
@@ -57,7 +57,7 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
-end
+end 
 
 abs(x::AbstractExpr) = AbsAtom(x)
-square_modulus(x::AbstractExpr) = square(abs(x))
+abs2(x::AbstractExpr) = square(abs(x))
