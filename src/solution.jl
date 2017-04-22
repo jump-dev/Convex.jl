@@ -1,7 +1,7 @@
 import MathProgBase
 export solve!
 
-# semantics: 
+# semantics:
 # * we *load* problem data from Convex into the MathProgBase model
 # * we *populate* objects in Convex with their optimal values
 
@@ -14,7 +14,7 @@ function solve!(problem::Problem,
 end
 
 function solve!(problem::Problem;
-                warmstart=false, 
+                warmstart=false,
                 check_vexity=true,
                 verbose=true)
 
@@ -43,20 +43,20 @@ function solve!(problem::Problem;
 end
 
 function set_warmstart!(m::MathProgBase.AbstractConicModel,
-                       problem::Problem, 
+                       problem::Problem,
                        n::Int, # length of primal (conic) solution
                        var_to_ranges)
-    # use previously cached solution, if any, 
+    # use previously cached solution, if any,
     try
       primal = problem.solution.primal
     catch
-      warn("Unable to use cached solution to warmstart problem. 
+      warn("Unable to use cached solution to warmstart problem.
             (Perhaps this is the first time you're solving this problem?)
             Warmstart may be ineffective.")
       primal = zeros(n)
     end
     if !(length(primal) == n)
-      warn("Unable to use cached solution to warmstart problem. 
+      warn("Unable to use cached solution to warmstart problem.
             (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
             Warmstart may be ineffective.")
       primal = zeros(n)
@@ -69,7 +69,7 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
     try
       MathProgBase.setwarmstart!(m, primal)
     catch
-      warn("Unable to warmstart solution. 
+      warn("Unable to warmstart solution.
         (Perhaps the solver doesn't support warm starts?)
         Using a cold start instead.")
     end
@@ -97,13 +97,13 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
                         problem::Problem,
                         var_to_ranges,
                         conic_constraints)
-  dual = try 
+  dual = try
     MathProgBase.getdual(m)
   catch
     fill(NaN, MathProgBase.numconstr(m))
   end
 
-  solution = try 
+  solution = try
     MathProgBase.getsolution(m)
   catch
     fill(NaN, MathProgBase.numvar(m))
@@ -114,8 +114,8 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
   catch
     NaN
   end
-  
-  if any(isnan(dual))
+
+  if any(@compat isnan.(dual))
     problem.solution = Solution(solution, MathProgBase.status(m), objective)
   else
     problem.solution = Solution(solution, dual, MathProgBase.status(m), objective)

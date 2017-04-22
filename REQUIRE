@@ -1,3 +1,4 @@
 julia 0.5
 MathProgBase 0.5 0.7
 DataStructures
+Compat 0.24

@@ -19,7 +19,7 @@ type RelativeEntropyAtom <: AbstractExpr
   function RelativeEntropyAtom(x::AbstractExpr, y::AbstractExpr)
     if sign(x)==ComplexSign() || sign(y)==ComplexSign()
       error("Both the arguments should be real but these are instead $(sign(x)) and $(sign(y))")
-    else 
+    else
       children = (x, y)
       return new(:entropy, hash(children), children, size(x))
     end
@@ -41,12 +41,12 @@ end
 function evaluate(e::RelativeEntropyAtom)
   x = evaluate(e.children[1])
   y = evaluate(e.children[2])
-  if any(isnan(y)) return Inf end
+  if any(@compat isnan.(y)) return Inf end
 
   out = x.*log(x./y)
   # fix value when x=0:
   # out will only be NaN if x=0, in which case the correct value is 0
-  out[isnan(out)] = 0
+  out[@compat isnan.(out)] = 0
   return out
 end
 
@@ -68,7 +68,7 @@ function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForm
         conic_form!(ExpConstraint(-z[i,j], x[i,j], y[i,j]), unique_conic_forms)
       end
     end
-    # need to constrain x>=0 and y>0. 
+    # need to constrain x>=0 and y>0.
     # x>=0 we get for free from the form of the exponential cone, so just add
     conic_form!(y>=0, unique_conic_forms) # nb we don't know how to ask for strict inequality
     cache_conic_form!(unique_conic_forms, e, objective)

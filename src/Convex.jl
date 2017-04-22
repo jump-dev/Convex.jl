@@ -2,8 +2,8 @@ __precompile__()
 
 module Convex
 import DataStructures
-
 importall Base.Operators
+using Compat
 
 global DEFAULT_SOLVER = nothing
 ### modeling framework

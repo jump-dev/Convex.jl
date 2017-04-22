@@ -17,7 +17,7 @@ export Sign, Positive, Negative, NoSign, ComplexSign
 export -, +, *
 
 # Vexity subtypes
-abstract Vexity
+@compat abstract type Vexity end
 type ConstVexity <: Vexity              end
 type AffineVexity <: Vexity             end
 type ConvexVexity <: Vexity             end
@@ -31,14 +31,14 @@ type NotDcp <: Vexity
 end
 
 # Monotonocity subtypes
-abstract Monotonicity
+@compat abstract type Monotonicity end
 type Nonincreasing <: Monotonicity      end
 type Nondecreasing <: Monotonicity      end
 type ConstMonotonicity <: Monotonicity  end
 type NoMonotonicity <: Monotonicity     end
 
 # Sign subtypes
-abstract Sign
+@compat abstract type Sign end
 type Positive <: Sign                   end
 type Negative <: Sign                   end
 type NoSign <: Sign                     end

@@ -3,7 +3,7 @@ import MathProgBase
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
 
-typealias Float64OrNothing Union{Float64, Void}
+@compat const Float64OrNothing = Union{Float64, Void}
 
 # TODO: Cleanup
 type Solution{T<:Number}
@@ -26,8 +26,8 @@ type Problem
   model::MathProgBase.AbstractConicModel
   solution::Solution
 
-  function Problem(head::Symbol, objective::AbstractExpr,  
-                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])  
+  function Problem(head::Symbol, objective::AbstractExpr,
+                   model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])
     if sign(objective)== Convex.ComplexSign()
       error("Objective can not be a complex expression")
     else
@@ -37,7 +37,7 @@ type Problem
 end
 
 # constructor if model is not specified
-function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[], 
+function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
                  solver::MathProgBase.AbstractMathProgSolver = get_default_solver())
   Problem(head, objective, MathProgBase.ConicModel(solver), constraints)
 end
@@ -60,7 +60,7 @@ function find_variable_ranges(constraints)
           if var.sign == ComplexSign()
             var_to_ranges[id] = (index + 1, index + 2*get_vectorized_size(var))
             index += 2*get_vectorized_size(var)
-          else 
+          else
             var_to_ranges[id] = (index + 1, index + get_vectorized_size(var))
             index += get_vectorized_size(var)
           end
@@ -107,8 +107,8 @@ function conic_problem(p::Problem)
   if  get_vectorized_size(p.objective) != 1
     error("Objective must be a scalar")
   end
-  
-  # conic problems have the form 
+
+  # conic problems have the form
   # minimize c'*x
   # st       b - Ax \in cones
   # our job is to take the conic forms of the objective and constraints
@@ -116,7 +116,7 @@ function conic_problem(p::Problem)
   # one chunk of rows in b and in A corresponds to each constraint,
   # and one chunk of columns in b and A corresponds to each variable,
   # with the size of the chunk determined by the size of the constraint or of the variable
-  
+
   # A map to hold unique constraints. Each constraint is keyed by a symbol
   # of which atom generated the constraints, and a integer hash of the child
   # expressions used by the atom
