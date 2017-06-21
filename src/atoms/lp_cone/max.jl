@@ -18,7 +18,7 @@ type MaxAtom <: AbstractExpr
   function MaxAtom(x::AbstractExpr, y::AbstractExpr)
     if sign(x)==ComplexSign() || sign(y)==ComplexSign()
       error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
-    else 
+    else
       if x.size == y.size
         sz = x.size
       elseif x.size == (1, 1)
@@ -29,7 +29,7 @@ type MaxAtom <: AbstractExpr
         error("Got different sizes for x as $(x.size) and y as $(y.size)")
       end
     end
-    
+
     children = (x, y)
     return new(:max, hash(children), children, sz)
   end
@@ -59,7 +59,7 @@ function curvature(x::MaxAtom)
 end
 
 function evaluate(x::MaxAtom)
-  return max(evaluate(x.children[1]), evaluate(x.children[2]))
+  return max.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
 # x <= this and y <= this if max(x, y) = this

@@ -29,8 +29,8 @@ type Variable <: AbstractExpr
   Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), sets...)
   Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
   Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
-  
-  
+
+
 
 end
 
@@ -131,8 +131,7 @@ end
 
 function free!(x::Variable)
   # TODO this won't work if :fixed appears other than at the end of x.sets
-  x.sets[end] == :fixed && pop!(x.sets) 
+  x.sets[end] == :fixed && pop!(x.sets)
   x.vexity = AffineVexity()
   x
 end
-

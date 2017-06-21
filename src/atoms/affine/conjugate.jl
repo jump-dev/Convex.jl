@@ -9,7 +9,7 @@ type ConjugateAtom <: AbstractExpr
 
   function ConjugateAtom(x::AbstractExpr)
     children = (x,)
-    return new(:conj, hash(children), children, (x.size[2], x.size[1]))
+    return new(:conj, hash(children), children, (x.size[1], x.size[2]))
   end
 end
 

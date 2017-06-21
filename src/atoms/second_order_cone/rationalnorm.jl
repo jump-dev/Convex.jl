@@ -43,7 +43,7 @@ function curvature(x::RationalNormAtom)
 end
 
 function evaluate(x::RationalNormAtom)
-  return sum(abs(evaluate(x.children[1])).^x.k)^(1/x.k);
+  return sum(abs.(evaluate(x.children[1])).^x.k)^(1/x.k);
 end
 
 
@@ -78,13 +78,13 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
     conic_form!(sum(s) <= t, unique_conic_forms)
 
     # Reduce to SOC constraints (get powers for each element)
-    numerator = Int(num(x.k));
-    denominator = Int(den(x.k));
+    num = @compat Int(numerator(x.k));
+    denom = @compat Int(denominator(x.k));
     # Construct list of inequalities of form u^2 <= vw, where the list
     # is given by triples in ineq_list.
     (ineq_list,
-     var_list) = psocp.ProductToSimpleInequalities(denominator,
-                                                   numerator - denominator);
+     var_list) = psocp.ProductToSimpleInequalities(denom,
+                                                   num - denom);
     if (length(ineq_list) > 10)
       warn(string("Rational norm generating ", length(ineq_list),
                   " intermediate constraints.\n\tIncreasing ",

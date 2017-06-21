@@ -59,7 +59,7 @@ function curvature(x::MinAtom)
 end
 
 function evaluate(x::MinAtom)
-  return min(evaluate(x.children[1]), evaluate(x.children[2]))
+  return min.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
 # x >= this and y >= this if min(x, y) = this

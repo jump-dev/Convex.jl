@@ -6,8 +6,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.*, Base.(.*), Base./, Base.(./)
-export *, .*, /, ./
+import Base.broadcast
+export broadcast
 export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
@@ -178,21 +178,21 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
   return get_conic_form(unique_conic_forms, x)
 end
 
-# function .*(x::Constant, y::AbstractExpr)
-#   if x.size == (1, 1) || y.size == (1, 1)
-#     return x * y
-#   elseif size(y,1) < size(x,1) && size(y,1) == 1
-#     return DotMultiplyAtom(x, ones(size(x,1))*y)
-#   elseif size(y,2) < size(x,2) && size(y,2) == 1
-#     return DotMultiplyAtom(x, y*ones(1,size(x,1)))
-#   else
-#     return DotMultiplyAtom(x, y)
-#   end
-# end
-# .*(y::AbstractExpr, x::Constant) = .*(x,y)
+function broadcast(::typeof(*), x::Constant, y::AbstractExpr)
+  if x.size == (1, 1) || y.size == (1, 1)
+    return x * y
+  elseif size(y,1) < size(x,1) && size(y,1) == 1
+    return DotMultiplyAtom(x, ones(size(x,1))*y)
+  elseif size(y,2) < size(x,2) && size(y,2) == 1
+    return DotMultiplyAtom(x, y*ones(1,size(x,1)))
+  else
+    return DotMultiplyAtom(x, y)
+  end
+end
+broadcast(::typeof(*), y::AbstractExpr, x::Constant) = DotMultiplyAtom(x, y)
 
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
-function .*(x::AbstractExpr, y::AbstractExpr)
+function broadcast(::typeof(*), x::AbstractExpr, y::AbstractExpr)
   if x.size == (1, 1) || y.size == (1, 1)
     return x * y
   elseif vexity(x) == ConstVexity()
@@ -203,7 +203,7 @@ function .*(x::AbstractExpr, y::AbstractExpr)
     return DotMultiplyAtom(y, x)
   end
 end
-.*(x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
-.*(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
-./(x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
+broadcast(::typeof(*), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
+broadcast(::typeof(*), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
+broadcast(::typeof(/), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
 # x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl

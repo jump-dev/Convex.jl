@@ -20,7 +20,7 @@ type ExpAtom <: AbstractExpr
   function ExpAtom(x::AbstractExpr)
     if sign(x)==ComplexSign()
       error("The argument should be real but it's instead complex")
-    else 
+    else
       children = (x,)
       return new(:exp, hash(children), children, x.size)
     end
@@ -40,7 +40,7 @@ function curvature(x::ExpAtom)
 end
 
 function evaluate(x::ExpAtom)
-  return exp(evaluate(x.children[1]))
+  return exp.(evaluate(x.children[1]))
 end
 
 exp(x::AbstractExpr) = ExpAtom(x)

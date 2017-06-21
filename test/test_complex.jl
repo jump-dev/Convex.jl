@@ -71,8 +71,8 @@ facts("Optimization with complex variables") do
     solve!(p)
     @fact p.optval --> roughly(0, TOL)
     @fact evaluate(objective) --> roughly(zeros(1,1), TOL)
-    real_diff = real(x.value) - real(a);
-    imag_diff = imag(x.value) - imag(a);
+    real_diff = real.(x.value) - real.(a);
+    imag_diff = imag.(x.value) - imag.(a);
     @fact real_diff --> roughly(zeros(2,1), TOL)
     @fact imag_diff --> roughly(zeros(2,1), TOL)
     end
@@ -103,10 +103,10 @@ facts("Optimization with complex variables") do
     solve!(p)
     # test that X is approximately equal to posA:
     l,v = eig(A)
-    posA = v*diagm(max(l,0))*v'
+    posA = v*diagm(max.(l,0))*v'
 
-    real_diff = real(x.value) - real(posA);
-    imag_diff = imag(x.value) - imag(posA);
+    real_diff = real.(x.value) - real.(posA);
+    imag_diff = imag.(x.value) - imag.(posA);
     @fact real_diff --> roughly(zeros(n,n), TOL)
     @fact imag_diff --> roughly(zeros(n,n), TOL)
     end

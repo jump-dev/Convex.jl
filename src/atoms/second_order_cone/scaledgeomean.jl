@@ -51,7 +51,7 @@ end
 function scaledgeomean(x::AbstractExpr)
   if length(x) > 2
     return ScaledGeoMeanAtom(x)
-  elseif length(x) == 2  
+  elseif length(x) == 2
     return geomean(x[1],x[2])
   else
     return x

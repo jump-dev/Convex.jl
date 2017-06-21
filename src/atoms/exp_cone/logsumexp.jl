@@ -21,7 +21,7 @@ type LogSumExpAtom <: AbstractExpr
   function LogSumExpAtom(x::AbstractExpr)
     if sign(x)==ComplexSign()
       error("The argument should be real but it's instead complex")
-    else 
+    else
       children = (x,)
       return new(:logsumexp, hash(children), children, (1,1))
     end
@@ -41,7 +41,7 @@ function curvature(x::LogSumExpAtom)
 end
 
 function evaluate(x::LogSumExpAtom)
-  return log(sum(exp(evaluate(x.children[1]))))
+  return log(sum(exp.(evaluate(x.children[1]))))
 end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)

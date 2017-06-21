@@ -20,7 +20,7 @@ type LogAtom <: AbstractExpr
   function LogAtom(x::AbstractExpr)
     if sign(x)==ComplexSign()
       error("The argument should be real but it's instead complex")
-    else 
+    else
       children = (x,)
       return new(:log, hash(children), children, x.size)
     end
@@ -40,7 +40,7 @@ function curvature(x::LogAtom)
 end
 
 function evaluate(x::LogAtom)
-  return log(evaluate(x.children[1]))
+  return log.(evaluate(x.children[1]))
 end
 
 log(x::AbstractExpr) = LogAtom(x)

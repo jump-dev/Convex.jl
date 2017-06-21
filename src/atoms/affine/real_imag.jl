@@ -25,7 +25,7 @@ end
 function sign(x::RealAtom)
   if sign(x.children[1]) == ComplexSign()
     return NoSign()
-  else 
+  else
     return sign(x.children[1])
   end
 end
@@ -39,7 +39,7 @@ function curvature(x::RealAtom)
 end
 
 function evaluate(x::RealAtom)
-  return real(evaluate(x.children[1]))
+  return real.(evaluate(x.children[1]))
 end
 
 function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
@@ -49,8 +49,8 @@ function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
 
 
     for var in keys(objective)
-      re = real(objective[var][1])
-      im = real(objective[var][2])
+      re = real.(objective[var][1])
+      im = real.(objective[var][2])
       new_objective[var] = (re,im)
     end
 
@@ -91,18 +91,18 @@ function curvature(x::ImaginaryAtom)
 end
 
 function evaluate(x::ImaginaryAtom)
-  return imag(evaluate(x.children[1]))
+  return imag.(evaluate(x.children[1]))
 end
 
 function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     new_objective = ConicObj()
     objective = conic_form!(x.children[1], unique_conic_forms)
-    
+
 
     for var in keys(objective)
-      re = imag(objective[var][1])
-      im = imag(objective[var][2])
+      re = imag.(objective[var][1])
+      im = imag.(objective[var][2])
       new_objective[var] = (re,im)
     end
     cache_conic_form!(unique_conic_forms, x, new_objective)
