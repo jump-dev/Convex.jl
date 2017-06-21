@@ -5,6 +5,7 @@
 
 [![Convex](http://pkg.julialang.org/badges/Convex_0.4.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.4)
 [![Convex](http://pkg.julialang.org/badges/Convex_0.5.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.5)
+[![Convex](http://pkg.julialang.org/badges/Convex_0.6.svg)](http://pkg.julialang.org/?pkg=Convex&ver=0.6)
 
 **Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface. It also supports optimization with complex variables and coefficients.
 
@@ -21,7 +22,7 @@ To run this example, first install Convex and at least one solver, such as SCS:
 Pkg.add("Convex")
 Pkg.add("SCS")
 ```
-Now let's solve a least-squares problem with inequality constraints. 
+Now let's solve a least-squares problem with inequality constraints.
 ```julia
 # Let us first make the Convex.jl module available
 using Convex
