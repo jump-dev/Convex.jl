@@ -6,8 +6,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.+, Base.-, Base.(.+), Base.(.-)
-export +, -, .+, .-
+import Base.broadcast
+export +, -, broadcast
 export sign, curvature, monotonicity, evaluate
 
 ### Unary Negation
@@ -122,10 +122,3 @@ end
 -(x::AbstractExpr, y::AbstractExpr) = x + (-y)
 -(x::Value, y::AbstractExpr) = Constant(x) + (-y)
 -(x::AbstractExpr, y::Value) = x + Constant(-y)
-
-.+(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
-.+(x::Value, y::AbstractExpr) = AdditionAtom(Constant(x), y)
-.+(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
-.-(x::AbstractExpr, y::AbstractExpr) = x + (-y)
-.-(x::Value, y::AbstractExpr) = Constant(x) + (-y)
-.-(x::AbstractExpr, y::Value) = x + Constant(-y)

@@ -48,9 +48,9 @@ An optimization problem using only these functions can be solved by any LP solve
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`x/y`                | division                   | affine     |increasing     | PR: :math:`y` is scalar constant|
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
-|:code:`x .* y`             | elementwise multiplication | affine     |increasing     | PR: one argument is constant    |
+|:code:`dot(*)(x, y)`       | elementwise multiplication | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
-|:code:`x ./ y`             | elementwise division       | affine     |increasing     | PR: one argument is constant    |
+|:code:`dot(/)(x, y)`       | elementwise division       | affine     |increasing     | PR: one argument is constant    |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
 |:code:`x[1:4, 2:3]`        | indexing and slicing       | affine     |increasing     | none                            |
 +---------------------------+----------------------------+------------+---------------+---------------------------------+
@@ -190,9 +190,14 @@ Of course, if an optimization problem has both LP and SOCP representable functio
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
 |:code:`sqrt(x)`             | :math:`\sqrt{x}`                    | concave    |decreasing     | IC: :math:`x>0`          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+
-|:code:`square(x), x.^2, x^2`| :math:`x^2`                         | convex     |increasing on  | elementwise              |
+|:code:`square(x), x^2`      | :math:`x^2`                         | convex     |increasing on  | PR : :math:`x` is scalar |
 |                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |               |                          |
+|                            |                                     |            |decreasing on  |                          |
+|                            |                                     |            |:math:`x \le 0`|                          |
++----------------------------+-------------------------------------+------------+---------------+--------------------------+
+|:code:`dot(^)(x,2)`         | :math:`x.^2`                        | convex     |increasing on  | elementwise              |
+|                            |                                     |            |:math:`x \ge 0`|                          |
 |                            |                                     |            |decreasing on  |                          |
 |                            |                                     |            |:math:`x \le 0`|                          |
 +----------------------------+-------------------------------------+------------+---------------+--------------------------+

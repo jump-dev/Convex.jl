@@ -44,7 +44,7 @@ end
 
 function evaluate(x::EntropyAtom)
   c = evaluate(x.children[1])
-  return map(y -> -y * log(y), c)
+  return -c .* log.(c)
 end
 
 function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms)

@@ -36,10 +36,8 @@ function curvature(x::AbsAtom)
 end
 
 function evaluate(x::AbsAtom)
-  return abs(evaluate(x.children[1]))
+  return abs.(evaluate(x.children[1]))
 end
-
-
 
 function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
@@ -50,14 +48,14 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
       for i in 1:length(vec(t))
         conic_form!(t[i]>=norm2([real(c[i]);imag(c[i])]), unique_conic_forms)
       end
-    else 
+    else
       conic_form!(c<=t, unique_conic_forms)
       conic_form!(c>=-t, unique_conic_forms)
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
-end 
+end
 
 abs(x::AbstractExpr) = AbsAtom(x)
 abs2(x::AbstractExpr) = square(abs(x))

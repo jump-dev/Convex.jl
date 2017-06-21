@@ -33,10 +33,10 @@ end
 # users specify SDPs as `A in :SDP` where A is an n x n square matrix
 # solvers (Mosek and SCS) specify the *lower triangular part of A* is in the SDP cone
 # so we need the lower triangular part (n*(n+1)/2 entries) of c.child to be in the SDP cone
-# and we need the corresponding upper elements to match the lower elements, 
+# and we need the corresponding upper elements to match the lower elements,
 # which we enforce via equality constraints
 function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
-  # TODO: 
+  # TODO:
     # 1) propagate dual values
     # 2) presolve to eliminate (many) variables --- variables on upper triangular part often don't matter at all
   if !has_conic_form(unique_conic_forms, c)
@@ -49,8 +49,8 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     rescale = sqrt(2)*tril(ones(n,n))
     rescale[find(diagm(ones(n)))] = 1.0
     diagandlowerpart = find(rescale)
-    lowerpart = Array(Int, div(n*(n-1),2))
-    upperpart = Array(Int, div(n*(n-1),2))
+    lowerpart = Array{Int}(div(n*(n-1),2))
+    upperpart = Array{Int}(div(n*(n-1),2))
     klower = 0
     # diagandlowerpart in column-major order:
     # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...
@@ -62,7 +62,7 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
         lowerpart[klower] = n*(j-1) + i # (i,j)th element
       end
     end
-    objective = conic_form!((rescale.*c.child)[diagandlowerpart], unique_conic_forms)
+    objective = conic_form!((broadcast(*,rescale,c.child))[diagandlowerpart], unique_conic_forms)
     sdp_constraint = ConicConstr([objective], :SDP, [div(n*(n+1),2)])
     cache_conic_form!(unique_conic_forms, c, sdp_constraint)
     # make sure upper and lower triangular part match in the solution
@@ -70,8 +70,8 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     # if the matrix we require to be PSD has already been constructed to be symmetric
     equality_constraint = conic_form!(c.child[lowerpart] == c.child[upperpart], unique_conic_forms)
 
-    # for computing duals --- won't work b/c 
-      # 1) sizes are wrong (will be n(n+1)/2, expects n^2), and 
+    # for computing duals --- won't work b/c
+      # 1) sizes are wrong (will be n(n+1)/2, expects n^2), and
       # 2) the "correct" dual is the sum of the sdp dual and the equality constraint dual (so yes, dual of sdp constraint is *not* symmetric)
     # conic_constr_to_constr[sdp_constraint] = c
 
@@ -121,7 +121,7 @@ function ⪰(x::AbstractExpr, y::Value)
   else
     all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
   end
-  
+
 end
 
 function ⪰(x::Value, y::AbstractExpr)

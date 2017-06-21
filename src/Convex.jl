@@ -84,6 +84,7 @@ include("atoms/exp_+_sdp_cone/logdet.jl")
 include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("utilities/deprecated.jl")
+include("utilities/broadcast.jl")
 
 #Temporary workaround for memory leak (https://github.com/JuliaOpt/Convex.jl/issues/83)
 function clearmemory()

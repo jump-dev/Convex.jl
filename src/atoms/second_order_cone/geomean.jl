@@ -13,7 +13,7 @@ type GeoMeanAtom <: AbstractExpr
       error("geo mean must take two arguments of the same size")
     elseif sign(x)==ComplexSign() || sign(y)==ComplexSign()
       error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
-    else 
+    else
       children = (x, y)
       return new(:geomean, hash(children), children, x.size)
       end
@@ -33,7 +33,7 @@ function curvature(q::GeoMeanAtom)
 end
 
 function evaluate(q::GeoMeanAtom)
-  return sqrt(evaluate(q.children[1]) .* evaluate(q.children[2]))
+  return sqrt.(evaluate(q.children[1]) .* evaluate(q.children[2]))
 end
 
 function conic_form!(q::GeoMeanAtom, unique_conic_forms::UniqueConicForms)
