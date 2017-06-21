@@ -22,3 +22,14 @@ Base.@deprecate operator_norm operatornorm
 Base.@deprecate dot_sort dotsort
 Base.@deprecate sum_largest sumlargest
 Base.@deprecate sum_smallest sumsmallest
+
+# broadcasting
+if VERSION<v"0.6.0"
+  Base.@deprecate .*(x::Value, y::AbstractExpr) broadcast(*, x, y)
+  Base.@deprecate .*(x::AbstractExpr, y::Value) broadcast(*, x, y)
+  Base.@deprecate .*(x::AbstractExpr, y::AbstractExpr) broadcast(*, x, y)
+  Base.@deprecate ./(x::Value, y::AbstractExpr) broadcast(/, x, y)
+  Base.@deprecate ./(x::AbstractExpr, y::Value) broadcast(/, x, y)
+  Base.@deprecate ./(x::AbstractExpr, y::AbstractExpr) broadcast(/, x, y)
+  Base.@deprecate .^(x::AbstractExpr, y::Value) broadcast(^, x, y)
+end
