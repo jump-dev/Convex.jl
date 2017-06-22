@@ -25,11 +25,11 @@ Base.@deprecate sum_smallest sumsmallest
 
 # broadcasting
 if VERSION<v"0.6.0"
-  Base.@deprecate .*(x::Value, y::AbstractExpr) broadcast(*, x, y)
-  Base.@deprecate .*(x::AbstractExpr, y::Value) broadcast(*, x, y)
-  Base.@deprecate .*(x::AbstractExpr, y::AbstractExpr) broadcast(*, x, y)
-  Base.@deprecate ./(x::Value, y::AbstractExpr) broadcast(/, x, y)
-  Base.@deprecate ./(x::AbstractExpr, y::Value) broadcast(/, x, y)
-  Base.@deprecate ./(x::AbstractExpr, y::AbstractExpr) broadcast(/, x, y)
-  Base.@deprecate .^(x::AbstractExpr, y::Value) broadcast(^, x, y)
+  .*(x::Value, y::AbstractExpr) = broadcast(*, x, y)
+  .*(x::AbstractExpr, y::Value) = broadcast(*, x, y)
+  .*(x::AbstractExpr, y::AbstractExpr) = broadcast(*, x, y)
+  ./(x::Value, y::AbstractExpr) = broadcast(/, x, y)
+  ./(x::AbstractExpr, y::Value) = broadcast(/, x, y)
+  ./(x::AbstractExpr, y::AbstractExpr) = broadcast(/, x, y)
+  .^(x::AbstractExpr, y::Value) = broadcast(^, x, y)
 end
