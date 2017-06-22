@@ -47,7 +47,7 @@ function evaluate(x::SumLargestAtom)
   return sum(sort(vec(evaluate(x.children[1])), rev=true)[1:x.k])
 end
 
-function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     c = x.children[1]
     t = Variable(size(c))

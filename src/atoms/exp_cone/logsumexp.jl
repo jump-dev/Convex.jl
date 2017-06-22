@@ -46,7 +46,7 @@ end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
-function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, e)
     # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
     t = Variable(e.size)

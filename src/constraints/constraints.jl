@@ -35,7 +35,7 @@ function vexity(c::EqConstraint)
   return vex
 end
 
-function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, c)
     if !(sign(c.lhs) == ComplexSign() || sign(c.rhs) == ComplexSign())
     
@@ -95,7 +95,7 @@ function vexity(c::LtConstraint)
   return vex
 end
 
-function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, c)
     expr = c.rhs - c.lhs
     objective = conic_form!(expr, unique_conic_forms)
@@ -147,7 +147,7 @@ function vexity(c::GtConstraint)
   return vex
 end
 
-function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, c)
     expr = c.lhs - c.rhs
     objective = conic_form!(expr, unique_conic_forms)

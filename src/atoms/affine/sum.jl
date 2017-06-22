@@ -43,7 +43,7 @@ end
 # Suppose x was of the form
 # x = Ay where A was a coefficient. Then sum(x) can also be considered
 # sum(A, 1) * y
-function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     objective = conic_form!(x.children[1], unique_conic_forms)
     new_obj = copy(objective)

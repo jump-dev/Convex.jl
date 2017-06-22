@@ -42,7 +42,7 @@ end
 
 -(x::AbstractExpr) = NegateAtom(x)
 
-function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     objective = conic_form!(x.children[1], unique_conic_forms)
     objective = -objective
@@ -101,7 +101,7 @@ function evaluate(x::AdditionAtom)
   return sum([evaluate(child) for child in x.children])
 end
 
-function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     objective = ConicObj()
     for child in x.children

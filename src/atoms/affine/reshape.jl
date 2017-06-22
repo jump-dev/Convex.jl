@@ -33,7 +33,7 @@ function evaluate(x::ReshapeAtom)
   return reshape(evaluate(x.children[1]), x.size[1], x.size[2])
 end
 
-function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   return conic_form!(x.children[1], unique_conic_forms)
 end
 

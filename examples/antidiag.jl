@@ -66,7 +66,7 @@ antidiag(x::AbstractExpr, k::Int=0) = AntidiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(x::AntidiagAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::AntidiagAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     (num_rows, num_cols) = x.children[1].size
     k = x.k

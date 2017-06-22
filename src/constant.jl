@@ -56,7 +56,7 @@ end
 
 
   
-function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     #real_Value = real_conic_form(x)
     #imag_Value = imag_conic_form(x) 

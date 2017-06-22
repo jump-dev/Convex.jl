@@ -45,7 +45,7 @@ end
 
 # x >= this if minimum(x) = this
 # so, x - this will be in the :NonNeg cone
-function conic_form!(x::MinimumAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::MinimumAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     this = Variable()
     objective = conic_form!(this, unique_conic_forms)

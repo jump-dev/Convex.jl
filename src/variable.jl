@@ -89,7 +89,7 @@ function imag_conic_form(x::Variable)
   end
 end
 
-function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     if :fixed in x.sets
       # do exactly what we would for a constant

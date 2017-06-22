@@ -63,7 +63,7 @@ function evaluate(x::MinAtom)
 end
 
 # x >= this and y >= this if min(x, y) = this
-function conic_form!(x::MinAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::MinAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     this = Variable(x.size[1], x.size[2])
     objective = conic_form!(this, unique_conic_forms)

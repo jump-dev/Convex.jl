@@ -35,7 +35,7 @@ end
 # so we need the lower triangular part (n*(n+1)/2 entries) of c.child to be in the SDP cone
 # and we need the corresponding upper elements to match the lower elements,
 # which we enforce via equality constraints
-function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   # TODO:
     # 1) propagate dual values
     # 2) presolve to eliminate (many) variables --- variables on upper triangular part often don't matter at all

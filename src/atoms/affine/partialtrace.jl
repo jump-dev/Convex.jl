@@ -77,7 +77,7 @@ function evaluate(x::PartialTraceAtom)
 end
 
 
-function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, x)
         sys = x.sys
         dims = x.dims

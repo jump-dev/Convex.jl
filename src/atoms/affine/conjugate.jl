@@ -29,7 +29,7 @@ function evaluate(x::ConjugateAtom)
   return conj(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     objective = conic_form!(x.children[1], unique_conic_forms)
     for var in keys(objective)

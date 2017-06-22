@@ -16,7 +16,7 @@ type SOCConstraint <: Constraint
   end
 end
 
-function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, c)
     objectives = @compat Array{ConicObj}(length(c.children))
     for iobj=1:length(c.children)
@@ -43,7 +43,7 @@ type SOCElemConstraint <: Constraint
   end
 end
 
-function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms)
+function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, c)
     num_constrs = get_vectorized_size(c.children[1])
     num_children = length(c.children)

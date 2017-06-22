@@ -33,7 +33,7 @@ function evaluate(q::QolElemAtom)
   return (evaluate(q.children[1]).^2) ./ evaluate(q.children[2])
 end
 
-function conic_form!(q::QolElemAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(q::QolElemAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, q)
     sz = q.children[1].size
     t = Variable(sz[1], sz[2])

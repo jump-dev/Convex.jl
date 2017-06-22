@@ -45,7 +45,7 @@ end
 
 log(x::AbstractExpr) = LogAtom(x)
 
-function conic_form!(e::LogAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(e::LogAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, e)
     # log(z) \geq x  <=>  (x,ones(),z) \in ExpCone
     z = e.children[1]

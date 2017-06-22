@@ -33,7 +33,7 @@ function evaluate(q::QuadOverLinAtom)
   return x'*x / evaluate(q.children[2])
 end
 
-function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, q)
     t = Variable()
     qol_objective = conic_form!(t, unique_conic_forms)

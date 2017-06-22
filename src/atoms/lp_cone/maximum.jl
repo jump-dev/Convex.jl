@@ -45,7 +45,7 @@ end
 
 # x <= this if maximum(x) = this
 # so, this - x will be in the :NonNeg cone
-function conic_form!(x::MaximumAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::MaximumAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     this = Variable()
     objective = conic_form!(this, unique_conic_forms)

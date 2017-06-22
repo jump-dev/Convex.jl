@@ -63,7 +63,7 @@ function evaluate(x::MaxAtom)
 end
 
 # x <= this and y <= this if max(x, y) = this
-function conic_form!(x::MaxAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::MaxAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
     this = Variable(x.size[1], x.size[2])
     objective = conic_form!(this, unique_conic_forms)

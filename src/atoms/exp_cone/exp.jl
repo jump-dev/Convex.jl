@@ -45,7 +45,7 @@ end
 
 exp(x::AbstractExpr) = ExpAtom(x)
 
-function conic_form!(e::ExpAtom, unique_conic_forms::UniqueConicForms)
+function conic_form!(e::ExpAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, e)
     # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
     x = e.children[1]
