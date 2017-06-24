@@ -21,6 +21,10 @@ include("solver_info.jl")
 include("problems.jl")
 include("solution.jl")
 
+### make .*, ./, .^ work on v0.6
+
+include("utilities/broadcast.jl")
+
 ### affine atoms
 include("atoms/affine/add_subtract.jl")
 include("atoms/affine/multiply_divide.jl")
@@ -84,7 +88,6 @@ include("atoms/exp_+_sdp_cone/logdet.jl")
 include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("utilities/deprecated.jl")
-include("utilities/broadcast.jl")
 
 #Temporary workaround for memory leak (https://github.com/JuliaOpt/Convex.jl/issues/83)
 function clearmemory()

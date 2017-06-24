@@ -6,8 +6,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.broadcast
-export broadcast
 export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
@@ -178,7 +176,10 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms=Un
   return get_conic_form(unique_conic_forms, x)
 end
 
-function broadcast(::typeof(*), x::Constant, y::AbstractExpr)
+### the dot_multiply methods infer size and call the appropriate atom
+
+# if one is constant, the expression is DCP
+function dot_multiply(x::Constant, y::AbstractExpr)
   if x.size == (1, 1) || y.size == (1, 1)
     return x * y
   elseif size(y,1) < size(x,1) && size(y,1) == 1
@@ -189,10 +190,9 @@ function broadcast(::typeof(*), x::Constant, y::AbstractExpr)
     return DotMultiplyAtom(x, y)
   end
 end
-broadcast(::typeof(*), y::AbstractExpr, x::Constant) = DotMultiplyAtom(x, y)
-
+dot_multiply(y::AbstractExpr, x::Constant) = dot_multiply(x, y)
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
-function broadcast(::typeof(*), x::AbstractExpr, y::AbstractExpr)
+function dot_multiply(x::AbstractExpr, y::AbstractExpr)
   if x.size == (1, 1) || y.size == (1, 1)
     return x * y
   elseif vexity(x) == ConstVexity()
@@ -203,7 +203,3 @@ function broadcast(::typeof(*), x::AbstractExpr, y::AbstractExpr)
     return DotMultiplyAtom(y, x)
   end
 end
-broadcast(::typeof(*), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
-broadcast(::typeof(*), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
-broadcast(::typeof(/), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
-# x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl
