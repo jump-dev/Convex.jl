@@ -1,11 +1,10 @@
 # This file adds a new syntax to call elementwise operations on Convex expressions
 # because overloading broadcast no longer works in Julia v0.6
 
-if VERSION>=v"0.6.0-pre"
-  import TakingBroadcastSeriously: unfuse, broadcast_
-  export broadcast_
+import TakingBroadcastSeriously: @unfuse, broadcast_
 
-  unfuse(AbstractExpr)
+if VERSION>=v"0.6.0-pre"
+  @unfuse AbstractExpr
 
   broadcast_(::typeof(*), x::Constant, y::AbstractExpr) = dot_multiply(x, y)
   broadcast_(::typeof(*), y::AbstractExpr, x::Constant) = dot_multiply(x, y)
