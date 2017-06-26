@@ -10,6 +10,7 @@ if VERSION>=v"0.6.0-pre"
   broadcast_(::typeof(*), y::AbstractExpr, x::Constant) = dot_multiply(x, y)
   broadcast_(::typeof(*), x::Value, y::AbstractExpr) = dot_multiply(Constant(x), y)
   broadcast_(::typeof(*), x::AbstractExpr, y::Value) = dot_multiply(Constant(y), x)
+  broadcast_(::typeof(*), x::AbstractExpr, y::AbstractExpr) = dot_multiply(x, y)
   broadcast_(::typeof(/), x::AbstractExpr, y::Value) = dot_multiply(Constant(1./y), x)
   broadcast_(::typeof(/), x::Value, y::AbstractExpr) = QolElemAtom(Constant(sqrt(x)), y)
   broadcast_(::typeof(^), x::AbstractExpr, k::Int) = k==2 ? QolElemAtom(x, Constant(ones(size(x)))) : error("raising variables to powers other than 2 is not implemented")
