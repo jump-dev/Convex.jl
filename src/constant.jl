@@ -22,9 +22,9 @@ type Constant <: AbstractExpr
     if check_sign
       if !isreal(x)
         return Constant(x, ComplexSign())
-      elseif all(x .>= 0)
+      elseif all(xi >= 0 for xi in x)
         return Constant(x, Positive())
-      elseif all(x .<= 0)
+      elseif all(xi <= 0 for xi in x)
         return Constant(x, Negative())
       end
     end
