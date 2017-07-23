@@ -93,17 +93,17 @@ facts("SOCP Atoms") do
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
     expr = A * x + b
-    p = minimize(sum(dot(^)(expr,2))) # elementwise ^
+    p = minimize(sum(expr.^2))
     @fact vexity(p) --> ConvexVexity()
     solve!(p)
     @fact p.optval --> roughly(0.42105, TOL)
-    @fact evaluate(sum(broadcast(^,expr,2))) --> roughly(0.42105, TOL)
+    @fact evaluate(sum(expr.^2)) --> roughly(0.42105, TOL)
 
-    p = minimize(sum(dot(*)(expr, expr))) # elementwise *
+    p = minimize(sum(expr.*expr))
     @fact vexity(p) --> ConvexVexity()
     solve!(p)
     @fact p.optval --> roughly(0.42105, TOL)
-    @fact evaluate(sum(dot(*)(expr, expr))) --> roughly(0.42105, TOL)
+    @fact evaluate(sum(expr.*expr)) --> roughly(0.42105, TOL)
   end
 
   context("inv pos atom") do
@@ -115,11 +115,11 @@ facts("SOCP Atoms") do
     @fact evaluate(sum(invpos(x))) --> roughly(2, TOL)
 
     x = Variable(3)
-    p = minimize(sum(dot(/)([3,6,9], x)), x<=3)
+    p = minimize(sum([3,6,9]./x), x<=3)
     solve!(p)
     @fact x.value --> roughly(3*ones(3,1), TOL)
     @fact p.optval --> roughly(6, TOL)
-    @fact evaluate(sum(dot(/)([3,6,9], x))) --> roughly(6, TOL)
+    @fact evaluate(sum([3,6,9]./x)) --> roughly(6, TOL)
 
     x = Variable()
     p = minimize(sum([3,6,9]/x), x<=3)
