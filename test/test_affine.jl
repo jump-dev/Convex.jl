@@ -217,12 +217,12 @@ facts("Affine Atoms") do
     @fact p.optval --> roughly(3, TOL)
     @fact evaluate(sum(x.*eye(3))) --> roughly(3, TOL)
 
-    x = Variable(5, 5)
-    p = minimize(x[1, 1], 3.*x >= 3)
-    @fact vexity(p) --> AffineVexity()
-    solve!(p)
-    @fact p.optval --> roughly(1, TOL)
-    @fact evaluate(x[1, 1])[1] --> roughly(1, TOL)
+#    x = Variable(5, 5)
+#    p = minimize(x[1, 1], 3.*x >= 3)
+#    @fact vexity(p) --> AffineVexity()
+#    solve!(p)
+#    @fact p.optval --> roughly(1, TOL)
+#    @fact evaluate(x[1, 1])[1] --> roughly(1, TOL)
 
     x = Variable(3,1)
     p = minimize(sum(ones(3,3).* x), x>=1)
