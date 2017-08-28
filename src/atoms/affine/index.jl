@@ -1,7 +1,7 @@
 import Base: getindex, to_index
 export IndexAtom, getindex
 
-@compat const ArrayOrNothing = Union{AbstractArray, Void}
+const ArrayOrNothing = Union{AbstractArray, Void}
 
 type IndexAtom <: AbstractExpr
   head::Symbol

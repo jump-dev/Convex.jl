@@ -3,7 +3,7 @@ import MathProgBase
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
 
-@compat const Float64OrNothing = Union{Float64, Void}
+const Float64OrNothing = Union{Float64, Void}
 
 # TODO: Cleanup
 type Solution{T<:Number}
@@ -143,7 +143,7 @@ function conic_problem(p::Problem)
       for (id, val) in constraint.objs[i]
         if id == object_id(:constant)
           for l in 1:sz
-            b[constr_index + l] = val[1][l]==0 ? val[2][l]:val[1][l]
+            b[constr_index + l] = val[1][l]==0 ? val[2][l] : val[1][l]
           end
           #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
         else

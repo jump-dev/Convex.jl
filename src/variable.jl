@@ -124,7 +124,7 @@ function fix!(x::Variable)
 end
 function fix!(x::Variable, v)
   # TODO: check sizes match
-  x.value = @compat Array{Float64}(size(x))
+  x.value = Array{Float64}(size(x))
   x.value[:] = v
   fix!(x)
 end

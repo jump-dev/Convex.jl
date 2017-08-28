@@ -115,7 +115,7 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
     NaN
   end
 
-  if any(@compat isnan.(dual))
+  if any(isnan.(dual))
     problem.solution = Solution(solution, MathProgBase.status(m), objective)
   else
     problem.solution = Solution(solution, dual, MathProgBase.status(m), objective)

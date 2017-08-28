@@ -41,12 +41,12 @@ end
 function evaluate(e::RelativeEntropyAtom)
   x = evaluate(e.children[1])
   y = evaluate(e.children[2])
-  if any(@compat isnan.(y)) return Inf end
+  if any(isnan.(y)) return Inf end
 
   out = x.*log.(x./y)
   # fix value when x=0:
   # out will only be NaN if x=0, in which case the correct value is 0
-  out[@compat isnan.(out)] = 0
+  out[isnan.(out)] = 0
   return out
 end
 
