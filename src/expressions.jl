@@ -99,9 +99,9 @@ function length(x::AbstractExpr)
 end
 
 ### User-defined Unions
-@compat const Value = Union{Number, AbstractArray}
-@compat const ValueOrNothing = Union{Value, Void}
-@compat const AbstractExprOrValue = Union{AbstractExpr, Value}
+const Value = Union{Number, AbstractArray}
+const ValueOrNothing = Union{Value, Void}
+const AbstractExprOrValue = Union{AbstractExpr, Value}
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x

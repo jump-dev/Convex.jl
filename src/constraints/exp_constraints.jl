@@ -41,7 +41,7 @@ function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms=Uniq
   if !has_conic_form(unique_conic_forms, c)
     conic_constrs = ConicConstr[]
     if c.size == (1, 1)
-      objectives = @compat Array{ConicObj}(3)
+      objectives = Array{ConicObj}(3)
       for iobj=1:3
         objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
       end
@@ -49,7 +49,7 @@ function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms=Uniq
     else
       for i=1:c.size[1]
         for j=1:c.size[2]
-          objectives = @compat Array{ConicObj}(3)
+          objectives = Array{ConicObj}(3)
           for iobj=1:3
             objectives[iobj] = conic_form!(c.children[iobj][i,j], unique_conic_forms)
           end
