@@ -8,7 +8,7 @@ import Base.maximum
 export maximum
 
 ### Maximum Atom
-type MaximumAtom <: AbstractExpr
+struct MaximumAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

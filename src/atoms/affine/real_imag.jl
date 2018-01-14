@@ -10,7 +10,7 @@ export sign, monotonicity, curvature, evaluate
 
 
 ### Real
-type RealAtom <: AbstractExpr
+struct RealAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
@@ -65,7 +65,7 @@ real(x::Value) = RealAtom(Constant(x))
 
 
 ### Imaginary
-type ImaginaryAtom <: AbstractExpr
+struct ImaginaryAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

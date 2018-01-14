@@ -9,7 +9,7 @@ export operatornorm, sigmamax
 
 ### Operator norm
 
-type OperatorNormAtom <: AbstractExpr
+struct OperatorNormAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

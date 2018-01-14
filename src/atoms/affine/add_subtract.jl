@@ -12,7 +12,7 @@ export sign, curvature, monotonicity, evaluate
 
 ### Unary Negation
 
-type NegateAtom <: AbstractExpr
+struct NegateAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
@@ -53,7 +53,7 @@ end
 
 
 ### Addition
-type AdditionAtom <: AbstractExpr
+struct AdditionAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Array{AbstractExpr, 1}

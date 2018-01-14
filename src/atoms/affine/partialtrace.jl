@@ -2,7 +2,7 @@ import Base.sign
 export partialtrace
 export sign, curvature, monotonicity, evaluate
 
-type PartialTraceAtom <: AbstractExpr
+struct PartialTraceAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}

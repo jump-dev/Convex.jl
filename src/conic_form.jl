@@ -85,7 +85,7 @@ end
 # we represent the cone as a Symbol (defined in MathProgBase), like :SOC, :LP, etc
 # and we record the sizes of the affine expressions (XXX check...)
 # XXX might it be better to represent objs as a single ConicObj rather than an array of them?
-type ConicConstr
+struct ConicConstr
   objs::Array{ConicObj}
   cone::Symbol
   sizes::Array{Int}
@@ -100,7 +100,7 @@ UniqueConstrMap = DataStructures.OrderedDict{Tuple{Symbol, UInt64}, Int}
 UniqueConstrList = Array{ConicConstr}
 
 # UniqueConicForms caches all the conic forms of expressions we've parsed so far
-type UniqueConicForms
+struct UniqueConicForms
   exp_map::UniqueExpMap
   constr_map::UniqueConstrMap
   constr_list::UniqueConstrList

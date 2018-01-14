@@ -11,7 +11,7 @@ export sign, curvature, monotonicity, evaluate
 
 ### Absolute Value
 
-type AbsAtom <: AbstractExpr
+struct AbsAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

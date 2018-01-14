@@ -3,9 +3,9 @@
 # Defines Constant, which is a subtype of AbstractExpr
 #############################################################################
 export Constant
-export vexity, evaluate, sign, domain, conic_form!
+export vexity, evaluate, sign, conic_form!
 
-type Constant <: AbstractExpr
+struct Constant <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   value::Value

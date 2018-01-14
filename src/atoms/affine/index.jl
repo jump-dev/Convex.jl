@@ -3,7 +3,7 @@ export IndexAtom, getindex
 
 const ArrayOrNothing = Union{AbstractArray, Void}
 
-type IndexAtom <: AbstractExpr
+struct IndexAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
@@ -78,12 +78,12 @@ end
 
 ## API Definition begins
 
-getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) = IndexAtom(x, rows, cols)
-getindex{T <: Real}(x::AbstractExpr, inds::AbstractArray{T, 1}) = IndexAtom(x, inds)
+getindex(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) where {T <: Real} = IndexAtom(x, rows, cols)
+getindex(x::AbstractExpr, inds::AbstractArray{T, 1}) where {T <: Real} = IndexAtom(x, inds)
 getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
 getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
-getindex{T <: Real}(x::AbstractExpr, row::Real, cols::AbstractArray{T, 1}) = getindex(x, row:row, cols)
-getindex{T <: Real}(x::AbstractExpr, rows::AbstractArray{T, 1}, col::Real) = getindex(x, rows, col:col)
+getindex(x::AbstractExpr, row::Real, cols::AbstractArray{T, 1}) where {T <: Real} = getindex(x, row:row, cols)
+getindex(x::AbstractExpr, rows::AbstractArray{T, 1}, col::Real) where {T <: Real} = getindex(x, rows, col:col)
 # XXX todo: speed test; there are lots of possible solutions for this
 function getindex(x::AbstractExpr, I::AbstractArray{Bool,2})
     return [xi for (xi,ii) in zip(x,I) if ii]

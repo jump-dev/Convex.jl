@@ -6,7 +6,7 @@ export Float64OrNothing
 const Float64OrNothing = Union{Float64, Void}
 
 # TODO: Cleanup
-type Solution{T<:Number}
+struct Solution{T<:Number}
   primal::Array{T, 1}
   dual::Array{T, 1}
   status::Symbol
@@ -17,7 +17,7 @@ end
 Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], status, optval, false)
 Solution{T}(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, status, optval, true)
 
-type Problem
+struct Problem
   head::Symbol
   objective::AbstractExpr
   constraints::Array{Constraint}
@@ -193,31 +193,32 @@ Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
 # Allow users to simply type minimize
 minimize(objective::AbstractExpr, constraints::Constraint...) =
   Problem(:minimize, objective, collect(constraints))
-minimize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
+minimize(objective::AbstractExpr, constraints::Array{T}=Constraint[]) where {T<:Constraint} =
   Problem(:minimize, objective, constraints)
 minimize(objective::Value, constraints::Constraint...) =
   minimize(convert(AbstractExpr, objective), collect(constraints))
-minimize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
+minimize(objective::Value, constraints::Array{T}=Constraint[]) where {T<:Constraint} =
   minimize(convert(AbstractExpr, objective), constraints)
 
 # Allow users to simply type maximize
 maximize(objective::AbstractExpr, constraints::Constraint...) =
   Problem(:maximize, objective, collect(constraints))
-maximize{T<:Constraint}(objective::AbstractExpr, constraints::Array{T}=Constraint[]) =
+maximize(objective::AbstractExpr, constraints::Array{T}=Constraint[]) where {T<:Constraint} =
   Problem(:maximize, objective, constraints)
 maximize(objective::Value, constraints::Constraint...) =
   maximize(convert(AbstractExpr, objective), collect(constraints))
-maximize{T<:Constraint}(objective::Value, constraints::Array{T}=Constraint[]) =
+maximize(objective::Value, constraints::Array{T}=Constraint[]) where {T<:Constraint} = 
   maximize(convert(AbstractExpr, objective), constraints)
 
 # Allow users to simply type satisfy (if there is no objective)
 satisfy(constraints::Constraint...) = Problem(:minimize, Constant(0), [constraints...])
-satisfy{T<:Constraint}(constraints::Array{T}=Constraint[]) =
+satisfy(constraints::Array{T}=Constraint[]) where {T<:Constraint} =
   Problem(:minimize, Constant(0), constraints)
 satisfy(constraint::Constraint) = satisfy([constraint])
 
 # +(constraints, constraints) is defined in constraints.jl
-add_constraints!{T<:Constraint}(p::Problem, constraints::Array{T}) = +(p.constraints, constraints)
+add_constraints!(p::Problem, constraints::Array{T}) where {T<:Constraint} = 
+  +(p.constraints, constraints)
 add_constraints!(p::Problem, constraint::Constraint) = add_constraints!(p, [constraint])
 add_constraint! = add_constraints!
 

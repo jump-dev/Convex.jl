@@ -2,7 +2,7 @@ import Base.broadcast
 export QolElemAtom, qol_elementwise, square, sumsquares, invpos, /
 export sign, monotonicity, curvature, conic_form!, broadcast
 
-type QolElemAtom <: AbstractExpr
+struct QolElemAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

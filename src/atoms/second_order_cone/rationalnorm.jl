@@ -15,7 +15,7 @@ export rationalnorm
 
 ### k-norm for rational k
 
-type RationalNormAtom <: AbstractExpr
+struct RationalNormAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

@@ -12,7 +12,7 @@ export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
 
-type MultiplyAtom <: AbstractExpr
+struct MultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}
@@ -108,7 +108,7 @@ end
 ### .*
 # All constructors of this check (and so this function requires)
 # that the first child be constant to have the expression be DCP
-type DotMultiplyAtom <: AbstractExpr
+struct DotMultiplyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

@@ -10,7 +10,7 @@ export sign, curvature, monotonicity, evaluate
 
 # This atom computes dot(sort(x), sort(w)), where w is constant
 # for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
-type DotSortAtom <: AbstractExpr
+struct DotSortAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

@@ -15,7 +15,7 @@
 using Compat
 module psocp
 
-type InequalityExpression
+struct InequalityExpression
   # Represents an inequality of the form
   #
   # x^n <= t^{p_1} s^{p_2} u^{p_3},
@@ -39,7 +39,7 @@ type InequalityExpression
   u_var_ind::Int
 end
 
-type SimpleInequalityExpression
+struct SimpleInequalityExpression
   # Represents an inequality of the form
   #
   # x^2 <= t s,

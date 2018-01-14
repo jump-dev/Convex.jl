@@ -6,7 +6,7 @@ function power_of_2_gt(n::Int)
   Int(2^ceil(log(2,n)))
 end
 
-type ScaledGeoMeanAtom <: AbstractExpr
+struct ScaledGeoMeanAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

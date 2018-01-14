@@ -9,7 +9,7 @@ export lambdamax, lambdamin
 
 ### Lambda max
 
-type LambdaMaxAtom <: AbstractExpr
+struct LambdaMaxAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
@@ -62,7 +62,7 @@ end
 
 ### Lambda min
 
-type LambdaMinAtom <: AbstractExpr
+struct LambdaMinAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
