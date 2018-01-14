@@ -15,7 +15,7 @@
 using Compat
 module psocp
 
-struct InequalityExpression
+mutable struct InequalityExpression
   # Represents an inequality of the form
   #
   # x^n <= t^{p_1} s^{p_2} u^{p_3},

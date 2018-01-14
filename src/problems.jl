@@ -6,7 +6,7 @@ export Float64OrNothing
 const Float64OrNothing = Union{Float64, Void}
 
 # TODO: Cleanup
-struct Solution{T<:Number}
+mutable struct Solution{T<:Number}
   primal::Array{T, 1}
   dual::Array{T, 1}
   status::Symbol
@@ -14,10 +14,12 @@ struct Solution{T<:Number}
   has_dual::Bool
 end
 
-Solution{T}(x::Array{T, 1}, status::Symbol, optval::T) = Solution(x, T[], status, optval, false)
-Solution{T}(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) = Solution(x, y, status, optval, true)
+Solution(x::Array{T, 1}, status::Symbol, optval::T) where {T} = 
+  Solution(x, T[], status, optval, false)
+Solution(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) where {T} = 
+  Solution(x, y, status, optval, true)
 
-struct Problem
+mutable struct Problem
   head::Symbol
   objective::AbstractExpr
   constraints::Array{Constraint}
