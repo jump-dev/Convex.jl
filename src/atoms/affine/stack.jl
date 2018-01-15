@@ -1,8 +1,8 @@
 import Base.vcat, Base.hcat
-export vcat, hcat, VcatAtom, HcatAtom
+export vcat, hcat, HcatAtom
 export sign, curvature, monotonicity, evaluate, conic_form!
 
-type HcatAtom <: AbstractExpr
+struct HcatAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple
@@ -121,7 +121,7 @@ vcat(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(Abstr
 vcat(args::Value...) = Base.cat(1, args...) # Note: this makes general vcat slower for anyone using Convex...
 
 
-Base.vect{T<:AbstractExpr}(args::T...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
+Base.vect(args::T...) where {T<:AbstractExpr} = transpose(HcatAtom([transpose(arg) for arg in args]...))
 Base.vect(args::AbstractExpr...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
 Base.vect(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(AbstractExpr,arg)) for arg in args]...))
 if Base._oldstyle_array_vcat_
@@ -132,6 +132,5 @@ else
     function Base.vect(args::Value...)
         T = Base.promote_typeof(args...)
         return copy!(Array{T}(length(args)), args)
-
     end
 end

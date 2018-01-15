@@ -10,7 +10,7 @@ export sign, curvature, monotonicity, evaluate
 
 # TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs
 
-type RelativeEntropyAtom <: AbstractExpr
+struct RelativeEntropyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr,AbstractExpr}

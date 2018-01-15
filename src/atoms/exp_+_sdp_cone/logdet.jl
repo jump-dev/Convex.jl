@@ -1,6 +1,6 @@
 import Base.logdet
 
-type LogDetAtom <: AbstractExpr
+struct LogDetAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

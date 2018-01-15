@@ -11,7 +11,7 @@ export sign, curvature, monotonicity, evaluate
 
 ### Exponential
 
-type ExpAtom <: AbstractExpr
+struct ExpAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

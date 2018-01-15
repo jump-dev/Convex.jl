@@ -8,7 +8,7 @@
 import Base.diagm
 export diagm
 
-type DiagMatrixAtom <: AbstractExpr
+struct DiagMatrixAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

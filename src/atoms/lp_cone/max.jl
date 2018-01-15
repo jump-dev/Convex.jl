@@ -9,7 +9,7 @@ export max, pos, hinge_loss
 
 # TODO: This can easily be extended to work
 ### Max Atom
-type MaxAtom <: AbstractExpr
+struct MaxAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

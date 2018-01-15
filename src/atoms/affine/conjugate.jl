@@ -1,7 +1,7 @@
 import Base.conj
 export conj
 export sign, curvature, monotonicity, evaluate, conic_form!
-type ConjugateAtom <: AbstractExpr
+struct ConjugateAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

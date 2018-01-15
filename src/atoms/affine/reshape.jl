@@ -3,7 +3,7 @@ export reshape, vec
 export sign, curvature, monotonicity, evaluate, conic_form!
 
 
-type ReshapeAtom <: AbstractExpr
+struct ReshapeAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

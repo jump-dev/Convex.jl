@@ -3,7 +3,7 @@ export socp
 
 # TODO: Document this. How is this different from SOCElemConstraint? Why do we need both. How does
 # conic form work for SOC constraints.
-type SOCConstraint <: Constraint
+struct SOCConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   children::Tuple
@@ -30,7 +30,7 @@ end
 # For debugging created this constraint
 socp(args::AbstractExpr...) = SOCConstraint(args::AbstractExpr...)
 
-type SOCElemConstraint <: Constraint
+struct SOCElemConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   children::Tuple

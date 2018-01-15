@@ -8,7 +8,7 @@ export nuclearnorm
 
 ### Nuclear norm
 
-type NuclearNormAtom <: AbstractExpr
+struct NuclearNormAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

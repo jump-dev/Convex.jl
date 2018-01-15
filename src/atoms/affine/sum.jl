@@ -9,7 +9,7 @@ import Base.sum
 export sum
 
 ### Sum Atom
-type SumAtom <: AbstractExpr
+struct SumAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

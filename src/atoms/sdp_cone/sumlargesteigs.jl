@@ -10,7 +10,7 @@ export sumlargesteigs
 
 ### sumlargesteigs
 
-type SumLargestEigs <: AbstractExpr
+struct SumLargestEigs <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

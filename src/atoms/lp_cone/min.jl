@@ -9,7 +9,7 @@ export min, neg
 
 # TODO: This can easily be extended to work
 ### Min Atom
-type MinAtom <: AbstractExpr
+struct MinAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

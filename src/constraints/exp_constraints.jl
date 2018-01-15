@@ -1,7 +1,7 @@
 export ExpConstraint, conic_form!, vexity
 
 ### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
-type ExpConstraint <: Constraint
+struct ExpConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr, AbstractExpr} # (x, y, z)

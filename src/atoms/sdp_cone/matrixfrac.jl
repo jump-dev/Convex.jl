@@ -7,7 +7,7 @@
 #############################################################################
 export matrixfrac
 
-type MatrixFracAtom <: AbstractExpr
+struct MatrixFracAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

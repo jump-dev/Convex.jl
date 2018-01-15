@@ -9,7 +9,7 @@ import Base.transpose, Base.ctranspose
 export transpose, ctranspose, TransposeAtom, CTransposeAtom
 export sign, curvature, monotonicity, evaluate, conic_form!
 
-type TransposeAtom <: AbstractExpr
+struct TransposeAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}
@@ -72,7 +72,7 @@ transpose(x::AbstractExpr) = TransposeAtom(x)
 
 
 
-type CTransposeAtom <: AbstractExpr
+struct CTransposeAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

@@ -12,7 +12,7 @@ export sign, curvature, monotonicity, evaluate
 
 # TODO: make this work for a *list* of inputs, rather than just for vector/matrix inputs
 
-type LogSumExpAtom <: AbstractExpr
+struct LogSumExpAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

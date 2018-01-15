@@ -4,7 +4,7 @@ export SDPConstraint, isposdef, in, ⪰, ⪯
 ### Positive semidefinite cone constraint
 
 # TODO: Terrible documentation. Please fix.
-type SDPConstraint <: Constraint
+struct SDPConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   child::AbstractExpr

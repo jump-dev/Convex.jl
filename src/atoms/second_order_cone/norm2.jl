@@ -9,7 +9,7 @@ export EucNormAtom, norm2, vecnorm
 export sign, monotonicity, curvature, conic_form!
 
 
-type EucNormAtom <: AbstractExpr
+struct EucNormAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

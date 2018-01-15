@@ -2,7 +2,7 @@ import Base.sqrt
 export GeoMeanAtom, geomean, sqrt
 export sign, monotonicity, curvature, conic_form!
 
-type GeoMeanAtom <: AbstractExpr
+struct GeoMeanAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

@@ -1,7 +1,7 @@
 export QuadOverLinAtom, quadoverlin
 export sign, monotonicity, curvature, conic_form!
 
-type QuadOverLinAtom <: AbstractExpr
+struct QuadOverLinAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr, AbstractExpr}

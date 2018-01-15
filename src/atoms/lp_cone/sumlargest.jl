@@ -8,7 +8,7 @@
 export sumlargest, sumsmallest
 export sign, curvature, monotonicity, evaluate
 
-type SumLargestAtom <: AbstractExpr
+struct SumLargestAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

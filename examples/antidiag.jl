@@ -14,7 +14,7 @@ export antidiag, sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
-type AntidiagAtom <: AbstractExpr
+struct AntidiagAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

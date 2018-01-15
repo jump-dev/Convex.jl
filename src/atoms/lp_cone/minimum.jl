@@ -8,7 +8,7 @@ import Base.minimum
 export minimum
 
 ### Minimum Atom
-type MinimumAtom <: AbstractExpr
+struct MinimumAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

@@ -1,6 +1,6 @@
 export huber
 
-type HuberAtom <: AbstractExpr
+struct HuberAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

@@ -6,7 +6,7 @@
 export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
-type Variable <: AbstractExpr
+mutable struct Variable <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   value::ValueOrNothing

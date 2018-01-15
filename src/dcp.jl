@@ -18,12 +18,12 @@ export -, +, *
 
 # Vexity subtypes
 @compat abstract type Vexity end
-type ConstVexity <: Vexity              end
-type AffineVexity <: Vexity             end
-type ConvexVexity <: Vexity             end
-type ConcaveVexity <: Vexity            end
+struct ConstVexity <: Vexity              end
+struct AffineVexity <: Vexity             end
+struct ConvexVexity <: Vexity             end
+struct ConcaveVexity <: Vexity            end
 
-type NotDcp <: Vexity
+struct NotDcp <: Vexity
 	function NotDcp()
 		warn("Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior.")
     return new()
@@ -32,21 +32,21 @@ end
 
 # Monotonocity subtypes
 @compat abstract type Monotonicity end
-type Nonincreasing <: Monotonicity      end
-type Nondecreasing <: Monotonicity      end
-type ConstMonotonicity <: Monotonicity  end
-type NoMonotonicity <: Monotonicity     end
+struct Nonincreasing <: Monotonicity      end
+struct Nondecreasing <: Monotonicity      end
+struct ConstMonotonicity <: Monotonicity  end
+struct NoMonotonicity <: Monotonicity     end
 
 # Sign subtypes
 @compat abstract type Sign end
-type Positive <: Sign                   end
-type Negative <: Sign                   end
-type NoSign <: Sign                     end
+struct Positive <: Sign                   end
+struct Negative <: Sign                   end
+struct NoSign <: Sign                     end
 
 # New coded
 
 # Also create a new subtype of Sign "NotDefined to handle the ComplexSign case"
-type ComplexSign <: Sign                 end
+struct ComplexSign <: Sign                end
 
 
 -(v::Vexity) = v
