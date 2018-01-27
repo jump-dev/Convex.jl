@@ -1,22 +1,22 @@
 using Convex
-using FactCheck
+using Base.Test
 
-facts("Utilities") do
+@testset "Utilities" begin
 
-  context("length and size") do
+  @testset "length and size" begin
     x = Variable(2,3)
-    @fact length(x) --> 6
-    @fact size(x) --> (2,3)
-    @fact size(x,1) --> 2
-    @fact size(x,2) --> 3
+    @test length(x) == 6
+    @test size(x) == (2, 3)
+    @test size(x, 1) == 2
+    @test size(x, 2) == 3
 
     x = Variable(3)
-    @fact length(x) --> 3
-    @fact size(x) --> (3,1)
+    @test length(x) == 3
+    @test size(x) == (3, 1)
 
     x = Variable()
-    @fact length(x) --> 1
-    @fact size(x) --> (1,1)
+    @test length(x) == 1
+    @test size(x) == (1, 1)
   end
 
   # returns [21]; not sure why

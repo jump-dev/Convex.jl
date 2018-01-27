@@ -34,4 +34,3 @@ println("this run should be faster than the last and have slightly higher optima
 @time solve!(problem, warmstart=true)
 @show problem.optval
 
-
