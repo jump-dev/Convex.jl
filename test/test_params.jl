@@ -1,29 +1,29 @@
 using Convex
-using FactCheck
+using Base.Test
 
 TOL = 1e-3
 
-facts("Fixed and freed variables") do
+@testset "Fixed and freed variables" begin
 
-  context("fix and free addition") do
+  @testset "fix and free addition" begin
 	x = Variable()
 	y = Variable()
 
 	p = minimize(x+y, x>=0, y>=0)
 	solve!(p)
-	@fact p.optval --> roughly(0, TOL)
+	@test isapprox(p.optval, 0, atol=TOL)
 
 	y.value = 4
 	fix!(y)
 	solve!(p)
-	@fact p.optval --> roughly(4, TOL)
+	@test isapprox(p.optval, 4, atol=TOL)
 
 	free!(y)
 	solve!(p)
-	@fact p.optval --> roughly(0, TOL)
+	@test isapprox(p.optval, 0, atol=TOL)
   end
 
-  context("fix multiplication") do
+  @testset "fix multiplication" begin
 	a = [1,2,3,2,1]
 	x = Variable(length(a))
 	gamma = Variable(Positive())
@@ -33,14 +33,14 @@ facts("Fixed and freed variables") do
 	solve!(p)
 	o1 = p.optval
 	# x should be very close to a
-	@fact o1 --> roughly(0.7*norm(a[1:end-1] - a[2:end]), TOL)
+	@test isapprox(o1, 0.7 * norm(a[1:end - 1] - a[2:end]), atol=TOL)
 	# increase regularization
 	fix!(gamma, 1.0)
 	solve!(p)
 	o2 = p.optval
 	# x should be very close to mean(a)
-	@fact o2 --> roughly(norm(a-mean(a)), TOL)
+	@test isapprox(o2, norm(a - mean(a)), atol=TOL)
 
-	@fact o1 <= o2 --> true
+	@test o1 <= o2
   end
 end

@@ -1,17 +1,17 @@
 using Convex
-using FactCheck
+using Base.Test
 
 TOL = 1e-2
 
-facts("SDP and Exp Atoms") do
+@testset "SDP and Exp Atoms" begin
 
-  context("log det atom") do
+  @testset "log det atom" begin
     x = Variable(2, 2)
     p = maximize(logdet(x), [x[1, 1] == 1, x[2, 2] == 1])
-    @fact vexity(p) --> ConvexVexity()
+    @test vexity(p) == ConvexVexity()
     solve!(p)
-    @fact p.optval --> roughly(0, TOL)
-    @fact evaluate(logdet(x)) --> roughly(0, TOL)
+    @test isapprox(p.optval, 0, atol=TOL)
+    @test isapprox(evaluate(logdet(x)), 0, atol=TOL)
   end
 
 end

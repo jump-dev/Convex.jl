@@ -1,5 +1,5 @@
 using Convex
-using FactCheck
+using Base.Test
 
 solvers = Any[]
 
@@ -36,4 +36,3 @@ for solver in solvers
     include("runtests_single_solver.jl")
 end
 
-FactCheck.exitstatus()
