@@ -1,5 +1,5 @@
 using Convex
-using Base.Test
+using Test
 
 tests = ["test_utilities.jl",
          "test_affine.jl",

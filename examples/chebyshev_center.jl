@@ -28,7 +28,7 @@ solve!(p)
 p.optval
 
 # Generate the figure
-x = linspace(-1.5, 1.5);
+x = range(-1.5, stop=1.5, length=50);
 theta = 0:pi/100:2*pi;
 using Gaston
 Gaston.set_terminal("x11")

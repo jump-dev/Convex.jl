@@ -18,7 +18,7 @@ function spdiags(B,d,m,n)
   return A
 end
 
-y = readcsv("snp_500.txt")
+y = readdlm("snp_500.txt")
 n = length(y)
 
 e = ones(n, 1)

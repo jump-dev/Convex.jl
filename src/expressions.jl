@@ -37,8 +37,8 @@ export Value, ValueOrNothing
 export get_vectorized_size
 
 ### Abstract types
-@compat abstract type AbstractExpr end
-@compat abstract type Constraint end
+abstract type AbstractExpr end
+abstract type Constraint end
 
 # Override hash function because of
 # https://github.com/JuliaLang/julia/issues/10267
@@ -100,7 +100,7 @@ end
 
 ### User-defined Unions
 const Value = Union{Number, AbstractArray}
-const ValueOrNothing = Union{Value, Void}
+const ValueOrNothing = Union{Value, Nothing}
 const AbstractExprOrValue = Union{AbstractExpr, Value}
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)

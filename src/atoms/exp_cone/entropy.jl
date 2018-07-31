@@ -13,7 +13,7 @@ export sign, curvature, monotonicity, evaluate
 # TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs
 
 # Entropy atom: -xlogx entrywise
-type EntropyAtom <: AbstractExpr
+mutable struct EntropyAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

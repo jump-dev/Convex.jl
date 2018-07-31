@@ -78,7 +78,7 @@ function ProductToSimpleInequalities(first_power::Int, second_power::Int)
   var_list = [1, 2, 3];
   init_inequality = InequalityExpression(first_power, second_power, 0,
                                          1, 2, 3, -1);
-  return ReducePowers(init_inequality, Array{SimpleInequalityExpression}(0),
+  return ReducePowers(init_inequality, Array{SimpleInequalityExpression}(undef, 0),
                       var_list);
 end
 

@@ -32,8 +32,8 @@ end
 
 for (dir, solver) in solvers
   if isinstalled(dir) && DEFAULT_SOLVER == nothing
-    eval(parse("using "*dir))
-    eval(parse("set_default_solver("*solver*"())"))
+    eval(Meta.parse("using "*dir))
+    eval(Meta.parse("set_default_solver("*solver*"())"))
   end
 end
 

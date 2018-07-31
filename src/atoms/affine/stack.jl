@@ -51,7 +51,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms=UniqueCon
     for objective in objectives
       for id in keys(objective)
         if !(id in keys(variable_to_sizes))
-          if id == object_id(:constant)
+          if id == objectid(:constant)
             variable_to_sizes[id] = 1
           else
             variable_to_sizes[id] = get_vectorized_size(id_to_variables[id])

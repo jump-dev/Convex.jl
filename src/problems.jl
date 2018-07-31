@@ -3,7 +3,7 @@ import MathProgBase
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
 
-const Float64OrNothing = Union{Float64, Void}
+const Float64OrNothing = Union{Float64, Nothing}
 
 # TODO: Cleanup
 mutable struct Solution{T<:Number}
@@ -57,7 +57,7 @@ function find_variable_ranges(constraints)
   for constraint in constraints
     for i = 1:length(constraint.objs)
       for (id, val) in constraint.objs[i]
-        if !haskey(var_to_ranges, id) && id != object_id(:constant)
+        if !haskey(var_to_ranges, id) && id != objectid(:constant)
           var = id_to_variables[id]
           if var.sign == ComplexSign()
             var_to_ranges[id] = (index + 1, index + 2*get_vectorized_size(var))
@@ -81,7 +81,7 @@ function vexity(p::Problem)
   if p.head == :maximize
     obj_vex = -obj_vex
   end
-  typeof(obj_vex) in bad_vex && warn("Problem not DCP compliant: objective is not DCP")
+  typeof(obj_vex) in bad_vex && @warn("Problem not DCP compliant: objective is not DCP")
 
   constr_vex = ConstVexity()
   for i in 1:length(p.constraints)
@@ -143,7 +143,7 @@ function conic_problem(p::Problem)
     for i = 1:length(constraint.objs)
       sz = constraint.sizes[i]
       for (id, val) in constraint.objs[i]
-        if id == object_id(:constant)
+        if id == objectid(:constant)
           for l in 1:sz
             b[constr_index + l] = val[1][l]==0 ? val[2][l] : val[1][l]
           end

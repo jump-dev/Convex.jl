@@ -5,7 +5,7 @@ export ==, <=, >=
 conic_constr_to_constr = Dict{ConicConstr, Constraint}()
 
 ### Linear equality constraint
-type EqConstraint <: Constraint
+mutable struct EqConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   lhs::AbstractExpr
@@ -62,7 +62,7 @@ end
 
 
 ### Linear inequality constraints
-type LtConstraint <: Constraint
+mutable struct LtConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   lhs::AbstractExpr
@@ -114,7 +114,7 @@ end
 <(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
 
 
-type GtConstraint <: Constraint
+mutable struct GtConstraint <: Constraint
   head::Symbol
   id_hash::UInt64
   lhs::AbstractExpr
@@ -165,12 +165,12 @@ end
 >(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
 >(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
 
-function +{T<:Constraint, T2<:Constraint}(constraints_one::Array{T}, constraints_two::Array{T2})
+function +(constraints_one::Array{T}, constraints_two::Array{T2}) where {T<:Constraint, T2<:Constraint}
   constraints = append!(Constraint[], constraints_one)
   return append!(constraints, constraints_two)
 end
 +(constraint_one::Constraint, constraint_two::Constraint) = [constraint_one] + [constraint_two]
-+{T<:Constraint}(constraint_one::Constraint, constraints_two::Array{T}) =
++(constraint_one::Constraint, constraints_two::Array{T}) where {T<:Constraint} =
   [constraint_one] + constraints_two
-+{T<:Constraint}(constraints_one::Array{T}, constraint_two::Constraint) =
++(constraints_one::Array{T}, constraint_two::Constraint) where {T<:Constraint} =
   constraints_one + [constraint_two]

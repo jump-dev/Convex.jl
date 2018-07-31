@@ -28,7 +28,7 @@ m = 20;
 n = 10;
 A = randn(m,n);
 (U,S,V) = svd(A);
-S = diagm(logspace(-1, 1, n));
+S = diagm(exp10.(range(-1, stop=1, length=n)));
 A = U[:, 1:n] * S * V';
 
 B = randn(m, n);
@@ -55,7 +55,7 @@ x_wc = x.evaluate()
 
 # plot residuals
 novals = 100;
-parvals = linspace(-2, 2, novals);
+parvals = range(-2, stop=2, length=novals);
 
 errvals_ls = [];
 errvals_stoch = [];

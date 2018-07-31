@@ -50,13 +50,13 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
     try
       primal = problem.solution.primal
     catch
-      warn("Unable to use cached solution to warmstart problem.
+      @warn("Unable to use cached solution to warmstart problem.
             (Perhaps this is the first time you're solving this problem?)
             Warmstart may be ineffective.")
       primal = zeros(n)
     end
     if !(length(primal) == n)
-      warn("Unable to use cached solution to warmstart problem.
+      @warn("Unable to use cached solution to warmstart problem.
             (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
             Warmstart may be ineffective.")
       primal = zeros(n)
@@ -69,7 +69,7 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
     try
       MathProgBase.setwarmstart!(m, primal)
     catch
-      warn("Unable to warmstart solution.
+      @warn("Unable to warmstart solution.
         (Perhaps the solver doesn't support warm starts?)
         Using a cold start instead.")
     end
@@ -179,7 +179,7 @@ function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UIn
   end
 end
 
-function populate_duals!{T}(constraints::Array{ConicConstr}, dual::Array{T, 1})
+function populate_duals!(constraints::Array{ConicConstr}, dual::Array{T, 1}) where T
   constr_index = 1
   for constraint in constraints
     # conic_constr_to_constr only has keys for conic constraints with a single objective

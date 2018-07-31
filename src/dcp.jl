@@ -17,7 +17,7 @@ export Sign, Positive, Negative, NoSign, ComplexSign
 export -, +, *
 
 # Vexity subtypes
-@compat abstract type Vexity end
+abstract type Vexity end
 struct ConstVexity <: Vexity              end
 struct AffineVexity <: Vexity             end
 struct ConvexVexity <: Vexity             end
@@ -25,20 +25,20 @@ struct ConcaveVexity <: Vexity            end
 
 struct NotDcp <: Vexity
 	function NotDcp()
-		warn("Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior.")
+		@warn("Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior.")
     return new()
 	end
 end
 
 # Monotonocity subtypes
-@compat abstract type Monotonicity end
+abstract type Monotonicity end
 struct Nonincreasing <: Monotonicity      end
 struct Nondecreasing <: Monotonicity      end
 struct ConstMonotonicity <: Monotonicity  end
 struct NoMonotonicity <: Monotonicity     end
 
 # Sign subtypes
-@compat abstract type Sign end
+abstract type Sign end
 struct Positive <: Sign                   end
 struct Negative <: Sign                   end
 struct NoSign <: Sign                     end

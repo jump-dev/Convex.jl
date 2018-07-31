@@ -15,7 +15,7 @@ struct Constant <: AbstractExpr
 
   function Constant(x::Value, sign::Sign)
     sz = (size(x, 1), size(x, 2))
-    return new(:constant, object_id(x), x, sz, ConstVexity(), sign)
+    return new(:constant, objectid(x), x, sz, ConstVexity(), sign)
   end
 
   function Constant(x::Value, check_sign::Bool=true)
@@ -61,7 +61,7 @@ function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms=UniqueCon
     #real_Value = real_conic_form(x)
     #imag_Value = imag_conic_form(x) 
     objective = ConicObj()
-    objective[object_id(:constant)] = (real_conic_form(x), imag_conic_form(x))
+    objective[objectid(:constant)] = (real_conic_form(x), imag_conic_form(x))
     cache_conic_form!(unique_conic_forms, x, objective)
   end
   return get_conic_form(unique_conic_forms, x)
