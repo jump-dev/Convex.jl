@@ -28,7 +28,7 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.length, Base.endof, Base.ndims, Base.convert
+import Base.sign, Base.size, Base.length, Base.ndims, Base.convert
 export AbstractExpr, Constraint
 export vexity, sign, size, evaluate, monotonicity, curvature, length, convert
 export conic_form!
@@ -100,7 +100,7 @@ end
 
 ### User-defined Unions
 const Value = Union{Number, AbstractArray}
-const ValueOrNothing = Union{Value, Void}
+const ValueOrNothing = Union{Value, Nothing}
 const AbstractExprOrValue = Union{AbstractExpr, Value}
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)

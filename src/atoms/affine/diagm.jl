@@ -5,7 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.diagm
 export diagm
 
 struct DiagMatrixAtom <: AbstractExpr

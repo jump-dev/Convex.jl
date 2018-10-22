@@ -1,5 +1,3 @@
-import Base.logdet
-
 struct LogDetAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64

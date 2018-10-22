@@ -44,8 +44,8 @@ function evaluate(x::PartialTraceAtom)
 
     subsystem = function(sys)
         function term(ρ, j::Int)
-            a = speye(1)
-            b = speye(1)
+            a = sparse(Diagonal(ones(1)))
+            b = sparse(Diagonal(ones(1)))
             i_sys = 1
             for dim in dims
                 if i_sys == sys
@@ -55,8 +55,8 @@ function evaluate(x::PartialTraceAtom)
                 a = kron(a, v')
                 b = kron(b, v)
                 else
-                    a = kron(a, speye(dim))
-                    b = kron(b, speye(dim))
+                    a = kron(a, sparse(Diagonal(ones(dim))))
+                    b = kron(b, sparse(Diagonal(ones(dim))))
                 end
                 i_sys += 1
             end
@@ -87,8 +87,8 @@ function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=U
         # in the system we want to trace out
         # This function returns every term in the sum
         function term(ρ, j::Int)
-            a = speye(1)
-            b = speye(1)
+            a = sparse(Diagonal(ones(1)))
+            b = sparse(Diagonal(ones(1)))
             i_sys = 1
             for dim in dims
                 if i_sys == sys
@@ -98,8 +98,8 @@ function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=U
                     a = kron(a, v')
                     b = kron(b, v)
                 else
-                    a = kron(a, speye(dim))
-                    b = kron(b, speye(dim))
+                    a = kron(a, sparse(Diagonal(ones(dim))))
+                    b = kron(b, sparse(Diagonal(ones(dim))))
                 end
                 i_sys += 1
             end

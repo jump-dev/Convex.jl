@@ -3,7 +3,6 @@
 # Handles convolution between a constant vector and an expression vector.
 #############################################################################
 
-import Base.conv
 export conv
 
 function conv(x::Value, y::AbstractExpr)

@@ -1,4 +1,3 @@
-import Base.trace
 export trace
 
 function trace(e::AbstractExpr)

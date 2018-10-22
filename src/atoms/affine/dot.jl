@@ -1,4 +1,3 @@
-import Base.dot, Base.vecdot
 export vecdot, dot
 
 

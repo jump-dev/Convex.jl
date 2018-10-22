@@ -53,7 +53,7 @@ function conic_form!(x::OperatorNormAtom, unique_conic_forms)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = minimize(t, [t*speye(m) A; A' t*speye(n)] ⪰ 0)
+    p = minimize(t, [t*sparse(Diagonal(ones(m))) A; A' t*sparse(Diagonal(ones(n)))] ⪰ 0)
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)

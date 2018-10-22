@@ -11,7 +11,7 @@ function quadform(x::AbstractExpr, A::Value)
   if !issymmetric(A)
     error("Quadratic form only defined for symmetric matrices")
   end
-  V = eigvals(Symmetric(full(A)))
+  V = eigvals(Symmetric(Matrix(A)))
 
   if all(V .>= 0)
     factor = 1
@@ -21,6 +21,6 @@ function quadform(x::AbstractExpr, A::Value)
     error("Quadratic forms supported only for semidefinite matrices")
   end
 
-  P = real(sqrtm(full(factor * A)))
+  P = real(sqrt(Matrix(factor * A)))
   return factor * square(norm2(P * x))
 end

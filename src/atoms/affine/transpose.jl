@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.transpose, Base.ctranspose
+import Base.transpose
 export transpose, ctranspose, TransposeAtom, CTransposeAtom
 export sign, curvature, monotonicity, evaluate, conic_form!
 

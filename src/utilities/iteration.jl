@@ -1,4 +1,3 @@
-import Base: start, next, done
 export start, next, done
 
 start(x::Variable) = 1

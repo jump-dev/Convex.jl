@@ -1,8 +1,6 @@
 # This file adds a new syntax to call elementwise operations on Convex expressions
 # because overloading broadcast no longer works in Julia v0.6
 
-import Base: dot
-
 export dot
 
 # multiplication

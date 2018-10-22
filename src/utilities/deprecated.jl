@@ -24,12 +24,12 @@ Base.@deprecate sum_largest sumlargest
 Base.@deprecate sum_smallest sumsmallest
 
 # broadcasting
-if VERSION<v"0.6.0"
-  .*(x::Value, y::AbstractExpr) = broadcast(*, x, y)
-  .*(x::AbstractExpr, y::Value) = broadcast(*, x, y)
-  .*(x::AbstractExpr, y::AbstractExpr) = broadcast(*, x, y)
-  ./(x::Value, y::AbstractExpr) = broadcast(/, x, y)
-  ./(x::AbstractExpr, y::Value) = broadcast(/, x, y)
-  ./(x::AbstractExpr, y::AbstractExpr) = broadcast(/, x, y)
-  .^(x::AbstractExpr, y::Value) = broadcast(^, x, y)
-end
+#if VERSION<v"0.6.0"
+#  .*(x::Value, y::AbstractExpr) = broadcast(*, x, y)
+#  .*(x::AbstractExpr, y::Value) = broadcast(*, x, y)
+#  .*(x::AbstractExpr, y::AbstractExpr) = broadcast(*, x, y)
+#  ./(x::Value, y::AbstractExpr) = broadcast(/, x, y)
+#  ./(x::AbstractExpr, y::Value) = broadcast(/, x, y)
+#  ./(x::AbstractExpr, y::AbstractExpr) = broadcast(/, x, y)
+#  .^(x::AbstractExpr, y::Value) = broadcast(^, x, y)
+#end

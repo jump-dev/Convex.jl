@@ -48,8 +48,8 @@ function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms=UniqueConi
     objective = conic_form!(x.children[1], unique_conic_forms)
     new_obj = copy(objective)
     for var in keys(new_obj)
-      re = sum(new_obj[var][1], 1)
-      im = sum(new_obj[var][2], 1)
+      re = sum(new_obj[var][1], dims=1)
+      im = sum(new_obj[var][2], dims=1)
       new_obj[var] = (re,im)
     end
     cache_conic_form!(unique_conic_forms, x, new_obj)

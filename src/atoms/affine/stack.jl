@@ -51,7 +51,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms=UniqueCon
     for objective in objectives
       for id in keys(objective)
         if !(id in keys(variable_to_sizes))
-          if id == object_id(:constant)
+          if id == objectid(:constant)
             variable_to_sizes[id] = 1
           else
             variable_to_sizes[id] = get_vectorized_size(id_to_variables[id])
@@ -124,13 +124,16 @@ vcat(args::Value...) = Base.cat(1, args...) # Note: this makes general vcat slow
 Base.vect(args::T...) where {T<:AbstractExpr} = transpose(HcatAtom([transpose(arg) for arg in args]...))
 Base.vect(args::AbstractExpr...) = transpose(HcatAtom([transpose(arg) for arg in args]...))
 Base.vect(args::AbstractExprOrValue...) = transpose(HcatAtom([transpose(convert(AbstractExpr,arg)) for arg in args]...))
-if Base._oldstyle_array_vcat_
-  Base.vect(args::Value...) = Base.vcat(args...)
-  # This is ugly, because the method redefines simple cases like [1,2,3]
-        
-else
-    function Base.vect(args::Value...)
-        T = Base.promote_typeof(args...)
-        return copy!(Array{T}(length(args)), args)
-    end
+#if Base._oldstyle_array_vcat_
+#  Base.vect(args::Value...) = Base.vcat(args...)
+#  # This is ugly, because the method redefines simple cases like [1,2,3]
+#        
+#else
+#    function Base.vect(args::Value...)
+#        T = Base.promote_typeof(args...)
+#        return copy!(Array{T}(length(args)), args)
+#    end
+#end
+function Base.vect(args::Value...)
+    return collect(args)
 end
