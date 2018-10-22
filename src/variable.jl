@@ -18,7 +18,7 @@ mutable struct Variable <: AbstractExpr
 
   function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
     this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
-    this.id_hash = object_id(this)
+    this.id_hash = objectid(this)
     id_to_variables[this.id_hash] = this
     return this
   end
@@ -77,13 +77,13 @@ end
 
 function real_conic_form(x::Variable)
   vec_size = get_vectorized_size(x)
-  return speye(vec_size)
+  return sparse(1.0I, vec_size, vec_size)
 end
 
 function imag_conic_form(x::Variable)
   vec_size = get_vectorized_size(x)
   if x.sign == ComplexSign()
-    return im*speye(vec_size)
+    return im*sparse(1.0I, vec_size, vec_size)
   else
     return spzeros(vec_size, vec_size)
   end
@@ -94,14 +94,14 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueCon
     if :fixed in x.sets
       # do exactly what we would for a constant
       objective = ConicObj()
-      objective[object_id(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
+      objective[objectid(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
       cache_conic_form!(unique_conic_forms, x, objective)
     else
       objective = ConicObj()
       vec_size = get_vectorized_size(x)
 
       objective[x.id_hash] = (real_conic_form(x), imag_conic_form(x))
-      objective[object_id(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
+      objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
       # placeholder values in unique constraints prevent infinite recursion depth
       cache_conic_form!(unique_conic_forms, x, objective)
       if !(x.sign == NoSign() || x.sign == ComplexSign())
@@ -122,12 +122,13 @@ function fix!(x::Variable)
   x.vexity = ConstVexity()
   x
 end
-function fix!(x::Variable, v)
-  # TODO: check sizes match
-  x.value = Array{Float64}(size(x))
-  x.value[:] = v
+function fix!(x::Variable, v::AbstractArray)
+  size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+  x.value = Array{Float64}(undef, size(x))
+  x.value[:,:] = v
   fix!(x)
 end
+fix!(x::Variable, v::Number) = fix!(x, fill(v, (1, 1)))
 
 function free!(x::Variable)
   # TODO this won't work if :fixed appears other than at the end of x.sets

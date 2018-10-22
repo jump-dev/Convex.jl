@@ -1,6 +1,6 @@
-import Base.trace
-export trace
+import LinearAlgebra.tr
+export tr
 
-function trace(e::AbstractExpr)
+function tr(e::AbstractExpr)
   return sum(diag(e))
 end

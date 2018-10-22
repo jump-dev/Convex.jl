@@ -81,6 +81,6 @@ function show(io::IO, p::Problem)
   join(io, p.constraints, "\n\t\t")
   print(io, "\ncurrent status: $(p.status)")
   if p.status == "solved"
-    print(io, " with optimal value of $(round(p.optval, 4))")
+    print(io, " with optimal value of $(round(p.optval, digits=4))")
   end
 end

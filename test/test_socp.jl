@@ -1,5 +1,6 @@
 using Convex
-using Base.Test
+using Test
+import LinearAlgebra.opnorm
 
 TOL = 1e-3
 
@@ -12,8 +13,8 @@ TOL = 1e-3
     p = minimize(norm2(A * x + b))
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 0.64888, atol=TOL)
-    @test isapprox(evaluate(norm2(A * x + b)), 0.64888, atol=TOL)
+    @test p.optval ≈ 0.64888 atol=TOL
+    @test evaluate(norm2(A * x + b)) ≈ 0.64888 atol=TOL
 
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
@@ -22,8 +23,8 @@ TOL = 1e-3
     p = minimize(norm2(A * x + b) + lambda * norm2(x), x >= 1)
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 14.9049, atol=TOL)
-    @test isapprox(evaluate(norm2(A * x + b) + lambda * norm2(x)), 14.9049, atol=TOL)
+    @test p.optval ≈ 14.9049 atol=TOL
+    @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol=TOL
 
     x = Variable(2)
 
@@ -31,8 +32,8 @@ TOL = 1e-3
     @test vexity(p) == ConvexVexity()
 
     solve!(p)
-    @test isapprox(p.optval, 14.9049, atol=TOL)
-    @test isapprox(evaluate(norm2(A * x + b) + lambda * norm2(x)), 14.9049, atol=TOL)
+    @test p.optval ≈ 14.9049 atol=TOL
+    @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol=TOL
 
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
@@ -41,8 +42,8 @@ TOL = 1e-3
     p = minimize(norm2(A * x + b) + lambda * norm_1(x), x >= 1)
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 15.4907, atol=TOL)
-    @test isapprox(evaluate(norm2(A * x + b) + lambda * norm_1(x)), 15.4907, atol=TOL)
+    @test p.optval ≈ 15.4907 atol=TOL
+    @test evaluate(norm2(A * x + b) + lambda * norm_1(x)) ≈ 15.4907 atol=TOL
   end
 
   @testset "frobenius norm atom" begin
@@ -51,8 +52,8 @@ TOL = 1e-3
     p = minimize(vecnorm(m, 2), c)
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, sqrt(35), atol=TOL)
-    @test isapprox(evaluate(vecnorm(m, 2)), sqrt(35), atol=TOL)
+    @test p.optval ≈ sqrt(35) atol=TOL
+    @test evaluate(vecnorm(m, 2)) ≈ sqrt(35) atol=TOL
   end
 
   @testset "quad over lin atom" begin
@@ -64,8 +65,8 @@ TOL = 1e-3
     p = minimize(quadoverlin(A*x + b, c*x + d))
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 17.7831, atol=TOL)
-    @test isapprox((evaluate(quadoverlin(A * x + b, c * x + d)))[1], 17.7831, atol=TOL)
+    @test p.optval ≈ 17.7831 atol=TOL
+    @test (evaluate(quadoverlin(A * x + b, c * x + d)))[1] ≈ 17.7831 atol=TOL
   end
 
   @testset "sum squares atom" begin
@@ -75,8 +76,8 @@ TOL = 1e-3
     p = minimize(sumsquares(A*x + b))
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 0.42105, atol=TOL)
-    @test isapprox((evaluate(sumsquares(A * x + b)))[1], 0.42105, atol=TOL)
+    @test p.optval ≈ 0.42105 atol=TOL
+    @test (evaluate(sumsquares(A * x + b)))[1] ≈ 0.42105 atol=TOL
   end
 
   @testset "square atom" begin
@@ -86,8 +87,8 @@ TOL = 1e-3
     p = minimize(sum(square(A*x + b)))
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 0.42105, atol=TOL)
-    @test isapprox(evaluate(sum(square(A * x + b))), 0.42105, atol=TOL)
+    @test p.optval ≈ 0.42105 atol=TOL
+    @test evaluate(sum(square(A * x + b))) ≈ 0.42105 atol=TOL
 
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
@@ -96,14 +97,14 @@ TOL = 1e-3
     p = minimize(sum(dot(^)(expr,2))) # elementwise ^
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 0.42105, atol=TOL)
-    @test isapprox(evaluate(sum(broadcast(^, expr, 2))), 0.42105, atol=TOL)
+    @test p.optval ≈ 0.42105 atol=TOL
+    @test evaluate(sum(broadcast(^, expr, 2))) ≈ 0.42105 atol=TOL
 
     p = minimize(sum(dot(*)(expr, expr))) # elementwise *
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 0.42105, atol=TOL)
-    @test isapprox(evaluate(sum((dot(*))(expr, expr))), 0.42105, atol=TOL)
+    @test p.optval ≈ 0.42105 atol=TOL
+    @test evaluate(sum((dot(*))(expr, expr))) ≈ 0.42105 atol=TOL
   end
 
   @testset "inv pos atom" begin
@@ -111,22 +112,22 @@ TOL = 1e-3
     p = minimize(sum(invpos(x)), invpos(x) < 2, x > 1, x == 2, 2 == x)
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 2, atol=TOL)
-    @test isapprox(evaluate(sum(invpos(x))), 2, atol=TOL)
+    @test p.optval ≈ 2 atol=TOL
+    @test evaluate(sum(invpos(x))) ≈ 2 atol=TOL
 
     x = Variable(3)
     p = minimize(sum(dot(/)([3,6,9], x)), x<=3)
     solve!(p)
-    @test isapprox(x.value, 3 * ones(3, 1), atol=TOL)
-    @test isapprox(p.optval, 6, atol=TOL)
-    @test isapprox(evaluate(sum((dot(/))([3, 6, 9], x))), 6, atol=TOL)
+    @test x.value ≈ fill(3.0, (3, 1)) atol=TOL
+    @test p.optval ≈ 6 atol=TOL
+    @test evaluate(sum((dot(/))([3, 6, 9], x))) ≈ 6 atol=TOL
 
     x = Variable()
     p = minimize(sum([3,6,9]/x), x<=3)
     solve!(p)
-    @test isapprox(x.value, 3, atol=TOL)
-    @test isapprox(p.optval, 6, atol=TOL)
-    @test isapprox(evaluate(sum([3, 6, 9] / x)), 6, atol=TOL)
+    @test x.value ≈ 3 atol=TOL
+    @test p.optval ≈ 6 atol=TOL
+    @test evaluate(sum([3, 6, 9] / x)) ≈ 6 atol=TOL
   end
 
   @testset "geo mean atom" begin
@@ -141,8 +142,8 @@ TOL = 1e-3
 
     p = maximize(sum(geomean(x, y)), 1 < x, x < 2, y < 2)
     solve!(p)
-    @test isapprox(p.optval, 4, atol=TOL)
-    @test isapprox(evaluate(sum(geomean(x, y))), 4, atol=TOL)
+    @test p.optval ≈ 4 atol=TOL
+    @test evaluate(sum(geomean(x, y))) ≈ 4 atol=TOL
   end
 
   @testset "sqrt atom" begin
@@ -156,8 +157,8 @@ TOL = 1e-3
     p = minimize(quadform(x, A), [x >= 1])
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 6.1464, atol=TOL)
-    @test isapprox((evaluate(quadform(x, A)))[1], 6.1464, atol=TOL)
+    @test p.optval ≈ 6.1464 atol=TOL
+    @test (evaluate(quadform(x, A)))[1] ≈ 6.1464 atol=TOL
 
     x = Variable(3, 1)
     A = -1.0*[0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
@@ -165,8 +166,8 @@ TOL = 1e-3
     p = maximize(c*x , [quadform(x, A) >= -1])
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 3.7713, atol=TOL)
-    @test isapprox((evaluate(quadform(x, A)))[1], -1, atol=TOL)
+    @test p.optval ≈ 3.7713 atol=TOL
+    @test (evaluate(quadform(x, A)))[1] ≈ -1 atol=TOL
   end
 
   @testset "huber atom" begin
@@ -174,8 +175,8 @@ TOL = 1e-3
     p = minimize(sum(huber(x, 1)), x >= 2)
     @test vexity(p) == ConvexVexity()
     solve!(p)
-    @test isapprox(p.optval, 9, atol=TOL)
-    @test isapprox(evaluate(sum(huber(x, 1))), 9, atol=TOL)
+    @test p.optval ≈ 9 atol=TOL
+    @test evaluate(sum(huber(x, 1))) ≈ 9 atol=TOL
   end
 
   @testset "rational norm atom" begin
@@ -186,8 +187,8 @@ TOL = 1e-3
     @test vexity(p) == ConvexVexity()
     # Solution is approximately x = [1, .93138, 1.04575]
     solve!(p)
-    @test isapprox(p.optval, 1.2717, atol=TOL)
-    @test isapprox(evaluate(norm(x, 4.5)), 1.2717, atol=TOL)
+    @test p.optval ≈ 1.2717 atol=TOL
+    @test evaluate(norm(x, 4.5)) ≈ 1.2717 atol=TOL
   end
 
   @testset "rational norm dual norm" begin
@@ -199,10 +200,10 @@ TOL = 1e-3
     p.constraints += (norm(x, q) <= 1)
     @test vexity(p) == ConvexVexity()
     solve!(p)  # Solution is -norm(v, q / (q - 1))
-    @test isapprox(p.optval, -2.144087, atol=TOL)
-    @test isapprox(sum(evaluate(x' * v)), -2.144087, atol=TOL)
-    @test isapprox(evaluate(norm(x, q)), 1, atol=TOL)
-    @test isapprox(sum(evaluate(x' * v)), -(sum(abs.(v) .^ qs) ^ (1 / qs)), atol=TOL)
+    @test p.optval ≈ -2.144087 atol=TOL
+    @test sum(evaluate(x' * v)) ≈ -2.144087 atol=TOL
+    @test evaluate(norm(x, q)) ≈ 1 atol=TOL
+    @test sum(evaluate(x' * v)) ≈ -(sum(abs.(v) .^ qs) ^ (1 / qs)) atol=TOL
   end
 
   @testset "rational norm atom sum" begin
@@ -221,22 +222,22 @@ TOL = 1e-3
     qs = q / (q - 1);  # Conjugate
     denom = sum(abs.(margins).^q)^(1/qs)
     g = x_opt + A' * (abs.(margins).^(q-1) .* sign.(margins)) / denom
-    @test isapprox(p.optval, 1.7227, atol=TOL)
-    @test isapprox(norm(g, 2) ^ 2, 0, atol=TOL)
+    @test p.optval ≈ 1.7227 atol=TOL
+    @test norm(g, 2) ^ 2 ≈ 0 atol=TOL
   end
 
   @testset "norm consistent with Base" begin
     A = randn(4, 4)
     x = Variable(4, 4)
     x.value = A
-    @test isapprox(evaluate(norm(x)), norm(A), atol=TOL)
-    @test isapprox(evaluate(norm(x, 1)), norm(A, 1), atol=TOL)
-    @test isapprox(evaluate(norm(x, 2)), norm(A, 2), atol=TOL)
-    @test isapprox(evaluate(norm(x, Inf)), norm(A, Inf), atol=TOL)
-    @test isapprox(evaluate(vecnorm(x, 1)), norm(vec(A), 1), atol=TOL)
-    @test isapprox(evaluate(vecnorm(x, 2)), norm(vec(A), 2), atol=TOL)
-    @test isapprox(evaluate(vecnorm(x, 7)), norm(vec(A), 7), atol=TOL)
-    @test isapprox(evaluate(vecnorm(x, Inf)), norm(vec(A), Inf), atol=TOL)
+    @test evaluate(norm(x)) ≈ opnorm(A) atol=TOL
+    @test evaluate(norm(x, 1)) ≈ opnorm(A, 1) atol=TOL
+    @test evaluate(norm(x, 2)) ≈ opnorm(A, 2) atol=TOL
+    @test evaluate(norm(x, Inf)) ≈ opnorm(A, Inf) atol=TOL
+    @test evaluate(vecnorm(x, 1)) ≈ norm(vec(A), 1) atol=TOL
+    @test evaluate(vecnorm(x, 2)) ≈ norm(vec(A), 2) atol=TOL
+    @test evaluate(vecnorm(x, 7)) ≈ norm(vec(A), 7) atol=TOL
+    @test evaluate(vecnorm(x, Inf)) ≈ norm(vec(A), Inf) atol=TOL
   end
 
 

@@ -10,14 +10,14 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-import Base.-, Base.+, Base.*
+import Base.-, Base.+, Base.*, Base./
 export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
 export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
 export Sign, Positive, Negative, NoSign, ComplexSign
 export -, +, *
 
 # Vexity subtypes
-@compat abstract type Vexity end
+abstract type Vexity end
 struct ConstVexity <: Vexity              end
 struct AffineVexity <: Vexity             end
 struct ConvexVexity <: Vexity             end
@@ -25,20 +25,20 @@ struct ConcaveVexity <: Vexity            end
 
 struct NotDcp <: Vexity
 	function NotDcp()
-		warn("Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior.")
-    return new()
+        @warn "Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior."
+        return new()
 	end
 end
 
 # Monotonocity subtypes
-@compat abstract type Monotonicity end
+abstract type Monotonicity end
 struct Nonincreasing <: Monotonicity      end
 struct Nondecreasing <: Monotonicity      end
 struct ConstMonotonicity <: Monotonicity  end
 struct NoMonotonicity <: Monotonicity     end
 
 # Sign subtypes
-@compat abstract type Sign end
+abstract type Sign end
 struct Positive <: Sign                   end
 struct Negative <: Sign                   end
 struct NoSign <: Sign                     end

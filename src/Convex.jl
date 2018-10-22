@@ -2,7 +2,8 @@ __precompile__()
 
 module Convex
 import DataStructures
-importall Base.Operators
+using LinearAlgebra
+using SparseArrays
 using Compat
 
 global DEFAULT_SOLVER = nothing
@@ -49,9 +50,6 @@ include("atoms/lp_cone/min.jl")
 include("atoms/lp_cone/sumlargest.jl")
 include("atoms/lp_cone/dotsort.jl")
 
-
-
-
 ### SOC atoms
 include("atoms/second_order_cone/norm.jl") # also includes some lp atoms
 include("atoms/second_order_cone/norm2.jl")
@@ -83,7 +81,6 @@ include("atoms/exp_+_sdp_cone/logdet.jl")
 ### utilities
 include("utilities/show.jl")
 include("utilities/iteration.jl")
-include("utilities/deprecated.jl")
 include("utilities/broadcast.jl")
 
 #Temporary workaround for memory leak (https://github.com/JuliaOpt/Convex.jl/issues/83)

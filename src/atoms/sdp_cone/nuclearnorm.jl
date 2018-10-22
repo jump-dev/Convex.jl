@@ -40,7 +40,7 @@ end
 nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 
 # Create the equivalent conic problem:
-#   minimize (trace(U) + trace(V))/2
+#   minimize (tr(U) + tr(V))/2
 #   subject to
 #            [U A; A' V] ⪰ 0
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
@@ -51,7 +51,7 @@ function conic_form!(x::NuclearNormAtom, unique_conic_forms)
     m, n = size(A)
     U = Variable(m,m)
     V = Variable(n,n)
-    p = minimize(.5*(trace(U) + trace(V)), [U A; A' V] ⪰ 0)
+    p = minimize(.5*(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
     cache_conic_form!(unique_conic_forms, x, p)
   end
   return get_conic_form(unique_conic_forms, x)

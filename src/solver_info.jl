@@ -1,6 +1,7 @@
+using Pkg
 import MathProgBase
 export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
-export set_default_solver, get_default_solver
+export set_default_solver, get_default_solver, isinstalled
 
 function set_default_solver(solver::MathProgBase.AbstractMathProgSolver)
   global DEFAULT_SOLVER
@@ -19,37 +20,35 @@ function get_default_solver()
 end
 
 # TODO: I have not listed solvers such as CPLEX etc because I have not tested Convex with them
-solvers = [("SCS", "SCSSolver"), ("ECOS", "ECOSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
+solvers = [("ECOS", "ECOSSolver"), ("SCS", "SCSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
           ("GLPKMathProgInterface", "GLPKSolverMIP")]
 
 function isinstalled(pkg)
-    if isdir(Pkg.dir(pkg)); return true; end
-    for path in Base.LOAD_PATH
-        if isdir(joinpath(path, pkg)); return true; end
+    for path in Base.DEPOT_PATH
+        if isdir(joinpath(path, pkg)) || isdir(joinpath(path, "packages", pkg))
+            return true
+        end
     end
     return false
 end
 
 for (dir, solver) in solvers
   if isinstalled(dir) && DEFAULT_SOLVER == nothing
-    eval(parse("using "*dir))
-    eval(parse("set_default_solver("*solver*"())"))
+    eval(Meta.parse("using $dir"))
+    eval(Meta.parse("set_default_solver($solver())"))
   end
 end
 
 
 if get_default_solver() == nothing
-  packages = ""
-  for (dir, solver) in solvers
-    packages = packages*dir*" | "
-  end
-  warn("***********************************************************************************************
+  packages = join([dir for (dir, solver) in solvers], " | ")
+  @warn "***********************************************************************************************
        You don't have any of
        "*packages*" installed.
        You must have at least one of these solvers. You can install a solver such as SCS by running:
        Pkg.add(\"SCS\")
        You will have to restart Julia after that.
-       ***********************************************************************************************")
+       ***********************************************************************************************"
 end
 
 function can_solve_mip(solver)
@@ -57,7 +56,7 @@ function can_solve_mip(solver)
   if name == :GurobiSolver || name == :MosekSolver || name == :GLPKSolverMIP || name == :CPLEXSolver || name == :CbcSolver
     return true
   else
-    info("$name cannot solve mixed integer programs. Consider using Gurobi, Mosek, or GLPK.")
+    @info "$name cannot solve mixed integer programs. Consider using Gurobi, Mosek, or GLPK."
     return false
   end
 end
@@ -67,7 +66,7 @@ function can_solve_socp(solver)
     return true
   else
     name = typeof(solver).name.name
-    info("$name cannot solve second order cone programs. Consider using SCS, ECOS, Mosek, or Gurobi.")
+    @info "$name cannot solve second order cone programs. Consider using SCS, ECOS, Mosek, or Gurobi."
     return false
   end
 end
@@ -77,7 +76,7 @@ function can_solve_exp(solver)
     return true
   else
     name = typeof(solver).name.name
-    info("$name cannot solve exponential programs. Consider using SCS or ECOS.")
+    @info "$name cannot solve exponential programs. Consider using SCS or ECOS."
     return false
   end
 end
@@ -87,7 +86,7 @@ function can_solve_sdp(solver)
     return true
   else
     name = typeof(solver).name.name
-    info("$name cannot solve semidefinite programs. Consider using SCS or Mosek.")
+    @info "$name cannot solve semidefinite programs. Consider using SCS or Mosek."
     return false
   end
 end

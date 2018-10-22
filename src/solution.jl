@@ -37,7 +37,7 @@ function solve!(problem::Problem;
   # and the primal (and possibly dual) variables with values
   populate_solution!(m, problem, var_to_ranges, conic_constraints)
   if !(problem.status==:Optimal) && verbose
-    warn("Problem status $(problem.status); solution may be inaccurate.")
+    @warn "Problem status $(problem.status); solution may be inaccurate."
   end
 
 end
@@ -50,15 +50,15 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
     try
       primal = problem.solution.primal
     catch
-      warn("Unable to use cached solution to warmstart problem.
+      @warn "Unable to use cached solution to warmstart problem.
             (Perhaps this is the first time you're solving this problem?)
-            Warmstart may be ineffective.")
+            Warmstart may be ineffective."
       primal = zeros(n)
     end
     if !(length(primal) == n)
-      warn("Unable to use cached solution to warmstart problem.
+      @warn "Unable to use cached solution to warmstart problem.
             (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
-            Warmstart may be ineffective.")
+            Warmstart may be ineffective."
       primal = zeros(n)
     end
 
@@ -69,9 +69,9 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
     try
       MathProgBase.setwarmstart!(m, primal)
     catch
-      warn("Unable to warmstart solution.
+      @warn "Unable to warmstart solution.
         (Perhaps the solver doesn't support warm starts?)
-        Using a cold start instead.")
+        Using a cold start instead."
     end
     m
 end
@@ -79,8 +79,7 @@ end
 function load_problem!(m::MathProgBase.AbstractConicModel, c, A, b, cones, vartypes)
   # no conic constraints on variables
   var_cones = fill((:Free, 1:size(A, 2)),1)
-  # TODO: Get rid of full once c and b are not sparse
-  MathProgBase.loadproblem!(m, vec(full(c)), A, vec(full(b)), cones, var_cones)
+  MathProgBase.loadproblem!(m, vec(Array(c)), A, vec(Array(b)), cones, var_cones)
 
   # add integer and binary constraints on variables
   if !all(Bool[t==:Cont for t in vartypes])
@@ -115,7 +114,7 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
     NaN
   end
 
-  if any(isnan.(dual))
+  if any(isnan, dual)
     problem.solution = Solution(solution, MathProgBase.status(m), objective)
   else
     problem.solution = Solution(solution, dual, MathProgBase.status(m), objective)
@@ -179,7 +178,7 @@ function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UIn
   end
 end
 
-function populate_duals!{T}(constraints::Array{ConicConstr}, dual::Array{T, 1})
+function populate_duals!(constraints::Array{ConicConstr}, dual::Vector)
   constr_index = 1
   for constraint in constraints
     # conic_constr_to_constr only has keys for conic constraints with a single objective

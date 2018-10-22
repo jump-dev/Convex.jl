@@ -73,8 +73,8 @@ end
 function promote_size(c::ConicObj, vectorized_size::Int)
   new_obj = copy(c)
   for var in keys(new_obj)
-      x1 = repmat(new_obj[var][1], vectorized_size, 1)
-      x2 = repmat(new_obj[var][2], vectorized_size, 1)
+      x1 = repeat(new_obj[var][1], vectorized_size, 1)
+      x2 = repeat(new_obj[var][2], vectorized_size, 1)
       new_obj[var] = (x1,x2)
   end
   return new_obj

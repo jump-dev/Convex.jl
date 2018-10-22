@@ -5,7 +5,7 @@
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.eigvals
+import LinearAlgebra.eigvals
 export sumlargesteigs
 
 ### sumlargesteigs
@@ -61,8 +61,8 @@ function conic_form!(x::SumLargestEigs, unique_conic_forms)
     m, n = size(A)
     Z = Variable(n, n)
     s = Variable()
-    p = minimize(s*k + trace(Z), 
-                 Z + s*eye(n) - A ⪰ 0, 
+    p = minimize(s*k + tr(Z), 
+                 Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
                  A ⪰ 0, Z ⪰ 0)
     cache_conic_form!(unique_conic_forms, x, p)
   end

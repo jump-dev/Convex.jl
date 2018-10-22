@@ -1,4 +1,5 @@
-import Base.isposdef, Base.in
+import LinearAlgebra.isposdef
+import Base.in
 export SDPConstraint, isposdef, in, ⪰, ⪯
 
 ### Positive semidefinite cone constraint
@@ -47,10 +48,10 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms=Uniq
     # symmetry => c.child[upperpart]
     # scale off-diagonal elements by sqrt(2)
     rescale = sqrt(2)*tril(ones(n,n))
-    rescale[find(diagm(ones(n)))] = 1.0
-    diagandlowerpart = find(rescale)
-    lowerpart = Array{Int}(div(n*(n-1),2))
-    upperpart = Array{Int}(div(n*(n-1),2))
+    rescale[diagind(n, n)] .= 1.0
+    diagandlowerpart = findall(!iszero, vec(rescale))
+    lowerpart = Array{Int}(undef, div(n*(n-1),2))
+    upperpart = Array{Int}(undef, div(n*(n-1),2))
     klower = 0
     # diagandlowerpart in column-major order:
     # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...

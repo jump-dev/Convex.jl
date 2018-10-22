@@ -13,7 +13,7 @@ struct ReshapeAtom <: AbstractExpr
     if m * n != get_vectorized_size(x)
       error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
     end
-    return new(:reshape, object_id(x), (x,), (m, n))
+    return new(:reshape, objectid(x), (x,), (m, n))
   end
 end
 

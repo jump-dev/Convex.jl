@@ -3,7 +3,9 @@ os:
     - linux
     - osx
 julia:
-    - 0.6
+    - 0.7
+    - 1.0
+    - nightly
 notifications:
     email: false
 sudo: false
@@ -13,10 +15,6 @@ addons:
         - liblapack-dev
         - libgmp-dev
         - libglpk-dev
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd())'
-    - julia -e 'Pkg.test("Convex", coverage=true)'
 after_success:
     - julia -e 'Pkg.add("Coverage")'
     - julia -e 'cd(Pkg.dir("Convex")); using Coverage; Coveralls.submit(process_folder())'

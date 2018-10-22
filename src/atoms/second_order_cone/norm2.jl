@@ -4,7 +4,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.vecnorm
+import LinearAlgebra.norm2
 export EucNormAtom, norm2, vecnorm
 export sign, monotonicity, curvature, conic_form!
 

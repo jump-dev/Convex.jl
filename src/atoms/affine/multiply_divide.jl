@@ -83,11 +83,11 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms=Uniqu
     # left matrix multiplication
     elseif x.children[1].head == :constant
       objective = conic_form!(x.children[2], unique_conic_forms)
-      objective = kron(speye(x.size[2]), x.children[1].value) * objective
+      objective = kron(sparse(1.0I, x.size[2], x.size[2]), x.children[1].value) * objective
     # right matrix multiplication
     else
       objective = conic_form!(x.children[1], unique_conic_forms)
-      objective = kron(x.children[2].value', speye(x.size[1])) * objective
+      objective = kron(x.children[2].value', sparse(1.0I, x.size[1], x.size[1])) * objective
     end
     cache_conic_form!(unique_conic_forms, x, objective)
   end
@@ -103,7 +103,7 @@ end
 
 *(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
-/(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1./y))
+/(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1 ./ y))
 
 ### .*
 # All constructors of this check (and so this function requires)
@@ -171,7 +171,7 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms=Un
       var = var*ones(1,size(coeff,1))
     end
 
-    const_multiplier = spdiagm(vec(coeff)) # used to be spdiagm((vec(coeff),), (0,)), not sure why
+    const_multiplier = spdiagm(0 => vec(coeff))
     objective = const_multiplier * conic_form!(var, unique_conic_forms)
     cache_conic_form!(unique_conic_forms, x, objective)
   end
@@ -205,5 +205,5 @@ function broadcast(::typeof(*), x::AbstractExpr, y::AbstractExpr)
 end
 broadcast(::typeof(*), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
 broadcast(::typeof(*), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
-broadcast(::typeof(/), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1./y), x)
+broadcast(::typeof(/), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1 ./ y), x)
 # x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl

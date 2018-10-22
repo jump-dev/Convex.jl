@@ -1,7 +1,7 @@
 import Base: getindex, to_index
 export IndexAtom, getindex
 
-const ArrayOrNothing = Union{AbstractArray, Void}
+const ArrayOrNothing = Union{AbstractArray, Nothing}
 
 struct IndexAtom <: AbstractExpr
   head::Symbol
@@ -54,7 +54,7 @@ function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms=UniqueCo
 
     if x.inds == nothing
       sz = length(x.cols) * length(x.rows)
-      J = Array{Int}(sz)
+      J = Array{Int}(undef, sz)
       k = 1
 
       num_rows = x.children[1].size[1]
@@ -78,14 +78,14 @@ end
 
 ## API Definition begins
 
-getindex(x::AbstractExpr, rows::AbstractArray{T, 1}, cols::AbstractArray{T, 1}) where {T <: Real} = IndexAtom(x, rows, cols)
-getindex(x::AbstractExpr, inds::AbstractArray{T, 1}) where {T <: Real} = IndexAtom(x, inds)
+getindex(x::AbstractExpr, rows::AbstractVector{T}, cols::AbstractVector{T}) where {T<:Real} = IndexAtom(x, rows, cols)
+getindex(x::AbstractExpr, inds::AbstractVector{<:Real}) = IndexAtom(x, inds)
 getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
 getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
-getindex(x::AbstractExpr, row::Real, cols::AbstractArray{T, 1}) where {T <: Real} = getindex(x, row:row, cols)
-getindex(x::AbstractExpr, rows::AbstractArray{T, 1}, col::Real) where {T <: Real} = getindex(x, rows, col:col)
+getindex(x::AbstractExpr, row::Real, cols::AbstractVector{<:Real}) = getindex(x, row:row, cols)
+getindex(x::AbstractExpr, rows::AbstractVector{<:Real}, col::Real) = getindex(x, rows, col:col)
 # XXX todo: speed test; there are lots of possible solutions for this
-function getindex(x::AbstractExpr, I::AbstractArray{Bool,2})
+function getindex(x::AbstractExpr, I::AbstractMatrix{Bool})
     return [xi for (xi,ii) in zip(x,I) if ii]
 end
 function getindex(x::AbstractExpr, I::AbstractVector{Bool})

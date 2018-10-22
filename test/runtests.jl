@@ -1,36 +1,27 @@
 using Convex
-using Base.Test
+using Test
+using ECOS
+using SCS
+using GLPKMathProgInterface
 
 # Seed random number stream to improve test reliability
 srand(2)
 
 solvers = Any[]
 
-if isdir(Pkg.dir("ECOS"))
-    using ECOS
-    push!(solvers, ECOSSolver(verbose=0))
-end
+push!(solvers, ECOSSolver(verbose=0))
+push!(solvers, GLPKSolverMIP())
+push!(solvers, SCSSolver(verbose=0, eps=1e-6))
 
-if isdir(Pkg.dir("SCS"))
-    using SCS
-    push!(solvers, SCSSolver(verbose=0, eps=1e-5))
-end
-
-if isdir(Pkg.dir("Gurobi"))
+if isinstalled("Gurobi")
     using Gurobi
     push!(solvers, GurobiSolver(OutputFlag=0))
 end
 
-if isdir(Pkg.dir("Mosek"))
+if isinstalled("Mosek")
     using Mosek
     push!(solvers, MosekSolver(LOG=0))
 end
-
-if isdir(Pkg.dir("GLPK")) && isdir(Pkg.dir("GLPKMathProgInterface"))
-    using GLPKMathProgInterface
-    push!(solvers, GLPKSolverMIP())
-end
-
 
 for solver in solvers
     println("Running tests with $(solver):")
@@ -38,4 +29,3 @@ for solver in solvers
     println(get_default_solver())
     include("runtests_single_solver.jl")
 end
-

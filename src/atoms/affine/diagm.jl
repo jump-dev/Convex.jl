@@ -5,8 +5,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.diagm
-export diagm
+import LinearAlgebra.diagm, LinearAlgebra.Diagonal
+export diagm, Diagonal
 
 struct DiagMatrixAtom <: AbstractExpr
   head::Symbol
@@ -22,7 +22,7 @@ struct DiagMatrixAtom <: AbstractExpr
     elseif num_cols == 1
       sz = num_rows
     else
-      error("Only vectors are allowed for diagm. Did you mean to use diag?")
+      throw(ArgumentError("Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?"))
     end
 
     children = (x, )
@@ -46,10 +46,11 @@ function curvature(x::DiagMatrixAtom)
 end
 
 function evaluate(x::DiagMatrixAtom)
-  return diagm(vec(evaluate(x.children[1])))
+  return Diagonal(vec(evaluate(x.children[1])))
 end
 
 diagm(x::AbstractExpr) = DiagMatrixAtom(x)
+Diagonal(x::AbstractExpr) = diagm(x)
 
 function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)

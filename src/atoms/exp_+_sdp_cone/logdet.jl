@@ -1,4 +1,5 @@
-import Base.logdet
+import LinearAlgebra.logdet
+export logdet
 
 struct LogDetAtom <: AbstractExpr
   head::Symbol
