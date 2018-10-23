@@ -1,5 +1,6 @@
-export start, next, done
+import Base.iterate
+export iterate
 
-start(x::Variable) = 1
-next(x::Variable, s::Int) = x[s], s+1
-done(x::Variable, s::Int) = (s > length(x))
+function iterate(x::Variable, (el, s)=(x[1], 0))
+    return s >= length(x) ? nothing : (el, (x[s+1], s+1))
+end

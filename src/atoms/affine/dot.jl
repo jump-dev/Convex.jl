@@ -1,3 +1,4 @@
+import LinearAlgebra.dot
 export vecdot, dot
 
 
