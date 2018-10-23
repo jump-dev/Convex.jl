@@ -50,9 +50,6 @@ include("atoms/lp_cone/min.jl")
 include("atoms/lp_cone/sumlargest.jl")
 include("atoms/lp_cone/dotsort.jl")
 
-
-
-
 ### SOC atoms
 include("atoms/second_order_cone/norm.jl") # also includes some lp atoms
 include("atoms/second_order_cone/norm2.jl")

@@ -20,7 +20,7 @@ function get_default_solver()
 end
 
 # TODO: I have not listed solvers such as CPLEX etc because I have not tested Convex with them
-solvers = [("SCS", "SCSSolver"), ("ECOS", "ECOSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
+solvers = [("ECOS", "ECOSSolver"), ("SCS", "SCSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
           ("GLPKMathProgInterface", "GLPKSolverMIP")]
 
 function isinstalled(pkg)
