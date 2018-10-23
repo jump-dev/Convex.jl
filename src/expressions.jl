@@ -37,8 +37,8 @@ export Value, ValueOrNothing
 export get_vectorized_size
 
 ### Abstract types
-@compat abstract type AbstractExpr end
-@compat abstract type Constraint end
+abstract type AbstractExpr end
+abstract type Constraint end
 
 # Override hash function because of
 # https://github.com/JuliaLang/julia/issues/10267

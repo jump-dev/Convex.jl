@@ -1,5 +1,5 @@
 using Convex
-using Base.Test
+using Test
 
 tests = ["test_utilities.jl",
          "test_affine.jl",
@@ -18,48 +18,48 @@ println("Running tests:")
 # set_default_solver(GurobiSolver())
 
 for curtest in tests
-    info(" Test: $(curtest)")
+    @info " Test: $(curtest)"
     include(curtest)
 end
 
 if can_solve_socp(get_default_solver())
     for curtest in tests_socp
-        info(" Test: $(curtest)")
+        @info " Test: $(curtest)"
         include(curtest)
     end
 end
 
 if can_solve_sdp(get_default_solver())
     for curtest in tests_sdp
-        info(" Test: $(curtest)")
+        @info " Test: $(curtest)"
         include(curtest)
     end
 end
 
 if can_solve_exp(get_default_solver())
     for curtest in tests_exp
-        info(" Test: $(curtest)")
+        @info " Test: $(curtest)"
         include(curtest)
     end
 end
 
 if can_solve_sdp(get_default_solver()) && can_solve_exp(get_default_solver())
     for curtest in tests_exp_and_sdp
-        info(" Test: $(curtest)")
+        @info " Test: $(curtest)"
         include(curtest)
     end
 end
 
 if can_solve_mip(get_default_solver())
 	for curtest in tests_int
-    info(" Test: $(curtest)")
+    @info " Test: $(curtest)"
     include(curtest)
 	end
 end
 
 if can_solve_sdp(get_default_solver())
     for curtest in tests_complex
-        info(" Test: $(curtest)")
+        @info " Test: $(curtest)"
         include(curtest)
     end
 end

@@ -5,8 +5,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.transpose
-export transpose, ctranspose, TransposeAtom, CTransposeAtom
+import Base.transpose, Base.adjoint
+export transpose, adjoint, ctranspose, TransposeAtom, CTransposeAtom
 export sign, curvature, monotonicity, evaluate, conic_form!
 
 struct TransposeAtom <: AbstractExpr
@@ -139,3 +139,6 @@ end
 
 ctranspose(x::AbstractExpr) = CTransposeAtom(x)
 ctranspose(x::Constant) = Constant(x.value')
+
+adjoint(x::AbstractExpr) = CTransposeAtom(x)
+adjoint(x::Constant) = Constant(x.value')

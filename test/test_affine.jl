@@ -1,7 +1,9 @@
 using Convex
-using Base.Test
+using Test
+import LinearAlgebra.Diagonal
 
 TOL = 1e-3
+eye(n) = Matrix(Diagonal(ones(n)))
 
 @testset "Affine Atoms" begin
 

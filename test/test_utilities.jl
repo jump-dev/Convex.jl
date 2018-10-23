@@ -1,5 +1,5 @@
 using Convex
-using Base.Test
+using Test
 
 @testset "Utilities" begin
 

@@ -17,7 +17,7 @@ export Sign, Positive, Negative, NoSign, ComplexSign
 export -, +, *
 
 # Vexity subtypes
-@compat abstract type Vexity end
+abstract type Vexity end
 struct ConstVexity <: Vexity              end
 struct AffineVexity <: Vexity             end
 struct ConvexVexity <: Vexity             end
@@ -31,14 +31,14 @@ struct NotDcp <: Vexity
 end
 
 # Monotonocity subtypes
-@compat abstract type Monotonicity end
+abstract type Monotonicity end
 struct Nonincreasing <: Monotonicity      end
 struct Nondecreasing <: Monotonicity      end
 struct ConstMonotonicity <: Monotonicity  end
 struct NoMonotonicity <: Monotonicity     end
 
 # Sign subtypes
-@compat abstract type Sign end
+abstract type Sign end
 struct Positive <: Sign                   end
 struct Negative <: Sign                   end
 struct NoSign <: Sign                     end

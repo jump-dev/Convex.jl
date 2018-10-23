@@ -1,5 +1,5 @@
 using Convex
-using Base.Test
+using Test
 
 TOL = 1e-2
 
