@@ -54,7 +54,7 @@ function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms=UniqueCo
 
     if x.inds == nothing
       sz = length(x.cols) * length(x.rows)
-      J = Array{Int}(sz)
+      J = Array{Int}(undef, sz)
       k = 1
 
       num_rows = x.children[1].size[1]

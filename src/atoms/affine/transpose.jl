@@ -48,8 +48,8 @@ function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms=Uniq
     num_rows = x.size[1]
     num_cols = x.size[2]
 
-    I = Array{Int}(sz)
-    J = Array{Int}(sz)
+    I = Array{Int}(undef, sz)
+    J = Array{Int}(undef, sz)
 
     k = 1
     for r = 1:num_rows
@@ -111,8 +111,8 @@ function conic_form!(x::CTransposeAtom, unique_conic_forms::UniqueConicForms=Uni
     num_rows = x.size[1]
     num_cols = x.size[2]
 
-    I = Array{Int}(sz)
-    J = Array{Int}(sz)
+    I = Array{Int}(undef, sz)
+    J = Array{Int}(undef, sz)
 
     k = 1
     for r = 1:num_rows
