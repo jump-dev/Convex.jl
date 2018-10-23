@@ -1,3 +1,4 @@
+import LinearAlgebra.norm
 export norm_inf, norm, norm_1, vecnorm
 
 # deprecate these soon
