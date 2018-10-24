@@ -1,6 +1,9 @@
 using Convex
 using Base.Test
 
+# Seed random number stream to improve test reliability
+srand(2)
+
 solvers = Any[]
 
 if isdir(Pkg.dir("ECOS"))
