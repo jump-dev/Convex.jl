@@ -4,9 +4,13 @@ os:
     - osx
 julia:
     - 0.6
-    - nightly
+    - 0.7
 notifications:
     email: false
+matrix:
+    allow_failures:
+        - julia: 0.7
+    fast_finish: true
 sudo: false
 addons:
     apt_packages:
