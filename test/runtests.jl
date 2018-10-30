@@ -3,9 +3,10 @@ using Test
 using ECOS
 using SCS
 using GLPKMathProgInterface
+using Random
 
 # Seed random number stream to improve test reliability
-srand(2)
+Random.seed!(2)
 
 solvers = Any[]
 
