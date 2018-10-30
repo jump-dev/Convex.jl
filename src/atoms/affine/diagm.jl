@@ -49,8 +49,11 @@ function evaluate(x::DiagMatrixAtom)
   return Diagonal(vec(evaluate(x.children[1])))
 end
 
-diagm(x::AbstractExpr) = DiagMatrixAtom(x)
-Diagonal(x::AbstractExpr) = diagm(x)
+function diagm((d, x)::Pair{<:Integer, <:AbstractExpr})
+  d == 0 || throw(ArgumentError("only the main diagonal is supported"))
+  return DiagMatrixAtom(x)
+end
+Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 
 function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
   if !has_conic_form(unique_conic_forms, x)
