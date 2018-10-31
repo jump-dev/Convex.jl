@@ -12,7 +12,6 @@
 # This reduction is documented in the pdf available at
 # https://github.com/JuliaOpt/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf
 
-using Compat
 module psocp
 
 mutable struct InequalityExpression
