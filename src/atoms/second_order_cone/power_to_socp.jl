@@ -38,7 +38,7 @@ mutable struct InequalityExpression
   u_var_ind::Int
 end
 
-mutable struct SimpleInequalityExpression
+struct SimpleInequalityExpression
   # Represents an inequality of the form
   #
   # x^2 <= t s,
