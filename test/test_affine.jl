@@ -1,6 +1,7 @@
 using Convex
 using Test
 import LinearAlgebra.I
+using Convex: DotMultiplyAtom
 
 TOL = 1e-3
 eye(n) = Matrix(1.0I, n, n)
@@ -246,6 +247,11 @@ eye(n) = Matrix(1.0I, n, n)
     solve!(p)
     @test p.optval ≈ 11 / 6 atol=TOL
     @test evaluate(sum((dot(/))(x, [1 2 3]))) ≈ 11 / 6 atol=TOL
+
+    # Broadcast fusion works
+    x = Variable(5, 5)
+    a = 2.0 .* x .* ones(Int, 5)
+    @test a isa DotMultiplyAtom
   end
 
   @testset "reshape atom" begin
