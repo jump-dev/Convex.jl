@@ -6,8 +6,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.broadcast
-export +, -, broadcast
+export +, -
 export sign, curvature, monotonicity, evaluate
 
 ### Unary Negation
