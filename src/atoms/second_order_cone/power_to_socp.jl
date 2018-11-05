@@ -12,7 +12,6 @@
 # This reduction is documented in the pdf available at
 # https://github.com/JuliaOpt/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf
 
-using Compat
 module psocp
 
 mutable struct InequalityExpression
@@ -73,12 +72,12 @@ end
 function ProductToSimpleInequalities(first_power::Int, second_power::Int)
   # Construct the first InequalityExpression, which is an inequality
   # of the form x^n <= t^p1 s^p2.
-  assert(first_power > 0 && second_power > 0);
+  @assert first_power > 0 && second_power > 0;
   n = first_power + second_power;
   var_list = [1, 2, 3];
   init_inequality = InequalityExpression(first_power, second_power, 0,
                                          1, 2, 3, -1);
-  return ReducePowers(init_inequality, Array{SimpleInequalityExpression}(0),
+  return ReducePowers(init_inequality, Array{SimpleInequalityExpression}(undef, 0),
                       var_list);
 end
 
@@ -108,8 +107,8 @@ function ReducePowers(curr_inequality::InequalityExpression,
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
   n = (p1 + p2 + p3);
-  assert(p1 >= 1);  # , "Must have at least 1 on first power");
-  assert(p2 >= 1);  # , "Must have at least 1 on second power");
+  @assert p1 >= 1;  # , "Must have at least 1 on first power");
+  @assert p2 >= 1;  # , "Must have at least 1 on second power");
   # Evaluate cases for variables
   if (p3 == 0)
     # Double check if we have p1 == 1, p2 == 1
@@ -181,8 +180,8 @@ function ReduceThirdZero(curr_inequality::InequalityExpression,
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
   n = (p1 + p2);
-  assert(p3 == 0);
-  assert(n >= 2);
+  @assert p3 == 0;
+  @assert n >= 2;
   if (mod(n, 2) == 0)
     # n is even, so check even-ness of power1, power2
     if (p1 == p2)
@@ -261,8 +260,8 @@ function ReduceThirdOne(curr_inequality::InequalityExpression,
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
   n = (p1 + p2 + p3);
-  assert(p3 == 1); # , "Must have third power 1");
-  assert(n >= 3); #  "Must have power n >= 3");
+  @assert p3 == 1; # , "Must have third power 1");
+  @assert n >= 3; #  "Must have power n >= 3");
   if (mod(n, 2) == 0)
     # Exactly one of p1, p2 is odd, find it and reduce
     if (mod(p1, 2) == 1)
@@ -367,9 +366,9 @@ function ReduceThirdTwo(curr_inequality::InequalityExpression,
   p2 = curr_inequality.power2;
   p3 = curr_inequality.power3;
   n = (p1 + p2 + p3);
-  assert(p3 == 2);  # , "Must have third power 2");
-  assert(n >= 6);  # , "Must have power n >= 6");
-  assert(p1 >= 2 && p2 >= 2);  # , "Did not rearrange powers properly");
+  @assert p3 == 2;  # , "Must have third power 2");
+  @assert n >= 6;  # , "Must have power n >= 6");
+  @assert p1 >= 2 && p2 >= 2;  # , "Did not rearrange powers properly");
   if (mod(n, 2) == 0)
     # Either both p1, p2 are even or both are odd
     if (mod(p1, 2) == 0)

@@ -6,8 +6,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.broadcast
-export +, -, broadcast
+export +, -
 export sign, curvature, monotonicity, evaluate
 
 ### Unary Negation
@@ -98,7 +97,8 @@ function curvature(x::AdditionAtom)
 end
 
 function evaluate(x::AdditionAtom)
-  return sum([evaluate(child) for child in x.children])
+  # broadcast function is used here instead of sum to support addition between scalars and arrays
+  return broadcast(+, map(evaluate, x.children)...)
 end
 
 function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())

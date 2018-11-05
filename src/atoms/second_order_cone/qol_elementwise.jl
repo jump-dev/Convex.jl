@@ -1,6 +1,6 @@
-import Base.broadcast
+import Base.Broadcast.broadcasted
 export QolElemAtom, qol_elementwise, square, sumsquares, invpos, /
-export sign, monotonicity, curvature, conic_form!, broadcast
+export sign, monotonicity, curvature, conic_form!
 
 struct QolElemAtom <: AbstractExpr
   head::Symbol
@@ -49,16 +49,16 @@ end
 
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 
-broadcast(::typeof(^),x::AbstractExpr,k::Int) = k==2 ? QolElemAtom(x, Constant(ones(x.size[1], x.size[2]))) : error("raising variables to powers other than 2 is not implemented")
+broadcasted(::typeof(^),x::AbstractExpr,k::Int) = k==2 ? QolElemAtom(x, Constant(ones(x.size[1], x.size[2]))) : error("raising variables to powers other than 2 is not implemented")
 
 invpos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
-broadcast(::typeof(/), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), invpos(y))
+broadcasted(::typeof(/), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), invpos(y))
 /(x::Value, y::AbstractExpr) = size(y) == (1,1) ? MultiplyAtom(Constant(x), invpos(y)) : error("cannot divide by a variable of size $(size(y))")
 sumsquares(x::AbstractExpr) = square(norm2(x))
 
 function square(x::AbstractExpr)
   if sign(x) == ComplexSign()
-    error(warn("Square of complex number is not DCP. Did you mean square_modulus?"))
+    error("Square of complex number is not DCP. Did you mean square_modulus?")
   else
     QolElemAtom(x, Constant(ones(x.size[1], x.size[2])))
   end

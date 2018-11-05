@@ -1,4 +1,4 @@
-import Base.norm, Base.vecnorm
+import LinearAlgebra.norm
 export norm_inf, norm, norm_1, vecnorm
 
 # deprecate these soon
@@ -9,7 +9,7 @@ norm_fro(x::AbstractExpr) = norm2(vec(x))
 # behavior of norm should be consistent with julia:
 # * vector norms for vectors
 # * operator norms for matrices
-function norm(x::AbstractExpr, p::Number=2)
+function norm(x::AbstractExpr, p::Real=2)
   if length(size(x)) <= 1 || minimum(size(x))==1
     # x is a vector
     if p == 1

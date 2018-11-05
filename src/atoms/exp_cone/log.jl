@@ -11,7 +11,7 @@ export sign, curvature, monotonicity, evaluate
 
 ### Logarithm
 
-type LogAtom <: AbstractExpr
+mutable struct LogAtom <: AbstractExpr
   head::Symbol
   id_hash::UInt64
   children::Tuple{AbstractExpr}

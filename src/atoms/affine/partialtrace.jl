@@ -44,8 +44,8 @@ function evaluate(x::PartialTraceAtom)
 
     subsystem = function(sys)
         function term(ρ, j::Int)
-            a = speye(1)
-            b = speye(1)
+            a = sparse(1.0I, 1, 1)
+            b = sparse(1.0I, 1, 1)
             i_sys = 1
             for dim in dims
                 if i_sys == sys
@@ -55,8 +55,8 @@ function evaluate(x::PartialTraceAtom)
                 a = kron(a, v')
                 b = kron(b, v)
                 else
-                    a = kron(a, speye(dim))
-                    b = kron(b, speye(dim))
+                    a = kron(a, sparse(1.0I, dim, dim))
+                    b = kron(b, sparse(1.0I, dim, dim))
                 end
                 i_sys += 1
             end
@@ -65,7 +65,7 @@ function evaluate(x::PartialTraceAtom)
         return sum([term(ρ, j) for j in 1:dims[sys]])
     end
     sub_systems = [subsystem(i) for i in 1:length(dims)]
-    a = eye(1)
+    a = Matrix(1.0I, 1, 1)
     for i in 1:length(dims)
         if i == x.sys
             continue
@@ -73,7 +73,7 @@ function evaluate(x::PartialTraceAtom)
             a = kron(a,sub_systems[i])
         end
     end
-    return trace(sub_systems[x.sys])*a
+    return tr(sub_systems[x.sys])*a
 end
 
 
@@ -87,8 +87,8 @@ function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=U
         # in the system we want to trace out
         # This function returns every term in the sum
         function term(ρ, j::Int)
-            a = speye(1)
-            b = speye(1)
+            a = sparse(1.0I, 1, 1)
+            b = sparse(1.0I, 1, 1)
             i_sys = 1
             for dim in dims
                 if i_sys == sys
@@ -98,8 +98,8 @@ function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=U
                     a = kron(a, v')
                     b = kron(b, v)
                 else
-                    a = kron(a, speye(dim))
-                    b = kron(b, speye(dim))
+                    a = kron(a, sparse(1.0I, dim, dim))
+                    b = kron(b, sparse(1.0I, dim, dim))
                 end
                 i_sys += 1
             end
