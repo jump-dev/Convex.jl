@@ -1,5 +1,5 @@
 import LinearAlgebra.norm
-export norm_inf, norm, norm_1, vecnorm
+export norm_inf, norm, norm_1
 
 # deprecate these soon
 norm_inf(x::AbstractExpr) = maximum(abs(x))
@@ -25,19 +25,16 @@ function norm(x::AbstractExpr, p::Real=2)
       error("vector p-norms not defined for p < 1")
     end
   else
-    # x is a matrix
-    if p == 1
-      return maximum(sum(abs(x), 1))
-    elseif p == 2
-      return operatornorm(x)
-    elseif p == Inf
-      return maximum(sum(abs(x), 2))
-    else
-      error("matrix p-norms only defined for p = 1, 2, and Inf")
-    end
+    # TODO: After the deprecation period, allow this again but make it consistent with
+    # LinearAlgebra, i.e. make norm(x, p) for x a matrix the same as norm(vec(x), p).
+    Base.depwarn("`norm(x, p)` for matrices will in the future be equivalent to " *
+                 "`norm(vec(x), p)`. Use `opnorm(x, p)` for the Julia 0.6 behavior of " *
+                 "computing the operator norm for matrices.", :norm)
+    return opnorm(x, p)
   end
 end
 
-function vecnorm(x::AbstractExpr, p::Real=2)
-  return norm(vec(x), p)
+if isdefined(LinearAlgebra, :vecnorm) # deprecated but defined
+  import LinearAlgebra: vecnorm
 end
+Base.@deprecate vecnorm(x::AbstractExpr, p::Real=2) norm(vec(x), p)

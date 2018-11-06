@@ -5,6 +5,7 @@
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
+import LinearAlgebra: opnorm
 export operatornorm, sigmamax
 
 ### Operator norm
@@ -41,6 +42,21 @@ end
 
 operatornorm(x::AbstractExpr) = OperatorNormAtom(x)
 sigmamax(x::AbstractExpr) = OperatorNormAtom(x)
+
+function opnorm(x::AbstractExpr, p::Real=2)
+  if length(size(x)) <= 1 || minimum(size(x)) == 1
+    throw(ArgumentError("argument to `opnorm` must be a matrix"))
+  end
+  if p == 1
+    return maximum(sum(abs(x), dims=1))
+  elseif p == 2
+    return operatornorm(x)
+  elseif p == Inf
+    return maximum(sum(abs(x), dims=2))
+  else
+    throw(ArgumentError("matrix p-norms only defined for p = 1, 2, and Inf"))
+  end
+end
 
 # Create the equivalent conic problem:
 #   minimize t

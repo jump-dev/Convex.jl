@@ -49,11 +49,11 @@ TOL = 1e-3
   @testset "frobenius norm atom" begin
     m = Variable(4, 5)
     c = [m[3, 3] == 4, m >= 1]
-    p = minimize(vecnorm(m, 2), c)
+    p = minimize(norm(vec(m), 2), c)
     @test vexity(p) == ConvexVexity()
     solve!(p)
     @test p.optval ≈ sqrt(35) atol=TOL
-    @test evaluate(vecnorm(m, 2)) ≈ sqrt(35) atol=TOL
+    @test evaluate(norm(vec(m), 2)) ≈ sqrt(35) atol=TOL
   end
 
   @testset "quad over lin atom" begin
@@ -226,18 +226,21 @@ TOL = 1e-3
     @test norm(g, 2) ^ 2 ≈ 0 atol=TOL
   end
 
-  @testset "norm consistent with Base" begin
+  @testset "norm consistent with Base for matrix variables" begin
     A = randn(4, 4)
     x = Variable(4, 4)
     x.value = A
-    @test evaluate(norm(x)) ≈ opnorm(A) atol=TOL
-    @test evaluate(norm(x, 1)) ≈ opnorm(A, 1) atol=TOL
-    @test evaluate(norm(x, 2)) ≈ opnorm(A, 2) atol=TOL
-    @test evaluate(norm(x, Inf)) ≈ opnorm(A, Inf) atol=TOL
-    @test evaluate(vecnorm(x, 1)) ≈ norm(vec(A), 1) atol=TOL
-    @test evaluate(vecnorm(x, 2)) ≈ norm(vec(A), 2) atol=TOL
-    @test evaluate(vecnorm(x, 7)) ≈ norm(vec(A), 7) atol=TOL
-    @test evaluate(vecnorm(x, Inf)) ≈ norm(vec(A), Inf) atol=TOL
+    # Matrix norm
+    @test evaluate(opnorm(x)) ≈ opnorm(A) atol=TOL
+    @test evaluate(opnorm(x, 1)) ≈ opnorm(A, 1) atol=TOL
+    @test evaluate(opnorm(x, 2)) ≈ opnorm(A, 2) atol=TOL
+    @test evaluate(opnorm(x, Inf)) ≈ opnorm(A, Inf) atol=TOL
+    # Vector norm
+    # TODO: Once the deprecation for norm on matrices is removed, remove the `vec` calls
+    @test evaluate(norm(vec(x), 1)) ≈ norm(vec(A), 1) atol=TOL
+    @test evaluate(norm(vec(x), 2)) ≈ norm(vec(A), 2) atol=TOL
+    @test evaluate(norm(vec(x), 7)) ≈ norm(vec(A), 7) atol=TOL
+    @test evaluate(norm(vec(x), Inf)) ≈ norm(vec(A), Inf) atol=TOL
   end
 
 

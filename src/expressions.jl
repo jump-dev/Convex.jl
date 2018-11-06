@@ -4,7 +4,7 @@
 # Each type which subtypes AbstractExpr (Variable and Constant being exceptions)
 # must have:
 #
-## head::Symbol                  -- a symbol such as :vecnorm, :+ etc
+## head::Symbol                  -- a symbol such as :norm, :+ etc
 ## children::(AbstractExpr,)     -- The expressions on which the current expression
 ##                               -- is operated
 ## id_hash::UInt64               -- identifier hash, can be a hash of children
