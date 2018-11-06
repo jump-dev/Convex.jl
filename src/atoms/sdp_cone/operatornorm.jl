@@ -6,7 +6,7 @@
 # Please read expressions.jl first.
 #############################################################################
 import LinearAlgebra: opnorm
-export operatornorm, sigmamax
+export sigmamax
 
 ### Operator norm
 
@@ -18,7 +18,7 @@ struct OperatorNormAtom <: AbstractExpr
 
   function OperatorNormAtom(x::AbstractExpr)
     children = (x,)
-    return new(:operatornorm, hash(children), children, (1,1))
+    return new(:opnorm, hash(children), children, (1,1))
   end
 end
 
@@ -40,7 +40,6 @@ function evaluate(x::OperatorNormAtom)
   opnorm(evaluate(x.children[1]), 2)
 end
 
-operatornorm(x::AbstractExpr) = OperatorNormAtom(x)
 sigmamax(x::AbstractExpr) = OperatorNormAtom(x)
 
 function opnorm(x::AbstractExpr, p::Real=2)
@@ -50,13 +49,15 @@ function opnorm(x::AbstractExpr, p::Real=2)
   if p == 1
     return maximum(sum(abs(x), dims=1))
   elseif p == 2
-    return operatornorm(x)
+    return OperatorNormAtom(x)
   elseif p == Inf
     return maximum(sum(abs(x), dims=2))
   else
     throw(ArgumentError("matrix p-norms only defined for p = 1, 2, and Inf"))
   end
 end
+
+Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
 
 # Create the equivalent conic problem:
 #   minimize t

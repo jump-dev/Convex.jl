@@ -72,11 +72,11 @@ eye(n) = Matrix(1.0I, n, n)
 
   @testset "operator norm atom" begin
     y = Variable((3,3))
-    p = minimize(operatornorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+    p = minimize(opnorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
     @test vexity(p) == ConvexVexity()
     solve!(p)
     @test p.optval ≈ 4 atol=TOL
-    @test evaluate(operatornorm(y)) ≈ 4 atol=TOL
+    @test evaluate(opnorm(y)) ≈ 4 atol=TOL
   end
 
   @testset "sigma max atom" begin
