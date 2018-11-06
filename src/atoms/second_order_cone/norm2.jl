@@ -5,7 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 import LinearAlgebra.norm2
-export EucNormAtom, norm2, vecnorm
+export EucNormAtom, norm2
 export sign, monotonicity, curvature, conic_form!
 
 

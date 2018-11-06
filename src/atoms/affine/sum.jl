@@ -57,9 +57,13 @@ function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms=UniqueConi
   return get_conic_form(unique_conic_forms, x)
 end
 
-sum(x::AbstractExpr) = SumAtom(x)
+# Dispatch to an internal helper function that handles the dimension argument in
+# the same manner as Base, with dims=: denoting a regular sum
+sum(x::AbstractExpr; dims=:) = _sum(x, dims)
 
-function sum(x::AbstractExpr, dimension::Int)
+_sum(x::AbstractExpr, ::Colon) = SumAtom(x)
+
+function _sum(x::AbstractExpr, dimension::Integer)
   if dimension == 1
     return Constant(ones(1, x.size[1]), Positive()) * x
   elseif dimension == 2
@@ -68,3 +72,5 @@ function sum(x::AbstractExpr, dimension::Int)
     error("Sum not implemented for dimension $dimension")
   end
 end
+
+Base.@deprecate sum(x::AbstractExpr, dim::Int) sum(x, dims=dim)
