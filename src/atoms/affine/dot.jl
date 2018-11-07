@@ -12,15 +12,15 @@ dot(x::AbstractExpr, y::Value) = (ismatrix(x) || ismatrix(y)) ? error("dot not i
 
 # tests if an array is a matrix (2D array) with both dimensions of size > 1
 function ismatrix(x)
-	sz = size(x)
-	if length(sz) != 2
-		return false
-	else
-		for s in sz
-			if s == 1
-				return false
-			end
-		end
-	end
-	return true
+    sz = size(x)
+    if length(sz) != 2
+        return false
+    else
+        for s in sz
+            if s == 1
+                return false
+            end
+        end
+    end
+    return true
 end

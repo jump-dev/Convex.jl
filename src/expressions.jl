@@ -47,12 +47,12 @@ export hash
 
 const hashaa_seed = UInt === UInt64 ? 0x7f53e68ceb575e76 : 0xeb575e7
 function hash(a::Array{AbstractExpr}, h::UInt)
-  h += hashaa_seed
-  h += hash(size(a))
-  for x in a
-    h = hash(x, h)
-  end
-  return h
+    h += hashaa_seed
+    h += hash(size(a))
+    for x in a
+        h = hash(x, h)
+    end
+    return h
 end
 
 
@@ -60,42 +60,42 @@ end
 # h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 # We calculate the vexity according to this
 function vexity(x::AbstractExpr)
-  monotonicities = monotonicity(x)
-  vex = curvature(x)
-  for i = 1:length(x.children)
-    vex += monotonicities[i] * vexity(x.children[i])
-  end
-  return vex
+    monotonicities = monotonicity(x)
+    vex = curvature(x)
+    for i = 1:length(x.children)
+        vex += monotonicities[i] * vexity(x.children[i])
+    end
+    return vex
 end
 
 
 
 # This function should never be reached
 function monotonicity(x::AbstractExpr)
-  error("monotonicity not implemented for $(x.head).")
+    error("monotonicity not implemented for $(x.head).")
 end
 
 # This function should never be reached
 function curvature(x::AbstractExpr)
-  error("curvature not implemented for $(x.head).")
+    error("curvature not implemented for $(x.head).")
 end
 
 # This function should never be reached
 function evaluate(x::AbstractExpr)
-  error("evaluate not implemented for $(x.head).")
+    error("evaluate not implemented for $(x.head).")
 end
 
 # This function should never be reached
 function sign(x::AbstractExpr)
-  error("sign not implemented for $(x.head).")
+    error("sign not implemented for $(x.head).")
 end
 
 function size(x::AbstractExpr)
-  return x.size
+    return x.size
 end
 
 function length(x::AbstractExpr)
-  return prod(x.size)
+    return prod(x.size)
 end
 
 ### User-defined Unions
@@ -107,13 +107,13 @@ convert(::Type{AbstractExpr}, x::Value) = Constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
 function size(x::AbstractExpr, dim::Integer)
-  if dim < 1
-    error("dimension out of range")
-  elseif dim > 2
-    return 1
-  else
-    return size(x)[dim]
-  end
+    if dim < 1
+        error("dimension out of range")
+    elseif dim > 2
+        return 1
+    else
+        return size(x)[dim]
+    end
 end
 
 ndims(x::AbstractExpr) = 2
