@@ -47,10 +47,10 @@ if can_solve_sdp(get_default_solver()) && can_solve_exp(get_default_solver())
 end
 
 if can_solve_mip(get_default_solver())
-	for curtest in tests_int
-    @info " Test: $(curtest)"
-    include(curtest)
-	end
+    for curtest in tests_int
+        @info " Test: $(curtest)"
+        include(curtest)
+    end
 end
 
 if can_solve_sdp(get_default_solver())

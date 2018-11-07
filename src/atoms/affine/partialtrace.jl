@@ -27,11 +27,11 @@ struct PartialTraceAtom <: AbstractExpr
 end
 
 function sign(x::PartialTraceAtom)
-     return sign(x.children[1])
- end
+    return sign(x.children[1])
+end
 
 function curvature(x::PartialTraceAtom)
-  return ConstVexity()
+    return ConstVexity()
 end
 
 function monotonicity(x::PartialTraceAtom)

@@ -2,44 +2,44 @@ import Base.conj
 export conj
 export sign, curvature, monotonicity, evaluate, conic_form!
 struct ConjugateAtom <: AbstractExpr
-  head::Symbol
-  id_hash::UInt64
-  children::Tuple{AbstractExpr}
-  size::Tuple{Int, Int}
+    head::Symbol
+    id_hash::UInt64
+    children::Tuple{AbstractExpr}
+    size::Tuple{Int, Int}
 
-  function ConjugateAtom(x::AbstractExpr)
-    children = (x,)
-    return new(:conj, hash(children), children, (x.size[1], x.size[2]))
-  end
+    function ConjugateAtom(x::AbstractExpr)
+        children = (x,)
+        return new(:conj, hash(children), children, (x.size[1], x.size[2]))
+    end
 end
 
 function sign(x::ConjugateAtom)
-  return sign(x.children[1])
+    return sign(x.children[1])
 end
 
 function monotonicity(x::ConjugateAtom)
-  return (Nondecreasing(),)
+    return (Nondecreasing(),)
 end
 
 function curvature(x::ConjugateAtom)
-  return ConstVexity()
+    return ConstVexity()
 end
 
 function evaluate(x::ConjugateAtom)
-  return conj(evaluate(x.children[1]))
+    return conj(evaluate(x.children[1]))
 end
 
 function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
-  if !has_conic_form(unique_conic_forms, x)
-    objective = conic_form!(x.children[1], unique_conic_forms)
-    for var in keys(objective)
-      x1 = conj(objective[var][1])
-      x2 = conj(objective[var][2])
-      objective[var] = (x1,x2)
+    if !has_conic_form(unique_conic_forms, x)
+        objective = conic_form!(x.children[1], unique_conic_forms)
+        for var in keys(objective)
+            x1 = conj(objective[var][1])
+            x2 = conj(objective[var][2])
+            objective[var] = (x1,x2)
+        end
+        cache_conic_form!(unique_conic_forms, x, objective)
     end
-    cache_conic_form!(unique_conic_forms, x, objective)
-  end
-  return get_conic_form(unique_conic_forms, x)
+    return get_conic_form(unique_conic_forms, x)
 end
 
 

@@ -16,68 +16,68 @@ ConicObj = DataStructures.OrderedDict{UInt64, Tuple{Value,Value}}
 # helper function to negate conic objectives
 # works by changing each (key, val) pair to (key, -val)
 function -(c::ConicObj)
-  new_obj = copy(c)
-  for var in keys(new_obj)
-    x1 = new_obj[var][1]*(-1)
-    x2 =  new_obj[var][2]*(-1)
-    new_obj[var] = (x1,x2)
-  end
-  return new_obj
+    new_obj = copy(c)
+    for var in keys(new_obj)
+        x1 = new_obj[var][1]*(-1)
+        x2 =  new_obj[var][2]*(-1)
+        new_obj[var] = (x1,x2)
+    end
+    return new_obj
 end
 
 function +(c::ConicObj, d::ConicObj)
-  new_obj = copy(c)
-  for var in keys(d)
-    if !haskey(new_obj, var)
-      new_obj[var] = d[var]
-    else
-      # .+ does not preserve sparsity
-      # need to override behavior
-      if size(new_obj[var][1]) == size(d[var][1])
-        x1 = new_obj[var][1] + d[var][1]
-      else
-        x1 = broadcast(+, new_obj[var][1], d[var][1])
-      end
-      if size(new_obj[var][2]) == size(d[var][2])
-        x2 = new_obj[var][2] + d[var][2]
-      else
-        x2 = broadcast(+, new_obj[var][2], d[var][2])
-      end
-      new_obj[var] = (x1,x2)
+    new_obj = copy(c)
+    for var in keys(d)
+        if !haskey(new_obj, var)
+            new_obj[var] = d[var]
+        else
+            # .+ does not preserve sparsity
+            # need to override behavior
+            if size(new_obj[var][1]) == size(d[var][1])
+                x1 = new_obj[var][1] + d[var][1]
+            else
+                x1 = broadcast(+, new_obj[var][1], d[var][1])
+            end
+            if size(new_obj[var][2]) == size(d[var][2])
+                x2 = new_obj[var][2] + d[var][2]
+            else
+                x2 = broadcast(+, new_obj[var][2], d[var][2])
+            end
+            new_obj[var] = (x1,x2)
+        end
     end
-  end
-  return new_obj
+    return new_obj
 end
 
 function get_row(c::ConicObj, row::Int)
-  new_obj = ConicObj()
-  for (var, coeff) in c
-    x1 = coeff[1][row, :]
-    x2 = coeff[2][row, :]
-    new_obj[var] = (x1,x2)
-  end
-  return new_obj
+    new_obj = ConicObj()
+    for (var, coeff) in c
+        x1 = coeff[1][row, :]
+        x2 = coeff[2][row, :]
+        new_obj[var] = (x1,x2)
+    end
+    return new_obj
 end
 
 function *(v::Value, c::ConicObj)
-  # TODO: this part is time consuming, esp new_obj[var] = v * new_obj[var]...
-  new_obj = copy(c)
-  for var in keys(new_obj)
-    x1 = v * new_obj[var][1]
-    x2 = v * new_obj[var][2]
-    new_obj[var] = (x1,x2)
-  end
-  return new_obj
+    # TODO: this part is time consuming, esp new_obj[var] = v * new_obj[var]...
+    new_obj = copy(c)
+    for var in keys(new_obj)
+        x1 = v * new_obj[var][1]
+        x2 = v * new_obj[var][2]
+        new_obj[var] = (x1,x2)
+    end
+    return new_obj
 end
 
 function promote_size(c::ConicObj, vectorized_size::Int)
-  new_obj = copy(c)
-  for var in keys(new_obj)
-      x1 = repeat(new_obj[var][1], vectorized_size, 1)
-      x2 = repeat(new_obj[var][2], vectorized_size, 1)
-      new_obj[var] = (x1,x2)
-  end
-  return new_obj
+    new_obj = copy(c)
+    for var in keys(new_obj)
+        x1 = repeat(new_obj[var][1], vectorized_size, 1)
+        x2 = repeat(new_obj[var][2], vectorized_size, 1)
+        new_obj[var] = (x1,x2)
+    end
+    return new_obj
 end
 
 # A conic constraint is of the form [affine_expr1, affine_expr2, ..., affine_exprk] \in cone
@@ -86,9 +86,9 @@ end
 # and we record the sizes of the affine expressions (XXX check...)
 # XXX might it be better to represent objs as a single ConicObj rather than an array of them?
 struct ConicConstr
-  objs::Array{ConicObj}
-  cone::Symbol
-  sizes::Array{Int}
+    objs::Array{ConicObj}
+    cone::Symbol
+    sizes::Array{Int}
 end
 
 # in conic form, every expression e is represented by a ConicObj together with a collection of ConicConstrs
@@ -101,39 +101,39 @@ UniqueConstrList = Array{ConicConstr}
 
 # UniqueConicForms caches all the conic forms of expressions we've parsed so far
 struct UniqueConicForms
-  exp_map::UniqueExpMap
-  constr_map::UniqueConstrMap
-  constr_list::UniqueConstrList
+    exp_map::UniqueExpMap
+    constr_map::UniqueConstrMap
+    constr_list::UniqueConstrList
 end
 
 UniqueConicForms() = UniqueConicForms(UniqueExpMap(), UniqueConstrMap(), ConicConstr[])
 
 function has_conic_form(conic_forms::UniqueConicForms, exp::AbstractExpr)
-  return haskey(conic_forms.exp_map, (exp.head, exp.id_hash))
+    return haskey(conic_forms.exp_map, (exp.head, exp.id_hash))
 end
 
 function has_conic_form(conic_forms::UniqueConicForms, constr::Constraint)
-  return haskey(conic_forms.constr_map, (constr.head, constr.id_hash))
+    return haskey(conic_forms.constr_map, (constr.head, constr.id_hash))
 end
 
 function get_conic_form(conic_forms::UniqueConicForms, exp::AbstractExpr)
-  return conic_forms.exp_map[(exp.head, exp.id_hash)]
+    return conic_forms.exp_map[(exp.head, exp.id_hash)]
 end
 
 function get_conic_form(conic_forms::UniqueConicForms, constr::Constraint)
-  return conic_forms.constr_map[(constr.head, constr.id_hash)]
+    return conic_forms.constr_map[(constr.head, constr.id_hash)]
 end
 
 function cache_conic_form!(conic_forms::UniqueConicForms, exp::AbstractExpr, new_conic_form::ConicObj)
-  conic_forms.exp_map[(exp.head, exp.id_hash)] = new_conic_form
+    conic_forms.exp_map[(exp.head, exp.id_hash)] = new_conic_form
 end
 
 function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_form::ConicConstr)
-  conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
-  push!(conic_forms.constr_list, new_conic_form)
+    conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
+    push!(conic_forms.constr_list, new_conic_form)
 end
 
 function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_forms::UniqueConstrList)
-  conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
-  append!(conic_forms.constr_list, new_conic_forms)
+    conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
+    append!(conic_forms.constr_list, new_conic_forms)
 end

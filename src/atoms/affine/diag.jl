@@ -14,44 +14,44 @@ export diag
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 
 struct DiagAtom <: AbstractExpr
-  head::Symbol
-  id_hash::UInt64
-  children::Tuple{AbstractExpr}
-  size::Tuple{Int, Int}
-  k::Int
+    head::Symbol
+    id_hash::UInt64
+    children::Tuple{AbstractExpr}
+    size::Tuple{Int, Int}
+    k::Int
 
-  function DiagAtom(x::AbstractExpr, k::Int=0)
-    (num_rows, num_cols) = x.size
+    function DiagAtom(x::AbstractExpr, k::Int=0)
+        (num_rows, num_cols) = x.size
 
-    if k >= min(num_rows, num_cols) || k <= -min(num_rows, num_cols)
-      error("Bounds error in calling diag")
+        if k >= min(num_rows, num_cols) || k <= -min(num_rows, num_cols)
+            error("Bounds error in calling diag")
+        end
+
+        children = (x, )
+        return new(:diag, hash((children, k)), children, (min(num_rows, num_cols) - k, 1), k)
     end
-
-    children = (x, )
-    return new(:diag, hash((children, k)), children, (min(num_rows, num_cols) - k, 1), k)
-  end
 end
 
 ## Type Definition Ends
 
 
 function sign(x::DiagAtom)
-  return sign(x.children[1])
+    return sign(x.children[1])
 end
 
 # The monotonicity
 function monotonicity(x::DiagAtom)
-  return (Nondecreasing(),)
+    return (Nondecreasing(),)
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
 # this represents the first term
 function curvature(x::DiagAtom)
-  return ConstVexity()
+    return ConstVexity()
 end
 
 function evaluate(x::DiagAtom)
-  return diag(evaluate(x.children[1]), x.k)
+    return diag(evaluate(x.children[1]), x.k)
 end
 
 ## API begins
@@ -71,27 +71,27 @@ diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
 # The canonical form will then be:
 # coeff * x - d = 0
 function conic_form!(x::DiagAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
-  if !has_conic_form(unique_conic_forms, x)
-    (num_rows, num_cols) = x.children[1].size
-    k = x.k
+    if !has_conic_form(unique_conic_forms, x)
+        (num_rows, num_cols) = x.children[1].size
+        k = x.k
 
-    if k >= 0
-      start_index = k * num_rows + 1
-      sz_diag = Base.min(num_rows, num_cols - k)
-    else
-      start_index = -k + 1
-      sz_diag = Base.min(num_rows + k, num_cols)
+        if k >= 0
+            start_index = k * num_rows + 1
+            sz_diag = Base.min(num_rows, num_cols - k)
+        else
+            start_index = -k + 1
+            sz_diag = Base.min(num_rows + k, num_cols)
+        end
+
+        select_diag = spzeros(sz_diag, get_vectorized_size(x.children[1]))
+        for i in 1:sz_diag
+            select_diag[i, start_index] = 1
+            start_index += num_rows + 1
+        end
+
+        objective = conic_form!(x.children[1], unique_conic_forms)
+        new_obj = select_diag * objective
+        cache_conic_form!(unique_conic_forms, x, new_obj)
     end
-
-    select_diag = spzeros(sz_diag, get_vectorized_size(x.children[1]))
-    for i in 1:sz_diag
-      select_diag[i, start_index] = 1
-      start_index += num_rows + 1
-    end
-
-    objective = conic_form!(x.children[1], unique_conic_forms)
-    new_obj = select_diag * objective
-    cache_conic_form!(unique_conic_forms, x, new_obj)
-  end
-  return get_conic_form(unique_conic_forms, x)
+    return get_conic_form(unique_conic_forms, x)
 end
