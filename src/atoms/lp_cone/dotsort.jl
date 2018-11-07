@@ -18,7 +18,7 @@ struct DotSortAtom <: AbstractExpr
     w::Value
 
     function DotSortAtom(x::AbstractExpr, w::Value)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("Argument should be real instead it is $(sign(x))")
         else
             if !(length(w) == get_vectorized_size(x))
@@ -32,9 +32,9 @@ struct DotSortAtom <: AbstractExpr
 end
 
 function sign(x::DotSortAtom)
-    if all(x.w.>=0)
+    if all(x.w .>= 0)
         return sign(x.children[1])
-    elseif all(x.w.<=0)
+    elseif all(x.w .<= 0)
         return sign(x.children[1])
     else
         return NoSign()
@@ -42,7 +42,7 @@ function sign(x::DotSortAtom)
 end
 
 function monotonicity(x::DotSortAtom)
-    if all(x.w.>=0)
+    if all(x.w .>= 0)
         return (Nondecreasing(), )
     else
         return (NoMonotonicity(), )

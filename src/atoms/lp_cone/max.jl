@@ -16,7 +16,7 @@ struct MaxAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function MaxAtom(x::AbstractExpr, y::AbstractExpr)
-        if sign(x)==ComplexSign() || sign(y)==ComplexSign()
+        if sign(x) == ComplexSign() || sign(y) == ComplexSign()
             error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
         else
             if x.size == y.size

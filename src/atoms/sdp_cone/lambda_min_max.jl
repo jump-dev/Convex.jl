@@ -17,9 +17,9 @@ struct LambdaMaxAtom <: AbstractExpr
 
     function LambdaMaxAtom(x::AbstractExpr)
         children = (x,)
-        m,n = size(x)
-        if m==n
-            return new(:lambdamax, hash(children), children, (1,1))
+        m, n = size(x)
+        if m == n
+            return new(:lambdamax, hash(children), children, (1, 1))
         else
             error("lambdamax can only be applied to a square matrix.")
         end
@@ -70,8 +70,8 @@ struct LambdaMinAtom <: AbstractExpr
 
     function LambdaMinAtom(x::AbstractExpr)
         children = (x,)
-        m,n = size(x)
-        if m==n
+        m, n = size(x)
+        if m == n
             return new(:lambdamin, hash(children), children, (1,1))
         else
             error("lambdamin can only be applied to a square matrix.")

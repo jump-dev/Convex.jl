@@ -18,8 +18,8 @@ struct SumLargestEigs <: AbstractExpr
 
     function SumLargestEigs(x::AbstractExpr, k::AbstractExpr)
         children = (x, k)
-        m,n = size(x)
-        if m==n
+        m, n = size(x)
+        if m == n
             return new(:sumlargesteigs, hash(children), children, (1,1))
         else
             error("sumlargesteigs can only be applied to a square matrix.")

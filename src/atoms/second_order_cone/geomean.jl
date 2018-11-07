@@ -11,7 +11,7 @@ struct GeoMeanAtom <: AbstractExpr
     function GeoMeanAtom(x::AbstractExpr, y::AbstractExpr)
         if x.size != y.size
             error("geo mean must take two arguments of the same size")
-        elseif sign(x)==ComplexSign() || sign(y)==ComplexSign()
+        elseif sign(x) == ComplexSign() || sign(y) == ComplexSign()
             error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
         else
             children = (x, y)

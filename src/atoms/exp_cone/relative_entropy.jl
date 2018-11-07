@@ -17,7 +17,7 @@ struct RelativeEntropyAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function RelativeEntropyAtom(x::AbstractExpr, y::AbstractExpr)
-        if sign(x)==ComplexSign() || sign(y)==ComplexSign()
+        if sign(x) == ComplexSign() || sign(y) == ComplexSign()
             error("Both the arguments should be real but these are instead $(sign(x)) and $(sign(y))")
         else
             children = (x, y)

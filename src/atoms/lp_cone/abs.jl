@@ -49,8 +49,8 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms=UniqueConi
                 conic_form!(t[i]>=norm2([real(c[i]);imag(c[i])]), unique_conic_forms)
             end
         else
-            conic_form!(c<=t, unique_conic_forms)
-            conic_form!(c>=-t, unique_conic_forms)
+            conic_form!(c <= t, unique_conic_forms)
+            conic_form!(c >= -t, unique_conic_forms)
         end
         cache_conic_form!(unique_conic_forms, x, objective)
     end

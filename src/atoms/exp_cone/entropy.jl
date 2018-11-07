@@ -20,7 +20,7 @@ mutable struct EntropyAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function EntropyAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
         else
             children = (x,)
@@ -53,9 +53,9 @@ function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms=Unique
         t = Variable(e.size)
         x = e.children[1]
         objective = conic_form!(t, unique_conic_forms)
-        for i=1:size(x,1)
-            for j=1:size(x,2)
-                conic_form!( ExpConstraint(t[i,j], x[i,j], 1), unique_conic_forms)
+        for i = 1:size(x, 1)
+            for j = 1:size(x, 2)
+                conic_form!(ExpConstraint(t[i, j], x[i, j], 1), unique_conic_forms)
             end
         end
         cache_conic_form!(unique_conic_forms, e, objective)

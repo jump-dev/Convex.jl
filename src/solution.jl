@@ -36,7 +36,7 @@ function solve!(problem::Problem;
     # populate the status, the primal (and possibly dual) solution
     # and the primal (and possibly dual) variables with values
     populate_solution!(m, problem, var_to_ranges, conic_constraints)
-    if !(problem.status==:Optimal) && verbose
+    if problem.status != :Optimal && verbose
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end
 end
@@ -54,7 +54,7 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
                 Warmstart may be ineffective."
          primal = zeros(n)
      end
-     if !(length(primal) == n)
+     if length(primal) != n
          @warn "Unable to use cached solution to warmstart problem.
                 (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
                 Warmstart may be ineffective."
@@ -81,7 +81,7 @@ function load_problem!(m::MathProgBase.AbstractConicModel, c, A, b, cones, varty
     MathProgBase.loadproblem!(m, vec(Array(c)), A, vec(Array(b)), cones, var_cones)
 
     # add integer and binary constraints on variables
-    if !all(Bool[t==:Cont for t in vartypes])
+    if !all(==(:Cont), vartypes)
         try
             MathProgBase.setvartype!(m, vartypes)
         catch
