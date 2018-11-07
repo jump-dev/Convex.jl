@@ -4,8 +4,11 @@ module Convex
 import DataStructures
 using LinearAlgebra
 using SparseArrays
+using Requires
+using MathProgBase: AbstractMathProgSolver
 
-global DEFAULT_SOLVER = nothing
+const DEFAULT_SOLVER = Ref{Union{AbstractMathProgSolver, Nothing}}(nothing)
+
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
@@ -88,6 +91,32 @@ function clearmemory()
     global var_to_ranges = Dict{UInt64, Tuple{Int, Int}}()
     global conic_constr_to_constr = Dict{ConicConstr, Constraint}()
     GC.gc()
+end
+
+function __init__()
+    global DEFAULT_SOLVER
+    # TODO: Solvers such as CPLEX are not listed because they have not been verified to
+    # work with Convex
+    @require ECOS="e2685f51-7e38-5353-a97d-a921fd2c8199" begin
+        using .ECOS
+        DEFAULT_SOLVER[] === nothing && set_default_solver(ECOSSolver())
+    end
+    @require SCS="c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13" begin
+        using .SCS
+        DEFAULT_SOLVER[] === nothing && set_default_solver(SCSSolver())
+    end
+    @require Gurobi="2e9cd046-0924-5485-92f1-d5272153d98b" begin
+        using .Gurobi
+        DEFAULT_SOLVER[] === nothing && set_default_solver(GurobiSolver())
+    end
+    @require Mosek="6405355b-0ac2-5fba-af84-adbd65488c0e" begin
+        using .Mosek
+        DEFAULT_SOLVER[] === nothing && set_default_solver(MosekSolver())
+    end
+    @require GLPKMathProgInterface="3c7084bd-78ad-589a-b5bb-dbd673274bea" begin
+        using .GLPKMathProgInterface
+        DEFAULT_SOLVER[] === nothing && set_default_solver(GLPKSolverMIP())
+    end
 end
 
 end

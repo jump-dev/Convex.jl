@@ -14,15 +14,15 @@ push!(solvers, ECOSSolver(verbose=0))
 push!(solvers, GLPKSolverMIP())
 push!(solvers, SCSSolver(verbose=0, eps=1e-6))
 
-if isinstalled("Gurobi")
-    using Gurobi
-    push!(solvers, GurobiSolver(OutputFlag=0))
-end
-
-if isinstalled("Mosek")
-    using Mosek
-    push!(solvers, MosekSolver(LOG=0))
-end
+#if isinstalled("Gurobi")
+#    using Gurobi
+#    push!(solvers, GurobiSolver(OutputFlag=0))
+#end
+#
+#if isinstalled("Mosek")
+#    using Mosek
+#    push!(solvers, MosekSolver(LOG=0))
+#end
 
 for solver in solvers
     println("Running tests with $(solver):")
