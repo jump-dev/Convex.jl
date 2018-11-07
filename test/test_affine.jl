@@ -60,13 +60,13 @@ eye(n) = Matrix(1.0I, n, n)
         @test (evaluate(dot([2.0; 2.0], x)))[1] ≈ 4.4 atol=TOL
     end
 
-    @testset "vecdot atom" begin
+    @testset "dot atom for matrix variables" begin
         x = Variable(2,2)
-        p = minimize(vecdot(fill(2.0, (2,2)), x), x >= 1.1)
+        p = minimize(dot(fill(2.0, (2,2)), x), x >= 1.1)
         @test vexity(p) == AffineVexity()
         solve!(p)
         @test p.optval ≈ 8.8 atol=TOL
-        @test (evaluate(vecdot(fill(2.0, (2, 2)), x)))[1] ≈ 8.8 atol=TOL
+        @test (evaluate(dot(fill(2.0, (2, 2)), x)))[1] ≈ 8.8 atol=TOL
     end
 
     @testset "add atom" begin
