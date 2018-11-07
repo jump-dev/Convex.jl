@@ -15,7 +15,7 @@ struct MinimumAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function MinimumAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("Argument should be real instead it is $(sign(x))")
         else
             children = (x,)

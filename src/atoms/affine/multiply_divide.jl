@@ -164,10 +164,10 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms=Un
         # and that the sizes are compatible,
         # so if the sizes aren't equal the smaller one is size 1
         var = x.children[2]
-        if size(var,1) < size(coeff,1)
-            var = ones(size(coeff,1))*var
-        elseif size(var,2) < size(coeff,2)
-            var = var*ones(1,size(coeff,1))
+        if size(var, 1) < size(coeff, 1)
+            var = ones(size(coeff, 1)) * var
+        elseif size(var, 2) < size(coeff, 2)
+            var = var * ones(1, size(coeff, 1))
         end
 
         const_multiplier = spdiagm(0 => vec(coeff))
@@ -180,10 +180,10 @@ end
 function broadcasted(::typeof(*), x::Constant, y::AbstractExpr)
     if x.size == (1, 1) || y.size == (1, 1)
         return x * y
-    elseif size(y,1) < size(x,1) && size(y,1) == 1
-        return DotMultiplyAtom(x, ones(size(x,1))*y)
-    elseif size(y,2) < size(x,2) && size(y,2) == 1
-        return DotMultiplyAtom(x, y*ones(1,size(x,1)))
+    elseif size(y, 1) < size(x, 1) && size(y, 1) == 1
+        return DotMultiplyAtom(x, ones(size(x, 1)) * y)
+    elseif size(y, 2) < size(x, 2) && size(y, 2) == 1
+        return DotMultiplyAtom(x, y * ones(1, size(x, 1)))
     else
         return DotMultiplyAtom(x, y)
     end

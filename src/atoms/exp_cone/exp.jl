@@ -18,7 +18,7 @@ struct ExpAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function ExpAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
         else
             children = (x,)

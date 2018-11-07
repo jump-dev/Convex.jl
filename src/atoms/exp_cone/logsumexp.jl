@@ -19,7 +19,7 @@ struct LogSumExpAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function LogSumExpAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
         else
             children = (x,)
@@ -48,7 +48,7 @@ logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
 function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, e)
-        # log(sum(exp(x))) <= t  <=>    sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
+        # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
         t = Variable(e.size)
         z = sum(exp(e.children[1] - t))
         objective = conic_form!(t, unique_conic_forms)
@@ -62,8 +62,8 @@ end
 
 function logisticloss(e::AbstractExpr)
     s = 0
-    length(e)==1 && return logsumexp([e, 0])
-    for i=1:length(e)
+    length(e) == 1 && return logsumexp([e, 0])
+    for i = 1:length(e)
         s += logsumexp([e[i]; 0])
     end
     return s

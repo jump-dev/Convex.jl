@@ -31,23 +31,23 @@ mutable struct Variable <: AbstractExpr
     Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
 end
 
-Semidefinite(m::Integer) = Variable((m,m), :Semidefinite)
+Semidefinite(m::Integer) = Variable((m, m), :Semidefinite)
 function Semidefinite(m::Integer, n::Integer)
-    if m==n
-        return Variable((m,m), :Semidefinite)
+    if m == n
+        return Variable((m, m), :Semidefinite)
     else
         error("Semidefinite matrices must be square")
     end
 end
 
-ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m,n), ComplexSign(), sets...)
+ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m, n), ComplexSign(), sets...)
 ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
 ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexSign(), sets...)
 ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
-HermitianSemidefinite(m::Integer) = ComplexVariable((m,m), :Semidefinite)
+HermitianSemidefinite(m::Integer) = ComplexVariable((m, m), :Semidefinite)
 function HermitianSemidefinite(m::Integer, n::Integer)
-    if m==n
-        return ComplexVariable((m,m), :Semidefinite)
+    if m == n
+        return ComplexVariable((m, m), :Semidefinite)
     else
         error("HermitianSemidefinite matrices must be square")
     end

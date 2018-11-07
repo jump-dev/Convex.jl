@@ -16,7 +16,7 @@ struct SumLargestAtom <: AbstractExpr
     k::Int
 
     function SumLargestAtom(x::AbstractExpr, k::Int)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("Argument should be real instead it is $(sign(x))")
         else
             if k <= 0
