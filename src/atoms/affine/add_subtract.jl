@@ -97,8 +97,9 @@ function curvature(x::AdditionAtom)
 end
 
 function evaluate(x::AdditionAtom)
-    # broadcast function is used here instead of sum to support addition between scalars and arrays
-    return broadcast(+, map(evaluate, x.children)...)
+    # broadcast is used in reduction instead of using sum directly to support addition
+    # between scalars and arrays
+    return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
 function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
