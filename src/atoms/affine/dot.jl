@@ -1,26 +1,23 @@
 import LinearAlgebra.dot
-export vecdot, dot
+export dot
 
+ismatrix(x::AbstractExpr) = (s = size(x); length(s) == 2 && s[1] > 1 && s[2] > 1)
+ismatrix(::AbstractMatrix) = true
+ismatrix(::Any) = false
 
-vecdot(x::AbstractExpr, y::AbstractExpr) = sum(broadcast(*, x, y))
-vecdot(x::Value, y::AbstractExpr) = sum(broadcast(*, Constant(x), y))
-vecdot(x::AbstractExpr, y::Value) = sum(broadcast(*, x, Constant(y)))
+# NOTE: Using asvec avoids broadcast-specific behaviors that we want to avoid, such
+# as extending singleton dimensions. We need to ensure that the inputs have the same
+# length, which broadcast will check for us if both inputs are vectors.
+asvec(x) = convert(AbstractExpr, ismatrix(x) ? vec(x) : x)
+_vecdot(x, y) = sum(broadcast(*, asvec(x), asvec(y)))
 
-dot(x::AbstractExpr, y::AbstractExpr) = (ismatrix(x) || ismatrix(y)) ? error("dot not implemented for matrices. perhaps you're looking for vecdot?") : vecdot(x, y)
-dot(x::Value, y::AbstractExpr) = (ismatrix(x) || ismatrix(y)) ? error("dot not implemented for matrices. perhaps you're looking for vecdot?") : vecdot(x, y)
-dot(x::AbstractExpr, y::Value) = (ismatrix(x) || ismatrix(y)) ? error("dot not implemented for matrices. perhaps you're looking for vecdot?") : vecdot(x, y)
+dot(x::AbstractExpr, y::AbstractExpr) = _vecdot(x, y)
+dot(x::Value, y::AbstractExpr) = _vecdot(x, y)
+dot(x::AbstractExpr, y::Value) = _vecdot(x, y)
 
-# tests if an array is a matrix (2D array) with both dimensions of size > 1
-function ismatrix(x)
-    sz = size(x)
-    if length(sz) != 2
-        return false
-    else
-        for s in sz
-            if s == 1
-                return false
-            end
-        end
-    end
-    return true
+if isdefined(LinearAlgebra, :vecdot) # defined but deprecated
+    import LinearAlgebra: vecdot
 end
+Base.@deprecate vecdot(x::AbstractExpr, y::AbstractExpr) dot(x, y)
+Base.@deprecate vecdot(x::Value, y::AbstractExpr) dot(x, y)
+Base.@deprecate vecdot(x::AbstractExpr, y::Value) dot(x, y)
