@@ -4,11 +4,17 @@ export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
 export set_default_solver, get_default_solver, isinstalled
 
 function set_default_solver(solver::MathProgBase.AbstractMathProgSolver)
+    Base.depwarn("Default solvers are deprecated and will not be provided in a future " *
+                 "release.\nLoad any necessary solvers manually.", :set_default_solver)
+
     global DEFAULT_SOLVER
     DEFAULT_SOLVER = solver
 end
 
 function get_default_solver()
+    Base.depwarn("Default solvers are deprecated and will not be provided in a future " *
+                 "release.\nLoad any necessary solvers manually.", :get_default_solver)
+
     if DEFAULT_SOLVER == nothing
         error("The default solver is set to `nothing`
               You must have at least one solver installed to use Convex.
@@ -16,6 +22,7 @@ function get_default_solver()
               Pkg.add(\"SCS\").
               You will have to restart Julia after that.")
     end
+
     return DEFAULT_SOLVER
 end
 
@@ -29,6 +36,7 @@ function isinstalled(pkg)
             return true
         end
     end
+
     return false
 end
 
@@ -90,4 +98,3 @@ function can_solve_sdp(solver)
         return false
     end
 end
-

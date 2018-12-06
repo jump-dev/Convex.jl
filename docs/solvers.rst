@@ -30,14 +30,6 @@ To use a specific solver, you can use the following syntax
 	using GLPKMathProgInterface
 	solve!(p, GLPKSolverMIP())
 
-You can set or see the current default solver by
-::
-
-	get_default_solver()
-	using Gurobi
-	set_default_solver(GurobiSolver()) # or set_default_solver(SCSSolver(verbose=0))
-	# Now Gurobi will be used by default as a solver
-
 Many of the solvers also allow options to be passed in. More details can be found in each solver's documentation.
 
 For example, if we wish to turn off printing for the SCS solver (ie, run in quiet mode), we can do so by
