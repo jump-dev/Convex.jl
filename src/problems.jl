@@ -40,17 +40,10 @@ mutable struct Problem
 end
 
 # constructor if model is not specified
-<<<<<<< HEAD
 function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
-                 solver::MathProgBase.AbstractMathProgSolver=DEFAULT_SOLVER)
-    Problem(head, objective, MathProgBase.ConicModel(solver), constraints)
-=======
-function Problem(head::Symbol, objective::AbstractExpr,
-                 constraints::Array=Constraint[],
                  solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing)
     model = solver !== nothing ? MathProgBase.ConicModel(solver) : solver
     Problem(head, objective, model, constraints)
->>>>>>> Completely dropped the DEFAULT_SOLVER logic
 end
 
 # If the problem constructed is of the form Ax=b where A is m x n
