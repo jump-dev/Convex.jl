@@ -25,11 +25,12 @@ mutable struct Problem
     constraints::Array{Constraint}
     status::Symbol
     optval::Float64OrNothing
-    model::MathProgBase.AbstractConicModel
+    model::Union{MathProgBase.AbstractConicModel, Nothing}
     solution::Solution
 
     function Problem(head::Symbol, objective::AbstractExpr,
-                     model::MathProgBase.AbstractConicModel, constraints::Array=Constraint[])
+                     model::Union{MathProgBase.AbstractConicModel, Nothing}=nothing,
+                     constraints::Array=Constraint[])
         if sign(objective)== Convex.ComplexSign()
             error("Objective can not be a complex expression")
         else
@@ -39,9 +40,17 @@ mutable struct Problem
 end
 
 # constructor if model is not specified
+<<<<<<< HEAD
 function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
                  solver::MathProgBase.AbstractMathProgSolver=DEFAULT_SOLVER)
     Problem(head, objective, MathProgBase.ConicModel(solver), constraints)
+=======
+function Problem(head::Symbol, objective::AbstractExpr,
+                 constraints::Array=Constraint[],
+                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing)
+    model = solver !== nothing ? MathProgBase.ConicModel(solver) : solver
+    Problem(head, objective, model, constraints)
+>>>>>>> Completely dropped the DEFAULT_SOLVER logic
 end
 
 # If the problem constructed is of the form Ax=b where A is m x n
