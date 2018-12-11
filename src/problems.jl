@@ -40,7 +40,7 @@ end
 
 # constructor if model is not specified
 function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
-                 solver::MathProgBase.AbstractMathProgSolver=get_default_solver())
+                 solver::MathProgBase.AbstractMathProgSolver=DEFAULT_SOLVER)
     Problem(head, objective, MathProgBase.ConicModel(solver), constraints)
 end
 
