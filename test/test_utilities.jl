@@ -1,6 +1,3 @@
-using Convex
-using Test
-
 @testset "Utilities" begin
 
     @testset "length and size" begin
@@ -37,5 +34,4 @@ using Test
     #     x.value = [1 2 3; 4 5 6]
     #     @fact evaluate(s) --> 21
     # end
-
 end

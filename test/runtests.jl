@@ -1,9 +1,19 @@
 using Convex
+using Convex: DotMultiplyAtom
 using Test
 using ECOS
 using SCS
 using GLPKMathProgInterface
 using Random
+
+import LinearAlgebra.eigen
+import LinearAlgebra.I
+import LinearAlgebra.opnorm
+import Random.shuffle
+import Statistics.mean
+
+TOL = 1e-3
+eye(n) = Matrix(1.0I, n, n)
 
 # Seed random number stream to improve test reliability
 Random.seed!(2)
@@ -24,9 +34,13 @@ if isinstalled("Mosek")
     push!(solvers, MosekSolver(LOG=0))
 end
 
-for solver in solvers
-    println("Running tests with $(solver):")
-    set_default_solver(solver)
-    println(get_default_solver())
-    include("runtests_single_solver.jl")
+@testset "Convex" begin
+    include("test_utilities.jl")
+    include("test_affine.jl")
+    include("test_lp.jl")
+    include("test_socp.jl")
+    include("test_sdp.jl")
+    include("test_exp.jl")
+    include("test_sdp_and_exp.jl")
+    include("test_mip.jl")
 end

@@ -18,6 +18,14 @@ function solve!(problem::Problem;
                 check_vexity=true,
                 verbose=true)
 
+    if problem.model === nothing
+        throw(ArgumentError(
+            "The provided problem hasn't been initialized with a conic model.
+            You can resolve this by passing in `AbstractMathProgSolver` such as:
+            solve!(problem, ECOSSolver())"
+        ))
+    end
+
     if check_vexity
         vex = vexity(problem)
     end
