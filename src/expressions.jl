@@ -28,7 +28,7 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.convert
+import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.convert, Base.axes
 export AbstractExpr, Constraint
 export vexity, sign, size, evaluate, monotonicity, curvature, length, convert
 export conic_form!
@@ -119,3 +119,7 @@ end
 ndims(x::AbstractExpr) = 2
 get_vectorized_size(x::AbstractExpr) = reduce(*, size(x))
 lastindex(x::AbstractExpr) = get_vectorized_size(x)
+
+axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
+axes(x::AbstractExpr, n::Integer) = axes(x)[n]
+lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))

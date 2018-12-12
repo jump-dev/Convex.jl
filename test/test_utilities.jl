@@ -19,6 +19,17 @@ using Test
         @test size(x) == (1, 1)
     end
 
+    @testset "lastindex and axes" begin
+        x = Variable(2, 3)
+        @test axes(x) == (Base.OneTo(2), Base.OneTo(3))
+        @test axes(x, 1) == Base.OneTo(2)
+        @test lastindex(x) == 6
+        @test lastindex(x, 2) == 3
+        y = x[:,end]
+        @test y isa AbstractExpr
+        @test size(y) == (2, 1)
+    end
+
     # returns [21]; not sure why
     # context("iteration") do
     #     x = Variable(2,3)
