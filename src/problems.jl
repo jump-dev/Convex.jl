@@ -29,7 +29,7 @@ mutable struct Problem
     solution::Solution
 
     function Problem(head::Symbol, objective::AbstractExpr,
-                     model::Union{MathProgBase.AbstractConicModel, Nothing}=nothing,
+                     model::Union{MathProgBase.AbstractConicModel, Nothing},
                      constraints::Array=Constraint[])
         if sign(objective)== Convex.ComplexSign()
             error("Objective can not be a complex expression")
