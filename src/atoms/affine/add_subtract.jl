@@ -108,7 +108,7 @@ function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms=Uniqu
         for child in x.children
             child_objective = conic_form!(child, unique_conic_forms)
             if x.size != child.size
-                child_objective = promote_size(child_objective, get_vectorized_size(x))
+                child_objective = promote_size(child_objective, length(x))
             end
             objective += child_objective
         end

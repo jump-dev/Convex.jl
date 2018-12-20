@@ -34,7 +34,6 @@ export vexity, sign, size, evaluate, monotonicity, curvature, length, convert
 export conic_form!
 export lastindex, ndims
 export Value, ValueOrNothing
-export get_vectorized_size
 
 ### Abstract types
 abstract type AbstractExpr end
@@ -117,9 +116,10 @@ function size(x::AbstractExpr, dim::Integer)
 end
 
 ndims(x::AbstractExpr) = 2
-get_vectorized_size(x::AbstractExpr) = reduce(*, size(x))
-lastindex(x::AbstractExpr) = get_vectorized_size(x)
+lastindex(x::AbstractExpr) = length(x)
 
 axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
 axes(x::AbstractExpr, n::Integer) = axes(x)[n]
 lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))
+
+@deprecate get_vectorized_size(x::AbstractExpr) length(x)

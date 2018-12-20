@@ -73,12 +73,12 @@ end
 
 
 function real_conic_form(x::Variable)
-    vec_size = get_vectorized_size(x)
+    vec_size = length(x)
     return sparse(1.0I, vec_size, vec_size)
 end
 
 function imag_conic_form(x::Variable)
-    vec_size = get_vectorized_size(x)
+    vec_size = length(x)
     if x.sign == ComplexSign()
         return im*sparse(1.0I, vec_size, vec_size)
     else
@@ -95,7 +95,7 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueCon
             cache_conic_form!(unique_conic_forms, x, objective)
         else
             objective = ConicObj()
-            vec_size = get_vectorized_size(x)
+            vec_size = length(x)
 
             objective[x.id_hash] = (real_conic_form(x), imag_conic_form(x))
             objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))

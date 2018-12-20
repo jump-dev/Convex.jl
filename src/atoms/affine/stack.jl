@@ -54,7 +54,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms=UniqueCon
                     if id == objectid(:constant)
                         variable_to_sizes[id] = 1
                     else
-                        variable_to_sizes[id] = get_vectorized_size(id_to_variables[id])
+                        variable_to_sizes[id] = length(id_to_variables[id])
                     end
                 end
             end
@@ -91,7 +91,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms=UniqueCon
             x2_value_list = Value[]
 
             for i in 1:length(objectives)
-                row_size = get_vectorized_size(x.children[i])
+                row_size = length(x.children[i])
                 if haskey(objectives[i], id)
                     push!(x1_value_list, objectives[i][id][1])
                     push!(x2_value_list, objectives[i][id][2])

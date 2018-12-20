@@ -43,7 +43,7 @@ function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms=Uniq
     if !has_conic_form(unique_conic_forms, x)
         objective = conic_form!(x.children[1], unique_conic_forms)
 
-        sz = get_vectorized_size(x)
+        sz = length(x)
 
         num_rows = x.size[1]
         num_cols = x.size[2]
@@ -106,7 +106,7 @@ function conic_form!(x::AdjointAtom, unique_conic_forms::UniqueConicForms=Unique
     if !has_conic_form(unique_conic_forms, x)
         objective = conic_form!(x.children[1], unique_conic_forms)
 
-        sz = get_vectorized_size(x)
+        sz = length(x)
 
         num_rows = x.size[1]
         num_cols = x.size[2]

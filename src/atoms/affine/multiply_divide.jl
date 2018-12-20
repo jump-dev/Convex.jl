@@ -74,7 +74,7 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms=Uniqu
             if const_child.size == (1, 1)
                 const_multiplier = evaluate(const_child)[1]
             else
-                const_multiplier = reshape(evaluate(const_child), get_vectorized_size(const_child), 1)
+                const_multiplier = reshape(evaluate(const_child), length(const_child), 1)
             end
 
             objective = const_multiplier * objective
