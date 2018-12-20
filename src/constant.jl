@@ -54,7 +54,9 @@ function imag_conic_form(x::Constant)
     return im*vec([imag(x.value);])
 end
 
-
+# We can more efficiently get the length of a constant by asking for the length of its
+# value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
+length(x::Constant) = length(x.value)
 
 function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, x)

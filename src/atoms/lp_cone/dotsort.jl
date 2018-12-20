@@ -21,11 +21,11 @@ struct DotSortAtom <: AbstractExpr
         if sign(x) == ComplexSign()
             error("Argument should be real instead it is $(sign(x))")
         else
-            if !(length(w) == get_vectorized_size(x))
+            if !(length(w) == length(x))
                 error("x and w must be the same size")
             end
             children = (x,)
-            vecw = reshape(w, get_vectorized_size(x))
+            vecw = reshape(w, length(x))
             return new(:dotsort, hash((children, vecw)), children, (1,1), vecw)
         end
     end

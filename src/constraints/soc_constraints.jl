@@ -22,7 +22,7 @@ function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms=Uniq
         for iobj=1:length(c.children)
             objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
         end
-        cache_conic_form!(unique_conic_forms, c, ConicConstr(objectives, :SOC, [get_vectorized_size(x) for x in c.children]))
+        cache_conic_form!(unique_conic_forms, c, ConicConstr(objectives, :SOC, [length(x) for x in c.children]))
     end
     return get_conic_form(unique_conic_forms, c)
 end
@@ -45,7 +45,7 @@ end
 
 function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, c)
-        num_constrs = get_vectorized_size(c.children[1])
+        num_constrs = length(c.children[1])
         num_children = length(c.children)
         conic_constrs = Array{ConicConstr}(undef, num_constrs)
         objectives = Array{ConicObj}(undef, num_children)

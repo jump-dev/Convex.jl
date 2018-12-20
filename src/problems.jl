@@ -62,11 +62,11 @@ function find_variable_ranges(constraints)
                 if !haskey(var_to_ranges, id) && id != objectid(:constant)
                     var = id_to_variables[id]
                     if var.sign == ComplexSign()
-                        var_to_ranges[id] = (index + 1, index + 2*get_vectorized_size(var))
-                        index += 2*get_vectorized_size(var)
+                        var_to_ranges[id] = (index + 1, index + 2*length(var))
+                        index += 2*length(var)
                     else
-                        var_to_ranges[id] = (index + 1, index + get_vectorized_size(var))
-                        index += get_vectorized_size(var)
+                        var_to_ranges[id] = (index + 1, index + length(var))
+                        index += length(var)
                     end
                 end
             end
@@ -108,7 +108,7 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms=UniqueConi
 end
 
 function conic_problem(p::Problem)
-    if get_vectorized_size(p.objective) != 1
+    if length(p.objective) != 1
         error("Objective must be a scalar")
     end
 
@@ -153,8 +153,8 @@ function conic_problem(p::Problem)
                 else
                     var_range = var_to_ranges[id]
                     if id_to_variables[id].sign == ComplexSign()
-                        A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + get_vectorized_size(id_to_variables[id])-1] = -val[1]
-                        A[constr_index + 1 : constr_index + sz, var_range[1] + get_vectorized_size(id_to_variables[id]) : var_range[2]] = -val[2]
+                        A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + length(id_to_variables[id])-1] = -val[1]
+                        A[constr_index + 1 : constr_index + sz, var_range[1] + length(id_to_variables[id]) : var_range[2]] = -val[2]
                     else
                         A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
                     end

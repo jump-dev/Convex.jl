@@ -22,7 +22,7 @@ struct SumLargestAtom <: AbstractExpr
             if k <= 0
                 error("sumlargest and sumsmallest only support positive values of k")
             end
-            if k > get_vectorized_size(x)
+            if k > length(x)
                 error("k cannot be larger than the number of entries in x")
             end
             children = (x,)

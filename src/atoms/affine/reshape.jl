@@ -10,7 +10,7 @@ struct ReshapeAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function ReshapeAtom(x::AbstractExpr, m::Int, n::Int)
-        if m * n != get_vectorized_size(x)
+        if m * n != length(x)
             error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
         end
         return new(:reshape, objectid(x), (x,), (m, n))
@@ -39,4 +39,4 @@ end
 
 
 reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
-vec(x::AbstractExpr) = reshape(x, get_vectorized_size(x), 1)
+vec(x::AbstractExpr) = reshape(x, length(x), 1)
