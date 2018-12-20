@@ -64,7 +64,7 @@ function vexity(x::Variable)
 end
 
 function evaluate(x::Variable)
-    return x.value == nothing ? error("Value of the variable is yet to be calculated") : x.value
+    return x.value === nothing ? error("Value of the variable is yet to be calculated") : x.value
 end
 
 function sign(x::Variable)
@@ -114,7 +114,7 @@ end
 
 # fix variables to hold them at their current value, and free them afterwards
 function fix!(x::Variable)
-    x.value == nothing && error("This variable has no value yet; cannot fix value to nothing!")
+    x.value === nothing && error("This variable has no value yet; cannot fix value to nothing!")
     push!(x.sets, :fixed)
     x.vexity = ConstVexity()
     x
