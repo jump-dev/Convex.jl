@@ -40,7 +40,7 @@ function curvature(x::IndexAtom)
 end
 
 function evaluate(x::IndexAtom)
-    if x.inds == nothing
+    if x.inds === nothing
         return getindex(evaluate(x.children[1]), x.rows, x.cols)
     else
         return getindex(evaluate(x.children[1]), x.inds)
@@ -52,7 +52,7 @@ function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms=UniqueCo
         m = length(x)
         n = length(x.children[1])
 
-        if x.inds == nothing
+        if x.inds === nothing
             sz = length(x.cols) * length(x.rows)
             J = Array{Int}(undef, sz)
             k = 1
