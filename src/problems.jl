@@ -131,13 +131,13 @@ function conic_problem(p::Problem)
     # var_size is the sum of the lengths of all variables in the problem
     # constr_size is the sum of the lengths of all constraints in the problem
     var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
-    c = spzeros(var_size, 1)
+    c = zeros(var_size, 1)
     objective_range = var_to_ranges[objective_var_id]
     c[objective_range[1]:objective_range[2]] .= 1
 
     # slot in all of the coefficients in the conic forms into A and b
-    A = spzeros(constr_size, var_size)
-    b = spzeros(constr_size, 1)
+    A = zeros(constr_size, var_size)
+    b = zeros(constr_size, 1)
     cones = Tuple{Symbol, UnitRange{Int}}[]
     constr_index = 0
     for constraint in constraints

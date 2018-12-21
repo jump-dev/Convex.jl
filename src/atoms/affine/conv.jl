@@ -11,7 +11,7 @@ function conv(x::Value, y::AbstractExpr)
     end
     m = length(x)
     n = y.size[1]
-    X = spzeros(m+n - 1, n)
+    X = zeros(m+n - 1, n)
     for i = 1:n
         X[i:m+i-1, i] = x
     end

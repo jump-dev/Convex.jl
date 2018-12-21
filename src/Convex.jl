@@ -4,6 +4,8 @@ module Convex
 import DataStructures
 using LinearAlgebra
 using SparseArrays
+using FillArrays
+using LazyArrays
 
 global DEFAULT_SOLVER = nothing
 ### modeling framework

@@ -96,8 +96,8 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms=UniqueCon
                     push!(x1_value_list, objectives[i][id][1])
                     push!(x2_value_list, objectives[i][id][2])
                 else
-                    push!(x1_value_list, spzeros(row_size, col_size))
-                    push!(x2_value_list, spzeros(row_size, col_size))
+                    push!(x1_value_list, Zeros{Float64}(row_size, col_size))
+                    push!(x2_value_list, Zeros{Float64}(row_size, col_size))
                 end
             end
             x1 = vcat(x1_value_list...)

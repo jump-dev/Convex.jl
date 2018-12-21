@@ -44,19 +44,19 @@ function evaluate(x::PartialTraceAtom)
 
     subsystem = function(sys)
         function term(ρ, j::Int)
-            a = sparse(1.0I, 1, 1)
-            b = sparse(1.0I, 1, 1)
+            a = Eye{Float64}(1)
+            b = Eye{Float64}(1)
             i_sys = 1
             for dim in dims
                 if i_sys == sys
                 # create a vector that is only 1 at its jth component
-                v = spzeros(dim, 1);
-                v[j] = 1;
-                a = kron(a, v')
-                b = kron(b, v)
+                v = zeros(dim)
+                v[j] = 1
+                a = Kron(a, v')
+                b = Kron(b, v)
                 else
-                    a = kron(a, sparse(1.0I, dim, dim))
-                    b = kron(b, sparse(1.0I, dim, dim))
+                    a = Kron(a, Eye{Float64}(dim))
+                    b = Kron(b, Eye{Float64}(dim))
                 end
                 i_sys += 1
             end
@@ -65,12 +65,12 @@ function evaluate(x::PartialTraceAtom)
         return sum([term(ρ, j) for j in 1:dims[sys]])
     end
     sub_systems = [subsystem(i) for i in 1:length(dims)]
-    a = Matrix(1.0I, 1, 1)
+    a = Eye{Float64}(1)
     for i in 1:length(dims)
         if i == x.sys
             continue
         else
-            a = kron(a,sub_systems[i])
+            a = Kron(a,sub_systems[i])
         end
     end
     return tr(sub_systems[x.sys])*a
@@ -87,19 +87,19 @@ function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=U
         # in the system we want to trace out
         # This function returns every term in the sum
         function term(ρ, j::Int)
-            a = sparse(1.0I, 1, 1)
-            b = sparse(1.0I, 1, 1)
+            a = Eye{Float64}(1)
+            b = Eye{Float64}(1)
             i_sys = 1
             for dim in dims
                 if i_sys == sys
                     # create a vector that is only 1 at its jth component
-                    v = spzeros(dim, 1);
-                    v[j] = 1;
-                    a = kron(a, v')
-                    b = kron(b, v)
+                    v = zeros(dim)
+                    v[j] = 1
+                    a = Kron(a, v')
+                    b = Kron(b, v)
                 else
-                    a = kron(a, sparse(1.0I, dim, dim))
-                    b = kron(b, sparse(1.0I, dim, dim))
+                    a = Kron(a, Eye{Float64}(dim))
+                    b = Kron(b, Eye{Float64}(dim))
                 end
                 i_sys += 1
             end

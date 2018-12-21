@@ -73,16 +73,15 @@ end
 
 
 function real_conic_form(x::Variable)
-    vec_size = length(x)
-    return sparse(1.0I, vec_size, vec_size)
+    return Eye{Float64}(length(x))
 end
 
 function imag_conic_form(x::Variable)
     vec_size = length(x)
     if x.sign == ComplexSign()
-        return im*sparse(1.0I, vec_size, vec_size)
+        return im * Eye{Float64}(vec_size)
     else
-        return spzeros(vec_size, vec_size)
+        return Zeros{Float64}(vec_size, vec_size)
     end
 end
 
@@ -98,7 +97,7 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueCon
             vec_size = length(x)
 
             objective[x.id_hash] = (real_conic_form(x), imag_conic_form(x))
-            objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
+            objective[objectid(:constant)] = (Zeros{Float64}(vec_size, 1), Zeros{Float64}(vec_size, 1))
             # placeholder values in unique constraints prevent infinite recursion depth
             cache_conic_form!(unique_conic_forms, x, objective)
             if !(x.sign == NoSign() || x.sign == ComplexSign())
