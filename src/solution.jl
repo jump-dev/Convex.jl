@@ -174,7 +174,7 @@ end
 function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UInt64, Tuple{Int, Int}})
     for (id, (start_index, end_index)) in var_to_ranges
         var = id_to_variables[id]
-        if var.value != nothing
+        if var.value !== nothing
             sz = size(var.value)
             if length(sz) <= 1
                 primal[start_index:end_index] = var.value

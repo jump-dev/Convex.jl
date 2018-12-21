@@ -17,7 +17,7 @@ function show(io::IO, x::Variable)
           size: ($(x.size[1]), $(x.size[2]))
           sign: $(x.sign)
           vexity: $(x.vexity)""")
-    if x.value != nothing
+    if x.value !== nothing
         print(io, "\nvalue: $(x.value)")
     end
 end
