@@ -121,8 +121,7 @@ function fix!(x::Variable)
 end
 function fix!(x::Variable, v::AbstractArray)
     size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = Array{Float64}(undef, size(x))
-    x.value[:,:] = v
+    x.value = convert(Array{Float64}, v)
     fix!(x)
 end
 fix!(x::Variable, v::Number) = fix!(x, fill(v, (1, 1)))

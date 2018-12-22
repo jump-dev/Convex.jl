@@ -41,16 +41,16 @@ function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms=Uniq
     if !has_conic_form(unique_conic_forms, c)
         conic_constrs = ConicConstr[]
         if c.size == (1, 1)
-            objectives = Array{ConicObj}(undef, 3)
-            for iobj=1:3
+            objectives = Vector{ConicObj}(undef, 3)
+            @inbounds for iobj = 1:3
                 objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
             end
             push!(conic_constrs, ConicConstr(objectives, :ExpPrimal, [1, 1, 1]))
         else
-            for i=1:c.size[1]
-                for j=1:c.size[2]
-                    objectives = Array{ConicObj}(undef, 3)
-                    for iobj=1:3
+            for i = 1:c.size[1]
+                for j = 1:c.size[2]
+                    objectives = Vector{ConicObj}(undef, 3)
+                    @inbounds for iobj = 1:3
                         objectives[iobj] = conic_form!(c.children[iobj][i,j], unique_conic_forms)
                     end
                     push!(conic_constrs, ConicConstr(objectives, :ExpPrimal, [1, 1, 1]))
