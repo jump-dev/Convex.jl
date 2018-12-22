@@ -1,7 +1,7 @@
 __precompile__()
 
 module Convex
-import DataStructures
+using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
 

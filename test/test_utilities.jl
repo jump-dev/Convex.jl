@@ -1,5 +1,20 @@
 @testset "Utilities" begin
 
+    @testset "ConicObj" begin
+        c = ConicObj()
+        z = UInt64(0)
+        @test !haskey(c, z)
+        c[z] = (1, 1)
+        @test c[z] == (1, 1)
+        x = UInt64[]
+        for (k, v) in c
+            push!(x, k)
+        end
+        @test x == collect(keys(c))
+        d = copy(c)
+        @test d !== c
+    end
+
     @testset "length and size" begin
         x = Variable(2,3)
         @test length(x) == 6
