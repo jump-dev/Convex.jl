@@ -158,16 +158,16 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms=Un
         # promote the size of the coefficient matrix, so eg
         # 3 .* x
         # works regardless of the size of x
-        coeff = x.children[1].value .* ones(size(x.children[2]))
+        coeff = x.children[1].value .* Ones(size(x.children[2]))
         # promote the size of the variable
         # we've previously ensured neither x nor y is 1x1
         # and that the sizes are compatible,
         # so if the sizes aren't equal the smaller one is size 1
         var = x.children[2]
         if size(var, 1) < size(coeff, 1)
-            var = ones(size(coeff, 1)) * var
+            var = Ones(size(coeff, 1)) * var
         elseif size(var, 2) < size(coeff, 2)
-            var = var * ones(1, size(coeff, 1))
+            var = var * Ones(1, size(coeff, 1))
         end
 
         const_multiplier = spdiagm(0 => vec(coeff))
@@ -181,9 +181,9 @@ function broadcasted(::typeof(*), x::Constant, y::AbstractExpr)
     if x.size == (1, 1) || y.size == (1, 1)
         return x * y
     elseif size(y, 1) < size(x, 1) && size(y, 1) == 1
-        return DotMultiplyAtom(x, ones(size(x, 1)) * y)
+        return DotMultiplyAtom(x, Ones(size(x, 1)) * y)
     elseif size(y, 2) < size(x, 2) && size(y, 2) == 1
-        return DotMultiplyAtom(x, y * ones(1, size(x, 1)))
+        return DotMultiplyAtom(x, y * Ones(1, size(x, 1)))
     else
         return DotMultiplyAtom(x, y)
     end

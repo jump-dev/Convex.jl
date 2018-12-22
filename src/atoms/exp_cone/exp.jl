@@ -49,7 +49,7 @@ function conic_form!(e::ExpAtom, unique_conic_forms::UniqueConicForms=UniqueConi
     if !has_conic_form(unique_conic_forms, e)
         # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
         x = e.children[1]
-        y = Constant(ones(size(x)))
+        y = Constant(Ones(size(x)))
         z = Variable(size(x))
         objective = conic_form!(z, unique_conic_forms)
         conic_form!(ExpConstraint(x, y, z), unique_conic_forms)

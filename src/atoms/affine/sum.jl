@@ -65,9 +65,9 @@ _sum(x::AbstractExpr, ::Colon) = SumAtom(x)
 
 function _sum(x::AbstractExpr, dimension::Integer)
     if dimension == 1
-        return Constant(ones(1, x.size[1]), Positive()) * x
+        return Constant(Ones(1, x.size[1]), Positive()) * x
     elseif dimension == 2
-        return x * Constant(ones(x.size[2], 1), Positive())
+        return x * Constant(Ones(x.size[2], 1), Positive())
     else
         error("Sum not implemented for dimension $dimension")
     end

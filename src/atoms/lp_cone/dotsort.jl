@@ -67,7 +67,7 @@ function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms=Unique
         end
         mu = Variable(size(y))
         nu = Variable(size(y))
-        onesvec = ones(size(y))
+        onesvec = Ones(size(y))
         # given by the solution to
         # minimize sum(mu) + sum(nu)
         # subject to y*w' <= onesvec*nu' + mu*onesvec'
