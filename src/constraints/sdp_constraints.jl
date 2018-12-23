@@ -50,13 +50,13 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms=Uniq
         rescale = sqrt(2)*tril(ones(n,n))
         rescale[diagind(n, n)] .= 1.0
         diagandlowerpart = findall(!iszero, vec(rescale))
-        lowerpart = Array{Int}(undef, div(n*(n-1),2))
-        upperpart = Array{Int}(undef, div(n*(n-1),2))
+        lowerpart = Vector{Int}(undef, div(n*(n-1),2))
+        upperpart = Vector{Int}(undef, div(n*(n-1),2))
         klower = 0
         # diagandlowerpart in column-major order:
         # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...
         # consider using  and find(triu(ones(3,3)))
-        for j = 1:n
+        @inbounds for j = 1:n
             for i = j+1:n
                 klower += 1
                 upperpart[klower] = n*(i-1) + j # (j,i)th element
