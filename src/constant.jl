@@ -22,9 +22,9 @@ struct Constant <: AbstractExpr
         if check_sign
             if !isreal(x)
                 return Constant(x, ComplexSign())
-            elseif all(xi >= 0 for xi in x)
+            elseif all(real(xi) >= 0 for xi in x)
                 return Constant(x, Positive())
-            elseif all(xi <= 0 for xi in x)
+            elseif all(real(xi) <= 0 for xi in x)
                 return Constant(x, Negative())
             end
         end
