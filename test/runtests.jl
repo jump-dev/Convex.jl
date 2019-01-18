@@ -24,15 +24,13 @@ push!(solvers, ECOSSolver(verbose=0))
 push!(solvers, GLPKSolverMIP())
 push!(solvers, SCSSolver(verbose=0, eps=1e-6))
 
-if isinstalled("Gurobi")
-    using Gurobi
-    push!(solvers, GurobiSolver(OutputFlag=0))
-end
+# If Gurobi is installed, uncomment to test with it:
+#using Gurobi
+#push!(solvers, GurobiSolver(OutputFlag=0))
 
-if isinstalled("Mosek")
-    using Mosek
-    push!(solvers, MosekSolver(LOG=0))
-end
+# If Mosek is installed, uncomment to test with it:
+#using Mosek
+#push!(solvers, MosekSolver(LOG=0))
 
 @testset "Convex" begin
     include("test_utilities.jl")
