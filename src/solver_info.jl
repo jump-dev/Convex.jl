@@ -1,22 +1,13 @@
-using Pkg
 import MathProgBase
 export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
-export isinstalled
 
-function isinstalled(pkg)
-    for path in Base.DEPOT_PATH
-        if isdir(joinpath(path, pkg)) || isdir(joinpath(path, "packages", pkg))
-            return true
-        end
-    end
-
-    return false
-end
-
-# TODO: I have not listed solvers such as CPLEX etc because I have not tested Convex with them
-solvers = [("ECOS", "ECOSSolver"), ("SCS", "SCSSolver"), ("Gurobi", "GurobiSolver"), ("Mosek", "MosekSolver"),
-           ("GLPKMathProgInterface", "GLPKSolverMIP")]
-
+# NOTE: Convex has been tested with the following solvers:
+#   ECOS:   ECOSSolver
+#   SCS:    SCSSolver
+#   Gurobi: GurobiSolver
+#   Mosek:  MosekSolver
+#   GLPKMathProgInterface: GLPKSolverMIP
+# It has not been tested with other solvers such a CPLEX.
 
 function can_solve_mip(solver)
     name = typeof(solver).name.name
