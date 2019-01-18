@@ -5,54 +5,56 @@
 export Constant
 export vexity, evaluate, sign, conic_form!
 
-struct Constant <: AbstractExpr
+ispos(x::Real) = x >= 0
+ispos(v::AbstractVecOrMat{<:Real}) = all(ispos, v)
+isneg(x::Real) = x <= 0
+isneg(v::AbstractVecOrMat{<:Real}) = all(isneg, v)
+
+_size(x::Number) = (1, 1)
+_size(x::AbstractVector) = (length(x), 1)
+_size(x::AbstractMatrix) = size(x)
+
+_sign(x::Union{Complex,AbstractVecOrMat{<:Complex}}) = ComplexSign()
+function _sign(x::Value)
+    if ispos(x)
+        Positive()
+    elseif isneg(x)
+        Negative()
+    else
+        NoSign()
+    end
+end
+
+struct Constant{T<:Value} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    value::Value
+    value::T
     size::Tuple{Int, Int}
-    vexity::Vexity
     sign::Sign
 
-    function Constant(x::Value, sign::Sign)
-        sz = (size(x, 1), size(x, 2))
-        return new(:constant, objectid(x), x, sz, ConstVexity(), sign)
-    end
-
-    function Constant(x::Value, check_sign::Bool=true)
-        if check_sign
-            if !isreal(x)
-                return Constant(x, ComplexSign())
-            elseif all(xi >= 0 for xi in x)
-                return Constant(x, Positive())
-            elseif all(xi <= 0 for xi in x)
-                return Constant(x, Negative())
-            end
-        end
-        return Constant(x, NoSign())
-    end
+    Constant(x::Value, sign::Sign) = new{typeof(x)}(:constant, objectid(x), x, _size(x), sign)
+    Constant(x::Value, check_sign::Bool=true) = Constant(x, check_sign ? _sign(x) : NoSign())
 end
+
 #### Constant Definition end     #####
 
-function vexity(x::Constant)
-    return x.vexity
-end
+vexity(::Constant) = ConstVexity()
 
-function evaluate(x::Constant)
-    return x.value
-end
+evaluate(x::Constant) = x.value
 
-function sign(x::Constant)
-    return x.sign
-end
+sign(x::Constant) = x.sign
 
+# `real(::Real)` is a no-op and should be optimized out for `Constant{<:Real}`
+real_conic_form(x::Constant{<:Number}) = [real(x.value)]
+real_conic_form(x::Constant{<:AbstractVecOrMat}) = vec(real(x.value))
 
-function real_conic_form(x::Constant)
-    return vec([real(x.value);])
-end
-
-function imag_conic_form(x::Constant)
-    return im*vec([imag(x.value);])
-end
+# `imag(::Real)` always returns 0, so we can avoid the implicit conversion to `Complex`
+# by multiplication with `im` and just use an explicit call to `zeros` with the appropriate
+# length
+imag_conic_form(x::Constant{T}) where {T<:Real} = zeros(Complex{T}, 1)
+imag_conic_form(x::Constant{<:AbstractVecOrMat{T}}) where {T<:Real} = zeros(Complex{T}, length(x))
+imag_conic_form(x::Constant{<:Complex}) = [im * imag(x.value)]
+imag_conic_form(x::Constant{<:AbstractVecOrMat{<:Complex}}) = im * vec(imag(x.value))
 
 # We can more efficiently get the length of a constant by asking for the length of its
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
