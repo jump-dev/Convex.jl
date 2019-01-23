@@ -34,7 +34,7 @@ Don't do this:
 	for i=1:10
 		x = Variable()
 		p = minimize(square(x), x >= i)
-		solve!(p)
+		solve!(p, SCSSolver())
 	end
 
 Contrast this with the following **good** code, which 
@@ -46,7 +46,7 @@ Do this instead:
 	obj = square(x)
 	for i=1:10
 		p = minimize(obj, x >= i)
-		solve!(p)
+		solve!(p, SCSSolver())
 	end
 
 Warmstarts, Parameters, Fixing and Freeing Variables

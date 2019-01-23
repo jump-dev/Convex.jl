@@ -53,7 +53,7 @@ Convex.jl allows the values of the expressions to be evaluated directly.
 	z = Variable()
 	expr = x + y + z
 	problem = minimize(expr, x >= 1, y >= x, 4 * z >= y)
-	solve!(problem)
+	solve!(problem, SCSSolver())
 
 	# Once the problem is solved, we can call evaluate() on expr:
 	evaluate(expr)
@@ -111,8 +111,9 @@ Constraints can be added at any time before the problem is solved.
 A problem can be solved by calling :code:`solve!`:
 ::
 
-	solve!(problem)
+	solve!(problem, solver)
 
+passing a solver such as :code:`SCSSolver()` from the package :code:`SCS` as the second argument.
 After the problem is solved, :code:`problem.status` records the status returned by the optimization solver, and can be :code:`:Optimal`, :code:`:Infeasible`, :code:`:Unbounded`, :code:`:Indeterminate` or :code:`:Error`.
 If the status is :code:`:Optimal`, :code:`problem.optval` will record the optimum value of the problem.
 The optimal value for each variable :code:`x` participating in the problem can be found in :code:`x.value`.

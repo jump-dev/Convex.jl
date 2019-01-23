@@ -17,7 +17,7 @@ This problem can be solved in Convex.jl as follows:
 ::
 
 	# Make the Convex.jl module available
-	using Convex
+	using Convex, SCS
 
 	# Generate random problem data
 	m = 4;	n = 5
@@ -31,7 +31,7 @@ This problem can be solved in Convex.jl as follows:
 	problem = minimize(sumsquares(A * x - b), [x >= 0])
 
 	# Solve the problem by calling solve!
-	solve!(problem)
+	solve!(problem, SCSSolver())
 
 	# Check the status of the problem
 	problem.status # :Optimal, :Infeasible, :Unbounded etc.
