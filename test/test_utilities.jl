@@ -71,6 +71,22 @@
         @test Convex.imag_conic_form(Constant([1.0, 2.0])) == [0.0, 0.0]
     end
 
+    @testset "Iteration" begin
+        x = Variable(2,3)
+        s = sum([xi for xi in x])
+        x.value = [1 2 3; 4 5 6]
+        # evaluate(s) == [21] (which might be wrong? expected 21)
+        # but [21][1] === 21[1] === 21
+        # so this should pass even after "fixing" that
+        @test evaluate(s)[1] == 21
+
+        x = Variable(4)
+        @test [xi.inds for xi in x] == [1:1, 2:2, 3:3, 4:4]
+
+        x = Variable(0)
+        @test [xi for xi in x] == []
+        @test iterate(x) == nothing
+    end
     # returns [21]; not sure why
     # context("iteration") do
     #     x = Variable(2,3)
