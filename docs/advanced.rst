@@ -8,12 +8,12 @@ Dual Variables
 Convex.jl also returns the optimal dual variables for a problem. These are stored in the :code:`dual` field associated with each constraint.
 ::
 
-	using Convex
+	using Convex, SCS
 
 	x = Variable()
 	constraint = x >= 0
 	p = minimize(x, constraint)
-	solve!(p)
+	solve!(p, SCSSolver())
 
 	# Get the dual value for the constraint
 	p.constraints[1].dual
@@ -40,13 +40,13 @@ pass the optional argument `warmstart=true` to the `solve!` method.
 	# first solve
 	lambda = 100
 	problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
-	@time solve!(problem)
+	@time solve!(problem, SCSSolver())
 
 	# now warmstart
 	# if the solver takes advantage of warmstarts, 
 	# this run will be faster
 	lambda = 105
-	@time solve!(problem, warmstart=true)
+	@time solve!(problem, SCSSolver(), warmstart=true)
 
 
 Fixing and freeing variables
@@ -84,11 +84,11 @@ We use warmstarts to speed up the solution.
 		# first solve for x
 		# with y fixed, the problem is convex
 		fix!(y)
-		solve!(problem, warmstart = i > 1 ? true : false)
+		solve!(problem, SCSSolver(), warmstart = i > 1 ? true : false)
 		free!(y)
 
 		# now solve for y with x fixed at the previous solution
 		fix!(x)
-		solve!(problem, warmstart = true)
+		solve!(problem, SCSSolver(), warmstart = true)
 		free!(x)
 	end
