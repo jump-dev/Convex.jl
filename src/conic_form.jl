@@ -16,9 +16,9 @@ end
 ConicObj() = ConicObj(OrderedDict{UInt64,Tuple{Value,Value}}())
 Base.iterate(c::ConicObj, s...) = iterate(c.mapping, s...)
 Base.keys(c::ConicObj) = keys(c.mapping)
-Base.haskey(c::ConicObj, var::UInt64) = haskey(c.mapping, var)
-Base.getindex(c::ConicObj, var::UInt64) = c.mapping[var]
-Base.setindex!(c::ConicObj, val, var::UInt64) = setindex!(c.mapping, val, var)
+Base.haskey(c::ConicObj, var::Integer) = haskey(c.mapping, UInt64(var))
+Base.getindex(c::ConicObj, var::Integer) = c.mapping[UInt64(var)]
+Base.setindex!(c::ConicObj, val, var::Integer) = setindex!(c.mapping, val, UInt64(var))
 Base.copy(c::ConicObj) = ConicObj(copy(c.mapping))
 
 # helper function to negate conic objectives
