@@ -1,12 +1,12 @@
 @testset "Utilities" begin
 
-    @testset "ConicObj" begin
+    @testset "ConicObj" for T = [UInt32, UInt64]
         c = ConicObj()
-        z = UInt64(0)
+        z = zero(T)
         @test !haskey(c, z)
         c[z] = (1, 1)
         @test c[z] == (1, 1)
-        x = UInt64[]
+        x = T[]
         for (k, v) in c
             push!(x, k)
         end
