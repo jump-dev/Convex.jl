@@ -78,4 +78,4 @@ end
 min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
 min(x::AbstractExpr, y::Value) = min(x, Constant(y))
 min(x::Value, y::AbstractExpr) = min(Constant(x), y)
-neg(x::AbstractExpr) = max(-x, 0)
+neg(x::AbstractExpr) = max(-x, Constant(0, Positive()))
