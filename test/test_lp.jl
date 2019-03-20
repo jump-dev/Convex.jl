@@ -92,7 +92,7 @@
         @test vexity(p) == ConvexVexity()
         solve!(p, solver)
         @test p.optval ≈ 1 atol=TOL
-        @test evaluate(sum(neg(x))) ≈ -6 atol=TOL
+        @test evaluate(sum(neg(x))) ≈ 6 atol=TOL
     end
 
     @testset "sumlargest atom" begin
