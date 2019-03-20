@@ -88,11 +88,11 @@
 
     @testset "neg atom" begin
         x = Variable(3)
-        p = minimize(1, [x >= -2, x <= -2, neg(x) >= -3])
+        p = minimize(1, [x >= -2, x <= -2, neg(x) <= -3])
         @test vexity(p) == ConvexVexity()
         solve!(p, solver)
         @test p.optval ≈ 1 atol=TOL
-        @test evaluate(sum(neg(x))) ≈ -6 atol=TOL
+        @test evaluate(sum(neg(x))) ≈ 6 atol=TOL
     end
 
     @testset "sumlargest atom" begin
