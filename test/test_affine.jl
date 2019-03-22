@@ -8,6 +8,13 @@
         @test evaluate(-x) ≈ 0 atol=TOL
     end
 
+    @testset "kron atom" begin
+        x = ComplexVariable(3, 3)
+        y = [1.0 2.0; 3.0 4.0]
+        @test size(kron(x, y)) == (6, 6)
+        @test size(kron(y, x)) == (6, 6)
+    end
+
     @testset "multiply atom" begin
         x = Variable(1)
         p = minimize(2.0 * x, [x >= 2, x <= 4])
