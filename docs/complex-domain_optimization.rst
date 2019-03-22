@@ -89,9 +89,9 @@ The complex and Hermitian matrix variables, along with the `kron` and `partialtr
     B = ComplexVariable(2, 2)
     ρ = kron(A, B)
     constraints = [partialtrace(ρ, 1, [2; 2]) == [1 0; 0 0]
-                   trace(ρ) == 1
+                   tr(ρ) == 1
                    ρ in :SDP]
     p = satisfy(constraints)
-    solve!(p)
+    solve!(p, SCSSolver())
 
 Since we fix both components as trace-1 positive semidefinite matrices, the last two constraints are actually redundant in this case.
