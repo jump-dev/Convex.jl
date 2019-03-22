@@ -23,7 +23,11 @@ function kron(a::AbstractExpr, b::Value)
     for i in 1:size(a)[1]
         row = AbstractExpr[]
         for j in 1:size(a)[2]
-            push!(row, a[i, j] .* b)
+            if isreal(b)
+                push!(row, a[i, j] * real(b))
+            else
+                push!(row, a[i, j] * b)
+            end
         end
         push!(rows, foldl(hcat, row))
     end
