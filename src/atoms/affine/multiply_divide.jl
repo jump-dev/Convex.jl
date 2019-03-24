@@ -86,7 +86,7 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms=Uniqu
         # right matrix multiplication
         else
             objective = conic_form!(x.children[1], unique_conic_forms)
-            objective = kron(x.children[2].value', sparse(1.0I, x.size[1], x.size[1])) * objective
+            objective = kron(transpose(x.children[2].value), sparse(1.0I, x.size[1], x.size[1])) * objective
         end
         cache_conic_form!(unique_conic_forms, x, objective)
     end
