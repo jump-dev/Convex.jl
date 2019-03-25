@@ -47,6 +47,12 @@
         @test vexity(p) == AffineVexity()
         solve!(p, solver)
         @test p.optval ≈ 3 atol=TOL
+
+        # Check #274
+        x = ComplexVariable(2,2)
+        p = minimize( real( [1.0im, 0.0]' * x * [1.0im, 0.0] ), [ x == [1.0 0.0; 0.0 1.0] ])
+        solve!(p, solver)
+        @test p.optval ≈ 1.0
     end
 
     @testset "dot atom" begin
