@@ -172,7 +172,29 @@
             p = satisfy(constraints)
             solve!(p, solver)
             @test evaluate(ρ) ≈ [0.09942819 0.29923607 0 0; 0.299237 0.900572 0 0; 0 0 0 0; 0 0 0 0] atol=TOL
-            @test evaluate(partialtrace(ρ, 1, [2; 2])) ≈ [1.0 0; 0 0] atol=TOL
+            @test evaluate(partialtrace(ρ, 1, [2; 2])) ≈ [0.09942819 0.29923607; 0.29923607 0.90057181] atol=TOL
+
+            function rand_normalized(n)
+                A = 5*randn(n, n) + im*5*randn(n, n)
+                A / tr(A)
+            end
+
+            As = [ rand_normalized(3) for _ = 1:5]
+            Bs = [ rand_normalized(2) for _ = 1:5]
+            p = rand(5)
+
+            AB = sum(i -> p[i]*kron(As[i],Bs[i]), 1:5)
+            @test partialtrace(AB, 2, [3, 2]) ≈ sum( p .* As )
+            @test partialtrace(AB, 1, [3, 2]) ≈ sum( p .* Bs )
+
+            A, B, C = rand(5,5), rand(4,4), rand(3,3)
+            ABC = kron(kron(A, B), C)
+            @test kron(A,B)*tr(C) ≈ partialtrace(ABC, 3, [5, 4, 3])
+
+            # Test 281
+            A = rand(6,6)
+            expr = partialtrace(Constant(A), 1, [2, 3])
+            @test size(expr) == size(evaluate(expr))
         end
 
         @testset "Optimization with complex variables" begin
