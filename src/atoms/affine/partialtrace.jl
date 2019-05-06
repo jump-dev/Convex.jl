@@ -1,116 +1,43 @@
-import Base.sign
 export partialtrace
-export sign, curvature, monotonicity, evaluate
 
-struct PartialTraceAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
-    children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
-    sys::Int
-    dims::Vector
-
-    function PartialTraceAtom(x::AbstractExpr, sys::Int, dims::Vector)
-        if x.size[1] ≠ x.size[2]
-            error("Only square matrices are supported")
-        end
-        if ! (1 ≤ sys ≤ length(dims))
-            error("Invalid system, should between 1 and ", length(dims), " got ", sys)
-        end
-        if x.size[1] ≠ prod(dims)
-            error("Dimension of system doesn't correspond to dimension of subsystems")
-        end
-        children = (x, )
-        newsize = (round(Int, x.size[2]/dims[sys]), round(Int, x.size[1]/dims[sys]))
-        return new(:partialtrace, hash(children), children, newsize, sys, dims)
-    end
-end
-
-function sign(x::PartialTraceAtom)
-    return sign(x.children[1])
-end
-
-function curvature(x::PartialTraceAtom)
-    return ConstVexity()
-end
-
-function monotonicity(x::PartialTraceAtom)
-    return (Nondecreasing(),)
-end
-
-function evaluate(x::PartialTraceAtom)
-    ρ = evaluate(x.children[1])
-    dims = x.dims
-
-    subsystem = function(sys)
-        function term(ρ, j::Int)
-            a = sparse(1.0I, 1, 1)
-            b = sparse(1.0I, 1, 1)
-            i_sys = 1
-            for dim in dims
-                if i_sys == sys
-                # create a vector that is only 1 at its jth component
-                v = spzeros(dim, 1);
-                v[j] = 1;
-                a = kron(a, v')
-                b = kron(b, v)
-                else
-                    a = kron(a, sparse(1.0I, dim, dim))
-                    b = kron(b, sparse(1.0I, dim, dim))
-                end
-                i_sys += 1
-            end
-            return a * ρ * b
-        end
-        return sum([term(ρ, j) for j in 1:dims[sys]])
-    end
-    sub_systems = [subsystem(i) for i in 1:length(dims)]
-    a = Matrix(1.0I, 1, 1)
-    for i in 1:length(dims)
-        if i == x.sys
-            continue
+# We compute the partial trace of x by summing over
+# (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I) for all j's
+# in the system we want to trace out.
+# This function returns the jth term in the sum, namely
+# (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I).
+function _term(x, j::Int, sys, dims)
+    a = sparse(1.0I, 1, 1)
+    b = sparse(1.0I, 1, 1)
+    for (i_sys, dim) in enumerate(dims)
+        if i_sys == sys
+            # create a vector that is only 1 at its jth component
+            v = spzeros(dim, 1);
+            v[j] = 1;
+            a = kron(a, v')
+            b = kron(b, v)
         else
-            a = kron(a,sub_systems[i])
+            a = kron(a, sparse(1.0I, dim, dim))
+            b = kron(b, sparse(1.0I, dim, dim))
         end
     end
-    return tr(sub_systems[x.sys])*a
+    return a * x * b
 end
 
+"""
+    partialtrace(x, sys::Int, dims::Vector)
 
-function conic_form!(x::PartialTraceAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
-    if !has_conic_form(unique_conic_forms, x)
-        sys = x.sys
-        dims = x.dims
-
-        # compute the partial trace of x by summing over
-        # (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I) for all j's
-        # in the system we want to trace out
-        # This function returns every term in the sum
-        function term(ρ, j::Int)
-            a = sparse(1.0I, 1, 1)
-            b = sparse(1.0I, 1, 1)
-            i_sys = 1
-            for dim in dims
-                if i_sys == sys
-                    # create a vector that is only 1 at its jth component
-                    v = spzeros(dim, 1);
-                    v[j] = 1;
-                    a = kron(a, v')
-                    b = kron(b, v)
-                else
-                    a = kron(a, sparse(1.0I, dim, dim))
-                    b = kron(b, sparse(1.0I, dim, dim))
-                end
-                i_sys += 1
-            end
-            return a * ρ * b
-        end
-
-        # sum all terms described above for all j's
-        objective = conic_form!(sum([term(x.children[1], j) for j in 1:dims[sys]]), unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
+Returns the partial trace of `x` over the `sys`th system, where `dims` is a vector of integers encoding the dimensions of each subsystem.
+"""
+function partialtrace(x, sys::Int, dims::Vector)
+    if size(x, 1) ≠ size(x, 2)
+        throw(ArgumentError("Only square matrices are supported"))
     end
-    return get_conic_form(unique_conic_forms, x)
-end
+    if ! (1 ≤ sys ≤ length(dims))
+        throw(ArgumentError("Invalid system index, should between 1 and $(length(dims)), got $sys"))
+    end
+    if size(x, 1) ≠ prod(dims)
+        throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))
+    end
 
-partialtrace(x::AbstractExpr, sys::Int, dim::Vector) = PartialTraceAtom(x, sys, dim)
+    return sum(j -> _term(x, j, sys, dims), 1:dims[sys])
+end
