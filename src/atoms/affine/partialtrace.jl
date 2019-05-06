@@ -33,7 +33,7 @@ function partialtrace(x, sys::Int, dims::Vector)
         throw(ArgumentError("Only square matrices are supported"))
     end
     if ! (1 ≤ sys ≤ length(dims))
-        throw(ArgumentError("Invalid system index, should between 1 and ", length(dims), " got ", sys))
+        throw(ArgumentError("Invalid system index, should between 1 and $(length(dims)), got $sys"))
     end
     if size(x, 1) ≠ prod(dims)
         throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))

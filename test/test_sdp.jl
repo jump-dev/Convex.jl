@@ -195,6 +195,10 @@
             A = rand(6,6)
             expr = partialtrace(Constant(A), 1, [2, 3])
             @test size(expr) == size(evaluate(expr))
+
+            @test_throws ArgumentError partialtrace(rand(6, 6), 3, [2, 3])
+            @test_throws ArgumentError partialtrace(rand(6, 6), 1, [2, 4])
+            @test_throws ArgumentError partialtrace(rand(3, 4), 1, [2, 3])
         end
 
         @testset "Optimization with complex variables" begin
