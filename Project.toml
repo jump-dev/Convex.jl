@@ -1,5 +1,6 @@
 name = "Convex"
 uuid = "f65535da-76fb-5f13-bab9-19810c17039a"
+version = "0.12.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
