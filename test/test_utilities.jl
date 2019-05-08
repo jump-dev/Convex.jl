@@ -63,7 +63,29 @@
         @test_deprecated Convex.clearmemory()
     end
 
-    @testset "ConicObj" for T = [UInt32, UInt64]
+    using SparseArrays
+    @testset "Parametrically typed problems with type $T" for T = [Float32, Float64, BigFloat]
+        x = Variable()
+        p = Problem{T}(:minimize, -x, [x <= 0])
+        c, A, b, cones, var_to_ranges, vartypes, constraints = Convex.conic_problem(p)
+        @test c isa SparseMatrixCSC{T,Int64}
+        @test A isa SparseMatrixCSC{T,Int64}
+        @test b isa SparseMatrixCSC{T,Int64}
+
+        Y = Variable(5,5)
+        X = rand(T, 5, 5)
+        p = Problem{T}(:minimize, tr(Y), [ diag(Y)[2:5] == diag(X)[2:5], Y[1,1] == big(0.0) ])
+        c, A, b, cones, var_to_ranges, vartypes, constraints = Convex.conic_problem(p)
+        @test c isa SparseMatrixCSC{T,Int64}
+        @test A isa SparseMatrixCSC{T,Int64}
+        @test b isa SparseMatrixCSC{T,Int64}
+        @test diag(X)[2:5] ≈ -1 * b[2:5]
+        if T == BigFloat
+            @test diag(X)[2:5] + 1e-30*rand(4) ≉ -1 * b[2:5]
+        end
+    end
+
+    @testset "ConicObj with type $T" for T = [UInt32, UInt64]
         c = ConicObj()
         z = zero(T)
         @test !haskey(c, z)

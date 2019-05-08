@@ -1,50 +1,55 @@
 import MathProgBase
-
+using MathOptInterface
+const MOI = MathOptInterface
+const MOIU = MOI.Utilities
 export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
 export Float64OrNothing
 
 const Float64OrNothing = Union{Float64, Nothing}
 
+const Status = MOI.TerminationStatusCode
 # TODO: Cleanup
 mutable struct Solution{T<:Number}
     primal::Array{T, 1}
     dual::Array{T, 1}
-    status::Symbol
+    status::Status
     optval::T
     has_dual::Bool
 end
 
-Solution(x::Array{T, 1}, status::Symbol, optval::T) where {T} =
+Solution(x::Array{T, 1}, status::Status, optval::T) where {T} =
     Solution(x, T[], status, optval, false)
-Solution(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) where {T} =
+Solution(x::Array{T, 1}, y::Array{T, 1}, status::Status, optval::T) where {T} =
     Solution(x, y, status, optval, true)
 
-mutable struct Problem
+mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr
     constraints::Array{Constraint}
-    status::Symbol
-    optval::Float64OrNothing
+    status::Status
+    optval::Union{Real,Nothing}
     model::Union{MathProgBase.AbstractConicModel, Nothing}
     solution::Solution
 
-    function Problem(head::Symbol, objective::AbstractExpr,
+    function Problem{T}(head::Symbol, objective::AbstractExpr,
                      model::Union{MathProgBase.AbstractConicModel, Nothing},
-                     constraints::Array=Constraint[])
+                     constraints::Array=Constraint[]) where {T <: Real}
         if sign(objective)== Convex.ComplexSign()
             error("Objective can not be a complex expression")
         else
-            return new(head, objective, constraints, Symbol("not yet solved"), nothing, model)
+            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, model)
         end
     end
 end
 
 # constructor if model is not specified
-function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
-                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing)
+function Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
+                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing) where {T<:Real}
     model = solver !== nothing ? MathProgBase.ConicModel(solver) : solver
-    Problem(head, objective, model, constraints)
+    Problem{T}(head, objective, model, constraints)
 end
+
+Problem(args...) = Problem{Float64}(args...)
 
 # If the problem constructed is of the form Ax=b where A is m x n
 # returns:
@@ -107,7 +112,7 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
     return objective, objective_var.id_hash
 end
 
-function conic_problem(p::Problem)
+function conic_problem(p::Problem{T}) where {T}
     if length(p.objective) != 1
         error("Objective must be a scalar")
     end
@@ -133,14 +138,14 @@ function conic_problem(p::Problem)
     # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
     # var_size is the sum of the lengths of all variables in the problem
     # constr_size is the sum of the lengths of all constraints in the problem
-    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints, id_to_variables)
-    c = spzeros(var_size, 1)
+    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
+    c = spzeros(T, var_size, 1)
     objective_range = var_to_ranges[objective_var_id]
     c[objective_range[1]:objective_range[2]] .= 1
 
     # slot in all of the coefficients in the conic forms into A and b
-    A = spzeros(constr_size, var_size)
-    b = spzeros(constr_size, 1)
+    A = spzeros(T, constr_size, var_size)
+    b = spzeros(T, constr_size, 1)
     cones = Tuple{Symbol, UnitRange{Int}}[]
     constr_index = 0
     for constraint in constraints
@@ -194,8 +199,8 @@ function conic_problem(p::Problem)
     return c, A, b, cones, var_to_ranges, vartypes, constraints, id_to_variables, conic_constr_to_constr
 end
 
-Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
-    Problem(head, objective, [constraints...])
+Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Real} =
+    Problem{T}(head, objective, [constraints...])
 
 # Allow users to simply type minimize
 minimize(objective::AbstractExpr, constraints::Constraint...) =

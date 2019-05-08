@@ -46,24 +46,22 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
         # the upper triangular part (not including diagonal)
         # and the corresponding entries in the lower triangular part, so
         # symmetry => c.child[upperpart]
-        # scale off-diagonal elements by sqrt(2)
-        rescale = sqrt(2)*tril(ones(n,n))
+        rescale = triu(ones(n,n))
         rescale[diagind(n, n)] .= 1.0
-        diagandlowerpart = findall(!iszero, vec(rescale))
+        diagandupperpart = findall(!iszero, vec(rescale))
         lowerpart = Vector{Int}(undef, div(n*(n-1),2))
         upperpart = Vector{Int}(undef, div(n*(n-1),2))
-        klower = 0
-        # diagandlowerpart in column-major order:
-        # ie the (1,1), (2,1), ..., (n,1), (2,2), (3,2), ...
-        # consider using  and find(triu(ones(3,3)))
+        kupper = 0
+        # diagandupperpart in column-major order:
+        # consider using find(triu(ones(3,3)))
         @inbounds for j = 1:n
             for i = j+1:n
-                klower += 1
-                upperpart[klower] = n*(i-1) + j # (j,i)th element
-                lowerpart[klower] = n*(j-1) + i # (i,j)th element
+                kupper += 1
+                upperpart[kupper] = n*(i-1) + j # (j,i)th element
+                lowerpart[kupper] =n*(j-1) + i # (i,j)th element
             end
         end
-        objective = conic_form!((broadcast(*,rescale,c.child))[diagandlowerpart], unique_conic_forms)
+        objective = conic_form!((broadcast(*,rescale,c.child))[diagandupperpart], unique_conic_forms)
         sdp_constraint = ConicConstr([objective], :SDP, [div(n*(n+1),2)])
         cache_conic_form!(unique_conic_forms, c, sdp_constraint)
         # make sure upper and lower triangular part match in the solution

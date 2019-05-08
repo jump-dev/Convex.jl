@@ -23,6 +23,7 @@ include("constraints/sdp_constraints.jl")
 include("solver_info.jl")
 include("problems.jl")
 include("solution.jl")
+include("moi_model.jl")
 
 ### affine atoms
 include("atoms/affine/add_subtract.jl")
