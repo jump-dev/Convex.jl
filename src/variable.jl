@@ -57,7 +57,7 @@ end
 # the expression tree will only utilize variable ids during construction
 # full information of the variables will be needed during stuffing
 # and after solving to populate the variables with values
-id_to_variables = Dict{UInt64, Variable}()
+const id_to_variables = Dict{UInt64, Variable}()
 
 function vexity(x::Variable)
     return x.vexity
