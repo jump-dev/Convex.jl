@@ -1,18 +1,11 @@
 language: julia
 os:
-    - linux
-    - osx
+  - linux
+  - osx
 julia:
-    - 1.0
-    - 1.1
+  - 1.0
+  - 1.1
 notifications:
-    email: false
-sudo: false
-addons:
-    apt_packages:
-        - gfortran
-        - liblapack-dev
-        - libgmp-dev
-        - libglpk-dev
+  email: false
 after_success:
-    - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
