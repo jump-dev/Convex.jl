@@ -1,5 +1,6 @@
 name = "Convex"
 uuid = "f65535da-76fb-5f13-bab9-19810c17039a"
+version = "0.12.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -8,9 +9,9 @@ OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
-MathProgBase = "0.7"
-OrderedCollections = ">=1.0.0"
-julia = "0.7, 1.0"
+MathProgBase = "^0.7"
+OrderedCollections = "^1.0"
+julia = "^1.0"
 
 [extras]
 ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
