@@ -353,6 +353,21 @@
         @test p.optval ≈ 3 atol=TOL
         @test evaluate(sum(conv(h, x))) ≈ 0 atol=TOL
 
+
+        # test #288
+        x = rand(5) + im*rand(5);
+        y = Constant(rand(5));
+        @test conv(x,y) isa AbstractExpr
+
+        x =  Variable(3)
+        y = im * x
+        h = [1, -1]
+        p = minimize(imag(sum(conv(y, h)) + sum(y)), x >= 1, x <= 2)
+        @test vexity(p) == AffineVexity()
+        solve!(p, solver)
+        @test p.optval ≈ 3 atol=TOL
+        @test evaluate(sum(conv(h, x))) ≈ 0 atol=TOL
+
     end
 
     @testset "satisfy problems" begin
