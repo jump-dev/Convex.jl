@@ -19,18 +19,18 @@ Solution(x::Array{T, 1}, status::Symbol, optval::T) where {T} =
 Solution(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) where {T} =
     Solution(x, y, status, optval, true)
 
-mutable struct Problem{T<:Number}
+mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr
     constraints::Array{Constraint}
     status::Symbol
-    optval::Union{Number,Nothing}
+    optval::Union{Real,Nothing}
     model::Union{MathProgBase.AbstractConicModel, Nothing}
     solution::Solution
 
     function Problem{T}(head::Symbol, objective::AbstractExpr,
                      model::Union{MathProgBase.AbstractConicModel, Nothing},
-                     constraints::Array=Constraint[]) where {T}
+                     constraints::Array=Constraint[]) where {T <: Real}
         if sign(objective)== Convex.ComplexSign()
             error("Objective can not be a complex expression")
         else
@@ -41,7 +41,7 @@ end
 
 # constructor if model is not specified
 function Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
-                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing) where {T<:Number}
+                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing) where {T<:Real}
     model = solver !== nothing ? MathProgBase.ConicModel(solver) : solver
     Problem{T}(head, objective, model, constraints)
 end
@@ -193,7 +193,7 @@ function conic_problem(p::Problem{T}) where {T}
     return c, A, b, cones, var_to_ranges, vartypes, constraints
 end
 
-Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Number} =
+Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Real} =
     Problem{T}(head, objective, [constraints...])
 
 # Allow users to simply type minimize
