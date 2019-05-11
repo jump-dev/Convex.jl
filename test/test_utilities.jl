@@ -18,7 +18,7 @@
     end
 
     using SparseArrays
-    @testset "Parametrically typed problems" for T = [Float32, Float64, BigFloat]
+    @testset "Parametrically typed problems with type $T" for T = [Float32, Float64, BigFloat]
         x = Variable()
         p = Problem{T}(:minimize, -x, [x <= 0])
         c, A, b, cones, var_to_ranges, vartypes, constraints = Convex.conic_problem(p)
@@ -39,7 +39,7 @@
         end
     end
 
-    @testset "ConicObj" for T = [UInt32, UInt64]
+    @testset "ConicObj with type $T" for T = [UInt32, UInt64]
         c = ConicObj()
         z = zero(T)
         @test !haskey(c, z)
