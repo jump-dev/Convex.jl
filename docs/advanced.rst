@@ -26,10 +26,12 @@ Warmstarting
 If you're solving the same problem many times with different values
 of a parameter, Convex.jl can initialize many solvers with the solution
 to the previous problem, which sometimes speeds up the solution time.
-This is called a **warm start**. 
+This is called a **warm start**.
 
 To use this feature,
 pass the optional argument `warmstart=true` to the `solve!` method.
+In the following example, we will also use `fix!`, described in the
+next section.
 ::
 
 	# initialize data
@@ -38,14 +40,15 @@ pass the optional argument `warmstart=true` to the `solve!` method.
 	x = Variable(n)
 
 	# first solve
-	lambda = 100
+	lambda = Variable(Positive())
+	fix!(lambda, 100)
 	problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
 	@time solve!(problem, SCSSolver())
 
 	# now warmstart
 	# if the solver takes advantage of warmstarts, 
 	# this run will be faster
-	lambda = 105
+	fix!(lambda, 105)
 	@time solve!(problem, SCSSolver(), warmstart=true)
 
 
