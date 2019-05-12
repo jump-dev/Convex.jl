@@ -26,7 +26,7 @@ Warmstarting
 If you're solving the same problem many times with different values
 of a parameter, Convex.jl can initialize many solvers with the solution
 to the previous problem, which sometimes speeds up the solution time.
-This is called a **warm start**.
+This is called a **warm start**. 
 
 To use this feature,
 pass the optional argument `warmstart=true` to the `solve!` method.
