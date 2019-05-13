@@ -34,6 +34,7 @@ push!(solvers, SCSSolver(verbose=0, eps=1e-6))
 
 @testset "Convex" begin
     include("test_utilities.jl")
+    include("test_constraints.jl")
     include("test_affine.jl")
     include("test_lp.jl")
     include("test_socp.jl")

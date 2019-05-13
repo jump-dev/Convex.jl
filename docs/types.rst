@@ -70,6 +70,8 @@ Constraints
 	# Inequality constraint
 	constraint = x >= 1
 
+Note that constraints apply elementwise automatically; that is, :code:`x >= 1` means that :code:`x[i] >= 1` for :code:`i=1:5`. Similarly, if :code:`y = rand(5)`, then :code:`x >= y` means that :code:`x[i] >= 1` for :code:`i=1:5`. In particular, broadcast should not generally be used to constain vectors, i.e., use :code:`x >= y` instead of :code:`x .>= y`. The latter yields a vector of constraints instead of one constraint on the vector.
+
 Matrices can also be constrained to be positive semidefinite.
 ::
 
