@@ -276,6 +276,25 @@
 
                 @test o1 <= o2
             end
+
+            @testset "Issue #166" begin
+                # Issue #166
+                α = Variable(5)
+                fix!(α, ones(5,1))
+
+                # has const vexity, but not at the head
+                c = (rand(5,5) * α) * ones(1,5) 
+
+                β = Variable(5)
+                β.value = ones(5)
+
+                problem = minimize(norm(c * β), [β >= 0])
+                solve!(problem, solver)
+                @test problem.optval ≈ evaluate(norm(c * β)) atol=TOL
+                @test problem.optval ≈ 0.0 atol=TOL
+                @test β.value ≈ zeros(5) atol=TOL
+             end
+
         end
     end
 end
