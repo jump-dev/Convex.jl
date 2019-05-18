@@ -88,6 +88,11 @@
         @test Convex.imag_conic_form(Constant([1.0, 2.0])) == [0.0, 0.0]
     end
 
+    @testset "Base.vect" begin
+    # Issue #223: ensure we can make vectors of variables
+    @test size([Variable(2), Variable(3,4)]) == (2,)
+    end
+
     @testset "Iteration" begin
         x = Variable(2,3)
         s = sum([xi for xi in x])

@@ -131,9 +131,3 @@ function hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
     end
     return vcat(rs...)
 end
-
-Base.vect(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)...))
-Base.vect(args::AbstractExprOrValue...) = transpose(HcatAtom(map(arg -> transpose(convert(AbstractExpr, arg)), args)...))
-
-# XXX: Reimplementation of the Base method
-Base.vect(args::Value...) = copyto!(Vector{Base.promote_typeof(args...)}(undef, length(args)), args)
