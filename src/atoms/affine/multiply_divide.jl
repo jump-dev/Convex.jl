@@ -80,13 +80,13 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms=Uniqu
             objective = const_multiplier * objective
 
         # left matrix multiplication
-        elseif x.children[1].head == :constant
+        elseif vexity(x.children[1]) == ConstVexity()
             objective = conic_form!(x.children[2], unique_conic_forms)
-            objective = kron(sparse(1.0I, x.size[2], x.size[2]), x.children[1].value) * objective
+            objective = kron(sparse(1.0I, x.size[2], x.size[2]), evaluate(x.children[1])) * objective
         # right matrix multiplication
         else
             objective = conic_form!(x.children[1], unique_conic_forms)
-            objective = kron(transpose(x.children[2].value), sparse(1.0I, x.size[1], x.size[1])) * objective
+            objective = kron(transpose(evaluate(x.children[2])), sparse(1.0I, x.size[1], x.size[1])) * objective
         end
         cache_conic_form!(unique_conic_forms, x, objective)
     end
@@ -158,7 +158,7 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms=Un
         # promote the size of the coefficient matrix, so eg
         # 3 .* x
         # works regardless of the size of x
-        coeff = x.children[1].value .* ones(size(x.children[2]))
+        coeff = evaluate(x.children[1]) .* ones(size(x.children[2]))
         # promote the size of the variable
         # we've previously ensured neither x nor y is 1x1
         # and that the sizes are compatible,
