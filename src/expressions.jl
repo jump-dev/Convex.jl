@@ -71,7 +71,7 @@ end
 
 # This function should never be reached
 function monotonicity(x::AbstractExpr)
-    error("mnotonicity not implemented for $(x.head)")
+    error("motonicity not implemented for $(x.head)")
 end
 
 # This function should never be reached
