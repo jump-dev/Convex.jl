@@ -65,7 +65,7 @@ struct AdditionAtom <: AbstractExpr
         elseif x.size == (1, 1)
             sz = y.size
         else
-            error("Cannot add expressions of sizes $(x.size) and $(y.size)")
+            error("cannot add expressions of sizes $(x.size) and $(y.size)")
         end
         # see if we're forming a sum of more than two terms and condense them
         children = AbstractExpr[]

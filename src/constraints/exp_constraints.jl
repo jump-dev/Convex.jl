@@ -26,13 +26,13 @@ ExpConstraint(x, y::AbstractExpr, z::AbstractExpr) = ExpConstraint(Constant(x), 
 function vexity(c::ExpConstraint)
     # TODO: check these...
     if vexity(c.x) == ConcaveVexity()
-        error("Exponential constraint requires x to be convex")
+        error("exponential constraint requires x to be convex")
     end
-    if vexity(c.y)!=ConstVexity()
-        error("Exponential constraint requires y to be constant")
+    if vexity(c.y) != ConstVexity()
+        error("exponential constraint requires y to be constant")
     end
     if vexity(c.z) == ConvexVexity()
-        error("Exponential constraint requires z to be concave")
+        error("exponential constraint requires z to be concave")
     end
     return ConvexVexity()
 end

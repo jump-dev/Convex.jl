@@ -36,7 +36,7 @@ function Semidefinite(m::Integer, n::Integer)
     if m == n
         return Variable((m, m), :Semidefinite)
     else
-        error("Semidefinite matrices must be square")
+        error("semidefinite matrices must be square")
     end
 end
 
@@ -49,7 +49,7 @@ function HermitianSemidefinite(m::Integer, n::Integer)
     if m == n
         return ComplexVariable((m, m), :Semidefinite)
     else
-        error("HermitianSemidefinite matrices must be square")
+        error("hermitianSemidefinite matrices must be square")
     end
 end
 
@@ -64,7 +64,7 @@ function vexity(x::Variable)
 end
 
 function evaluate(x::Variable)
-    return x.value === nothing ? error("Value of the variable is yet to be calculated") : x.value
+    return x.value === nothing ? error("value of the variable is yet to be calculated") : x.value
 end
 
 function sign(x::Variable)
@@ -114,13 +114,13 @@ end
 
 # fix variables to hold them at their current value, and free them afterwards
 function fix!(x::Variable)
-    x.value === nothing && error("This variable has no value yet; cannot fix value to nothing!")
+    x.value === nothing && error("this variable has no value yet; cannot fix value to nothing!")
     push!(x.sets, :fixed)
     x.vexity = ConstVexity()
     x
 end
 function fix!(x::Variable, v::AbstractArray)
-    size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    size(x) == size(v) || throw(DimensionMismatch("variable and value sizes do not match!"))
     x.value = convert(Array{Float64}, v)
     fix!(x)
 end

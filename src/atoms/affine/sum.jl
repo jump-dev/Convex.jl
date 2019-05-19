@@ -69,7 +69,7 @@ function _sum(x::AbstractExpr, dimension::Integer)
     elseif dimension == 2
         return x * Constant(ones(x.size[2], 1), Positive())
     else
-        error("Sum not implemented for dimension $dimension")
+        error("sum not implemented for dimension $dimension")
     end
 end
 

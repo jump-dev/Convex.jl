@@ -27,9 +27,11 @@ function norm(x::AbstractExpr, p::Real=2)
     else
         # TODO: After the deprecation period, allow this again but make it consistent with
         # LinearAlgebra, i.e. make norm(x, p) for x a matrix the same as norm(vec(x), p).
-        Base.depwarn("`norm(x, p)` for matrices will in the future be equivalent to " *
-                     "`norm(vec(x), p)`. Use `opnorm(x, p)` for the Julia 0.6 behavior of " *
-                     "computing the operator norm for matrices.", :norm)
+        Base.depwarn("""
+                     `norm(x, p)` for matrices will in the future be equivalent to
+                     `norm(vec(x), p)`. Use `opnorm(x, p)` for the Julia 0.6 behavior of
+                     computing the operator norm for matrices.
+                     """, :norm)
         return opnorm(x, p)
     end
 end

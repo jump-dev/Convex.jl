@@ -13,7 +13,7 @@ struct HcatAtom <: AbstractExpr
         num_cols = 0
         for arg in args
             if arg.size[1] != num_rows
-                error("Cannot horizontally stack expressions of varying number of rows")
+                error("cannot horizontally stack expressions of varying number of rows")
             end
             num_cols += arg.size[2]
         end

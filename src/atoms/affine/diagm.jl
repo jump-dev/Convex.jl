@@ -22,7 +22,7 @@ struct DiagMatrixAtom <: AbstractExpr
         elseif num_cols == 1
             sz = num_rows
         else
-            throw(ArgumentError("Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?"))
+            throw(ArgumentError("only vectors are allowed for diagm/Diagonal, did you mean to use diag?"))
         end
 
         children = (x, )

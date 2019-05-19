@@ -20,9 +20,11 @@ function solve!(problem::Problem;
 
     if problem.model === nothing
         throw(ArgumentError(
-            "The provided problem hasn't been initialized with a conic model.
+            """
+            The provided problem hasn't been initialized with a conic model.
             You can resolve this by passing in `AbstractMathProgSolver` such as:
-            solve!(problem, ECOSSolver())"
+            solve!(problem, ECOSSolver())
+            """
         ))
     end
 
@@ -57,15 +59,19 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
      try
          primal = problem.solution.primal
      catch
-         @warn "Unable to use cached solution to warmstart problem.
-                (Perhaps this is the first time you're solving this problem?)
-                Warmstart may be ineffective."
+         @warn """
+               Unable to use cached solution to warmstart problem.
+               (Perhaps this is the first time you're solving this problem?)
+               Warmstart may be ineffective.
+               """
          primal = zeros(n)
      end
      if length(primal) != n
-         @warn "Unable to use cached solution to warmstart problem.
-                (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
-                Warmstart may be ineffective."
+         @warn """
+               Unable to use cached solution to warmstart problem.
+               (Perhaps the number of variables or constraints in the problem have changed since you last solved it?)
+               Warmstart may be ineffective.
+               """
          primal = zeros(n)
      end
 
@@ -76,9 +82,11 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
      try
          MathProgBase.setwarmstart!(m, primal)
      catch
-         @warn "Unable to warmstart solution.
+         @warn """
+               Unable to warmstart solution.
                (Perhaps the solver doesn't support warm starts?)
-               Using a cold start instead."
+               Using a cold start instead.
+               """
      end
      m
 end

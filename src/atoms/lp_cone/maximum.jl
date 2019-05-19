@@ -16,7 +16,7 @@ struct MaximumAtom <: AbstractExpr
 
     function MaximumAtom(x::AbstractExpr)
         if sign(x)==ComplexSign()
-            error("Argument should be real instead it is $(sign(x))")
+            error("argument should be real instead it is $(sign(x))")
         else
             children = (x,)
             return new(:maximum, hash(children), children, (1, 1))

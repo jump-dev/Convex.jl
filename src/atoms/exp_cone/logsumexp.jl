@@ -20,7 +20,7 @@ struct LogSumExpAtom <: AbstractExpr
 
     function LogSumExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("The argument should be real but it's instead complex")
+            error("argument should be real but it's instead complex")
         else
             children = (x,)
             return new(:logsumexp, hash(children), children, (1,1))

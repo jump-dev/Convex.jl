@@ -9,9 +9,9 @@ struct HuberAtom <: AbstractExpr
 
     function HuberAtom(x::AbstractExpr, M::Real)
         if sign(x) == ComplexSign()
-            error("Arguemt must be real")
+            error("argument must be real")
         elseif M <= 0
-            error("Huber parameter must by a positive scalar")
+            error("huber parameter must by a positive scalar")
         end
         children = (x,)
         return new(:huber, hash((children, M)), children, x.size, M)

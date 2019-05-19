@@ -19,7 +19,7 @@ mutable struct EqConstraint <: Constraint
         elseif rhs.size == (1, 1)
             sz = lhs.size
         else
-            error("Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+            error("cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)")
         end
         id_hash = hash((lhs, rhs, :(==)))
         return new(:(==), id_hash, lhs, rhs, sz, nothing)
@@ -72,14 +72,14 @@ mutable struct LtConstraint <: Constraint
 
     function LtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
         if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
-            error("Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
+            error("cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
             elseif rhs.size == (1, 1)
                 sz = lhs.size
             else
-                error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+                error("cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
             end
         end
         id_hash = hash((lhs, rhs, :(<=)))
@@ -124,14 +124,14 @@ mutable struct GtConstraint <: Constraint
 
     function GtConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
         if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
-            error("Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
+            error("cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))")
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
             elseif rhs.size == (1, 1)
                 sz = lhs.size
             else
-                error("Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
+                error("cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)")
             end
         end
         id_hash = hash((lhs, rhs, :(>=)))

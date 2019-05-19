@@ -17,7 +17,7 @@ struct MinAtom <: AbstractExpr
 
     function MinAtom(x::AbstractExpr, y::AbstractExpr)
         if sign(x) == ComplexSign() || sign(y) == ComplexSign()
-            error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
+            error("both arguments should be real but they are instead $(sign(x)) and $(sign(y))")
         else
             if x.size == y.size
                 sz = x.size
@@ -26,7 +26,7 @@ struct MinAtom <: AbstractExpr
             elseif y.size == (1, 1)
                 sz = x.size
             else
-                error("Got different sizes for x as $(x.size) and y as $(y.size)")
+                error("got different sizes for x as $(x.size) and y as $(y.size)")
             end
         end
 

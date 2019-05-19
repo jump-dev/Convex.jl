@@ -15,7 +15,7 @@ struct SDPConstraint <: Constraint
     function SDPConstraint(child::AbstractExpr)
         sz = child.size
         if sz[1] != sz[2]
-            error("Positive semidefinite expressions must be square")
+            error("positive semidefinite expressions must be square")
         end
         id_hash = hash((child, :sdp))
         return new(:sdp, id_hash, child, sz, nothing)

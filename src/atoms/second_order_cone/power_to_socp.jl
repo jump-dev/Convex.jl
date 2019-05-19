@@ -125,8 +125,7 @@ function ReducePowers(curr_inequality::InequalityExpression,
     elseif (p3 == 2)
         return ReduceThirdTwo(curr_inequality, ineq_array, variable_array);
     else
-        error("Third power in inequality (", curr_inequality.power3,
-              ") must be 0, 1, or 2");
+        error("third power in inequality (", curr_inequality.power3, ") must be 0, 1, or 2");
     end
 end
 

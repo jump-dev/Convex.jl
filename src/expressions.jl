@@ -71,22 +71,22 @@ end
 
 # This function should never be reached
 function monotonicity(x::AbstractExpr)
-    error("monotonicity not implemented for $(x.head).")
+    error("mnotonicity not implemented for $(x.head)")
 end
 
 # This function should never be reached
 function curvature(x::AbstractExpr)
-    error("curvature not implemented for $(x.head).")
+    error("curvature not implemented for $(x.head)")
 end
 
 # This function should never be reached
 function evaluate(x::AbstractExpr)
-    error("evaluate not implemented for $(x.head).")
+    error("evaluate not implemented for $(x.head)")
 end
 
 # This function should never be reached
 function sign(x::AbstractExpr)
-    error("sign not implemented for $(x.head).")
+    error("sign not implemented for $(x.head)")
 end
 
 function size(x::AbstractExpr)

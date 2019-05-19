@@ -16,7 +16,7 @@ struct MinimumAtom <: AbstractExpr
 
     function MinimumAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("Argument should be real instead it is $(sign(x))")
+            error("argument should be real instead it is $(sign(x))")
         else
             children = (x,)
             return new(:minimum, hash(children), children, (1, 1))

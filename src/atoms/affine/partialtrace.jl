@@ -30,13 +30,13 @@ Returns the partial trace of `x` over the `sys`th system, where `dims` is a vect
 """
 function partialtrace(x, sys::Int, dims::Vector)
     if size(x, 1) ≠ size(x, 2)
-        throw(ArgumentError("Only square matrices are supported"))
+        throw(ArgumentError("only square matrices are supported"))
     end
     if ! (1 ≤ sys ≤ length(dims))
-        throw(ArgumentError("Invalid system index, should between 1 and $(length(dims)), got $sys"))
+        throw(ArgumentError("invalid system index, should between 1 and $(length(dims)), got $sys"))
     end
     if size(x, 1) ≠ prod(dims)
-        throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))
+        throw(ArgumentError("dimension of system doesn't correspond to dimension of subsystems"))
     end
 
     return sum(j -> _term(x, j, sys, dims), 1:dims[sys])

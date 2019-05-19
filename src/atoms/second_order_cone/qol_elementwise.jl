@@ -58,7 +58,7 @@ sumsquares(x::AbstractExpr) = square(norm2(x))
 
 function square(x::AbstractExpr)
     if sign(x) == ComplexSign()
-        error("Square of complex number is not DCP. Did you mean square_modulus?")
+        error("square of complex number is not DCP, did you mean square_modulus?")
     else
         QolElemAtom(x, Constant(ones(x.size[1], x.size[2])))
     end

@@ -32,7 +32,7 @@ mutable struct Problem
                      model::Union{MathProgBase.AbstractConicModel, Nothing},
                      constraints::Array=Constraint[])
         if sign(objective)== Convex.ComplexSign()
-            error("Objective can not be a complex expression")
+            error("objective can not be a complex expression")
         else
             return new(head, objective, constraints, Symbol("not yet solved"), nothing, model)
         end
@@ -109,7 +109,7 @@ end
 
 function conic_problem(p::Problem)
     if length(p.objective) != 1
-        error("Objective must be a scalar")
+        error("objective must be a scalar")
     end
 
     # conic problems have the form

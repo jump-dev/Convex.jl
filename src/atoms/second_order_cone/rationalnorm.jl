@@ -85,10 +85,10 @@ function conic_form!(x::RationalNormAtom, unique_conic_forms)
         (ineq_list,
          var_list) = psocp.ProductToSimpleInequalities(denom, num - denom);
         if (length(ineq_list) > 10)
-            @warn string("Rational norm generating ", length(ineq_list),
-                         " intermediate constraints.\n\tIncreasing ",
-                         ":max_iters or decreasing solver tolerance\n\tmay give ",
-                         "more accurate solutions")
+            @warn """
+                  Rational norm generating $(length(ineq_list)) intermediate constraints.
+                  Increasing :max_iters or decreasing solver tolerance may give more accurate solutions.
+                  """
         end
         # u corresponds to "introduced" variables; make a matrix of them
         # and then add equality constraints for the first and second

@@ -18,8 +18,8 @@ mutable struct LogAtom <: AbstractExpr
     size::Tuple{Int, Int}
 
     function LogAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
-            error("The argument should be real but it's instead complex")
+        if sign(x) == ComplexSign()
+            error("argument should be real but it's instead complex")
         else
             children = (x,)
             return new(:log, hash(children), children, x.size)

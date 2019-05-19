@@ -19,7 +19,7 @@ struct ExpAtom <: AbstractExpr
 
     function ExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("The argument should be real but it's instead complex")
+            error("argument should be real but it's instead complex")
         else
             children = (x,)
             return new(:exp, hash(children), children, x.size)

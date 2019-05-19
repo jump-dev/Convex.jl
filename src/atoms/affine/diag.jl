@@ -24,7 +24,7 @@ struct DiagAtom <: AbstractExpr
         (num_rows, num_cols) = x.size
 
         if k >= min(num_rows, num_cols) || k <= -min(num_rows, num_cols)
-            error("Bounds error in calling diag")
+            error("bounds error in calling diag")
         end
 
         children = (x, )

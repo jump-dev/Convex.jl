@@ -11,7 +11,7 @@ struct ReshapeAtom <: AbstractExpr
 
     function ReshapeAtom(x::AbstractExpr, m::Int, n::Int)
         if m * n != length(x)
-            error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
+            error("cannot reshape expression of size $(x.size) to ($(m), $(n))")
         end
         return new(:reshape, objectid(x), (x,), (m, n))
     end

@@ -19,7 +19,7 @@ struct DotSortAtom <: AbstractExpr
 
     function DotSortAtom(x::AbstractExpr, w::Value)
         if sign(x) == ComplexSign()
-            error("Argument should be real instead it is $(sign(x))")
+            error("argument should be real instead it is $(sign(x))")
         else
             if !(length(w) == length(x))
                 error("x and w must be the same size")

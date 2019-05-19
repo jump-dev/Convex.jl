@@ -25,7 +25,7 @@ struct MultiplyAtom <: AbstractExpr
         elseif x.size[2] ==  y.size[1]
             sz = (x.size[1], y.size[2])
         else
-            error("Cannot multiply two expressions of sizes $(x.size) and $(y.size)")
+            error("cannot multiply two expressions of sizes $(x.size) and $(y.size)")
         end
         children = (x, y)
         return new(:*, hash(children), children, sz)
