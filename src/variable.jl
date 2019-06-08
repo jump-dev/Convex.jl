@@ -127,8 +127,7 @@ end
 fix!(x::Variable, v::Number) = fix!(x, fill(v, (1, 1)))
 
 function free!(x::Variable)
-    # TODO this won't work if :fixed appears other than at the end of x.sets
-    x.sets[end] == :fixed && pop!(x.sets)
+    deleteat!(x.sets, findall(==(:fixed), x.sets))
     x.vexity = AffineVexity()
     x
 end

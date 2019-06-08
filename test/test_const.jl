@@ -31,5 +31,24 @@
         @test prob.optval ≈ 0.0 atol = TOL
     end
 
+    @testset "Test double `fix!`" begin
+        x = Variable()
+        y = Variable()
+        fix!(x, 1.0)
+        prob = minimize(y*x, [y >= x, x >= 0.5])
+        solve!(prob, solver)
+        @test prob.optval ≈ 1.0 atol = TOL
+
+        fix!(x, 2.0)
+        solve!(prob, solver)
+        @test prob.optval ≈ 4.0 atol = TOL
+
+        free!(x)
+        fix!(y, 1.0)
+        solve!(prob, solver)
+        @test prob.optval ≈ 0.5 atol = TOL
+
+    end
+
 
 end
