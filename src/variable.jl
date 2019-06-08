@@ -88,7 +88,7 @@ end
 
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, x)
-        if :fixed in x.sets
+        if x.vexity == ConstVexity()
             # do exactly what we would for a constant
             objective = ConicObj()
             objective[objectid(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
@@ -115,7 +115,6 @@ end
 # fix variables to hold them at their current value, and free them afterwards
 function fix!(x::Variable)
     x.value === nothing && error("This variable has no value yet; cannot fix value to nothing!")
-    push!(x.sets, :fixed)
     x.vexity = ConstVexity()
     x
 end
@@ -127,7 +126,6 @@ end
 fix!(x::Variable, v::Number) = fix!(x, fill(v, (1, 1)))
 
 function free!(x::Variable)
-    deleteat!(x.sets, findall(==(:fixed), x.sets))
     x.vexity = AffineVexity()
     x
 end
