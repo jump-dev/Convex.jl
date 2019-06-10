@@ -88,7 +88,7 @@ end
 
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, x)
-        if x.vexity == ConstVexity()
+        if vexity(x) == ConstVexity()
             # do exactly what we would for a constant
             objective = ConicObj()
             objective[objectid(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
