@@ -21,8 +21,11 @@ function solve!(problem::Problem;
     if problem.model === nothing
         throw(ArgumentError(
             "The provided problem hasn't been initialized with a conic model.
-            You can resolve this by passing in `AbstractMathProgSolver` such as:
-            solve!(problem, ECOSSolver())"
+            You can resolve this by passing in a `AbstractMathProgSolver`. For example,
+            ```
+            using ECOS
+            solve!(problem, ECOSSolver())
+            ```"
         ))
     end
 
