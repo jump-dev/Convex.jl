@@ -19,6 +19,7 @@
 
 To run this example, first install Convex and at least one solver, such as SCS:
 ```julia
+using Pkg
 Pkg.add("Convex")
 Pkg.add("SCS")
 ```
