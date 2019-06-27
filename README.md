@@ -19,13 +19,14 @@
 
 To run this example, first install Convex and at least one solver, such as SCS:
 ```julia
+using Pkg
 Pkg.add("Convex")
 Pkg.add("SCS")
 ```
 Now let's solve a least-squares problem with inequality constraints.
 ```julia
 # Let us first make the Convex.jl module available
-using Convex
+using Convex, SCS
 
 # Generate random problem data
 m = 4;  n = 5
@@ -39,7 +40,7 @@ x = Variable(n)
 problem = minimize(sumsquares(A * x - b), [x >= 0])
 
 # Solve the problem by calling solve!
-solve!(problem)
+solve!(problem, SCSSolver())
 
 # Check the status of the problem
 problem.status # :Optimal, :Infeasible, :Unbounded etc.
