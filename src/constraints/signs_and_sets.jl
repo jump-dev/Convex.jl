@@ -5,7 +5,7 @@ conic_form!(s::Negative, x::Variable, unique_conic_forms) = conic_form!(x<=0, un
 
 function conic_form!(set::Symbol, x::Variable, unique_conic_forms)
     if set==:Semidefinite
-        if sign(x) == ComplexVariable()
+        if sign(x) == ComplexSign()
             conic_form!(SDPConstraint([real(x) -imag(x);imag(x) real(x)]), unique_conic_forms)
         else
             conic_form!(SDPConstraint(x), unique_conic_forms)
