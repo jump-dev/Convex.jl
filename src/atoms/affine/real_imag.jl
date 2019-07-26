@@ -47,7 +47,6 @@ function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms=UniqueCon
         new_objective = ConicObj()
         objective = conic_form!(x.children[1], unique_conic_forms)
 
-
         for var in keys(objective)
             re = real.(objective[var][1])
             im = real.(objective[var][2])

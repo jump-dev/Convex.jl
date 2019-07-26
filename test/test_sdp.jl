@@ -250,6 +250,7 @@
                 solve!(p, SCSSolver())
                 @test p.status == :Optimal
                 @test p.solution.primal ≈ [0.; 1.; 0.; 0.; 1.; zeros(4)] atol=TOL
+                @test p.optval ≈ 0 atol=TOL
             end
 
             @testset "norm2 atom" begin
