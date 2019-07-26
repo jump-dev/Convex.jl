@@ -243,7 +243,7 @@
                 #@fact x1==x2 --> true
             end
 
-            @testset "" begin
+            @testset "Issue #198" begin
                 ρ = HermitianSemidefinite(2)
                 constraints = [ρ == [ 1. 0.; 0.  1.]]
                 p = satisfy(constraints)
