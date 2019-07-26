@@ -243,6 +243,15 @@
                 #@fact x1==x2 --> true
             end
 
+            @testset "" begin
+                ρ = HermitianSemidefinite(2)
+                constraints = [ρ == [ 1. 0.; 0.  1.]]
+                p = satisfy(constraints)
+                solve!(p, SCSSolver())
+                @test p.status == :Optimal
+                @test p.solution.primal ≈ [0.; 1.; 0.; 0.; 1.; zeros(4)] atol=TOL
+            end
+
             @testset "norm2 atom" begin
                 a = 2+4im
                 x = ComplexVariable()
