@@ -6,7 +6,18 @@
 export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
+export BinVar, IntVar, ContVar
+
+"""
+    VarType
+
+Describe the type of a `Variable`: either continuous (`ContVar`), integer-valued (`IntVar`), or binary (`BinVar`).
+"""
 @enum VarType BinVar IntVar ContVar
+
+@doc "Indicates a `Variable` is a binary variable." BinVar
+@doc "Indicates a `Variable` is integer-valued." IntVar
+@doc "Indicates a `Variable` is continuous." ContVar
 
 abstract type AbstractVariable <: AbstractExpr end
 
@@ -20,22 +31,27 @@ mutable struct Variable <: AbstractVariable
     constraints::Vector{Constraint}
     vartype::VarType
     function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), constraint_fns...)
-        syms = [s for s in constraint_fns if s isa Symbol]
-        fns = Any[s for s in constraint_fns if !(s isa Symbol)]
-        if :Bin in syms
+        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
+
+        # compatability with old `sets` model
+        if :Bin in constraint_fns
             vartype = BinVar
-        elseif :Int in syms
+        elseif :Int in constraint_fns
             vartype = IntVar
         else
             vartype = ContVar
         end
-        if :Semidefinite in syms
+
+        fns = Any[s for s in constraint_fns if !(s isa Symbol)]
+        if :Semidefinite in constraint_fns
             push!(fns, x -> x ⪰ 0)
         end
-        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
+
+        # now that we have access to the variable (`this`), we can apply constraints to it.
         for f in fns
             push!(this.constraints, f(this))
         end
+
         this.id_hash = objectid(this)
         id_to_variables[this.id_hash] = this
         return this
@@ -49,6 +65,8 @@ mutable struct Variable <: AbstractVariable
     Variable(size::Int, constraint_fns...) = Variable((size, 1), constraint_fns...)
 end
 
+set_vartype(x::AbstractVariable, vt::VarType) = x.vartype = vt
+get_vartype(x::AbstractVariable) = x.vartype
 
 Semidefinite(m::Integer) = Variable((m, m), x -> x ⪰ 0)
 function Semidefinite(m::Integer, n::Integer)
@@ -123,6 +141,8 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms=U
             if !(x.sign == NoSign() || x.sign == ComplexSign())
                 conic_form!(x.sign, x, unique_conic_forms)
             end
+
+            # apply the constraints `x` itself carries
             for constraint in x.constraints
                 conic_form!(constraint, unique_conic_forms)
             end
