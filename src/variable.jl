@@ -6,50 +6,66 @@
 export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
-mutable struct Variable <: AbstractExpr
+@enum VarType BinVar IntVar ContVar
+
+mutable struct Variable <: AbstractVariable
     head::Symbol
     id_hash::UInt64
     value::ValueOrNothing
     size::Tuple{Int, Int}
     vexity::Vexity
     sign::Sign
-    sets::Array{Symbol,1}
-
-
-    function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
-        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
+    constraints::Vector{Constraint}
+    vartype::VarType
+    function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), constraint_fns...)
+        syms = [s for s in constraint_fns if s isa Symbol]
+        fns = Any[s for s in constraint_fns if !(s isa Symbol)]
+        if :Bin in syms
+            vartype = BinVar
+        elseif :Int in syms
+            vartype = IntVar
+        else
+            vartype = ContVar
+        end
+        if :Semidefinite in syms
+            push!(fns, x -> x ⪰ 0)
+        end
+        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
+        for f in fns
+            push!(this.constraints, f(this))
+        end
         this.id_hash = objectid(this)
         id_to_variables[this.id_hash] = this
         return this
     end
 
-    Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
-    Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
-    Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
-    Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), sets...)
-    Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
-    Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
+    Variable(m::Int, n::Int, sign::Sign=NoSign(), constraint_fns...) = Variable((m,n), sign, constraint_fns...)
+    Variable(sign::Sign, constraint_fns...) = Variable((1, 1), sign, constraint_fns...)
+    Variable(constraint_fns...) = Variable((1, 1), NoSign(), constraint_fns...)
+    Variable(size::Tuple{Int, Int}, constraint_fns...) = Variable(size, NoSign(), constraint_fns...)
+    Variable(size::Int, sign::Sign=NoSign(), constraint_fns...) = Variable((size, 1), sign, constraint_fns...)
+    Variable(size::Int, constraint_fns...) = Variable((size, 1), constraint_fns...)
 end
 
-Semidefinite(m::Integer) = Variable((m, m), :Semidefinite)
+Semidefinite(m::Integer) = Variable((m, m), x -> x ⪰ 0)
 function Semidefinite(m::Integer, n::Integer)
     if m == n
-        return Variable((m, m), :Semidefinite)
+        return Variable((m, m), x -> x ⪰ 0)
     else
         error("Semidefinite matrices must be square")
     end
 end
 
-ComplexVariable(m::Int, n::Int, sets::Symbol...) = Variable((m, n), ComplexSign(), sets...)
-ComplexVariable(sets::Symbol...) = Variable((1, 1), ComplexSign(), sets...)
-ComplexVariable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, ComplexSign(), sets...)
-ComplexVariable(size::Int, sets::Symbol...) = Variable((size, 1), ComplexSign(), sets...)
-HermitianSemidefinite(m::Integer) = ComplexVariable((m, m), :Semidefinite)
+ComplexVariable(m::Int, n::Int, constraint_fns...) = Variable((m, n), ComplexSign(), constraint_fns...)
+ComplexVariable(constraint_fns...) = Variable((1, 1), ComplexSign(), constraint_fns...)
+ComplexVariable(size::Tuple{Int, Int}, constraint_fns...) = Variable(size, ComplexSign(), constraint_fns...)
+ComplexVariable(size::Int, constraint_fns...) = Variable((size, 1), ComplexSign(), constraint_fns...)
+HermitianSemidefinite(m::Integer) = ComplexVariable((m, m), x -> x ⪰ 0)
 function HermitianSemidefinite(m::Integer, n::Integer)
     if m == n
-        return ComplexVariable((m, m), :Semidefinite)
+        return ComplexVariable((m, m), x -> x ⪰ 0)
     else
-        error("HermitianSemidefinite matrices must be square")
+        error("`HermitianSemidefinite` matrices must be square")
     end
 end
 
@@ -104,8 +120,8 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueCon
             if !(x.sign == NoSign() || x.sign == ComplexSign())
                 conic_form!(x.sign, x, unique_conic_forms)
             end
-            for set in x.sets
-                conic_form!(set, x, unique_conic_forms)
+            for constraint in x.constraints
+                conic_form!(constraint, unique_conic_forms)
             end
         end
     end
