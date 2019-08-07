@@ -6,7 +6,7 @@
 export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
-export BinVar, IntVar, ContVar
+export BinVar, IntVar, ContVar, get_vartype, set_vartype
 
 """
     VarType
@@ -31,7 +31,6 @@ mutable struct Variable <: AbstractVariable
     constraints::Vector{Constraint}
     vartype::VarType
     function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), constraint_fns...)
-        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
 
         # compatability with old `sets` model
         if :Bin in constraint_fns
@@ -41,6 +40,8 @@ mutable struct Variable <: AbstractVariable
         else
             vartype = ContVar
         end
+
+        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
 
         fns = Any[s for s in constraint_fns if !(s isa Symbol)]
         if :Semidefinite in constraint_fns

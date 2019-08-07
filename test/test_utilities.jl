@@ -21,7 +21,7 @@
         let
             density_matrix(d) = ComplexVariable((d,d), x -> x ⪰ 0, x -> tr(x) == 1)
             ρ = density_matrix(2) 
-            prob = minimize( ρ[1,1] )
+            prob = minimize( real(ρ[1,1]) )
             solve!(prob, solver)
             @test prob.optval ≈ 0.0 atol = TOL
             @test tr(evaluate(ρ)) ≈ 1.0 atol = TOL
