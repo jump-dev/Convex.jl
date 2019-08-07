@@ -8,6 +8,8 @@ export vexity, evaluate, sign, conic_form!, fix!, free!
 
 @enum VarType BinVar IntVar ContVar
 
+abstract type AbstractVariable <: AbstractExpr end
+
 mutable struct Variable <: AbstractVariable
     head::Symbol
     id_hash::UInt64
@@ -47,6 +49,7 @@ mutable struct Variable <: AbstractVariable
     Variable(size::Int, constraint_fns...) = Variable((size, 1), constraint_fns...)
 end
 
+
 Semidefinite(m::Integer) = Variable((m, m), x -> x ⪰ 0)
 function Semidefinite(m::Integer, n::Integer)
     if m == n
@@ -73,27 +76,27 @@ end
 # the expression tree will only utilize variable ids during construction
 # full information of the variables will be needed during stuffing
 # and after solving to populate the variables with values
-const id_to_variables = Dict{UInt64, Variable}()
+const id_to_variables = Dict{UInt64, AbstractVariable}()
 
-function vexity(x::Variable)
+function vexity(x::AbstractVariable)
     return x.vexity
 end
 
-function evaluate(x::Variable)
+function evaluate(x::AbstractVariable)
     return x.value === nothing ? error("Value of the variable is yet to be calculated") : x.value
 end
 
-function sign(x::Variable)
+function sign(x::AbstractVariable)
     return x.sign
 end
 
 
-function real_conic_form(x::Variable)
+function real_conic_form(x::AbstractVariable)
     vec_size = length(x)
     return sparse(1.0I, vec_size, vec_size)
 end
 
-function imag_conic_form(x::Variable)
+function imag_conic_form(x::AbstractVariable)
     vec_size = length(x)
     if x.sign == ComplexSign()
         return im*sparse(1.0I, vec_size, vec_size)
@@ -102,7 +105,7 @@ function imag_conic_form(x::Variable)
     end
 end
 
-function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, x)
         if vexity(x) == ConstVexity()
             # do exactly what we would for a constant
@@ -129,12 +132,12 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueCon
 end
 
 # fix variables to hold them at their current value, and free them afterwards
-function fix!(x::Variable)
+function fix!(x::AbstractVariable)
     x.value === nothing && error("This variable has no value yet; cannot fix value to nothing!")
     x.vexity = ConstVexity()
     x
 end
-function fix!(x::Variable, v::AbstractArray)
+function fix!(x::AbstractVariable, v::AbstractArray)
     size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
     x.value = sign(x) == ComplexSign() ? convert(Array{ComplexF64}, v) : convert(Array{Float64}, v)
     fix!(x)
@@ -153,7 +156,7 @@ function fix!(x::Variable, v::Number)
     fix!(x)
 end
 
-function free!(x::Variable)
+function free!(x::AbstractVariable)
     x.vexity = AffineVexity()
     x
 end

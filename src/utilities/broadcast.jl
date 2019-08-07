@@ -20,8 +20,8 @@ applyDotExpAtom(x, y) = broadcast(^, x, y)
 
 # alternative syntax
 
-# dot(::typeof(*), x::Variable, y::Variable) = broadcast(*, x, y)
-# dot(::typeof(/), x::Variable, y::Variable) = broadcast(/, x, y)
-# dot(::typeof(+), x::Variable, y::Variable) = broadcast(+, x, y)
-# dot(::typeof(-), x::Variable, y::Variable) = broadcast(-, x, y)
-# dot(::typeof(^), x::Variable, y::Variable) = broadcast(^, x, y)
+# dot(::typeof(*), x::AbstractVariable, y::AbstractVariable) = broadcast(*, x, y)
+# dot(::typeof(/), x::AbstractVariable, y::AbstractVariable) = broadcast(/, x, y)
+# dot(::typeof(+), x::AbstractVariable, y::AbstractVariable) = broadcast(+, x, y)
+# dot(::typeof(-), x::AbstractVariable, y::AbstractVariable) = broadcast(-, x, y)
+# dot(::typeof(^), x::AbstractVariable, y::AbstractVariable) = broadcast(^, x, y)

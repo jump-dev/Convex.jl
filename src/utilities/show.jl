@@ -12,7 +12,7 @@ end
 # size: (3, 4)
 # sign: NoSign()
 # vexity: AffineVexity()
-function show(io::IO, x::Variable)
+function show(io::IO, x::AbstractVariable)
     print(io, """Variable of
           size: ($(x.size[1]), $(x.size[2]))
           sign: $(x.sign)
