@@ -85,7 +85,7 @@ function make_MOI_constr(conic_constr::ConicConstr, var_to_indices, id_to_variab
                 end
             else
                 var_indices = var_to_indices[id]
-                if id_to_variables[id].sign == ComplexSign()
+                if sign(id_to_variables[id]) == ComplexSign()
                     l = length(var_indices) ÷ 2
                     # We create MOI terms and add them to `terms`.
                     # Real part:
@@ -117,7 +117,7 @@ function get_variable_indices!(model, conic_constraints, id_to_variables)
             for (id, val) in conic_constr.objs[i]
                 if !haskey(var_to_indices, id) && id != objectid(:constant)
                     var = id_to_variables[id]
-                    if var.sign == ComplexSign()
+                    if sign(var) == ComplexSign()
                         var_size = 2 * length(var)
                     else
                         var_size = length(var)
@@ -166,14 +166,13 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
     # Add integral and boolean constraints
     for var_id in keys(var_to_indices)
         variable = id_to_variables[var_id]
-        if :Int in variable.sets
+        if vartype(variable) == IntVar
             var_indices = var_to_indices[var_id]
             for idx = eachindex(var_indices)
                 push!(MOI_constr_fn, MOI.SingleVariable(var_indices[idx]))
                 push!(MOI_sets, MOI.Integer())
             end
-        end
-        if :Bin in variable.sets
+        elseif vartype(variable) == BinVar
             var_indices = var_to_indices[var_id]
             for idx in eachindex(var_indices)
                 push!(MOI_constr_fn, MOI.SingleVariable(var_indices[idx]))
@@ -235,9 +234,9 @@ function warmstart_variables!(model, var_to_indices, id_to_variables, T, verbose
     if MOI.supports(model, MOI.VariablePrimalStart(), MOI.VariableIndex)
         for (id, var_inds) in pairs(var_to_indices)
             x = id_to_variables[id]
-            value = x.value
-            value === nothing && continue
-            value_vec = packvec(value, sign(x) == ComplexSign())
+            val = evaluate(x)
+            val === nothing && continue
+            value_vec = packvec(val, sign(x) == ComplexSign())
             value_vec = convert(Vector{T}, value_vec)
             MOI.set(model, MOI.VariablePrimalStart(), var_inds, value_vec)
         end
@@ -263,12 +262,12 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, id_to_variables, 
         for (id, var_indices) in var_to_indices
             var = id_to_variables[id]
             vectorized_value =  MOI.get(model, MOI.VariablePrimal(), var_indices)
-            var.value = unpackvec(vectorized_value, size(var), var.sign == ComplexSign())
+            set_value!(var, unpackvec(vectorized_value, size(var), sign(var) == ComplexSign()))
         end
     else
         for (id, var_indices) in var_to_indices
             var = id_to_variables[id]
-            var.value = nothing
+            set_value!(var, nothing)
         end
     end
 

@@ -46,20 +46,20 @@ this should be the same for every problem, except for the name, which is a descr
 
 Then begins the body of the problem. It is setup like any other Convex.jl problem, only `handle_problem!` is called instead of `solve!`. This allows particular solvers to be used (via e.g. choosing `handle_problem! = p -> solve!(p, solver)`), or for any other function of the problem. Tests should be included and gated behind `if test` blocks, so that tests can be skipped for benchmarking, or in the case that the problem is not in fact solved during `handle_problem!`.
 
-The fact that the problems may not be solved during `handle_problem!` brings with it a small complication: any command that assumes the problem has been solved should be behind an `if test` check. For example, in some of the problems, `real(x.value)` is used, for a variable `x`; perhaps as
+The fact that the problems may not be solved during `handle_problem!` brings with it a small complication: any command that assumes the problem has been solved should be behind an `if test` check. For example, in some of the problems, `real(evaluate(x))` is used, for a variable `x`; perhaps as
 
 ```julia
-x_re = real(x.value)
+x_re = real(evaluate(x))
 if test
     @test x_re = ...
 end
 ```
 
-However, if the problem `x` is used in has not been solved, then `x.value === nothing`, and `real(nothing)` throws an error. So instead, this should be rewritten as
+However, if the problem `x` is used in has not been solved, then `evaluate(x) === nothing`, and `real(nothing)` throws an error. So instead, this should be rewritten as
 
 ```julia
 if test
-    x_re = real(x.value)
+    x_re = real(evaluate(x))
     @test x_re = ...
 end
 ```

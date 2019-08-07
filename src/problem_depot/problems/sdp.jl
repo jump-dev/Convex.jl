@@ -301,12 +301,12 @@ end
     p1 = minimize(sum(x), A*x == b, x>=0; numeric_type = T)
 
     handle_problem!(p1)
-    x1 = x.value
+    x1 = evaluate(x)
 
     p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0; numeric_type = T)
 
     handle_problem!(p2)
-    x2 = x.value
+    x2 = evaluate(x)
     if test
         @test x1 == x2
     end
@@ -322,20 +322,19 @@ end
     p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0; numeric_type = T)
 
     handle_problem!(p1)
-    x1 = x.value
+    x1 = evaluate(x)
 
     xr = Variable(n)
     xi = Variable(n)
     p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0; numeric_type = T)
 
     handle_problem!(p2)
-    #x2 = xr.value + im*xi.value
 
     if test
-        real_diff = real(x1) - xr.value
+        real_diff = real(x1) - evaluate(xr)
         @test real_diff ≈ zeros(10, 1) atol=atol rtol=rtol
 
-        imag_diff = imag(x1) - xi.value
+        imag_diff = imag(x1) - evaluate(xi)
         @test imag_diff ≈ zeros(10, 1) atol=atol rtol=rtol
     end
 end
@@ -365,8 +364,8 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(objective) ≈ 0 atol=atol rtol=rtol
 
-        real_diff = real(x.value) - real(a)
-        imag_diff = imag(x.value) - imag(a)
+        real_diff = real(evaluate(x)) - real(a)
+        imag_diff = imag(evaluate(x)) - imag(a)
         @test real_diff ≈ 0 atol=atol rtol=rtol
         @test imag_diff ≈ 0 atol=atol rtol=rtol
     end
@@ -384,8 +383,8 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(objective) ≈ 0.0 atol=atol rtol=rtol
 
-        real_diff = real.(x.value) - real.(a)
-        imag_diff = imag.(x.value) - imag.(a)
+        real_diff = real.(evaluate(x)) - real.(a)
+        imag_diff = imag.(evaluate(x)) - imag.(a)
         @test real_diff ≈ zeros(2, 1) atol=atol rtol=rtol
         @test imag_diff ≈ zeros(2, 1) atol=atol rtol=rtol
     end
@@ -403,8 +402,8 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(objective) ≈ 0.0 atol=atol rtol=rtol
 
-        real_diff = real(x.value) - real(a)
-        imag_diff = imag(x.value) - imag(a)
+        real_diff = real(evaluate(x)) .- real(a)
+        imag_diff = imag(evaluate(x)) .- imag(a)
         @test real_diff ≈ 0.0 atol=atol rtol=rtol
         @test imag_diff ≈ 0.0 atol=atol rtol=rtol
     end
@@ -426,8 +425,8 @@ end
 
     
     if test
-        real_diff = real.(x.value) - real.(posA)
-        imag_diff = imag.(x.value) - imag.(posA)
+        real_diff = real.(evaluate(x)) - real.(posA)
+        imag_diff = imag.(evaluate(x)) - imag.(posA)
         @test real_diff ≈ zeros(n, n) atol=atol rtol=rtol
         @test imag_diff ≈ zeros(n, n) atol=atol rtol=rtol
     end

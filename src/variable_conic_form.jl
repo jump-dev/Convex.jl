@@ -1,10 +1,10 @@
-function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
+function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         add_to_id_to_variables!(unique_conic_forms, x)
         if vexity(x) == ConstVexity()
             # do exactly what we would for a constant
             objective = ConicObj()
-            objective[objectid(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
+            objective[objectid(:constant)] = (vec([real(evaluate(x));]),vec([imag(evaluate(x));]))
             cache_conic_form!(unique_conic_forms, x, objective)
         else
             objective = ConicObj()
@@ -14,11 +14,13 @@ function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
             objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
             # placeholder values in unique constraints prevent infinite recursion depth
             cache_conic_form!(unique_conic_forms, x, objective)
-            if !(x.sign == NoSign() || x.sign == ComplexSign())
-                conic_form!(x.sign, x, unique_conic_forms)
+            if !(sign(x) == NoSign() || sign(x) == ComplexSign())
+                conic_form!(sign(x), x, unique_conic_forms)
             end
-            for set in x.sets
-                conic_form!(set, x, unique_conic_forms)
+
+            # apply the constraints `x` itself carries
+            for constraint in constraints(x)
+                conic_form!(constraint, unique_conic_forms)
             end
         end
     end

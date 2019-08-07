@@ -28,10 +28,18 @@ being
 
 -   (entrywise) positive: `x = Variable(4, Positive())`
 -   (entrywise) negative: `x = Variable(4, Negative())`
--   integral: `x = Variable(4, :Int)`
--   binary: `x = Variable(4, :Bin)`
+-   integral: `x = Variable(4, IntVar)`
+-   binary: `x = Variable(4, BinVar)`
 -   (for a matrix) being symmetric, with nonnegative eigenvalues (ie,
      positive semidefinite): `z = Semidefinite(4)`
+
+The order of the arguments is the size, the sign, and then the
+[`VarType`](@ref) (i.e., integer, binary, or continuous), and any may be omitted
+to use the default.
+
+The current value of a variable `x` can be accessed with `evaluate(x)`. After
+`solve!`ing a problem, the value of each variable used in the problem is set to
+its optimal value.
 
 Constants
 ---------
@@ -107,6 +115,16 @@ constraint = ([x y; y' z] in :SDP)
 constraint = ([x y; y' z] ⪰ 0)
 ```
 
+Constraints can also be added to variables after their construction, to automatically apply constraints
+to any problem which uses the variable. For example,
+
+```julia
+x = Variable(3)
+add_constraint!(x, sum(x) == 1)
+```
+
+Now, in any problem in which `x` is used, the constraint `sum(x) == 1` will be added.
+
 Objective
 ---------
 
@@ -154,6 +172,6 @@ the status returned by the optimization solver, and can be `:Optimal`,
 `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. If the status
 is `:Optimal`, `problem.optval` will record the optimum value of the
 problem. The optimal value for each variable `x` participating in the
-problem can be found in `x.value`. The optimal value of an expression
+problem can be found in `evaluate(x)`. The optimal value of an expression
 can be found by calling the `evaluate()` function on the expression as
 follows: `evaluate(expr)`.

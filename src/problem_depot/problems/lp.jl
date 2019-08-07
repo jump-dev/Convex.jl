@@ -207,7 +207,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 19 atol=atol rtol=rtol
-        @test vec(x.value) ≈ [2; 2; 2; 1] atol=atol rtol=rtol
+        @test vec(evaluate(x)) ≈ [2; 2; 2; 1] atol=atol rtol=rtol
         @test evaluate(dotsort(x, [1, 2, 3, 4])) ≈ 19 atol=atol rtol=rtol
     end
 

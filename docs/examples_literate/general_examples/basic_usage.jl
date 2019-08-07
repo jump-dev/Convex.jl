@@ -34,7 +34,7 @@ p.constraints += [x >= 1; x <= 10; x[2] <= 5; x[1] + x[4] - x[2] <= 10]
 solve!(p, solver)
 
 println(round(p.optval, digits=2))
-println(round.(x.value, digits=2))
+println(round.(evaluate(x), digits=2))
 println(evaluate(x[1] + x[4] - x[2]))
 
 # ### Matrix Variables and promotions
@@ -55,8 +55,8 @@ y = Variable()
 ## X is a 2 x 2 variable, and y is scalar. X' + y promotes y to a 2 x 2 variable before adding them
 p = minimize(norm(X) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
 solve!(p, solver)
-println(round.(X.value, digits=2))
-println(y.value)
+println(round.(evaluate(X), digits=2))
+println(evaluate(y))
 p.optval
 
 # ### Norm, exponential and geometric mean
@@ -75,7 +75,7 @@ x = Variable(4)
 p = satisfy(norm(x) <= 100, exp(x[1]) <= 5, x[2] >= 7, geomean(x[3], x[4]) >= x[2])
 solve!(p, solver)
 println(p.status)
-x.value
+evaluate(x)
 
 # ### SDP cone and Eigenvalues
 
@@ -92,7 +92,7 @@ y = Variable((2, 2))
 ## SDP constraints
 p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1)
 solve!(p, solver)
-y.value
+evaluate(y)
 
 # ### Mixed integer program
 #
@@ -109,6 +109,5 @@ using GLPK
 x = Variable(4, :Int)
 p = minimize(sum(x), x >= 0.5)
 solve!(p, GLPK.Optimizer)
-x.value
-
+evaluate(x)
 #-

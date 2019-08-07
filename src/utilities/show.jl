@@ -28,7 +28,7 @@ function show_id(x::Union{AbstractExpr, Constraint}; digits = MAXDIGITS[])
 end
 
 """
-    Base.summary(io::IO, x::Variable)
+    Base.summary(io::IO, x::AbstractVariable)
 
 Prints a one-line summary of a variable `x` to `io`.
 
@@ -40,7 +40,7 @@ julia> summary(stdout, x)
 3×2 complex variable (id: 732…737)
 ```
 """
-function Base.summary(io::IO, x::Variable)
+function Base.summary(io::IO, x::AbstractVariable)
     sgn = summary(sign(x))
     cst = vexity(x) == ConstVexity() ? " (fixed)" : ""
     cst = cst * " (" * sprint(show_id, x) * ")"
@@ -89,7 +89,7 @@ show(io::IO, x::Constant) = print(io, x.value)
 # vexity: affine
 # id: 758…633
 # here, the `id` will change from run to run.
-function show(io::IO, x::Variable)
+function show(io::IO, x::AbstractVariable)
     print(io, "Variable")
     print(io, "\nsize: $(size(x))")
     print(io, "\nsign: ")
@@ -99,7 +99,7 @@ function show(io::IO, x::Variable)
     println(io)
     show_id(io, x)
     if x.value !== nothing
-        print(io, "\nvalue: $(x.value)")
+        print(io, "\nvalue: $(evaluate(x))")
     end
 end
 

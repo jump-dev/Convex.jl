@@ -154,7 +154,129 @@ using Convex: AbstractExpr, ConicObj
 
     end
 
-    @testset "ConicObj with type $T" for T = [UInt32, UInt64]
+    @testset "vartype and set_vartype" begin
+        for x in (Variable(), Variable(1), ComplexVariable(2, 2))
+            @test vartype(x) == ContVar
+            
+            vartype!(x, BinVar)
+            @test vartype(x) == BinVar
+            @test x.vartype == BinVar
+
+            vartype!(x, IntVar)
+            @test vartype(x) == IntVar
+            @test x.vartype == IntVar
+
+            vartype!(x, ContVar)
+            @test vartype(x) == ContVar
+            @test x.vartype == ContVar
+
+        end
+    end
+
+    @testset "Constructors" begin
+
+        # Constructors with sign
+        for sgn in (Positive(), NoSign())
+            for x in    [   # tuple size
+                            Variable((2, 2), sgn), 
+                            Variable((2, 2), sgn, BinVar),
+                            Variable((2, 2), sgn, :Bin),
+                            # individual size 
+                            Variable(2, 2, sgn),
+                            Variable(2, 2, sgn, BinVar),
+                            Variable(2, 2, sgn, :Bin),
+                            # single dimension
+                            Variable(2, sgn),
+                            Variable(2, sgn, BinVar),
+                            Variable(2, sgn, :Bin),
+                            # no dimension
+                            Variable(sgn),
+                            Variable(sgn, BinVar),
+                            Variable(sgn, :Bin),  ]
+                @test x isa Variable
+                @test sign(x) == sgn
+                @test x.sign == sgn
+                @test eltype(x) == Float64
+            end
+        end
+
+        # constructors without sign
+        for x in    [   # tuple size
+                        Variable((2, 2)), 
+                        Variable((2, 2), BinVar),
+                        Variable((2, 2), :Bin),
+                        # individual size 
+                        Variable(2, 2),
+                        Variable(2, 2, BinVar),
+                        Variable(2, 2, :Bin),
+                        # single dimension
+                        Variable(2),
+                        Variable(2, BinVar),
+                        Variable(2, :Bin),
+                        # no dimension
+                        Variable(),
+                        Variable(BinVar),
+                        Variable(:Bin),  ]
+            @test x isa Variable
+            @test sign(x) == NoSign()
+            @test x.sign == NoSign()
+            @test eltype(x) == Float64
+        end
+
+        # Various element types
+        for T in (Float32, Float64, BigFloat)
+            for sgn in (Positive(), NoSign())
+                for x in    [
+                    # tuple size
+                    Variable{T}((2, 2), sgn), 
+                    Variable{T}((2, 2), sgn, BinVar),
+                    Variable{T}((2, 2), sgn, :Bin),
+                    # individual size 
+                    Variable{T}(2, 2, sgn),
+                    Variable{T}(2, 2, sgn, BinVar),
+                    Variable{T}(2, 2, sgn, :Bin),
+                    # single dimension
+                    Variable{T}(2, sgn),
+                    Variable{T}(2, sgn, BinVar),
+                    Variable{T}(2, sgn, :Bin),
+                    # no dimension
+                    Variable{T}(sgn),
+                    Variable{T}(sgn, BinVar),
+                    Variable{T}(sgn, :Bin),  ]
+
+                    @test x isa Variable
+                    @test sign(x) == sgn
+                    @test x.sign == sgn
+                    @test eltype(x) == T
+                end
+            end
+            for x in [
+                # tuple size
+                Variable{T}((2, 2)), 
+                Variable{T}((2, 2), BinVar),
+                Variable{T}((2, 2), :Bin),
+                # individual size 
+                Variable{T}(2, 2),
+                Variable{T}(2, 2, BinVar),
+                Variable{T}(2, 2, :Bin),
+                # single dimension
+                Variable{T}(2),
+                Variable{T}(2, BinVar),
+                Variable{T}(2, :Bin),
+                # no dimension
+                Variable{T}(),
+                Variable{T}(BinVar),
+                Variable{T}(:Bin), 
+            ]
+                @test x isa Variable
+                @test sign(x) == NoSign()
+                @test x.sign == NoSign()
+                @test eltype(x) == T
+            end
+        end
+    end
+
+    @testset "ConicObj" for T = [UInt32, UInt64]
         c = ConicObj()
         z = zero(T)
         @test !haskey(c, z)
@@ -170,7 +292,7 @@ using Convex: AbstractExpr, ConicObj
     end
 
     @testset "length and size" begin
-        x = Variable(2,3)
+        x = Variable(2, 3)
         @test length(x) == 6
         @test size(x) == (2, 3)
         @test size(x, 1) == 2
@@ -218,8 +340,8 @@ using Convex: AbstractExpr, ConicObj
         @test Convex._sign([-1,-1,-1]) == Negative()
         @test Convex._size([0 0; 0 0]) == (2, 2)
         @test Convex._sign([0 0; 0 0]) == Positive()
-        @test Convex._size(0+1im) == (1, 1)
-        @test Convex._sign(0+1im) == ComplexSign()
+        @test Convex._size(0 + 1im) == (1, 1)
+        @test Convex._sign(0 + 1im) == ComplexSign()
 
         @test Convex.imag_conic_form(Constant(1.0)) == [0.0]
         @test Convex.imag_conic_form(Constant([1.0, 2.0])) == [0.0, 0.0]
@@ -239,13 +361,13 @@ using Convex: AbstractExpr, ConicObj
 
     @testset "Base.vect" begin
     # Issue #223: ensure we can make vectors of variables
-    @test size([Variable(2), Variable(3,4)]) == (2,)
+        @test size([Variable(2), Variable(3, 4)]) == (2,)
     end
 
     @testset "Iteration" begin
-        x = Variable(2,3)
+        x = Variable(2, 3)
         s = sum([xi for xi in x])
-        x.value = [1 2 3; 4 5 6]
+        set_value!(x, [1 2 3; 4 5 6])
         # evaluate(s) == [21] (which might be wrong? expected 21)
         # but [21][1] === 21[1] === 21
         # so this should pass even after "fixing" that

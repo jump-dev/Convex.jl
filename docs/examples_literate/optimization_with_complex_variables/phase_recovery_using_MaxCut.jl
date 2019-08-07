@@ -70,12 +70,13 @@ c1 = diag(U) == 1
 c2 = U in :SDP
 p = minimize(objective,c1,c2)
 solve!(p, () -> SCS.Optimizer(verbose=0))
-U.value
+evaluate(U)
+
 
 #-
 
 # Verify if the rank of $U$ is 1:
-B, C = eigen(U.value);
+B, C = eigen(evaluate(U));
 length([e for e in B if(abs(real(e))>1e-4)])
 
 #- 

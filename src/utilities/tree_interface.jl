@@ -2,7 +2,7 @@ AbstractTrees.children(p::Problem) = (p.objective, p.constraints)
 
 AbstractTrees.children(e::AbstractExpr) = e.children
 
-AbstractTrees.children(v::Variable) = ()
+AbstractTrees.children(v::AbstractVariable) = ()
 AbstractTrees.children(c::Constant) = ()
 
 AbstractTrees.children(C::Constraint) = (C.lhs, C.rhs)
@@ -32,4 +32,4 @@ function AbstractTrees.printnode(io::IO, node::Constant)
     end
 end
 
-AbstractTrees.printnode(io::IO, node::Variable) = summary(io, node)
+AbstractTrees.printnode(io::IO, node::AbstractVariable) = summary(io, node)

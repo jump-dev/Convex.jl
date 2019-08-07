@@ -133,7 +133,7 @@ p.status
 
 #-
 
-x.value
+evaluate(x)
 
 #-
 
