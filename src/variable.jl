@@ -123,7 +123,12 @@ function fix!(x::Variable, v::AbstractArray)
     x.value = convert(Array{Float64}, v)
     fix!(x)
 end
-fix!(x::Variable, v::Number) = fix!(x, fill(v, (1, 1)))
+
+function fix!(x::Variable, v::Number)
+    size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    x.value = Float64(v)
+    fix!(x)
+end
 
 function free!(x::Variable)
     x.vexity = AffineVexity()

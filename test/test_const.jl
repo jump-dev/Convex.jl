@@ -47,7 +47,16 @@
         fix!(y, 1.0)
         solve!(prob, solver)
         @test prob.optval ≈ 0.5 atol = TOL
+    end
 
+    @testset "fix! and multiply" begin
+        p = Variable()
+        fix!(p, 1.0)
+        x = Variable(2,2)
+        prob = minimize( tr(p*x), [ x >= 1 ])
+        solve!(prob, solver)
+        @test prob.optval ≈ 2.0 atol = TOL
+        @test evaluate( tr(p*x) ) ≈ 2.0 atol = TOL
     end
 
 
