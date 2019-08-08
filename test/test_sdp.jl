@@ -2,6 +2,18 @@
 # TODO: uncomment vexity checks once SDP on vars/constraints changes vexity of problem
 @testset "SDP Atoms: $solver" for solver in solvers
     if can_solve_sdp(solver)
+
+        @testset "Variable constructors with functions" begin
+            let
+                density_matrix(d) = ComplexVariable((d,d), x -> x ⪰ 0, x -> tr(x) == 1)
+                ρ = density_matrix(2) 
+                prob = minimize( real(ρ[1,1]) )
+                solve!(prob, solver)
+                @test prob.optval ≈ 0.0 atol = TOL
+                @test tr(evaluate(ρ)) ≈ 1.0 atol = TOL
+            end   
+        end
+
         @testset "sdp variables" begin
             y = Variable((2,2), :Semidefinite)
             p = minimize(y[1,1])

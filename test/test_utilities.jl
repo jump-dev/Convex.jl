@@ -17,33 +17,21 @@
         @test isempty(Convex.conic_constr_to_constr)
     end
 
-    @testset "Variable constructors with functions" begin
-        let
-            density_matrix(d) = ComplexVariable((d,d), x -> x ⪰ 0, x -> tr(x) == 1)
-            ρ = density_matrix(2) 
-            prob = minimize( real(ρ[1,1]) )
-            solve!(prob, solver)
-            @test prob.optval ≈ 0.0 atol = TOL
-            @test tr(evaluate(ρ)) ≈ 1.0 atol = TOL
-        end   
-
-    end
-
     @testset "get_vartype and set_vartype" begin
         for x in (Variable(), Variable(1), ComplexVariable(2,2))
             @test get_vartype(x) == ContVar
             
             set_vartype(x, BinVar)
             @test get_vartype(x) == BinVar
-            @test x.vartype = BinVar
+            @test x.vartype == BinVar
 
             set_vartype(x, IntVar)
             @test get_vartype(x) == IntVar
-            @test x.vartype = IntVar
+            @test x.vartype == IntVar
 
             set_vartype(x, ContVar)
             @test get_vartype(x) == ContVar
-            @test x.vartype = ContVar
+            @test x.vartype == ContVar
 
         end
     end
