@@ -30,26 +30,11 @@ mutable struct Variable <: AbstractVariable
     sign::Sign
     constraints::Vector{Constraint}
     vartype::VarType
-    function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), constraint_fns...)
-
-        # compatability with old `sets` model
-        if :Bin in constraint_fns
-            vartype = BinVar
-        elseif :Int in constraint_fns
-            vartype = IntVar
-        else
-            vartype = ContVar
-        end
-
+    function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), constraint_fns...; vartype = ContVar)
         this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
 
-        fns = Any[s for s in constraint_fns if !(s isa Symbol)]
-        if :Semidefinite in constraint_fns
-            push!(fns, x -> x ⪰ 0)
-        end
-
         # now that we have access to the variable (`this`), we can apply constraints to it.
-        for f in fns
+        for f in constraint_fns
             push!(this.constraints, f(this))
         end
 
@@ -66,6 +51,31 @@ mutable struct Variable <: AbstractVariable
     Variable(size::Int, constraint_fns...) = Variable((size, 1), constraint_fns...)
 end
 
+
+# compatability with old `sets` model
+function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
+    if :Bin in sets
+        vartype = BinVar
+    elseif :Int in sets
+        vartype = IntVar
+    else
+        vartype = ContVar
+    end
+    if :Semidefinite in sets
+        fns = [ x -> x ⪰ 0 ]
+    else
+        fns = []
+    end
+    Variable(size, sign, fns...; vartype = vartype)
+end
+Variable(m::Int, n::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((m,n), sign, sets...)
+Variable(sign::Sign, sets::Symbol...) = Variable((1, 1), sign, sets...)
+Variable(sets::Symbol...) = Variable((1, 1), NoSign(), sets...)
+Variable(size::Tuple{Int, Int}, sets::Symbol...) = Variable(size, NoSign(), sets...)
+Variable(size::Int, sign::Sign=NoSign(), sets::Symbol...) = Variable((size, 1), sign, sets...)
+Variable(size::Int, sets::Symbol...) = Variable((size, 1), sets...)
+
+# Access `vartype`
 set_vartype(x::AbstractVariable, vt::VarType) = x.vartype = vt
 get_vartype(x::AbstractVariable) = x.vartype
 

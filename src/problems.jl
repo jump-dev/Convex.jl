@@ -170,13 +170,13 @@ function conic_problem(p::Problem)
     vartypes = fill(:Cont, length(c))
     for var_id in keys(var_to_ranges)
         variable = id_to_variables[var_id]
-        if IntVar == variable.vartype
+        if get_vartype(variable) == IntVar
             startidx, endidx = var_to_ranges[var_id]
             for idx in startidx:endidx
                 vartypes[idx] = :Int
             end
         end
-        if BinVar == variable.vartype
+        if get_vartype(variable) == BinVar
             startidx, endidx = var_to_ranges[var_id]
             for idx in startidx:endidx
                 vartypes[idx] = :Bin
