@@ -20,19 +20,21 @@ Complex Variables
 
 Complex Variables in Convex.jl are declared in the same way as the
 variables are declared but using the different keyword
-`ComplexVariable`. :
+`ComplexVariable`.
 
-    # Scalar complex variable
-    z = ComplexVariable()
+```julia
+  # Scalar complex variable
+  z = ComplexVariable()
 
-    # Column vector variable
-    z = ComplexVariable(5)
+  # Column vector variable
+  z = ComplexVariable(5)
 
-    # Matrix variable
-    z = ComplexVariable(4, 6)
+  # Matrix variable
+  z = ComplexVariable(4, 6)
 
-    # Complex Positive Semidefinite variable
-    z = HermitianSemidefinite(4)
+  # Complex Positive Semidefinite variable
+  z = HermitianSemidefinite(4)
+```
 
 Linear Program Representable Functions (complex variables)
 ----------------------------------------------------------
@@ -95,7 +97,8 @@ complex-valued matrix. We can optimize over the second component $B$ to
 meet some requirement. Here we simply fix the second component too, but
 via the `partialtrace` operator:
 
-``` {.julia}
+```@example
+using Convex, SCS
 A = [ 0.47213595 0.11469794+0.48586827im; 0.11469794-0.48586827im  0.52786405]
 B = ComplexVariable(2, 2)
 ρ = kron(A, B)
@@ -104,6 +107,7 @@ constraints = [partialtrace(ρ, 1, [2; 2]) == [1 0; 0 0]
                ρ in :SDP]
 p = satisfy(constraints)
 solve!(p, SCSSolver())
+p.status
 ```
 
 Since we fix both components as trace-1 positive semidefinite matrices,

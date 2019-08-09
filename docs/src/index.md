@@ -28,15 +28,3 @@ Note that Convex.jl was previously called CVX.jl. This package is under
 active development; we welcome bug reports and feature requests. For
 usage questions, please contact us via the [JuliaOpt mailing
 list](https://groups.google.com/forum/#!forum/julia-opt).
-
-In Depth Documentation:
------------------------
-
-::: {.toctree maxdepth="2"}
-Installation \<installation\> Quick Tutorial \<quick\_tutorial\> Basic
-Types \<types\> Supported Operations \<operations\> Examples
-\<examples\> Complex-domain Optimization
-\<complex-domain\_optimization\> Solvers \<solvers\> FAQ \<faq\>
-Optimizing in a Loop \<loop\> Advanced \<advanced\> Contributing
-\<contributing\> Credits \<credits\>
-:::

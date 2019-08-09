@@ -10,7 +10,7 @@ variables and expressions persist even after they are out of scope. If
 you create large numbers of variables inside a loop, this dictionary can
 eat a considerable amount of memory.
 
-To flush the memory, you can call :: Convex.clearmemory()
+To flush the memory, you can call `Convex.clearmemory()`.
 
 This will remove every variable and expression you've formed before
 from the memory cache, so that you're starting as fresh as if you'd
@@ -27,14 +27,28 @@ expressions.
 
 For example, the following **bad** code will create a new instance of a
 variable and of the expression `square(x)` for each value of `i`. Don't
-do this: :: for i=1:10 x = Variable() p = minimize(square(x), x \>= i)
-solve!(p, SCSSolver()) end
+do this:
+
+```julia
+for i = 1:10
+    x = Variable()
+    p = minimize(square(x), x >= i)
+    solve!(p, SCSSolver())
+end
+```
 
 Contrast this with the following **good** code, which will reuse the
 cached conic form for `square(x)` for each `i`, reducing the memory
-footprint and speeding up the computation. Do this instead: :: x =
-Variable() obj = square(x) for i=1:10 p = minimize(obj, x \>= i)
-solve!(p, SCSSolver()) end
+footprint and speeding up the computation. Do this instead:
+
+```julia
+x = Variable()
+obj = square(x)
+for i = 1:10
+    p = minimize(obj, x >= i)
+    solve!(p, SCSSolver())
+end
+```
 
 Warmstarts, Parameters, Fixing and Freeing Variables
 ----------------------------------------------------

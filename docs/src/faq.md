@@ -1,8 +1,6 @@
 FAQ
 ===
 
-::: {.contents local="" backlinks="none" depth="1"}
-:::
 
 Where can I get help?
 ---------------------
