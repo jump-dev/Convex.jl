@@ -61,7 +61,7 @@ function find_variable_ranges(constraints)
             for (id, val) in constraint.objs[i]
                 if !haskey(var_to_ranges, id) && id != objectid(:constant)
                     var = id_to_variables[id]
-                    if var.sign == ComplexSign()
+                    if sign(var) == ComplexSign()
                         var_to_ranges[id] = (index + 1, index + 2*length(var))
                         index += 2*length(var)
                     else
@@ -152,7 +152,7 @@ function conic_problem(p::Problem)
                     #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
                 else
                     var_range = var_to_ranges[id]
-                    if id_to_variables[id].sign == ComplexSign()
+                    if sign(id_to_variables[id]) == ComplexSign()
                         A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + length(id_to_variables[id])-1] = -val[1]
                         A[constr_index + 1 : constr_index + sz, var_range[1] + length(id_to_variables[id]) : var_range[2]] = -val[2]
                     else
@@ -170,13 +170,13 @@ function conic_problem(p::Problem)
     vartypes = fill(:Cont, length(c))
     for var_id in keys(var_to_ranges)
         variable = id_to_variables[var_id]
-        if get_vartype(variable) == IntVar
+        if vartype(variable) == IntVar
             startidx, endidx = var_to_ranges[var_id]
             for idx in startidx:endidx
                 vartypes[idx] = :Int
             end
         end
-        if get_vartype(variable) == BinVar
+        if vartype(variable) == BinVar
             startidx, endidx = var_to_ranges[var_id]
             for idx in startidx:endidx
                 vartypes[idx] = :Bin

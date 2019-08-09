@@ -6,7 +6,7 @@
 export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
-export BinVar, IntVar, ContVar, get_vartype, set_vartype
+export BinVar, IntVar, ContVar, vartype, vartype!
 
 """
     VarType
@@ -19,8 +19,62 @@ Describe the type of a `Variable`: either continuous (`ContVar`), integer-valued
 @doc "Indicates a `Variable` is integer-valued." IntVar
 @doc "Indicates a `Variable` is continuous." ContVar
 
+"""
+    abstract type AbstractVariable <: AbstractExpr end
+
+An `AbstractVariable` should have `head` field, an `id_hash` field and a `size` field
+to conform to the `AbstractExpr` interface, and implement methods for
+
+* `value`, `value!`: get or set the numeric value of the variable. `value` should return `nothing` when no numeric value is set.
+* `vexity`, `vexity!`: get or set the `vexity` of the variable. The `vexity` should be `AffineVexity()` unless the variable has been `fix!`'d, in which case it is `ConstVexity()`.
+* `sign`, `sign!`: get or set the `Sign` of the variable
+* `vartype`, `vartype!`: get or set the `VarType` of the variable
+* `constraints`, `constraints!`: get or set a `Vector` of constraints which are to be applied to any problem in which the variable is used
+* `eltype`: return a numeric type for the variable
+
+Moreover, when an `AbstractVariable` `x` is constructed, it should populate `Convex.id_to_variables` via, e.g.
+```
+Convex.id_to_variables(x.id_hash) = x
+```
+
+"""
 abstract type AbstractVariable <: AbstractExpr end
 
+# Default implementation of `AbstractVariable` interface
+constraints(x::AbstractVariable) = x.constraints
+constraints!(x::AbstractVariable, L::Vector{Constraint}) = x.constraints = L
+
+vartype(x::AbstractVariable) = x.vartype
+vartype!(x::AbstractVariable, vt::VarType) = x.vartype = vt
+
+vexity(x::AbstractVariable) = x.vexity
+vexity!(x::AbstractVariable, v::Vexity) = x.vexity = v
+
+sign(x::AbstractVariable) = x.sign
+sign!(x::AbstractVariable, s::Sign) = x.sign = s
+
+eltype(x::AbstractVariable) = sign(x) == ComplexSign() ? Complex{Float64} :  Float64
+
+value(x::AbstractVariable) = x.value
+
+function value!(x::AbstractVariable, v::AbstractArray)
+    size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    x.value = convert(Array{eltype(x)}, v)
+end
+
+function value!(x::Variable, v::AbstractVector)
+    size(x, 2) == 1 || throw(DimensionMismatch("Cannot set value of a variable of size $(size(x)) to a vector"))
+    size(x, 1) == length(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    x.value = convert(Array{eltype(x)}, v)
+end
+
+function value!(x::AbstractVariable, v::Number)
+    size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    x.value = convert(eltype(x), v)
+end
+
+
+# A concrete implementation of the `AbstractVariable` interface
 mutable struct Variable <: AbstractVariable
     """
     Every `AbstractExpr` has a `head`; for a Variable it is set to `:variable`.
@@ -111,11 +165,6 @@ Variable(size::Tuple{Int, Int},first_set::Symbol, more_sets::Symbol...) = Variab
 Variable(size::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((size, 1), sign, first_set, more_sets...)
 Variable(size::Int, first_set::Symbol, more_sets::Symbol...) = Variable((size, 1), NoSign(), first_set, more_sets...)
 
-
-# Access `vartype`
-set_vartype(x::AbstractVariable, vt::VarType) = x.vartype = vt
-get_vartype(x::AbstractVariable) = x.vartype
-
 Semidefinite(m::Integer) = Variable((m, m), x -> x ⪰ 0)
 function Semidefinite(m::Integer, n::Integer)
     if m == n
@@ -152,18 +201,9 @@ end
 # and after solving to populate the variables with values
 const id_to_variables = Dict{UInt64, AbstractVariable}()
 
-function vexity(x::AbstractVariable)
-    return x.vexity
-end
-
 function evaluate(x::AbstractVariable)
-    return x.value === nothing ? error("Value of the variable is yet to be calculated") : x.value
+    return value(x) === nothing ? error("Value of the variable is yet to be calculated") : value(x)
 end
-
-function sign(x::AbstractVariable)
-    return x.sign
-end
-
 
 function real_conic_form(x::AbstractVariable)
     vec_size = length(x)
@@ -172,7 +212,7 @@ end
 
 function imag_conic_form(x::AbstractVariable)
     vec_size = length(x)
-    if x.sign == ComplexSign()
+    if sign(x) == ComplexSign()
         return im*sparse(1.0I, vec_size, vec_size)
     else
         return spzeros(vec_size, vec_size)
@@ -184,7 +224,7 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms=U
         if vexity(x) == ConstVexity()
             # do exactly what we would for a constant
             objective = ConicObj()
-            objective[objectid(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
+            objective[objectid(:constant)] = (vec([real(value(x));]),vec([imag(value(x));]))
             cache_conic_form!(unique_conic_forms, x, objective)
         else
             objective = ConicObj()
@@ -194,12 +234,12 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms=U
             objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
             # placeholder values in unique constraints prevent infinite recursion depth
             cache_conic_form!(unique_conic_forms, x, objective)
-            if !(x.sign == NoSign() || x.sign == ComplexSign())
-                conic_form!(x.sign, x, unique_conic_forms)
+            if !(sign(x) == NoSign() || sign(x) == ComplexSign())
+                conic_form!(sign(x), x, unique_conic_forms)
             end
 
             # apply the constraints `x` itself carries
-            for constraint in x.constraints
+            for constraint in constraints(x)
                 conic_form!(constraint, unique_conic_forms)
             end
         end
@@ -209,30 +249,17 @@ end
 
 # fix variables to hold them at their current value, and free them afterwards
 function fix!(x::AbstractVariable)
-    x.value === nothing && error("This variable has no value yet; cannot fix value to nothing!")
-    x.vexity = ConstVexity()
+    value(x) === nothing && error("This variable has no value yet; cannot fix value to nothing!")
+    vexity!(x, ConstVexity())
     x
 end
-function fix!(x::AbstractVariable, v::AbstractArray)
-    size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = sign(x) == ComplexSign() ? convert(Array{ComplexF64}, v) : convert(Array{Float64}, v)
-    fix!(x)
-end
 
-function fix!(x::Variable, v::AbstractVector)
-    size(x, 2) == 1 || throw(DimensionMismatch("Cannot set value of a variable of size $(size(x)) to a vector"))
-    size(x, 1) == length(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = sign(x) == ComplexSign() ? convert(Array{ComplexF64}, v) : convert(Array{Float64}, v)
-    fix!(x)
-end
-
-function fix!(x::Variable, v::Number)
-    size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = sign(x) == ComplexSign() ? convert(ComplexF64, v) : convert(Float64, v)
+function fix!(x::AbstractVariable, v)
+    value!(x, v)
     fix!(x)
 end
 
 function free!(x::AbstractVariable)
-    x.vexity = AffineVexity()
+    vexity!(x, AffineVexity())
     x
 end

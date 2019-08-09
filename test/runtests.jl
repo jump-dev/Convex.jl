@@ -42,4 +42,5 @@ push!(solvers, SCSSolver(verbose=0, eps=1e-6))
     include("test_exp.jl")
     include("test_sdp_and_exp.jl")
     include("test_mip.jl")
+    include("test_abstract_variable.jl")
 end

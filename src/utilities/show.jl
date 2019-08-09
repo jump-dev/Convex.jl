@@ -14,11 +14,11 @@ end
 # vexity: AffineVexity()
 function show(io::IO, x::AbstractVariable)
     print(io, """Variable of
-          size: ($(x.size[1]), $(x.size[2]))
-          sign: $(x.sign)
-          vexity: $(x.vexity)""")
-    if x.value !== nothing
-        print(io, "\nvalue: $(x.value)")
+          size: ($(size(x)[1]), $(size(x)[2]))
+          sign: $(sign(x))
+          vexity: $(vexity(x))""")
+    if value(x) !== nothing
+        print(io, "\nvalue: $(value(x))")
     end
 end
 

@@ -17,20 +17,20 @@
         @test isempty(Convex.conic_constr_to_constr)
     end
 
-    @testset "get_vartype and set_vartype" begin
+    @testset "vartype and set_vartype" begin
         for x in (Variable(), Variable(1), ComplexVariable(2,2))
-            @test get_vartype(x) == ContVar
+            @test vartype(x) == ContVar
             
-            set_vartype(x, BinVar)
-            @test get_vartype(x) == BinVar
+            vartype!(x, BinVar)
+            @test vartype(x) == BinVar
             @test x.vartype == BinVar
 
-            set_vartype(x, IntVar)
-            @test get_vartype(x) == IntVar
+            vartype!(x, IntVar)
+            @test vartype(x) == IntVar
             @test x.vartype == IntVar
 
-            set_vartype(x, ContVar)
-            @test get_vartype(x) == ContVar
+            vartype!(x, ContVar)
+            @test vartype(x) == ContVar
             @test x.vartype == ContVar
 
         end
