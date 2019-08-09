@@ -49,8 +49,8 @@ end
 
 import .TypedVectors
 
-@testset "AbstractVariable interface" for solver in solvers
-    # Basic problem
+@testset "AbstractVariable interface: $solver" for solver in solvers
+    # Let us solve a basic problem from `test_affine.jl`
 
     x = TypedVectors.TypedVector{BigFloat}(1)
     y = TypedVectors.TypedVector{BigFloat}(1)
@@ -60,4 +60,55 @@ import .TypedVectors
     @test p.optval ≈ 5 atol=TOL
     @test evaluate(x + y) ≈ 5 atol=TOL
     @test Convex.eltype(x) == BigFloat
+end
+
+
+# Let us do another example of custom variable types, but using field access for simplicity
+  
+module DensityMatricies
+using Convex
+
+mutable struct DensityMatrix <: Convex.AbstractVariable
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int, Int}
+    value::Convex.ValueOrNothing
+    vexity::Vexity
+    function DensityMatrix(d)
+        this = new(:DensityMatrix, 0, (d,d), nothing, Convex.AffineVexity())
+        this.id_hash = objectid(this)
+        Convex.id_to_variables[this.id_hash] = this
+        this
+    end
+end
+Convex.constraints(ρ::DensityMatrix) = [ ρ ⪰ 0, tr(ρ) == 1 ]
+Convex.sign(::DensityMatrix) = Convex.ComplexSign()
+Convex.vartype(::DensityMatrix) = Convex.ContVar
+Convex.eltype(::DensityMatrix) = ComplexF64
+
+end
+
+import .DensityMatricies
+import LinearAlgebra
+@testset "DensityMatrix custom variable type: $solver" for solver in solvers
+
+    if can_solve_sdp(solver)
+        X = randn(4,4) + im*rand(4,4); X = X+X'
+        # `X` is Hermitian and non-degenerate (with probability 1)
+        # Let us calculate the projection onto the eigenspace associated
+        # to the maximum eigenvalue
+        e_vals, e_vecs = LinearAlgebra.eigen(LinearAlgebra.Hermitian(X))
+        e_val, idx = findmax(e_vals)
+        e_vec = e_vecs[:, idx]
+        proj = e_vec * e_vec'
+
+        # found it! Now let us do it again via an SDP
+        ρ = DensityMatricies.DensityMatrix(4)
+        
+        prob = maximize( real(tr(ρ*X)) )
+        solve!(prob, solver)
+
+        @test prob.optval ≈ e_val atol = TOL
+        @test evaluate(ρ) ≈ proj atol = TOL
+    end
 end

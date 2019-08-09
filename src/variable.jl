@@ -23,16 +23,13 @@ Describe the type of a `Variable`: either continuous (`ContVar`), integer-valued
     abstract type AbstractVariable <: AbstractExpr end
 
 An `AbstractVariable` should have `head` field, an `id_hash` field and a `size` field
-to conform to the `AbstractExpr` interface, and implement methods for
+to conform to the `AbstractExpr` interface, and implement methods (or use the field-access fallbacks) for
 
 * `value`, `value!`: get or set the numeric value of the variable. `value` should return `nothing` when no numeric value is set.
 * `vexity`, `vexity!`: get or set the `vexity` of the variable. The `vexity` should be `AffineVexity()` unless the variable has been `fix!`'d, in which case it is `ConstVexity()`.
-* `sign`, `sign!`: get or set the `Sign` of the variable
-* `vartype`, `vartype!`: get or set the `VarType` of the variable
-* `constraints`, `constraints!`: get or set a `Vector` of constraints which are to be applied to any problem in which the variable is used
-* `eltype`: return a numeric type for the variable
+* `sign`, `vartype`, `eltype`, and `constraints`: get the `Sign`, `VarType`, numeric type, and a (possibly empty) vector of constraints which are to be applied to any problem in which the variable is used.
 
-Moreover, when an `AbstractVariable` `x` is constructed, it should populate `Convex.id_to_variables` via, e.g.
+Optionally, also implement `sign!`, `vartype!`, and `constraints!` to allow users to modify those values. Moreover, when an `AbstractVariable` `x` is constructed, it should populate `Convex.id_to_variables` via, e.g.
 ```
 Convex.id_to_variables(x.id_hash) = x
 ```

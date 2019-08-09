@@ -98,3 +98,55 @@ for i=1:10
     free!(x)
 end
 ```
+
+Custom Variable Types
+---------------------
+
+By making subtypes of `AbstractVariable` that conform to the appropriate interface (see the `AbstractVariable` docstring for details), one can easily provide custom variable types for specific constructions. For example, in quantum mechanics, a density matrix is a complex positive semi-definite matrix with unit trace. With the following code, we can define a `DensityMatrix` type which encodes this information:
+ 
+```@example 1
+using Convex
+
+mutable struct DensityMatrix <: Convex.AbstractVariable{ComplexF64}
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int, Int}
+    value::Convex.ValueOrNothing
+    vexity::Vexity
+    function DensityMatrix(d)
+        this = new(:DensityMatrix, 0, (d,d), nothing, Convex.AffineVexity())
+        this.id_hash = objectid(this)
+        Convex.id_to_variables[this.id_hash] = this
+        this
+    end
+end
+Convex.constraints(ρ::DensityMatrix) = [ ρ ⪰ 0, tr(ρ) == 1 ]
+Convex.sign(::DensityMatrix) = Convex.ComplexSign()
+Convex.vartype(::DensityMatrix) = Convex.ContVar
+```
+
+Then one can call `ρ = DensityMatrix(d)` to construct a variable which can be used in Convex, and which already encodes the appropriate constraints (i.e. positive semi-definite and unit trace). For example,
+
+```@example 1
+using Convex, LinearAlgebra, SCS, Test
+
+X = randn(4,4) + im*rand(4,4); X = X+X'
+# `X` is Hermitian and non-degenerate (with probability 1)
+# Let us calculate the projection onto the eigenspace associated
+# to the maximum eigenvalue
+
+e_vals, e_vecs = LinearAlgebra.eigen(LinearAlgebra.Hermitian(X))
+e_val, idx = findmax(e_vals)
+e_vec = e_vecs[:, idx]
+proj = e_vec * e_vec'
+
+# found it!
+# Now let us do it again via an SDP
+ρ = DensityMatrix(4)
+
+prob = maximize( real(tr(ρ*X)) )
+solve!(prob, SCSSolver())
+
+@test prob.optval ≈ e_val atol = 1e-3
+@test evaluate(ρ) ≈ proj atol = 1e-3
+```
