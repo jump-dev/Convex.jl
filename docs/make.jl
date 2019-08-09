@@ -19,5 +19,10 @@ makedocs(;
                 "Credits" => "credits.md"
             ],
             repo="https://github.com/JuliaOpt/Convex.jl/blob/{commit}{path}#L{line}",
-            sitename="Convex.jl",
-            authors="")
+            sitename="Convex.jl")
+
+
+deploydocs(;
+    repo="https://github.com/JuliaOpt/Convex.jl",
+)
+
