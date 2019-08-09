@@ -41,7 +41,7 @@ Convex.vartype(x::TypedVector) = global_cache[x.id_hash][:vartype]
 Convex.vartype!(x::TypedVector, s::Convex.VarType) = global_cache[x.id_hash][:vartype] = s
 
 Convex.constraints(x::TypedVector) = global_cache[x.id_hash][:constraints]
-Convex.constraints!(x::TypedVector, s::Vector{Constraint}) = global_cache[x.id_hash][:constraints] = s
+Convex.add_constraint!(x::TypedVector, s::Constraint) = push!(global_cache[x.id_hash][:constraints], s)
 
 Convex.eltype(x::TypedVector{T}) where {T} = T
 
@@ -60,6 +60,13 @@ import .TypedVectors
     @test p.optval ≈ 5 atol=TOL
     @test evaluate(x + y) ≈ 5 atol=TOL
     @test Convex.eltype(x) == BigFloat
+
+    add_constraint!(x, x >= 4)
+    solve!(p, solver)
+    @test p.optval ≈ 6 atol=TOL
+    @test evaluate(x + y) ≈ 6 atol=TOL
+    @test length(constraints(x)) == 1
+
 end
 
 

@@ -107,6 +107,16 @@ constraint = ([x y; y' z] in :SDP)
 constraint = ([x y; y' z] ⪰ 0)
 ```
 
+Constraints can also be added to variables after their construction, to automatically apply constraints
+to any problem which uses the variable. For example,
+
+```julia
+x = Variable(3)
+add_constraint!(x, sum(x) == 1)
+```
+
+Now, in any problem in which `x` is used, the constraint `sum(x) == 1` will be added.
+
 Objective
 ---------
 

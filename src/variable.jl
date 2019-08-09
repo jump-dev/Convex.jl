@@ -7,6 +7,7 @@ export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
 export vexity, evaluate, sign, conic_form!, fix!, free!
 
 export BinVar, IntVar, ContVar, vartype, vartype!
+export constraints, add_constraint!
 
 """
     VarType
@@ -29,7 +30,7 @@ to conform to the `AbstractExpr` interface, and implement methods (or use the fi
 * `vexity`, `vexity!`: get or set the `vexity` of the variable. The `vexity` should be `AffineVexity()` unless the variable has been `fix!`'d, in which case it is `ConstVexity()`.
 * `sign`, `vartype`, `eltype`, and `constraints`: get the `Sign`, `VarType`, numeric type, and a (possibly empty) vector of constraints which are to be applied to any problem in which the variable is used.
 
-Optionally, also implement `sign!`, `vartype!`, and `constraints!` to allow users to modify those values. Moreover, when an `AbstractVariable` `x` is constructed, it should populate `Convex.id_to_variables` via, e.g.
+Optionally, also implement `sign!`, `vartype!`, and `add_constraint!` to allow users to modify those values or add a constraint. Moreover, when an `AbstractVariable` `x` is constructed, it should populate `Convex.id_to_variables` via, e.g.
 ```
 Convex.id_to_variables(x.id_hash) = x
 ```
@@ -39,7 +40,7 @@ abstract type AbstractVariable <: AbstractExpr end
 
 # Default implementation of `AbstractVariable` interface
 constraints(x::AbstractVariable) = x.constraints
-constraints!(x::AbstractVariable, L::Vector{Constraint}) = x.constraints = L
+add_constraint!(x::AbstractVariable, C::Constraint) = push!(x.constraints, C)
 
 vartype(x::AbstractVariable) = x.vartype
 vartype!(x::AbstractVariable, vt::VarType) = x.vartype = vt
@@ -110,7 +111,7 @@ mutable struct Variable <: AbstractVariable
     The `VarType` of the variable (binary, integer, or continuous).
     """
     vartype::VarType
-    function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), constraint_fns...; vartype = ContVar)
+    function Variable(size::Tuple{Int, Int}, sign::Sign, constraint_fns...; vartype = ContVar)
         this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
 
         # now that we have access to the variable (`this`), we can apply constraints to it.
@@ -122,27 +123,29 @@ mutable struct Variable <: AbstractVariable
         id_to_variables[this.id_hash] = this
         return this
     end
+    Variable(size::Tuple{Int, Int}, constraint_fns...; vartype = ContVar) = Variable(size, NoSign(), constraint_fns...; vartype = vartype)
 
-    Variable(m::Int, n::Int, sign::Sign=NoSign(), constraint_fns...) = Variable((m,n), sign, constraint_fns...)
-    Variable(sign::Sign, constraint_fns...) = Variable((1, 1), sign, constraint_fns...)
-    Variable(constraint_fns...) = Variable((1, 1), NoSign(), constraint_fns...)
-    Variable(size::Tuple{Int, Int}, constraint_fns...) = Variable(size, NoSign(), constraint_fns...)
-    Variable(size::Int, sign::Sign=NoSign(), constraint_fns...) = Variable((size, 1), sign, constraint_fns...)
-    Variable(size::Int, constraint_fns...) = Variable((size, 1), constraint_fns...)
+    Variable(m::Int, n::Int, sign::Sign, constraint_fns...; vartype = ContVar) = Variable((m,n), sign, constraint_fns...; vartype = vartype)
+    Variable(m::Int, n::Int, constraint_fns...; vartype = ContVar) = Variable((m,n), NoSign(), constraint_fns...; vartype = vartype)
+
+    Variable(size::Int, sign::Sign, constraint_fns...; vartype = ContVar) = Variable((size, 1), sign, constraint_fns...; vartype = vartype)
+    Variable(size::Int, constraint_fns...; vartype = ContVar) = Variable((size, 1), NoSign(), constraint_fns...; vartype = vartype)
+
+    Variable(sign::Sign, constraint_fns...; vartype = ContVar) = Variable((1, 1), sign, constraint_fns...; vartype = vartype)
+    Variable(constraint_fns...; vartype = ContVar) = Variable((1, 1), NoSign(), constraint_fns...; vartype = vartype)
+    
 end
 
 # Compatability with old `sets` model
 # Only dispatch to these methods when at least one set is given
 # Otherwise dispatch to the inner constructors
-function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_sets::Symbol...)
+function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar)
     sets = [first_set]
     append!(sets, more_sets)
     if :Bin in sets
         vartype = BinVar
     elseif :Int in sets
         vartype = IntVar
-    else
-        vartype = ContVar
     end
     if :Semidefinite in sets
         fns = [ x -> x ⪰ 0 ]
@@ -153,40 +156,47 @@ function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_set
 end
 
 
-Variable(m::Int, n::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), sign, first_set, more_sets...)
-Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), NoSign(), first_set, more_sets...)
+Variable(m::Int, n::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((m,n), sign, first_set, more_sets...; vartype = vartype)
+Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((m,n), NoSign(), first_set, more_sets...; vartype = vartype)
 
-Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((1, 1), sign, first_set, more_sets...)
-Variable(first_set::Symbol, more_sets::Symbol...) = Variable((1, 1), NoSign(), first_set, more_sets...)
-Variable(size::Tuple{Int, Int},first_set::Symbol, more_sets::Symbol...) = Variable(size, NoSign(), first_set, more_sets...)
-Variable(size::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((size, 1), sign, first_set, more_sets...)
-Variable(size::Int, first_set::Symbol, more_sets::Symbol...) = Variable((size, 1), NoSign(), first_set, more_sets...)
+Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((1, 1), sign, first_set, more_sets...; vartype = vartype)
+Variable(first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((1, 1), NoSign(), first_set, more_sets...; vartype = vartype)
+Variable(size::Tuple{Int, Int},first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable(size, NoSign(), first_set, more_sets...; vartype = vartype)
+Variable(size::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((size, 1), sign, first_set, more_sets...; vartype = vartype)
+Variable(size::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((size, 1), NoSign(), first_set, more_sets...; vartype = vartype)
 
-Semidefinite(m::Integer) = Variable((m, m), x -> x ⪰ 0)
-function Semidefinite(m::Integer, n::Integer)
+Semidefinite(m::Integer; vartype = ContVar) = Variable((m, m), x -> x ⪰ 0; vartype = vartype)
+
+function Semidefinite(m::Integer, n::Integer; vartype = ContVar)
     if m == n
-        return Variable((m, m), x -> x ⪰ 0)
+        return Variable((m, m), x -> x ⪰ 0; vartype = vartype)
     else
         error("Semidefinite matrices must be square")
     end
 end
 
-ComplexVariable(m::Int, n::Int, constraint_fns...) = Variable((m, n), ComplexSign(), constraint_fns...)
-ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m, n), ComplexSign(), first_set, more_sets...)
+ComplexVariable(m::Int, n::Int, constraint_fns...; vartype = ContVar) = Variable((m, n), ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((m, n), ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-ComplexVariable(constraint_fns...) = Variable((1, 1), ComplexSign(), constraint_fns...)
-ComplexVariable(first_set::Symbol, more_sets::Symbol...) = Variable((1, 1), ComplexSign(), first_set, more_sets...)
+ComplexVariable(constraint_fns...; vartype = ContVar) = Variable((1, 1), ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((1, 1), ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-ComplexVariable(size::Tuple{Int, Int}, constraint_fns...) = Variable(size, ComplexSign(), constraint_fns...)
-ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...) = Variable(size, ComplexSign(), first_set, more_sets...)
+ComplexVariable(size::Tuple{Int, Int}, constraint_fns...; vartype = ContVar) = Variable(size, ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable(size, ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-ComplexVariable(size::Int, constraint_fns...) = Variable((size, 1), ComplexSign(), constraint_fns...)
-ComplexVariable(size::Int, first_set::Symbol, more_sets::Symbol...) = Variable((size, 1), ComplexSign(), first_set, more_sets...)
+ComplexVariable(size::Int, constraint_fns...; vartype = ContVar) = Variable((size, 1), ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(size::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((size, 1), ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-HermitianSemidefinite(m::Integer) = ComplexVariable((m, m), x -> x ⪰ 0)
-function HermitianSemidefinite(m::Integer, n::Integer)
+function HermitianSemidefinite(m::Integer, constraint_fns...; vartype = ContVar)
+    fns = [ x -> x ⪰ 0 ]
+    append!(fns, constraint_fns)
+    ComplexVariable((m, m), fns; vartype = vartype)
+end
+function HermitianSemidefinite(m::Integer, n::Integer, constraint_fns...; vartype = ContVar)
     if m == n
-        return ComplexVariable((m, m), x -> x ⪰ 0)
+        fns = [ x -> x ⪰ 0 ]
+        append!(fns, constraint_fns)
+        return ComplexVariable((m, m), fns; vartype = vartype)
     else
         error("`HermitianSemidefinite` matrices must be square")
     end

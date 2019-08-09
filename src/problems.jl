@@ -224,7 +224,8 @@ satisfy(constraint::Constraint) = satisfy([constraint])
 add_constraints!(p::Problem, constraints::Array{<:Constraint}) =
     +(p.constraints, constraints)
 add_constraints!(p::Problem, constraint::Constraint) = add_constraints!(p, [constraint])
-add_constraint! = add_constraints!
+add_constraint!(p::Problem, constraint::Constraint) = add_constraints!(p::Problem, constraint::Constraint)
+add_constraint!(p::Problem, constraints::Array{<:Constraint}) = add_constraints!(p::Problem, constraints::Array{<:Constraint})
 
 # caches conic form of x when x is the solution to the optimization problem p
 function cache_conic_form!(conic_forms::UniqueConicForms, x::AbstractExpr, p::Problem)

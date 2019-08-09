@@ -36,6 +36,65 @@
         end
     end
 
+    @testset "Constructors" begin
+
+        # Constructors with sign
+        sgn = Positive()
+        for x in    [   # tuple size
+                        Variable((2,2), sgn), 
+                        Variable((2,2), sgn, x -> x <= 3),
+                        Variable((2,2), sgn, x -> x <= 3; vartype = BinVar),
+                        Variable((2,2), sgn, :Bin),
+                        # individual size 
+                        Variable(2,2, sgn),
+                        Variable(2,2, sgn, x -> x <= 3),
+                        Variable(2,2, sgn, x -> x <= 3; vartype = BinVar),
+                        Variable(2,2, sgn, :Bin),
+                        # single dimension
+                        Variable(2, sgn),
+                        Variable(2, sgn, x -> x <= 3),
+                        Variable(2, sgn, x -> x <= 3; vartype = BinVar),
+                        Variable(2, sgn, :Bin),
+                        # no dimension
+                        Variable(sgn),
+                        Variable(sgn, x -> x <= 3),
+                        Variable(sgn, x -> x <= 3; vartype = BinVar),
+                        Variable(sgn, :Bin),  ]
+            @test x isa Variable
+            @test sign(x) == Positive()
+            @test x.sign == Positive()
+        end
+
+        # constructors without sign
+        for x in    [   # tuple size
+                        Variable((2,2)), 
+                        Variable((2,2), x -> x <= 3),
+                        Variable((2,2), x -> x <= 3; vartype = BinVar),
+                        Variable((2,2), :Bin),
+                        # individual size 
+                        Variable(2,2),
+                        Variable(2,2, x -> x <= 3),
+                        Variable(2,2, x -> x <= 3; vartype = BinVar),
+                        Variable(2,2, :Bin),
+                        # single dimension
+                        Variable(2),
+                        Variable(2, x -> x <= 3),
+                        Variable(2, x -> x <= 3; vartype = BinVar),
+                        Variable(2, :Bin),
+                        # no dimension
+                        Variable(),
+                        Variable(x -> x <= 3),
+                        Variable(x -> x <= 3; vartype = BinVar),
+                        Variable(:Bin),  ]
+                @test x isa Variable
+                @test sign(x) == NoSign()
+                @test x.sign == NoSign()
+        end
+
+
+
+    end
+
     @testset "ConicObj" for T = [UInt32, UInt64]
         c = ConicObj()
         z = zero(T)

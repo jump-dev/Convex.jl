@@ -17,11 +17,16 @@
         end
 
         @testset "integer variables" begin
-            x = Variable(:Int)
-            p = minimize(x, x>=4.3)
-            @test vexity(p) == AffineVexity()
-            solve!(p, mip_solver)
-            @test p.optval ≈ 5 atol=TOL
+            y = Variable()
+            vartype!(y, IntVar)
+
+            for x in [ Variable(:Int), Variable(vartype = IntVar), y ]
+                @test vartype(x) == IntVar
+                p = minimize(x, x>=4.3)
+                @test vexity(p) == AffineVexity()
+                solve!(p, mip_solver)
+                @test p.optval ≈ 5 atol=TOL
+            end
 
             x = Variable(2, :Int)
             p = minimize(sum(x), x>=4.3)
