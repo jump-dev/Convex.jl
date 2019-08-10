@@ -22,4 +22,4 @@ makedocs(;
     sitename = "Convex.jl")
 
 
-deploydocs(repo = "https://github.com/JuliaOpt/Convex.jl")
+deploydocs(repo = "github.com/JuliaOpt/Convex.jl.git")
