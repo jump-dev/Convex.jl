@@ -120,13 +120,13 @@ function fix!(x::Variable)
 end
 function fix!(x::Variable, v::AbstractArray)
     size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = convert(Array{Float64}, v)
+    x.value = sign(x) == ComplexSign() ? convert(Array{ComplexF64}, v) : convert(Array{Float64}, v)
     fix!(x)
 end
 
 function fix!(x::Variable, v::Number)
     size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = Float64(v)
+    x.value = sign(x) == ComplexSign() ? convert(ComplexF64, v) : convert(Float64, v)
     fix!(x)
 end
 
