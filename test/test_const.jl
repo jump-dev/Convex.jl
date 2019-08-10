@@ -59,5 +59,23 @@
         @test evaluate( tr(p*x) ) ≈ 2.0 atol = TOL
     end
 
+    @testset "fix! with complex numbers" begin
+        x = ComplexVariable()
+        fix!(x, 1.0 + im*1.0)
+        y = Variable()
+        prob = minimize( real(x*y), [ y >= .5, real(x) >= .5, imag(x) >= 0])
+        solve!(prob, solver)
+        @test prob.optval ≈ .5 atol=TOL
+        @test evaluate(real(x*y)) ≈ .5 atol=TOL
+        @test evaluate(y) ≈ 0.5 atol=TOL
+
+        free!(x)
+        fix!(y)
+        solve!(prob, solver)
+        @test prob.optval ≈ 0.25 atol=TOL
+        @test evaluate(real(x*y)) ≈ 0.25 atol=TOL
+        @test real(evaluate(x)) ≈ 0.5 atol=TOL
+        @test evaluate(y) ≈ 0.5 atol=TOL
+    end
 
 end
