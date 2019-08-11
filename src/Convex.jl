@@ -80,6 +80,7 @@ include("atoms/exp_+_sdp_cone/logdet.jl")
 
 ### utilities
 include("utilities/show.jl")
+include("utilities/tree_interface.jl")
 include("utilities/iteration.jl")
 include("utilities/broadcast.jl")
 

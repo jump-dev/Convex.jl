@@ -3,6 +3,7 @@ uuid = "f65535da-76fb-5f13-bab9-19810c17039a"
 version = "0.12.4"
 
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MathProgBase = "fdba3010-5040-5b88-9595-932c9decdf73"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"

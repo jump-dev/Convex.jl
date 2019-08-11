@@ -1,5 +1,23 @@
-import Base.show
-export show
+import Base.show, Base.summary
+export show, summary
+
+
+function Base.summary(io::IO, x::Variable)
+    sgn = sign(x) == ComplexSign() ? " complex " : " "
+    cst = vexity(x) == ConstVexity() ? " (fixed)" : ""
+    if size(x) == (1,1)
+        if sign(x) == ComplexSign()
+            print(io, "complex variable$(cst)")
+        else
+            print(io, "variable$(cst)")
+        end
+    elseif size(x,2) == 1
+        print(io, "$(size(x,1))-element$(sgn)variable$(cst)")
+    else
+        print(io, "$(size(x,1))×$(size(x,2))$(sgn)variable$(cst)")
+
+    end
+end
 
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
