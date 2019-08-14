@@ -5,7 +5,8 @@ FAQ
 Where can I get help?
 ---------------------
 
-For usage questions, please contact us via the [Julia Discourse](https://discourse.julialang.org/c/domain/opt). If you're
+For usage questions, please contact us via the
+[Julia Discourse](https://discourse.julialang.org/c/domain/opt). If you're
 running into bugs or have feature requests, please use the [Github Issue
 Tracker](https://github.com/JuliaOpt/Convex.jl/issues).
 
