@@ -26,5 +26,4 @@ interface.
 
 Note that Convex.jl was previously called CVX.jl. This package is under
 active development; we welcome bug reports and feature requests. For
-usage questions, please contact us via the [JuliaOpt mailing
-list](https://groups.google.com/forum/#!forum/julia-opt).
+usage questions, please contact us via the [Julia Discourse](https://discourse.julialang.org/c/domain/opt).

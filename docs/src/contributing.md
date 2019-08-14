@@ -34,7 +34,7 @@ Convex.jl. Let's say you're adding the new function $f$.
 > -   Take a look at the [nuclear norm
 >     atom](https://github.com/JuliaOpt/Convex.jl/blob/master/src/atoms/sdp_cone/nuclearnorm.jl)
 >     for an example of how to construct atoms, and see the [norm
->     atom](https://github.com/JuliaOpt/Convex.jl/blob/master/src/atoms/norm.jl)
+>     atom](https://github.com/JuliaOpt/Convex.jl/blob/master/src/atoms/second_order_cone/norm.jl)
 >     for an example of an atom that depends on a parameter.
 > -   Copy paste (eg) the nuclear norm file, replace anything saying
 >     nuclear norm with the name of the atom $f$, fill in monotonicity,
