@@ -12,7 +12,8 @@ export constraints, add_constraint!
 """
     VarType
 
-Describe the type of a `Variable`: either continuous (`ContVar`), integer-valued (`IntVar`), or binary (`BinVar`).
+Describe the type of a `Variable`: either continuous (`ContVar`),
+integer-valued (`IntVar`), or binary (`BinVar`).
 """
 @enum VarType BinVar IntVar ContVar
 
@@ -23,19 +24,30 @@ Describe the type of a `Variable`: either continuous (`ContVar`), integer-valued
 """
     abstract type AbstractVariable{T <: Number} <: AbstractExpr end
 
-An `AbstractVariable` should have `head` field, an `id_hash` field and a `size` field
-to conform to the `AbstractExpr` interface, and implement methods (or use the field-access fallbacks) for
+An `AbstractVariable` should have `head` field, an `id_hash` field
+and a `size` field to conform to the `AbstractExpr` interface, and
+implement methods (or use the field-access fallbacks) for
 
-* `value`, `value!`: get or set the numeric value of the variable. `value` should return `nothing` when no numeric value is set.
-* `vexity`, `vexity!`: get or set the `vexity` of the variable. The `vexity` should be `AffineVexity()` unless the variable has been `fix!`'d, in which case it is `ConstVexity()`.
-* `sign`, `vartype`, and `constraints`: get the `Sign`, `VarType`, numeric type, and a (possibly empty) vector of constraints which are to be applied to any problem in which the variable is used.
+* `value`, `value!`: get or set the numeric value of the variable.
+    `value` should return `nothing` when no numeric value is set.
+* `vexity`, `vexity!`: get or set the `vexity` of the variable. The
+    `vexity` should be `AffineVexity()` unless the variable has been
+    `fix!`'d, in which case it is `ConstVexity()`.
+* `sign`, `vartype`, and `constraints`: get the `Sign`, `VarType`,
+    numeric type, and a (possibly empty) vector of constraints which are
+    to be applied to any problem in which the variable is used.
 
-Optionally, also implement `sign!`, `vartype!`, and `add_constraint!` to allow users to modify those values or add a constraint. Moreover, when an `AbstractVariable` `x` is constructed, it should populate `Convex.id_to_variables` via, e.g.
+Optionally, also implement `sign!`, `vartype!`, and `add_constraint!`
+to allow users to modify those values or add a constraint. Moreover,
+when an `AbstractVariable` `x` is constructed, it should populate
+`Convex.id_to_variables` via, e.g.
 ```
 Convex.id_to_variables(x.id_hash) = x
 ```
 
-The parameter `T` indicates the numeric type (e.g. `Float64`). If the variable is a complex variable, `T` should be complex (e.g. `Complex{Float64}`).
+The parameter `T` indicates the numeric type (e.g. `Float64`). If
+the variable is a complex variable, `T` should be complex
+(e.g. `Complex{Float64}`).
 
 """
 abstract type AbstractVariable{T <: Number} <: AbstractExpr end
@@ -92,28 +104,32 @@ mutable struct Variable{T <: Number} <: AbstractVariable{T}
     """
     id_hash::UInt64
     """
-    The current value of the variable. Defaults to `nothing` until the variable has been
-    [`fix!`](@ref)'d to a particular value, or the variable has been used in a problem which
-    has been solved, at which point the optimal value is populated into this field.
+    The current value of the variable. Defaults to `nothing` until the
+    variable has been [`fix!`](@ref)'d to a particular value, or the
+    variable has been used in a problem which has been solved, at which
+    point the optimal value is populated into this field.
     """
     value::ValueOrNothing
     """
-    The size of the variable. Scalar variables have size `(1,1)`; `d`-dimensional vectors have
-    size `(d, 1)`, and `n` by `m` matrices have size `(n,m)`.
+    The size of the variable. Scalar variables have size `(1,1)`;
+    `d`-dimensional vectors have size `(d, 1)`, and `n` by `m` matrices
+    have size `(n,m)`.
     """
     size::Tuple{Int, Int}
     """
-    `AffineVexity()` unless the variable is `fix!`'d, in which case it is `ConstVexity()`.
-    Accessed by `vexity(v::Variable)`. To check if a `Variable` is fixed, use `vexity(v) == ConstVexity()`.
+    `AffineVexity()` unless the variable is `fix!`'d, in which case it is
+    `ConstVexity()`. Accessed by `vexity(v::Variable)`. To check if a
+    `Variable` is fixed, use `vexity(v) == ConstVexity()`.
     """
     vexity::Vexity
     """
-    The sign of the variable. Can be  `Positive()`, `Negative()`, `NoSign()` (i.e. real), or `ComplexSign()`.
-    Accessed by `sign(v::Variable)`. 
+    The sign of the variable. Can be  `Positive()`, `Negative()`, `NoSign()`
+    (i.e. real), or `ComplexSign()`. Accessed by `sign(v::Variable)`. 
     """
     sign::Sign
     """
-    Vector of constraints which are enforced whenever the variable is used in a problem.
+    Vector of constraints which are enforced whenever the variable is used
+    in a problem.
     """
     constraints::Vector{Constraint}
     """
