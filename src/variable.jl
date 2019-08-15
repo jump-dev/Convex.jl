@@ -53,7 +53,7 @@ vexity!(x::AbstractVariable, v::Vexity) = x.vexity = v
 sign(x::AbstractVariable) = x.sign
 sign!(x::AbstractVariable, s::Sign) = x.sign = s
 
-Base.eltype(x::AbstractVariable{T}) where {T} = T
+Base.eltype(::Type{<:AbstractVariable{T}}) where {T} = T
 
 value(x::AbstractVariable) = x.value
 
