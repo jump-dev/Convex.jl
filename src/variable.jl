@@ -21,7 +21,7 @@ Describe the type of a `Variable`: either continuous (`ContVar`), integer-valued
 @doc "Indicates a `Variable` is continuous." ContVar
 
 """
-    abstract type AbstractVariable <: AbstractExpr end
+    abstract type AbstractVariable{T <: Number} <: AbstractExpr end
 
 An `AbstractVariable` should have `head` field, an `id_hash` field and a `size` field
 to conform to the `AbstractExpr` interface, and implement methods (or use the field-access fallbacks) for
@@ -35,8 +35,10 @@ Optionally, also implement `sign!`, `vartype!`, and `add_constraint!` to allow u
 Convex.id_to_variables(x.id_hash) = x
 ```
 
+The parameter `T` indicates the numeric type (e.g. `Float64`). If the variable is a complex variable, `T` should be complex (e.g. `Complex{Float64}`).
+
 """
-abstract type AbstractVariable <: AbstractExpr end
+abstract type AbstractVariable{T <: Number} <: AbstractExpr end
 
 # Default implementation of `AbstractVariable` interface
 constraints(x::AbstractVariable) = x.constraints
@@ -51,7 +53,7 @@ vexity!(x::AbstractVariable, v::Vexity) = x.vexity = v
 sign(x::AbstractVariable) = x.sign
 sign!(x::AbstractVariable, s::Sign) = x.sign = s
 
-eltype(x::AbstractVariable) = sign(x) == ComplexSign() ? Complex{Float64} :  Float64
+Base.eltype(x::AbstractVariable{T}) where {T} = T
 
 value(x::AbstractVariable) = x.value
 
@@ -71,9 +73,16 @@ function value!(x::AbstractVariable, v::Number)
     x.value = convert(eltype(x), v)
 end
 
+iscomplex(::Type{T}) where {T <: Number} = T != real(T)
+iscomplex(sign::Sign) = sign == ComplexSign()
+
+defaultsign(::Type{T}) where {T <: Number} = iscomplex(T) ? ComplexSign() : NoSign()
+defaultsign() = NoSign()
+defaulttype(sign::Sign) = iscomplex(sign) ? Complex{Float64} : Float64
+defaulttype() = Float64
 
 # A concrete implementation of the `AbstractVariable` interface
-mutable struct Variable <: AbstractVariable
+mutable struct Variable{T <: Number} <: AbstractVariable{T}
     """
     Every `AbstractExpr` has a `head`; for a Variable it is set to `:variable`.
     """
@@ -111,8 +120,14 @@ mutable struct Variable <: AbstractVariable
     The `VarType` of the variable (binary, integer, or continuous).
     """
     vartype::VarType
-    function Variable(size::Tuple{Int, Int}, sign::Sign, constraint_fns...; vartype = ContVar)
-        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
+    function Variable{T}(size::Tuple{Int, Int}, sign::Sign, constraint_fns...; vartype = ContVar) where {T <: Number}
+        if iscomplex(T) != iscomplex(sign)
+            throw(ArgumentError("type parameter and sign must agree (both complex or both real). Got T=$T, sign = $sign"))
+        end
+        if iscomplex(T) && vartype != ContVar
+            throw(ArgumentError("vartype must be `ContVar` for complex variables; got vartype = $vartype"))
+        end
+        this = new{T}(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
 
         # now that we have access to the variable (`this`), we can apply constraints to it.
         for f in constraint_fns
@@ -123,23 +138,29 @@ mutable struct Variable <: AbstractVariable
         id_to_variables[this.id_hash] = this
         return this
     end
-    Variable(size::Tuple{Int, Int}, constraint_fns...; vartype = ContVar) = Variable(size, NoSign(), constraint_fns...; vartype = vartype)
+    Variable{T}(size::Tuple{Int, Int}, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}(size, defaultsign(T), constraint_fns...; vartype = vartype)
+    Variable(size::Tuple{Int, Int}, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{defaulttype()}(size, defaultsign(), constraint_fns...; vartype = vartype)
 
-    Variable(m::Int, n::Int, sign::Sign, constraint_fns...; vartype = ContVar) = Variable((m,n), sign, constraint_fns...; vartype = vartype)
-    Variable(m::Int, n::Int, constraint_fns...; vartype = ContVar) = Variable((m,n), NoSign(), constraint_fns...; vartype = vartype)
+    Variable{T}(m::Int, n::Int, sign::Sign, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}((m,n), sign, constraint_fns...; vartype = vartype)
+    Variable(m::Int, n::Int, sign::Sign, constraint_fns...; vartype = ContVar) = Variable{defaulttype(sign)}((m,n), sign, constraint_fns...; vartype = vartype)
+    Variable{T}(m::Int, n::Int, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}((m,n), defaultsign(T), constraint_fns...; vartype = vartype)
+    Variable(m::Int, n::Int, constraint_fns...; vartype = ContVar) = Variable{defaulttype()}((m,n), defaultsign(), constraint_fns...; vartype = vartype)
 
-    Variable(size::Int, sign::Sign, constraint_fns...; vartype = ContVar) = Variable((size, 1), sign, constraint_fns...; vartype = vartype)
-    Variable(size::Int, constraint_fns...; vartype = ContVar) = Variable((size, 1), NoSign(), constraint_fns...; vartype = vartype)
+    Variable{T}(size::Int, sign::Sign, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}((size, 1), sign, constraint_fns...; vartype = vartype)
+    Variable(size::Int, sign::Sign, constraint_fns...; vartype = ContVar) = Variable{defaultsign(T)}((size, 1), sign, constraint_fns...; vartype = vartype)
+    Variable{T}(size::Int, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}((size, 1), defaultsign(T), constraint_fns...; vartype = vartype)
+    Variable(size::Int, constraint_fns...; vartype = ContVar) = Variable{defaulttype()}((size, 1), defaultsign(), constraint_fns...; vartype = vartype)
 
-    Variable(sign::Sign, constraint_fns...; vartype = ContVar) = Variable((1, 1), sign, constraint_fns...; vartype = vartype)
-    Variable(constraint_fns...; vartype = ContVar) = Variable((1, 1), NoSign(), constraint_fns...; vartype = vartype)
-    
+    Variable{T}(sign::Sign, constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}((1, 1), sign, constraint_fns...; vartype = vartype)
+    Variable(sign::Sign, constraint_fns...; vartype = ContVar) = Variable{defaultsign(T)}((1, 1), sign, constraint_fns...; vartype = vartype)
+    Variable{T}(constraint_fns...; vartype = ContVar) where {T <: Number} = Variable{T}((1, 1), defaultsign(T), constraint_fns...; vartype = vartype)
+    Variable(constraint_fns...; vartype = ContVar) = Variable{defaulttype()}((1, 1), defaultsign(), constraint_fns...; vartype = vartype)
 end
 
 # Compatability with old `sets` model
 # Only dispatch to these methods when at least one set is given
 # Otherwise dispatch to the inner constructors
-function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar)
+function Variable{T}(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar)  where {T <: Number}
     sets = [first_set]
     append!(sets, more_sets)
     if :Bin in sets
@@ -152,47 +173,57 @@ function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_set
     else
         fns = []
     end
-    Variable(size, sign, fns...; vartype = vartype)
+    Variable{T}(size, sign, fns...; vartype = vartype)
 end
+Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable{defaulttype(sign)}(size, sign, first_set, more_sets...; vartype = vartype)
+
+Variable{T}(m::Int, n::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}((m,n), sign, first_set, more_sets...; vartype = vartype)
+Variable(m::Int, n::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable{defaulttype(sign)}((m,n), sign, first_set, more_sets...; vartype = vartype)
+
+Variable{T}(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}((m,n), defaultsign(T), first_set, more_sets...; vartype = vartype)
+Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable{defaulttype()}((m,n), defaultsign(), first_set, more_sets...; vartype = vartype)
+
+Variable{T}(sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}((1, 1), sign, first_set, more_sets...; vartype = vartype)
+Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{defaulttype(sign)}((1, 1), sign, first_set, more_sets...; vartype = vartype)
+Variable{T}(first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}((1, 1), NoSign(), first_set, more_sets...; vartype = vartype)
+Variable(first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{defaulttype()}((1, 1), defaultsign(), first_set, more_sets...; vartype = vartype)
+Variable{T}(size::Tuple{Int, Int},first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}(size, NoSign(), first_set, more_sets...; vartype = vartype)
+Variable(size::Tuple{Int, Int},first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{defaulttype()}(size, defaultsign(), first_set, more_sets...; vartype = vartype)
+Variable{T}(size::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}((size, 1), sign, first_set, more_sets...; vartype = vartype)
+Variable(size::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{defaulttype(sign)}((size, 1), sign, first_set, more_sets...; vartype = vartype)
+Variable{T}(size::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{T}((size, 1), NoSign(), first_set, more_sets...; vartype = vartype)
+Variable(size::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) where {T <: Number} = Variable{defaulttype()}((size, 1), defaultsign(), first_set, more_sets...; vartype = vartype)
 
 
-Variable(m::Int, n::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((m,n), sign, first_set, more_sets...; vartype = vartype)
-Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((m,n), NoSign(), first_set, more_sets...; vartype = vartype)
+Semidefinite(m::Integer; eltype=Float64, vartype = ContVar) = Variable{eltype}((m, m), x -> x ⪰ 0; vartype = vartype)
 
-Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((1, 1), sign, first_set, more_sets...; vartype = vartype)
-Variable(first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((1, 1), NoSign(), first_set, more_sets...; vartype = vartype)
-Variable(size::Tuple{Int, Int},first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable(size, NoSign(), first_set, more_sets...; vartype = vartype)
-Variable(size::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((size, 1), sign, first_set, more_sets...; vartype = vartype)
-Variable(size::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((size, 1), NoSign(), first_set, more_sets...; vartype = vartype)
-
-Semidefinite(m::Integer; vartype = ContVar) = Variable((m, m), x -> x ⪰ 0; vartype = vartype)
-
-function Semidefinite(m::Integer, n::Integer; vartype = ContVar)
+function Semidefinite(m::Integer, n::Integer; eltype=Float64, vartype = ContVar)
     if m == n
-        return Variable((m, m), x -> x ⪰ 0; vartype = vartype)
+        return Variable{eltype}((m, m), x -> x ⪰ 0; vartype = vartype)
     else
         error("Semidefinite matrices must be square")
     end
 end
 
-ComplexVariable(m::Int, n::Int, constraint_fns...; vartype = ContVar) = Variable((m, n), ComplexSign(), constraint_fns...; vartype = vartype)
-ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((m, n), ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-ComplexVariable(constraint_fns...; vartype = ContVar) = Variable((1, 1), ComplexSign(), constraint_fns...; vartype = vartype)
-ComplexVariable(first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((1, 1), ComplexSign(), first_set, more_sets...; vartype = vartype)
+ComplexVariable(m::Int, n::Int, constraint_fns...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}((m, n), ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}((m, n), ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-ComplexVariable(size::Tuple{Int, Int}, constraint_fns...; vartype = ContVar) = Variable(size, ComplexSign(), constraint_fns...; vartype = vartype)
-ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable(size, ComplexSign(), first_set, more_sets...; vartype = vartype)
+ComplexVariable(constraint_fns...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}((1, 1), ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(first_set::Symbol, more_sets::Symbol...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}((1, 1), ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-ComplexVariable(size::Int, constraint_fns...; vartype = ContVar) = Variable((size, 1), ComplexSign(), constraint_fns...; vartype = vartype)
-ComplexVariable(size::Int, first_set::Symbol, more_sets::Symbol...; vartype = ContVar) = Variable((size, 1), ComplexSign(), first_set, more_sets...; vartype = vartype)
+ComplexVariable(size::Tuple{Int, Int}, constraint_fns...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}(size, ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}(size, ComplexSign(), first_set, more_sets...; vartype = vartype)
 
-function HermitianSemidefinite(m::Integer, constraint_fns...; vartype = ContVar)
+ComplexVariable(size::Int, constraint_fns...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}((size, 1), ComplexSign(), constraint_fns...; vartype = vartype)
+ComplexVariable(size::Int, first_set::Symbol, more_sets::Symbol...; eltype=ComplexF64, vartype = ContVar) = Variable{eltype}((size, 1), ComplexSign(), first_set, more_sets...; vartype = vartype)
+ 
+function HermitianSemidefinite(m::Integer, constraint_fns...; eltype=ComplexF64, vartype = ContVar)
     fns = [ x -> x ⪰ 0 ]
     append!(fns, constraint_fns)
     ComplexVariable((m, m), fns; vartype = vartype)
 end
-function HermitianSemidefinite(m::Integer, n::Integer, constraint_fns...; vartype = ContVar)
+function HermitianSemidefinite(m::Integer, n::Integer, constraint_fns...; eltype=ComplexF64, vartype = ContVar)
     if m == n
         fns = [ x -> x ⪰ 0 ]
         append!(fns, constraint_fns)
@@ -201,6 +232,8 @@ function HermitianSemidefinite(m::Integer, n::Integer, constraint_fns...; vartyp
         error("`HermitianSemidefinite` matrices must be square")
     end
 end
+
+
 
 # global map from unique variable ids to variables.
 # the expression tree will only utilize variable ids during construction
