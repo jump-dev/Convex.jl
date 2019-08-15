@@ -42,27 +42,23 @@
         for sgn in (Positive(), NoSign())
             for x in    [   # tuple size
                             Variable((2, 2), sgn), 
-                            Variable((2, 2), sgn, x->x <= 3),
-                            Variable((2, 2), sgn, x->x <= 3; vartype = BinVar),
+                            Variable((2, 2), sgn, BinVar),
                             Variable((2, 2), sgn, :Bin),
                             # individual size 
                             Variable(2, 2, sgn),
-                            Variable(2, 2, sgn, x->x <= 3),
-                            Variable(2, 2, sgn, x->x <= 3; vartype = BinVar),
+                            Variable(2, 2, sgn, BinVar),
                             Variable(2, 2, sgn, :Bin),
                             # single dimension
                             Variable(2, sgn),
-                            Variable(2, sgn, x->x <= 3),
-                            Variable(2, sgn, x->x <= 3; vartype = BinVar),
+                            Variable(2, sgn, BinVar),
                             Variable(2, sgn, :Bin),
                             # no dimension
                             Variable(sgn),
-                            Variable(sgn, x->x <= 3),
-                            Variable(sgn, x->x <= 3; vartype = BinVar),
+                            Variable(sgn, BinVar),
                             Variable(sgn, :Bin),  ]
                 @test x isa Variable
-                @test sign(x) == Positive()
-                @test x.sign == Positive()
+                @test sign(x) == sgn
+                @test x.sign == sgn
                 @test eltype(x) == Float64
             end
         end
@@ -70,23 +66,19 @@
         # constructors without sign
         for x in    [   # tuple size
                         Variable((2, 2)), 
-                        Variable((2, 2), x->x <= 3),
-                        Variable((2, 2), x->x <= 3; vartype = BinVar),
+                        Variable((2, 2), BinVar),
                         Variable((2, 2), :Bin),
                         # individual size 
                         Variable(2, 2),
-                        Variable(2, 2, x->x <= 3),
-                        Variable(2, 2, x->x <= 3; vartype = BinVar),
+                        Variable(2, 2, BinVar),
                         Variable(2, 2, :Bin),
                         # single dimension
                         Variable(2),
-                        Variable(2, x->x <= 3),
-                        Variable(2, x->x <= 3; vartype = BinVar),
+                        Variable(2, BinVar),
                         Variable(2, :Bin),
                         # no dimension
                         Variable(),
-                        Variable(x->x <= 3),
-                        Variable(x->x <= 3; vartype = BinVar),
+                        Variable(BinVar),
                         Variable(:Bin),  ]
             @test x isa Variable
             @test sign(x) == NoSign()
@@ -100,23 +92,19 @@
                 for x in    [
                     # tuple size
                     Variable{T}((2, 2), sgn), 
-                    Variable{T}((2, 2), sgn, x->x <= 3),
-                    Variable{T}((2, 2), sgn, x->x <= 3; vartype = BinVar),
+                    Variable{T}((2, 2), sgn, BinVar),
                     Variable{T}((2, 2), sgn, :Bin),
                     # individual size 
                     Variable{T}(2, 2, sgn),
-                    Variable{T}(2, 2, sgn, x->x <= 3),
-                    Variable{T}(2, 2, sgn, x->x <= 3; vartype = BinVar),
+                    Variable{T}(2, 2, sgn, BinVar),
                     Variable{T}(2, 2, sgn, :Bin),
                     # single dimension
                     Variable{T}(2, sgn),
-                    Variable{T}(2, sgn, x->x <= 3),
-                    Variable{T}(2, sgn, x->x <= 3; vartype = BinVar),
+                    Variable{T}(2, sgn, BinVar),
                     Variable{T}(2, sgn, :Bin),
                     # no dimension
                     Variable{T}(sgn),
-                    Variable{T}(sgn, x->x <= 3),
-                    Variable{T}(sgn, x->x <= 3; vartype = BinVar),
+                    Variable{T}(sgn, BinVar),
                     Variable{T}(sgn, :Bin),  ]
 
                     @test x isa Variable
@@ -128,23 +116,19 @@
             for x in [
                 # tuple size
                 Variable{T}((2, 2)), 
-                Variable{T}((2, 2), x->x <= 3),
-                Variable{T}((2, 2), x->x <= 3; vartype = BinVar),
+                Variable{T}((2, 2), BinVar),
                 Variable{T}((2, 2), :Bin),
                 # individual size 
                 Variable{T}(2, 2),
-                Variable{T}(2, 2, x->x <= 3),
-                Variable{T}(2, 2, x->x <= 3; vartype = BinVar),
+                Variable{T}(2, 2, BinVar),
                 Variable{T}(2, 2, :Bin),
                 # single dimension
                 Variable{T}(2),
-                Variable{T}(2, x->x <= 3),
-                Variable{T}(2, x->x <= 3; vartype = BinVar),
+                Variable{T}(2, BinVar),
                 Variable{T}(2, :Bin),
                 # no dimension
                 Variable{T}(),
-                Variable{T}(x->x <= 3),
-                Variable{T}(x->x <= 3; vartype = BinVar),
+                Variable{T}(BinVar),
                 Variable{T}(:Bin), 
             ]
                 @test x isa Variable

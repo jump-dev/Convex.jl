@@ -5,7 +5,12 @@
 
         @testset "Variable constructors with functions" begin
             let
-                density_matrix(d) = ComplexVariable((d,d), x -> x ⪰ 0, x -> tr(x) == 1)
+                function density_matrix(d)
+                    x = ComplexVariable(d,d)
+                    add_constraint!(x, x ⪰ 0)
+                    add_constraint!(x, tr(x) == 1)
+                    return x
+                end
                 ρ = density_matrix(2) 
                 prob = minimize( real(ρ[1,1]) )
                 solve!(prob, solver)

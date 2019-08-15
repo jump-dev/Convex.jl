@@ -1,19 +1,19 @@
 # We provide a non-`Variable` implementation of the `AbstractVariable` interface
 # to test that only the interface is used (and not, e.g. direct field access).
     
-module TypedVectors
+module DictVectors
 using Convex
 
 # To make sure `Convex` isn't using field access on `AbstractVariable`'s
 # we'll use a global dictionary to store information about each instance
-# our of mock variable type, `TypedVector`.
+# our of mock variable type, `DictVector`.
 const global_cache = Dict{UInt64, Any}()
 
-mutable struct TypedVector{T} <: Convex.AbstractVariable
+mutable struct DictVector{T} <: Convex.AbstractVariable{T}
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}
-    function TypedVector{T}(d) where {T}
+    function DictVector{T}(d) where {T}
         this = new(:ConstSizeVariable, 0, (d,1))
         this.id_hash = objectid(this)
         Convex.id_to_variables[this.id_hash] = this
@@ -26,34 +26,32 @@ mutable struct TypedVector{T} <: Convex.AbstractVariable
     end
 end
 
-Convex.value(x::TypedVector) = global_cache[x.id_hash][:value]
+Convex.value(x::DictVector) = global_cache[x.id_hash][:value]
 
-Convex.value!(x::TypedVector, v::AbstractArray) = global_cache[x.id_hash][:value] = v
-Convex.value!(x::TypedVector, v::Number) = global_cache[x.id_hash][:value] = v
+Convex.value!(x::DictVector, v::AbstractArray) = global_cache[x.id_hash][:value] = v
+Convex.value!(x::DictVector, v::Number) = global_cache[x.id_hash][:value] = v
 
-Convex.vexity(x::TypedVector) = global_cache[x.id_hash][:vexity]
-Convex.vexity!(x::TypedVector, v::Vexity) = global_cache[x.id_hash][:vexity] = v
+Convex.vexity(x::DictVector) = global_cache[x.id_hash][:vexity]
+Convex.vexity!(x::DictVector, v::Vexity) = global_cache[x.id_hash][:vexity] = v
 
-Convex.sign(x::TypedVector) = global_cache[x.id_hash][:sign]
-Convex.sign!(x::TypedVector, s::Sign) = global_cache[x.id_hash][:sign] = s
+Convex.sign(x::DictVector) = global_cache[x.id_hash][:sign]
+Convex.sign!(x::DictVector, s::Sign) = global_cache[x.id_hash][:sign] = s
 
-Convex.vartype(x::TypedVector) = global_cache[x.id_hash][:vartype]
-Convex.vartype!(x::TypedVector, s::Convex.VarType) = global_cache[x.id_hash][:vartype] = s
+Convex.vartype(x::DictVector) = global_cache[x.id_hash][:vartype]
+Convex.vartype!(x::DictVector, s::Convex.VarType) = global_cache[x.id_hash][:vartype] = s
 
-Convex.constraints(x::TypedVector) = global_cache[x.id_hash][:constraints]
-Convex.add_constraint!(x::TypedVector, s::Constraint) = push!(global_cache[x.id_hash][:constraints], s)
-
-Convex.eltype(x::TypedVector{T}) where {T} = T
+Convex.constraints(x::DictVector) = global_cache[x.id_hash][:constraints]
+Convex.add_constraint!(x::DictVector, s::Constraint) = push!(global_cache[x.id_hash][:constraints], s)
 
 end
 
-import .TypedVectors
+import .DictVectors
 
 @testset "AbstractVariable interface: $solver" for solver in solvers
     # Let us solve a basic problem from `test_affine.jl`
 
-    x = TypedVectors.TypedVector{BigFloat}(1)
-    y = TypedVectors.TypedVector{BigFloat}(1)
+    x = DictVectors.DictVector{BigFloat}(1)
+    y = DictVectors.DictVector{BigFloat}(1)
     p = minimize(x + y, [x >= 3, y >= 2])
     @test vexity(p) == AffineVexity()
     solve!(p, solver)
@@ -75,14 +73,14 @@ end
 module DensityMatricies
 using Convex
 
-mutable struct DensityMatrix <: Convex.AbstractVariable
+mutable struct DensityMatrix{T} <: Convex.AbstractVariable{T}
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}
     value::Convex.ValueOrNothing
     vexity::Vexity
     function DensityMatrix(d)
-        this = new(:DensityMatrix, 0, (d,d), nothing, Convex.AffineVexity())
+        this = new{ComplexF64}(:DensityMatrix, 0, (d,d), nothing, Convex.AffineVexity())
         this.id_hash = objectid(this)
         Convex.id_to_variables[this.id_hash] = this
         this
@@ -91,7 +89,6 @@ end
 Convex.constraints(ρ::DensityMatrix) = [ ρ ⪰ 0, tr(ρ) == 1 ]
 Convex.sign(::DensityMatrix) = Convex.ComplexSign()
 Convex.vartype(::DensityMatrix) = Convex.ContVar
-Convex.eltype(::DensityMatrix) = ComplexF64
 
 end
 

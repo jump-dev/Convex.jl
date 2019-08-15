@@ -20,7 +20,7 @@
             y = Variable()
             vartype!(y, IntVar)
 
-            for x in [ Variable(:Int), Variable(vartype = IntVar), y ]
+            for x in [ Variable(:Int), Variable(IntVar), y ]
                 @test vartype(x) == IntVar
                 p = minimize(x, x>=4.3)
                 @test vexity(p) == AffineVexity()
