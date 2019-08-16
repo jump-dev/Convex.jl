@@ -76,6 +76,9 @@
         @test evaluate(real(x*y)) ≈ 0.25 atol=TOL
         @test real(evaluate(x)) ≈ 0.5 atol=TOL
         @test evaluate(y) ≈ 0.5 atol=TOL
+
+        @test_throws DimensionMismatch fix!(x, rand(2))
+        @test_throws DimensionMismatch fix!(x, rand(2,2))
     end
 
     @testset "fix! with vectors" begin
@@ -95,6 +98,10 @@
         @test evaluate(real(y*sum(x))) ≈ 1.25 atol=TOL
         @test real(evaluate(x)) ≈ 0.5*ones(5) atol=TOL
         @test evaluate(y) ≈ 0.5 atol=TOL
+
+        @test_throws DimensionMismatch fix!(x, rand(5,5))
+        @test_throws DimensionMismatch fix!(x, rand(4))
+
     end
 
 end
