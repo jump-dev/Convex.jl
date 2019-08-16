@@ -116,3 +116,43 @@ import LinearAlgebra
         @test evaluate(ρ) ≈ proj atol = TOL
     end
 end
+
+
+module ProbabilityVectors
+using Convex
+mutable struct ProbabilityVector <: Convex.AbstractVariable{Float64}
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int, Int}
+    value::Convex.ValueOrNothing
+    vexity::Vexity
+    function ProbabilityVector(d)
+        this = new(:ProbabilityVector, 0, (d,1), nothing, Convex.AffineVexity())
+        this.id_hash = objectid(this)
+        Convex.id_to_variables[this.id_hash] = this
+        this
+    end
+end
+Convex.constraints(p::ProbabilityVector) = [ sum(p) == 1 ]
+Convex.sign(::ProbabilityVector) = Convex.Positive()
+Convex.vartype(::ProbabilityVector) = Convex.ContVar
+
+(p::ProbabilityVector)(x) = dot(p, x)
+
+end
+
+using .ProbabilityVectors
+
+@testset "ProbabilityVectors: $solver" for solver in solvers
+    p = ProbabilityVectors.ProbabilityVector(3)
+    x = [1.0, 2.0, 3.0]
+
+    @test p(x) isa AbstractExpr
+    @test sign(p) == Positive()
+    prob = minimize( p(x) )
+    solve!(prob, solver)
+    @test prob.optval ≈ 1.0 atol=TOL
+    @test evaluate(p(x)) ≈ 1.0 atol=TOL
+    @test evaluate(p) ≈ [1.0, 0.0, 0.0] atol=TOL
+
+end
