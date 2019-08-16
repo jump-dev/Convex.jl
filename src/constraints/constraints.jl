@@ -2,7 +2,7 @@ import Base.==, Base.<=, Base.>=, Base.<, Base.>
 export EqConstraint, LtConstraint, GtConstraint
 export ==, <=, >=
 
-const conic_constr_to_constr = Dict{ConicConstr, Constraint}()
+conic_constr_to_constr = Dict{ConicConstr, Constraint}()
 
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint
