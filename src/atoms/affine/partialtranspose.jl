@@ -41,7 +41,11 @@ function evaluate(x::PartialTransposeAtom)
     return partialtranspose( evaluate( x.children[1] ))
 end
 
+"""
+    partialtranspose(x, sys::Int, dims::Vector)
 
+Returns the partial transpose of `x` over the `sys`th system, where `dims` is a vector of integers encoding the dimensions of each subsystem.
+"""
 function partialtranspose(x::AbstractMatrix, sys::Int, dims::Vector) 
     n = length(dims)
     d = prod(dims)
