@@ -78,4 +78,23 @@
         @test evaluate(y) ≈ 0.5 atol=TOL
     end
 
+    @testset "fix! with vectors" begin
+        x = ComplexVariable(5)
+        fix!(x, ones(5) + im*ones(5))
+        y = Variable()
+        prob = minimize( real(y*sum(x)), [ y >= .5, real(x) >= .5, imag(x) >= 0])
+        solve!(prob, solver)
+        @test prob.optval ≈ 2.5 atol=TOL
+        @test evaluate(real(y*sum(x))) ≈ 2.5 atol=TOL
+        @test evaluate(y) ≈ 0.5 atol=TOL
+
+        free!(x)
+        fix!(y)
+        solve!(prob, solver)
+        @test prob.optval ≈ 1.25 atol=TOL
+        @test evaluate(real(y*sum(x))) ≈ 1.25 atol=TOL
+        @test real(evaluate(x)) ≈ 0.5*ones(5) atol=TOL
+        @test evaluate(y) ≈ 0.5 atol=TOL
+    end
+
 end
