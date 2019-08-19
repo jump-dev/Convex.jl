@@ -12,13 +12,13 @@ struct PartialTransposeAtom <: AbstractExpr
 
     function PartialTransposeAtom(x::AbstractExpr, sys::Int, dims::Vector)
         if x.size[1] ≠ x.size[2]
-            error("Only square matrices are supported")
+            throw(ArgumentError("Only square matrices are supported"))
         end
         if ! (1 ≤ sys ≤ length(dims))
-            error("Invalid system, should between 1 and ", length(dims), "; got ", sys)
+            throw(ArgumentError("Invalid system, should between 1 and ", length(dims), "; got ", sys))
         end
         if x.size[1] ≠ prod(dims)
-            error("Dimension of system doesn't correspond to dimension of subsystems")
+            throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))
         end
         children = (x, )
         return new(:partialtranspose, hash(children), children, x.size, sys, dims)    
@@ -47,6 +47,15 @@ end
 Returns the partial transpose of `x` over the `sys`th system, where `dims` is a vector of integers encoding the dimensions of each subsystem.
 """
 function partialtranspose(x::AbstractMatrix, sys::Int, dims::Vector) 
+    if size(x,1) ≠ size(x,2)
+            throw(ArgumentError("Only square matrices are supported"))
+    end
+    if ! (1 ≤ sys ≤ length(dims))
+            throw(ArgumentError("Invalid system, should between 1 and $(length(dims)); got $sys"))
+    end
+    if size(x,1) ≠ prod(dims)
+            throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))
+    end
     n = length(dims)
     d = prod(dims)
     s = n - sys + 1
