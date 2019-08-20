@@ -433,9 +433,9 @@
         Rt2 = ComplexVariable(d,d)
         Rt3 = ComplexVariable(d,d)
         S = rand(ComplexF64,d,d)
-        solve!(satisfy(partialtranspose(Rt1, 1, dims) == S ),SCSSolver(verbose=false))
-        solve!(satisfy(partialtranspose(Rt2, 2, dims) == S ),SCSSolver(verbose=false))
-        solve!(satisfy(partialtranspose(Rt3, 3, dims) == S ),SCSSolver(verbose=false))
+        solve!(satisfy(partialtranspose(Rt1, 1, dims) == S ),solver)
+        solve!(satisfy(partialtranspose(Rt2, 2, dims) == S ),solver)
+        solve!(satisfy(partialtranspose(Rt3, 3, dims) == S ),solver)
 
             
         @test partialtranspose(M,1,dims) ≈ Mt1 atol = TOL
@@ -448,5 +448,18 @@
         @test_throws ArgumentError partialtrace(rand(6, 6), 3, [2, 3])
         @test_throws ArgumentError partialtrace(rand(6, 6), 1, [2, 4])
         @test_throws ArgumentError partialtrace(rand(3, 4), 1, [2, 3])
+    end
+
+    @testset "permuteddims_matrix" begin
+    #this function is used in the partial transpose 
+        for n in (2, 3, 4, 5)
+            dims = ntuple( i -> rand(2:5), n)
+            d = prod(dims)
+            v = rand(d)
+            p = randperm(n)
+            out1 = vec(permutedims(reshape(v, dims), p))
+            out2 = Convex.permutedims_matrix(dims, p) * v
+            @test out1 ≈ out2
+        end
     end
 end

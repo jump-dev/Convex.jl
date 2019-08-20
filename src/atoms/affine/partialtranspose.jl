@@ -64,11 +64,15 @@ function partialtranspose(x::AbstractMatrix, sys::Int, dims::Vector)
     p[n + s] = s
 
     rdims = reverse(dims)
-    r = reshape(x, [rdims;rdims]...)
+    r = reshape(x, (rdims..., rdims...))
     return reshape(permutedims(r,p),(d,d))
 end
 
-
+"""
+    permutedims_matrix(dims, p)
+Returns a matrix `M` so that for any vector `v` of length `prod(dims)`,
+    M*v == vec(permutedims(reshape(v, dims), p))
+"""
 function permutedims_matrix(dims, p)
     d = prod(dims)
     n = length(dims)
@@ -91,7 +95,7 @@ function conic_form!(x::PartialTransposeAtom, unique_conic_forms::UniqueConicFor
 
         rdims = reverse(x.dims)
 
-        partialtranspose_matrix = permutedims_matrix([rdims;rdims],p)
+        partialtranspose_matrix = permutedims_matrix((rdims...,rdims...),p)
 
         objective = partialtranspose_matrix * objective
         cache_conic_form!(unique_conic_forms, x, objective)
