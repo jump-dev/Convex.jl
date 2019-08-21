@@ -74,7 +74,7 @@ function value!(x::AbstractVariable, v::AbstractArray)
     x.value = convert(Array{eltype(x)}, v)
 end
 
-function value!(x::Variable, v::AbstractVector)
+function value!(x::AbstractVariable, v::AbstractVector)
     size(x, 2) == 1 || throw(DimensionMismatch("Cannot set value of a variable of size $(size(x)) to a vector"))
     size(x, 1) == length(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
     x.value = convert(Array{eltype(x)}, v)
@@ -84,7 +84,10 @@ function value!(x::AbstractVariable, v::Number)
     size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
     x.value = convert(eltype(x), v)
 end
+# End of `AbstractVariable` interface
 
+
+# Some helpers for the constructors for `Variable`
 iscomplex(::Type{T}) where {T <: Number} = T != real(T)
 iscomplex(sign::Sign) = sign == ComplexSign()
 
