@@ -417,4 +417,49 @@
             @test all(abs.(p.constraints[1].dual - dual) .<= TOL)
         end
     end
+
+    @testset "Partial transpose" begin
+        dims = [2,3,4]
+        d = prod(dims)
+        A = rand(ComplexF64,2,2)
+        B = rand(ComplexF64,3,3)
+        C = rand(ComplexF64,4,4)
+        M = kron(A,B,C)
+        Mt1 = kron(transpose(A),B,C)
+        Mt2 = kron(A,transpose(B),C)
+        Mt3 = kron(A,B,transpose(C))
+
+        Rt1 = ComplexVariable(d,d)
+        Rt2 = ComplexVariable(d,d)
+        Rt3 = ComplexVariable(d,d)
+        S = rand(ComplexF64,d,d)
+        solve!(satisfy(partialtranspose(Rt1, 1, dims) == S ),solver)
+        solve!(satisfy(partialtranspose(Rt2, 2, dims) == S ),solver)
+        solve!(satisfy(partialtranspose(Rt3, 3, dims) == S ),solver)
+
+            
+        @test partialtranspose(M,1,dims) ≈ Mt1 atol = TOL
+        @test partialtranspose(M,2,dims) ≈ Mt2 atol = TOL
+        @test partialtranspose(M,3,dims) ≈ Mt3 atol = TOL
+        @test partialtranspose(S,1,dims) ≈ evaluate(Rt1) atol = TOL
+        @test partialtranspose(S,2,dims) ≈ evaluate(Rt2) atol = TOL
+        @test partialtranspose(S,3,dims) ≈ evaluate(Rt3) atol = TOL
+
+        @test_throws ArgumentError partialtrace(rand(6, 6), 3, [2, 3])
+        @test_throws ArgumentError partialtrace(rand(6, 6), 1, [2, 4])
+        @test_throws ArgumentError partialtrace(rand(3, 4), 1, [2, 3])
+    end
+
+    @testset "permuteddims_matrix" begin
+    #this function is used in the partial transpose 
+        for n in (2, 3, 4, 5)
+            dims = ntuple( i -> rand(2:5), n)
+            d = prod(dims)
+            v = rand(d)
+            p = randperm(n)
+            out1 = vec(permutedims(reshape(v, dims), p))
+            out2 = Convex.permutedims_matrix(dims, p) * v
+            @test out1 ≈ out2
+        end
+    end
 end
