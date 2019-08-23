@@ -3,7 +3,7 @@ using MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 using SparseArrays
-
+using LinearAlgebra
 TOL = 1e-3
 
 get_solver() = SCS.Optimizer(verbose = 0, eps = 1e-6)
@@ -51,4 +51,27 @@ using LinearAlgebra
     @test evaluate(tr(E12 * s1 + 2 * E12 * s2 + E21 * s2 + 2 * E21 * s1)) ≈ p.optval rtol = 1e-4
     @test evaluate(E12) ≈ [0.146447 -0.353553im; 0.353553im 0.853553] rtol = 1e-4
     @test evaluate(E21) ≈ [0.853553 0.353553im; -0.353553im 0.146447] rtol = 1e-4
+
+    @testset "Complex Semidefinite constraint" begin
+        n = 10
+        A = rand(n,n) + im*rand(n,n)
+        A = A + A' # now A is hermitian
+        x = ComplexVariable(n,n)
+        objective = sumsquares(A - x)
+        c1 = x in :SDP
+        p = minimize(objective, c1)
+        solve!(p, get_solver())
+        # test that X is approximately equal to posA:
+        l,v = eigen(A)
+        posA = v*Diagonal(max.(l,0))*v'
+
+        real_diff = real.(x.value) - real.(posA)
+        imag_diff = imag.(x.value) - imag.(posA)
+        @test real_diff ≈ zeros(n, n) atol=TOL
+        @test imag_diff ≈ zeros(n, n) atol=TOL
+    end
 end
+
+# @testset "fail" begin
+    # @test false
+# end

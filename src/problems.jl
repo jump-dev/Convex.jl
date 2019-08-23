@@ -30,6 +30,7 @@ mutable struct Problem{T<:Real}
     optval::Union{Real,Nothing}
     model::Union{MathProgBase.AbstractConicModel, Nothing}
     solution::Solution
+    MOI_model::MOI.ModelLike
 
     function Problem{T}(head::Symbol, objective::AbstractExpr,
                      model::Union{MathProgBase.AbstractConicModel, Nothing},
