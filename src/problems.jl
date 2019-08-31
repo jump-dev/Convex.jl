@@ -191,11 +191,6 @@ function conic_problem(p::Problem)
     return c, A, b, cones, var_to_ranges, vartypes, constraints
 end
 
-# For the purpose of benchmarking, we define an alias
-# `@time formulate_problem(p::Problem)` should be an
-# estimate for how long it takes Convex to formulate a problem.
-const formulate_problem = conic_problem
-
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
     Problem(head, objective, [constraints...])
 

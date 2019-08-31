@@ -4,6 +4,5 @@
 *.DS_Store
 *.cov
 .ipynb_checkpoints/
-/Manifest.toml
-docs/Manifest.toml
-test/Manifest.toml
+Manifest.toml
+benchmark/*.json

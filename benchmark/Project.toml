@@ -1,6 +1,2 @@
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
-Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
-ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
 PkgBenchmark = "32113eaa-f34f-5b0d-bd6c-c81e245fc73d"
-SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"
