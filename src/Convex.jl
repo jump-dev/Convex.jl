@@ -9,8 +9,11 @@ global DEFAULT_SOLVER = nothing
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
-include("conic_form.jl")
+# need to define `Variable` before `UniqueConicForms`
 include("variable.jl")
+include("conic_form.jl")
+# need to define `conic_form!` for `Variable`s after `UniqueConicForms`
+include("variable_conic_form.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
 include("constraints/signs_and_sets.jl")
@@ -85,8 +88,6 @@ include("utilities/broadcast.jl")
 
 #Temporary workaround for memory leak (https://github.com/JuliaOpt/Convex.jl/issues/83)
 function clearmemory()
-    global id_to_variables
-    empty!(id_to_variables)
     global conic_constr_to_constr 
     empty!(conic_constr_to_constr)
     GC.gc()

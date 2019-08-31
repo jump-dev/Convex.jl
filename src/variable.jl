@@ -19,7 +19,6 @@ mutable struct Variable <: AbstractExpr
     function Variable(size::Tuple{Int, Int}, sign::Sign=NoSign(), sets::Symbol...)
         this = new(:variable, 0, nothing, size, AffineVexity(), sign, Symbol[sets...])
         this.id_hash = objectid(this)
-        id_to_variables[this.id_hash] = this
         return this
     end
 
@@ -53,11 +52,6 @@ function HermitianSemidefinite(m::Integer, n::Integer)
     end
 end
 
-# global map from unique variable ids to variables.
-# the expression tree will only utilize variable ids during construction
-# full information of the variables will be needed during stuffing
-# and after solving to populate the variables with values
-const id_to_variables = Dict{UInt64, Variable}()
 
 function vexity(x::Variable)
     return x.vexity
@@ -84,32 +78,6 @@ function imag_conic_form(x::Variable)
     else
         return spzeros(vec_size, vec_size)
     end
-end
-
-function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
-    if !has_conic_form(unique_conic_forms, x)
-        if vexity(x) == ConstVexity()
-            # do exactly what we would for a constant
-            objective = ConicObj()
-            objective[objectid(:constant)] = (vec([real(x.value);]),vec([imag(x.value);]))
-            cache_conic_form!(unique_conic_forms, x, objective)
-        else
-            objective = ConicObj()
-            vec_size = length(x)
-
-            objective[x.id_hash] = (real_conic_form(x), imag_conic_form(x))
-            objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
-            # placeholder values in unique constraints prevent infinite recursion depth
-            cache_conic_form!(unique_conic_forms, x, objective)
-            if !(x.sign == NoSign() || x.sign == ComplexSign())
-                conic_form!(x.sign, x, unique_conic_forms)
-            end
-            for set in x.sets
-                conic_form!(set, x, unique_conic_forms)
-            end
-        end
-    end
-    return get_conic_form(unique_conic_forms, x)
 end
 
 # fix variables to hold them at their current value, and free them afterwards

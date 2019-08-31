@@ -33,20 +33,20 @@ function solve!(problem::Problem;
         vex = vexity(problem)
     end
 
-    c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
+    c, A, b, cones, var_to_ranges, vartypes, conic_constraints, id_to_variables = conic_problem(problem)
 
     # load MPB conic problem
     m = problem.model
     load_problem!(m, c, A, b, cones, vartypes)
     if warmstart
-        set_warmstart!(m, problem, length(c), var_to_ranges)
+        set_warmstart!(m, problem, length(c), var_to_ranges, id_to_variables)
     end
     # optimize MPB conic problem
     MathProgBase.optimize!(m)
 
     # populate the status, the primal (and possibly dual) solution
     # and the primal (and possibly dual) variables with values
-    populate_solution!(m, problem, var_to_ranges, conic_constraints)
+    populate_solution!(m, problem, var_to_ranges, conic_constraints, id_to_variables)
     if problem.status != :Optimal && verbose
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end
@@ -55,7 +55,8 @@ end
 function set_warmstart!(m::MathProgBase.AbstractConicModel,
                         problem::Problem,
                         n::Int, # length of primal (conic) solution
-                        var_to_ranges)
+                        var_to_ranges,
+                        id_to_variables)
      # use previously cached solution, if any,
      try
          primal = problem.solution.primal
@@ -73,7 +74,7 @@ function set_warmstart!(m::MathProgBase.AbstractConicModel,
      end
 
      # grab any variables whose values the user may be trying to set
-     load_primal_solution!(primal, var_to_ranges)
+     load_primal_solution!(primal, var_to_ranges, id_to_variables)
 
      # notify the model that we're trying to warmstart
      try
@@ -105,7 +106,8 @@ end
 function populate_solution!(m::MathProgBase.AbstractConicModel,
                             problem::Problem,
                             var_to_ranges,
-                            conic_constraints)
+                            conic_constraints,
+                            id_to_variables)
     dual = try
         MathProgBase.getdual(m)
     catch
@@ -130,7 +132,7 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
         problem.solution = Solution(solution, dual, MathProgBase.status(m), objective)
     end
 
-    populate_variables!(problem, var_to_ranges)
+    populate_variables!(problem, var_to_ranges, id_to_variables)
 
     if problem.solution.has_dual
         populate_duals!(conic_constraints, problem.solution.dual)
@@ -148,7 +150,7 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
     problem
 end
 
-function populate_variables!(problem::Problem, var_to_ranges::Dict{UInt64, Tuple{Int, Int}})
+function populate_variables!(problem::Problem, var_to_ranges::Dict{UInt64, Tuple{Int, Int}}, id_to_variables)
     x = problem.solution.primal
     for (id, (start_index, end_index)) in var_to_ranges
         var = id_to_variables[id]
@@ -174,7 +176,7 @@ end
 # TODO: it would be super cool to grab the other expressions that appear in the primal solution vector,
 # get their `expression_to_range`,
 # and populate them too using `evaluate`
-function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UInt64, Tuple{Int, Int}})
+function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UInt64, Tuple{Int, Int}}, id_to_variables)
     for (id, (start_index, end_index)) in var_to_ranges
         var = id_to_variables[id]
         if var.value !== nothing
