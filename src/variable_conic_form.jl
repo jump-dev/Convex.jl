@@ -1,6 +1,6 @@
 function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
     if !has_conic_form(unique_conic_forms, x)
-        cache_conic_form!(unique_conic_forms, x)
+        add_to_id_to_variables!(unique_conic_forms, x)
         if vexity(x) == ConstVexity()
             # do exactly what we would for a constant
             objective = ConicObj()

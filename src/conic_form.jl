@@ -149,6 +149,6 @@ function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, ne
     append!(conic_forms.constr_list, new_conic_forms)
 end
 
-function cache_conic_form!(conic_forms::UniqueConicForms, var::Variable)
+function add_to_id_to_variables!(conic_forms::UniqueConicForms, var::Variable)
     conic_forms.id_to_variables[var.id_hash] = var
 end
