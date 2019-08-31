@@ -56,4 +56,3 @@ end
     p = minimize(objective, c1)
     handle_problem(p)
 end
-
