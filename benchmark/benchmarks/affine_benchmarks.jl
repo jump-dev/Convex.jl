@@ -33,7 +33,8 @@ end
         end,
         let
             x = ComplexVariable(2,2)
-            p = minimize( real( [1.0im, 0.0]' * x * [1.0im, 0.0] ), [ x == [1.0 0.0; 0.0 1.0] ])
+            p = minimize(   real( [1.0im, 0.0]' * x * [1.0im, 0.0] ),
+                    [ x == [1.0 0.0; 0.0 1.0] ] )
         end
     ]
     handle_problem.(probs)
