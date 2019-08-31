@@ -5,3 +5,4 @@
 *.cov
 .ipynb_checkpoints/
 Manifest.toml
+benchmark/*.json
