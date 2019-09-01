@@ -27,6 +27,7 @@ jobs:
               using Pkg; Pkg.instantiate();
               include("benchmark/pprintjudge.jl");'
       after_success: skip
+      if: type = pull_request
     - stage: Documentation
       julia: 1.0
       script: julia --project=docs -e '
