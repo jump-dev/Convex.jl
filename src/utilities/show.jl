@@ -95,13 +95,15 @@ struct ShowProblemConstraints
     constraints::Vector{Constraint}
 end
 
-AbstractTrees.children(p::ShowProblemConstraints) = tuple(p.constraints)
+AbstractTrees.children(p::ShowProblemConstraints) = p.constraints
 AbstractTrees.printnode(io::IO, p::ShowProblemConstraints) = print(io,"subject to")
 
 
 function show(io::IO, p::Problem)
     AbstractTrees.print_tree(io, ShowProblemObjective(p.head, p.objective))
-    AbstractTrees.print_tree(io, ShowProblemConstraints(p.constraints))
+    if !(isempty(p.constraints))
+        AbstractTrees.print_tree(io, ShowProblemConstraints(p.constraints))
+    end
     print(io, "\ncurrent status: $(p.status)")
     if p.status == "solved"
         print(io, " with optimal value of $(round(p.optval, digits=4))")

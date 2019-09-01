@@ -17,7 +17,7 @@ AbstractTrees.children(C::SOCConstraint) = C.children
 AbstractTrees.children(C::SOCElemConstraint) = C.children
 AbstractTrees.children(C::ExpConstraint) = C.children
 
-AbstractTrees.printnode(io::IO, node::AbstractExpr) = summary(io,node)
+AbstractTrees.printnode(io::IO, node::AbstractExpr) = summary(io, node)
 AbstractTrees.printnode(io::IO, node::Constraint) = summary(io, node)
 
 function AbstractTrees.printnode(io::IO, node::Vector{Constraint})
