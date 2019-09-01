@@ -127,6 +127,7 @@ function conic_problem(p::Problem)
     unique_conic_forms = UniqueConicForms()
     objective, objective_var_id = conic_form!(p, unique_conic_forms)
     constraints = unique_conic_forms.constr_list
+    conic_constr_to_constr = unique_conic_forms.conic_constr_to_constr
     id_to_variables = unique_conic_forms.id_to_variables
 
     # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
@@ -190,7 +191,7 @@ function conic_problem(p::Problem)
         c = -c
     end
 
-    return c, A, b, cones, var_to_ranges, vartypes, constraints, id_to_variables
+    return c, A, b, cones, var_to_ranges, vartypes, constraints, id_to_variables, conic_constr_to_constr
 end
 
 Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =

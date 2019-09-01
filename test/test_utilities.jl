@@ -1,18 +1,7 @@
 @testset "Utilities" begin
 
     @testset "clearmemory" begin
-        # solve a problem to populate global
-        x = Variable()
-        p = minimize(-x, [x <= 0])
-        @test vexity(p) == AffineVexity()
-        solve!(p, solvers[1])
-
-        @test !isempty(Convex.conic_constr_to_constr)
-
-        Convex.clearmemory()
-
-        # check it is cleared
-        @test isempty(Convex.conic_constr_to_constr)
+        @test_deprecated Convex.clearmemory()
     end
 
     @testset "ConicObj" for T = [UInt32, UInt64]

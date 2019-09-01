@@ -108,16 +108,17 @@ const UniqueConstrMap = OrderedDict{Tuple{Symbol, UInt64}, Int}
 const UniqueConstrList = Vector{ConicConstr}
 # map variables' hash to the variable itself 
 const IdToVariables = OrderedDict{UInt64, Variable}
-
+const ConicConstrToConstr = Dict{ConicConstr, Constraint}
 # UniqueConicForms caches all the conic forms of expressions we've parsed so far
 struct UniqueConicForms
     exp_map::UniqueExpMap
     constr_map::UniqueConstrMap
     constr_list::UniqueConstrList
     id_to_variables::IdToVariables
+    conic_constr_to_constr::ConicConstrToConstr
 end
 
-UniqueConicForms() = UniqueConicForms(UniqueExpMap(), UniqueConstrMap(), ConicConstr[], IdToVariables())
+UniqueConicForms() = UniqueConicForms(UniqueExpMap(), UniqueConstrMap(), ConicConstr[], IdToVariables(), ConicConstrToConstr())
 
 function has_conic_form(conic_forms::UniqueConicForms, exp::AbstractExpr)
     return haskey(conic_forms.exp_map, (exp.head, exp.id_hash))

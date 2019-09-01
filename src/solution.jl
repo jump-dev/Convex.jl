@@ -33,7 +33,7 @@ function solve!(problem::Problem;
         vex = vexity(problem)
     end
 
-    c, A, b, cones, var_to_ranges, vartypes, conic_constraints, id_to_variables = conic_problem(problem)
+    c, A, b, cones, var_to_ranges, vartypes, conic_constraints, id_to_variables, conic_constr_to_constr = conic_problem(problem)
 
     # load MPB conic problem
     m = problem.model
@@ -46,7 +46,7 @@ function solve!(problem::Problem;
 
     # populate the status, the primal (and possibly dual) solution
     # and the primal (and possibly dual) variables with values
-    populate_solution!(m, problem, var_to_ranges, conic_constraints, id_to_variables)
+    populate_solution!(m, problem, var_to_ranges, conic_constraints, id_to_variables, conic_constr_to_constr)
     if problem.status != :Optimal && verbose
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end
@@ -107,7 +107,8 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
                             problem::Problem,
                             var_to_ranges,
                             conic_constraints,
-                            id_to_variables)
+                            id_to_variables,
+                            conic_constr_to_constr)
     dual = try
         MathProgBase.getdual(m)
     catch
@@ -135,7 +136,7 @@ function populate_solution!(m::MathProgBase.AbstractConicModel,
     populate_variables!(problem, var_to_ranges, id_to_variables)
 
     if problem.solution.has_dual
-        populate_duals!(conic_constraints, problem.solution.dual)
+        populate_duals!(conic_constraints, problem.solution.dual, conic_constr_to_constr)
     end
 
     # minimize -> maximize
@@ -190,7 +191,7 @@ function load_primal_solution!(primal::Array{Float64,1}, var_to_ranges::Dict{UIn
     end
 end
 
-function populate_duals!(constraints::Array{ConicConstr}, dual::Vector)
+function populate_duals!(constraints::Array{ConicConstr}, dual::Vector, conic_constr_to_constr)
     constr_index = 1
     for constraint in constraints
         # conic_constr_to_constr only has keys for conic constraints with a single objective
