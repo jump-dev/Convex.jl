@@ -88,8 +88,7 @@ include("utilities/broadcast.jl")
 
 # Deprecated workaround for memory leak (https://github.com/JuliaOpt/Convex.jl/issues/83)
 function clearmemory()
-    Base.depwarn("Convex.clearmemory() is deprecated, as the memory leak it works around has been closed. See https://github.com/JuliaOpt/Convex.jl/issues/83. Use `GC.gc()` for a literal translation of the remaining functionality.", :clearmemory )
-    GC.gc()
+    Base.depwarn("Convex.clearmemory() is deprecated, as the memory leak it works around has been closed (in https://github.com/JuliaOpt/Convex.jl/pull/322). This function no longer does anything and will be removed in a future Convex.jl release.", :clearmemory )
 end
 
 end
