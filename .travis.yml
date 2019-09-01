@@ -18,11 +18,15 @@ jobs:
         - git fetch origin '+refs/heads/master:refs/remotes/origin/master'
         - git branch master origin/master
         # Run benchmark outside `script` so that it's hidden by default:
-        - julia --project=benchmark benchmark/runjudge.jl'
+        - julia --project=benchmark -e '
+              using Pkg; Pkg.instantiate();
+              include("benchmark/runjudge.jl");'
+
       script:
-        - julia --project=benchmark benchmark/pprintjudge.jl'
+        - julia --project=benchmark -e '
+              using Pkg; Pkg.instantiate();
+              include("benchmark/pprintjudge.jl");'
       after_success: skip
-      if: NOT (branch = master)
     - stage: Documentation
       julia: 1.0
       script: julia --project=docs -e '
