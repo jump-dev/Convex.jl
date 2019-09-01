@@ -1,29 +1,51 @@
 import Base.show, Base.summary
 export show, summary
+import AbstractTrees
 
 
 function Base.summary(io::IO, x::Variable)
-    sgn = sign(x) == ComplexSign() ? " complex " : " "
+    hash_str = string(x.id_hash)
+    hash_str = hash_str[1:nextind(hash_str, 3)]
+    sgn = summary(sign(x))
     cst = vexity(x) == ConstVexity() ? " (fixed)" : ""
+    cst = cst * " (id: " * hash_str * "...)"
     if size(x) == (1,1)
-        if sign(x) == ComplexSign()
-            print(io, "complex variable$(cst)")
-        else
-            print(io, "variable$(cst)")
-        end
+        print(io, "$(sgn) variable$(cst)")
     elseif size(x,2) == 1
-        print(io, "$(size(x,1))-element$(sgn)variable$(cst)")
+        print(io, "$(size(x,1))-element $(sgn) variable$(cst)")
     else
-        print(io, "$(size(x,1))×$(size(x,2))$(sgn)variable$(cst)")
+        print(io, "$(size(x,1))×$(size(x,2)) $(sgn) variable$(cst)")
 
     end
 end
 
+Base.summary(io::IO, ::AffineVexity) = print(io, "affine")
+Base.summary(io::IO, ::ConvexVexity) = print(io, "convex")
+Base.summary(io::IO, ::ConcaveVexity) = print(io, "concave")
+Base.summary(io::IO, ::ConstVexity) = print(io, "constant")
+
+Base.summary(io::IO, ::Positive) = print(io, "positive")
+Base.summary(io::IO, ::Negative) = print(io, "negative")
+Base.summary(io::IO, ::NoSign) = print(io, "real")
+Base.summary(io::IO, ::ComplexSign) = print(io, "complex")
+
+function Base.summary(io::IO, c::Constraint)
+    print(io, "$(c.head) constraint (")
+    summary(io, vexity(c))
+    print(io, ")")
+end
+
+function Base.summary(io::IO, e::AbstractExpr)
+    print(io, "$(e.head) (")
+    summary(io, vexity(e))
+    print(io, "; ")
+    summary(io, sign(e))
+    print(io, ")")
+end
+
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
-function show(io::IO, x::Constant)
-    print(io, "$(x.value)")
-end
+show(io::IO, x::Constant) = print(io, x.value)
 
 # A variable, for example, Variable(3, 4), will be displayed as:
 # Variable of
@@ -40,63 +62,46 @@ function show(io::IO, x::Variable)
     end
 end
 
-# A constraint, for example, square(x) <= 4 will be displayed as:
-# Constraint:
-# <= constraint
-# lhs: ...
-# rhs: ...
-function show(io::IO, c::Constraint)
-    print(io, """Constraint:
-          $(c.head) constraint
-          lhs: $(c.lhs)
-          rhs: $(c.rhs)
-          vexity: $(vexity(c))""")
+struct ShowConstraint
+    constraint::Constraint
 end
 
-# SDP constraints are displayed as:
-# Constraint:
-# sdp constraint
-# expression: ...
-function show(io::IO, c::SDPConstraint)
-    print(io, """Constraint:
-          $(c.head) constraint
-          expression: $(c.child)
-          """)
+AbstractTrees.children(c::ShowConstraint) = AbstractTrees.children(c.constraint)
+AbstractTrees.printnode(io::IO, c::ShowConstraint) = AbstractTrees.printnode(io, c.constraint)
+
+show(io::IO, c::Constraint) = AbstractTrees.print_tree(io, ShowConstraint(c))
+
+
+
+struct ShowExpr
+    expr::AbstractExpr
 end
 
-# An expression, for example, 2 * x, will be displayed as:
-# AbstractExpr with
-# head: *
-# size: (1, 1)
-# sign: NoSign()
-# vexity: AffineVexity()
-function show(io::IO, e::AbstractExpr)
-    print(io, """AbstractExpr with
-          head: $(e.head)
-          size: ($(e.size[1]), $(e.size[2]))
-          sign: $(sign(e))
-          vexity: $(vexity(e))
-          """)
+AbstractTrees.children(c::ShowExpr) = AbstractTrees.children(c.expr)
+AbstractTrees.printnode(io::IO, c::ShowExpr) = AbstractTrees.printnode(io, c.expr)
+
+show(io::IO, c::AbstractExpr) = AbstractTrees.print_tree(io, ShowExpr(c))
+
+
+struct ShowProblemObjective
+    head::Symbol
+    objective::AbstractExpr
 end
 
-# A problem, for example, p = minimize(sum(x) + 3, [x >= 0, x >= 1, x <= 10])
-# will be displayed as follows:
-#
-# Problem: minimize `Expression`
-#        subject to
-#            Constraint: ...
-#            Constraint: ...
-#            Constraint: ...
-#        current status: not yet solved
-#
-# Once it is solved, the current status would look like:
-#        current status: solved with optimal value of 9.0
+AbstractTrees.children(p::ShowProblemObjective) = (p.objective,)
+AbstractTrees.printnode(io::IO, p::ShowProblemObjective) =  print(io,string(p.head))
+
+struct ShowProblemConstraints
+    constraints::Vector{Constraint}
+end
+
+AbstractTrees.children(p::ShowProblemConstraints) = tuple(p.constraints)
+AbstractTrees.printnode(io::IO, p::ShowProblemConstraints) = print(io,"subject to")
+
+
 function show(io::IO, p::Problem)
-    print(io, """Problem:
-          $(p.head) $(p.objective)
-          subject to
-          """)
-    join(io, p.constraints, "\n\t\t")
+    AbstractTrees.print_tree(io, ShowProblemObjective(p.head, p.objective))
+    AbstractTrees.print_tree(io, ShowProblemConstraints(p.constraints))
     print(io, "\ncurrent status: $(p.status)")
     if p.status == "solved"
         print(io, " with optimal value of $(round(p.optval, digits=4))")
