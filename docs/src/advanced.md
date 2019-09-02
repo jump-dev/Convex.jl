@@ -113,11 +113,47 @@ and structures. This is what allows powers the printing of problems, expressions
 and constraints. This can also be used to analyze the structure of a Convex.jl
 problem. For example,
 
-```@repl
+```@repl 1
 using Convex, AbstractTrees
 x = Variable()
 p = maximize( log(x), x >= 1, x <= 3 )
 for leaf in AbstractTrees.Leaves(p)
     println("Here's a leaf: $(summary(leaf))")
+end
+```
+
+We can also iterate over the problem in various orders. The following descriptions
+are taken from the AbstractTrees.jl docstrings, which have more information.
+
+### PostOrderDFS
+
+Iterator to visit the nodes of a tree, guaranteeing that children
+will be visited before their parents.
+
+```@repl 1
+for (i, node) in enumerate(AbstractTrees.PostOrderDFS(p))
+    println("Here's node $i via PostOrderDFS: $(summary(node))")
+end
+```
+
+### PreOrderDFS
+
+Iterator to visit the nodes of a tree, guaranteeing that parents
+will be visited before their children.
+
+```@repl 1
+for (i, node) in enumerate(AbstractTrees.PreOrderDFS(p))
+    println("Here's node $i via PreOrderDFS: $(summary(node))")
+end
+```
+
+### StatelessBFS
+
+Iterator to visit the nodes of a tree, guaranteeing that all nodes of a level
+will be visited before their children.
+
+```@repl 1
+for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
+    println("Here's node $i via StatelessBFS: $(summary(node))")
 end
 ```
