@@ -1,12 +1,8 @@
 import AbstractTrees
 
-function AbstractTrees.children(p::Problem)
-    return (p.objective, p.constraints)
-end
+AbstractTrees.children(p::Problem) = (p.objective, p.constraints)
 
-function AbstractTrees.children(e::AbstractExpr)
-    return e.children
-end
+AbstractTrees.children(e::AbstractExpr) = e.children
 
 AbstractTrees.children(v::Variable) = ()
 AbstractTrees.children(c::Constant) = ()
@@ -28,7 +24,7 @@ function AbstractTrees.printnode(io::IO, node::Vector{Constraint})
     end
 end
 
-AbstractTrees.printnode(io::IO, node::Problem) = print(io,node.head)
+AbstractTrees.printnode(io::IO, node::Problem) = print(io, node.head)
 
 function AbstractTrees.printnode(io::IO, node::Constant)
     if length(node.value) <= 3

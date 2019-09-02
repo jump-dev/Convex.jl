@@ -1,5 +1,54 @@
 @testset "Utilities" begin
 
+    @testset "Show" begin
+        x = Variable()
+        @test sprint(show, x) == raw"""
+        Variable
+        size: (1, 1)
+        sign: real
+        vexity: affine
+        """ * "$(Convex.show_id(x))"
+        fix!(x, 1.0)
+        @test sprint(show, x) == raw"""
+        Variable
+        size: (1, 1)
+        sign: real
+        vexity: constant
+        """ * "$(Convex.show_id(x))" *
+        "\nvalue: 1.0"
+
+        @test sprint(show, 2*x) == raw"""
+        * (constant; real)
+        ├─ 2
+        └─ real variable (fixed) (""" * "$(Convex.show_id(x)))"
+        
+        free!(x)
+        p = maximize( log(x), x >= 1, x <= 3 )
+
+        @test sprint(show, p) == raw"""
+        maximize
+        └─ log (concave; real)
+           └─ real variable (""" *  "$(Convex.show_id(x))" * raw""")
+        subject to
+        ├─ >= constraint (affine)
+        │  ├─ real variable (""" *  "$(Convex.show_id(x))" * raw""")
+        │  └─ 1
+        └─ <= constraint (affine)
+           ├─ real variable (""" *  "$(Convex.show_id(x))" * raw""")
+           └─ 3
+        
+        current status: not yet solved"""
+        
+        x = ComplexVariable(2,3)
+        @test sprint(show, x) == raw"""
+        Variable
+        size: (2, 3)
+        sign: complex
+        vexity: affine
+        """ * "$(Convex.show_id(x))"
+
+    end
+
     @testset "clearmemory" begin
         # solve a problem to populate globals
         x = Variable()
