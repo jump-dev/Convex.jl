@@ -98,3 +98,26 @@ for i=1:10
     free!(x)
 end
 ```
+
+Using the tree structure
+------------------------
+
+A Convex problem is structured as a *tree*, with the *root* being the
+problem object, with branches to the objective and the set of constraints.
+The objective is an `AbstractExpr` which itself is a tree, with each atom
+being a node and having `children` which are other atoms, variables, or
+constants. Convex provides `children` methods from
+[AbstractTrees.jl](https://github.com/Keno/AbstractTrees.jl) so that the
+tree-traversal functions of that package can be used with Convex.jl problems
+and structures. This is what allows powers the printing of problems, expressions,
+and constraints. This can also be used to analyze the structure of a Convex.jl
+problem. For example,
+
+```@repl
+using Convex, AbstractTrees
+x = Variable()
+p = maximize( log(x), x >= 1, x <= 3 )
+for leaf in AbstractTrees.Leaves(p)
+    println("Here's a leaf: $(summary(leaf))")
+end
+```
