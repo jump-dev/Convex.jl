@@ -1,4 +1,4 @@
-import AbstractTrees
+using AbstractTrees: AbstractTrees
 
 AbstractTrees.children(p::Problem) = (p.objective, p.constraints)
 

@@ -79,8 +79,9 @@ include("atoms/exp_cone/relative_entropy.jl")
 include("atoms/exp_+_sdp_cone/logdet.jl")
 
 ### utilities
-include("utilities/show.jl")
+include("utilities/tree_print.jl")
 include("utilities/tree_interface.jl")
+include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("utilities/broadcast.jl")
 

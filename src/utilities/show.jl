@@ -1,6 +1,14 @@
 import Base.show, Base.summary
 export show, summary
-import AbstractTrees
+using AbstractTrees: AbstractTrees
+using .TreePrint
+
+"""
+    const MAXDEPTH = Ref(3)
+
+Controls depth of tree printing globally for Convex.jl
+"""
+const MAXDEPTH = Ref(3)
 
 """
     show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 4)
@@ -104,12 +112,12 @@ end
 """
     print_tree_rstrip(io::IO, x)
 
-Prints the results of `AbstractTrees.print_tree(io, x)`
+Prints the results of `TreePrint.print_tree(io, x)`
 without the final newline. Used for `show` methods which
 invoke `print_tree`.
 """
 function print_tree_rstrip(io::IO, x)
-    str = sprint(AbstractTrees.print_tree, x)
+    str = sprint(TreePrint.print_tree, x, MAXDEPTH[])
     print(io, rstrip(str))
 end
 
@@ -127,7 +135,7 @@ end
 struct ConstraintRoot
     constraint::Constraint
 end
-AbstractTrees.print_tree(io::IO, c::Constraint) = AbstractTrees.print_tree(io, ConstraintRoot(c))
+TreePrint.print_tree(io::IO, c::Constraint, maxdepth = 5) = TreePrint.print_tree(io, ConstraintRoot(c), maxdepth)
 AbstractTrees.children(c::ConstraintRoot) = AbstractTrees.children(c.constraint)
 AbstractTrees.printnode(io::IO, c::ConstraintRoot) = AbstractTrees.printnode(io, c.constraint)
 
@@ -136,7 +144,7 @@ show(io::IO, c::Constraint) = print_tree_rstrip(io, c)
 struct ExprRoot
     expr::AbstractExpr
 end
-AbstractTrees.print_tree(io::IO, e::AbstractExpr) = AbstractTrees.print_tree(io, ExprRoot(e))
+TreePrint.print_tree(io::IO, e::AbstractExpr, maxdepth = 5) = TreePrint.print_tree(io, ExprRoot(e), maxdepth)
 AbstractTrees.children(e::ExprRoot) = AbstractTrees.children(e.expr)
 AbstractTrees.printnode(io::IO, e::ExprRoot) = AbstractTrees.printnode(io, e.expr)
 
@@ -160,15 +168,15 @@ AbstractTrees.children(p::ProblemConstraintsRoot) = p.constraints
 AbstractTrees.printnode(io::IO, p::ProblemConstraintsRoot) = print(io, "subject to")
 
 
-function AbstractTrees.print_tree(io::IO, p::Problem)
-    AbstractTrees.print_tree(io, ProblemObjectiveRoot(p.head, p.objective))
+function TreePrint.print_tree(io::IO, p::Problem, maxdepth = 5)
+    TreePrint.print_tree(io, ProblemObjectiveRoot(p.head, p.objective), maxdepth)
     if !(isempty(p.constraints))
-        AbstractTrees.print_tree(io, ProblemConstraintsRoot(p.constraints))
+        TreePrint.print_tree(io, ProblemConstraintsRoot(p.constraints), maxdepth)
     end
 end
 
 function show(io::IO, p::Problem)
-    AbstractTrees.print_tree(io, p)
+    TreePrint.print_tree(io, p, MAXDEPTH[])
     print(io, "\ncurrent status: $(p.status)")
     if p.status == "solved"
         print(io, " with optimal value of $(round(p.optval, digits=4))")
