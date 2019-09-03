@@ -39,7 +39,8 @@ function curvature(x::LambdaMaxAtom)
 end
 
 function evaluate(x::LambdaMaxAtom)
-    eigvals(evaluate(x.children[1]))[end]
+    #eigvals(evaluate(x.children[1]))[end]
+    sort(eigvals(evaluate(x.children[1])), by = x -> real(x))[end]
 end
 
 lambdamax(x::AbstractExpr) = LambdaMaxAtom(x)
@@ -92,7 +93,8 @@ function curvature(x::LambdaMinAtom)
 end
 
 function evaluate(x::LambdaMinAtom)
-    eigvals(evaluate(x.children[1]))[1]
+    #eigvals(evaluate(x.children[1]))[1]
+    sort(eigvals(evaluate(x.children[1])), by = x -> real(x))[1]
 end
 
 lambdamin(x::AbstractExpr) = LambdaMinAtom(x)
