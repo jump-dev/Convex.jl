@@ -255,7 +255,7 @@
         # Broadcast fusion works
         x = Variable(5, 5)
         a = 2.0 .* x .* ones(Int, 5)
-        @test a isa DotMultiplyAtom
+        @test a isa Convex.DotMultiplyAtom
     end
 
     @testset "reshape atom" begin
