@@ -11,7 +11,7 @@ Controls depth of tree printing globally for Convex.jl
 const MAXDEPTH = Ref(3)
 
 """
-    show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 4)
+    show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3)
 
 Print a truncated version of the objects `id_hash` field.
 
@@ -21,15 +21,14 @@ Print a truncated version of the objects `id_hash` field.
 julia> x = Variable();
 
 julia> Convex.show_id(stdout, x)
-id: 6201...
+id: 163…906
 ```
 """
-show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 4) = print(io, show_id(x))
+show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3) = print(io, show_id(x; digits=digits))
 
-function show_id(x::Union{AbstractExpr, Constraint}; digits = 4)
+function show_id(x::Union{AbstractExpr, Constraint}; digits = 3)
     hash_str = string(x.id_hash)
-    hash_str = hash_str[1:nextind(hash_str, digits-1)]
-    return "id: " * hash_str * "..."
+    return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
 end
 
 """
@@ -42,7 +41,7 @@ Prints a one-line summary of a variable `x` to `io`.
 julia> x = ComplexVariable(3,2);
 
 julia> summary(stdout, x)
-3×2 complex variable (id: 5455...)
+3×2 complex variable (id: 732…737)
 ```
 """
 function Base.summary(io::IO, x::Variable)
@@ -92,7 +91,7 @@ show(io::IO, x::Constant) = print(io, x.value)
 # size: (3, 4)
 # sign: real
 # vexity: affine
-# id: 7385...
+# id: 758…633
 # here, the `id` will change from run to run.
 function show(io::IO, x::Variable)
     print(io, "Variable")
