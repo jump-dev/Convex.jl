@@ -55,7 +55,6 @@ function Base.summary(io::IO, x::Variable)
         print(io, "$(size(x,1))-element $(sgn) variable$(cst)")
     else
         print(io, "$(size(x,1))×$(size(x,2)) $(sgn) variable$(cst)")
-
     end
 end
 
@@ -135,6 +134,7 @@ end
 struct ConstraintRoot
     constraint::Constraint
 end
+
 TreePrint.print_tree(io::IO, c::Constraint, maxdepth = 5) = TreePrint.print_tree(io, ConstraintRoot(c), maxdepth)
 AbstractTrees.children(c::ConstraintRoot) = AbstractTrees.children(c.constraint)
 AbstractTrees.printnode(io::IO, c::ConstraintRoot) = AbstractTrees.printnode(io, c.constraint)
