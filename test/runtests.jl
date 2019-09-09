@@ -8,6 +8,18 @@ using SCS, ECOS, GLPKMathProgInterface
 using Random
 Random.seed!(2)
 
+@testset "ProblemDepot" begin
+    @testset "Problems can run without `solve!`ing if `test==false`" begin
+        Convex.ProblemDepot.foreach_problem() do name, func
+            @testset "$name" begin
+                # We want to check to make sure this does not throw
+                func(Convex.conic_problem, Val(false), 0.0, 0.0, Float64)
+                @test true
+            end
+        end
+    end
+end
+
 @testset "Convex" begin
     include("test_utilities.jl")
 

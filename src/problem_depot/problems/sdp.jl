@@ -1,4 +1,3 @@
-
 # TODO: uncomment vexity checks once SDP on vars/constraints changes vexity of problem
 @add_problem sdp function sdp_sdp_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((2,2), :Semidefinite)
@@ -161,6 +160,7 @@ end
     x = Semidefinite(3)
     p = minimize(sumlargesteigs(x, 2), x >= 1)
     handle_problem!(p)
+
     if test
         @test p.optval ≈ 3 atol=atol rtol=rtol
         @test evaluate(x) ≈ ones(3, 3) atol=atol rtol=rtol
@@ -169,6 +169,7 @@ end
     x = Semidefinite(3)
     p = minimize(sumlargesteigs(x, 2), [x[i,:] >= i for i=1:3]...)
     handle_problem!(p)
+
     if test
         @test p.optval ≈ 8.4853 atol=atol rtol=rtol
     end
@@ -197,7 +198,6 @@ end
         @test p1.optval ≈ p2.optval atol=atol rtol=rtol
     end
 
-    println(p1.optval)
 end
 
 @add_problem sdp function sdp_kron_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
@@ -252,150 +252,143 @@ end
     expr = partialtrace(Constant(A), 1, [2, 3])
     if test
         @test size(expr) == size(evaluate(expr))
-    end
 
-    if test
         @test_throws ArgumentError partialtrace(rand(6, 6), 3, [2, 3])
         @test_throws ArgumentError partialtrace(rand(6, 6), 1, [2, 4])
         @test_throws ArgumentError partialtrace(rand(3, 4), 1, [2, 3])
     end
 end
 
-@add_problem sdp function sdp_Optimization_with_complex_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    @add_problem sdp function sdp_Real_Variables_with_complex_equality_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        n = 10 # variable dimension (parameter)
-        m = 5 # number of constraints (parameter)
-        xo = rand(n)
-        A = randn(m,n) + im*randn(m,n)
-        b = A * xo
-        x = Variable(n)
-        p1 = minimize(sum(x), A*x == b, x>=0)
-        handle_problem!(p1)
-        x1 = x.value
 
-        p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0)
-        handle_problem!(p2)
-        x2 = x.value
-        if test
-            @test x1 == x2
-        end
+@add_problem sdp function sdp_Real_Variables_with_complex_equality_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 10 # variable dimension (parameter)
+    m = 5 # number of constraints (parameter)
+    xo = rand(n)
+    A = randn(m,n) + im*randn(m,n)
+    b = A * xo
+    x = Variable(n)
+    p1 = minimize(sum(x), A*x == b, x>=0)
+    handle_problem!(p1)
+    x1 = x.value
+
+    p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0)
+    handle_problem!(p2)
+    x2 = x.value
+    if test
+        @test x1 == x2
     end
+end
 
-    @add_problem sdp function sdp_Complex_Variable_with_complex_equality_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        n = 10 # variable dimension (parameter)
-        m = 5 # number of constraints (parameter)
-        xo = rand(n)+im*rand(n)
-        A = randn(m,n) + im*randn(m,n)
-        b = A * xo
-        x = ComplexVariable(n)
-        p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0)
-        handle_problem!(p1)
-        x1 = x.value
+@add_problem sdp function sdp_Complex_Variable_with_complex_equality_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 10 # variable dimension (parameter)
+    m = 5 # number of constraints (parameter)
+    xo = rand(n)+im*rand(n)
+    A = randn(m,n) + im*randn(m,n)
+    b = A * xo
+    x = ComplexVariable(n)
+    p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0)
+    handle_problem!(p1)
+    x1 = x.value
 
-        xr = Variable(n)
-        xi = Variable(n)
-        p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0)
-        handle_problem!(p2)
-        #x2 = xr.value + im*xi.value
+    xr = Variable(n)
+    xi = Variable(n)
+    p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0)
+    handle_problem!(p2)
+    #x2 = xr.value + im*xi.value
+
+    if test
         real_diff = real(x1) - xr.value
+        @test real_diff ≈ zeros(10, 1) atol=atol rtol=rtol
 
-        if test
-            @test real_diff ≈ zeros(10, 1) atol=atol rtol=rtol
-        end
         imag_diff = imag(x1) - xi.value
-        if test
-            @test imag_diff ≈ zeros(10, 1) atol=atol rtol=rtol
-        end
-        #@fact x1==x2 --> true
+        @test imag_diff ≈ zeros(10, 1) atol=atol rtol=rtol
     end
+end
 
-    @add_problem sdp function sdp_Issue_198(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        ρ = HermitianSemidefinite(2)
-        constraints = [ρ == [ 1. 0.; 0.  1.]]
-        p = satisfy(constraints)
-        handle_problem!(p)
-        if test
-            @test p.status == :Optimal
-            @test p.solution.primal ≈ [0.; 1.; 0.; 0.; 1.; zeros(4)] atol=atol rtol=rtol
-            @test p.optval ≈ 0 atol=atol rtol=rtol
-        end
+@add_problem sdp function sdp_Issue_198(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    ρ = HermitianSemidefinite(2)
+    constraints = [ρ == [ 1. 0.; 0.  1.]]
+    p = satisfy(constraints)
+    handle_problem!(p)
+    if test
+        @test p.status == :Optimal
+        @test p.solution.primal ≈ [0.; 1.; 0.; 0.; 1.; zeros(4)] atol=atol rtol=rtol
+        @test p.optval ≈ 0 atol=atol rtol=rtol
     end
+end
 
-    @add_problem sdp function sdp_norm2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        a = 2+4im
-        x = ComplexVariable()
-        objective = norm2(a-x)
-        c1 = real(x)>=0
-        p = minimize(objective,c1)
-        handle_problem!(p)
-        if test
-            @test p.optval ≈ 0 atol=atol rtol=rtol
-            @test evaluate(objective) ≈ 0 atol=atol rtol=rtol
-        end
+@add_problem sdp function sdp_norm2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    a = 2+4im
+    x = ComplexVariable()
+    objective = norm2(a-x)
+    c1 = real(x)>=0
+    p = minimize(objective,c1)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 0 atol=atol rtol=rtol
+        @test evaluate(objective) ≈ 0 atol=atol rtol=rtol
+
         real_diff = real(x.value) - real(a)
         imag_diff = imag(x.value) - imag(a)
-        if test
-            @test real_diff ≈ 0 atol=atol rtol=rtol
-            @test imag_diff ≈ 0 atol=atol rtol=rtol
-        end
+        @test real_diff ≈ 0 atol=atol rtol=rtol
+        @test imag_diff ≈ 0 atol=atol rtol=rtol
     end
+end
 
-    @add_problem sdp function sdp_sumsquares_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        a = [2+4im;4+6im]
-        x = ComplexVariable(2)
-        objective = sumsquares(a-x)
-        c1 = real(x)>=0
-        p = minimize(objective,c1)
-        handle_problem!(p)
-        if test
-            @test p.optval ≈ 0 atol=atol rtol=rtol
-            @test evaluate(objective) ≈ zeros(1, 1) atol=atol rtol=rtol
-        end
+@add_problem sdp function sdp_sumsquares_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    a = [2+4im;4+6im]
+    x = ComplexVariable(2)
+    objective = sumsquares(a-x)
+    c1 = real(x)>=0
+    p = minimize(objective,c1)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 0 atol=atol rtol=rtol
+        @test evaluate(objective) ≈ zeros(1, 1) atol=atol rtol=rtol
+
         real_diff = real.(x.value) - real.(a)
         imag_diff = imag.(x.value) - imag.(a)
-        if test
-            @test real_diff ≈ zeros(2, 1) atol=atol rtol=rtol
-            @test imag_diff ≈ zeros(2, 1) atol=atol rtol=rtol
-        end
+        @test real_diff ≈ zeros(2, 1) atol=atol rtol=rtol
+        @test imag_diff ≈ zeros(2, 1) atol=atol rtol=rtol
     end
+end
 
-    @add_problem sdp function sdp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        a = [5-4im]
-        x = ComplexVariable()
-        objective = abs(a-x)
-        c1 = real(x)>=0
-        p = minimize(objective,c1)
-        handle_problem!(p)
-        if test
-            @test p.optval ≈ 0 atol=atol rtol=rtol
-            @test evaluate(objective) ≈ zeros(1) atol=atol rtol=rtol
-        end
+@add_problem sdp function sdp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    a = [5-4im]
+    x = ComplexVariable()
+    objective = abs(a-x)
+    c1 = real(x)>=0
+    p = minimize(objective,c1)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 0 atol=atol rtol=rtol
+        @test evaluate(objective) ≈ zeros(1) atol=atol rtol=rtol
+
         real_diff = real(x.value) .- real(a)
         imag_diff = imag(x.value) .- imag(a)
-        if test
-            @test real_diff ≈ zeros(1) atol=atol rtol=rtol
-            @test imag_diff ≈ zeros(1) atol=atol rtol=rtol
-        end
+        @test real_diff ≈ zeros(1) atol=atol rtol=rtol
+        @test imag_diff ≈ zeros(1) atol=atol rtol=rtol
     end
+end
 
-    @add_problem sdp function sdp_Complex_Semidefinite_constraint(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        n = 10
-        A = rand(n,n) + im*rand(n,n)
-        A = A + A' # now A is hermitian
-        x = ComplexVariable(n,n)
-        objective = sumsquares(A - x)
-        c1 = x in :SDP
-        p = minimize(objective, c1)
-        handle_problem!(p)
-        # test that X is approximately equal to posA:
-        l,v = eigen(A)
-        posA = v*Diagonal(max.(l,0))*v'
+@add_problem sdp function sdp_Complex_Semidefinite_constraint(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 10
+    A = rand(n,n) + im*rand(n,n)
+    A = A + A' # now A is hermitian
+    x = ComplexVariable(n,n)
+    objective = sumsquares(A - x)
+    c1 = x in :SDP
+    p = minimize(objective, c1)
+    handle_problem!(p)
+    # test that X is approximately equal to posA:
+    l,v = eigen(A)
+    posA = v*Diagonal(max.(l,0))*v'
 
+    
+    if test
         real_diff = real.(x.value) - real.(posA)
         imag_diff = imag.(x.value) - imag.(posA)
-        if test
-            @test real_diff ≈ zeros(n, n) atol=atol rtol=rtol
-            @test imag_diff ≈ zeros(n, n) atol=atol rtol=rtol
-        end
+        @test real_diff ≈ zeros(n, n) atol=atol rtol=rtol
+        @test imag_diff ≈ zeros(n, n) atol=atol rtol=rtol
     end
 end

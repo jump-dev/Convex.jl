@@ -1,5 +1,3 @@
-
-
 @add_problem constant function constant_Issue_166(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     # Issue #166
     α = Variable(5)
@@ -86,7 +84,11 @@ end
     end
 
     free!(x)
-    fix!(y)
+    if test
+        fix!(y)
+    else # if we haven't solved the problem, we need to fix! it to a number
+        fix!(y, 0.5)
+    end
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 0.25 atol=atol rtol=rtol
@@ -114,7 +116,12 @@ end
     end
 
     free!(x)
-    fix!(y)
+    if test
+        fix!(y)
+    else # if we haven't solved the problem, we need to fix! it to a number
+        fix!(y, 0.5)
+    end
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 1.25 atol=atol rtol=rtol

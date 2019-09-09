@@ -1,4 +1,3 @@
-
 @add_problem sdp_and_exp function sdp_and_exp_log_det_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 2)
     p = maximize(logdet(x), [x[1, 1] == 1, x[2, 2] == 1])

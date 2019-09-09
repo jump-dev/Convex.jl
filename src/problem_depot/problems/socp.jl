@@ -1,4 +1,3 @@
-
 @add_problem socp function socp_norm_2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
@@ -285,13 +284,14 @@ end
         @test vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
-    # Compute gradient, check it is zero(ish)
-    x_opt = xvar.value
-    margins = A * x_opt - b
-    qs = q / (q - 1);  # Conjugate
-    denom = sum(abs.(margins).^q)^(1/qs)
-    g = x_opt + A' * (abs.(margins).^(q-1) .* sign.(margins)) / denom
+    
     if test
+        # Compute gradient, check it is zero(ish)
+        x_opt = xvar.value
+        margins = A * x_opt - b
+        qs = q / (q - 1);  # Conjugate
+        denom = sum(abs.(margins).^q)^(1/qs)
+        g = x_opt + A' * (abs.(margins).^(q-1) .* sign.(margins)) / denom
         @test p.optval ≈ 1.7227 atol=atol rtol=rtol
         @test norm(g, 2) ^ 2 ≈ 0 atol=atol rtol=rtol
     end
@@ -318,55 +318,55 @@ end
     end
 end
 
-@add_problem socp function socp_Fixed_and_freed_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    @add_problem socp function socp_fix_and_free_addition(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        x = Variable()
-        y = Variable()
 
-        p = minimize(x+y, x>=0, y>=0)
-        handle_problem!(p)
-        if test
-            @test p.optval ≈ 0 atol=atol rtol=rtol
-        end
+@add_problem socp function socp_fix_and_free_addition(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    x = Variable()
+    y = Variable()
 
-        y.value = 4
-        fix!(y)
-        handle_problem!(p)
-        if test
-            @test p.optval ≈ 4 atol=atol rtol=rtol
-        end
-
-        free!(y)
-        handle_problem!(p)
-        if test
-            @test p.optval ≈ 0 atol=atol rtol=rtol
-        end
+    p = minimize(x+y, x>=0, y>=0)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 0 atol=atol rtol=rtol
     end
 
-    @add_problem socp function socp_fix_multiplication(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-        a = [1,2,3,2,1]
-        x = Variable(length(a))
-        gamma = Variable(Positive())
-        fix!(gamma, 0.7)
+    y.value = 4
+    fix!(y)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 4 atol=atol rtol=rtol
+    end
 
-        p = minimize(norm(x-a) + gamma*norm(x[1:end-1] - x[2:end]))
-        handle_problem!(p)
+    free!(y)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 0 atol=atol rtol=rtol
+    end
+end
+
+@add_problem socp function socp_fix_multiplication(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    a = [1,2,3,2,1]
+    x = Variable(length(a))
+    gamma = Variable(Positive())
+    fix!(gamma, 0.7)
+
+    p = minimize(norm(x-a) + gamma*norm(x[1:end-1] - x[2:end]))
+    handle_problem!(p)
+    if test
         o1 = p.optval
         # x should be very close to a
-        if test
-            @test o1 ≈ 0.7 * norm(a[1:end - 1] - a[2:end]) atol=atol rtol=rtol
-        end
-        # increase regularization
-        fix!(gamma, 1.0)
-        handle_problem!(p)
+        @test o1 ≈ 0.7 * norm(a[1:end - 1] - a[2:end]) atol=atol rtol=rtol
+    end
+    # increase regularization
+    fix!(gamma, 1.0)
+    handle_problem!(p)
+    
+    if test
         o2 = p.optval
         # x should be very close to mean(a)
-        if test
-            @test o2 ≈ norm(a .- mean(a)) atol=atol rtol=rtol
-        end
+        @test o2 ≈ norm(a .- mean(a)) atol=atol rtol=rtol
+    end
 
-        if test
-            @test o1 <= o2
-        end
+    if test
+        @test o1 <= o2
     end
 end

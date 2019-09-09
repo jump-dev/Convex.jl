@@ -1,5 +1,3 @@
-
-
 @add_problem affine function affine_negate_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     p = minimize(-x, [x <= 0])
@@ -553,19 +551,19 @@ end
     x = Variable()
     p = minimize(x, x >= 0)
     handle_problem!(p)
-    if p.solution.has_dual
-        println("Solution object has dual value, checking for dual correctness.")
-        if test
-            @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
+    if test
+        if p.solution.has_dual
+            println("Solution object has dual value, checking for dual correctness.")
+                @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
         end
     end
 
     x = Variable()
     p = maximize(x, x <= 0)
     handle_problem!(p)
-    if p.solution.has_dual
+    if test
+        if p.solution.has_dual
         println("Solution object has dual value, checking for dual correctness.")
-        if test
             @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
         end
     end
@@ -573,9 +571,9 @@ end
     x = Variable()
     p = minimize(x, x >= 0, x == 2)
     handle_problem!(p)
-    if p.solution.has_dual
+    if test
+        if p.solution.has_dual
         println("Solution object has dual value, checking for dual correctness.")
-        if test
             @test p.constraints[1].dual ≈ 0 atol=atol rtol=rtol
             @test abs.(p.constraints[2].dual) ≈ 1 atol=atol rtol=rtol
         end
@@ -585,10 +583,10 @@ end
     A = 1.5 * eye(2)
     p = minimize(dot([2.0; 2.0], x), [A * x >= [1.1; 1.1]])
     handle_problem!(p)
-    if p.solution.has_dual
+    if test
+        if p.solution.has_dual
         println("Solution object has dual value, checking for dual correctness.")
         dual = [4/3; 4/3]
-        if test
             @test all(abs.(p.constraints[1].dual - dual) .<= atol)
         end
     end

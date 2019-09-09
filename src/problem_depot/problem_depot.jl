@@ -28,7 +28,7 @@ tolerances for the tests, and a numeric type in which the problem
 should be specified (currently, this is not respected and all
 problems are specified in `Float64` precision).
 
-See also [`run_tests`](@ref) and [`suite`](@ref) for helpers
+See also [`run_tests`](@ref) and [`benchmark_suite`](@ref) for helpers
 to use these problems in testing or benchmarking.
 
 ### Examples
@@ -36,11 +36,9 @@ to use these problems in testing or benchmarking.
 ```julia
 julia> PROBLEMS["affine"]["affine_diag_atom"]
 affine_diag_atom (generic function with 1 method)
-
 ```
 """
 const PROBLEMS = Dict{String, Dict{String, Function}}()
-
 
 """
     run_tests(
@@ -49,13 +47,14 @@ const PROBLEMS = Dict{String, Dict{String, Function}}()
         T=Float64, atol=1e-3, rtol=0.0, 
     )
 
-Run a set of tests benchmarks. `handle_problem!` should be a function that takes one
+Run a set of tests. `handle_problem!` should be a function that takes one
 argument, a Convex.jl `Problem` and processes it (e.g. `solve!` the problem with
 a specific solver).
 
-Use `exclude` to exclude a subset of sets. The test tolerances specified by `atol` and `rtol`.
-Set `T` to choose a numeric type for the problem. Currently this option is not respected
-and all problems are specified Float64` precision.
+Use `exclude` to exclude a subset of sets; automatically excludes `r"benchmark"`.
+The test tolerances specified by `atol` and `rtol`. Set `T` to choose a numeric type
+for the problem. Currently this option is not respected and all problems are specified
+Float64` precision.
 
 ### Examples
 
@@ -66,14 +65,40 @@ end
 ```
 """
 function run_tests(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
+    push!(exclude, r"benchmark")
+    foreach_problem(;exclude=exclude) do name, problem_func
+        @testset "$name" begin
+            problem_func(handle_problem!, Val(true), atol, rtol, T)
+        end
+    end
+end
+
+"""
+    foreach_problem(apply::Function; exclude::Vector{Regex} = Regex[])
+
+For each problem in [`PROBLEMS`](@ref), apply the function `apply`, which
+takes two arguments: the name of the function associated to the problem,
+and the function associated to the problem itself.
+
+### Example
+
+[`run_tests`](@ref) can be implemented just by
+
+```julia
+foreach_problem(;exclude=exclude) do name, problem_func
+    @testset "\$name" begin
+        problem_func(handle_problem!, Val(true), atol, rtol, T)
+    end
+end
+```
+"""
+function foreach_problem(apply::Function; exclude::Vector{Regex} = Regex[])
     for (class, dict) in PROBLEMS
         any(occursin.(exclude, Ref(class))) && continue
         @testset "$class" begin
             for (name, func) in dict
                 any(occursin.(exclude, Ref(name))) && continue
-                @testset "$name" begin
-                    func(handle_problem!, Val(true), atol, rtol, T)
-                end
+                apply(name, func)
             end
         end
     end
@@ -88,7 +113,7 @@ end
         T=Float64, atol=1e-3, rtol=0.0, 
     )
 
-Create a suite of benchmarks. `handle_problem!` should be a function that takes one
+Create a benchmark_suite of benchmarks. `handle_problem!` should be a function that takes one
 argument, a Convex.jl `Problem` and processes it (e.g. `solve!` the problem with
 a specific solver).
 
@@ -100,19 +125,19 @@ specified Float64` precision.
 ### Examples
 
 ```julia
-suite(exclude=[r"mip"]) do p
+benchmark_suite(exclude=[r"mip"]) do p
     solve!(p, SCSSolver(verbose=0))
 end
 ```
 """
-function suite(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
+function benchmark_suite(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
     group = BenchmarkGroup()
     for (class, dict) in ProblemDepot.PROBLEMS
         any(occursin.(exclude, Ref(class))) && continue
-        group[class] = class_group = BenchmarkGroup()
+        group[class] = BenchmarkGroup()
         for (name, func) in dict
             any(occursin.(exclude, Ref(name))) && continue
-                class_group[name] = @benchmarkable $func($handle_problem!, $test, $atol, $rtol, $T)
+            group[class][name] = @benchmarkable $func($handle_problem!, $test, $atol, $rtol, $T)
         end
     end
     return group
