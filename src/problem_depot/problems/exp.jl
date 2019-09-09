@@ -1,4 +1,4 @@
-@add_problem exp function exp_exp_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_exp_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable()
     p = minimize(exp(y), y>=0)
     if test
@@ -43,7 +43,7 @@
     end
 end
 
-@add_problem exp function exp_log_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_log_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable()
     p = maximize(log(y), y<=1)
     if test
@@ -75,7 +75,7 @@ end
     end
 end
 
-@add_problem exp function exp_log_sum_exp_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_log_sum_exp_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5)
     p = minimize(logsumexp(y), y>=1)
     if test
@@ -87,7 +87,7 @@ end
     end
 end
 
-@add_problem exp function exp_logistic_loss_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_logistic_loss_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5)
     p = minimize(logisticloss(y), y>=1)
     if test
@@ -99,7 +99,7 @@ end
     end
 end
 
-@add_problem exp function exp_entropy_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_entropy_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5, Positive())
     p = maximize(entropy(y), sum(y)<=1)
     if test
@@ -111,7 +111,7 @@ end
     end
 end
 
-@add_problem exp function exp_relative_entropy_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_relative_entropy_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(1)
     y = Variable(1)
     # x log (x/y)
@@ -125,7 +125,7 @@ end
     end
 end
 
-@add_problem exp function exp_log_perspective_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem exp function exp_log_perspective_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(1)
     y = Variable(1)
     # y log (x/y)

@@ -1,6 +1,6 @@
 
 
-@add_problem constant function constant_Issue_166(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem constant function constant_Issue_166(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     # Issue #166
     α = Variable(5)
     fix!(α, ones(5,1))
@@ -20,7 +20,7 @@
     end
 end
 
-@add_problem constant function constant_Issue_228(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem constant function constant_Issue_228(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2)
     y = Variable(2)
     fix!(x, [1 1]')
@@ -37,7 +37,7 @@ end
     end
 end
 
-@add_problem constant function constant_Test_double_fix!(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem constant function constant_Test_double_fix!(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     y = Variable()
     fix!(x, 1.0)
@@ -61,7 +61,7 @@ end
     end
 end
 
-@add_problem constant function constant_fix!_and_multiply(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem constant function constant_fix!_and_multiply(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     p = Variable()
     fix!(p, 1.0)
     x = Variable(2,2)
@@ -73,7 +73,7 @@ end
     end
 end
 
-@add_problem constant function constant_fix!_with_complex_numbers(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem constant function constant_fix!_with_complex_numbers(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = ComplexVariable()
     fix!(x, 1.0 + im*1.0)
     y = Variable()
@@ -101,7 +101,7 @@ end
     end
 end
 
-@add_problem constant function constant_fix!_with_vectors(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem constant function constant_fix!_with_vectors(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = ComplexVariable(5)
     fix!(x, ones(5) + im*ones(5))
     y = Variable()

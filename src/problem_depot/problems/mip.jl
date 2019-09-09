@@ -1,4 +1,4 @@
-@add_problem mip function mip_lp_fallback_interface(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem mip function mip_lp_fallback_interface(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     p = minimize(x, x>=4.3)
     if test
@@ -20,7 +20,7 @@
     end
 end
 
-@add_problem mip function mip_integer_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem mip function mip_integer_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(:Int)
     p = minimize(x, x>=4.3)
     if test
@@ -83,7 +83,7 @@ end
     end
 end
 
-@add_problem mip function mip_binary_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem mip function mip_binary_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, :Bin)
     p = minimize(sum(x), x>=.5)
     if test

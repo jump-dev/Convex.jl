@@ -57,7 +57,7 @@ function replace_function_names(str, prefix)
         name = replace(name, " " => "_")
         name = replace(name, "#" => "")
         name = replace(name, "`" => "")
-        output = "@add_problem $prefix function $(prefix)_$(name)(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}"
+        output = "@add_problem $prefix function $(prefix)_$(name)(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}"
     end
 end
 

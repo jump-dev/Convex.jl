@@ -1,56 +1,31 @@
-using Convex: solve!
-using Convex.ProblemDepot: run_test
-using SCS, Test
-@testset "SCS" begin
-    run_test(; exclude=[r"mip"]) do p
-        solve!(p, SCSSolver(verbose=0, eps=1e-6))
-    end
-end
-
 using Convex
-using Convex: DotMultiplyAtom
+using Convex.ProblemDepot: run_test
 using Test
-using ECOS
-using SCS
-using GLPKMathProgInterface
-using Random
+using SCS, ECOS, GLPKMathProgInterface
 
-import LinearAlgebra.eigen
-import LinearAlgebra.I
-import LinearAlgebra.opnorm
-import Random.shuffle
-import Statistics.mean
-
-TOL = 1e-3
-eye(n) = Matrix(1.0I, n, n)
 
 # Seed random number stream to improve test reliability
+using Random
 Random.seed!(2)
 
-solvers = Any[]
-
-push!(solvers, ECOSSolver(verbose=0))
-push!(solvers, GLPKSolverMIP())
-push!(solvers, SCSSolver(verbose=0, eps=1e-6))
-
-hp = p -> solve!(p, SCSSolver(verbose=0, eps=1e-6))
-# If Gurobi is installed, uncomment to test with it:
-#using Gurobi
-#push!(solvers, GurobiSolver(OutputFlag=0))
-
-# If Mosek is installed, uncomment to test with it:
-#using Mosek
-#push!(solvers, MosekSolver(LOG=0))
-
-Convex.ProblemDepot.do_test
 @testset "Convex" begin
     include("test_utilities.jl")
-    include("test_const.jl")
-    include("test_affine.jl")
-    include("test_lp.jl")
-    include("test_socp.jl")
-    include("test_sdp.jl")
-    include("test_exp.jl")
-    include("test_sdp_and_exp.jl")
-    include("test_mip.jl")
+
+    @testset "SCS" begin
+        run_test(; exclude=[r"mip"]) do p
+            solve!(p, SCSSolver(verbose=0, eps=1e-6))
+        end
+    end
+
+    @testset "ECOS" begin
+        run_test(; exclude=[r"mip", r"sdp"]) do p
+            solve!(p, ECOSSolver(verbose=0))
+        end
+    end
+
+    @testset "GLPK MIP" begin
+        run_test(; exclude=[r"socp", r"sdp", r"exp"]) do p
+            solve!(p, GLPKSolverMIP())
+        end
+end
 end

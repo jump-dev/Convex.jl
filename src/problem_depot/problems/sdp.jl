@@ -1,6 +1,6 @@
 
 # TODO: uncomment vexity checks once SDP on vars/constraints changes vexity of problem
-@add_problem sdp function sdp_sdp_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_sdp_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((2,2), :Semidefinite)
     p = minimize(y[1,1])
     # @fact vexity(p) --> ConvexVexity()
@@ -52,7 +52,7 @@
     end
 end
 
-@add_problem sdp function sdp_sdp_constraints(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_sdp_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     # This test fails on Mosek
     x = Variable(Positive())
     y = Variable((3, 3))
@@ -64,7 +64,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_nuclear_norm_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_nuclear_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
     p = minimize(nuclearnorm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2)
     if test
@@ -77,7 +77,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_operator_norm_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_operator_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((3,3))
     p = minimize(opnorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
     if test
@@ -90,7 +90,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_sigma_max_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_sigma_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((3,3))
     p = minimize(sigmamax(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
     if test
@@ -103,7 +103,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_lambda_max_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_lambda_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
     p = minimize(lambdamax(y), y[1,1]>=4)
     if test
@@ -116,7 +116,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_lambda_min_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_lambda_min_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
     p = maximize(lambdamin(y), tr(y)<=6)
     if test
@@ -129,7 +129,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_matrix_frac_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_matrix_frac_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = [1, 2, 3]
     P = Variable(3, 3)
     p = minimize(matrixfrac(x, P), P <= 2*eye(3), P >= 0.5 * eye(3))
@@ -143,7 +143,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_matrix_frac_atom_both_arguments_variable(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_matrix_frac_atom_both_arguments_variable(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     P = Variable(3, 3)
     p = minimize(matrixfrac(x, P), lambdamax(P) <= 2, x[1] >= 1)
@@ -157,7 +157,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_sum_largest_eigs(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_sum_largest_eigs(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Semidefinite(3)
     p = minimize(sumlargesteigs(x, 2), x >= 1)
     handle_problem!(p)
@@ -200,7 +200,7 @@ end
     println(p1.optval)
 end
 
-@add_problem sdp function sdp_kron_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_kron_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     id = eye(4)
     X = Semidefinite(4)
     W = kron(id, X)
@@ -214,7 +214,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_Partial_trace(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_Partial_trace(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     A = Semidefinite(2)
     B = [1 0; 0 0]
     ρ = kron(B, A)
@@ -261,8 +261,8 @@ end
     end
 end
 
-@add_problem sdp function sdp_Optimization_with_complex_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
-    @add_problem sdp function sdp_Real_Variables_with_complex_equality_constraints(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem sdp function sdp_Optimization_with_complex_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    @add_problem sdp function sdp_Real_Variables_with_complex_equality_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         n = 10 # variable dimension (parameter)
         m = 5 # number of constraints (parameter)
         xo = rand(n)
@@ -281,7 +281,7 @@ end
         end
     end
 
-    @add_problem sdp function sdp_Complex_Variable_with_complex_equality_constraints(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem sdp function sdp_Complex_Variable_with_complex_equality_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         n = 10 # variable dimension (parameter)
         m = 5 # number of constraints (parameter)
         xo = rand(n)+im*rand(n)
@@ -309,7 +309,7 @@ end
         #@fact x1==x2 --> true
     end
 
-    @add_problem sdp function sdp_Issue_198(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem sdp function sdp_Issue_198(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         ρ = HermitianSemidefinite(2)
         constraints = [ρ == [ 1. 0.; 0.  1.]]
         p = satisfy(constraints)
@@ -321,7 +321,7 @@ end
         end
     end
 
-    @add_problem sdp function sdp_norm2_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem sdp function sdp_norm2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         a = 2+4im
         x = ComplexVariable()
         objective = norm2(a-x)
@@ -340,7 +340,7 @@ end
         end
     end
 
-    @add_problem sdp function sdp_sumsquares_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem sdp function sdp_sumsquares_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         a = [2+4im;4+6im]
         x = ComplexVariable(2)
         objective = sumsquares(a-x)
@@ -359,7 +359,7 @@ end
         end
     end
 
-    @add_problem sdp function sdp_abs_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem sdp function sdp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         a = [5-4im]
         x = ComplexVariable()
         objective = abs(a-x)
@@ -378,7 +378,7 @@ end
         end
     end
 
-    @add_problem sdp function sdp_Complex_Semidefinite_constraint(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem sdp function sdp_Complex_Semidefinite_constraint(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         n = 10
         A = rand(n,n) + im*rand(n,n)
         A = A + A' # now A is hermitian

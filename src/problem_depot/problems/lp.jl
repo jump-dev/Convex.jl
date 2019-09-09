@@ -1,4 +1,4 @@
-@add_problem lp function lp_abs_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     p = minimize(abs(x), x<=-1)
     if test
@@ -22,7 +22,7 @@
     end
 end
 
-@add_problem lp function lp_maximum_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_maximum_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(10)
     a = shuffle(collect(0.1:0.1:1.0))
     p = minimize(maximum(x), x >= a)
@@ -36,7 +36,7 @@ end
     end
 end
 
-@add_problem lp function lp_minimum_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_minimum_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(1)
     a = reshape(shuffle(collect(0.01:0.01:1.0)), (10, 10))
     p = maximize(minimum(x), x <= a)
@@ -67,7 +67,7 @@ end
     end
 end
 
-@add_problem lp function lp_max_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(10, 10)
     y = Variable(10, 10)
     a = reshape(shuffle(collect(0.01:0.01:1.0)), (10, 10))
@@ -85,7 +85,7 @@ end
     end
 end
 
-@add_problem lp function lp_min_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_min_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(10, 10)
     y = Variable(10, 10)
     a = reshape(shuffle(collect(0.01:0.01:1.0)), (10, 10))
@@ -103,7 +103,7 @@ end
     end
 end
 
-@add_problem lp function lp_pos_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_pos_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     a = [-2; 1; 2]
     p = minimize(sum(pos(x)), [x >= a, x <= 2])
@@ -117,7 +117,7 @@ end
     end
 end
 
-@add_problem lp function lp_neg_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_neg_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     p = minimize(1, [x >= -2, x <= -2, neg(x) <= 3])
     if test
@@ -130,7 +130,7 @@ end
     end
 end
 
-@add_problem lp function lp_sumlargest_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_sumlargest_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2)
     p = minimize(sumlargest(x, 2), x >= [1; 1])
     if test
@@ -154,7 +154,7 @@ end
     end
 end
 
-@add_problem lp function lp_sumsmallest_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_sumsmallest_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(4, 4)
     p = minimize(sumlargest(x, 2), sumsmallest(x, 4) >= 1)
     if test
@@ -178,7 +178,7 @@ end
     end
 end
 
-@add_problem lp function lp_dotsort_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_dotsort_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(4, 1)
     p = minimize(dotsort(x, [1, 2, 3, 4]), sum(x) >= 7, x >= 0, x <= 2, x[4] <= 1)
     if test
@@ -203,11 +203,11 @@ end
     end
 end
 
-@add_problem lp function lp_hinge_loss_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_hinge_loss_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     # TODO: @davidlizeng. We should finish this someday.
 end
 
-@add_problem lp function lp_norm_inf_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_norm_inf_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     p = minimize(norm_inf(x), [-2 <= x, x <= 1])
     if test
@@ -220,7 +220,7 @@ end
     end
 end
 
-@add_problem lp function lp_norm_1_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem lp function lp_norm_1_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     p = minimize(norm_1(x), [-2 <= x, x <= 1])
     if test

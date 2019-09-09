@@ -1,5 +1,5 @@
 
-@add_problem socp function socp_norm_2_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_norm_2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
@@ -55,7 +55,7 @@
     end
 end
 
-@add_problem socp function socp_frobenius_norm_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_frobenius_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     m = Variable(4, 5)
     c = [m[3, 3] == 4, m >= 1]
     p = minimize(norm(vec(m), 2), c)
@@ -69,7 +69,7 @@ end
     end
 end
 
-@add_problem socp function socp_quad_over_lin_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_quad_over_lin_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3, 1)
     A = [2 -3 5; -2 9 -3; 5 -8 3]
     b = [-3; 9; 5]
@@ -86,7 +86,7 @@ end
     end
 end
 
-@add_problem socp function socp_sum_squares_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_sum_squares_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
@@ -101,7 +101,7 @@ end
     end
 end
 
-@add_problem socp function socp_square_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_square_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
@@ -140,7 +140,7 @@ end
     end
 end
 
-@add_problem socp function socp_inv_pos_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_inv_pos_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(4)
     p = minimize(sum(invpos(x)), invpos(x) < 2, x > 1, x == 2, 2 == x)
     if test
@@ -171,7 +171,7 @@ end
     end
 end
 
-@add_problem socp function socp_geo_mean_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_geo_mean_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2)
     y = Variable(2)
     p = minimize(geomean(x, y), x >= 1, y >= 2)
@@ -193,12 +193,12 @@ end
     end
 end
 
-@add_problem socp function socp_sqrt_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_sqrt_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     p = maximize(sqrt(x), 1 >= x)
 end
 
-@add_problem socp function socp_quad_form_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_quad_form_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3, 1)
     A = [0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
     p = minimize(quadform(x, A), [x >= 1])
@@ -225,7 +225,7 @@ end
     end
 end
 
-@add_problem socp function socp_huber_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_huber_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     p = minimize(sum(huber(x, 1)), x >= 2)
     if test
@@ -238,7 +238,7 @@ end
     end
 end
 
-@add_problem socp function socp_rational_norm_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_rational_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     A = [1 2 3; -1 2 3]
     b = A * ones(3)
     x = Variable(3)
@@ -254,7 +254,7 @@ end
     end
 end
 
-@add_problem socp function socp_rational_norm_dual_norm(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_rational_norm_dual_norm(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     v = [0.463339, 0.0216084, -2.07914, 0.99581, 0.889391]
     x = Variable(5)
     q = 1.379;  # q norm constraint that generates many inequalities
@@ -273,7 +273,7 @@ end
     end
 end
 
-@add_problem socp function socp_rational_norm_atom_sum(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_rational_norm_atom_sum(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     A = [-0.719255  -0.229089
         -1.33632   -1.37121
         0.703447  -1.4482]
@@ -297,7 +297,7 @@ end
     end
 end
 
-@add_problem socp function socp_norm_consistent_with_Base_for_matrix_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_norm_consistent_with_Base_for_matrix_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     A = randn(4, 4)
     x = Variable(4, 4)
     x.value = A
@@ -318,8 +318,8 @@ end
     end
 end
 
-@add_problem socp function socp_Fixed_and_freed_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
-    @add_problem socp function socp_fix_and_free_addition(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem socp function socp_Fixed_and_freed_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    @add_problem socp function socp_fix_and_free_addition(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         x = Variable()
         y = Variable()
 
@@ -343,7 +343,7 @@ end
         end
     end
 
-    @add_problem socp function socp_fix_multiplication(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+    @add_problem socp function socp_fix_multiplication(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
         a = [1,2,3,2,1]
         x = Variable(length(a))
         gamma = Variable(Positive())
