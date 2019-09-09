@@ -28,7 +28,7 @@ tolerances for the tests, and a numeric type in which the problem
 should be specified (currently, this is not respected and all
 problems are specified in `Float64` precision).
 
-See also [`run_test`](@ref) and [`suite`](@ref) for helpers
+See also [`run_tests`](@ref) and [`suite`](@ref) for helpers
 to use these problems in testing or benchmarking.
 
 ### Examples
@@ -43,7 +43,7 @@ const PROBLEMS = Dict{String, Dict{String, Function}}()
 
 
 """
-    run_test(
+    run_tests(
         handle_problem!::Function;
         exclude::Vector{Regex} = Regex[],
         T=Float64, atol=1e-3, rtol=0.0, 
@@ -60,12 +60,12 @@ and all problems are specified Float64` precision.
 ### Examples
 
 ```julia
-run_test(exclude=[r"mip"]) do p
+run_tests(exclude=[r"mip"]) do p
     solve!(p, SCSSolver(verbose=0))
 end
 ```
 """
-function run_test(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
+function run_tests(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
     for (class, dict) in PROBLEMS
         any(occursin.(exclude, Ref(class))) && continue
         @testset "$class" begin
