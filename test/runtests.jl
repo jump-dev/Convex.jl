@@ -39,5 +39,5 @@ end
         run_tests(; exclude=[r"socp", r"sdp", r"exp"]) do p
             solve!(p, GLPKSolverMIP())
         end
-end
+    end
 end
