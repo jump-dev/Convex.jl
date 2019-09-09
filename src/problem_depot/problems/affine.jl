@@ -1,6 +1,6 @@
 
 
-@add_problem affine function negate_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_negate_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable()
     p = minimize(-x, [x <= 0])
     if test
@@ -13,7 +13,7 @@
     end
 end
 
-@add_problem affine function kron_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_kron_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = ComplexVariable(3, 3)
     y = [1.0 2.0; 3.0 4.0]
     if test
@@ -22,7 +22,7 @@ end
     end
 end
 
-@add_problem affine function multiply_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_multiply_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(1)
     p = minimize(2.0 * x, [x >= 2, x <= 4])
     if test
@@ -80,7 +80,7 @@ end
     end
 end
 
-@add_problem affine function dot_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_dot_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2)
     p = minimize(dot([2.0; 2.0], x), x >= [1.1; 1.1])
     if test
@@ -93,7 +93,7 @@ end
     end
 end
 
-@add_problem affine function dot_atom_for_matrix_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_dot_atom_for_matrix_variables(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2,2)
     p = minimize(dot(fill(2.0, (2,2)), x), x >= 1.1)
     if test
@@ -106,7 +106,7 @@ end
     end
 end
 
-@add_problem affine function add_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_add_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(1)
     y = Variable(1)
     p = minimize(x + y, [x >= 3, y >= 2])
@@ -142,7 +142,7 @@ end
     end
 end
 
-@add_problem affine function transpose_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_transpose_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2)
     c = ones(2, 1)
     p = minimize(x' * c, x >= 1)
@@ -187,7 +187,7 @@ end
     end
 end
 
-@add_problem affine function index_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_index_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2)
     p = minimize(x[1] + x[2], [x >= 1])
     if test
@@ -229,7 +229,7 @@ end
     end
 end
 
-@add_problem affine function sum_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_sum_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2,2)
     p = minimize(sum(x), x>=1)
     if test
@@ -265,7 +265,7 @@ end
     end
 end
 
-@add_problem affine function diag_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_diag_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2,2)
     p = minimize(sum(diag(x,1)), x >= 1)
     if test
@@ -289,7 +289,7 @@ end
     end
 end
 
-@add_problem affine function trace_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_trace_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2,2)
     p = minimize(tr(x), x >= 1)
     if test
@@ -302,7 +302,7 @@ end
     end
 end
 
-@add_problem affine function dot_multiply_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_dot_multiply_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(3)
     p = maximize(sum(dot(*)(x,[1,2,3])), x<=1)
     if test
@@ -377,7 +377,7 @@ end
     end
 end
 
-@add_problem affine function reshape_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_reshape_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     A = rand(2, 3)
     X = Variable(3, 2)
     c = rand()
@@ -418,7 +418,7 @@ end
     end
 end
 
-@add_problem affine function hcat_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_hcat_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(4, 4)
     y = Variable(4, 6)
     p = maximize(sum(x) + sum([y fill(4.0, 4)]), [x y fill(2.0, (4, 2))] <= 2)
@@ -433,7 +433,7 @@ end
     end
 end
 
-@add_problem affine function vcat_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_vcat_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(4, 4)
     y = Variable(4, 6)
 
@@ -451,7 +451,7 @@ end
     end
 end
 
-@add_problem affine function Diagonal_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_Diagonal_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(2, 2)
     if test
         @test_throws ArgumentError Diagonal(x)
@@ -488,7 +488,7 @@ end
     end
 end
 
-@add_problem affine function conv_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_conv_atom(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable(3)
     h = [1, -1]
     p = minimize(sum(conv(h, x)) + sum(x), x >= 1, x <= 2)
@@ -515,7 +515,7 @@ end
 
 end
 
-@add_problem affine function satisfy_problems(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_satisfy_problems(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable()
     p = satisfy(x >= 0)
     add_constraints!(p, x >= 1)
@@ -549,7 +549,7 @@ end
     end
 end
 
-@add_problem affine function dual(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_dual(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     x = Variable()
     p = minimize(x, x >= 0)
     handle_problem!(p)
@@ -594,7 +594,7 @@ end
     end
 end
 
-@add_problem affine function Partial_transpose(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_Partial_transpose(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
     dims = [2,3,4]
     d = prod(dims)
     A = rand(ComplexF64,2,2)
@@ -630,7 +630,7 @@ end
     end
 end
 
-@add_problem affine function permuteddims_matrix(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}
+@add_problem affine function affine_permuteddims_matrix(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}
 #this function is used in the partial transpose 
     for n in (2, 3, 4, 5)
         dims = ntuple( i -> rand(2:5), n)

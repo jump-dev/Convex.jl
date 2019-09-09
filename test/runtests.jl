@@ -1,3 +1,12 @@
+using Convex: solve!
+using Convex.ProblemDepot: run_test
+using SCS, Test
+@testset "SCS" begin
+    run_test(; exclude=[r"mip"]) do p
+        solve!(p, SCSSolver(verbose=0, eps=1e-6))
+    end
+end
+
 using Convex
 using Convex: DotMultiplyAtom
 using Test
@@ -24,6 +33,7 @@ push!(solvers, ECOSSolver(verbose=0))
 push!(solvers, GLPKSolverMIP())
 push!(solvers, SCSSolver(verbose=0, eps=1e-6))
 
+hp = p -> solve!(p, SCSSolver(verbose=0, eps=1e-6))
 # If Gurobi is installed, uncomment to test with it:
 #using Gurobi
 #push!(solvers, GurobiSolver(OutputFlag=0))
@@ -32,6 +42,7 @@ push!(solvers, SCSSolver(verbose=0, eps=1e-6))
 #using Mosek
 #push!(solvers, MosekSolver(LOG=0))
 
+Convex.ProblemDepot.do_test
 @testset "Convex" begin
     include("test_utilities.jl")
     include("test_const.jl")

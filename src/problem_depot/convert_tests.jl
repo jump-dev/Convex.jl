@@ -16,7 +16,7 @@ function convert_test(file, prefix)
     file_contents = process_problems(file_contents)
     file_contents = replace(file_contents, "TOL" => "atol")
 
-    open("$(prefix).jl", "w") do io
+    open(joinpath("problems", "$(prefix).jl"), "w") do io
         write(io, file_contents)
     end
 end
@@ -31,6 +31,9 @@ function special_cases(file_contents)
         if strip(line) == "@test solve!(p, solver) === nothing"
             space = get_indent(line)
             return space * "output = solve!(p, solver)\n" * space * "@test output === nothing"
+        elseif strip(line) == "@test_throws Exception solve!(p, solver)"
+            space = get_indent(line)
+            return space * "@test_throws Exception handle_problem!(p)"
         else
             return line
         end
@@ -50,8 +53,11 @@ end
 
 function replace_function_names(str, prefix)
     replace_matched(str, r"""@testset "(.*)" begin""") do m
-        name = replace(m.captures[], " " => "_")
-        output = "@add_problem $prefix function $(name)(handle_problem!, valtest::Val{test} = Val(false), atol=1e-4, rtol=0.0, typ::Type{T} = Float64) where {T, test}"
+        name = m.captures[]
+        name = replace(name, " " => "_")
+        name = replace(name, "#" => "")
+        name = replace(name, "`" => "")
+        output = "@add_problem $prefix function $(prefix)_$(name)(handle_problem!, valtest::Val{test} = Val(false), atol=1e-3, rtol=0.0, typ::Type{T} = Float64) where {T, test}"
     end
 end
 
@@ -102,4 +108,13 @@ function process_problem_line(line)
     end
 end
 
-# update_test("test_affine.jl", "affine")
+for f in readdir("tests")
+    if startswith(f, "test_")
+        m = match(r"test_(.*)\.jl", f)
+        prefix = m.captures[1]
+        if prefix == "const"
+            prefix = "constant"
+        end
+        convert_test(joinpath("tests", f), string(prefix))
+    end
+end

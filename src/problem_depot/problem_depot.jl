@@ -1,9 +1,16 @@
 # Some code in `src/problem_depot` was modified from MathOptInterface
 # which is available under an MIT license (see LICENSE).
 module ProblemDepot
-using Convex
-using Random: randperm
 using BenchmarkTools, Test
+
+using Convex
+
+using Random
+import LinearAlgebra.eigen
+import LinearAlgebra.I
+import LinearAlgebra.opnorm
+import Random.shuffle
+import Statistics.mean
 using LinearAlgebra
 
 const PROBLEMS = Dict{String, Dict{String, Function}}()
@@ -41,7 +48,7 @@ function suite(handle_problem!::Function, args...; exclude::Vector{Regex} = Rege
 end
 
 
-function do_test(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-4, rtol=0.0, test = Val(true))
+function run_test(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-4, rtol=0.0, test = Val(true))
     for (class, dict) in PROBLEMS
         any(occursin.(exclude, Ref(class))) && continue
         @testset "$class" begin
@@ -83,7 +90,12 @@ eye(n, T) = Matrix{T}(I, n, n)
 eye(n) = Matrix{Float64}(I, n, n)
 
 include("problems/affine.jl")
-
-
+include("problems/constant.jl")
+include("problems/exp.jl")
+include("problems/lp.jl")
+include("problems/mip.jl")
+include("problems/sdp_and_exp.jl")
+include("problems/sdp.jl")
+include("problems/socp.jl")
 
 end
