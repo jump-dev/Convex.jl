@@ -54,7 +54,7 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms=UniqueCon
                     if id == objectid(:constant)
                         variable_to_sizes[id] = 1
                     else
-                        variable_to_sizes[id] = length(id_to_variables[id])
+                        variable_to_sizes[id] = length(unique_conic_forms.id_to_variables[id])
                     end
                 end
             end

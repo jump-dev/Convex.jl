@@ -2,8 +2,6 @@ import Base.==, Base.<=, Base.>=, Base.<, Base.>
 export EqConstraint, LtConstraint, GtConstraint
 export ==, <=, >=
 
-const conic_constr_to_constr = Dict{ConicConstr, Constraint}()
-
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint
     head::Symbol
@@ -42,14 +40,14 @@ function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms=Uniqu
             expr = c.lhs - c.rhs
             objective = conic_form!(expr, unique_conic_forms)
             new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-            conic_constr_to_constr[new_constraint] = c
+            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
         else
             real_expr = real(c.lhs - c.rhs)
             imag_expr = imag(c.lhs - c.rhs)
             real_objective = conic_form!(real_expr, unique_conic_forms)
             imag_objective = conic_form!(imag_expr, unique_conic_forms)
             new_constraint = ConicConstr([real_objective, imag_objective], :Zero, [c.size[1] * c.size[2], c.size[1] * c.size[2]])
-            conic_constr_to_constr[new_constraint] = c
+            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
         end
         cache_conic_form!(unique_conic_forms, c, new_constraint)
     end
@@ -100,7 +98,7 @@ function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms=Uniqu
         expr = c.rhs - c.lhs
         objective = conic_form!(expr, unique_conic_forms)
         new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        conic_constr_to_constr[new_constraint] = c
+        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
         cache_conic_form!(unique_conic_forms, c, new_constraint)
     end
     return get_conic_form(unique_conic_forms, c)
@@ -152,7 +150,7 @@ function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms=Uniqu
         expr = c.lhs - c.rhs
         objective = conic_form!(expr, unique_conic_forms)
         new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        conic_constr_to_constr[new_constraint] = c
+        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
         cache_conic_form!(unique_conic_forms, c, new_constraint)
     end
     return get_conic_form(unique_conic_forms, c)
