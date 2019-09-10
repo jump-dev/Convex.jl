@@ -98,3 +98,62 @@ for i=1:10
     free!(x)
 end
 ```
+
+Using the tree structure
+------------------------
+
+A Convex problem is structured as a *tree*, with the *root* being the
+problem object, with branches to the objective and the set of constraints.
+The objective is an `AbstractExpr` which itself is a tree, with each atom
+being a node and having `children` which are other atoms, variables, or
+constants. Convex provides `children` methods from
+[AbstractTrees.jl](https://github.com/Keno/AbstractTrees.jl) so that the
+tree-traversal functions of that package can be used with Convex.jl problems
+and structures. This is what allows powers the printing of problems, expressions,
+and constraints. This can also be used to analyze the structure of a Convex.jl
+problem. For example,
+
+```@repl 1
+using Convex, AbstractTrees
+x = Variable()
+p = maximize( log(x), x >= 1, x <= 3 )
+for leaf in AbstractTrees.Leaves(p)
+    println("Here's a leaf: $(summary(leaf))")
+end
+```
+
+We can also iterate over the problem in various orders. The following descriptions
+are taken from the AbstractTrees.jl docstrings, which have more information.
+
+### PostOrderDFS
+
+Iterator to visit the nodes of a tree, guaranteeing that children
+will be visited before their parents.
+
+```@repl 1
+for (i, node) in enumerate(AbstractTrees.PostOrderDFS(p))
+    println("Here's node $i via PostOrderDFS: $(summary(node))")
+end
+```
+
+### PreOrderDFS
+
+Iterator to visit the nodes of a tree, guaranteeing that parents
+will be visited before their children.
+
+```@repl 1
+for (i, node) in enumerate(AbstractTrees.PreOrderDFS(p))
+    println("Here's node $i via PreOrderDFS: $(summary(node))")
+end
+```
+
+### StatelessBFS
+
+Iterator to visit the nodes of a tree, guaranteeing that all nodes of a level
+will be visited before their children.
+
+```@repl 1
+for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
+    println("Here's node $i via StatelessBFS: $(summary(node))")
+end
+```

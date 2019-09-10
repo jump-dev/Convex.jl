@@ -1,5 +1,59 @@
 @testset "Utilities" begin
 
+    @testset "Show" begin
+        x = Variable()
+        @test sprint(show, x) == """
+        Variable
+        size: (1, 1)
+        sign: real
+        vexity: affine
+        $(Convex.show_id(x))"""
+        fix!(x, 1.0)
+        @test sprint(show, x) == """
+        Variable
+        size: (1, 1)
+        sign: real
+        vexity: constant
+        $(Convex.show_id(x))
+        value: 1.0"""
+
+        @test sprint(show, 2*x) == """
+        * (constant; real)
+        ├─ 2
+        └─ real variable (fixed) ($(Convex.show_id(x)))"""
+        
+        free!(x)
+        p = maximize( log(x), x >= 1, x <= 3 )
+
+        @test sprint(show, p) == """
+        maximize
+        └─ log (concave; real)
+           └─ real variable ($(Convex.show_id(x)))
+        subject to
+        ├─ >= constraint (affine)
+        │  ├─ real variable ($(Convex.show_id(x)))
+        │  └─ 1
+        └─ <= constraint (affine)
+           ├─ real variable ($(Convex.show_id(x)))
+           └─ 3
+        
+        current status: not yet solved"""
+        
+        x = ComplexVariable(2,3)
+        @test sprint(show, x) == """
+        Variable
+        size: (2, 3)
+        sign: complex
+        vexity: affine
+        $(Convex.show_id(x))"""
+
+        # test `maxdepth`
+        x = Variable(2)
+        y = Variable(2)
+        p = minimize(sum(x), hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))) == hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))))
+        @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\ncurrent status: not yet solved" 
+    end
+
     @testset "clearmemory" begin
         # solve a problem to populate globals
         x = Variable()
