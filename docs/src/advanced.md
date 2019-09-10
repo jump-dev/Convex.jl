@@ -99,8 +99,8 @@ for i=1:10
 end
 ```
 
-Using the tree structure
-------------------------
+Printing and the tree structure
+-------------------------------
 
 A Convex problem is structured as a *tree*, with the *root* being the
 problem object, with branches to the objective and the set of constraints.
@@ -110,8 +110,16 @@ constants. Convex provides `children` methods from
 [AbstractTrees.jl](https://github.com/Keno/AbstractTrees.jl) so that the
 tree-traversal functions of that package can be used with Convex.jl problems
 and structures. This is what allows powers the printing of problems, expressions,
-and constraints. This can also be used to analyze the structure of a Convex.jl
-problem. For example,
+and constraints. The depth to which the tree corresponding to a problem,
+expression, or constraint is printed is controlled by the global variable
+`MAXDEPTH`, which defaults to 3. This can be changed by e.g. setting
+
+```julia
+Convex.MAXDEPTH[] = 5
+```
+
+The AbstractTrees methods can also be used to analyze the structure
+of a Convex.jl problem. For example,
 
 ```@repl 1
 using Convex, AbstractTrees
