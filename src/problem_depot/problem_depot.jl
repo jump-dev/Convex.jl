@@ -131,21 +131,41 @@ benchmark_suite(exclude=[r"mip"]) do p
 end
 ```
 """
-function benchmark_suite(handle_problem!::Function; exclude::Vector{Regex} = Regex[], include::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
+function benchmark_suite(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
     group = BenchmarkGroup()
     for (class, dict) in ProblemDepot.PROBLEMS
-        included = false
         any(occursin.(exclude, Ref(class))) && continue
-        if !isempty(include)
-            any(occursin.(include, Ref(class))) && (included = true)
-        end
         group[class] = BenchmarkGroup()
         for (name, func) in dict
             any(occursin.(exclude, Ref(name))) && continue
-            if !isempty(include)
-                any(occursin.(include, Ref(name))) && (included = true)
-                included || continue
-            end
+            group[class][name] = @benchmarkable $func($handle_problem!, $test, $atol, $rtol, $T)
+        end
+    end
+    return group
+end
+
+
+"""
+    suite(
+        handle_problem!::Function,
+        problems::Vector{String};
+        exclude::Vector{Regex} = Regex[],
+        test = Val(false),
+        T=Float64, atol=1e-3, rtol=0.0, 
+    )
+
+Create a benchmark_suite of benchmarks using only the problems specified
+in the list `problems`.
+```
+"""
+function benchmark_suite(handle_problem!::Function, problems::Vector{String}; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
+    group = BenchmarkGroup()
+    for (class, dict) in ProblemDepot.PROBLEMS
+        any(occursin.(exclude, Ref(class))) && continue
+        group[class] = BenchmarkGroup()
+        for (name, func) in dict
+            any(occursin.(exclude, Ref(name))) && continue
+            name ∈ problems || continue
             group[class][name] = @benchmarkable $func($handle_problem!, $test, $atol, $rtol, $T)
         end
     end
