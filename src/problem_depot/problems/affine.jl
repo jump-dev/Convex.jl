@@ -482,7 +482,7 @@ end
     output = handle_problem!(p)
     if test
         @test output === nothing
-        @test p.status != :Optimal
+        @test p.status != MOI.OPTIMAL
     end
 end
 
@@ -520,19 +520,19 @@ end
     add_constraints!(p, [x >= -1, x <= 4])
     handle_problem!(p)
     if test
-        @test p.status == :Optimal
+        @test p.status == MOI.OPTIMAL
     end
 
     p = satisfy([x >= 0, x >= 1, x <= 2])
     handle_problem!(p)
     if test
-        @test p.status == :Optimal
+        @test p.status == MOI.OPTIMAL
     end
 
     p = maximize(1, [x >= 1, x <= 2])
     handle_problem!(p)
     if test
-        @test p.status == :Optimal
+        @test p.status == MOI.OPTIMAL
     end
 
     constr = x >= 0
@@ -543,7 +543,7 @@ end
     p = satisfy(constr)
     handle_problem!(p)
     if test
-        @test p.status == :Optimal
+        @test p.status == MOI.OPTIMAL
     end
 end
 

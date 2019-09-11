@@ -37,7 +37,7 @@
            ├─ real variable ($(Convex.show_id(x)))
            └─ 3
         
-        current status: not yet solved"""
+        current status: OPTIMIZE_NOT_CALLED"""
         
         x = ComplexVariable(2,3)
         @test sprint(show, x) == """
@@ -51,38 +51,11 @@
         x = Variable(2)
         y = Variable(2)
         p = minimize(sum(x), hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))) == hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))))
-        @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\ncurrent status: not yet solved" 
-
-        # test `MAXWIDTH`
-        x = Variable()
-        p = satisfy([ x == i for i = 1:100])
-        @test sprint(show, p) == "minimize\n└─ 0\nsubject to\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 1\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 2\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 3\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 4\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 5\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 6\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 7\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 8\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 9\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 10\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 11\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 12\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 13\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 14\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 15\n⋮\n\ncurrent status: not yet solved"
+        @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\ncurrent status: OPTIMIZE_NOT_CALLED" 
     end
 
     @testset "clearmemory" begin
         @test_deprecated Convex.clearmemory()
-    end
-
-    using SparseArrays
-    @testset "Parametrically typed problems with type $T" for T = [Float32, Float64, BigFloat]
-        x = Variable()
-        p = Problem{T}(:minimize, -x, [x <= 0])
-        c, A, b, cones, var_to_ranges, vartypes, constraints = Convex.conic_problem(p)
-        @test c isa SparseMatrixCSC{T,Int64}
-        @test A isa SparseMatrixCSC{T,Int64}
-        @test b isa SparseMatrixCSC{T,Int64}
-
-        Y = Variable(5,5)
-        X = rand(T, 5, 5)
-        p = Problem{T}(:minimize, tr(Y), [ diag(Y)[2:5] == diag(X)[2:5], Y[1,1] == big(0.0) ])
-        c, A, b, cones, var_to_ranges, vartypes, constraints = Convex.conic_problem(p)
-        @test c isa SparseMatrixCSC{T,Int64}
-        @test A isa SparseMatrixCSC{T,Int64}
-        @test b isa SparseMatrixCSC{T,Int64}
-        @test diag(X)[2:5] ≈ -1 * b[2:5]
-        if T == BigFloat
-            @test diag(X)[2:5] + 1e-30*rand(4) ≉ -1 * b[2:5]
-        end
     end
 
     @testset "ConicObj with type $T" for T = [UInt32, UInt64]

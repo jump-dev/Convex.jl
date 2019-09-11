@@ -20,10 +20,8 @@ include("constraints/signs_and_sets.jl")
 include("constraints/soc_constraints.jl")
 include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
-include("solver_info.jl")
 include("problems.jl")
-include("solution.jl")
-include("moi_model.jl")
+include("MOI_solve.jl")
 
 ### affine atoms
 include("atoms/affine/add_subtract.jl")

@@ -67,7 +67,7 @@ end
 
 
 
-function process_constr!(constr_fns, sets, T, constraint, var_to_ranges, vars)
+function process_constr!(constr_fns, sets, T, constraint, var_to_ranges, vars, id_to_variables)
         total_constraint_size = sum(constraint.sizes)
         constr_index = 0
         # A = spzeros(T, total_constraint_size, var_size)
@@ -118,16 +118,17 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
     # and one chunk of columns in b and A corresponds to each variable,
     # with the size of the chunk determined by the size of the constraint or of the variable
 
-    # A map to hold unique constraints. Each constraint is keyed by a symbol
-    # of which atom generated the constraints, and a integer hash of the child
-    # expressions used by the atom
     unique_conic_forms = UniqueConicForms()
     objective, objective_var_id = conic_form!(problem, unique_conic_forms)
     constraints = unique_conic_forms.constr_list
+    conic_constr_to_constr = unique_conic_forms.conic_constr_to_constr
+    id_to_variables = unique_conic_forms.id_to_variables
+
     # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
     # var_size is the sum of the lengths of all variables in the problem
     # constr_size is the sum of the lengths of all constraints in the problem
-    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
+    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints, id_to_variables)
+    
     # c = spzeros(T, var_size, 1)
     objective_range = var_to_ranges[objective_var_id]
 
@@ -143,7 +144,7 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
     MOI_constr_fn = Union{MOI.VectorAffineFunction{T}, MOI.SingleVariable}[]
     MOI_sets = Any[]
     for constraint in constraints
-        process_constr!(MOI_constr_fn, MOI_sets, T, constraint, var_to_ranges, vars)
+        process_constr!(MOI_constr_fn, MOI_sets, T, constraint, var_to_ranges, vars, id_to_variables)
     end
 
     # find integral and boolean variables
@@ -167,7 +168,7 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
 
     MOI.add_constraints(model, MOI_constr_fn, MOI_sets)
 
-    return var_to_ranges
+    return var_to_ranges, id_to_variables, conic_constr_to_constr
 end
 
 
@@ -180,7 +181,7 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     end
 
     model = MOIU.CachingOptimizer(MOIU.Model{T}(), MOIU.MANUAL)
-    var_to_ranges = load_MOI_model!(model, problem)
+    var_to_ranges, id_to_variables, conic_constr_to_constr = load_MOI_model!(model, problem)
 
     universal_fallback = MOIU.UniversalFallback(MOIU.Model{T}())
     optimizer = MOIU.CachingOptimizer(universal_fallback, optimizer)
@@ -189,19 +190,18 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     MOIU.reset_optimizer(model, optimizer);
     MOIU.attach_optimizer(model);
     MOI.optimize!(model)
-    problem.MOI_model = model
+    problem.model = model
 
-    moi_populate_solution!(model, problem, var_to_ranges)
     # # populate the status, the primal (and possibly dual) solution
     # # and the primal (and possibly dual) variables with values
-    # populate_solution!(m, problem, var_to_ranges, conic_constraints)
+    moi_populate_solution!(model, problem, var_to_ranges, id_to_variables, conic_constr_to_constr)
     if problem.status != MOI.OPTIMAL && verbose
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end
 
 end
 
-function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges)
+function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id_to_variables, conic_constr_to_constr)
     status = MOI.get(model, MOI.TerminationStatus())
     dual_status = MOI.get(model, MOI.DualStatus())
     primal_status = MOI.get(model, MOI.PrimalStatus())
@@ -236,7 +236,7 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges)
     problem.optval = problem.solution.optval
     problem.status = problem.solution.status
 
-    populate_variables_moi!(problem, var_to_ranges)
+    populate_variables_moi!(problem, var_to_ranges, id_to_variables)
 
 end
 
@@ -244,7 +244,7 @@ end
 # this is somehow working! But it's the same as MBP version even though
 # MathOptInterface packs them differently than MathProgBase
 # todo: figure out why this works still
-function populate_variables_moi!(problem::Problem, var_to_ranges::Dict{UInt64,Tuple{Int,Int}})
+function populate_variables_moi!(problem::Problem, var_to_ranges::Dict{UInt64,Tuple{Int,Int}}, id_to_variables)
     x = problem.solution.primal
     for (id, (start_index, end_index)) in var_to_ranges
         var = id_to_variables[id]

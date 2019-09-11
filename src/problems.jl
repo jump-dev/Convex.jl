@@ -1,4 +1,3 @@
-import MathProgBase
 using MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
@@ -12,42 +11,33 @@ const Status = MOI.TerminationStatusCode
 mutable struct Solution{T<:Number}
     primal::Array{T, 1}
     dual::Array{T, 1}
-    status::Status
+    status::Union{Status, Symbol}
     optval::T
     has_dual::Bool
 end
 
-Solution(x::Array{T, 1}, status::Status, optval::T) where {T} =
+Solution(x::Array{T, 1}, status::Union{Status, Symbol}, optval::T) where {T} =
     Solution(x, T[], status, optval, false)
-Solution(x::Array{T, 1}, y::Array{T, 1}, status::Status, optval::T) where {T} =
+Solution(x::Array{T, 1}, y::Array{T, 1}, status::Union{Status, Symbol}, optval::T) where {T} =
     Solution(x, y, status, optval, true)
 
 mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr
     constraints::Array{Constraint}
-    status::Status
+    status::Union{Status, Symbol}
     optval::Union{Real,Nothing}
-    model::Union{MathProgBase.AbstractConicModel, Nothing}
-    solution::Solution
-    MOI_model::MOI.ModelLike
+    model::Union{MOI.ModelLike, Nothing}
+    solution::Union{Solution, Nothing}
 
     function Problem{T}(head::Symbol, objective::AbstractExpr,
-                     model::Union{MathProgBase.AbstractConicModel, Nothing},
                      constraints::Array=Constraint[]) where {T <: Real}
         if sign(objective)== Convex.ComplexSign()
-            error("Objective can not be a complex expression")
+            error("Objective cannot be a complex expression")
         else
-            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, model)
+            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, nothing, nothing)
         end
     end
-end
-
-# constructor if model is not specified
-function Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
-                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing) where {T<:Real}
-    model = solver !== nothing ? MathProgBase.ConicModel(solver) : solver
-    Problem{T}(head, objective, model, constraints)
 end
 
 Problem(args...) = Problem{Float64}(args...)
@@ -111,93 +101,6 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
         conic_form!(constraint, unique_conic_forms)
     end
     return objective, objective_var.id_hash
-end
-
-function conic_problem(p::Problem{T}) where {T}
-    if length(p.objective) != 1
-        error("Objective must be a scalar")
-    end
-
-    # conic problems have the form
-    # minimize c'*x
-    # st       b - Ax \in cones
-    # our job is to take the conic forms of the objective and constraints
-    # and convert them into vectors b and c and a matrix A
-    # one chunk of rows in b and in A corresponds to each constraint,
-    # and one chunk of columns in b and A corresponds to each variable,
-    # with the size of the chunk determined by the size of the constraint or of the variable
-
-    # A map to hold unique constraints. Each constraint is keyed by a symbol
-    # of which atom generated the constraints, and a integer hash of the child
-    # expressions used by the atom
-    unique_conic_forms = UniqueConicForms()
-    objective, objective_var_id = conic_form!(p, unique_conic_forms)
-    constraints = unique_conic_forms.constr_list
-    conic_constr_to_constr = unique_conic_forms.conic_constr_to_constr
-    id_to_variables = unique_conic_forms.id_to_variables
-
-    # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
-    # var_size is the sum of the lengths of all variables in the problem
-    # constr_size is the sum of the lengths of all constraints in the problem
-    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
-    c = spzeros(T, var_size, 1)
-    objective_range = var_to_ranges[objective_var_id]
-    c[objective_range[1]:objective_range[2]] .= 1
-
-    # slot in all of the coefficients in the conic forms into A and b
-    A = spzeros(T, constr_size, var_size)
-    b = spzeros(T, constr_size, 1)
-    cones = Tuple{Symbol, UnitRange{Int}}[]
-    constr_index = 0
-    for constraint in constraints
-        total_constraint_size = 0
-        for i = 1:length(constraint.objs)
-            sz = constraint.sizes[i]
-            for (id, val) in constraint.objs[i]
-                if id == objectid(:constant)
-                    for l in 1:sz
-                        b[constr_index + l] = val[1][l] == 0 ? val[2][l] : val[1][l]
-                    end
-                    #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
-                else
-                    var_range = var_to_ranges[id]
-                    if id_to_variables[id].sign == ComplexSign()
-                        A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + length(id_to_variables[id])-1] = -val[1]
-                        A[constr_index + 1 : constr_index + sz, var_range[1] + length(id_to_variables[id]) : var_range[2]] = -val[2]
-                    else
-                        A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
-                    end
-                end
-            end
-            constr_index += sz
-            total_constraint_size += sz
-        end
-        push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
-    end
-
-    # find integral and boolean variables
-    vartypes = fill(:Cont, length(c))
-    for var_id in keys(var_to_ranges)
-        variable = id_to_variables[var_id]
-        if :Int in variable.sets
-            startidx, endidx = var_to_ranges[var_id]
-            for idx in startidx:endidx
-                vartypes[idx] = :Int
-            end
-        end
-        if :Bin in variable.sets
-            startidx, endidx = var_to_ranges[var_id]
-            for idx in startidx:endidx
-                vartypes[idx] = :Bin
-            end
-        end
-    end
-
-    if p.head == :maximize
-        c = -c
-    end
-
-    return c, A, b, cones, var_to_ranges, vartypes, constraints, id_to_variables, conic_constr_to_constr
 end
 
 Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Real} =

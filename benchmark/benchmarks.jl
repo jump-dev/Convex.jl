@@ -2,12 +2,14 @@ using Pkg
 tempdir = mktempdir()
 Pkg.activate(tempdir)
 Pkg.develop(PackageSpec(path=joinpath(@__DIR__, "..")))
-Pkg.add(["BenchmarkTools", "PkgBenchmark"])
+Pkg.add(["BenchmarkTools", "PkgBenchmark", "MathOptInterface"])
 Pkg.resolve()
 
 using Convex: Convex, ProblemDepot
 using BenchmarkTools
-
+using MathOptInterface
+const MOI = MathOptInterface
+const MOIU = MOI.Utilities
 
 const SUITE = BenchmarkGroup()
 
@@ -30,4 +32,7 @@ problems =  [
                 "mip_integer_variables",
             ]
 
-SUITE["formulation"] = ProblemDepot.benchmark_suite(Convex.conic_problem, problems)
+SUITE["formulation"] = ProblemDepot.benchmark_suite(problems) do problem
+    model = MOIU.MockOptimizer(MOIU.Model{Float64}())
+    Convex.load_MOI_model!(model, problem)
+end

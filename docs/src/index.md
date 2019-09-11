@@ -20,9 +20,8 @@ Convex.jl supports many solvers, including
 [Gurobi](https://github.com/JuliaOpt/gurobi.jl),
 [ECOS](https://github.com/JuliaOpt/ECOS.jl),
 [SCS](https://github.com/karanveerm/SCS.jl) and
-[GLPK](https://github.com/JuliaOpt/GLPK.jl), through the
-[MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/)
-interface.
+[GLPK](https://github.com/JuliaOpt/GLPK.jl), through
+[MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl).
 
 Note that Convex.jl was previously called CVX.jl. This package is under
 active development; we welcome bug reports and feature requests. For

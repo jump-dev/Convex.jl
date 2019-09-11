@@ -14,8 +14,8 @@ How does Convex.jl differ from JuMP?
 ------------------------------------
 
 Convex.jl and JuMP are both modelling languages for mathematical
-programming embedded in Julia, and both interface with solvers via the
-MathProgBase interface, so many of the same solvers are available in
+programming embedded in Julia, and both interface with solvers via
+MathOptInterface, so many of the same solvers are available in
 both. Convex.jl converts problems to a standard conic form. This
 approach requires (and certifies) that the problem is convex and DCP
 compliant, and guarantees global optimality of the resulting solution.

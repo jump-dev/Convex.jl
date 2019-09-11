@@ -311,7 +311,7 @@ end
     p = satisfy(constraints)
     handle_problem!(p)
     if test
-        @test p.status == :Optimal
+        @test p.status == MOI.OPTIMAL
         @test p.solution.primal ≈ [0.; 1.; 0.; 0.; 1.; zeros(4)] atol=atol rtol=rtol
         @test p.optval ≈ 0 atol=atol rtol=rtol
     end
