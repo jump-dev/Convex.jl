@@ -2,7 +2,8 @@
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
-    p = minimize(norm2(A * x + b))
+    p = minimize(norm2(A * x + b); numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -16,7 +17,8 @@
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
     lambda = 1
-    p = minimize(norm2(A * x + b) + lambda * norm2(x), x >= 1)
+    p = minimize(norm2(A * x + b) + lambda * norm2(x), x >= 1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -28,7 +30,8 @@
 
     x = Variable(2)
 
-    p = minimize(norm2([x[1] + 2x[2] + 2; 2x[1] + x[2] + 3; 3x[1]+4x[2] + 4]) + lambda * norm2(x), x >= 1)
+    p = minimize(norm2([x[1] + 2x[2] + 2; 2x[1] + x[2] + 3; 3x[1]+4x[2] + 4]) + lambda * norm2(x), x >= 1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -43,7 +46,8 @@
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
     lambda = 1
-    p = minimize(norm2(A * x + b) + lambda * norm_1(x), x >= 1)
+    p = minimize(norm2(A * x + b) + lambda * norm_1(x), x >= 1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -57,7 +61,8 @@ end
 @add_problem socp function socp_frobenius_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     m = Variable(4, 5)
     c = [m[3, 3] == 4, m >= 1]
-    p = minimize(norm(vec(m), 2), c)
+    p = minimize(norm(vec(m), 2), c; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -74,7 +79,8 @@ end
     b = [-3; 9; 5]
     c = [3 2 4]
     d = -3
-    p = minimize(quadoverlin(A*x + b, c*x + d))
+    p = minimize(quadoverlin(A*x + b, c*x + d); numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -89,7 +95,8 @@ end
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
-    p = minimize(sumsquares(A*x + b))
+    p = minimize(sumsquares(A*x + b); numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -104,7 +111,8 @@ end
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
-    p = minimize(sum(square(A*x + b)))
+    p = minimize(sum(square(A*x + b)); numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -118,7 +126,7 @@ end
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
     expr = A * x + b
-    p = minimize(sum(dot(^)(expr,2))) # elementwise ^
+    p = minimize(sum(dot(^)(expr,2)); numeric_type = T) # elementwise ^
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -128,7 +136,7 @@ end
         @test evaluate(sum(broadcast(^, expr, 2))) ≈ 0.42105 atol=atol rtol=rtol
     end
 
-    p = minimize(sum(dot(*)(expr, expr))) # elementwise *
+    p = minimize(sum(dot(*)(expr, expr)); numeric_type = T) # elementwise *
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -141,7 +149,8 @@ end
 
 @add_problem socp function socp_inv_pos_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(4)
-    p = minimize(sum(invpos(x)), invpos(x) < 2, x > 1, x == 2, 2 == x)
+    p = minimize(sum(invpos(x)), invpos(x) < 2, x > 1, x == 2, 2 == x; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -152,7 +161,8 @@ end
     end
 
     x = Variable(3)
-    p = minimize(sum(dot(/)([3,6,9], x)), x<=3)
+    p = minimize(sum(dot(/)([3,6,9], x)), x<=3; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test x.value ≈ fill(3.0, (3, 1)) atol=atol rtol=rtol
@@ -161,7 +171,8 @@ end
     end
 
     x = Variable()
-    p = minimize(sum([3,6,9]/x), x<=3)
+    p = minimize(sum([3,6,9]/x), x<=3; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test x.value ≈ 3 atol=atol rtol=rtol
@@ -173,18 +184,21 @@ end
 @add_problem socp function socp_geo_mean_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2)
     y = Variable(2)
-    p = minimize(geomean(x, y), x >= 1, y >= 2)
+    p = minimize(geomean(x, y), x >= 1, y >= 2; numeric_type = T)
+
     # not DCP compliant
     if test
         @test vexity(p) == ConcaveVexity()
     end
-    p = maximize(geomean(x, y), 1 < x, x < 2, y < 2)
+    p = maximize(geomean(x, y), 1 < x, x < 2, y < 2; numeric_type = T)
+
     # Just gave it a vector as an objective, not okay
     if test
         @test_throws Exception handle_problem!(p)
     end
 
-    p = maximize(sum(geomean(x, y)), 1 < x, x < 2, y < 2)
+    p = maximize(sum(geomean(x, y)), 1 < x, x < 2, y < 2; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test p.optval ≈ 4 atol=atol rtol=rtol
@@ -194,13 +208,15 @@ end
 
 @add_problem socp function socp_sqrt_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
-    p = maximize(sqrt(x), 1 >= x)
+    p = maximize(sqrt(x), 1 >= x; numeric_type = T)
+
 end
 
 @add_problem socp function socp_quad_form_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3, 1)
     A = [0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
-    p = minimize(quadform(x, A), [x >= 1])
+    p = minimize(quadform(x, A), [x >= 1]; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -213,7 +229,8 @@ end
     x = Variable(3, 1)
     A = -1.0*[0.8608 0.3131 0.5458; 0.3131 0.8584 0.5836; 0.5458 0.5836 1.5422]
     c = [3 2 4]
-    p = maximize(c*x , [quadform(x, A) >= -1])
+    p = maximize(c*x , [quadform(x, A) >= -1]; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -226,7 +243,8 @@ end
 
 @add_problem socp function socp_huber_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
-    p = minimize(sum(huber(x, 1)), x >= 2)
+    p = minimize(sum(huber(x, 1)), x >= 2; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -241,7 +259,8 @@ end
     A = [1 2 3; -1 2 3]
     b = A * ones(3)
     x = Variable(3)
-    p = minimize(norm(x, 4.5), [A * x == b])
+    p = minimize(norm(x, 4.5), [A * x == b]; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -258,7 +277,8 @@ end
     x = Variable(5)
     q = 1.379;  # q norm constraint that generates many inequalities
     qs = q / (q - 1);  # Conjugate to q
-    p = minimize(x' * v)
+    p = minimize(x' * v; numeric_type = T)
+
     p.constraints += (norm(x, q) <= 1)
     if test
         @test vexity(p) == ConvexVexity()
@@ -279,7 +299,8 @@ end
     b = [-1.82041, -1.67516, -0.866884]
     q = 1.5
     xvar = Variable(2)
-    p = minimize(.5 * sumsquares(xvar) + norm(A * xvar - b, q))
+    p = minimize(.5 * sumsquares(xvar) + norm(A * xvar - b, q); numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -323,7 +344,8 @@ end
     x = Variable()
     y = Variable()
 
-    p = minimize(x+y, x>=0, y>=0)
+    p = minimize(x+y, x>=0, y>=0; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
@@ -349,7 +371,8 @@ end
     gamma = Variable(Positive())
     fix!(gamma, 0.7)
 
-    p = minimize(norm(x-a) + gamma*norm(x[1:end-1] - x[2:end]))
+    p = minimize(norm(x-a) + gamma*norm(x[1:end-1] - x[2:end]); numeric_type = T)
+
     handle_problem!(p)
     if test
         o1 = p.optval

@@ -1,7 +1,8 @@
 # TODO: uncomment vexity checks once SDP on vars/constraints changes vexity of problem
 @add_problem sdp function sdp_sdp_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((2,2), :Semidefinite)
-    p = minimize(y[1,1])
+    p = minimize(y[1,1]; numeric_type = T)
+
     # @fact vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
@@ -9,7 +10,8 @@
     end
 
     y = Variable((3,3), :Semidefinite)
-    p = minimize(y[1,1], y[2,2]==1)
+    p = minimize(y[1,1], y[2,2]==1; numeric_type = T)
+
     # @fact vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
@@ -20,13 +22,15 @@
     # This test fails on Mosek. See
     # https://github.com/JuliaOpt/Mosek.jl/issues/29
     # y = Variable((2, 2), :Semidefinite)
-    # p = minimize(y[1, 1], y[1, 2] == 1)
+    # p = minimize(y[1, 1], y[1, 2] == 1; numeric_type = T)
+
     # # @fact vexity(p) --> ConvexVexity()
     # handle_problem!(p)
     # @fact p.optval --> roughly(0, atol)
 
     y = Semidefinite(3)
-    p = minimize(sum(diag(y)), y[1, 1] == 1)
+    p = minimize(sum(diag(y)), y[1, 1] == 1; numeric_type = T)
+
     # @fact vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
@@ -34,7 +38,8 @@
     end
 
     y = Variable((3, 3), :Semidefinite)
-    p = minimize(tr(y), y[2,1]<=4, y[2,2]>=3)
+    p = minimize(tr(y), y[2,1]<=4, y[2,2]>=3; numeric_type = T)
+
     # @fact vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
@@ -43,7 +48,8 @@
 
     x = Variable(Positive())
     y = Semidefinite(3)
-    p = minimize(y[1, 2], y[2, 1] == 1)
+    p = minimize(y[1, 2], y[2, 1] == 1; numeric_type = T)
+
     # @fact vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
@@ -55,7 +61,8 @@ end
     # This test fails on Mosek
     x = Variable(Positive())
     y = Variable((3, 3))
-    p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1)
+    p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1; numeric_type = T)
+
     # @fact vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
@@ -65,7 +72,8 @@ end
 
 @add_problem sdp function sdp_nuclear_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
-    p = minimize(nuclearnorm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2)
+    p = minimize(nuclearnorm(y), y[2,1]<=4, y[2,2]>=3, y[3,3]<=2; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -78,7 +86,8 @@ end
 
 @add_problem sdp function sdp_operator_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((3,3))
-    p = minimize(opnorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+    p = minimize(opnorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -91,7 +100,8 @@ end
 
 @add_problem sdp function sdp_sigma_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((3,3))
-    p = minimize(sigmamax(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12)
+    p = minimize(sigmamax(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -104,7 +114,8 @@ end
 
 @add_problem sdp function sdp_lambda_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
-    p = minimize(lambdamax(y), y[1,1]>=4)
+    p = minimize(lambdamax(y), y[1,1]>=4; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -117,7 +128,8 @@ end
 
 @add_problem sdp function sdp_lambda_min_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
-    p = maximize(lambdamin(y), tr(y)<=6)
+    p = maximize(lambdamin(y), tr(y)<=6; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -131,7 +143,8 @@ end
 @add_problem sdp function sdp_matrix_frac_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = [1, 2, 3]
     P = Variable(3, 3)
-    p = minimize(matrixfrac(x, P), P <= 2*eye(3), P >= 0.5 * eye(3))
+    p = minimize(matrixfrac(x, P), P <= 2*eye(3), P >= 0.5 * eye(3); numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -145,7 +158,8 @@ end
 @add_problem sdp function sdp_matrix_frac_atom_both_arguments_variable(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     P = Variable(3, 3)
-    p = minimize(matrixfrac(x, P), lambdamax(P) <= 2, x[1] >= 1)
+    p = minimize(matrixfrac(x, P), lambdamax(P) <= 2, x[1] >= 1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -158,7 +172,8 @@ end
 
 @add_problem sdp function sdp_sum_largest_eigs(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Semidefinite(3)
-    p = minimize(sumlargesteigs(x, 2), x >= 1)
+    p = minimize(sumlargesteigs(x, 2), x >= 1; numeric_type = T)
+
     handle_problem!(p)
 
     if test
@@ -167,7 +182,8 @@ end
     end
 
     x = Semidefinite(3)
-    p = minimize(sumlargesteigs(x, 2), [x[i,:] >= i for i=1:3]...)
+    p = minimize(sumlargesteigs(x, 2), [x[i,:] >= i for i=1:3]...; numeric_type = T)
+
     handle_problem!(p)
 
     if test
@@ -175,11 +191,13 @@ end
     end
 
     x1 = Semidefinite(3)
-    p1 = minimize(lambdamax(x1), x1[1,1]>=4)
+    p1 = minimize(lambdamax(x1), x1[1,1]>=4; numeric_type = T)
+
     handle_problem!(p1)
 
     x2 = Semidefinite(3)
-    p2 = minimize(sumlargesteigs(x2, 1), x2[1,1]>=4)
+    p2 = minimize(sumlargesteigs(x2, 1), x2[1,1]>=4; numeric_type = T)
+
     handle_problem!(p2)
 
     if test
@@ -187,11 +205,13 @@ end
     end
 
     x1 = Semidefinite(3)
-    p1 = minimize(lambdamax(x1), [x1[i,:] >= i for i=1:3]...)
+    p1 = minimize(lambdamax(x1), [x1[i,:] >= i for i=1:3]...; numeric_type = T)
+
     handle_problem!(p1)
 
     x2 = Semidefinite(3)
-    p2 = minimize(sumlargesteigs(x2, 1), [x2[i,:] >= i for i=1:3]...)
+    p2 = minimize(sumlargesteigs(x2, 1), [x2[i,:] >= i for i=1:3]...; numeric_type = T)
+
     handle_problem!(p2)
 
     if test
@@ -204,7 +224,8 @@ end
     id = eye(4)
     X = Semidefinite(4)
     W = kron(id, X)
-    p = maximize(tr(W), tr(X) ≤ 1)
+    p = maximize(tr(W), tr(X) ≤ 1; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -219,7 +240,8 @@ end
     B = [1 0; 0 0]
     ρ = kron(B, A)
     constraints = [partialtrace(ρ, 1, [2; 2]) == [0.09942819 0.29923607; 0.29923607 0.90057181], ρ in :SDP]
-    p = satisfy(constraints)
+    p = satisfy(constraints; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test evaluate(ρ) ≈ [0.09942819 0.29923607 0 0; 0.299237 0.900572 0 0; 0 0 0 0; 0 0 0 0] atol=atol rtol=rtol
@@ -267,11 +289,13 @@ end
     A = randn(m,n) + im*randn(m,n)
     b = A * xo
     x = Variable(n)
-    p1 = minimize(sum(x), A*x == b, x>=0)
+    p1 = minimize(sum(x), A*x == b, x>=0; numeric_type = T)
+
     handle_problem!(p1)
     x1 = x.value
 
-    p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0)
+    p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0; numeric_type = T)
+
     handle_problem!(p2)
     x2 = x.value
     if test
@@ -286,13 +310,15 @@ end
     A = randn(m,n) + im*randn(m,n)
     b = A * xo
     x = ComplexVariable(n)
-    p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0)
+    p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0; numeric_type = T)
+
     handle_problem!(p1)
     x1 = x.value
 
     xr = Variable(n)
     xi = Variable(n)
-    p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0)
+    p2 = minimize(sum(xr), real(A)*xr-imag(A)*xi == real(b), imag(A)*xr+real(A)*xi == imag(b), xr>=0, xi>=0; numeric_type = T)
+
     handle_problem!(p2)
     #x2 = xr.value + im*xi.value
 
@@ -308,7 +334,8 @@ end
 @add_problem sdp function sdp_Issue_198(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     ρ = HermitianSemidefinite(2)
     constraints = [ρ == [ 1. 0.; 0.  1.]]
-    p = satisfy(constraints)
+    p = satisfy(constraints; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test p.status == MOI.OPTIMAL
@@ -322,7 +349,8 @@ end
     x = ComplexVariable()
     objective = norm2(a-x)
     c1 = real(x)>=0
-    p = minimize(objective,c1)
+    p = minimize(objective,c1; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
@@ -340,7 +368,8 @@ end
     x = ComplexVariable(2)
     objective = sumsquares(a-x)
     c1 = real(x)>=0
-    p = minimize(objective,c1)
+    p = minimize(objective,c1; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
@@ -358,7 +387,8 @@ end
     x = ComplexVariable()
     objective = abs(a-x)
     c1 = real(x)>=0
-    p = minimize(objective,c1)
+    p = minimize(objective,c1; numeric_type = T)
+
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
@@ -378,7 +408,8 @@ end
     x = ComplexVariable(n,n)
     objective = sumsquares(A - x)
     c1 = x in :SDP
-    p = minimize(objective, c1)
+    p = minimize(objective, c1; numeric_type = T)
+
     handle_problem!(p)
     # test that X is approximately equal to posA:
     l,v = eigen(A)

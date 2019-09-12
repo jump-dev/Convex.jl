@@ -107,30 +107,30 @@ Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) wh
     Problem{T}(head, objective, [constraints...])
 
 # Allow users to simply type minimize
-minimize(objective::AbstractExpr, constraints::Constraint...) =
-    Problem(:minimize, objective, collect(constraints))
-minimize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]) =
-    Problem(:minimize, objective, constraints)
-minimize(objective::Value, constraints::Constraint...) =
-    minimize(convert(AbstractExpr, objective), collect(constraints))
-minimize(objective::Value, constraints::Array{<:Constraint}=Constraint[]) =
-    minimize(convert(AbstractExpr, objective), constraints)
+minimize(objective::AbstractExpr, constraints::Constraint...; numeric_type = Float64) =
+    Problem{numeric_type}(:minimize, objective, collect(constraints))
+minimize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    Problem{numeric_type}(:minimize, objective, constraints)
+minimize(objective::Value, constraints::Constraint...; numeric_type = Float64) =
+    minimize(convert(AbstractExpr, objective), collect(constraints); numeric_type = numeric_type)
+minimize(objective::Value, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    minimize(convert(AbstractExpr, objective), constraints; numeric_type = numeric_type)
 
 # Allow users to simply type maximize
-maximize(objective::AbstractExpr, constraints::Constraint...) =
-    Problem(:maximize, objective, collect(constraints))
-maximize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]) =
-    Problem(:maximize, objective, constraints)
-maximize(objective::Value, constraints::Constraint...) =
-    maximize(convert(AbstractExpr, objective), collect(constraints))
-maximize(objective::Value, constraints::Array{<:Constraint}=Constraint[]) =
-    maximize(convert(AbstractExpr, objective), constraints)
+maximize(objective::AbstractExpr, constraints::Constraint...; numeric_type = Float64) =
+    Problem{numeric_type}(:maximize, objective, collect(constraints))
+maximize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    Problem{numeric_type}(:maximize, objective, constraints)
+maximize(objective::Value, constraints::Constraint...; numeric_type = Float64) =
+    maximize(convert(AbstractExpr, objective), collect(constraints); numeric_type = numeric_type)
+maximize(objective::Value, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    maximize(convert(AbstractExpr, objective), constraints; numeric_type = numeric_type)
 
 # Allow users to simply type satisfy (if there is no objective)
-satisfy(constraints::Constraint...) = Problem(:minimize, Constant(0), [constraints...])
-satisfy(constraints::Array{<:Constraint}=Constraint[]) =
-    Problem(:minimize, Constant(0), constraints)
-satisfy(constraint::Constraint) = satisfy([constraint])
+satisfy(constraints::Constraint...; numeric_type = Float64) = Problem{numeric_type}(:minimize, Constant(0), [constraints...])
+satisfy(constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    Problem{numeric_type}(:minimize, Constant(0), constraints)
+satisfy(constraint::Constraint; numeric_type = Float64) = satisfy([constraint]; numeric_type = numeric_type)
 
 # +(constraints, constraints) is defined in constraints.jl
 add_constraints!(p::Problem, constraints::Array{<:Constraint}) =

@@ -12,15 +12,15 @@ using Random
 Random.seed!(2)
 
 @testset "ProblemDepot" begin
-    @testset "Problems can run without `solve!`ing if `test==false`" begin
+    @testset "Problems can run without `solve!`ing if `test==false`; T=$T" for T in (Float64, BigFloat)
         Convex.ProblemDepot.foreach_problem() do name, func
             @testset "$name" begin
                 # We want to check to make sure this does not throw
-                func(Val(false), 0.0, 0.0, Float64) do problem
-                    model = MOIU.MockOptimizer(MOIU.Model{Float64}())
-                    Convex.load_MOI_model!(model, problem)
+                func(Val(false), 0.0, 0.0, T) do problem
+                    @test problem isa Convex.Problem{T} # check numeric type
+                    model = MOIU.MockOptimizer(MOIU.Model{T}())
+                    Convex.load_MOI_model!(model, problem) # make sure it loads without throwing
                 end
-                @test true
             end
         end
     end
