@@ -42,8 +42,48 @@ affine_diag_atom (generic function with 1 method)
 const PROBLEMS = Dict{String, Dict{String, Function}}()
 
 """
+    foreach_problem(apply::Function, [class::String],
+        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+        exclude::Vector{Regex} = Regex[])
+
+Provides a convience method for iterating over problems in [`PROBLEMS`](@ref). 
+For each problem in [`PROBLEMS`](@ref), apply the function `apply`, which
+takes two arguments: the name of the function associated to the problem,
+and the function associated to the problem itself.
+
+Optionally, pass a second argument `class` to only iterate over a class of
+problems (`class` should satsify `class ∈ keys(PROBLEMS)`), and pass third
+argument `problems` to only allow certain problems (specified by exact names or
+regex). Use the `exclude` keyword argument to exclude problems by regex.
+"""
+function foreach_problem(   apply::Function, 
+                            problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+                            exclude::Vector{Regex} = Regex[])
+    for class in keys(PROBLEMS)
+        any(occursin.(exclude, Ref(class))) && continue
+        foreach_problem(apply, class, problems; exclude=exclude)
+    end
+end
+
+function foreach_problem(   apply::Function, 
+                            class::String,
+                            problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
+                            exclude::Vector{Regex} = Regex[])
+    for (name, func) in PROBLEMS[class]
+        any(occursin.(exclude, Ref(name))) && continue
+        if problems !== nothing
+            problems isa Vector{String} && !(name ∈ problems) && continue
+            problems isa Vector{Regex} && !any(occursin.(problems, Ref(name))) && continue
+        end
+        apply(name, func)
+    end
+end
+
+
+"""
     run_tests(
         handle_problem!::Function;
+        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
         exclude::Vector{Regex} = Regex[],
         T=Float64, atol=1e-3, rtol=0.0, 
     )
@@ -52,10 +92,12 @@ Run a set of tests. `handle_problem!` should be a function that takes one
 argument, a Convex.jl `Problem` and processes it (e.g. `solve!` the problem with
 a specific solver).
 
-Use `exclude` to exclude a subset of sets; automatically excludes `r"benchmark"`.
-The test tolerances specified by `atol` and `rtol`. Set `T` to choose a numeric type
-for the problem. Currently this option is not respected and all problems are specified
-Float64` precision.
+Use `exclude` to exclude a subset of sets; automatically excludes
+`r"benchmark"`. Optionally, pass a second argument `problems` to only allow certain problems
+(specified by exact names or regex). The test tolerances specified by `atol` and
+`rtol`. Set `T` to choose a numeric type for the problem. Currently
+this is only used for choosing the type parameter of the underlying
+MathOptInterface model, but not for the actual problem data.
 
 ### Examples
 
@@ -65,41 +107,17 @@ run_tests(exclude=[r"mip"]) do p
 end
 ```
 """
-function run_tests(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
+function run_tests( handle_problem!::Function, 
+                    problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+                    exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
     push!(exclude, r"benchmark")
-    foreach_problem(;exclude=exclude) do name, problem_func
-        @testset "$name" begin
-            problem_func(handle_problem!, Val(true), atol, rtol, T)
-        end
-    end
-end
-
-"""
-    foreach_problem(apply::Function; exclude::Vector{Regex} = Regex[])
-
-For each problem in [`PROBLEMS`](@ref), apply the function `apply`, which
-takes two arguments: the name of the function associated to the problem,
-and the function associated to the problem itself.
-
-### Example
-
-[`run_tests`](@ref) can be implemented just by
-
-```julia
-foreach_problem(;exclude=exclude) do name, problem_func
-    @testset "\$name" begin
-        problem_func(handle_problem!, Val(true), atol, rtol, T)
-    end
-end
-```
-"""
-function foreach_problem(apply::Function; exclude::Vector{Regex} = Regex[])
-    for (class, dict) in PROBLEMS
+    for class in keys(PROBLEMS)
         any(occursin.(exclude, Ref(class))) && continue
         @testset "$class" begin
-            for (name, func) in dict
-                any(occursin.(exclude, Ref(name))) && continue
-                apply(name, func)
+            foreach_problem(class, problems; exclude=exclude) do name, problem_func
+                @testset "$name" begin
+                    problem_func(handle_problem!, Val(true), atol, rtol, T)
+                end
             end
         end
     end
@@ -107,21 +125,25 @@ end
 
 
 """
-    suite(
-        handle_problem!::Function;
+    benchmark_suite(
+        handle_problem!::Function,
+        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
         exclude::Vector{Regex} = Regex[],
         test = Val(false),
         T=Float64, atol=1e-3, rtol=0.0, 
     )
 
-Create a benchmark_suite of benchmarks. `handle_problem!` should be a function that takes one
-argument, a Convex.jl `Problem` and processes it (e.g. `solve!` the problem with
-a specific solver).
+Create a benchmark_suite of benchmarks. `handle_problem!` should be a function
+that takes one argument, a Convex.jl `Problem` and processes it (e.g. `solve!`
+the problem with a specific solver). Pass a second argument `problems` to specify
+run benchmarks only with certain problems (specified by exact names or regex).
 
-Use `exclude` to exclude a subset of benchmarks. Set `test=true` to also check the
-answers, with tolerances specified by `atol` and `rtol`. Set `T` to choose a numeric
-type for the problem. Currently this option is not respected and all problems are
-specified Float64` precision.
+Use `exclude` to exclude a subset of benchmarks. Optionally, pass a second
+argument `problems` to only allow certain problems (specified by exact names or
+regex). Set `test=true` to also check the answers, with tolerances specified by
+`atol` and `rtol`. Set `T` to choose a numeric type for the problem. Currently
+this is only used for choosing the type parameter of the underlying
+MathOptInterface model, but not for the actual problem data.
 
 ### Examples
 
@@ -131,42 +153,16 @@ benchmark_suite(exclude=[r"mip"]) do p
 end
 ```
 """
-function benchmark_suite(handle_problem!::Function; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
+function benchmark_suite(handle_problem!::Function,
+                         problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+                         exclude::Vector{Regex} = Regex[],
+                         T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
     group = BenchmarkGroup()
-    for (class, dict) in ProblemDepot.PROBLEMS
+    for class in keys(PROBLEMS)
         any(occursin.(exclude, Ref(class))) && continue
         group[class] = BenchmarkGroup()
-        for (name, func) in dict
-            any(occursin.(exclude, Ref(name))) && continue
-            group[class][name] = @benchmarkable $func($handle_problem!, $test, $atol, $rtol, $T)
-        end
-    end
-    return group
-end
-
-
-"""
-    suite(
-        handle_problem!::Function,
-        problems::Vector{String};
-        exclude::Vector{Regex} = Regex[],
-        test = Val(false),
-        T=Float64, atol=1e-3, rtol=0.0, 
-    )
-
-Create a benchmark_suite of benchmarks using only the problems specified
-in the list `problems`.
-```
-"""
-function benchmark_suite(handle_problem!::Function, problems::Vector{String}; exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
-    group = BenchmarkGroup()
-    for (class, dict) in ProblemDepot.PROBLEMS
-        any(occursin.(exclude, Ref(class))) && continue
-        group[class] = BenchmarkGroup()
-        for (name, func) in dict
-            any(occursin.(exclude, Ref(name))) && continue
-            name ∈ problems || continue
-            group[class][name] = @benchmarkable $func($handle_problem!, $test, $atol, $rtol, $T)
+        foreach_problem(class, problems; exclude=exclude) do name, problem_func
+            group[class][name] = @benchmarkable $problem_func($handle_problem!, $test, $atol, $rtol, $T)
         end
     end
     return group
