@@ -1,5 +1,12 @@
 @testset "Utilities" begin
 
+    @testset "`solve!` does not return anything" begin
+        x = Variable()
+        p = satisfy(x >= 0)
+        output = solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
+        @test output === nothing
+    end
+
     @testset "Show" begin
         x = Variable()
         @test sprint(show, x) == """

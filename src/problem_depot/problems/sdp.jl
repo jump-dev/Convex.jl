@@ -344,7 +344,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_norm2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem sdp function sdp_socp_norm2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     a = 2+4im
     x = ComplexVariable()
     objective = norm2(a-x)
@@ -363,7 +363,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_sumsquares_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem sdp function sdp_socp_sumsquares_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     a = [2+4im;4+6im]
     x = ComplexVariable(2)
     objective = sumsquares(a-x)
@@ -382,7 +382,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem sdp function sdp_socp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     a = [5-4im]
     x = ComplexVariable()
     objective = abs(a-x)
