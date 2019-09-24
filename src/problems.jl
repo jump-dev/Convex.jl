@@ -1,44 +1,28 @@
 using MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
-export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
-export Float64OrNothing
-
-const Float64OrNothing = Union{Float64, Nothing}
-
-const Status = MOI.TerminationStatusCode
-# TODO: Cleanup
-mutable struct Solution{T<:Number}
-    primal::Array{T, 1}
-    dual::Array{T, 1}
-    status::Union{Status, Symbol}
-    optval::T
-    has_dual::Bool
-end
-
-Solution(x::Array{T, 1}, status::Union{Status, Symbol}, optval::T) where {T} =
-    Solution(x, T[], status, optval, false)
-Solution(x::Array{T, 1}, y::Array{T, 1}, status::Union{Status, Symbol}, optval::T) where {T} =
-    Solution(x, y, status, optval, true)
+export Problem, minimize, maximize, satisfy, add_constraint!, add_constraints!
 
 mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr
     constraints::Array{Constraint}
-    status::Union{Status, Symbol}
+    status::MOI.TerminationStatusCode
     optval::Union{Real,Nothing}
     model::Union{MOI.ModelLike, Nothing}
-    solution::Union{Solution, Nothing}
 
     function Problem{T}(head::Symbol, objective::AbstractExpr,
                      constraints::Array=Constraint[]) where {T <: Real}
         if sign(objective)== Convex.ComplexSign()
             error("Objective cannot be a complex expression")
         else
-            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, nothing, nothing)
+            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, nothing)
         end
     end
 end
+
+dual_status(p::Problem) = get(p.model, MOI.DualStatus())
+primal_status(p::Problem) = get(p.model, MOI.PrimalStatus())
 
 Problem(args...) = Problem{Float64}(args...)
 

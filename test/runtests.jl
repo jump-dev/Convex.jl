@@ -35,7 +35,6 @@ end
 
     @testset "SCS" begin
         run_tests(; exclude=[   r"mip",
-                                r"dual",
                                 r"sdp_matrix_frac_atom", # bug: https://github.com/JuliaOpt/SCS.jl/issues/153
                             ]) do p
             solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
@@ -43,13 +42,13 @@ end
     end
 
     @testset "ECOS" begin
-        run_tests(; exclude=[r"mip", r"dual", r"sdp"]) do p
+        run_tests(; exclude=[r"mip", r"sdp"]) do p
             solve!(p, ECOS.Optimizer(verbose=0))
         end
     end
 
     @testset "GLPK" begin
-        run_tests(; exclude=[r"exp", r"dual", r"sdp", r"socp"]) do p
+        run_tests(; exclude=[r"exp", r"sdp", r"socp"]) do p
             solve!(p, GLPK.Optimizer(msg_lev = GLPK.OFF))
         end
     end

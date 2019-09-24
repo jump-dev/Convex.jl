@@ -586,7 +586,7 @@ end
     end
 end
 
-@add_problem affine function affine_dual(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem affine function affine_dualvalue(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     p = minimize(x, x >= 0; numeric_type = T)
 

@@ -166,9 +166,9 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
         end
     end
 
-    MOI.add_constraints(model, MOI_constr_fn, MOI_sets)
+    constraint_indices = MOI.add_constraints(model, MOI_constr_fn, MOI_sets)
 
-    return var_to_ranges, id_to_variables, conic_constr_to_constr
+    return var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices
 end
 
 
@@ -181,7 +181,7 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     end
 
     model = MOIU.CachingOptimizer(MOIU.Model{T}(), MOIU.MANUAL)
-    var_to_ranges, id_to_variables, conic_constr_to_constr = load_MOI_model!(model, problem)
+    var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices = load_MOI_model!(model, problem)
 
     universal_fallback = MOIU.UniversalFallback(MOIU.Model{T}())
     optimizer = MOIU.CachingOptimizer(universal_fallback, optimizer)
@@ -194,21 +194,20 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
 
     # # populate the status, the primal (and possibly dual) solution
     # # and the primal (and possibly dual) variables with values
-    moi_populate_solution!(model, problem, var_to_ranges, id_to_variables, conic_constr_to_constr)
+    moi_populate_solution!(model, problem, var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices)
     if problem.status != MOI.OPTIMAL && verbose
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end
 
 end
 
-function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id_to_variables, conic_constr_to_constr)
+function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices)
     status = MOI.get(model, MOI.TerminationStatus())
     dual_status = MOI.get(model, MOI.DualStatus())
     primal_status = MOI.get(model, MOI.PrimalStatus())
 
     # should check when this is allowed
     objective = MOI.get(model, MOI.ObjectiveValue())
-
 
     if primal_status != MOI.NO_SOLUTION
         vars = MOI.get(model, MOI.ListOfVariableIndices())
@@ -217,26 +216,23 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id
         primal = fill(NaN, MOI.get(model, MOI.NumberOfVariables()))
     end
 
-    # if dual_status != MOI.NO_SOLUTION
-    #     dual = Vector{T}()
-    #     for (F, S) in MOI.get(model, MOI.ListOfConstraints())
-    #         constr_inds = MOI.get(model, MOI.ListOfConstraintIndices{F,S}())
-    #         dual_value = MOI.get(model, MOI.ConstraintDual(), constr_inds)
-    #         @show dual_value
-    #         # append!(dual, dual_value)
-    #     end
-    #     problem.solution = Solution(primal, dual, status, objective)
-    # else
-    # end
-    problem.solution = Solution(primal, status, objective)
-    if (problem.head == :maximize)
-        problem.solution.optval = -problem.solution.optval
+    if dual_status != MOI.NO_SOLUTION
+        for (idx, constr) in enumerate(constraints)
+            haskey(conic_constr_to_constr, constr) || continue
+            MOI_constr_idx = constraint_indices[idx]
+            dual_value = MOI.get(model, MOI.ConstraintDual(), MOI_constr_idx)
+            if length(dual_value) == 1
+                dual_value = dual_value[]
+            end
+            conic_constr_to_constr[constr].dual = dual_value
+        end
     end
 
-    problem.optval = problem.solution.optval
-    problem.status = problem.solution.status
 
-    populate_variables_moi!(problem, var_to_ranges, id_to_variables)
+    problem.optval = problem.head == :maximize ? -objective : objective
+    problem.status = status
+
+    populate_variables_moi!(primal, var_to_ranges, id_to_variables)
 
 end
 
@@ -244,19 +240,18 @@ end
 # this is somehow working! But it's the same as MBP version even though
 # MathOptInterface packs them differently than MathProgBase
 # todo: figure out why this works still
-function populate_variables_moi!(problem::Problem, var_to_ranges::Dict{UInt64,Tuple{Int,Int}}, id_to_variables)
-    x = problem.solution.primal
+function populate_variables_moi!(primal, var_to_ranges::Dict{UInt64,Tuple{Int,Int}}, id_to_variables)
     for (id, (start_index, end_index)) in var_to_ranges
         var = id_to_variables[id]
         sz = var.size
         if var.sign != ComplexSign()
-            var.value = reshape(x[start_index:end_index], sz[1], sz[2])
+            var.value = reshape(primal[start_index:end_index], sz[1], sz[2])
             if sz == (1, 1)
                 var.value = var.value[1]
             end
         else
-            real_value = reshape(x[start_index:start_index + div(end_index - start_index + 1, 2) - 1], sz[1], sz[2])
-            imag_value = reshape(x[start_index + div(end_index - start_index + 1, 2):end_index], sz[1], sz[2])
+            real_value = reshape(primal[start_index:start_index + div(end_index - start_index + 1, 2) - 1], sz[1], sz[2])
+            imag_value = reshape(primal[start_index + div(end_index - start_index + 1, 2):end_index], sz[1], sz[2])
             var.value = real_value + im * imag_value
             if sz == (1, 1)
                 var.value = var.value[1]
