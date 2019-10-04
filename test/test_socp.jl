@@ -19,15 +19,23 @@
             solve!(p, solver)
             @test p.optval ≈ 14.9049 atol=TOL
             @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual correctness.")
+                dual = [4.4134, 5.1546]
+                @test p.constraints[1].dual ≈ dual atol=TOL
+            end
 
             x = Variable(2)
-
             p = minimize(norm2([x[1] + 2x[2] + 2; 2x[1] + x[2] + 3; 3x[1]+4x[2] + 4]) + lambda * norm2(x), x >= 1)
             @test vexity(p) == ConvexVexity()
-
             solve!(p, solver)
             @test p.optval ≈ 14.9049 atol=TOL
             @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual correctness.")
+                dual = [4.4134, 5.1546]
+                @test p.constraints[1].dual ≈ dual atol=TOL
+            end
 
             x = Variable(2, 1)
             A = [1 2; 2 1; 3 4]
@@ -38,6 +46,11 @@
             solve!(p, solver)
             @test p.optval ≈ 15.4907 atol=TOL
             @test evaluate(norm2(A * x + b) + lambda * norm_1(x)) ≈ 15.4907 atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual correctness.")
+                dual = [4.7062, 5.4475]
+                @test p.constraints[1].dual ≈ dual atol=TOL
+            end
         end
 
         @testset "frobenius norm atom" begin
@@ -48,6 +61,12 @@
             solve!(p, solver)
             @test p.optval ≈ sqrt(35) atol=TOL
             @test evaluate(norm(vec(m), 2)) ≈ sqrt(35) atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual correctness.")
+                @test p.constraints[1].dual ≈ 0.6761 atol=TOL
+                dual = 0.1690 .* ones(4, 5); dual[3, 3] = 0
+                @test p.constraints[2].dual ≈ dual atol=TOL
+            end
         end
 
         @testset "quad over lin atom" begin
@@ -276,6 +295,38 @@
 
                 @test o1 <= o2
             end
+        end
+
+        @testset "minimal norm solutions" begin
+            x = Variable(2)
+            A = [1 2; 2 4];
+            b = [3, 6];
+            p = minimize(norm(x, 1), A*x==b)
+            @test vexity(p) == ConvexVexity()
+            solve!(p, solver)
+            @test p.optval ≈ 1.5 atol=TOL
+            @test evaluate(x) ≈ [0, 1.5] atol=TOL
+            @test evaluate(norm(x, 1)) ≈ 1.5 atol=TOL
+
+            x = Variable(2)
+            A = [1 2; 2 4];
+            b = [3, 6];
+            p = minimize(norm(x, 2), A*x==b)
+            @test vexity(p) == ConvexVexity()
+            solve!(p, solver)
+            @test p.optval ≈ 3/sqrt(5) atol=TOL
+            @test evaluate(x) ≈ [3/5, 6/5] atol=TOL
+            @test evaluate(norm(x, 2)) ≈ 3/sqrt(5) atol=TOL
+
+            x = Variable(2)
+            A = [1 2; 2 4];
+            b = [3, 6];
+            p = minimize(norm(x, Inf), A*x==b)
+            @test vexity(p) == ConvexVexity()
+            solve!(p, solver)
+            @test p.optval ≈ 1.0 atol=TOL
+            @test evaluate(x) ≈ [1, 1] atol=TOL
+            @test evaluate(norm(x, Inf)) ≈ 1.0 atol=TOL
         end
     end
 end
