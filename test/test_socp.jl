@@ -306,7 +306,11 @@
             solve!(p, solver)
             @test p.optval ≈ 1.5 atol=TOL
             @test evaluate(x) ≈ [0, 1.5] atol=TOL
-            @test evaluate(norm(x, 1)) ≈ 1.5 atol=TOL
+            @test evaluate(norm(x, 1)) ≈ p.optval atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual problem correctness.")
+                @test dot(b, p.constraints[1].dual) ≈ p.optval atol=TOL
+            end
 
             x = Variable(2)
             A = [1 2; 2 4];
@@ -316,7 +320,11 @@
             solve!(p, solver)
             @test p.optval ≈ 3/sqrt(5) atol=TOL
             @test evaluate(x) ≈ [3/5, 6/5] atol=TOL
-            @test evaluate(norm(x, 2)) ≈ 3/sqrt(5) atol=TOL
+            @test evaluate(norm(x, 2)) ≈ p.optval atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual problem correctness.")
+                @test dot(b, p.constraints[1].dual) ≈ p.optval atol=TOL
+            end
 
             x = Variable(2)
             A = [1 2; 2 4];
@@ -326,7 +334,11 @@
             solve!(p, solver)
             @test p.optval ≈ 1.0 atol=TOL
             @test evaluate(x) ≈ [1, 1] atol=TOL
-            @test evaluate(norm(x, Inf)) ≈ 1.0 atol=TOL
+            @test evaluate(norm(x, Inf)) ≈ p.optval atol=TOL
+            if p.solution.has_dual
+                println("Solution object has dual value, checking for dual problem correctness.")
+                @test dot(b, p.constraints[1].dual) ≈ p.optval atol=TOL
+            end
         end
     end
 end
