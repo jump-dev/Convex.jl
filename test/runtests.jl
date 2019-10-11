@@ -34,9 +34,8 @@ end
     include("test_utilities.jl")
 
     @testset "SCS" begin
-        run_tests(; exclude=[   r"mip",
-                                r"sdp_matrix_frac_atom", # bug: https://github.com/JuliaOpt/SCS.jl/issues/153
-                            ]) do p
+        # We exclude `sdp_matrix_frac_atom` due to the bug https://github.com/JuliaOpt/SCS.jl/issues/153
+        run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom"]) do p
             solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
         end
     end
