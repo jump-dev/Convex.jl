@@ -1,4 +1,4 @@
-@add_problem socp function socp_norm_2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem socp function socp_dual_norm_2_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 1)
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
@@ -26,6 +26,7 @@
     if test
         @test p.optval ≈ 14.9049 atol=atol rtol=rtol
         @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol=atol rtol=rtol
+        @test p.constraints[1].dual ≈ [4.4134, 5.1546] atol=atol rtol=rtol
     end
 
     x = Variable(2)
@@ -40,6 +41,7 @@
     if test
         @test p.optval ≈ 14.9049 atol=atol rtol=rtol
         @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol=atol rtol=rtol
+        @test p.constraints[1].dual ≈ [4.4134, 5.1546] atol=atol rtol=rtol
     end
 
     x = Variable(2, 1)
@@ -55,10 +57,12 @@
     if test
         @test p.optval ≈ 15.4907 atol=atol rtol=rtol
         @test evaluate(norm2(A * x + b) + lambda * norm_1(x)) ≈ 15.4907 atol=atol rtol=rtol
+        @test p.constraints[1].dual ≈ [4.7062, 5.4475] atol=atol rtol=rtol
+
     end
 end
 
-@add_problem socp function socp_frobenius_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem socp function socp_dual_frobenius_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     m = Variable(4, 5)
     c = [m[3, 3] == 4, m >= 1]
     p = minimize(norm(vec(m), 2), c; numeric_type = T)
@@ -70,6 +74,9 @@ end
     if test
         @test p.optval ≈ sqrt(35) atol=atol rtol=rtol
         @test evaluate(norm(vec(m), 2)) ≈ sqrt(35) atol=atol rtol=rtol
+        @test p.constraints[1].dual ≈ 0.6761 atol=atol rtol=rtol
+        dual = 0.1690 .* ones(4, 5); dual[3, 3] = 0
+        @test p.constraints[2].dual ≈ dual atol=atol rtol=rtol
     end
 end
 
@@ -399,7 +406,7 @@ end
     x = Variable(2)
     A = [1 2; 2 4];
     b = [3, 6];
-    p = minimize(norm(x, 1), A*x==b)
+    p = minimize(norm(x, 1), A*x==b; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()
@@ -416,7 +423,7 @@ end
     x = Variable(2)
     A = [1 2; 2 4];
     b = [3, 6];
-    p = minimize(norm(x, 2), A*x==b)
+    p = minimize(norm(x, 2), A*x==b; numeric_type = T)
     
     test && @test vexity(p) == ConvexVexity()
     
@@ -432,7 +439,7 @@ end
     x = Variable(2)
     A = [1 2; 2 4];
     b = [3, 6];
-    p = minimize(norm(x, Inf), A*x==b)
+    p = minimize(norm(x, Inf), A*x==b; numeric_type = T)
 
     test && @test vexity(p) == ConvexVexity()
 
