@@ -6,6 +6,10 @@
         solve!(p, solver)
         @test p.optval ≈ 1 atol=TOL
         @test evaluate(abs(x)) ≈ 1 atol=TOL
+        if p.solution.has_dual
+            println("Solution object has dual value, checking for dual correctness.")
+            @test p.constraints[1].dual ≈ 1 atol=TOL
+        end
 
         x = Variable(2,2)
         p = minimize(sum(abs(x)), x[2,2]>=1, x[1,1]>=1, x>=0)
@@ -13,6 +17,14 @@
         solve!(p, solver)
         @test p.optval ≈ 2 atol=TOL
         @test evaluate(sum(abs(x))) ≈ 2 atol=TOL
+        if p.solution.has_dual
+            println("Solution object has dual value, checking for dual correctness.")
+            @test p.constraints[1].dual ≈ 1 atol=TOL
+            @test p.constraints[2].dual ≈ 1 atol=TOL
+            @test p.constraints[3].dual[1,1] ≈ 0 atol=TOL
+            @test p.constraints[3].dual[2,2] ≈ 0 atol=TOL
+            @test p.constraints[3].dual[1,2] ≈ p.constraints[3].dual[2,1] atol=TOL
+        end
     end
 
     @testset "maximum atom" begin
@@ -155,6 +167,11 @@
         solve!(p, solver)
         @test p.optval ≈ 0 atol=TOL
         @test evaluate(norm_inf(x)) ≈ 0 atol=TOL
+        if p.solution.has_dual
+            println("Solution object has dual value, checking for dual correctness.")
+            @test norm(p.constraints[1].dual) ≈ 0 atol=TOL
+            @test norm(p.constraints[2].dual) ≈ 0 atol=TOL
+        end
     end
 
     @testset "norm 1 atom" begin
@@ -164,5 +181,10 @@
         solve!(p, solver)
         @test p.optval ≈ 0 atol=TOL
         @test evaluate(norm_1(x)) ≈ 0 atol=TOL
+        if p.solution.has_dual
+            println("Solution object has dual value, checking for dual correctness.")
+            @test norm(p.constraints[1].dual) ≈ 0 atol=TOL
+            @test norm(p.constraints[2].dual) ≈ 0 atol=TOL
+        end
     end
 end
