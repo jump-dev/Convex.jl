@@ -217,14 +217,13 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id
     end
 
     if dual_status != MOI.NO_SOLUTION
-        for (idx, constr) in enumerate(constraints)
-            haskey(conic_constr_to_constr, constr) || continue
-            MOI_constr_idx = constraint_indices[idx]
-            dual_value = MOI.get(model, MOI.ConstraintDual(), MOI_constr_idx)
-            if length(dual_value) == 1
-                dual_value = dual_value[]
-            end
-            conic_constr_to_constr[constr].dual = dual_value
+        for (idx, conic_constr) in enumerate(constraints)
+            haskey(conic_constr_to_constr, conic_constr) || continue
+            constr = conic_constr_to_constr[conic_constr]
+            MOI_constr_indices = constraint_indices[idx]
+            dual_value_vectorized = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices)
+            iscomplex = sign(constr.lhs) == ComplexSign() || sign(constr.rhs) == ComplexSign()
+            constr.dual = unvec(dual_value_vectorized, constr.size, iscomplex)
         end
     end
 
@@ -238,24 +237,27 @@ end
 
 
 # this is somehow working! But it's the same as MBP version even though
-# MathOptInterface packs them differently than MathProgBase
+# MathOptInterface packs PSD variables differently than MathProgBase
 # todo: figure out why this works still
 function populate_variables_moi!(primal, var_to_ranges::Dict{UInt64,Tuple{Int,Int}}, id_to_variables)
     for (id, (start_index, end_index)) in var_to_ranges
         var = id_to_variables[id]
         sz = var.size
-        if var.sign != ComplexSign()
-            var.value = reshape(primal[start_index:end_index], sz[1], sz[2])
-            if sz == (1, 1)
-                var.value = var.value[1]
-            end
-        else
-            real_value = reshape(primal[start_index:start_index + div(end_index - start_index + 1, 2) - 1], sz[1], sz[2])
-            imag_value = reshape(primal[start_index + div(end_index - start_index + 1, 2):end_index], sz[1], sz[2])
-            var.value = real_value + im * imag_value
-            if sz == (1, 1)
-                var.value = var.value[1]
-            end
-        end
+        vec = primal[start_index:end_index]
+        var.value = unvec(vec, sz, var.sign == ComplexSign())
+    end
+end
+
+function unvec(v::AbstractVector, size::Tuple{Int, Int}, iscomplex::Bool)
+    if iscomplex && length(v) == 2
+        return v[1] + im*v[2]
+    elseif iscomplex
+        l = length(v) ÷ 2
+        # use views?
+        return reshape(v[1:l], size) + im*reshape(v[l+1:end], size)
+    elseif length(v) == 1
+        return v[]
+    else
+        return reshape(v, size)
     end
 end

@@ -112,7 +112,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_lambda_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem sdp function sdp_dual_lambda_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
     p = minimize(lambdamax(y), y[1,1]>=4; numeric_type = T)
 
@@ -123,6 +123,16 @@ end
     if test
         @test p.optval ≈ 4 atol=atol rtol=rtol
         @test evaluate(lambdamax(y)) ≈ 4 atol=atol rtol=rtol
+    end
+
+    # https://github.com/JuliaOpt/Convex.jl/issues/337
+    x = ComplexVariable(2, 2)
+    p = minimize( lambdamax(x), [ x[1,2] == im, x[2,2] == 1.0, x ⪰ - eye(2) ]; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 1.5 atol=atol rtol=rtol
+        @test p.constraints[1].dual ≈ im atol=atol rtol=rtol
+        @test p.constraints[2].dual ≈ 0.75 atol=atol rtol=rtol
     end
 end
 
