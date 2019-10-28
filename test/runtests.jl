@@ -33,6 +33,13 @@ end
 @testset "Convex" begin
     include("test_utilities.jl")
 
+    @testset "SCS with warmstarts" begin
+        # We exclude `sdp_matrix_frac_atom` due to the bug https://github.com/JuliaOpt/SCS.jl/issues/153
+        run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom"]) do p
+            solve!(p, SCS.Optimizer(verbose=0, eps=1e-6); warmstart = true)
+        end
+    end
+
     @testset "SCS" begin
         # We exclude `sdp_matrix_frac_atom` due to the bug https://github.com/JuliaOpt/SCS.jl/issues/153
         run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom"]) do p

@@ -168,27 +168,31 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
 
     constraint_indices = MOI.add_constraints(model, MOI_constr_fn, MOI_sets)
 
-    return var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices
+    return var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices, vars
 end
 
 
 function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     check_vexity = true,
-    verbose = true) where {T}
+    verbose = true,
+    warmstart = false) where {T}
 
     if check_vexity
         vex = vexity(problem)
     end
 
-    model = MOIU.CachingOptimizer(MOIU.Model{T}(), MOIU.MANUAL)
-    var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices = load_MOI_model!(model, problem)
-
-    universal_fallback = MOIU.UniversalFallback(MOIU.Model{T}())
-    optimizer = MOIU.CachingOptimizer(universal_fallback, optimizer)
-    optimizer = MOI.Bridges.full_bridge_optimizer(optimizer, T)
-
-    MOIU.reset_optimizer(model, optimizer);
-    MOIU.attach_optimizer(model);
+    model = MOIB.full_bridge_optimizer(
+        MOIU.CachingOptimizer(
+            MOIU.UniversalFallback(MOIU.Model{T}()),
+            optimizer
+        ),
+        T
+    )
+    var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices, vars = load_MOI_model!(model, problem)
+    if warmstart
+        warmstart!(model, var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices, vars, T)
+    end
+ 
     MOI.optimize!(model)
     problem.model = model
 
@@ -199,6 +203,24 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end
 
+end
+
+
+function warmstart!(model, var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices, vars, T)
+
+    if MOI.supports(model, MOI.VariablePrimalStart(), MOI.VariableIndex)
+        for (id, (start_index, end_index)) in var_to_ranges
+            x = id_to_variables[id]
+            x_vars = vars[start_index:end_index]
+            value = x.value
+            value === nothing && continue
+            value_vec = packvec(value, sign(x) == ComplexSign())
+            value_vec = convert(Vector{T}, value_vec)
+            MOI.set(model, MOI.VariablePrimalStart(), x_vars, value_vec)
+        end
+    else
+        @warn "Skipping variable warmstart; the solver does not support it."
+    end
 end
 
 function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id_to_variables, conic_constr_to_constr, constraints, constraint_indices)
@@ -223,7 +245,7 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id
             MOI_constr_indices = constraint_indices[idx]
             dual_value_vectorized = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices)
             iscomplex = sign(constr.lhs) == ComplexSign() || sign(constr.rhs) == ComplexSign()
-            constr.dual = unvec(dual_value_vectorized, constr.size, iscomplex)
+            constr.dual = unpackvec(dual_value_vectorized, constr.size, iscomplex)
         end
     end
 
@@ -244,11 +266,12 @@ function populate_variables_moi!(primal, var_to_ranges::Dict{UInt64,Tuple{Int,In
         var = id_to_variables[id]
         sz = var.size
         vec = primal[start_index:end_index]
-        var.value = unvec(vec, sz, var.sign == ComplexSign())
+        var.value = unpackvec(vec, sz, var.sign == ComplexSign())
     end
 end
 
-function unvec(v::AbstractVector, size::Tuple{Int, Int}, iscomplex::Bool)
+# This is type unstable!
+function unpackvec(v::AbstractVector, size::Tuple{Int, Int}, iscomplex::Bool)
     if iscomplex && length(v) == 2
         return v[1] + im*v[2]
     elseif iscomplex
@@ -259,5 +282,23 @@ function unvec(v::AbstractVector, size::Tuple{Int, Int}, iscomplex::Bool)
         return v[]
     else
         return reshape(v, size)
+    end
+end
+
+# In `packvec`, we use `real` even in the `iscomplex == false` branch
+# for type stability. Note here `iscomplex` refers to the `Sign` of the variable
+# associated to the values here, not whether or not the variable actually holds
+# a complex number at this point. Hence, one could have `iscomplex==true` and
+# `isreal(value)==true` or even `value isa Real` could hold.
+function packvec(value::Number, iscomplex::Bool)
+    iscomplex ? [real(value), imag(value)] : [real(value)]
+end
+
+function packvec(value::AbstractArray, iscomplex::Bool)
+    value = reshape(value, length(value))
+    if iscomplex
+        return [real(value); imag(value)]
+    else
+        return real(value) 
     end
 end
