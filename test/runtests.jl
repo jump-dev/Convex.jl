@@ -26,10 +26,6 @@ Random.seed!(2)
     end
 end
 
-@testset "Convex with MOI" begin
-    include("test_moi.jl")
-end
-
 @testset "Convex" begin
     include("test_utilities.jl")
 
