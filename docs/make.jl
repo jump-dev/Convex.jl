@@ -15,6 +15,7 @@ makedocs(;
         "FAQ" => "faq.md",
         "Optimizing in a Loop" => "loop.md",
         "Advanced" => "advanced.md",
+        "Problem Depot" => "problem_depot.md",
         "Contributing" => "contributing.md",
         "Credits" => "credits.md"
     ],
