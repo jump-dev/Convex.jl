@@ -370,3 +370,55 @@ end
         @test o1 <= o2
     end
 end
+
+
+@add_problem socp function socp_dual_minimal_norm_solutions(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    x = Variable(2)
+    A = [1 2; 2 4];
+    b = [3, 6];
+    p = minimize(norm(x, 1), A*x==b)
+
+    if test
+        @test vexity(p) == ConvexVexity()
+    end
+
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 1.5 atol=atol rtol=rtol
+        @test evaluate(x) ≈ [0, 1.5] atol=atol rtol=rtol
+        @test evaluate(norm(x, 1)) ≈ p.optval atol=atol rtol=rtol
+        @test dot(b, p.constraints[1].dual) ≈ p.optval atol=atol rtol=rtol
+    end
+
+    x = Variable(2)
+    A = [1 2; 2 4];
+    b = [3, 6];
+    p = minimize(norm(x, 2), A*x==b)
+    
+    test && @test vexity(p) == ConvexVexity()
+    
+    handle_problem!(p)
+    
+    if test
+        @test p.optval ≈ 3/sqrt(5) atol=atol rtol=rtol
+        @test evaluate(x) ≈ [3/5, 6/5] atol=atol rtol=rtol
+        @test evaluate(norm(x, 2)) ≈ p.optval atol=atol rtol=rtol
+        @test dot(b, p.constraints[1].dual) ≈ p.optval atol=atol rtol=rtol
+    end
+
+    x = Variable(2)
+    A = [1 2; 2 4];
+    b = [3, 6];
+    p = minimize(norm(x, Inf), A*x==b)
+
+    test && @test vexity(p) == ConvexVexity()
+
+    handle_problem!(p)
+
+    if test
+        @test p.optval ≈ 1.0 atol=atol rtol=rtol
+        @test evaluate(x) ≈ [1, 1] atol=atol rtol=rtol
+        @test evaluate(norm(x, Inf)) ≈ p.optval atol=atol rtol=rtol
+        @test dot(b, p.constraints[1].dual) ≈ p.optval atol=atol rtol=rtol
+    end
+end

@@ -36,7 +36,7 @@ end
     end
 
     @testset "GLPK MIP" begin
-        run_tests(; exclude=[r"socp", r"sdp", r"exp"]) do p
+        run_tests(; exclude=[r"socp", r"sdp", r"exp", r"dual"]) do p
             solve!(p, GLPKSolverMIP())
         end
     end

@@ -1,4 +1,4 @@
-@add_problem lp function lp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem lp function lp_dual_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
     p = minimize(abs(x), x<=-1)
     if test
@@ -19,6 +19,11 @@
     if test
         @test p.optval ≈ 2 atol=atol rtol=rtol
         @test evaluate(sum(abs(x))) ≈ 2 atol=atol rtol=rtol
+        @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
+        @test p.constraints[2].dual ≈ 1 atol=atol rtol=rtol
+        @test p.constraints[3].dual[1,1] ≈ 0 atol=atol rtol=rtol
+        @test p.constraints[3].dual[2,2] ≈ 0 atol=atol rtol=rtol
+        @test p.constraints[3].dual[1,2] ≈ p.constraints[3].dual[2,1] atol=atol rtol=rtol
     end
 end
 
@@ -207,7 +212,7 @@ end
     # TODO: @davidlizeng. We should finish this someday.
 end
 
-@add_problem lp function lp_norm_inf_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem lp function lp_dual_norm_inf_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     p = minimize(norm_inf(x), [-2 <= x, x <= 1])
     if test
@@ -217,10 +222,12 @@ end
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(norm_inf(x)) ≈ 0 atol=atol rtol=rtol
+        @test norm(p.constraints[1].dual) ≈ 0 atol=atol rtol=rtol
+        @test norm(p.constraints[2].dual) ≈ 0 atol=atol rtol=rtol
     end
 end
 
-@add_problem lp function lp_norm_1_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem lp function lp_dual_norm_1_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     p = minimize(norm_1(x), [-2 <= x, x <= 1])
     if test
@@ -230,5 +237,7 @@ end
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(norm_1(x)) ≈ 0 atol=atol rtol=rtol
+        @test norm(p.constraints[1].dual) ≈ 0 atol=atol rtol=rtol
+        @test norm(p.constraints[2].dual) ≈ 0 atol=atol rtol=rtol
     end
 end
