@@ -184,7 +184,13 @@ end
 
 function show(io::IO, p::Problem)
     TreePrint.print_tree(io, p, MAXDEPTH[], MAXWIDTH[])
-    print(io, "\ncurrent status: $(p.status)")
+    if p.status == MOI.OPTIMIZE_NOT_CALLED
+        print(io, "\nstatus: `solve!` not called yet")
+    else
+        print(io, "\ntermination status: $(p.status)")
+        print(io, "\nprimal status: $(primal_status(p))")
+        print(io, "\ndual status: $(dual_status(p))")
+    end
     if p.status == "solved"
         print(io, " with optimal value of $(round(p.optval, digits=4))")
     end

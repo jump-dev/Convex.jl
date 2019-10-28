@@ -256,9 +256,11 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, id_to_variables, 
     status = MOI.get(model, MOI.TerminationStatus())
     problem.status = status
 
-    # should check when this is allowed
-    objective = MOI.get(model, MOI.ObjectiveValue())
-    problem.optval = objective
+    ## This can throw if the problem was not solved correctly
+    # objective = MOI.get(model, MOI.ObjectiveValue())
+    # problem.optval = objective
+    ## Instead, we use a `getproperty` override to access the objective value only when the user asks.
+    ## That way `moi_populate_solution!` will complete successfully.
 
     dual_status = MOI.get(model, MOI.DualStatus())
     primal_status = MOI.get(model, MOI.PrimalStatus())

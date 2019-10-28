@@ -5,7 +5,6 @@ mutable struct Problem{T<:Real}
     objective::AbstractExpr
     constraints::Array{Constraint}
     status::MOI.TerminationStatusCode
-    optval::Union{Real,Nothing}
     model::Union{MOI.ModelLike, Nothing}
 
     function Problem{T}(head::Symbol, objective::AbstractExpr,
@@ -13,13 +12,27 @@ mutable struct Problem{T<:Real}
         if sign(objective)== Convex.ComplexSign()
             error("Objective cannot be a complex expression")
         else
-            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, nothing)
+            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing)
         end
     end
 end
 
-dual_status(p::Problem) = get(p.model, MOI.DualStatus())
-primal_status(p::Problem) = get(p.model, MOI.PrimalStatus())
+function Base.getproperty(p::Problem, s::Symbol)
+    if s === :optval
+        if getfield(p, :status) == MOI.OPTIMIZE_NOT_CALLED
+            return nothing
+        else
+            return MOI.get(p.model, MOI.ObjectiveValue())
+        end
+    else
+        return getfield(p, s)
+    end
+end
+
+dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
+primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
+termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
+objective_value(p::Problem) = MOI.get(p.model, MOI.ObjectiveValue())
 
 Problem(args...) = Problem{Float64}(args...)
 
