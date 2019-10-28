@@ -26,36 +26,6 @@ primal_status(p::Problem) = get(p.model, MOI.PrimalStatus())
 
 Problem(args...) = Problem{Float64}(args...)
 
-# If the problem constructed is of the form Ax=b where A is m x n
-# returns:
-# index: n
-# constr_size: m
-# var_to_ranges a dictionary mapping from variable id to (start_index, end_index)
-# where start_index and end_index are the start and end indexes of the variable in A
-function find_variable_ranges(constraints, id_to_variables)
-    index = 0
-    constr_size = 0
-    var_to_ranges = Dict{UInt64, Tuple{Int, Int}}()
-    for constraint in constraints
-        for i = 1:length(constraint.objs)
-            for (id, val) in constraint.objs[i]
-                if !haskey(var_to_ranges, id) && id != objectid(:constant)
-                    var = id_to_variables[id]
-                    if var.sign == ComplexSign()
-                        var_to_ranges[id] = (index + 1, index + 2*length(var))
-                        index += 2*length(var)
-                    else
-                        var_to_ranges[id] = (index + 1, index + length(var))
-                        index += length(var)
-                    end
-                end
-            end
-            constr_size += constraint.sizes[i]
-        end
-    end
-    return index, constr_size, var_to_ranges
-end
-
 function vexity(p::Problem)
     bad_vex = [ConcaveVexity, NotDcp]
 
