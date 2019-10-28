@@ -5,6 +5,11 @@ using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
 
+using MathOptInterface
+const MOI = MathOptInterface
+const MOIU = MOI.Utilities
+const MOIB = MOI.Bridges
+
 global DEFAULT_SOLVER = nothing
 ### modeling framework
 include("dcp.jl")
@@ -21,7 +26,7 @@ include("constraints/soc_constraints.jl")
 include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
-include("MOI_solve.jl")
+include("solution.jl")
 
 ### affine atoms
 include("atoms/affine/add_subtract.jl")

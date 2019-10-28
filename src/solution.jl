@@ -1,8 +1,3 @@
-using MathOptInterface
-const MOI = MathOptInterface
-const MOIU = MOI.Utilities
-const MOIB = MOI.Bridges
-
 export solve!
 
 # Convert from sets used within Convex to MOI sets
