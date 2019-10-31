@@ -1,2 +1,3 @@
 [deps]
-JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
