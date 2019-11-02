@@ -1,135 +1,117 @@
-## Generate data for long only portfolio optimization.
-srand(9);
-n = 10;
-mu = abs(randn(n, 1));
-Sigma = randn(n, n);
-Sigma = Sigma' * Sigma;
+# #  Portfolio Optimization - Markowitz Efficient Frontier 
+#
+# In this problem, we will find the unconstrained portfolio allocation where we introduce the weighting parameter $\lambda \;(0 \leq \lambda \leq$ 1) and minimize $\lambda * \text{risk} - (1-\lambda)* \text{expected return}$. By varying the values of $\lambda$, we trace out the efficient frontier.  
+#
+# Suppose that we know the mean returns $\mu \in \mathbf{R}^n$ of each asset and the covariance $\Sigma \in \mathbf{R}^{n \times n}$ between the assets. Our objective is to find a portfolio allocation that minimizes the *risk* (which we measure as the variance $w^T \Sigma w$) and maximizes the *expected return* ($w^T \mu$) of the portfolio of the simulataneously. We require $w \in \mathbf{R}^n$ and $\sum_i w_i = 1$.
+#
+# This problem can be written as
+#
+# $
+# \begin{array}{ll}
+#     \mbox{minimize}   & \lambda*w^T \Sigma w - (1-\lambda)*w^T \mu \\
+#     \mbox{subject to} & \sum_i w_i = 1
+# \end{array}
+# $
+#
+# where $w \in \mathbf{R}^n$ is the vector containing weights allocated to each asset.
 
-#-
+using Convex, SCS    #We are using SCS solver. Install using Pkg.add("SCS")
 
-## Long only portfolio optimization.
-using Convex, SCS, ECOS
-set_default_solver(SCSSolver(verbose=0));
-w = Variable(n);
-ret = sum(mu' * w);
-risk = sum(quad_form(w, Sigma));
+## generate problem data
+μ = [11.5; 9.5; 6]/100          #expected returns
+Σ  = [166  34  58;              #covariance matrix
+       34  64   4;
+       58   4 100]/100^2
 
-## Compute trade-off curve.
-SAMPLES = 100;
-risk_data = zeros(SAMPLES);
-ret_data = zeros(SAMPLES);
-gamma_vals = logspace(-2, 3, SAMPLES);
-for i=1:SAMPLES
-    gamma = gamma_vals[i];
-    problem = maximize(ret - gamma*risk, [sum(w) == 1, w >= 0]);
-    solve!(problem);
-    risk_data[i] = sqrt(evaluate(risk));
-    ret_data[i] = evaluate(ret);
+n = length(μ)                   #number of assets 
+
+# If you want to try the optimization with more assets, uncomment and run the next cell. It creates a vector or average returns and a variance-covariance matrix that have scales similar to the numbers above.
+
+#=
+using Random
+Random.seed!(123)
+
+n = 15                                      #number of assets, CHANGE IT?
+
+μ = (6 .+ (11.5-6)*rand(n))/100             #mean
+A = randn(n,n)
+Σ = (A * A' + diagm(0=>rand(n)))/500;       #covariance matrix
+=#
+
+# First we solve without any bounds on $w$
+
+N = 101
+λ_vals = range(0.01,stop=0.99,length=N)
+
+w    = Variable(n)
+ret  = dot(w,μ)
+risk = quadform(w,Σ)
+
+MeanVarA = zeros(N,2)                    
+for i = 1:N
+    λ = λ_vals[i]
+    p = minimize( λ*risk - (1-λ)*ret,
+                  sum(w) == 1 )    
+    solve!(p, SCSSolver(verbose = false))
+    MeanVarA[i,:]= [evaluate(ret),evaluate(risk)[1]]    #risk is a 1x1 matrix
+end
+
+# Now we solve with the bounds $0\le w_i \le 1$
+
+w_lower = 0                     #bounds on w
+w_upper = 1
+
+MeanVarB = zeros(N,2)   #repeat, but with 0<w[i]<1
+for i = 1:N
+    λ = λ_vals[i]
+    p = minimize( λ*risk - (1-λ)*ret,
+                  sum(w) == 1,
+                  w_lower <= w,     #w[i] is bounded
+                  w <= w_upper )
+    solve!(p, SCSSolver(verbose = false))
+    MeanVarB[i,:]= [evaluate(ret),evaluate(risk)[1]]    
 end
 
 #-
 
-using Gadfly
-markers_on = [29, 40];
-labels = [@sprintf("γ = %0.2f", gamma_vals[marker]) for marker in markers_on];
-plot(
-layer(x=[sqrt(Sigma[i,i]) for i=1:n], y=mu,
-        Geom.point, Theme(default_color=color("red"))),
-layer(x=risk_data, y=ret_data,
-        Geom.line, Theme(default_color=color("green"))),
-layer(x=risk_data[markers_on], y=ret_data[markers_on], label=labels,
-        Geom.point, Geom.label, Theme(default_color=color("blue"))),
-Guide.XLabel("Risk"), Guide.YLabel("Return")
-)
+using Plots
+plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2]]),
+      [MeanVarA[:,1] MeanVarB[:,1]],
+      xlim = (0,0.25),
+      ylim = (0,0.15),
+      title = "Markowitz Efficient Frontier",
+      xlabel = "Standard deviation",
+      ylabel = "Expected return",
+      label = ["no bounds on w","with 0<w<1",])
+scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
 
-#-
+# We now instead impose a restriction on  $\sum_i |w_i| - 1$, allowing for varying degrees of "leverage".
 
-## Plot return distributions for two points on the trade-off curve.
-using DataFrames, Distributions
-xdata = linspace(-2, 5, 1000);
-df = DataFrame(x=xdata,
-    y=pdf(Normal(ret_data[markers_on[1]], risk_data[markers_on[1]]), xdata),
-    label=@sprintf("γ = %0.2f", gamma_vals[markers_on[1]]));
-for i=2:length(markers_on)
-    m = markers_on[i];
-    df = vcat(df, DataFrame(x=xdata,
-                    y=pdf(Normal(ret_data[m], risk_data[m]), xdata),
-                    label=@sprintf("γ = %0.2f", gamma_vals[m])));
-end
-plot(df, x="x", y="y", color="label", Geom.line, Guide.XLabel("Return"), Guide.YLabel("Density"))
+Lmax = 0.5
 
-#-
-
-## Portfolio optimization with leverage limit.
-## Compute trade-off curve for each leverage limit.
-L_vals = [1, 2, 4];
-SAMPLES = 100;
-risk_data = zeros(length(L_vals), SAMPLES);
-ret_data = zeros(length(L_vals), SAMPLES);
-for k=1:length(L_vals)
-    for i=1:SAMPLES
-        Lmax = L_vals[k];
-        gamma = gamma_vals[i];
-        problem = maximize(ret - gamma*risk,[sum(w) == 1, norm(w, 1) <= Lmax]);
-        solve!(problem);
-        risk_data[k, i] = sqrt(evaluate(risk));
-        ret_data[k, i] = evaluate(ret);
-    end
+MeanVarC = zeros(N,2)   #repeat, but with restriction on Sum(|w[i]|)
+for i = 1:N
+    λ = λ_vals[i]
+    p = minimize( λ*risk - (1-λ)*ret,
+                  sum(w) == 1,
+                  (norm(w, 1)-1) <= Lmax)
+    solve!(p, SCSSolver(verbose = false))
+    MeanVarC[i,:]= [evaluate(ret),evaluate(risk)[1]]    
 end
 
 #-
 
-df = DataFrame(x=vec(risk_data[1,:]), y=vec(ret_data[1,:]), label=@sprintf("Lmax = %d", L_vals[1]));
-for i=2:length(L_vals)
-    df = vcat(df, DataFrame(x=vec(risk_data[i,:]), y=vec(ret_data[i,:]), label=@sprintf("Lmax = %d", L_vals[i])));
-end
-plot(df, x="x", y="y", color="label", Geom.line, Guide.XLabel("Return"), Guide.YLabel("Standard deviation"))
+plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2] MeanVarC[:,2]]),
+      [MeanVarA[:,1] MeanVarB[:,1] MeanVarC[:,1]],
+      xlim = (0,0.25),
+      ylim = (0,0.15),
+      title = "Markowitz Efficient Frontier",
+      xlabel = "Standard deviation",
+      ylabel = "Expected return",
+      label = ["no bounds on w","with 0<w<1","restriction on sum(|w|)"])
+scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
 
 #-
 
-## Portfolio optimization with a leverage limit and a bound on risk.
-## Compute solution for different leverage limits.
-w_vals = zeros(n, length(L_vals));
-for i=1:length(L_vals)
-    problem = maximize(ret, [sum(w) == 1, norm(w, 1) <= L_vals[i], risk <= 2]);
-    solve!(problem);
-    w_vals[:, i] = evaluate(w);
-end
 
-#-
-
-## Generate data for factor model.
-n = 3000;
-m = 50;
-mu = abs(randn(n, 1));
-Sigma_tilde = randn(m, m);
-Sigma_tilde = Sigma_tilde' * Sigma_tilde;
-D = diagm(0.9 * rand(n));
-F = randn(n, m);
-
-#-
-
-## Factor model portfolio optimization.
-w = Variable(n);
-f = F' * w;
-ret = sum(mu' * w); 
-risk = quad_form(f, Sigma_tilde) + quad_form(w, D);
-
-
-## Solve the factor model problem.
-Lmax = 2
-gamma = 0.1
-factor_problem = maximize(ret - gamma*risk, [sum(w) == 1, norm(w, 1) <= Lmax]);
-solve!(factor_problem, ECOSSolver())
-
-#-
-
-## Standard portfolio optimization with data from factor model.
-risk = quad_form(w, F * Sigma_tilde * F' + D);
-problem = maximize(ret - gamma*risk,  [sum(w) == 1, norm(w, 1) <= Lmax]);
-
-#-
-
-## Warning: This takes a long time.
-## solve!(problem, ECOSSolver())
 
