@@ -1,3 +1,4 @@
+# # POVM simulation
 # This notebook shows how we can check how much depolarizing noise a qubit positive operator-valued measure (POVM) can take before it becomes simulable by projective measurements. The general method is described in [arXiv:1609.06139](https://arxiv.org/abs/1609.06139). The question of simulability by projective measurements boils down to an SDP problem. Eq. (8) from the paper defines the noisy POVM that we obtain subjecting a POVM $\mathbf{M}$ to a depolarizing channel $\Phi_t$:
 #
 # $\left[\Phi_t\left(\mathbf{M}\right)\right]_i := t M_i + (1-t)\frac{\mathrm{tr}(M_i)}{d} \mathbb{1}$.
@@ -6,16 +7,11 @@
 #
 # We will use Convex.jl to solve the SDP problem.
 
-using Convex
-using LinearAlgebra
+using Convex, SCS, LinearAlgebra
 if VERSION < v"1.2.0-DEV.0"
     (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
      LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
 end
-
-import SCS
-## passing in verbose=0 to hide output from SCS
-solver = SCS.SCSSolver(verbose=0)
 
 # For the qubit case, a four outcome qubit POVM $\mathbf{M} \in\mathcal{P}(2,4)$ is simulable if and only if 
 #
@@ -57,7 +53,7 @@ function get_visibility(K)
     constraints += t*K[3] + (1-t)*noise[3] == P[2][2] + P[4][2] + P[6][1]
     constraints += t*K[4] + (1-t)*noise[4] == P[3][2] + P[5][2] + P[6][2]
     p = maximize(t, constraints)
-    solve!(p, solver)
+    solve!(p, SCSSolver(verbose=0))
     return p.optval
 end
 
@@ -74,4 +70,3 @@ M = [dp(b[i, :]) for i=1:size(b,1)]/4;
 get_visibility(M)
 
 # This value matches the one [we obtained](https://github.com/peterwittek/ipython-notebooks/blob/master/Simulating_POVMs.ipynb) using [PICOS](http://picos.zib.de/).
-

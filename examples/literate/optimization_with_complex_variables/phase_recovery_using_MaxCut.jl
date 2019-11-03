@@ -1,3 +1,4 @@
+# # Phase recovery using MaxCut
 # In this example, we relax the phase retrieval problem similar to the classical [MaxCut](http://www-math.mit.edu/~goemans/PAPERS/maxcut-jacm.pdf) semidefinite program and recover the phase of the signal given the magnitude of the linear measurements.
 #
 # Phase recovery has wide applications such as  in X-ray and crystallography imaging, diffraction imaging or microscopy and audio signal processing. In all these applications, the detectors cannot measure the phase of the incoming wave and only record its amplitude i.e complex measurements of a signal $x \in \mathbb{C}^p$ are obtained from a linear injective operator A, **but we can only measure the magnitude vector Ax, not the phase fo Ax**.
@@ -29,16 +30,11 @@
 #
 # Here the variable $U$ must be hermitian ($U \in \mathbb{H}_n $), and we have a solution to the phase recovery problem if $U = u u^*$ has rank one. Otherwise, the leading singular vector of $U$ can be used to approximate the solution.
 
-using Convex
-using LinearAlgebra
+using Convex, SCS, LinearAlgebra
 if VERSION < v"1.2.0-DEV.0"
     (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
      LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
 end
-
-import SCS
-## passing in verbose=0 to hide output from SCS
-solver = SCS.SCSSolver(verbose=0)
 
 n = 20
 p = 2
@@ -52,7 +48,7 @@ objective = inner_product(U,M)
 c1 = diag(U) == 1 
 c2 = U in :SDP
 p = minimize(objective,c1,c2)
-solve!(p, solver)
+solve!(p, SCSSolver(verbose=0))
 U.value
 
 #-
@@ -67,4 +63,3 @@ for i in 1:n
     u[i] = u[i]/abs(u[i])
 end
 u
-
