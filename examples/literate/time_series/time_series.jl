@@ -1,13 +1,13 @@
 # # Time Series Analysis
 # A time series is a sequence of data points, each associated with a time. In our example, we will work with a time series of daily temperatures in the city of Melbourne, Australia over a period of a few years. Let $x$ be the vector of the time series, and $x_i$ denote the temperature in Melbourne on day $i$. Here is a picture of the time series:
 
-using Gadfly, Convex, SCS
-temps = readdlm("melbourne_temps.txt", ',')
+using Plots, Convex, ECOS, DelimitedFiles
+aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+
+temps = readdlm(aux("melbourne_temps.txt"), ',')
 n = size(temps)[1]
-p = plot(
-  x=1:1500, y=temps[1:1500], Geom.line,
-  Theme(panel_fill=color("white"))
-)
+plot(1:1500, temps[1:1500], ylabel="Temperature (°C)", label="data")
+
 
 # We can quickly compute the mean of the time series to be $11.2$. If we were to always guess the mean as the temperature of Melbourne on a given day, the RMS error of our guesswork would be $4.1$. We'll try to lower this RMS error by coming up with better ways to model the temperature than guessing the mean.
 #
@@ -31,32 +31,25 @@ p = plot(
 # The following code uses Convex to find and plot the model:
 
 yearly = Variable(n)
-eq_constraints = []
-for i in 365 + 1 : n
-  eq_constraints += yearly[i] == yearly[i - 365]
-end
+eq_constraints = [ yearly[i] == yearly[i - 365] for i in 365 + 1 : n ]
 
 smoothing = 100
 smooth_objective = sumsquares(yearly[1 : n - 1] - yearly[2 : n])
-problem = minimize(sumsquares(temps - yearly) + smoothing * smooth_objective, eq_constraints)
-solve!(problem, SCSSolver(max_iters=5000, verbose=0))
+problem = minimize(sumsquares(temps - yearly) + smoothing * smooth_objective, eq_constraints);
+solve!(problem, ECOSSolver(maxit=200, verbose=0))
 residuals = temps - evaluate(yearly)
 
 ## Plot smooth fit
-p = plot(
-  layer(x=1:1500, y=evaluate(yearly)[1:1500], Geom.line, Theme(default_color=color("red"), line_width=2px)),
-  layer(x=1:1500, y=temps[1:1500], Geom.line),
-  Theme(panel_fill=color("white"))
-)
+plot_times = 1:1500
+plot(plot_times, temps[plot_times], label="data")
+plot!(plot_times, evaluate(yearly)[plot_times], label="smooth fit",  ylabel="Temperature (°C)")
 
 # We can also plot the residual temperatures, $r$, defined as $r = x - s$.
 
 ## Plot residuals for a few days
-p = plot(
-    x=1:100, y=residuals[1:100], Geom.line,
-    Theme(default_color=color("green"), panel_fill=color("white"))
-)
+plot(1:100, residuals[1:100], ylabel="Residuals")
 
+root_mean_square_error = sqrt(sum( x -> x^2, residuals) / length(residuals))
 # Our smooth model has a RMS error of $2.7$, a significant improvement from just guessing the mean, but we can do better.
 #
 # We now make the hypothesis that the residual temperature on a given day is some linear combination of the previous $5$ days. Such a model is called autoregressive. We are essentially trying to fit the residuals as a function of other parts of the data itself. We want to find a vector of coefficients $a$ such that
@@ -71,24 +64,23 @@ p = plot(
 
 ## Generate the residuals matrix
 ar_len = 5
-residuals_mat = residuals[ar_len : n - 1]
-for i = 1:ar_len - 1
-  residuals_mat = [residuals_mat residuals[ar_len - i : n - i - 1]]
+
+residuals_mat = Matrix{Float64}(undef, length(residuals) - ar_len, ar_len)
+for i = 1:ar_len
+  residuals_mat[:, i] = residuals[ar_len - i + 1 : n - i]
 end
 
 ## Solve autoregressive problem
 ar_coef = Variable(ar_len)
 problem = minimize(sumsquares(residuals_mat * ar_coef - residuals[ar_len + 1 : end]))
-solve!(problem, SCSSolver(max_iters=5000, verbose=0))
+solve!(problem, ECOSSolver(max_iters=200, verbose=0))
 
 ## plot autoregressive fit of daily fluctuations for a few days
 ar_range = 1:145
-day_range = ar_range + ar_len
-p = plot(
-  layer(x=day_range, y=residuals[day_range], Geom.line, Theme(default_color=color("green"))),
-  layer(x=day_range, y=residuals_mat[ar_range, :] * evaluate(ar_coef), Geom.line, Theme(default_color=color("red"))),
-  Theme(panel_fill=color("white"))
-)
+day_range = ar_range .+ ar_len
+plot(day_range, residuals[day_range], label="fluctuations from smooth fit", ylabel="Temperature difference (°C)")
+plot!(day_range, residuals_mat[ar_range, :] * evaluate(ar_coef), label="autoregressive estimate")
+
 
 # Now, we can add our autoregressive model for the residual temperatures to our smooth model to get an better fitting model for the daily temperatures in the city of Melbourne:
 
@@ -96,11 +88,9 @@ total_estimate = evaluate(yearly)
 total_estimate[ar_len + 1 : end] += residuals_mat * evaluate(ar_coef)
 
 ## plot final fit of data
-p = plot(
-  layer(x=1:1500, y=total_estimate[1:1500], Geom.line, Theme(default_color=color("red"))),
-  layer(x=1:1500, y=temps[1:1500], Geom.line),
-  Theme(panel_fill=color("white"))
-)
+plot(plot_times, temps[plot_times], label="data", ylabel="Temperature (°C)")
+plot!(plot_times, total_estimate[plot_times], label="estimate")
+
+root_mean_square_error = sqrt(sum( x -> x^2, total_estimate - temps) / length(temps))
 
 # The RMS error of this final model is $2.3$.
-
