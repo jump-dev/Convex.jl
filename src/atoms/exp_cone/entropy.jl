@@ -21,7 +21,7 @@ mutable struct EntropyAtom <: AbstractExpr
 
     function EntropyAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("argument should be real but it's instead complex")
+            error("argument should be real but it's complex instead")
         else
             children = (x,)
             # TODO check positivity or enforce it
