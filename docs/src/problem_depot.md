@@ -36,13 +36,13 @@ The problems are organized into folders in `src/problem_depot/problems`. Each is
 end
 ```
 
-The `@add_problem` call adds the problem to the registry of problems in [`Convex.ProblemDepot.PROBLEMS`](@ref), which in turn is used by [`run_tests`](@ref) and [`benchmark_suite`](@ref). Next, `affine` is the grouping of the problem; this problem came from one of the affine tests, and in particular is testing the negation atom. Next is the function signature:
+The `@add_problem` call adds the problem to the registry of problems in [`Convex.ProblemDepot.PROBLEMS`](@ref), which in turn is used by [`Convex.ProblemDepot.run_tests`](@ref) and [`Convex.ProblemDepot.benchmark_suite`](@ref). Next, `affine` is the grouping of the problem; this problem came from one of the affine tests, and in particular is testing the negation atom. Next is the function signature:
 
 ```julia
 function affine_negate_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
 ```
 
-this should be the same for every problem, except for the name, which is a description of the problem. It should include what kind of atoms it uses (`affine` in this case), so that certain kinds of atoms can be ruled out by the `exclude` keyword to [`run_tests`](@ref) and [`benchmark_suite`](@ref); for example, many solvers cannot solve mixed-integer problems, so `mip` is included in the name of such problems.
+this should be the same for every problem, except for the name, which is a description of the problem. It should include what kind of atoms it uses (`affine` in this case), so that certain kinds of atoms can be ruled out by the `exclude` keyword to [`Convex.ProblemDepot.run_tests`](@ref) and [`Convex.ProblemDepot.benchmark_suite`](@ref); for example, many solvers cannot solve mixed-integer problems, so `mip` is included in the name of such problems.
 
 Then begins the body of the problem. It is setup like any other Convex.jl problem, only `handle_problem!` is called instead of `solve!`. This allows particular solvers to be used (via e.g. choosing `handle_problem! = p -> solve!(p, solver)`), or for any other function of the problem (e.g. `handle_problem! = p -> Convex.conic_problem(p)` which is used for benchmarking problem formulation speed.) Tests should be included and gated behind `if test` blocks, so that tests can be skipped for benchmarking, or in the case that the problem is not in fact solved during `handle_problem!`.
 
