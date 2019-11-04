@@ -37,7 +37,7 @@ function vexity(c::ExpConstraint)
     return ConvexVexity()
 end
 
-function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, c)
         conic_constrs = ConicConstr[]
         if c.size == (1, 1)

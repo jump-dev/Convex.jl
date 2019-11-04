@@ -42,7 +42,7 @@ function evaluate(x::RealAtom)
     return real.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         new_objective = ConicObj()
         objective = conic_form!(x.children[1], unique_conic_forms)
@@ -93,7 +93,7 @@ function evaluate(x::ImaginaryAtom)
     return imag.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         new_objective = ConicObj()
         objective = conic_form!(x.children[1], unique_conic_forms)

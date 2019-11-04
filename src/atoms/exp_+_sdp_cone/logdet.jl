@@ -29,7 +29,7 @@ function evaluate(x::LogDetAtom)
     return log(det(evaluate(x.children[1])))
 end
 
-function conic_form!(x::LogDetAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::LogDetAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         A = x.children[1]
         D = Variable(size(A)) # diagonal matrix

@@ -47,7 +47,7 @@ function evaluate(x::EntropyAtom)
     return -c .* log.(c)
 end
 
-function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, e)
         # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
         t = Variable(e.size)

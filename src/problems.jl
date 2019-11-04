@@ -97,7 +97,7 @@ function vexity(p::Problem)
     return problem_vex
 end
 
-function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
     objective_var = Variable()
     objective = conic_form!(objective_var, unique_conic_forms)
     conic_form!(p.objective - objective_var == 0, unique_conic_forms)

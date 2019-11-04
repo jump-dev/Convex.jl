@@ -47,7 +47,7 @@ function evaluate(x::IndexAtom)
     end
 end
 
-function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         m = length(x)
         n = length(x.children[1])

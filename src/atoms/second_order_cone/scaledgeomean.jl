@@ -35,7 +35,7 @@ function evaluate(q::ScaledGeoMeanAtom)
     return prod(evaluate(q.children[1]))^(1/nbar)
 end
 
-function conic_form!(q::ScaledGeoMeanAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(q::ScaledGeoMeanAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, q)
         t = Variable()
         qol_objective = conic_form!(t, unique_conic_forms)

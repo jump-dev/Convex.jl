@@ -57,7 +57,7 @@ function evaluate(x::DotSortAtom)
     return sum(sort(vec(evaluate(x.children[1])), rev=true) .* sort(vec(x.w), rev=true))
 end
 
-function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         y = x.children[1]
         w = x.w

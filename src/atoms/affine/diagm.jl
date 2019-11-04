@@ -55,7 +55,7 @@ function diagm((d, x)::Pair{<:Integer, <:AbstractExpr})
 end
 Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 
-function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         sz = x.size[1]
 

@@ -54,7 +54,7 @@ function evaluate(x::MultiplyAtom)
     return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         # scalar multiplication
         if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
@@ -145,7 +145,7 @@ function evaluate(x::DotMultiplyAtom)
     return evaluate(x.children[1]) .* evaluate(x.children[2])
 end
 
-function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         if vexity(x.children[1]) != ConstVexity()
             if vexity(x.children[2]) != ConstVexity()

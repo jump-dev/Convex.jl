@@ -47,7 +47,7 @@ matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
 matrixfrac(x::Value, P::AbstractExpr) = MatrixFracAtom(Constant(x), P)
 matrixfrac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, Constant(P))
 
-function conic_form!(m::MatrixFracAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(m::MatrixFracAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, m)
         x = m.children[1]
         P = m.children[2]

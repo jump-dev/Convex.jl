@@ -40,7 +40,7 @@ end
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
-function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         euc_norm = Variable()
         objective = conic_form!(euc_norm, unique_conic_forms)
