@@ -1,4 +1,6 @@
+# # Logistic regression
 using DataFrames
+using Plots
 using RDatasets
 using Convex
 using SCS
@@ -9,10 +11,9 @@ using SCS
 ## predict whether the iris species is versicolor using the sepal length and width and petal length and width
 iris = dataset("datasets", "iris")
 ## outcome variable: +1 for versicolor, -1 otherwise
-iris[:Y] = [species == "versicolor" ? 1.0 : -1.0 for species in iris[:Species]]
-Y = array(iris[:Y])
+Y = [species == "versicolor" ? 1.0 : -1.0 for species in iris.Species]
 ## create data matrix with one column for each feature (first column corresponds to offset)
-X = [ones(size(iris, 1)) iris[:SepalLength] iris[:SepalWidth] iris[:PetalLength] iris[:PetalWidth]];
+X = hcat(ones(size(iris, 1)), iris.SepalLength, iris.SepalWidth, iris.PetalLength, iris.PetalWidth);
 
 #-
 
@@ -26,8 +27,8 @@ solve!(problem, SCSSolver(verbose=false))
 #-
 
 ## let's see how well the model fits
-using Gadfly
-perm = Base.Sort.sortperm(vec(X*beta.value))
-set_default_plot_size(25cm, 12cm)
-plot(layer(x=1:n,y=(Y[perm]+1)/2,Geom.point),layer(x=1:n,y=logistic(X*beta.value)[perm],Geom.line))
-
+using Plots
+logistic(x::Real) = inv(exp(-x) + one(x))
+perm = sortperm(vec(X*beta.value))
+plot(1:n, (Y[perm] .+ 1)/2, st=:scatter)
+plot!(1:n, logistic.(X*beta.value)[perm])

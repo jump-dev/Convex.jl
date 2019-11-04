@@ -1,3 +1,5 @@
+# # Basic Usage
+
 using Convex
 using LinearAlgebra
 if VERSION < v"1.2.0-DEV.0"
@@ -102,6 +104,3 @@ solve!(p, GLPKSolverMIP())
 x.value
 
 #-
-
-
-

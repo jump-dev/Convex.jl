@@ -79,7 +79,7 @@
 # The following code builds and solves our control example:
 
 
-using Convex, SCS, Gadfly
+using Convex, SCS, Plots
 
 ## Some constraints on our motion
 ## The object should start from the origin, and end at rest
@@ -99,41 +99,35 @@ force = Variable(2, T - 1)
 
 ## Create a problem instance
 mu = 1
-constraints = []
 
 ## Add constraints on our variables
-for i in 1 : T - 1
-  constraints += position[:, i + 1] == position[:, i] + h * velocity[:, i]
-end
+constraints = Constraint[ position[:, i + 1] == position[:, i] + h * velocity[:, i] for i in 1 : T - 1]
+
 
 for i in 1 : T - 1
   acceleration = force[:, i]/mass + g - drag * velocity[:, i]
-  constraints += velocity[:, i + 1] == velocity[:, i] + h * acceleration
+  push!(constraints, velocity[:, i + 1] == velocity[:, i] + h * acceleration)
 end
 
 ## Add position constraints
-constraints += position[:, 1] == 0
-constraints += position[:, T] == final_position
+push!(constraints, position[:, 1] == 0)
+push!(constraints, position[:, T] == final_position)
 
 ## Add velocity constraints
-constraints += velocity[:, 1] == initial_velocity
-constraints += velocity[:, T] == 0
+push!(constraints, velocity[:, 1] == initial_velocity)
+push!(constraints, velocity[:, T] == 0)
 
 ## Solve the problem
 problem = minimize(sumsquares(force), constraints)
 solve!(problem, SCSSolver(verbose=0))
 
-# We can plot the trajectory taken by the object. The blue point denotes the initial position, and the green point denotes the final position.
+# We can plot the trajectory taken by the object.
 
 pos = evaluate(position)
-p = plot(
-  layer(x=[pos[1, 1]], y=[pos[2, 1]], Geom.point, Theme(default_color=color("blue"))),
-  layer(x=[pos[1, T]], y=[pos[2, T]], Geom.point, Theme(default_color=color("green"))),
-  layer(x=pos[1, :], y=pos[2, :], Geom.line(preserve_order=true)),
-  Theme(panel_fill=color("white"))
-)
+plot([pos[1, 1]], [pos[2, 1]], st=:scatter, label="initial point")
+plot!([pos[1, T]], [pos[2, T]], st=:scatter, label="final point")
+plot!(pos[1, :], pos[2, :], label="trajectory") 
 
 # We can also see how the magnitude of the force changes over time.
 
-p = plot(x=1:T, y=sum(evaluate(force).^2, 1), Geom.line, Theme(panel_fill=color("white")))
-
+plot(vec(sum(evaluate(force).^2, dims=1)), label="force (magnitude)")

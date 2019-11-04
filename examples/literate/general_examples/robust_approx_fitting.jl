@@ -1,3 +1,4 @@
+# # Robust approximate fitting
 # Section 6.4.2
 # Boyd & Vandenberghe "Convex Optimization"
 # Original by Lieven Vandenberghe
@@ -21,58 +22,51 @@
 #           minimize sup{-1<=u<=1} ||(A+tB)x - b||_2)
 #      (reduces to minimizing max{||(A-B)x - b||_2, ||(A+B)x - b||_2} )
 
-using Convex
+using Convex, LinearAlgebra, SCS
 
 # Input Data
 m = 20;
 n = 10;
 A = randn(m,n);
 (U,S,V) = svd(A);
-S = diagm(logspace(-1, 1, n));
+S = diagm(exp10.(range(-1, stop=1, length=n)));
 A = U[:, 1:n] * S * V';
 
 B = randn(m, n);
-B = B / Base.norm(B);
+B = B / norm(B);
 
 b = randn(m, 1);
 x = Variable(n)
 
 # Case 1: Nominal optimal solution
 p = minimize(norm(A * x - b, 2))
-solve!(p)
-x_nom = x.evaluate()
+solve!(p, SCSSolver(verbose=0))
+x_nom = evaluate(x)
 
 # Case 2: Stochastic robust approximation
 P = 1 / 3 * B' * B;
-p = minimize(square_pos(norm(A * x - b)) + quadform(x, P))
-solve!(p)
-x_stoch = x.evaluate()
+p = minimize(square(pos(norm(A * x - b))) + quadform(x, Symmetric(P)))
+solve!(p, SCSSolver(verbose=0))
+x_stoch = evaluate(x)
 
 # Case 3: Worst-case robust approximation
 p = minimize(max(norm((A - B) * x - b), norm((A + B) * x - b)))
-solve!(p)
-x_wc = x.evaluate()
+solve!(p, SCSSolver(verbose=0))
+x_wc = evaluate(x)
 
 # plot residuals
-novals = 100;
-parvals = linspace(-2, 2, novals);
+parvals = range(-2, stop=2, length=100);
 
-errvals_ls = [];
-errvals_stoch = [];
-errvals_wc = [];
+errvals(x) = [ norm((A + parvals[k] * B) * x - b) for k = eachindex(parvals)]
+errvals_ls = errvals(x_nom)
+errvals_stoch = errvals(x_stoch)
+errvals_wc = errvals(x_wc)
 
-for k=1:novals
-  errvals_ls = [errvals_ls, Base.norm((A + parvals[k] * B) * x_nom - b)];
-  errvals_stoch = [errvals_stoch, Base.norm((A + parvals[k] * B) * x_stoch - b)];
-  errvals_wc = [errvals_wc, Base.norm((A + parvals[k] * B) * x_wc - b)];
-end
 
-# Plots. You'll need Gaston and gnuplot installed.
-# For other plotting libraries, you probably have to change the next few lines.
-using Gaston
-Gaston.set_terminal("x11")
-plot(parvals, errvals_ls, "color","blue", "legend", "Nominal problem",
-     parvals, errvals_stoch, "color", "black", "legend", "Stochastic Robust Approximation",
-     parvals, errvals_wc, "color", "red", "legend", "Worst-Case Robust Approximation",
-     "title", "Residual r(u) vs a parameter u for three approximate solutions",
-     "xlabel", "u", "ylabel", "r(u) = ||A(u)x-b||_2")
+# Plots
+
+using Plots
+plot(parvals, errvals_ls, label="Nominal problem")
+plot!(parvals, errvals_stoch, label="Stochastic Robust Approximation")
+plot!(parvals, errvals_wc, label="Worst-Case Robust Approximation")
+plot!(title="Residual r(u) vs a parameter u for three approximate solutions", xlabel="u", ylabel="r(u) = ||A(u)x-b||_2")
