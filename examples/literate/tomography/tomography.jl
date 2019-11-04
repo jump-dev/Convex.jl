@@ -22,26 +22,27 @@
 #
 # This is simply an unconstrained least squares problem; something we can readily solve!
 
-using Convex, Gadfly, SCS
+using Convex, ECOS, DelimitedFiles, SparseArrays
+aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+line_mat_x = readdlm(aux("tux_sparse_x.txt"))
+line_mat_y = readdlm(aux("tux_sparse_y.txt"))
+line_mat_val = readdlm(aux("tux_sparse_val.txt"))
+line_vals = readdlm(aux("tux_sparse_lines.txt"))
 
-line_mat_x = readdlm("tux_sparse_x.txt")
-line_mat_y = readdlm("tux_sparse_y.txt")
-line_mat_val = readdlm("tux_sparse_val.txt")
-line_vals = readdlm("tux_sparse_lines.txt")
-
-## Form the sparse matrix from the data
-## Image is 50 x 50
+# Form the sparse matrix from the data
+# Image is 50 x 50
 img_size = 50
-## The number of pixels in the image
+
+# The number of pixels in the image
 num_pixels = img_size * img_size
 
-line_mat = spzeros(3300, num_pixels)
+line_mat = spzeros(length(line_vals), num_pixels)
 
 num_vals = length(line_mat_val)
 
 for i in 1:num_vals
-  x = int(line_mat_x[i])
-  y = int(line_mat_y[i])
+  x = Int(line_mat_x[i])
+  y = Int(line_mat_y[i])
   line_mat[x + 1, y + 1] = line_mat_val[i]
 end
 
@@ -50,7 +51,7 @@ pixel_colors = Variable(num_pixels)
 ## to reflect that, we minimize a norm
 objective = sumsquares(line_mat * pixel_colors - line_vals)
 problem = minimize(objective)
-solve!(problem, SCSSolver(verbose=0))
+solve!(problem, ECOSSolver(verbose=0))
 
 rows = zeros(img_size*img_size)
 cols = zeros(img_size*img_size)
@@ -61,9 +62,8 @@ for i = 1:img_size
   end
 end
 
-## Plot the image using the pixel values obtained!
-p = plot(
-  x=rows, y=cols, color=reshape(evaluate(pixel_colors), img_size, img_size), Geom.rectbin,
-  Scale.ContinuousColorScale(Scale.lab_gradient(color("black"), color("white")))
-)
+# Plot the image using the pixel values obtained!
 
+using Plots
+image = reshape(evaluate(pixel_colors), img_size, img_size)
+heatmap(image, yflip=true, aspect_ratio=1, colorbar=nothing, color=:grays)
