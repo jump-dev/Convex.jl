@@ -39,7 +39,7 @@ end
 
 # Since everything is vectorized, we simply need to multiply x by a permutation
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
-function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         objective = conic_form!(x.children[1], unique_conic_forms)
 
@@ -102,7 +102,7 @@ end
 
 # Since everything is vectorized, we simply need to multiply x by a permutation
 # matrix such that coeff * vectorized(x) - vectorized(x') = 0
-function conic_form!(x::AdjointAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::AdjointAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         objective = conic_form!(x.children[1], unique_conic_forms)
 

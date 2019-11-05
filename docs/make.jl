@@ -13,7 +13,6 @@ makedocs(;
         "Complex-domain Optimization" => "complex-domain_optimization.md",
         "Solvers" => "solvers.md",
         "FAQ" => "faq.md",
-        "Optimizing in a Loop" => "loop.md",
         "Advanced" => "advanced.md",
         "Problem Depot" => "problem_depot.md",
         "Contributing" => "contributing.md",

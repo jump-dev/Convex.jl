@@ -16,7 +16,7 @@ struct SOCConstraint <: Constraint
     end
 end
 
-function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, c)
         objectives = Vector{ConicObj}(undef, length(c.children))
         @inbounds for iobj = 1:length(c.children)
@@ -43,7 +43,7 @@ struct SOCElemConstraint <: Constraint
     end
 end
 
-function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, c)
         num_constrs = length(c.children[1])
         num_children = length(c.children)

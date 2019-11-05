@@ -50,7 +50,7 @@ function evaluate(e::RelativeEntropyAtom)
     return out
 end
 
-function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, e)
         # transform to conic form:
         # x log x/y <= z

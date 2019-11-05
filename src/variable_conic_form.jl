@@ -1,4 +1,4 @@
-function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::Variable, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         add_to_id_to_variables!(unique_conic_forms, x)
         if vexity(x) == ConstVexity()
