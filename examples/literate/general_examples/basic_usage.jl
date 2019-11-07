@@ -11,6 +11,7 @@ using SCS
 solver = SCSSolver(verbose=0)
 
 # ### Linear program
+#
 # $$
 # \begin{array}{ll}
 #   \mbox{maximize} & c^T x \\
@@ -21,6 +22,7 @@ solver = SCSSolver(verbose=0)
 #   & x_1 + x_4 - x_2 \leq 10 \\
 # \end{array}
 # $$
+#
 
 x = Variable(4)
 c = [1; 2; 3; 4]
@@ -36,6 +38,7 @@ println(round.(x.value, digits=2))
 println(evaluate(x[1] + x[4] - x[2]))
 
 # ### Matrix Variables and promotions
+#
 # $$
 # \begin{array}{ll}
 #   \mbox{minimize} & \| X \|_F + y \\
@@ -45,6 +48,7 @@ println(evaluate(x[1] + x[4] - x[2]))
 #   & y \geq 0 \\
 # \end{array}
 # $$
+#
 
 X = Variable(2, 2)
 y = Variable()
@@ -56,6 +60,7 @@ println(y.value)
 p.optval
 
 # ### Norm, exponential and geometric mean
+#
 # $$
 # \begin{array}{ll}
 #   \mbox{satisfy} & \| x \|_2 \leq 100 \\
@@ -64,6 +69,7 @@ p.optval
 #   & \sqrt{x_3 x_4} \geq x_2
 # \end{array}
 # $$
+#
 
 x = Variable(4)
 p = satisfy(norm(x) <= 100, exp(x[1]) <= 5, x[2] >= 7, geomean(x[3], x[4]) >= x[2])
@@ -89,6 +95,7 @@ solve!(p, solver)
 y.value
 
 # ### Mixed integer program
+#
 # $$
 # \begin{array}{ll}
 #   \mbox{minimize} & \sum_{i=1}^n x_i \\
@@ -96,6 +103,7 @@ y.value
 #   & x \geq 0.5 \\
 # \end{array}
 # $$
+#
 
 using GLPKMathProgInterface
 x = Variable(4, :Int)

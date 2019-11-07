@@ -13,21 +13,32 @@
 # $A_{ij}$ describes how much of pixel $j$ is intersected by line $i$.
 # Assuming our measurements of the line integrals are perfect, we have the relationship that
 #
-# $$y = Ax$$
+# $$
+#   y = Ax
+# $$
 #
 # However, anytime we have measurements, there are usually small errors that occur.
 # Therefore it makes sense to try to minimize
 #
-# $$\|y - Ax\|_2^2.$$
+# $$
+#  \|y - Ax\|_2^2.
+# $$
 #
 # This is simply an unconstrained least squares problem; something we can readily solve!
 
 using Convex, ECOS, DelimitedFiles, SparseArrays
 aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
 line_mat_x = readdlm(aux("tux_sparse_x.txt"))
+summary(line_mat_x)
+
 line_mat_y = readdlm(aux("tux_sparse_y.txt"))
+summary(line_mat_y)
+
 line_mat_val = readdlm(aux("tux_sparse_val.txt"))
+summary(line_mat_val)
+
 line_vals = readdlm(aux("tux_sparse_lines.txt"))
+summary(line_vals)
 
 # Form the sparse matrix from the data
 # Image is 50 x 50

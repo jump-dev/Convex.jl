@@ -5,9 +5,13 @@
 # Perfect linear separation is not always possible, so we seek to minimize the amount that these inequalities are violated. The violation of point $x_i$ is $\text{max} \{1 + b - w^T x_i, 0\}$, and the violation of point $y_i$ is $\text{max} \{1 - b + w^T y_i, 0\}$. We tradeoff the error $\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\}$ with the distance between the two hyperplanes, which we want to be large, via minimizing $\|w\|^2$.
 #
 # We can write this problem as
+#
+# $$
 # \begin{array}{ll}
-#     \mbox{minimize}   & \|w\|^2 + C * (\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\}) \\
+#     \mbox{minimize}   & \|w\|^2 + C * (\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\})
 # \end{array},
+# $$
+#
 # where $w \in {\bf R}^n$ and $b \in {\bf R}$ are our optimization variables.
 #
 # We can solve the problem as follows.
@@ -31,12 +35,12 @@ neg_data = rand(MvNormal([-1.0, 2.0], 1.0), M);
 #-
 
 function svm(pos_data, neg_data, solver=SCSSolver(verbose=0))
-    # Create variables for the separating hyperplane w'*x = b.
+    ## Create variables for the separating hyperplane w'*x = b.
     w = Variable(n)
     b = Variable()
-    # Form the objective.
+    ## Form the objective.
     obj = sumsquares(w) + C*sum(max(1+b-w'*pos_data, 0)) + C*sum(max(1-b+w'*neg_data, 0))
-    # Form and solve problem.
+    ## Form and solve problem.
     problem = minimize(obj)
     solve!(problem, solver)
     return evaluate(w), evaluate(b)

@@ -6,14 +6,14 @@
 #
 # This problem can be written as
 #
-# $
+# $$
 # \begin{array}{ll}
 #     \mbox{minimize}   & w^T \Sigma w \\
 #     \mbox{subject to} & w^T \mu >= R_\mbox{target} \\
 #                       & \sum_i w_i = 1 \\
 #                       & w_\mbox{lower} \leq w \leq w_\mbox{upper}
 # \end{array}
-# $
+# $$
 #
 # where $w \in \mathbf{R}^n$ is our optimization variable.
 
@@ -60,10 +60,9 @@ solve!(p, SCSSolver())     #use SCSSolver(verbose = false) to suppress printing
 
 #-
 
-display("Optimal portfolio weights")
-display(w.value)
+# Optimal portfolio weights:
+w.value
 
 #-
 
 sum(w.value)
-

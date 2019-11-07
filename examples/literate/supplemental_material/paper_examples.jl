@@ -52,6 +52,6 @@ n = 3
 A = randn(n, n);
 #@time begin
   X = Variable(n, n);
-  p = minimize(vecnorm(X' - A), X[1,1] == 1);
+  p = minimize(norm(vec(X' - A)), X[1,1] == 1);
   solve!(p, ECOSSolver())
 #end

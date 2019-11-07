@@ -1,7 +1,9 @@
 # # POVM simulation
 # This notebook shows how we can check how much depolarizing noise a qubit positive operator-valued measure (POVM) can take before it becomes simulable by projective measurements. The general method is described in [arXiv:1609.06139](https://arxiv.org/abs/1609.06139). The question of simulability by projective measurements boils down to an SDP problem. Eq. (8) from the paper defines the noisy POVM that we obtain subjecting a POVM $\mathbf{M}$ to a depolarizing channel $\Phi_t$:
 #
-# $\left[\Phi_t\left(\mathbf{M}\right)\right]_i := t M_i + (1-t)\frac{\mathrm{tr}(M_i)}{d} \mathbb{1}$.
+# $$
+# \left[\Phi_t\left(\mathbf{M}\right)\right]_i := t M_i + (1-t)\frac{\mathrm{tr}(M_i)}{d} \mathbb{1}.
+# $$
 #
 # If this visibility $t\in[0,1]$ is one, the POVM $\mathbf{M}$ is simulable.
 #

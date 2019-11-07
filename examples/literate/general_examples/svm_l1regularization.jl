@@ -35,7 +35,7 @@ for i = 1:TRIALS
     lambda = lambda_vals[i];
     problem = minimize(loss/m + lambda*reg);
     solve!(problem, ECOSSolver(verbose=0));
-    # solve!(problem, SCSSolver(verbose=0,linear_solver=SCS.Direct, eps=1e-3))
+    ## solve!(problem, SCSSolver(verbose=0,linear_solver=SCS.Direct, eps=1e-3))
     train_error[i] = sum(float(sign.(X*beta_true .+ offset) .!= sign.(evaluate(X*beta - v))))/m;
     test_error[i] = sum(float(sign.(X_test*beta_true .+ offset) .!= sign.(evaluate(X_test*beta - v))))/TEST;
     beta_vals[:, i] =  evaluate(beta);

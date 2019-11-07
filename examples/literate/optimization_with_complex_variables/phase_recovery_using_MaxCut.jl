@@ -3,13 +3,13 @@
 #
 # Phase recovery has wide applications such as  in X-ray and crystallography imaging, diffraction imaging or microscopy and audio signal processing. In all these applications, the detectors cannot measure the phase of the incoming wave and only record its amplitude i.e complex measurements of a signal $x \in \mathbb{C}^p$ are obtained from a linear injective operator A, **but we can only measure the magnitude vector Ax, not the phase fo Ax**.
 #
-# Recovering the phase of Ax from |Ax| is a **nonconvex optimization problem**. Using results from [this paper](https://arxiv.org/abs/1206.0102), the problem can be relaxed to a (complex) semidefinite program (complex SDP).
+# Recovering the phase of $Ax$ from $|Ax|$ is a **nonconvex optimization problem**. Using results from [this paper](https://arxiv.org/abs/1206.0102), the problem can be relaxed to a (complex) semidefinite program (complex SDP).
 #
 # The original reprsentation of the problem is as follows:
 #
-# >>>> find x
+# >>>> find $x$
 #
-# >>>> such that |Ax| = b
+# >>>> such that $|Ax| = b$
 #
 # >>>> where $x \in \mathbb{C}^p$, $A \in \mathbb{C}^{n \times p}$ and $b \in \mathbb{R}^n$.
 
@@ -53,11 +53,13 @@ U.value
 
 #-
 
-## Verify if the rank of U is 1
+# Verify if the rank of $U$ is 1:
 B, C = eigen(U.value);
-println(length([e for e in B if(abs(real(e))>1e-4)]))
-#Decompose U = uu*
-## u is the phase of Ax
+length([e for e in B if(abs(real(e))>1e-4)])
+
+#- 
+
+# Decompose $U = uu^*$ where $u$ is the phase of $Ax$
 u = C[:,1];
 for i in 1:n
     u[i] = u[i]/abs(u[i])

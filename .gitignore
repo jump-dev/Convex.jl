@@ -6,4 +6,5 @@
 .ipynb_checkpoints/
 Manifest.toml
 benchmark/*.json
+examples/**/*.ipynb
 examples/notebooks

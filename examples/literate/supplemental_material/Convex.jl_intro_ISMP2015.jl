@@ -107,13 +107,13 @@ x <= 0
 
 #-
 
-x^2 <= sum(y)
+square(x) <= sum(y)
 
 #-
 
 M = Z 
 for i = 1:length(y)
-    global M += rand(size(Z))*y[i]
+    global M += rand(size(Z)...)*y[i]
 end
 M ⪰ 0
 
@@ -171,7 +171,7 @@ x = Variable(n)
 ## nonnegative elastic net with regularization
 λ = 1
 μ = 1
-problem = minimize(norm(A * x - b)^2 + λ*norm(x)^2 + μ*norm(x, 1), 
+problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1), 
                    x >= 0)
 @time solve!(problem, SCSSolver(verbose=0))
 λ = 1.5
@@ -191,7 +191,7 @@ sum(x) + y[2]
 #-
 
 ## not dcp compliant
-log(x) + x^2
+log(x) + square(x)
 
 #-
 

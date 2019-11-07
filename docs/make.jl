@@ -1,9 +1,17 @@
 using Documenter, Convex, Literate, Pkg
 
+previous_GKSwstype = get(ENV, "GKSwstype", "")
+ENV["GKSwstype"] = "100"
+
 @info "Building examples"
 
 filename(str) = first(splitext(last(splitdir(str))))
 filename_to_name(str) = uppercasefirst(replace(replace(filename(str), "-" => " "), "_" => " "))
+
+function fix_math_md(content)
+    replace(content, r"\$\$(.*?)\$\$"s => s"```math\1```")
+end
+
 
 literate_path = joinpath(@__DIR__(), "..", "examples", "literate")
 build_path =  joinpath(@__DIR__, "src", "examples")
@@ -34,7 +42,7 @@ for dir in readdir(literate_path)
                 """
             end
             documenter = true
-            Literate.markdown(file_path, build_dir; documenter = documenter, postprocess =  documenter ? postprocess : identity)
+            Literate.markdown(file_path, build_dir; preprocess = fix_math_md, documenter = documenter, postprocess =  documenter ? postprocess : identity)
             Literate.notebook(file_path, build_dir; execute=false)
             name = string(filename_to_name(file), " (webpage)")
             path = filename(file) * ".md"
@@ -45,11 +53,11 @@ for dir in readdir(literate_path)
 end
 
 
-function nav_dir(path)
-    [ joinpath(splitpath(path)[end-1:end]..., file) for file in readdir(path) if endswith(file, ".md") && file != "index.md" ]
+function nav_dir(dir, path)
+    sort([ joinpath("examples", dir, file) for file in readdir(path) if endswith(file, ".md") && file != "index.md" ])
 end
 
-examples_nav = [ filename_to_name(dir) => nav_dir(joinpath(build_path, dir)) for dir in readdir(build_path) if isdir(joinpath(build_path, dir)) ]
+examples_nav = [ filename_to_name(dir) => nav_dir(dir, joinpath(build_path, dir)) for dir in readdir(build_path) if isdir(joinpath(build_path, dir)) ]
 
 @info "Starting `makedocs`"
 
@@ -77,3 +85,5 @@ makedocs(;
 Pkg.activate(@__DIR__)
 
 deploydocs(repo = "github.com/JuliaOpt/Convex.jl.git")
+
+ENV["GKSwstype"] = previous_GKSwstype

@@ -9,21 +9,24 @@
 # http://web.cvxr.com/cvx/examples/cvxbook/Ch06_approx_fitting/html/fig6_15.html
 #
 # Consider the least-squares problem:
-#       minimize ||(A + tB)x - b||_2
-# where t is an uncertain parameter in [-1,1]
+#       minimize $\|(A + tB)x - b\|_2$
+# where $t$ is an uncertain parameter in [-1,1]
 # Three approximate solutions are found:
-#   1- nominal optimal (i.e. letting t=0)
-#   2- stochastic robust approximation:
-#           minimize E||(A+tB)x - b||_2
-#      assuming u is uniformly distributed on [-1,1] )
-#      (reduces to minimizing E ||(A+tB)x-b||^2 = ||A*x-b||^2  + x^TPx
-#        where P = E(t^2) B^TB = (1/3) B^TB )
-#   3- worst-case robust approximation:
-#           minimize sup{-1<=u<=1} ||(A+tB)x - b||_2)
-#      (reduces to minimizing max{||(A-B)x - b||_2, ||(A+B)x - b||_2} )
-
+#
+#   1. nominal optimal (i.e. letting t=0)
+#   2. stochastic robust approximation:
+#           minimize $\mathbb{E}\|(A+tB)x - b\|_2$
+#      assuming $u$ is uniformly distributed on [-1,1].
+#      (reduces to minimizing $\mathbb{E} \|(A+tB)x-b\|^2 = \|A*x-b\|^2  + x^TPx$
+#        where $P = \mathbb{E}(t^2) B^TB = (1/3) B^TB$ )
+#   3. worst-case robust approximation:
+#           minimize $sup_{-1\leq u\leq 1} \|(A+tB)x - b\|_2$
+#      (reduces to minimizing $\max\{\|(A-B)x - b\|_2, \|(A+B)x - b\|_2\}$ ).
+#
 using Convex, LinearAlgebra, SCS
-
+if VERSION < v"1.2.0-DEV.0"
+     LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
+end
 # Input Data
 m = 20;
 n = 10;
@@ -62,8 +65,6 @@ errvals_ls = errvals(x_nom)
 errvals_stoch = errvals(x_stoch)
 errvals_wc = errvals(x_wc)
 
-
-# Plots
 
 using Plots
 plot(parvals, errvals_ls, label="Nominal problem")

@@ -6,7 +6,7 @@
 #
 # The goal is to find the largest Euclidean ball (i.e. its center and
 # radius) that lies in a polyhedron described by affine inequalites in this
-# fashion: P = {x : a_i'*x <= b_i, i=1,...,m} where x is in R^2
+# fashion: $P = \{x : a_i'*x \leq b_i, i=1,\ldots,m \}$ where $x \in \mathbb{R}^2$.
 
 using Convex, LinearAlgebra, SCS
 
@@ -36,5 +36,5 @@ plot(x, x -> -x * a1[1] / a1[2] + b[1] / a1[2])
 plot!(x, x -> -x * a2[1]/ a2[2] + b[2] / a2[2])
 plot!(x, x -> -x * a3[1]/ a3[2] + b[3] / a3[2])
 plot!(x, x -> -x * a4[1]/ a4[2] + b[4] / a4[2])
-plot!(x_c.value[1] .+ r.value * cos.(theta), x_c.value[2] .+ r.value * sin.(theta))
+plot!(x_c.value[1] .+ r.value * cos.(theta), x_c.value[2] .+ r.value * sin.(theta), linewidth = 2)
 plot!(title ="Largest Euclidean ball lying in a 2D polyhedron", legend = nothing)

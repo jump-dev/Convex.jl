@@ -2,11 +2,13 @@
 #
 # Here is a constrained entropy maximization problem:
 #
+# $$
 # \begin{array}{ll}
 #     \mbox{maximize}   & -\sum_{i=1}^n x_i \log x_i \\
 #     \mbox{subject to} & \mathbf{1}' x = 1 \\
 #                   & Ax \leq b
 # \end{array}
+# $$
 #
 # where $x \in \mathbf{R}^n$ is our optimization variable and $A \in \mathbf{R}^{m \times n}, b \in \mathbf{R}^{m}$.
 #
@@ -22,6 +24,8 @@ b = rand(m, 1);
 x = Variable(n);
 problem = maximize(entropy(x), sum(x) == 1, A * x <= b)
 solve!(problem, SCSSolver(verbose=0))
+problem.optval
 
-println(problem.optval)
-println(x.value)
+#-
+
+x.value

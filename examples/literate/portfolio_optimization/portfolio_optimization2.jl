@@ -6,12 +6,12 @@
 #
 # This problem can be written as
 #
-# $
+# $$
 # \begin{array}{ll}
 #     \mbox{minimize}   & \lambda*w^T \Sigma w - (1-\lambda)*w^T \mu \\
 #     \mbox{subject to} & \sum_i w_i = 1
 # \end{array}
-# $
+# $$
 #
 # where $w \in \mathbf{R}^n$ is the vector containing weights allocated to each asset.
 
@@ -112,6 +112,3 @@ plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2] MeanVarC[:,2]]),
 scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
 
 #-
-
-
-

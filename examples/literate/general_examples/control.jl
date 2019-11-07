@@ -7,7 +7,9 @@
 # denotes the input into the system over time. Linear constraints are used to
 # capture the evolution of the system over time:
 #
-# $$x(t) = Ax(t - 1) + Bu(t), \ \mbox{for} \ t = 1,\ldots, T,$$
+# $$
+# x(t) = Ax(t - 1) + Bu(t), \ \text{for} \ t = 1,\ldots, T,
+# $$
 #
 # where the numerical matrices $A$ and $B$ are called the dynamics and input matrices,
 # respectively.
@@ -17,10 +19,10 @@
 # at certain times. For example, we can specify initial and final states of the system:
 #
 # $$
-#   \begin{align*}
-#     x(0) &= x_i \\
-#     x(T) &= x_f
-#   \end{align*}
+# \begin{aligned}
+#   x(0) &= x_i \\
+#   x(T) &= x_f
+# \end{aligned}
 # $$
 #
 # Additional states between the initial and final states can also be specified. These
@@ -43,10 +45,10 @@
 # must satisfy:
 #
 # $$
-#   \begin{align*}
+#   \begin{aligned}
 #     p(t+1) &= p(t) + h v(t) \\
 #     v(t+1) &= v(t) + h a(t)
-#   \end{align*}.
+#   \end{aligned}.
 # $$
 #
 # Here, $a(t)$ denotes the acceleration at time $t$, for which we we use
@@ -57,18 +59,18 @@
 # Additionally, we have our initial/final position/velocity conditions:
 #
 # $$
-#   \begin{align*}
+#   \begin{aligned}
 #     p(1) &= p_i\\
 #     v(1) &= v_i\\
 #     p(T+1) &= p_f\\
 #     v(T+1) &= 0
-#   \end{align*}
+#   \end{aligned}
 # $$
 #
 # One reasonable objective to minimize would be
 #
 # $$
-#   \mbox{objective} = \mu \sum_{t = 1}^{T+1} (v(t))^2 + \sum_{t = 1}^T (f(t))^2
+#   \text{objective} = \mu \sum_{t = 1}^{T+1} (v(t))^2 + \sum_{t = 1}^T (f(t))^2
 # $$
 #
 # We would like to keep both the forces small to perhaps save fuel, and keep

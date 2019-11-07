@@ -6,20 +6,21 @@
 using Convex, GLPKMathProgInterface
 aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
 
-## data.jl has our preference matrix, P
+# Load our preference matrix, P
 include(aux("data.jl"))
+summary(P)
 
 X = Variable(size(P), :Bin)
 
-## We want every student to be assigned to exactly one section. So, every row must have exactly one non-zero entry
-## In other words, the sum of all the columns for every row is 1
-## We also want each section to have between 6 and 10 students, so the sum of all the rows for every column should 
-## be between these
+# We want every student to be assigned to exactly one section. So, every row must have exactly one non-zero entry
+# In other words, the sum of all the columns for every row is 1
+# We also want each section to have between 6 and 10 students, so the sum of all the rows for every column should 
+# be between these
 constraints = [sum(X, dims=2) == 1, sum(X, dims=1) <= 10, sum(X, dims=1) >= 6]
 
-## Our objective is simple sum(X .* P), which can be more efficiently represented as vec(X)' * vec(P)
-## Since each entry of X is either 0 or 1, this is basically summing up the rankings of students that were assigned to them.
-## If all students got their first choice, this value will be the number of students since the ranking of the first choice is 1.
+# Our objective is simple sum(X .* P), which can be more efficiently represented as vec(X)' * vec(P)
+# Since each entry of X is either 0 or 1, this is basically summing up the rankings of students that were assigned to them.
+# If all students got their first choice, this value will be the number of students since the ranking of the first choice is 1.
 p = minimize(vec(X)' * vec(P), constraints)
 
 solve!(p, GLPKSolverMIP())
