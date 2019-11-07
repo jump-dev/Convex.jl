@@ -9,9 +9,7 @@ ENV["GKSwstype"] = "100"
 filename(str) = first(splitext(last(splitdir(str))))
 filename_to_name(str) = uppercasefirst(replace(replace(filename(str), "-" => " "), "_" => " "))
 
-function fix_math_md(content)
-    replace(content, r"\$\$(.*?)\$\$"s => s"```math\1```")
-end
+fix_math_md(content) = replace(content, r"\$\$(.*?)\$\$"s => s"```math\1```")
 
 literate_path = joinpath(@__DIR__(), "examples_literate")
 build_path =  joinpath(@__DIR__, "src", "examples")
@@ -42,6 +40,47 @@ for dir in readdir(literate_path)
     end
 end
 
+# Copy `Project.toml` to notebooks
+cp(joinpath(@__DIR__, "Project.toml"), joinpath(notebooks_path, "Project.toml"))
+
+# Add a README file to notebooks
+open(joinpath(notebooks_path, "README.md"), "w") do io
+    print(io, """
+    # Convex.jl example notebooks
+
+    Start Julia in this directory and set the project flag to point to this directory. E.g. run the command
+
+    ```julia
+    julia --project=.
+    ```
+
+    in this directory.
+
+    Then add `IJulia` if it's not installed already in your global environment by
+
+    ```julia
+    pkg> add IJulia
+    ```
+
+    Also call `instantiate` to download the required packages:
+
+    ```julia
+    pkg> instantiate
+    ```
+
+    Then launch Jupyter:
+
+    ```julia
+    julia> using IJulia
+
+    julia> notebook(dir=pwd(); detached=true)
+    ```
+
+    This should allow you to try any of the notebooks.
+    """)
+end
+
+# zip up the notebooks directory
 zip_path = joinpath(build_path, "notebooks.zip")
 run(Cmd(`zip $zip_path -r notebooks`; dir = @__DIR__))
 
@@ -68,8 +107,6 @@ for dir in readdir(literate_path)
         end
     end
 end
-
-
 
 @info "Starting `makedocs`"
 
@@ -103,5 +140,5 @@ makedocs(;
 
 deploydocs(repo = "github.com/JuliaOpt/Convex.jl.git")
 
-
-ENV["GKSwstype"] = previous_GKSwstype
+# restore the environmental variable `GKSwstype`.
+ENV["GKSwstype"] = previous_GKSwstype;
