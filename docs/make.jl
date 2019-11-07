@@ -99,7 +99,18 @@ for dir in readdir(literate_path)
             postprocess = function(content)
                 """
                 All of the examples can be found in Jupyter notebook form [here](../$(filename(zip_path)).zip).
-                """ * content
+
+                ```@setup $(filename(file))
+                __START_TIME = time_ns()
+                @info "Starting example $(filename(file))"
+                ```
+                """ * content * """
+                ```@setup $(filename(file))
+                __END_TIME = time_ns()
+                elapsed = string(round((__END_TIME - __START_TIME)*1e-9; sigdigits = 3), "s")
+                @info "Finished example $(filename(file)) after " * elapsed
+                ```
+                """
             end
             Literate.markdown(file_path, build_dir; preprocess = fix_math_md, documenter = true, postprocess =  postprocess)
         else
