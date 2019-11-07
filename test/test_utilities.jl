@@ -47,11 +47,16 @@
         vexity: affine
         $(Convex.show_id(x))"""
 
-        # test `maxdepth`
+        # test `MAXDEPTH`
         x = Variable(2)
         y = Variable(2)
         p = minimize(sum(x), hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))) == hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))))
         @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\ncurrent status: not yet solved" 
+
+        # test `MAXWIDTH`
+        x = Variable()
+        p = satisfy([ x == i for i = 1:100])
+        @test sprint(show, p) == "minimize\n└─ 0\nsubject to\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 1\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 2\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 3\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 4\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 5\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 6\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 7\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 8\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 9\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 10\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 11\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 12\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 13\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 14\n├─ == constraint (affine)\n│  ├─ real variable ($(Convex.show_id(x)))\n│  └─ 15\n⋮\n\ncurrent status: not yet solved"
     end
 
     @testset "clearmemory" begin
