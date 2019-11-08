@@ -48,9 +48,11 @@ problem.optval
 ```
 
 ## More Examples
-A number of examples can be found [here](https://www.juliaopt.org/Convex.jl/stable/examples/). The [basic usage notebook](https://nbviewer.jupyter.org/github/JuliaOpt/Convex.jl/blob/master/examples/basic_usage.ipynb) gives a simple tutorial on problems that can be solved using Convex.jl. Many use cases of the package in complex-domain optimization can be found [here](https://github.com/JuliaOpt/Convex.jl/tree/master/examples/optimization_with_complex_variables).
 
-Note: many of the examples are currently outdated (August 2019). Pull requests to update them are greatly appreciated!
+A number of examples can be found [here](https://www.juliaopt.org/Convex.jl/stable/).
+The [basic usage notebook](https://www.juliaopt.org/Convex.jl/stable/examples/general_examples/basic_usage/)
+gives a simple tutorial on problems that can be solved using Convex.jl. All examples can be downloaded as
+a zip file from [here](https://www.juliaopt.org/Convex.jl/stable/examples/notebooks.zip/).
 
 ## Citing this package
 
