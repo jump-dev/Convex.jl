@@ -52,7 +52,7 @@ problem.optval
 A number of examples can be found [here](https://www.juliaopt.org/Convex.jl/stable/).
 The [basic usage notebook](https://www.juliaopt.org/Convex.jl/stable/examples/general_examples/basic_usage/)
 gives a simple tutorial on problems that can be solved using Convex.jl. All examples can be downloaded as
-a zip file from [here](https://www.juliaopt.org/Convex.jl/stable/examples/notebooks.zip/).
+a zip file from [here](https://www.juliaopt.org/Convex.jl/stable/examples/notebooks.zip).
 
 ## Citing this package
 
