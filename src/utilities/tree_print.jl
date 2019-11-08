@@ -61,7 +61,7 @@ Dict{String,Any}("b"=>['c','d'],"a"=>"b")
 """
 print_tree
 
-function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5; depth = 0, active_levels = Int[],
+function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5, maxwidth = Inf; depth = 0, active_levels = Int[],
     charset = TreeCharSet(), withinds = false, inds = [], from = nothing, to = nothing, roottree = tree)
     nodebuf = IOBuffer()
     isa(io, IOContext) && (nodebuf = IOContext(nodebuf, io))
@@ -81,8 +81,10 @@ function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5; depth = 0,
     c = isa(treekind(roottree), IndexedTree) ?
         childindices(roottree, tree) : children(roottree, tree)
     if c !== ()
+        width = 0
         s = Iterators.Stateful(from === nothing ? pairs(c) : Iterators.Rest(pairs(c), from))
-        while !isempty(s)
+        while !isempty(s) && width < maxwidth
+            width += 1
             ind, child = popfirst!(s)
             ind === to && break
             active = false
@@ -96,9 +98,13 @@ function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5; depth = 0,
             end
             print(io, charset.dash, ' ')
             print_tree(depth == maxdepth ? (io, val) -> print(io, charset.ellipsis) : printnode,
-                io, child, maxdepth; depth = depth + 1,
+                io, child, maxdepth, maxwidth; depth = depth + 1,
                 active_levels = child_active_levels, charset = charset, withinds=withinds,
                 inds = withinds ? [inds; ind] : [], roottree = roottree)
+        end
+        if !isempty(s)
+            print_prefix(io, depth, charset, active_levels)
+            println(io, "⋮")
         end
     end
 end

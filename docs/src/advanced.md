@@ -112,11 +112,17 @@ tree-traversal functions of that package can be used with Convex.jl problems
 and structures. This is what allows powers the printing of problems, expressions,
 and constraints. The depth to which the tree corresponding to a problem,
 expression, or constraint is printed is controlled by the global variable
-`MAXDEPTH`, which defaults to 3. This can be changed by e.g. setting
+[`Convex.MAXDEPTH`](@ref), which defaults to 3. This can be changed by e.g. setting
 
 ```julia
 Convex.MAXDEPTH[] = 5
 ```
+
+Likewise, [`Convex.MAXWIDTH`](@ref), which defaults to 15, controls the "width"
+of the printed tree. For example, when printing a problem with 20 constraints,
+only the first `MAXWIDTH` of the constraints will be printed. Vertical dots,
+"⋮", will be printed indicating that some constraints were omitted in the
+printing.
 
 The AbstractTrees methods can also be used to analyze the structure
 of a Convex.jl problem. For example,
@@ -164,4 +170,12 @@ will be visited before their children.
 for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
     println("Here's node $i via StatelessBFS: $(summary(node))")
 end
+```
+
+Reference
+---------
+
+```@docs
+Convex.MAXDEPTH
+Convex.MAXWIDTH
 ```
