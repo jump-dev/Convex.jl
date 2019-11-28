@@ -19,7 +19,7 @@ Y = [species == "versicolor" ? 1.0 : -1.0 for species in iris.Species]
 # (first column corresponds to offset).
 X = hcat(ones(size(iris, 1)), iris.SepalLength, iris.SepalWidth, iris.PetalLength, iris.PetalWidth);
 
-# Now to soolve the logistic regression problem.
+# Now to solve the logistic regression problem.
 n, p = size(X)
 beta = Variable(p)
 problem = minimize(logisticloss(-Y.*(X*beta)))
