@@ -8,7 +8,7 @@
 #
 # $$
 # \begin{array}{ll}
-#     \mbox{minimize}   & \|w\|^2 + C * (\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\})
+#     \text{minimize}   & \|w\|^2 + C * (\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\})
 # \end{array},
 # $$
 #

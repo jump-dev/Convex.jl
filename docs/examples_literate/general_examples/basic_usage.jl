@@ -14,8 +14,8 @@ solver = SCSSolver(verbose=0)
 #
 # $$
 # \begin{array}{ll}
-#   \mbox{maximize} & c^T x \\
-#   \mbox{subject to} & A x \leq b\\
+#   \text{maximize} & c^T x \\
+#   \text{subject to} & A x \leq b\\
 #   & x \geq 1 \\
 #   & x \leq 10 \\
 #   & x_2 \leq 5 \\
@@ -41,8 +41,8 @@ println(evaluate(x[1] + x[4] - x[2]))
 #
 # $$
 # \begin{array}{ll}
-#   \mbox{minimize} & \| X \|_F + y \\
-#   \mbox{subject to} & 2 X \leq 1\\
+#   \text{minimize} & \| X \|_F + y \\
+#   \text{subject to} & 2 X \leq 1\\
 #   & X' + y \geq 1 \\
 #   & X \geq 0 \\
 #   & y \geq 0 \\
@@ -63,7 +63,7 @@ p.optval
 #
 # $$
 # \begin{array}{ll}
-#   \mbox{satisfy} & \| x \|_2 \leq 100 \\
+#   \text{satisfy} & \| x \|_2 \leq 100 \\
 #   & e^{x_1} \leq 5 \\
 #   & x_2 \geq 7 \\
 #   & \sqrt{x_3 x_4} \geq x_2
@@ -98,8 +98,8 @@ y.value
 #
 # $$
 # \begin{array}{ll}
-#   \mbox{minimize} & \sum_{i=1}^n x_i \\
-#     \mbox{subject to} & x \in \mathbb{Z}^n \\
+#   \text{minimize} & \sum_{i=1}^n x_i \\
+#     \text{subject to} & x \in \mathbb{Z}^n \\
 #   & x \geq 0.5 \\
 # \end{array}
 # $$

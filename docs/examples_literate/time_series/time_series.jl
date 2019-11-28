@@ -60,13 +60,13 @@ root_mean_square_error = sqrt(sum( x -> x^2, residuals) / length(residuals))
 # We now make the hypothesis that the residual temperature on a given day is some linear combination of the previous $5$ days. Such a model is called autoregressive. We are essentially trying to fit the residuals as a function of other parts of the data itself. We want to find a vector of coefficients $a$ such that
 #
 # $$
-#  \mbox{r}(i) \approx \sum_{j = 1}^5 a_j \mbox{r}(i - j)
+#  \text{r}(i) \approx \sum_{j = 1}^5 a_j \text{r}(i - j)
 # $$
 #
 # This can be done by simply minimizing the following sum of squares objective
 #
 # $$
-#  \sum_{i = 6}^n \left(\mbox{r}(i) - \sum_{j = 1}^5 a_j \mbox{r}(i - j)\right)^2
+#  \sum_{i = 6}^n \left(\text{r}(i) - \sum_{j = 1}^5 a_j \text{r}(i - j)\right)^2
 # $$
 #
 # The following Convex code solves this problem and plots our autoregressive model against the actual residual temperatures:

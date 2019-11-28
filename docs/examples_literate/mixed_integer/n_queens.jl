@@ -5,7 +5,7 @@ aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
 include(aux("antidiag.jl"))
 
 n = 8
-# We encode the locations of the queens with a matrix of binary random variables
+# We encode the locations of the queens with a matrix of binary random variables.
 x = Variable((n, n), :Bin)
 
 # Now we impose the constraints: at most one queen on any anti-diagonal, at most one queen on any diagonal, and we must have exactly one queen per row and per column.

@@ -26,12 +26,12 @@ x = Variable(4, 6)
 Variables may also be declared as having special properties, such as
 being
 
-> -   (entrywise) positive: `x = Variable(4, Positive())`
-> -   (entrywise) negative: `x = Variable(4, Negative())`
-> -   integral: `x = Variable(4, :Int)`
-> -   binary: `x = Variable(4, :Bin)`
-> -   (for a matrix) being symmetric, with nonnegative eigenvalues (ie,
->     positive semidefinite): `z = Semidefinite(4)`
+-   (entrywise) positive: `x = Variable(4, Positive())`
+-   (entrywise) negative: `x = Variable(4, Negative())`
+-   integral: `x = Variable(4, :Int)`
+-   binary: `x = Variable(4, :Bin)`
+-   (for a matrix) being symmetric, with nonnegative eigenvalues (ie,
+     positive semidefinite): `z = Semidefinite(4)`
 
 Constants
 ---------

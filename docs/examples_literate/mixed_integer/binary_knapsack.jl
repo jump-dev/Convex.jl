@@ -5,8 +5,8 @@
 #
 # $$
 # \begin{array}{ll}
-#   \mbox{maximize} & x' p \\
-#     \mbox{subject to} & x \in \{0, 1\} \\
+#   \text{maximize} & x' p \\
+#     \text{subject to} & x \in \{0, 1\} \\
 #   & w' x \leq C \\
 # \end{array}
 # $$

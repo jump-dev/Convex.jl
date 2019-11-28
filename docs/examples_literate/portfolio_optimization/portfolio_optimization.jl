@@ -1,17 +1,17 @@
 # #  Portfolio Optimization
 #
-# In this problem, we will find the portfolio allocation that minimizes risk while achieving a given expected return $R_\mbox{target}$.
+# In this problem, we will find the portfolio allocation that minimizes risk while achieving a given expected return $R_\text{target}$.
 #
-# Suppose that we know the mean returns $\mu \in \mathbf{R}^n$ and the covariance $\Sigma \in \mathbf{R}^{n \times n}$ of the $n$ assets. We would like to find a portfolio allocation $w \in \mathbf{R}^n$, $\sum_i w_i = 1$, minimizing the *risk* of the portfolio, which we measure as the variance $w^T \Sigma w$ of the portfolio. The requirement that the portfolio allocation achieve the target expected return can be expressed as $w^T \mu >= R_\mbox{target}$. We suppose further that our portfolio allocation must comply with some lower and upper bounds on the allocation, $w_\mbox{lower} \leq w \leq w_\mbox{upper}$.
+# Suppose that we know the mean returns $\mu \in \mathbf{R}^n$ and the covariance $\Sigma \in \mathbf{R}^{n \times n}$ of the $n$ assets. We would like to find a portfolio allocation $w \in \mathbf{R}^n$, $\sum_i w_i = 1$, minimizing the *risk* of the portfolio, which we measure as the variance $w^T \Sigma w$ of the portfolio. The requirement that the portfolio allocation achieve the target expected return can be expressed as $w^T \mu >= R_\text{target}$. We suppose further that our portfolio allocation must comply with some lower and upper bounds on the allocation, $w_\text{lower} \leq w \leq w_\text{upper}$.
 #
 # This problem can be written as
 #
 # $$
 # \begin{array}{ll}
-#     \mbox{minimize}   & w^T \Sigma w \\
-#     \mbox{subject to} & w^T \mu >= R_\mbox{target} \\
+#     \text{minimize}   & w^T \Sigma w \\
+#     \text{subject to} & w^T \mu >= R_\text{target} \\
 #                       & \sum_i w_i = 1 \\
-#                       & w_\mbox{lower} \leq w \leq w_\mbox{upper}
+#                       & w_\text{lower} \leq w \leq w_\text{upper}
 # \end{array}
 # $$
 #

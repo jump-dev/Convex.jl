@@ -6,7 +6,7 @@
 #
 # Adapted for Convex.jl by Karanveer Mohan and David Zeng - 26/05/14
 # Original cvx code and plots here:
-# http://web.cvxr.com/cvx/examples/cvxbook/Ch06_approx_fitting/html/fig6_15.html
+# <http://web.cvxr.com/cvx/examples/cvxbook/Ch06_approx_fitting/html/fig6_15.html>
 #
 # Consider the least-squares problem:
 #       minimize $\|(A + tB)x - b\|_2$
@@ -20,7 +20,7 @@
 #      (reduces to minimizing $\mathbb{E} \|(A+tB)x-b\|^2 = \|A*x-b\|^2  + x^TPx$
 #        where $P = \mathbb{E}(t^2) B^TB = (1/3) B^TB$ )
 #   3. worst-case robust approximation:
-#           minimize $sup_{-1\leq u\leq 1} \|(A+tB)x - b\|_2$
+#           minimize $\mathrm{sup}_{-1\leq u\leq 1} \|(A+tB)x - b\|_2$
 #      (reduces to minimizing $\max\{\|(A-B)x - b\|_2, \|(A+B)x - b\|_2\}$ ).
 #
 using Convex, LinearAlgebra, SCS
@@ -57,7 +57,7 @@ p = minimize(max(norm((A - B) * x - b), norm((A + B) * x - b)))
 solve!(p, SCSSolver(verbose=0))
 x_wc = evaluate(x)
 
-# plot residuals
+# Plot residuals:
 parvals = range(-2, stop=2, length=100);
 
 errvals(x) = [ norm((A + parvals[k] * B) * x - b) for k = eachindex(parvals)]

@@ -3,12 +3,14 @@ Quick Tutorial
 
 Consider a constrained least squares problem
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \begin{array}{ll}
-\mbox{minimize} & \|Ax - b\|_2^2 \\
-\mbox{subject to} & x \geq 0
+\text{minimize} & \|Ax - b\|_2^2 \\
+\text{subject to} & x \geq 0
 \end{array}
-\end{aligned}$$
+\end{aligned}
+$$
 
 with variable $x\in \mathbf{R}^{n}$, and problem data
 $A \in \mathbf{R}^{m \times n}$, $b \in \mathbf{R}^{m}$.
