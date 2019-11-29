@@ -106,7 +106,7 @@ constraints = [partialtrace(ρ, 1, [2; 2]) == [1 0; 0 0]
                tr(ρ) == 1
                ρ in :SDP]
 p = satisfy(constraints)
-solve!(p, SCSSolver())
+solve!(p, SCSSolver(verbose=false))
 p.status
 ```
 
