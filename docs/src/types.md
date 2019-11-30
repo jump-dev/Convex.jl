@@ -10,7 +10,7 @@ Variables
 
 The simplest kind of expression in Convex.jl is a variable. Variables in
 Convex.jl are declared using the `Variable` keyword, along
-with the dimensions of the variable. :
+with the dimensions of the variable.
 
 ```julia
 # Scalar variable

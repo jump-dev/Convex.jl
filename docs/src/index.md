@@ -7,13 +7,13 @@ describe optimization problems in a natural, mathematical syntax, and to
 solve those problems using a variety of different (commercial and
 open-source) solvers. Convex.jl can solve
 
-> -   linear programs
-> -   mixed-integer linear programs and mixed-integer second-order cone
->     programs
-> -   dcp-compliant convex programs including
->     -   second-order cone programs (SOCP)
->     -   exponential cone programs
->     -   semidefinite programs (SDP)
+-   linear programs
+-   mixed-integer linear programs and mixed-integer second-order cone
+    programs
+-   dcp-compliant convex programs including
+    -   second-order cone programs (SOCP)
+    -   exponential cone programs
+    -   semidefinite programs (SDP)
 
 Convex.jl supports many solvers, including
 [Mosek](https://github.com/JuliaOpt/Mosek.jl),
