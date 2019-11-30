@@ -149,7 +149,7 @@ makedocs(;
     repo = "https://github.com/JuliaOpt/Convex.jl/blob/{commit}{path}#L{line}",
     sitename = "Convex.jl")
 
-deploydocs(repo = "github.com/JuliaOpt/Convex.jl.git")
+deploydocs(repo = "github.com/JuliaOpt/Convex.jl.git", push_preview = true)
 
 # restore the environmental variable `GKSwstype`.
 ENV["GKSwstype"] = previous_GKSwstype;

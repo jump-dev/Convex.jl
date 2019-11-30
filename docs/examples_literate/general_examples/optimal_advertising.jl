@@ -2,7 +2,7 @@
 
 # This example is taken from <https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf>.
 
-# Setup
+# Setup:
 #
 # * We have $m$ adverts and $n$ timeslots
 # * The total traffic in time slot $t$ is $T_t$

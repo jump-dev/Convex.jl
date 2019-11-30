@@ -4,8 +4,8 @@
 #
 # $$
 # \begin{array}{ll}
-#     \mbox{maximize}   & -\sum_{i=1}^n x_i \log x_i \\
-#     \mbox{subject to} & \mathbf{1}' x = 1 \\
+#     \text{maximize}   & -\sum_{i=1}^n x_i \log x_i \\
+#     \text{subject to} & \mathbf{1}' x = 1 \\
 #                   & Ax \leq b
 # \end{array}
 # $$
@@ -23,7 +23,7 @@ b = rand(m, 1);
 
 x = Variable(n);
 problem = maximize(entropy(x), sum(x) == 1, A * x <= b)
-solve!(problem, SCSSolver(verbose=0))
+solve!(problem, SCSSolver(verbose=false))
 problem.optval
 
 #-

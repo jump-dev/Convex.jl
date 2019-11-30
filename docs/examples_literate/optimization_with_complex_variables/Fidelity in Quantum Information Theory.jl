@@ -11,8 +11,8 @@
 #
 # $$
 # \begin{array}{ll}
-#   \mbox{maximize} &  \frac{1}{2}\text{tr}(Z+Z^\dagger) \\
-#   \mbox{subject to} &\\
+#   \text{maximize} &  \frac{1}{2}\text{tr}(Z+Z^\dagger) \\
+#   \text{subject to} &\\
 #   & \left[\begin{array}{cc}P&Z\\{Z}^{\dagger}&Q\end{array}\right] \succeq 0\\
 #   & Z \in \mathbf {C}^{n \times n}\\
 # \end{array}

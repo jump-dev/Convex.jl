@@ -8,8 +8,8 @@
 #
 # $$
 # \begin{array}{ll}
-#     \mbox{minimize}   & \lambda*w^T \Sigma w - (1-\lambda)*w^T \mu \\
-#     \mbox{subject to} & \sum_i w_i = 1
+#     \text{minimize}   & \lambda*w^T \Sigma w - (1-\lambda)*w^T \mu \\
+#     \text{subject to} & \sum_i w_i = 1
 # \end{array}
 # $$
 #
