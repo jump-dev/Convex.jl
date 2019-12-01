@@ -67,7 +67,6 @@ end
 
 # This function generates a MOI set and VectorAffineFunction corresponding to a constraint that
 # Convex represents with a `ConicConstr` object.
-# This is part of what used to be `Convex.conic_problem` (under MPB instead of MOI).
 # The constraint is of the form Ax + b ∈ set
 # where `A` is a matrix, `x` a vector of variables, and `b` a constant vector.
 # MOI represents this type of constraint as a VectorAffineFunction, where `A` is represented
@@ -75,9 +74,7 @@ end
 function make_MOI_constr(conic_constr::ConicConstr, var_to_indices, id_to_variables, T)
     total_constraint_size = sum(conic_constr.sizes)
     constr_index = 0
-    # Under MPB, we would have
-    # A = spzeros(T, total_constraint_size, var_size)
-    # Instead, we hold a vector of `VectorAffineTerm`'s.
+    # We create a vector of `VectorAffineTerm`'s to build the constraint.
     terms =  MOI.VectorAffineTerm{T}[]
     b = spzeros(T, total_constraint_size)
 
@@ -92,22 +89,16 @@ function make_MOI_constr(conic_constr::ConicConstr, var_to_indices, id_to_variab
                 var_indices = var_to_indices[id]
                 if id_to_variables[id].sign == ComplexSign()
                     l = length(var_indices) ÷ 2
-                    # Under MPB, we would perform the following to update `A`
-                    # A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + length(id_to_variables[id])-1] = -val[1]
-                    # where `var_range` is the analog of `var_indices` (i.e. unwrapped indices).
-                    # Here, instead we use `add_terms!` to reproduce this behavior with MOI's `VectorAffineTerm`s.
-                    # We also differ by a minus sign due a difference in convention between MPB and MOI.
+                    # We create MOI terms and add them to `terms`.
+                    # Real part:
                     add_terms!(terms, val[1], constr_index + 1 : constr_index + sz, var_indices[1:l])
 
-                    # MPB version:
-                    # A[constr_index + 1 : constr_index + sz, var_range[1] + length(id_to_variables[id]) : var_range[2]] = -val[2]
+                    # Imaginary part:
                     add_terms!(terms, val[2], constr_index + 1 : constr_index + sz, var_indices[l+1 : end])
 
                 else
-                    # MPB version:
-                    # A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
+                    # Only a real part:
                     add_terms!(terms, val[1], constr_index + 1 : constr_index + sz, var_indices)
-
                 end
             end
         end
@@ -119,7 +110,6 @@ function make_MOI_constr(conic_constr::ConicConstr, var_to_indices, id_to_variab
 end
 
 
-# Under MPB, this was the function `find_variable_ranges`.
 # This function gets MOI variable indices for each variable used as a key
 # inside a `ConicObj` used in the problem.
 function get_variable_indices!(model, conic_constraints, id_to_variables)
@@ -147,7 +137,6 @@ end
 # This function traverses the problem tree and loads
 # an MOI model with the corresponding problem instance.
 # The problem is written in a simple epigraph form.
-# Under MPB, this was `Convex.conic_problem`.
 function load_MOI_model!(model, problem::Problem{T}) where {T}
     if length(problem.objective) != 1
         error("Objective must be a scalar")
@@ -159,7 +148,7 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
     conic_constr_to_constr = unique_conic_forms.conic_constr_to_constr
     id_to_variables = unique_conic_forms.id_to_variables
 
-    # var_to_indices maps from variable id to the MOI `VariableIndex`'s corresponding to the variable
+    # `var_to_indices` maps from variable id to the MOI `VariableIndex`'s corresponding to the variable
     var_to_indices = get_variable_indices!(model, conic_constraints, id_to_variables)
 
     # the objective: maximize or minimize a scalar variable
