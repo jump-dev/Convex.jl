@@ -23,7 +23,7 @@ b = rand(m, 1);
 
 x = Variable(n);
 problem = maximize(entropy(x), sum(x) == 1, A * x <= b)
-solve!(problem, SCSSolver(verbose=false))
+solve!(problem, SCS.Optimizer(verbose=false))
 problem.optval
 
 #-

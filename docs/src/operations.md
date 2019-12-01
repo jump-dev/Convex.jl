@@ -4,8 +4,7 @@ Operations
 Convex.jl currently supports the following functions. These functions
 may be composed according to the [DCP](http://dcp.stanford.edu)
 composition rules to form new convex, concave, or affine expressions.
-Convex.jl transforms each problem into an equivalent [cone
-program](http://mathprogbasejl.readthedocs.org/en/latest/conic.html) in
+Convex.jl transforms each problem into an equivalent conic program in
 order to pass the problem to a specialized solver. Depending on the
 types of functions used in the problem, the conic constraints may
 include linear, second-order, exponential, or semidefinite constraints,

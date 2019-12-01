@@ -21,8 +21,8 @@ n = length(w)
 
 #-
 
-using Convex, GLPKMathProgInterface
+using Convex, GLPK
 x = Variable(n, :Bin)
 problem = maximize(dot(p, x), dot(w, x) <= C)
-solve!(problem, GLPKSolverMIP())
+solve!(problem, GLPK.Optimizer())
 evaluate(x)

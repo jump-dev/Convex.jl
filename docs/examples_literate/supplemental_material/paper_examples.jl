@@ -13,7 +13,7 @@ e = 0;
   end
   p = minimize(e, x>=1);
 end
-@time solve!(p, ECOSSolver(verbose=0))
+@time solve!(p, ECOS.Optimizer(verbose=0))
 
 # Indexing.
 println("Indexing example")
@@ -26,7 +26,7 @@ e = 0;
   end
   p = minimize(e, x >= ones(1000, 1));
 end
-@time solve!(p, ECOSSolver(verbose=0))
+@time solve!(p, ECOS.Optimizer(verbose=0))
 
 # Matrix constraints.
 println("Matrix constraint example")
@@ -37,7 +37,7 @@ b = randn(p, n);
 @time begin
   p = minimize(norm(vec(X)), A * X == b);
 end
-@time solve!(p, ECOSSolver(verbose=0))
+@time solve!(p, ECOS.Optimizer(verbose=0))
 
 # Transpose.
 println("Transpose example")
@@ -46,12 +46,12 @@ A = randn(5, 5);
 @time begin
   p = minimize(norm2(X - A), X' == X);
 end
-@time solve!(p, ECOSSolver(verbose=0))
+@time solve!(p, ECOS.Optimizer(verbose=0))
 
 n = 3
 A = randn(n, n);
 #@time begin
   X = Variable(n, n);
   p = minimize(norm(vec(X' - A)), X[1,1] == 1);
-  solve!(p, ECOSSolver(verbose=0))
+  solve!(p, ECOS.Optimizer(verbose=0))
 #end

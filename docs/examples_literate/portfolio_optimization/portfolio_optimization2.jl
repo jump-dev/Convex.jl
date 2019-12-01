@@ -52,7 +52,7 @@ for i = 1:N
     λ = λ_vals[i]
     p = minimize( λ*risk - (1-λ)*ret,
                   sum(w) == 1 )    
-    solve!(p, SCSSolver(verbose = false))
+    solve!(p, SCS.Optimizer(verbose = false))
     MeanVarA[i,:]= [evaluate(ret),evaluate(risk)[1]]    #risk is a 1x1 matrix
 end
 
@@ -68,7 +68,7 @@ for i = 1:N
                   sum(w) == 1,
                   w_lower <= w,     #w[i] is bounded
                   w <= w_upper )
-    solve!(p, SCSSolver(verbose = false))
+    solve!(p, SCS.Optimizer(verbose = false))
     MeanVarB[i,:]= [evaluate(ret),evaluate(risk)[1]]    
 end
 
@@ -95,7 +95,7 @@ for i = 1:N
     p = minimize( λ*risk - (1-λ)*ret,
                   sum(w) == 1,
                   (norm(w, 1)-1) <= Lmax)
-    solve!(p, SCSSolver(verbose = false))
+    solve!(p, SCS.Optimizer(verbose = false))
     MeanVarC[i,:]= [evaluate(ret),evaluate(risk)[1]]    
 end
 

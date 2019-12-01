@@ -73,15 +73,14 @@ Then read the conic form code:
  -   We define data structures for conic objectives and conic
      constraints, and simple ways of combining them, in
      [conic\_form.jl](https://github.com/JuliaOpt/Convex.jl/blob/master/src/conic_form.jl)
- -   We convert the internal conic form representation into the
-     [standard form for conic
-     solvers](http://mathprogbasejl.readthedocs.io/en/latest/conic.html)
-     in the function
-     [conic\_problem](https://github.com/JuliaOpt/Convex.jl/blob/master/src/problems.jl#L97).
+ -   We load the internal conic form representation into the
+     [MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl)
+     model in the function
+     [load\_MOI\_model!](https://github.com/JuliaOpt/Convex.jl/blob/master/src/solution.jl#L151).
  -   We solve problems (that is, pass the standard form of the problem
      to a solver, and put the solution back into the values of the
      appropriate variables) in
-     [solution.jl](https://github.com/JuliaOpt/Convex.jl/blob/master/src/solution.jl#L8).
+     [solve!](https://github.com/JuliaOpt/Convex.jl/blob/master/src/solution.jl#L205).
 
 You're now armed and dangerous. Go ahead and open an issue (or comment
 on a previous one) if you can't figure something out, or submit a PR if
