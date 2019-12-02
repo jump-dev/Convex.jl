@@ -5,7 +5,7 @@
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://www.juliaopt.org/Convex.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://www.juliaopt.org/Convex.jl/dev)
 
-**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through the [MathProgBase](http://mathprogbasejl.readthedocs.org/en/latest/) interface. It also supports optimization with complex variables and coefficients.
+**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through [MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl). It also supports optimization with complex variables and coefficients.
 
 **Installation**: `julia> Pkg.add("Convex")`
 
@@ -38,7 +38,7 @@ x = Variable(n)
 problem = minimize(sumsquares(A * x - b), [x >= 0])
 
 # Solve the problem by calling solve!
-solve!(problem, SCSSolver())
+solve!(problem, SCS.Optimizer())
 
 # Check the status of the problem
 problem.status # :Optimal, :Infeasible, :Unbounded etc.

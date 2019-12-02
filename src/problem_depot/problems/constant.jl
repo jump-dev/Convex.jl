@@ -9,7 +9,8 @@
     β = Variable(5)
     β.value = ones(5)
 
-    problem = minimize(sum(c * β), [β >= 0])
+    problem = minimize(sum(c * β), [β >= 0]; numeric_type = T)
+
     handle_problem!(problem)
     if test
         @test problem.optval ≈ evaluate(sum(c * β)) atol=atol rtol=rtol
@@ -22,13 +23,15 @@ end
     x = Variable(2)
     y = Variable(2)
     fix!(x, [1 1]')
-    prob = minimize(y'*(x+[2 2]'), [y>=0])
+    prob = minimize(y'*(x+[2 2]'), [y>=0]; numeric_type = T)
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 0.0 atol=atol rtol=rtol
     end
 
-    prob = minimize(x'*y, [y>=0])
+    prob = minimize(x'*y, [y>=0]; numeric_type = T)
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 0.0 atol=atol rtol=rtol
@@ -39,7 +42,8 @@ end
     x = Variable()
     y = Variable()
     fix!(x, 1.0)
-    prob = minimize(y*x, [y >= x, x >= 0.5])
+    prob = minimize(y*x, [y >= x, x >= 0.5]; numeric_type = T)
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 1.0 atol=atol rtol=rtol
@@ -63,7 +67,8 @@ end
     p = Variable()
     fix!(p, 1.0)
     x = Variable(2,2)
-    prob = minimize( tr(p*x), [ x >= 1 ])
+    prob = minimize( tr(p*x), [ x >= 1 ]; numeric_type = T)
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 2.0 atol=atol rtol=rtol
@@ -75,7 +80,8 @@ end
     x = ComplexVariable()
     fix!(x, 1.0 + im*1.0)
     y = Variable()
-    prob = minimize( real(x*y), [ y >= .5, real(x) >= .5, imag(x) >= 0])
+    prob = minimize( real(x*y), [ y >= .5, real(x) >= .5, imag(x) >= 0]; numeric_type = T)
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ .5 atol=atol rtol=rtol
@@ -107,7 +113,8 @@ end
     x = ComplexVariable(5)
     fix!(x, ones(5) + im*ones(5))
     y = Variable()
-    prob = minimize( real(y*sum(x)), [ y >= .5, real(x) >= .5, imag(x) >= 0])
+    prob = minimize( real(y*sum(x)), [ y >= .5, real(x) >= .5, imag(x) >= 0]; numeric_type = T)
+
     handle_problem!(prob)
     if test
         @test prob.optval ≈ 2.5 atol=atol rtol=rtol

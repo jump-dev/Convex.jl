@@ -1,6 +1,7 @@
 @add_problem mip function mip_lp_fallback_interface(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable()
-    p = minimize(x, x>=4.3)
+    p = minimize(x, x>=4.3; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -10,7 +11,8 @@
     end
 
     x = Variable(2)
-    p = minimize(norm(x,1), x[1]>=4.3)
+    p = minimize(norm(x,1), x[1]>=4.3; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -22,7 +24,8 @@ end
 
 @add_problem mip function mip_integer_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(:Int)
-    p = minimize(x, x>=4.3)
+    p = minimize(x, x>=4.3; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -32,7 +35,8 @@ end
     end
 
     x = Variable(2, :Int)
-    p = minimize(sum(x), x>=4.3)
+    p = minimize(sum(x), x>=4.3; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -43,7 +47,8 @@ end
 
     x = Variable(:Int)
     y = Variable()
-    p = minimize(sum(x + y), x>=4.3, y>=7)
+    p = minimize(sum(x + y), x>=4.3, y>=7; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -53,7 +58,8 @@ end
     end
 
     x = Variable(2, :Int)
-    p = minimize(norm(x, 1), x[1]>=4.3)
+    p = minimize(norm(x, 1), x[1]>=4.3; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -63,7 +69,8 @@ end
     end
 
     x = Variable(2, :Int)
-    p = minimize(sum(x), x[1]>=4.3, x>=0)
+    p = minimize(sum(x), x[1]>=4.3, x>=0; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -73,7 +80,8 @@ end
     end
 
     x = Variable(2, :Int)
-    p = minimize(sum(x), x>=.5)
+    p = minimize(sum(x), x>=.5; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -85,7 +93,8 @@ end
 
 @add_problem mip function mip_binary_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, :Bin)
-    p = minimize(sum(x), x>=.5)
+    p = minimize(sum(x), x>=.5; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end
@@ -95,7 +104,8 @@ end
     end
 
     x = Variable(2, :Bin)
-    p = minimize(sum(x), x[1]>=.5, x>=0)
+    p = minimize(sum(x), x[1]>=.5, x>=0; numeric_type = T)
+
     if test
         @test vexity(p) == AffineVexity()
     end

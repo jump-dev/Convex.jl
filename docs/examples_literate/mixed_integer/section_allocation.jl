@@ -9,7 +9,7 @@
 # The goal will be to get an allocation matrix $X$, where $X_{ij} = 1$ if
 # student $i$ is assigned to section $j$ and $0$ otherwise. 
 
-using Convex, GLPKMathProgInterface
+using Convex, GLPK
 aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
 
 # Load our preference matrix, `P`
@@ -30,5 +30,5 @@ constraints = [sum(X, dims=2) == 1, sum(X, dims=1) <= 10, sum(X, dims=1) >= 6]
 # students since the ranking of the first choice is 1.
 p = minimize(vec(X)' * vec(P), constraints)
 
-solve!(p, GLPKSolverMIP())
+solve!(p, GLPK.Optimizer())
 p.optval

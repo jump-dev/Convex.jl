@@ -18,6 +18,6 @@ Pkg.add("SCS")
 
 To solve certain problems such as mixed integer programming problems you
 will need to install another solver as well, such as
-[GLPK](https://github.com/JuliaOpt/GLPKMathProgInterface.jl). If you
+[GLPK](https://github.com/JuliaOpt/GLPK.jl). If you
 wish to use other solvers, please read the section on
 [Solvers](@ref).

@@ -27,20 +27,19 @@ the documentation for that solver.
 To use a specific solver, you can use the following syntax
 
 ```julia
-solve!(p, GurobiSolver())
-solve!(p, MosekSolver())
-solve!(p, GLPKSolverMIP())
-solve!(p, GLPKSolverLP())
-solve!(p, ECOSSolver())
-solve!(p, SCSSolver())
+solve!(p, Gurobi.Optimizer())
+solve!(p, Mosek.Optimizer())
+solve!(p, GLPK.Optimizer())
+solve!(p, ECOS.Optimizer())
+solve!(p, SCS.Optimizer())
 ```
 
 (Of course, the solver must be installed first.) For example, we can use
 GLPK to solve a MILP
 
 ```julia
-using GLPKMathProgInterface
-solve!(p, GLPKSolverMIP())
+using GLPK
+solve!(p, GLPK.Optimizer())
 ```
 
 Many of the solvers also allow options to be passed in. More details can
@@ -51,7 +50,7 @@ in quiet mode), we can do so by
 
 ```julia
 using SCS
-solve!(p, SCSSolver(verbose=false))
+solve!(p, SCS.Optimizer(verbose=false))
 ```
 
 If we wish to increase the maximum number of iterations for ECOS or SCS,
@@ -59,9 +58,9 @@ we can do so by
 
 ```julia
 using ECOS
-solve!(p, ECOSSolver(maxit=10000))
+solve!(p, ECOS.Optimizer(maxit=10000))
 using SCS
-solve!(p, SCSSolver(max_iters=10000))
+solve!(p, SCS.Optimizer(max_iters=10000))
 ```
 
 To turn off the problem status warning issued by Convex when a solver is
@@ -70,5 +69,5 @@ not able to solve a problem to optimality, use the keyword argument
 solver parameters:
 
 ```julia
-solve!(p, SCSSolver(verbose=false), verbose=false)
+solve!(p, SCS.Optimizer(verbose=false), verbose=false)
 ```

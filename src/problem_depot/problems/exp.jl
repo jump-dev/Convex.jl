@@ -1,6 +1,7 @@
 @add_problem exp function exp_exp_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable()
-    p = minimize(exp(y), y>=0)
+    p = minimize(exp(y), y>=0; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -11,7 +12,8 @@
     end
 
     y = Variable()
-    p = minimize(exp(y), y>=1)
+    p = minimize(exp(y), y>=1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -22,7 +24,8 @@
     end
 
     y = Variable(5)
-    p = minimize(sum(exp(y)), y>=0)
+    p = minimize(sum(exp(y)), y>=0; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -33,7 +36,8 @@
     end
 
     y = Variable(5)
-    p = minimize(sum(exp(y)), y>=0)
+    p = minimize(sum(exp(y)), y>=0; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -45,7 +49,8 @@ end
 
 @add_problem exp function exp_log_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable()
-    p = maximize(log(y), y<=1)
+    p = maximize(log(y), y<=1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -55,7 +60,8 @@ end
     end
 
     y = Variable()
-    p = maximize(log(y), y<=2)
+    p = maximize(log(y), y<=2; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -65,7 +71,8 @@ end
     end
 
     y = Variable()
-    p = maximize(log(y), [y<=2, exp(y)<=10])
+    p = maximize(log(y), [y<=2, exp(y)<=10]; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -77,7 +84,8 @@ end
 
 @add_problem exp function exp_log_sum_exp_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5)
-    p = minimize(logsumexp(y), y>=1)
+    p = minimize(logsumexp(y), y>=1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -89,7 +97,8 @@ end
 
 @add_problem exp function exp_logistic_loss_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5)
-    p = minimize(logisticloss(y), y>=1)
+    p = minimize(logisticloss(y), y>=1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -101,7 +110,8 @@ end
 
 @add_problem exp function exp_entropy_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5, Positive())
-    p = maximize(entropy(y), sum(y)<=1)
+    p = maximize(entropy(y), sum(y)<=1; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -115,7 +125,8 @@ end
     x = Variable(1)
     y = Variable(1)
     # x log (x/y)
-    p = minimize(relative_entropy(x,y), y==1, x >= 2)
+    p = minimize(relative_entropy(x,y), y==1, x >= 2; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end
@@ -129,7 +140,8 @@ end
     x = Variable(1)
     y = Variable(1)
     # y log (x/y)
-    p = maximize(log_perspective(x,y), y==5, x <= 10)
+    p = maximize(log_perspective(x,y), y==5, x <= 10; numeric_type = T)
+
     if test
         @test vexity(p) == ConvexVexity()
     end

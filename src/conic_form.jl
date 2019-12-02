@@ -90,7 +90,8 @@ end
 
 # A conic constraint is of the form [affine_expr1, affine_expr2, ..., affine_exprk] \in cone
 # we represent each affine expressions as a ConicObj
-# we represent the cone as a Symbol (defined in MathProgBase), like :SOC, :LP, etc
+# we represent the cone as a Symbol, like :SOC, :SDP, etc.
+# See the details of `get_MOI_set` for the full list of symbols used.
 # and we record the sizes of the affine expressions (XXX check...)
 # XXX might it be better to represent objs as a single ConicObj rather than an array of them?
 struct ConicConstr

@@ -6,3 +6,4 @@
 .ipynb_checkpoints/
 Manifest.toml
 benchmark/*.json
+test/Project.toml

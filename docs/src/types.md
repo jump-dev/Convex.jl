@@ -73,7 +73,7 @@ y = Variable()
 z = Variable()
 expr = x + y + z
 problem = minimize(expr, x >= 1, y >= x, 4 * z >= y)
-solve!(problem, SCSSolver())
+solve!(problem, SCS.Optimizer())
 
 # Once the problem is solved, we can call evaluate() on expr:
 evaluate(expr)
@@ -148,7 +148,7 @@ A problem can be solved by calling `solve!`
 solve!(problem, solver)
 ```
 
-passing a solver such as `SCSSolver()` from the package `SCS` as the
+passing a solver such as `SCS.Optimizer()` from the package `SCS` as the
 second argument. After the problem is solved, `problem.status` records
 the status returned by the optimization solver, and can be `:Optimal`,
 `:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. If the status

@@ -1,80 +1,40 @@
-import MathProgBase
+export Problem, minimize, maximize, satisfy, add_constraint!, add_constraints!
 
-export Problem, Solution, minimize, maximize, satisfy, add_constraint!, add_constraints!
-export Float64OrNothing
-
-const Float64OrNothing = Union{Float64, Nothing}
-
-# TODO: Cleanup
-mutable struct Solution{T<:Number}
-    primal::Array{T, 1}
-    dual::Array{T, 1}
-    status::Symbol
-    optval::T
-    has_dual::Bool
-end
-
-Solution(x::Array{T, 1}, status::Symbol, optval::T) where {T} =
-    Solution(x, T[], status, optval, false)
-Solution(x::Array{T, 1}, y::Array{T, 1}, status::Symbol, optval::T) where {T} =
-    Solution(x, y, status, optval, true)
-
-mutable struct Problem
+mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr
     constraints::Array{Constraint}
-    status::Symbol
-    optval::Float64OrNothing
-    model::Union{MathProgBase.AbstractConicModel, Nothing}
-    solution::Solution
+    status::MOI.TerminationStatusCode
+    model::Union{MOI.ModelLike, Nothing}
 
-    function Problem(head::Symbol, objective::AbstractExpr,
-                     model::Union{MathProgBase.AbstractConicModel, Nothing},
-                     constraints::Array=Constraint[])
+    function Problem{T}(head::Symbol, objective::AbstractExpr,
+                     constraints::Array=Constraint[]) where {T <: Real}
         if sign(objective)== Convex.ComplexSign()
-            error("Objective can not be a complex expression")
+            error("Objective cannot be a complex expression")
         else
-            return new(head, objective, constraints, Symbol("not yet solved"), nothing, model)
+            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing)
         end
     end
 end
 
-# constructor if model is not specified
-function Problem(head::Symbol, objective::AbstractExpr, constraints::Array=Constraint[],
-                 solver::Union{MathProgBase.AbstractMathProgSolver, Nothing}=nothing)
-    model = solver !== nothing ? MathProgBase.ConicModel(solver) : solver
-    Problem(head, objective, model, constraints)
+function Base.getproperty(p::Problem, s::Symbol)
+    if s === :optval
+        if getfield(p, :status) == MOI.OPTIMIZE_NOT_CALLED
+            return nothing
+        else
+            return MOI.get(p.model, MOI.ObjectiveValue())
+        end
+    else
+        return getfield(p, s)
+    end
 end
 
-# If the problem constructed is of the form Ax=b where A is m x n
-# returns:
-# index: n
-# constr_size: m
-# var_to_ranges a dictionary mapping from variable id to (start_index, end_index)
-# where start_index and end_index are the start and end indexes of the variable in A
-function find_variable_ranges(constraints, id_to_variables)
-    index = 0
-    constr_size = 0
-    var_to_ranges = Dict{UInt64, Tuple{Int, Int}}()
-    for constraint in constraints
-        for i = 1:length(constraint.objs)
-            for (id, val) in constraint.objs[i]
-                if !haskey(var_to_ranges, id) && id != objectid(:constant)
-                    var = id_to_variables[id]
-                    if var.sign == ComplexSign()
-                        var_to_ranges[id] = (index + 1, index + 2*length(var))
-                        index += 2*length(var)
-                    else
-                        var_to_ranges[id] = (index + 1, index + length(var))
-                        index += length(var)
-                    end
-                end
-            end
-            constr_size += constraint.sizes[i]
-        end
-    end
-    return index, constr_size, var_to_ranges
-end
+dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
+primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
+termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
+objective_value(p::Problem) = MOI.get(p.model, MOI.ObjectiveValue())
+
+Problem(args...) = Problem{Float64}(args...)
 
 function vexity(p::Problem)
     bad_vex = [ConcaveVexity, NotDcp]
@@ -107,121 +67,34 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
     return objective, objective_var.id_hash
 end
 
-function conic_problem(p::Problem)
-    if length(p.objective) != 1
-        error("Objective must be a scalar")
-    end
-
-    # conic problems have the form
-    # minimize c'*x
-    # st       b - Ax \in cones
-    # our job is to take the conic forms of the objective and constraints
-    # and convert them into vectors b and c and a matrix A
-    # one chunk of rows in b and in A corresponds to each constraint,
-    # and one chunk of columns in b and A corresponds to each variable,
-    # with the size of the chunk determined by the size of the constraint or of the variable
-
-    # A map to hold unique constraints. Each constraint is keyed by a symbol
-    # of which atom generated the constraints, and a integer hash of the child
-    # expressions used by the atom
-    unique_conic_forms = UniqueConicForms()
-    objective, objective_var_id = conic_form!(p, unique_conic_forms)
-    constraints = unique_conic_forms.constr_list
-    conic_constr_to_constr = unique_conic_forms.conic_constr_to_constr
-    id_to_variables = unique_conic_forms.id_to_variables
-
-    # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
-    # var_size is the sum of the lengths of all variables in the problem
-    # constr_size is the sum of the lengths of all constraints in the problem
-    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints, id_to_variables)
-    c = spzeros(var_size, 1)
-    objective_range = var_to_ranges[objective_var_id]
-    c[objective_range[1]:objective_range[2]] .= 1
-
-    # slot in all of the coefficients in the conic forms into A and b
-    A = spzeros(constr_size, var_size)
-    b = spzeros(constr_size, 1)
-    cones = Tuple{Symbol, UnitRange{Int}}[]
-    constr_index = 0
-    for constraint in constraints
-        total_constraint_size = 0
-        for i = 1:length(constraint.objs)
-            sz = constraint.sizes[i]
-            for (id, val) in constraint.objs[i]
-                if id == objectid(:constant)
-                    for l in 1:sz
-                        b[constr_index + l] = val[1][l] == 0 ? val[2][l] : val[1][l]
-                    end
-                    #b[constr_index + sz + 1 : constr_index + 2*sz] = val[2]
-                else
-                    var_range = var_to_ranges[id]
-                    if id_to_variables[id].sign == ComplexSign()
-                        A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[1] + length(id_to_variables[id])-1] = -val[1]
-                        A[constr_index + 1 : constr_index + sz, var_range[1] + length(id_to_variables[id]) : var_range[2]] = -val[2]
-                    else
-                        A[constr_index + 1 : constr_index + sz, var_range[1] : var_range[2]] = -val[1]
-                    end
-                end
-            end
-            constr_index += sz
-            total_constraint_size += sz
-        end
-        push!(cones, (constraint.cone, constr_index - total_constraint_size + 1 : constr_index))
-    end
-
-    # find integral and boolean variables
-    vartypes = fill(:Cont, length(c))
-    for var_id in keys(var_to_ranges)
-        variable = id_to_variables[var_id]
-        if :Int in variable.sets
-            startidx, endidx = var_to_ranges[var_id]
-            for idx in startidx:endidx
-                vartypes[idx] = :Int
-            end
-        end
-        if :Bin in variable.sets
-            startidx, endidx = var_to_ranges[var_id]
-            for idx in startidx:endidx
-                vartypes[idx] = :Bin
-            end
-        end
-    end
-
-    if p.head == :maximize
-        c = -c
-    end
-
-    return c, A, b, cones, var_to_ranges, vartypes, constraints, id_to_variables, conic_constr_to_constr
-end
-
-Problem(head::Symbol, objective::AbstractExpr, constraints::Constraint...) =
-    Problem(head, objective, [constraints...])
+Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Real} =
+    Problem{T}(head, objective, [constraints...])
 
 # Allow users to simply type minimize
-minimize(objective::AbstractExpr, constraints::Constraint...) =
-    Problem(:minimize, objective, collect(constraints))
-minimize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]) =
-    Problem(:minimize, objective, constraints)
-minimize(objective::Value, constraints::Constraint...) =
-    minimize(convert(AbstractExpr, objective), collect(constraints))
-minimize(objective::Value, constraints::Array{<:Constraint}=Constraint[]) =
-    minimize(convert(AbstractExpr, objective), constraints)
+minimize(objective::AbstractExpr, constraints::Constraint...; numeric_type = Float64) =
+    Problem{numeric_type}(:minimize, objective, collect(constraints))
+minimize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    Problem{numeric_type}(:minimize, objective, constraints)
+minimize(objective::Value, constraints::Constraint...; numeric_type = Float64) =
+    minimize(convert(AbstractExpr, objective), collect(constraints); numeric_type = numeric_type)
+minimize(objective::Value, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    minimize(convert(AbstractExpr, objective), constraints; numeric_type = numeric_type)
 
 # Allow users to simply type maximize
-maximize(objective::AbstractExpr, constraints::Constraint...) =
-    Problem(:maximize, objective, collect(constraints))
-maximize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]) =
-    Problem(:maximize, objective, constraints)
-maximize(objective::Value, constraints::Constraint...) =
-    maximize(convert(AbstractExpr, objective), collect(constraints))
-maximize(objective::Value, constraints::Array{<:Constraint}=Constraint[]) =
-    maximize(convert(AbstractExpr, objective), constraints)
+maximize(objective::AbstractExpr, constraints::Constraint...; numeric_type = Float64) =
+    Problem{numeric_type}(:maximize, objective, collect(constraints))
+maximize(objective::AbstractExpr, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    Problem{numeric_type}(:maximize, objective, constraints)
+maximize(objective::Value, constraints::Constraint...; numeric_type = Float64) =
+    maximize(convert(AbstractExpr, objective), collect(constraints); numeric_type = numeric_type)
+maximize(objective::Value, constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    maximize(convert(AbstractExpr, objective), constraints; numeric_type = numeric_type)
 
 # Allow users to simply type satisfy (if there is no objective)
-satisfy(constraints::Constraint...) = Problem(:minimize, Constant(0), [constraints...])
-satisfy(constraints::Array{<:Constraint}=Constraint[]) =
-    Problem(:minimize, Constant(0), constraints)
-satisfy(constraint::Constraint) = satisfy([constraint])
+satisfy(constraints::Constraint...; numeric_type = Float64) = Problem{numeric_type}(:minimize, Constant(0), [constraints...])
+satisfy(constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
+    Problem{numeric_type}(:minimize, Constant(0), constraints)
+satisfy(constraint::Constraint; numeric_type = Float64) = satisfy([constraint]; numeric_type = numeric_type)
 
 # +(constraints, constraints) is defined in constraints.jl
 add_constraints!(p::Problem, constraints::Array{<:Constraint}) =

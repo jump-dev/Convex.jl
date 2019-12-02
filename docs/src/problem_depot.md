@@ -11,7 +11,7 @@ For example, to test the solver SCS on all the problems of the depot except the 
 using Convex, SCS, Test
 @testset "SCS" begin
     Convex.ProblemDepot.run_tests(; exclude=[r"mip"]) do p
-        solve!(p, SCSSolver(verbose=0, eps=1e-6))
+        solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
     end
 end
 ```
@@ -44,7 +44,7 @@ function affine_negate_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T})
 
 this should be the same for every problem, except for the name, which is a description of the problem. It should include what kind of atoms it uses (`affine` in this case), so that certain kinds of atoms can be ruled out by the `exclude` keyword to [`Convex.ProblemDepot.run_tests`](@ref) and [`Convex.ProblemDepot.benchmark_suite`](@ref); for example, many solvers cannot solve mixed-integer problems, so `mip` is included in the name of such problems.
 
-Then begins the body of the problem. It is setup like any other Convex.jl problem, only `handle_problem!` is called instead of `solve!`. This allows particular solvers to be used (via e.g. choosing `handle_problem! = p -> solve!(p, solver)`), or for any other function of the problem (e.g. `handle_problem! = p -> Convex.conic_problem(p)` which is used for benchmarking problem formulation speed.) Tests should be included and gated behind `if test` blocks, so that tests can be skipped for benchmarking, or in the case that the problem is not in fact solved during `handle_problem!`.
+Then begins the body of the problem. It is setup like any other Convex.jl problem, only `handle_problem!` is called instead of `solve!`. This allows particular solvers to be used (via e.g. choosing `handle_problem! = p -> solve!(p, solver)`), or for any other function of the problem. Tests should be included and gated behind `if test` blocks, so that tests can be skipped for benchmarking, or in the case that the problem is not in fact solved during `handle_problem!`.
 
 The fact that the problems may not be solved during `handle_problem!` brings with it a small complication: any command that assumes the problem has been solved should be behind an `if test` check. For example, in some of the problems, `real(x.value)` is used, for a variable `x`; perhaps as
 

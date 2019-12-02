@@ -62,7 +62,7 @@ pixel_colors = Variable(num_pixels)
 ## to reflect that, we minimize a norm
 objective = sumsquares(line_mat * pixel_colors - line_vals)
 problem = minimize(objective)
-solve!(problem, ECOSSolver(verbose=0))
+solve!(problem, ECOS.Optimizer(verbose=0))
 
 rows = zeros(img_size*img_size)
 cols = zeros(img_size*img_size)

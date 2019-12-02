@@ -1,12 +1,16 @@
 Credits
 =======
 
-Convex.jl was developed and maintained by:
+Convex.jl was created, developed, and maintained by:
 
 -   [Jenny Hong](http://www.stanford.edu/~jyunhong/)
 -   [Karanveer Mohan](http://www.stanford.edu/~kvmohan/)
 -   [Madeleine Udell](http://www.stanford.edu/~udell/)
 -   [David Zeng](http://www.stanford.edu/~dzeng0/)
+
+Convex.jl is currently developed and maintained by the Julia
+community; see [Contributors](https://github.com/JuliaOpt/Convex.jl/graphs/contributors)
+for more.
 
 The Convex.jl developers also thank:
 

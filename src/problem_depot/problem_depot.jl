@@ -3,7 +3,8 @@
 
 module ProblemDepot
 using BenchmarkTools, Test
-
+using MathOptInterface
+const MOI = MathOptInterface
 using Convex
 using LinearAlgebra
 using LinearAlgebra: eigen, I, opnorm

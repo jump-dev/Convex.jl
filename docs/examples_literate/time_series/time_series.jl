@@ -40,7 +40,7 @@ eq_constraints = [ yearly[i] == yearly[i - 365] for i in 365 + 1 : n ]
 smoothing = 100
 smooth_objective = sumsquares(yearly[1 : n - 1] - yearly[2 : n])
 problem = minimize(sumsquares(temps - yearly) + smoothing * smooth_objective, eq_constraints);
-solve!(problem, ECOSSolver(maxit=200, verbose=0))
+solve!(problem, ECOS.Optimizer(maxit=200, verbose=0))
 residuals = temps - evaluate(yearly)
 
 ## Plot smooth fit
@@ -82,7 +82,7 @@ end
 ## Solve autoregressive problem
 ar_coef = Variable(ar_len)
 problem = minimize(sumsquares(residuals_mat * ar_coef - residuals[ar_len + 1 : end]))
-solve!(problem, ECOSSolver(max_iters=200, verbose=0))
+solve!(problem, ECOS.Optimizer(max_iters=200, verbose=0))
 
 ## plot autoregressive fit of daily fluctuations for a few days
 ar_range = 1:145
