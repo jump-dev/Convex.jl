@@ -55,10 +55,72 @@
         $(Convex.show_id(x))"""
 
         # test `MAXDEPTH`
+        # We construct a binary tree of depth >= 3
+        # to make sure it gets truncated appropriately.
         x = Variable(2)
         y = Variable(2)
-        p = minimize(sum(x), hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))) == hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))))
-        @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\nstatus: `solve!` not called yet" 
+        level3 = hcat(x,y)
+        level2 = hcat(level3, level3)
+        root = hcat(level2, level2)
+        p = minimize(sum(x), root == root)
+        @test sprint(show, p) == """
+        minimize
+        └─ sum (affine; real)
+           └─ 2-element real variable ($(Convex.show_id(x)))
+        subject to
+        └─ == constraint (affine)
+           ├─ hcat (affine; real)
+           │  ├─ hcat (affine; real)
+           │  │  ├─ …
+           │  │  └─ …
+           │  └─ hcat (affine; real)
+           │     ├─ …
+           │     └─ …
+           └─ hcat (affine; real)
+              ├─ hcat (affine; real)
+              │  ├─ …
+              │  └─ …
+              └─ hcat (affine; real)
+                 ├─ …
+                 └─ …
+
+        status: `solve!` not called yet"""
+
+        # test `MAXWIDTH`
+        x = Variable()
+        p = satisfy([ x == i for i = 1:100])
+        old_maxwidth = Convex.MAXWIDTH[]
+        Convex.MAXWIDTH[] = 2
+        @test sprint(show, p) == """
+            minimize
+            └─ 0
+            subject to
+            ├─ == constraint (affine)
+            │  ├─ real variable ($(Convex.show_id(x)))
+            │  └─ 1
+            ├─ == constraint (affine)
+            │  ├─ real variable ($(Convex.show_id(x)))
+            │  └─ 2
+            ⋮
+
+            status: `solve!` not called yet"""
+        Convex.MAXWIDTH[] = old_maxwidth
+
+        # solved problem
+        x = Variable()
+        p = satisfy(x >= 0)
+        output = solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
+        @test sprint(show, p) == """
+                minimize
+                └─ 0
+                subject to
+                └─ >= constraint (affine)
+                   ├─ real variable ($(Convex.show_id(x)))
+                   └─ 0
+
+                termination status: OPTIMAL
+                primal status: FEASIBLE_POINT
+                dual status: FEASIBLE_POINT"""
     end
 
     @testset "clearmemory" begin
