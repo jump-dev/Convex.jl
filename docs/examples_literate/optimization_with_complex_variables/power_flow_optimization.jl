@@ -4,7 +4,7 @@
 using Convex, SCS
 using Test
 using MAT   #Pkg.add("MAT")
-aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
 
 TOL = 1e-2;
 input = matopen(aux("Data.mat"))

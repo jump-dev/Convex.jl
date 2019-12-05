@@ -27,7 +27,7 @@
 # This is simply an unconstrained least squares problem; something we can readily solve!
 
 using Convex, ECOS, DelimitedFiles, SparseArrays
-aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
 line_mat_x = readdlm(aux("tux_sparse_x.txt"))
 summary(line_mat_x)
 

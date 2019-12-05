@@ -31,14 +31,15 @@ end
 
     @testset "SCS with warmstarts" begin
         # We exclude `sdp_matrix_frac_atom` due to the bug https://github.com/JuliaOpt/SCS.jl/issues/153
-        run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom"]) do p
+        # Likewise, `sdp_sdp_constraints` hits a bug https://github.com/JuliaOpt/SCS.jl/issues/167
+        run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom", r"sdp_sdp_constraints"]) do p
             solve!(p, SCS.Optimizer(verbose=0, eps=1e-6); warmstart = true)
         end
     end
 
     @testset "SCS" begin
-        # We exclude `sdp_matrix_frac_atom` due to the bug https://github.com/JuliaOpt/SCS.jl/issues/153
-        run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom"]) do p
+        # Exclusions same as for "SCS with warmstarts"
+        run_tests(; exclude=[r"mip", r"sdp_matrix_frac_atom", r"sdp_sdp_constraints"]) do p
             solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
         end
     end

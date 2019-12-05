@@ -10,7 +10,7 @@
 # student $i$ is assigned to section $j$ and $0$ otherwise. 
 
 using Convex, GLPK
-aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
 
 # Load our preference matrix, `P`
 include(aux("data.jl"))

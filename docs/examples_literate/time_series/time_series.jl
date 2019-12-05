@@ -2,7 +2,7 @@
 # A time series is a sequence of data points, each associated with a time. In our example, we will work with a time series of daily temperatures in the city of Melbourne, Australia over a period of a few years. Let $x$ be the vector of the time series, and $x_i$ denote the temperature in Melbourne on day $i$. Here is a picture of the time series:
 
 using Plots, Convex, ECOS, DelimitedFiles
-aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
 
 temps = readdlm(aux("melbourne_temps.txt"), ',')
 n = size(temps, 1)

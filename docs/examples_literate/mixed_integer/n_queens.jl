@@ -1,7 +1,7 @@
 # # N queens
 
 using Convex, GLPK, LinearAlgebra, SparseArrays, Test
-aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
 include(aux("antidiag.jl"))
 
 n = 8
