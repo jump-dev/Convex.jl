@@ -9,7 +9,7 @@
 
 **Installation**: `julia> Pkg.add("Convex")`
 
-- **Detailed documentation and examples** for Convex.jl ([stable](https://juliaopt.github.io/Convex.jl/stable) | [latest](https://juliaopt.github.io/Convex.jl/dev)).
+- **Detailed documentation and examples** for Convex.jl ([stable](https://juliaopt.github.io/Convex.jl/stable) | [development version](https://juliaopt.github.io/Convex.jl/dev)).
 - If you're running into **bugs or have feature requests**, please use the [Github Issue Tracker](https://github.com/JuliaOpt/Convex.jl/issues>).
 - For usage questions, please contact us via [Discourse](https://discourse.julialang.org/c/domain/opt).
 
