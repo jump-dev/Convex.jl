@@ -31,7 +31,6 @@ export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
 # Problems
 export add_constraint!, add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
-global DEFAULT_SOLVER = nothing
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
