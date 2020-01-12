@@ -1,7 +1,5 @@
 import LinearAlgebra.isposdef
 import Base.in
-export SDPConstraint, isposdef, in, ⪰, ⪯
-
 ### Positive semidefinite cone constraint
 
 # TODO: Terrible documentation. Please fix.

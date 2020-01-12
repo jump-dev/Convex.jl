@@ -4,10 +4,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-
 import Base.exp
-export exp
-export sign, curvature, monotonicity, evaluate
 
 ### Exponential
 

@@ -6,9 +6,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export +, -
-export sign, curvature, monotonicity, evaluate
-
 ### Unary Negation
 
 struct NegateAtom <: AbstractExpr

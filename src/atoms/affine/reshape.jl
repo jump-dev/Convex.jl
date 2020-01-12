@@ -1,7 +1,4 @@
 import Base.reshape, Base.vec
-export reshape, vec
-export sign, curvature, monotonicity, evaluate, conic_form!
-
 
 struct ReshapeAtom <: AbstractExpr
     head::Symbol

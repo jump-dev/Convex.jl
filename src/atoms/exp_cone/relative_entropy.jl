@@ -5,9 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export relative_entropy, log_perspective
-export sign, curvature, monotonicity, evaluate
-
 # TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs
 
 struct RelativeEntropyAtom <: AbstractExpr

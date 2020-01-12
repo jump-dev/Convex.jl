@@ -1,6 +1,3 @@
-export SOCConstraint, SOCElemConstraint, conic_form!
-export socp
-
 # TODO: Document this. How is this different from SOCElemConstraint? Why do we need both. How does
 # conic form work for SOC constraints.
 struct SOCConstraint <: Constraint

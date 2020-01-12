@@ -6,7 +6,6 @@
 #############################################################################
 
 import LinearAlgebra.diagm, LinearAlgebra.Diagonal
-export diagm, Diagonal
 
 struct DiagMatrixAtom <: AbstractExpr
     head::Symbol

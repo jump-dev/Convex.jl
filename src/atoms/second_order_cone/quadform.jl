@@ -1,4 +1,3 @@
-export quadform
 
 function quadform(x::Value, A::AbstractExpr)
     return x' * A * x

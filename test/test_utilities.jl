@@ -1,3 +1,5 @@
+using Convex: AbstractExpr, ComplexSign, ConicObj, Negative, NoSign
+
 @testset "Utilities" begin
 
     @testset "`solve!` does not return anything" begin

@@ -1,6 +1,3 @@
-export QuadOverLinAtom, quadoverlin
-export sign, monotonicity, curvature, conic_form!
-
 struct QuadOverLinAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64

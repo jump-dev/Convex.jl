@@ -1,5 +1,3 @@
-export inner_product
-
 function inner_product(x::AbstractExpr, y::AbstractExpr)
     if x.size == y.size && x.size[1] == x.size[2]
         return real(tr(x'*y))

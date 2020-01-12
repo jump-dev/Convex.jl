@@ -1,5 +1,4 @@
 import LinearAlgebra.kron
-export kron
 
 function kron(a::Value, b::AbstractExpr)
     rows = AbstractExpr[]

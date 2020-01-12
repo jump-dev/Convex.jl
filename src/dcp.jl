@@ -11,10 +11,6 @@
 #############################################################################
 
 import Base.-, Base.+, Base.*, Base./
-export Vexity, ConstVexity, AffineVexity, ConvexVexity, ConcaveVexity, NotDcp
-export Monotonicity, Nonincreasing, Nondecreasing, NoMonotonicity
-export Sign, Positive, Negative, NoSign, ComplexSign
-export -, +, *
 
 # Vexity subtypes
 abstract type Vexity end

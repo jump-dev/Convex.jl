@@ -1,6 +1,4 @@
 import Base.sqrt
-export GeoMeanAtom, geomean, sqrt
-export sign, monotonicity, curvature, conic_form!
 
 struct GeoMeanAtom <: AbstractExpr
     head::Symbol

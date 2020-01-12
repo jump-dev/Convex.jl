@@ -5,9 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export logsumexp, logisticloss
-export sign, curvature, monotonicity, evaluate
-
 ### LogSumExp
 
 # TODO: make this work for a *list* of inputs, rather than just for vector/matrix inputs

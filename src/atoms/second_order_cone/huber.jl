@@ -1,5 +1,3 @@
-export huber
-
 struct HuberAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64

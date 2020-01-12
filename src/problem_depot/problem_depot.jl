@@ -8,6 +8,7 @@ const MOI = MathOptInterface
 using Convex
 using LinearAlgebra
 using LinearAlgebra: eigen, I, opnorm
+using Convex: AffineVexity, ConcaveVexity, ConvexVexity
 
 randperm(d) = sortperm(rand(d))
 shuffle(x) = x[randperm(length(x))]

@@ -4,9 +4,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-
 import Base.sum
-export sum
 
 ### Sum Atom
 struct SumAtom <: AbstractExpr

@@ -1,6 +1,4 @@
 import Base.Broadcast.broadcasted
-export QolElemAtom, qol_elementwise, square, sumsquares, invpos, /
-export sign, monotonicity, curvature, conic_form!
 
 struct QolElemAtom <: AbstractExpr
     head::Symbol

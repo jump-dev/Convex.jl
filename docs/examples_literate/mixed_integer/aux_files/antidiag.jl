@@ -8,9 +8,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-
-import Convex.sign, Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-export antidiag, sign, monotonicity, curvature, evaluate, conic_form!
+export antidiag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector

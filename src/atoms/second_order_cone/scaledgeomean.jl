@@ -1,6 +1,4 @@
 import Base.sqrt
-export ScaledGeoMeanAtom, scaledgeomean, sqrt
-export sign, monotonicity, curvature, conic_form!
 
 function power_of_2_gt(n::Int)
     Int(2^ceil(log(2,n)))

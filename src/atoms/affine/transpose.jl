@@ -6,8 +6,6 @@
 #############################################################################
 
 import Base.transpose, Base.adjoint
-export transpose, adjoint, TransposeAtom, AdjointAtom
-export sign, curvature, monotonicity, evaluate, conic_form!
 
 struct TransposeAtom <: AbstractExpr
     head::Symbol

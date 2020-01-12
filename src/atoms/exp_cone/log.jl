@@ -4,10 +4,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-
 import Base.log
-export log
-export sign, curvature, monotonicity, evaluate
 
 ### Logarithm
 

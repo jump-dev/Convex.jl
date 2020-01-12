@@ -1,6 +1,4 @@
 import Base.sign
-export partialtranspose, PartialTransposeAtom
-export sign, curvature, monotonicity, evaluate, conic_form!
 
 struct PartialTransposeAtom <: AbstractExpr
     head::Symbol

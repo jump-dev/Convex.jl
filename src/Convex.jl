@@ -4,11 +4,32 @@ module Convex
 using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
+using AbstractTrees: AbstractTrees
 
 using MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 const MOIB = MOI.Bridges
+
+# Functions
+export conv, dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, invpos, lambdamax, lambdamin
+export log_perspective, logisticloss, logsumexp, matrixfrac, neg, norm2, norm_1, norm_inf, nuclearnorm
+export partialtrace, partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
+export relative_entropy, scaledgeomean, sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
+
+# rexports from LinearAlgebra
+export diag, diagm, Diagonal, dot, kron, logdet, norm, tr
+
+# Constraints
+export isposdef, ⪰, ⪯ # PSD constraints
+export socp
+
+# Variables
+export Constant, ComplexVariable, HermitianSemidefinite, Positive, Semidefinite, Variable
+export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
+
+# Problems
+export add_constraint!, add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
 global DEFAULT_SOLVER = nothing
 ### modeling framework

@@ -1,5 +1,3 @@
-export solve!
-
 # Convert from sets used within Convex to MOI sets
 function get_MOI_set(cone, length_inds)
     if cone == :SDP
