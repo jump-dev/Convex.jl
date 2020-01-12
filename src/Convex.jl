@@ -25,8 +25,11 @@ export isposdef, ⪰, ⪯ # PSD constraints
 export socp
 
 # Variables
-export Constant, ComplexVariable, HermitianSemidefinite, Positive, Semidefinite, Variable
+export Constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
 export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
+
+# Signs
+export Positive, Negative, ComplexSign, NoSign
 
 # Problems
 export add_constraint!, add_constraints!, maximize, minimize, Problem, satisfy, solve!

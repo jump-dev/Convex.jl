@@ -1,4 +1,4 @@
-using Convex: AbstractExpr, ComplexSign, ConicObj, Negative, NoSign
+using Convex: AbstractExpr, ConicObj
 
 @testset "Utilities" begin
 
