@@ -8,6 +8,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
+import Convex.sign, Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
 export antidiag
 
 ### Diagonal
