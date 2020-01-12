@@ -40,7 +40,7 @@ function curvature(x::EigMaxAtom)
 end
 
 function evaluate(x::EigMaxAtom)
-    eigvals(evaluate(x.children[1]))[end]
+    eigmax(evaluate(x.children[1]))
 end
 
 eigmax(x::AbstractExpr) = EigMaxAtom(x)
@@ -93,7 +93,7 @@ function curvature(x::EigMinAtom)
 end
 
 function evaluate(x::EigMinAtom)
-    eigvals(evaluate(x.children[1]))[1]
+    eigmin(evaluate(x.children[1]))
 end
 
 eigmin(x::AbstractExpr) = EigMinAtom(x)
