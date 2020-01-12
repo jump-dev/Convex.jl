@@ -81,7 +81,7 @@ x.value
 
 
 y = Semidefinite(2)
-p = maximize(lambdamin(y), tr(y)<=6)
+p = maximize(eigmin(y), tr(y)<=6)
 solve!(p, SCS.Optimizer(verbose=0))
 p.optval
 

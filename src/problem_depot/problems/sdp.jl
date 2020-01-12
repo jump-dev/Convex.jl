@@ -114,7 +114,7 @@ end
 
 @add_problem sdp function sdp_dual_lambda_max_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
-    p = minimize(lambdamax(y), y[1,1]>=4; numeric_type = T)
+    p = minimize(eigmax(y), y[1,1]>=4; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()
@@ -122,12 +122,12 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 4 atol=atol rtol=rtol
-        @test evaluate(lambdamax(y)) ≈ 4 atol=atol rtol=rtol
+        @test evaluate(eigmax(y)) ≈ 4 atol=atol rtol=rtol
     end
 
     # https://github.com/JuliaOpt/Convex.jl/issues/337
     x = ComplexVariable(2, 2)
-    p = minimize( lambdamax(x), [ x[1,2] == im, x[2,2] == 1.0, x ⪰ - eye(2) ]; numeric_type = T)
+    p = minimize( eigmax(x), [ x[1,2] == im, x[2,2] == 1.0, x ⪰ - eye(2) ]; numeric_type = T)
     handle_problem!(p)
     if test
         @test p.optval ≈ 1.5 atol=atol rtol=rtol
@@ -138,7 +138,7 @@ end
 
 @add_problem sdp function sdp_lambda_min_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Semidefinite(3)
-    p = maximize(lambdamin(y), tr(y)<=6; numeric_type = T)
+    p = maximize(eigmin(y), tr(y)<=6; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()
@@ -146,7 +146,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 2 atol=atol rtol=rtol
-        @test evaluate(lambdamin(y)) ≈ 2 atol=atol rtol=rtol
+        @test evaluate(eigmin(y)) ≈ 2 atol=atol rtol=rtol
     end
 end
 
@@ -168,7 +168,7 @@ end
 @add_problem sdp function sdp_matrix_frac_atom_both_arguments_variable(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(3)
     P = Variable(3, 3)
-    p = minimize(matrixfrac(x, P), lambdamax(P) <= 2, x[1] >= 1; numeric_type = T)
+    p = minimize(matrixfrac(x, P), eigmax(P) <= 2, x[1] >= 1; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()
@@ -201,7 +201,7 @@ end
     end
 
     x1 = Semidefinite(3)
-    p1 = minimize(lambdamax(x1), x1[1,1]>=4; numeric_type = T)
+    p1 = minimize(eigmax(x1), x1[1,1]>=4; numeric_type = T)
 
     handle_problem!(p1)
 
@@ -215,7 +215,7 @@ end
     end
 
     x1 = Semidefinite(3)
-    p1 = minimize(lambdamax(x1), [x1[i,:] >= i for i=1:3]...; numeric_type = T)
+    p1 = minimize(eigmax(x1), [x1[i,:] >= i for i=1:3]...; numeric_type = T)
 
     handle_problem!(p1)
 

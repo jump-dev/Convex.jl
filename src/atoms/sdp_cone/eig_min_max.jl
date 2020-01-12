@@ -1,54 +1,56 @@
 #############################################################################
-# lambdamin_max.jl
+# eigmin_max.jl
 # Handles maximum and minimum eigenvalue of a symmetric positive definite matrix
 # (and imposes the constraint that its argument be PSD)
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
 
-### Lambda max
+import LinearAlgebra: eigmin, eigmax
 
-struct LambdaMaxAtom <: AbstractExpr
+### Eig max
+
+struct EigMaxAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int, Int}
 
-    function LambdaMaxAtom(x::AbstractExpr)
+    function EigMaxAtom(x::AbstractExpr)
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:lambdamax, hash(children), children, (1, 1))
+            return new(:eigmax, hash(children), children, (1, 1))
         else
-            error("lambdamax can only be applied to a square matrix.")
+            error("eigmax can only be applied to a square matrix.")
         end
     end
 end
 
-function sign(x::LambdaMaxAtom)
+function sign(x::EigMaxAtom)
     return Positive()
 end
 
-function monotonicity(x::LambdaMaxAtom)
+function monotonicity(x::EigMaxAtom)
     return (Nondecreasing(),)
 end
 
-function curvature(x::LambdaMaxAtom)
+function curvature(x::EigMaxAtom)
     return ConvexVexity()
 end
 
-function evaluate(x::LambdaMaxAtom)
+function evaluate(x::EigMaxAtom)
     eigvals(evaluate(x.children[1]))[end]
 end
 
-lambdamax(x::AbstractExpr) = LambdaMaxAtom(x)
+eigmax(x::AbstractExpr) = EigMaxAtom(x)
 
 # Create the equivalent conic problem:
 #   minimize t
 #   subject to
 #            tI - A is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(x::LambdaMaxAtom, unique_conic_forms)
+function conic_form!(x::EigMaxAtom, unique_conic_forms)
     if !has_conic_form(unique_conic_forms, x)
         A = x.children[1]
         m, n = size(A)
@@ -59,49 +61,49 @@ function conic_form!(x::LambdaMaxAtom, unique_conic_forms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-### Lambda min
+### Eig min
 
-struct LambdaMinAtom <: AbstractExpr
+struct EigMinAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int, Int}
 
-    function LambdaMinAtom(x::AbstractExpr)
+    function EigMinAtom(x::AbstractExpr)
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:lambdamin, hash(children), children, (1,1))
+            return new(:eigmin, hash(children), children, (1,1))
         else
-            error("lambdamin can only be applied to a square matrix.")
+            error("eigmin can only be applied to a square matrix.")
         end
     end
 end
 
-function sign(x::LambdaMinAtom)
+function sign(x::EigMinAtom)
     return Positive()
 end
 
-function monotonicity(x::LambdaMinAtom)
+function monotonicity(x::EigMinAtom)
     return (Nondecreasing(),)
 end
 
-function curvature(x::LambdaMinAtom)
+function curvature(x::EigMinAtom)
     return ConcaveVexity()
 end
 
-function evaluate(x::LambdaMinAtom)
+function evaluate(x::EigMinAtom)
     eigvals(evaluate(x.children[1]))[1]
 end
 
-lambdamin(x::AbstractExpr) = LambdaMinAtom(x)
+eigmin(x::AbstractExpr) = EigMinAtom(x)
 
 # Create the equivalent conic problem:
 #   maximize t
 #   subject to
 #            A - tI is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(x::LambdaMinAtom, unique_conic_forms)
+function conic_form!(x::EigMinAtom, unique_conic_forms)
     if !has_conic_form(unique_conic_forms, x)
         A = x.children[1]
         m, n = size(A)

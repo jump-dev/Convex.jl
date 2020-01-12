@@ -125,10 +125,6 @@ using Convex: AbstractExpr, ComplexSign, ConicObj, Negative, NoSign
                 dual status: FEASIBLE_POINT"""
     end
 
-    @testset "clearmemory" begin
-        @test_deprecated Convex.clearmemory()
-    end
-
     @testset "ConicObj with type $T" for T = [UInt32, UInt64]
         c = ConicObj()
         z = zero(T)
