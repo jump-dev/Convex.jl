@@ -3,9 +3,6 @@
 # Defines Variable, which is a subtype of AbstractExpr
 #############################################################################
 
-export Variable, Semidefinite, ComplexVariable, HermitianSemidefinite
-export vexity, evaluate, sign, conic_form!, fix!, free!
-
 mutable struct Variable <: AbstractExpr
     head::Symbol
     id_hash::UInt64

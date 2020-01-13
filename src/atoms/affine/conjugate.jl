@@ -1,6 +1,4 @@
 import Base.conj
-export conj
-export sign, curvature, monotonicity, evaluate, conic_form!
 struct ConjugateAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64

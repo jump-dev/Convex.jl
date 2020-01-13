@@ -2,8 +2,6 @@
 # constant.jl
 # Defines Constant, which is a subtype of AbstractExpr
 #############################################################################
-export Constant
-export vexity, evaluate, sign, conic_form!
 
 ispos(x::Real) = x >= 0
 ispos(v::AbstractVecOrMat{<:Real}) = all(ispos, v)

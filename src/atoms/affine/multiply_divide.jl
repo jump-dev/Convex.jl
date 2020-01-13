@@ -7,7 +7,6 @@
 #############################################################################
 
 import Base.Broadcast.broadcasted
-export sign, monotonicity, curvature, evaluate, conic_form!
 
 ### Scalar and matrix multiplication
 

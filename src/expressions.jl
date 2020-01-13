@@ -29,11 +29,6 @@
 #############################################################################
 
 import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.convert, Base.axes
-export AbstractExpr, Constraint
-export vexity, sign, size, evaluate, monotonicity, curvature, length, convert
-export conic_form!
-export lastindex, ndims
-export Value, ValueOrNothing
 
 ### Abstract types
 abstract type AbstractExpr end
@@ -42,7 +37,6 @@ abstract type Constraint end
 # Override hash function because of
 # https://github.com/JuliaLang/julia/issues/10267
 import Base.hash
-export hash
 
 const hashaa_seed = UInt === UInt64 ? 0x7f53e68ceb575e76 : 0xeb575e7
 function hash(a::Array{AbstractExpr}, h::UInt)

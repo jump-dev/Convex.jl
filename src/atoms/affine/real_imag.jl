@@ -5,9 +5,6 @@
 #############################################################################
 
 import Base.real, Base.imag
-export real, imag
-export sign, monotonicity, curvature, evaluate
-
 
 ### Real
 struct RealAtom <: AbstractExpr

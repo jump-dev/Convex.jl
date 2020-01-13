@@ -1,3 +1,5 @@
+using Convex: AbstractExpr, ConicObj
+
 @testset "Utilities" begin
 
     @testset "`solve!` does not return anything" begin
@@ -121,10 +123,6 @@
                 termination status: OPTIMAL
                 primal status: FEASIBLE_POINT
                 dual status: FEASIBLE_POINT"""
-    end
-
-    @testset "clearmemory" begin
-        @test_deprecated Convex.clearmemory()
     end
 
     @testset "ConicObj with type $T" for T = [UInt32, UInt64]

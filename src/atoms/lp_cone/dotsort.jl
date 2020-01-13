@@ -5,9 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export dotsort
-export sign, curvature, monotonicity, evaluate
-
 # This atom computes dot(sort(x), sort(w)), where w is constant
 # for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
 struct DotSortAtom <: AbstractExpr

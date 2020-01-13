@@ -1,4 +1,3 @@
-export partialtrace
 
 # We compute the partial trace of x by summing over
 # (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I) for all j's

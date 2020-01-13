@@ -2,7 +2,6 @@
 # because overloading broadcast no longer works in Julia v0.6
 
 import LinearAlgebra.dot
-export dot
 
 # multiplication
 dot(::typeof(*)) = applyDotMultiplyAtom

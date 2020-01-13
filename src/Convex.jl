@@ -4,13 +4,36 @@ module Convex
 using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
+using AbstractTrees: AbstractTrees
 
 using MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 const MOIB = MOI.Bridges
 
-global DEFAULT_SOLVER = nothing
+# Functions
+export conv, dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, invpos
+export log_perspective, logisticloss, logsumexp, matrixfrac, neg, norm2, norm_1, norm_inf, nuclearnorm
+export partialtrace, partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
+export relative_entropy, scaledgeomean, sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
+
+# rexports from LinearAlgebra
+export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
+
+# Constraints
+export isposdef, ⪰, ⪯ # PSD constraints
+export socp
+
+# Variables
+export Constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
+export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
+
+# Signs
+export Positive, Negative, ComplexSign, NoSign
+
+# Problems
+export add_constraint!, add_constraints!, maximize, minimize, Problem, satisfy, solve!
+
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
@@ -71,7 +94,7 @@ include("atoms/second_order_cone/huber.jl")
 ### SDP atoms
 include("atoms/sdp_cone/nuclearnorm.jl")
 include("atoms/sdp_cone/operatornorm.jl")
-include("atoms/sdp_cone/lambda_min_max.jl")
+include("atoms/sdp_cone/eig_min_max.jl")
 include("atoms/sdp_cone/matrixfrac.jl")
 include("atoms/sdp_cone/sumlargesteigs.jl")
 
@@ -97,5 +120,8 @@ include("problem_depot/problem_depot.jl")
 function clearmemory()
     Base.depwarn("Convex.clearmemory() is deprecated, as the memory leak it works around has been closed (in https://github.com/JuliaOpt/Convex.jl/pull/322). This function no longer does anything and will be removed in a future Convex.jl release.", :clearmemory )
 end
+
+@deprecate lambdamin eigmin
+@deprecate lambdamax eigmax
 
 end

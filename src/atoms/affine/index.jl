@@ -1,5 +1,4 @@
-import Base: getindex, to_index
-export IndexAtom, getindex
+import Base.getindex
 
 const ArrayOrNothing = Union{AbstractArray, Nothing}
 

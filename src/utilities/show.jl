@@ -1,6 +1,4 @@
 import Base.show, Base.summary
-export show, summary
-using AbstractTrees: AbstractTrees
 using .TreePrint
 
 """

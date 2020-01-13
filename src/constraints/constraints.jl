@@ -1,6 +1,4 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
-export EqConstraint, LtConstraint, GtConstraint
-export ==, <=, >=
 
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint

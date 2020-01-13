@@ -1,5 +1,3 @@
-using AbstractTrees: AbstractTrees
-
 AbstractTrees.children(p::Problem) = (p.objective, p.constraints)
 
 AbstractTrees.children(e::AbstractExpr) = e.children

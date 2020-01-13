@@ -11,8 +11,6 @@
 # https://github.com/JuliaOpt/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf
 #############################################################################
 
-export rationalnorm
-
 ### k-norm for rational k
 
 struct RationalNormAtom <: AbstractExpr

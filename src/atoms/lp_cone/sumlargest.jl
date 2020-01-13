@@ -5,9 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export sumlargest, sumsmallest
-export sign, curvature, monotonicity, evaluate
-
 struct SumLargestAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64

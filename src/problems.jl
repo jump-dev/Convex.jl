@@ -1,5 +1,3 @@
-export Problem, minimize, maximize, satisfy, add_constraint!, add_constraints!
-
 mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr

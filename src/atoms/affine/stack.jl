@@ -1,7 +1,4 @@
 import Base.vcat, Base.hcat, Base.hvcat
-export vcat, hcat, hvcat, HcatAtom
-export sign, curvature, monotonicity, evaluate, conic_form!
-
 struct HcatAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64

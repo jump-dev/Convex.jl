@@ -5,7 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 import Base.max
-export max, pos, hinge_loss
 
 # TODO: This can easily be extended to work
 ### Max Atom

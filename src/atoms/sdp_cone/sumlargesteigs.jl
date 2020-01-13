@@ -6,7 +6,6 @@
 # Please read expressions.jl first.
 #############################################################################
 import LinearAlgebra.eigvals
-export sumlargesteigs
 
 ### sumlargesteigs
 

@@ -5,7 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 import Base.minimum
-export minimum
 
 ### Minimum Atom
 struct MinimumAtom <: AbstractExpr

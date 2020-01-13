@@ -5,9 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-export entropy
-export sign, curvature, monotonicity, evaluate
-
 ### Entropy: sum_i -x_i log (x_i)
 
 # TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs

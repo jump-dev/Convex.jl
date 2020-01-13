@@ -5,7 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 import Base.maximum
-export maximum
 
 ### Maximum Atom
 struct MaximumAtom <: AbstractExpr

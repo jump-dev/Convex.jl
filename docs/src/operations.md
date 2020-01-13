@@ -110,8 +110,8 @@ solver (including SCS and Mosek).
 | ------------------ | --------------------------------- | ------- | ------------- | ------------------------------ |
 | `nuclearnorm(x)`   | sum of singular values of $x$ | convex  | not monotonic | none                           |
 | `operatornorm(x)`  | max of singular values of $x$ | convex  | not monotonic | none                           |
-| `lambdamax(x)`     | max eigenvalue of $x$         | convex  | not monotonic | none                           |
-| `lambdamin(x)`     | min eigenvalue of $x$         | concave | not monotonic | none                           |
+| `eigmax(x)`     | max eigenvalue of $x$         | convex  | not monotonic | none                           |
+| `eigmin(x)`     | min eigenvalue of $x$         | concave | not monotonic | none                           |
 | `matrixfrac(x, P)` | $x^TP^{-1}x$                  | convex  | not monotonic | IC: P is positive semidefinite |
 
 Exponential + SDP representable Functions

@@ -5,7 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 import Base.min
-export min, neg
 
 # TODO: This can easily be extended to work
 ### Min Atom

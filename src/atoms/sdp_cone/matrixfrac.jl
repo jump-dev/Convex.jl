@@ -5,7 +5,6 @@
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-export matrixfrac
 
 struct MatrixFracAtom <: AbstractExpr
     head::Symbol

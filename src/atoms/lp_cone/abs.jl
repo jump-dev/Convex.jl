@@ -4,10 +4,7 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-
 import Base.abs, Base.abs2
-export abs, abs2
-export sign, curvature, monotonicity, evaluate
 
 ### Absolute Value
 
