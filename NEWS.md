@@ -1,3 +1,27 @@
+# Changes in v0.13.4
+
+* You can now create your own variable types by subtyping `AbstractVariable`.
+  See the
+  [docs](https://www.juliaopt.org/Convex.jl/dev/advanced/#Custom-Variable-Types-1)
+  for more information. You can also add constraints directly to a variable
+  using `add_constraint!`. ([#358](https://github.com/JuliaOpt/Convex.jl/pull/358))
+* Accessors `vexity(x::Variable)`, `sign(x::Variable)`, and
+  `evaluate(x::Variable)` should now be the preferred way to access properties
+  of a variable; likewise use `set_value!` to set the initial value of a
+  variable. ([#358](https://github.com/JuliaOpt/Convex.jl/pull/358))
+* To create integer or binary constraints, use the `VarType` enum (e.g.
+  `Variable(BinVar)`). Access or set this via `vartype` and `vartype!`.
+  ([#358](https://github.com/JuliaOpt/Convex.jl/pull/358))
+
+# Changes in v0.13.3
+
+* Make [`add_constraint!`](https://github.com/jump-dev/Convex.jl/pull/381)
+  actually add the constraint to the problem.
+
+# Changes in v0.13.2
+
+* Add [`Convex.MAXDIGITS`](https://github.com/jump-dev/Convex.jl/pull/379)
+
 # Changes in v0.13.1
 
 * Allow disabling DCP warnings ([#372](https://github.com/JuliaOpt/Convex.jl/pull/372))
