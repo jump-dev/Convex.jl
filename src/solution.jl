@@ -234,7 +234,7 @@ function warmstart_variables!(model, var_to_indices, id_to_variables, T, verbose
     if MOI.supports(model, MOI.VariablePrimalStart(), MOI.VariableIndex)
         for (id, var_inds) in pairs(var_to_indices)
             x = id_to_variables[id]
-            val = evaluate(x)
+            val = _value(x)
             val === nothing && continue
             value_vec = packvec(val, sign(x) == ComplexSign())
             value_vec = convert(Vector{T}, value_vec)

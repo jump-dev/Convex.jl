@@ -301,13 +301,16 @@ end
     p1 = minimize(sum(x), A*x == b, x>=0; numeric_type = T)
 
     handle_problem!(p1)
-    x1 = evaluate(x)
+
+    if test
+        x1 = copy(evaluate(x))
+    end
 
     p2 = minimize(sum(x), real(A)*x == real(b), imag(A)*x==imag(b), x>=0; numeric_type = T)
 
     handle_problem!(p2)
-    x2 = evaluate(x)
     if test
+        x2 = evaluate(x)
         @test x1 == x2
     end
 end
@@ -322,7 +325,10 @@ end
     p1 = minimize(real(sum(x)), A*x == b, real(x)>=0, imag(x)>=0; numeric_type = T)
 
     handle_problem!(p1)
-    x1 = evaluate(x)
+
+    if test
+        x1 = evaluate(x)
+    end
 
     xr = Variable(n)
     xi = Variable(n)

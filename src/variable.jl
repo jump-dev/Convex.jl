@@ -22,8 +22,9 @@ An `AbstractVariable` should have `head` field, an `id_hash` field
 and a `size` field to conform to the `AbstractExpr` interface, and
 implement methods (or use the field-access fallbacks) for
 
-* [`evaluate`](@ref), [`set_value!`](@ref): get or set the numeric value of the variable.
-    `evaluate` should return `nothing` when no numeric value is set.
+* [`_value`](@ref), [`set_value!`](@ref): get or set the numeric value of the variable.
+    `_value` should return `nothing` when no numeric value is set. Note:
+    [`evaluate`](@ref) is the user-facing method to access the value of `x`.
 * [`vexity`](@ref), [`vexity!`](@ref): get or set the `vexity` of the variable. The
     `vexity` should be `AffineVexity()` unless the variable has been
     [`fix!`](@ref)'d, in which case it is `ConstVexity()`.
@@ -81,7 +82,6 @@ by [`fix!`](@ref) and [`free!`](@ref).
 """
 vexity!(x::AbstractVariable, v::Vexity) = x.vexity = v
 
-
 """
     sign(x::AbstractVariable)
 
@@ -100,9 +100,17 @@ sign!(x::AbstractVariable, s::Sign) = x.sign = s
 """
     evaluate(x::AbstractVariable)
 
-Returns the current value of `x`.
+Returns the current value of `x` if assigned; errors otherwise.
 """
-evaluate(x::AbstractVariable) = x.value === nothing ? nothing : output(x.value)
+evaluate(x::AbstractVariable) = _value(x) === nothing ? error("Value of the variable is yet to be calculated") : output(_value(x))
+
+"""
+    _value(x::AbstractVariable)
+
+Raw access to the current value of `x`; used internally by Convex.jl.
+"""
+_value(x::AbstractVariable) = x.value
+
 
 """
     set_value!(x::AbstractVariable, v)
@@ -301,7 +309,7 @@ optimization problems. See also [`free!`](@ref).
 function fix! end
 
 function fix!(x::AbstractVariable)
-    evaluate(x) === nothing && error("This variable has no value yet; cannot fix value to nothing!")
+    _value(x) === nothing && error("This variable has no value yet; cannot fix value to nothing!")
     vexity!(x, ConstVexity())
     x
 end

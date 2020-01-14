@@ -4,7 +4,7 @@ The `AbstractVariable` interface:
 
 ```@docs
 Convex.AbstractVariable
-Convex.evaluate
+Convex._value
 Convex.set_value!
 Convex.constraints
 Convex.add_constraint!
@@ -22,4 +22,5 @@ Functions:
 ```@docs
 Convex.fix!
 Convex.free!
+Convex.evaluate
 ```

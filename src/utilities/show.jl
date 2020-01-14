@@ -79,7 +79,7 @@ end
 
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
-show(io::IO, x::Constant) = print(io, x.value)
+show(io::IO, x::Constant) = print(io, evaluate(x))
 
 # A variable, for example, Variable(3, 4), will be displayed as:
 # julia> Variable(3,4)
@@ -98,7 +98,7 @@ function show(io::IO, x::AbstractVariable)
     summary(io, vexity(x))
     println(io)
     show_id(io, x)
-    if x.value !== nothing
+    if _value(x) !== nothing
         print(io, "\nvalue: $(evaluate(x))")
     end
 end
