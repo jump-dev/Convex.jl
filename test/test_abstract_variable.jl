@@ -10,7 +10,7 @@ using Convex
 # our of mock variable type, `DictVector`.
 const global_cache = Dict{UInt64, Any}()
 
-mutable struct DictVector{T} <: Convex.AbstractVariable{T}
+mutable struct DictVector{T} <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}
@@ -57,7 +57,6 @@ import .DictVectors
     solve!(p, solver())
     @test p.optval ≈ 5 atol=TOL
     @test evaluate(x + y) ≈ 5 atol=TOL
-    @test Convex.eltype(x) == BigFloat
 
     add_constraint!(x, x >= 4)
     solve!(p, solver())
@@ -73,7 +72,7 @@ end
 module DensityMatricies
 using Convex
 
-mutable struct DensityMatrix{T} <: Convex.AbstractVariable{T}
+mutable struct DensityMatrix{T} <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}
@@ -116,7 +115,7 @@ end
 
 module ProbabilityVectors
 using Convex
-mutable struct ProbabilityVector <: Convex.AbstractVariable{Float64}
+mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}

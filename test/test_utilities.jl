@@ -194,9 +194,9 @@ using Convex: AbstractExpr, ConicObj
                             Variable(sgn, BinVar),
                             Variable(sgn, :Bin),  ]
                 @test x isa Variable
+                @test x isa Convex.AbstractVariable
                 @test sign(x) == sgn
                 @test x.sign == sgn
-                @test eltype(x) == Float64
             end
         end
 
@@ -218,61 +218,9 @@ using Convex: AbstractExpr, ConicObj
                         Variable(BinVar),
                         Variable(:Bin),  ]
             @test x isa Variable
+            @test x isa Convex.AbstractVariable
             @test sign(x) == NoSign()
             @test x.sign == NoSign()
-            @test eltype(x) == Float64
-        end
-
-        # Various element types
-        for T in (Float32, Float64, BigFloat)
-            for sgn in (Positive(), NoSign())
-                for x in    [
-                    # tuple size
-                    Variable{T}((2, 2), sgn), 
-                    Variable{T}((2, 2), sgn, BinVar),
-                    Variable{T}((2, 2), sgn, :Bin),
-                    # individual size 
-                    Variable{T}(2, 2, sgn),
-                    Variable{T}(2, 2, sgn, BinVar),
-                    Variable{T}(2, 2, sgn, :Bin),
-                    # single dimension
-                    Variable{T}(2, sgn),
-                    Variable{T}(2, sgn, BinVar),
-                    Variable{T}(2, sgn, :Bin),
-                    # no dimension
-                    Variable{T}(sgn),
-                    Variable{T}(sgn, BinVar),
-                    Variable{T}(sgn, :Bin),  ]
-
-                    @test x isa Variable
-                    @test sign(x) == sgn
-                    @test x.sign == sgn
-                    @test eltype(x) == T
-                end
-            end
-            for x in [
-                # tuple size
-                Variable{T}((2, 2)), 
-                Variable{T}((2, 2), BinVar),
-                Variable{T}((2, 2), :Bin),
-                # individual size 
-                Variable{T}(2, 2),
-                Variable{T}(2, 2, BinVar),
-                Variable{T}(2, 2, :Bin),
-                # single dimension
-                Variable{T}(2),
-                Variable{T}(2, BinVar),
-                Variable{T}(2, :Bin),
-                # no dimension
-                Variable{T}(),
-                Variable{T}(BinVar),
-                Variable{T}(:Bin), 
-            ]
-                @test x isa Variable
-                @test sign(x) == NoSign()
-                @test x.sign == NoSign()
-                @test eltype(x) == T
-            end
         end
     end
 

@@ -9,8 +9,7 @@
 # Please read expressions.jl first.
 #############################################################################
 import Convex.sign, Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-using Convex: AbstractExpr, Nondecreasing, ConstVexity, UniqueConicForms, has_conic_form, cache_conic_form!, get_conic_form
-using LinearAlgebra, SparseArrays
+using Convex: AbstractExpr, ConstVexity, Nondecreasing, has_conic_form, cache_conic_form, get_conic_form
 export antidiag
 
 ### Diagonal
@@ -67,7 +66,7 @@ antidiag(x::AbstractExpr, k::Int=0) = AntidiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(x::AntidiagAtom, unique_conic_forms::UniqueConicForms=UniqueConicForms())
+function conic_form!(x::AntidiagAtom, unique_conic_forms::Convex.UniqueConicForms)
   if !has_conic_form(unique_conic_forms, x)
     (num_rows, num_cols) = x.children[1].size
     k = x.k

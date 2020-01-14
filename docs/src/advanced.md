@@ -117,60 +117,81 @@ end
 Custom Variable Types
 ---------------------
 
-By making subtypes of [`AbstractVariable`](@ref) that conform to the appropriate
-interface (see the [`AbstractVariable`](@ref) docstring for details), one can easily
-provide custom variable types for specific constructions. For example, in
-quantum mechanics, a density matrix is a complex positive semi-definite matrix
-with unit trace. With the following code, we can define a `DensityMatrix` type
-which encodes this information:
+By making subtypes of [`Convex.AbstractVariable`](@ref) that conform to the appropriate
+interface (see the [`Convex.AbstractVariable`](@ref) docstring for details), one can
+easily provide custom variable types for specific constructions. These aren't
+always necessary though; for example, one can define the following function
+
+`probabilityvector`:
+```@example prob
+using Convex
+
+function probabilityvector(d::Int)
+    x = Variable(d, Positive())
+    add_constraint!(x, sum(x) == 1)
+    return x
+end
+```
+and then use, say, `p = probabilityvector(3)` in any Convex.jl problem. The
+constraints that the entries of `p` are non-negative and sum to 1 will be
+automatically added to any problem `p` is used in.
+
+Custom types are necessary when one wants to dispatch on custom variables, use
+them as callable types, or provide a different implementation. Continuing with
+the probability vector example, let's say we often use probability vectors
+variables in taking expectation values, and we want to use function notation for
+this. To do so, we define
  
 ```@example 1
 using Convex
-
-mutable struct DensityMatrix <: Convex.AbstractVariable{ComplexF64}
+mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}
     value::Convex.ValueOrNothing
     vexity::Convex.Vexity
-    function DensityMatrix(d)
-        this = new(:DensityMatrix, 0, (d,d), nothing, Convex.AffineVexity())
+    function ProbabilityVector(d)
+        this = new(:ProbabilityVector, 0, (d,1), nothing, Convex.AffineVexity())
         this.id_hash = objectid(this)
         this
     end
 end
-Convex.constraints(ρ::DensityMatrix) = [ ρ ⪰ 0, tr(ρ) == 1 ]
-Convex.sign(::DensityMatrix) = Convex.ComplexSign()
-Convex.vartype(::DensityMatrix) = Convex.ContVar
+
+Convex.constraints(p::ProbabilityVector) = [ sum(p) == 1 ]
+Convex.sign(::ProbabilityVector) = Convex.Positive()
+Convex.vartype(::ProbabilityVector) = Convex.ContVar
+
+(p::ProbabilityVector)(x) = dot(p, x)
 ```
 
-Then one can call `ρ = DensityMatrix(d)` to construct a variable which can be
-used in Convex, and which already encodes the appropriate constraints (i.e.
-positive semi-definite and unit trace). For example,
+Then one can call `p = ProbabilityVector(3)` to construct a our custom variable
+which can be used in Convex, which already encodes the appropriate constraints
+(non-negative and sums to 1), and which can act on constants via `p(x)`. For
+example,
 
 ```@example 1
-using Convex, LinearAlgebra, SCS, Test
-
-X = randn(4,4) + im*rand(4,4); X = X+X'
-# `X` is Hermitian and non-degenerate (with probability 1)
-# Let us calculate the projection onto the eigenspace associated
-# to the maximum eigenvalue
-
-e_vals, e_vecs = LinearAlgebra.eigen(LinearAlgebra.Hermitian(X))
-e_val, idx = findmax(e_vals)
-e_vec = e_vecs[:, idx]
-proj = e_vec * e_vec'
-
-# found it!
-# Now let us do it again via an SDP
-ρ = DensityMatrix(4)
-
-prob = maximize( real(tr(ρ*X)) )
+using SCS
+p = ProbabilityVector(3)
+x = [1.0, 2.0, 3.0]
+prob = minimize( p(x) )
 solve!(prob, SCS.Optimizer(verbose=false))
-
-@test prob.optval ≈ e_val atol = 1e-3
-@test evaluate(ρ) ≈ proj atol = 1e-3
+evaluate(p) # [1.0, 0.0, 0.0]
 ```
+
+Subtypes of `AbstractVariable` must have the fields `head`, `id_hash`, and
+`size`, and `id_hash` must be populated as shown in the example. Then they must also
+
+* either have a field `value`, or implement [`Convex.evaluate`](@ref) and [`Convex.set_value!`](@ref)
+* either have a field `vexity`, or implement [`Convex.vexity`](@ref) and
+  [`Convex.vexity!`](@ref) (though the latter is only necessary if you wish to support
+  [`Convex.fix!`](@ref) and [`Convex.free!`](@ref)
+* have a field `constraints` or implement [`Convex.constraints`](@ref) (optionally,
+  implement [`Convex.add_constraint!`](@ref) to be able to add constraints to your
+  variable after its creation),
+* either have a field `sign` or implement [`Convex.sign`](@ref), and 
+* either have a field `vartype`, or implement [`Convex.vartype`](@ref) (optionally,
+  implement [`Convex.vartype!`](@ref) to be able to change a variables' `vartype`
+  after construction.)
 
 
 Printing and the tree structure

@@ -34,12 +34,14 @@ being
      positive semidefinite): `z = Semidefinite(4)`
 
 The order of the arguments is the size, the sign, and then the
-[`VarType`](@ref) (i.e., integer, binary, or continuous), and any may be omitted
+[`Convex.VarType`](@ref) (i.e., integer, binary, or continuous), and any may be omitted
 to use the default.
-
 The current value of a variable `x` can be accessed with `evaluate(x)`. After
 `solve!`ing a problem, the value of each variable used in the problem is set to
 its optimal value.
+
+See also [Custom Variable Types](@ref) for how to implement your own variable
+types.
 
 Constants
 ---------
