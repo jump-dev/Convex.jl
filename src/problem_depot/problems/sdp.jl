@@ -383,7 +383,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
-        @test evaluate(objective) ≈ zeros(1, 1) atol=atol rtol=rtol
+        @test evaluate(objective) ≈ 0.0 atol=atol rtol=rtol
 
         real_diff = real.(x.value) - real.(a)
         imag_diff = imag.(x.value) - imag.(a)
@@ -393,7 +393,7 @@ end
 end
 
 @add_problem sdp function sdp_socp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    a = [5-4im]
+    a = 5-4im
     x = ComplexVariable()
     objective = abs(a-x)
     c1 = real(x)>=0
@@ -402,12 +402,12 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
-        @test evaluate(objective) ≈ zeros(1) atol=atol rtol=rtol
+        @test evaluate(objective) ≈ 0.0 atol=atol rtol=rtol
 
-        real_diff = real(x.value) .- real(a)
-        imag_diff = imag(x.value) .- imag(a)
-        @test real_diff ≈ zeros(1) atol=atol rtol=rtol
-        @test imag_diff ≈ zeros(1) atol=atol rtol=rtol
+        real_diff = real(x.value) - real(a)
+        imag_diff = imag(x.value) - imag(a)
+        @test real_diff ≈ 0.0 atol=atol rtol=rtol
+        @test imag_diff ≈ 0.0 atol=atol rtol=rtol
     end
 end
 

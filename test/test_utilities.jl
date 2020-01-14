@@ -196,6 +196,18 @@ using Convex: AbstractExpr, ConicObj
         @test Convex.imag_conic_form(Constant([1.0, 2.0])) == [0.0, 0.0]
     end
 
+    @testset "#341: Evaluate for constants" begin
+        A = rand(4,4)
+        @test evaluate(Constant(A)) ≈ copy(A)
+        @test Constant(A).size == (4,4)
+        b = rand(4)
+        @test evaluate(Constant(b)) ≈ copy(b)
+        @test Constant(b).size == (4,1)
+        c = 1.0
+        @test evaluate(Constant(c)) ≈ c
+        @test Constant(c).size == (1,1)
+    end
+
     @testset "Base.vect" begin
     # Issue #223: ensure we can make vectors of variables
     @test size([Variable(2), Variable(3,4)]) == (2,)

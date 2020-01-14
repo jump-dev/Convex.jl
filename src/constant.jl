@@ -38,7 +38,20 @@ end
 
 vexity(::Constant) = ConstVexity()
 
-evaluate(x::Constant) = x.value
+# Lower (1,1)-matrices to scalars and (d,1)-matrices to vectors, for outputting to the user.
+function output(x::Value)
+    if size(x, 2) == 1
+        if size(x, 1) == 1
+            return x[]
+        else
+            return vec(x)
+        end
+    else
+        return x
+    end
+end
+
+evaluate(x::Constant) = output(x.value)
 
 sign(x::Constant) = x.sign
 
