@@ -55,7 +55,7 @@ function vexity(x::Variable)
 end
 
 function evaluate(x::Variable)
-    return x.value === nothing ? error("Value of the variable is yet to be calculated") : x.value
+    return x.value === nothing ? error("Value of the variable is yet to be calculated") : output(x.value)
 end
 
 function sign(x::Variable)

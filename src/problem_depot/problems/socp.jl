@@ -81,12 +81,12 @@ end
 end
 
 @add_problem socp function socp_quad_over_lin_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    x = Variable(3, 1)
+    x = Variable(3)
     A = [2 -3 5; -2 9 -3; 5 -8 3]
     b = [-3; 9; 5]
-    c = [3 2 4]
+    c = [3, 2, 4]
     d = -3
-    p = minimize(quadoverlin(A*x + b, c*x + d); numeric_type = T)
+    p = minimize(quadoverlin(A*x + b, dot(c, x) + d); numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()
@@ -94,7 +94,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 17.7831 atol=atol rtol=rtol
-        @test (evaluate(quadoverlin(A * x + b, c * x + d)))[1] ≈ 17.7831 atol=atol rtol=rtol
+        @test evaluate(quadoverlin(A * x + b, dot(c, x) + d)) ≈ 17.7831 atol=atol rtol=rtol
     end
 end
 
@@ -230,7 +230,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 6.1464 atol=atol rtol=rtol
-        @test (evaluate(quadform(x, A)))[1] ≈ 6.1464 atol=atol rtol=rtol
+        @test evaluate(quadform(x, A)) ≈ 6.1464 atol=atol rtol=rtol
     end
 
     x = Variable(3, 1)
@@ -244,7 +244,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 3.7713 atol=atol rtol=rtol
-        @test (evaluate(quadform(x, A)))[1] ≈ -1 atol=atol rtol=rtol
+        @test evaluate(quadform(x, A)) ≈ -1 atol=atol rtol=rtol
     end
 end
 
