@@ -1,6 +1,6 @@
-# #  Portfolio Optimization - Markowitz Efficient Frontier 
+# #  Portfolio Optimization - Markowitz Efficient Frontier
 #
-# In this problem, we will find the unconstrained portfolio allocation where we introduce the weighting parameter $\lambda \;(0 \leq \lambda \leq$ 1) and minimize $\lambda * \text{risk} - (1-\lambda)* \text{expected return}$. By varying the values of $\lambda$, we trace out the efficient frontier.  
+# In this problem, we will find the unconstrained portfolio allocation where we introduce the weighting parameter $\lambda \;(0 \leq \lambda \leq$ 1) and minimize $\lambda * \text{risk} - (1-\lambda)* \text{expected return}$. By varying the values of $\lambda$, we trace out the efficient frontier.
 #
 # Suppose that we know the mean returns $\mu \in \mathbf{R}^n$ of each asset and the covariance $\Sigma \in \mathbf{R}^{n \times n}$ between the assets. Our objective is to find a portfolio allocation that minimizes the *risk* (which we measure as the variance $w^T \Sigma w$) and maximizes the *expected return* ($w^T \mu$) of the portfolio of the simulataneously. We require $w \in \mathbf{R}^n$ and $\sum_i w_i = 1$.
 #
@@ -23,7 +23,7 @@ using Convex, SCS    #We are using SCS solver. Install using Pkg.add("SCS")
        34  64   4;
        58   4 100]/100^2
 
-n = length(μ)                   #number of assets 
+n = length(μ)                   #number of assets
 
 # If you want to try the optimization with more assets, uncomment and run the next cell. It creates a vector or average returns and a variance-covariance matrix that have scales similar to the numbers above.
 
@@ -47,13 +47,13 @@ w    = Variable(n)
 ret  = dot(w,μ)
 risk = quadform(w,Σ)
 
-MeanVarA = zeros(N,2)                    
+MeanVarA = zeros(N,2)
 for i = 1:N
     λ = λ_vals[i]
     p = minimize( λ*risk - (1-λ)*ret,
-                  sum(w) == 1 )    
+                  sum(w) == 1 )
     solve!(p, SCS.Optimizer(verbose = false))
-    MeanVarA[i,:]= [evaluate(ret),evaluate(risk)[1]]    #risk is a 1x1 matrix
+    MeanVarA[i,:]= [evaluate(ret),evaluate(risk)]
 end
 
 # Now we solve with the bounds $0\le w_i \le 1$
@@ -69,7 +69,7 @@ for i = 1:N
                   w_lower <= w,     #w[i] is bounded
                   w <= w_upper )
     solve!(p, SCS.Optimizer(verbose = false))
-    MeanVarB[i,:]= [evaluate(ret),evaluate(risk)[1]]    
+    MeanVarB[i,:]= [evaluate(ret),evaluate(risk)]
 end
 
 #-
@@ -82,7 +82,7 @@ plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2]]),
       title = "Markowitz Efficient Frontier",
       xlabel = "Standard deviation",
       ylabel = "Expected return",
-      label = ["no bounds on w","with 0<w<1",])
+      label = ["no bounds on w" "with 0<w<1"])
 scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
 
 # We now instead impose a restriction on  $\sum_i |w_i| - 1$, allowing for varying degrees of "leverage".
@@ -96,7 +96,7 @@ for i = 1:N
                   sum(w) == 1,
                   (norm(w, 1)-1) <= Lmax)
     solve!(p, SCS.Optimizer(verbose = false))
-    MeanVarC[i,:]= [evaluate(ret),evaluate(risk)[1]]    
+    MeanVarC[i,:]= [evaluate(ret),evaluate(risk)]
 end
 
 #-
@@ -108,7 +108,7 @@ plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2] MeanVarC[:,2]]),
       title = "Markowitz Efficient Frontier",
       xlabel = "Standard deviation",
       ylabel = "Expected return",
-      label = ["no bounds on w","with 0<w<1","restriction on sum(|w|)"])
+      label = ["no bounds on w" "with 0<w<1" "restriction on sum(|w|)"])
 scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
 
 #-
