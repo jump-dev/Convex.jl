@@ -26,6 +26,10 @@ Random.seed!(2)
     end
 end
 
+@testset "Definitions" begin
+    include("definitions.jl")
+end
+
 @testset "Convex" begin
     include("test_utilities.jl")
     include("deprecations.jl")
