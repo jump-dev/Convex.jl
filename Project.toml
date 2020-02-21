@@ -12,7 +12,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-AbstractTrees = "^0.2.1"
+AbstractTrees = "0.2, 0.3"
 BenchmarkTools = "^0.4"
 MathOptInterface = "~0.9"
 OrderedCollections = "^1.0"
