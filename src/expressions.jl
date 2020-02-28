@@ -34,19 +34,8 @@ import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.conve
 abstract type AbstractExpr end
 abstract type Constraint end
 
-# Override hash function because of
-# https://github.com/JuliaLang/julia/issues/10267
-import Base.hash
-
-const hashaa_seed = UInt === UInt64 ? 0x7f53e68ceb575e76 : 0xeb575e7
-function hash(a::Array{AbstractExpr}, h::UInt)
-    h += hashaa_seed
-    h += hash(size(a))
-    for x in a
-        h = hash(x, h)
-    end
-    return h
-end
+Base.isequal(a::AbstractExpr, b::AbstractExpr) = a.id_hash == b.id_hash && a.head == b.head
+Base.hash(a::AbstractExpr, h::UInt) = hash((a.id_hash, a.head), h)
 
 
 # If h(x)=f∘g(x), then (for single variable calculus)
