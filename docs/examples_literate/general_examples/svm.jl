@@ -34,7 +34,7 @@ neg_data = rand(MvNormal([-1.0, 2.0], 1.0), M);
 
 #-
 
-function svm(pos_data, neg_data, solver=SCS.Optimizer(verbose=0))
+function svm(pos_data, neg_data, solver=() -> SCS.Optimizer(verbose=0))
     ## Create variables for the separating hyperplane w'*x = b.
     w = Variable(n)
     b = Variable()

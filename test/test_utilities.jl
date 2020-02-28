@@ -5,8 +5,22 @@ using Convex: AbstractExpr, ConicObj
     @testset "`solve!` does not return anything" begin
         x = Variable()
         p = satisfy(x >= 0)
+        output = solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6))
+        @test output === nothing
+    end
+
+    # This might get deprecated later.
+    @testset "`solve!` can take an optimizer directly" begin
+        x = Variable()
+        p = satisfy(x >= 0)
         output = solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
         @test output === nothing
+    end
+
+    @testset "`solve!` with MPB solver errors" begin
+        x = Variable()
+        p = satisfy(x >= 0)
+        @test_throws ArgumentError solve!(p, SCSSolver())
     end
 
     @testset "Show" begin

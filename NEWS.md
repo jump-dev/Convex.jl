@@ -1,8 +1,10 @@
-# Changes in v0.13.0
+# Major changes in v0.13.0
 
 * The intermediate layer has changed from MathProgBase.jl to
   [MathOptInterface.jl](https://github.com/JuliaOpt/MathOptInterface.jl)
-  ([#330](https://github.com/JuliaOpt/Convex.jl/pull/330)).
+  ([#330](https://github.com/JuliaOpt/Convex.jl/pull/330)). To solve problems,
+  one should pass a MathOptInterface optimizer constructor, such as
+  `SCS.Optimizer`, or `() -> SCS.Optimizer(verbose=false)`.
 * `lambdamin` and `lambdamax` have been deprecated in favor of `eigmin` and
   `eigmax`. ([#357](https://github.com/JuliaOpt/Convex.jl/pull/357))
 * `evaluate(x::Variable)` and `evaluate(c::Constant)` now return scalars and

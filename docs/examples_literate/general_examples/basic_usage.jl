@@ -8,7 +8,7 @@ end
 
 using SCS
 ## passing in verbose=0 to hide output from SCS
-solver = SCS.Optimizer(verbose=0)
+solver = () -> SCS.Optimizer(verbose=0)
 
 # ### Linear program
 #
@@ -73,7 +73,7 @@ p.optval
 
 x = Variable(4)
 p = satisfy(norm(x) <= 100, exp(x[1]) <= 5, x[2] >= 7, geomean(x[3], x[4]) >= x[2])
-solve!(p, SCS.Optimizer(verbose=0))
+solve!(p, solver)
 println(p.status)
 x.value
 
@@ -82,7 +82,7 @@ x.value
 
 y = Semidefinite(2)
 p = maximize(eigmin(y), tr(y)<=6)
-solve!(p, SCS.Optimizer(verbose=0))
+solve!(p, solver)
 p.optval
 
 #-
@@ -108,7 +108,7 @@ y.value
 using GLPK
 x = Variable(4, :Int)
 p = minimize(sum(x), x >= 0.5)
-solve!(p, GLPK.Optimizer())
+solve!(p, GLPK.Optimizer)
 x.value
 
 #-

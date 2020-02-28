@@ -33,4 +33,3 @@ lambda = 105
 println("this run should be faster than the last and have slightly higher optimal value")
 @time solve!(problem, warmstart=true)
 @show problem.optval
-

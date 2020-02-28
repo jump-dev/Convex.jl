@@ -41,7 +41,7 @@ problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
                    x >= 0)
 
 ## Solve the problem by calling solve!
-solve!(problem, SCS.Optimizer(verbose=0))
+solve!(problem, () -> SCS.Optimizer(verbose=0))
 
 println("problem status is ", problem.status) # :Optimal, :Infeasible, :Unbounded etc.
 println("optimal value is ", problem.optval)
@@ -54,7 +54,7 @@ using Interact, Plots
     global A
     problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
                    x >= 0)
-    solve!(problem, SCS.Optimizer(verbose=0))
+    solve!(problem, () -> SCS.Optimizer(verbose=0))
     histogram(evaluate(x), xlims=(0,3.5), label="x")
 end
 
@@ -128,7 +128,7 @@ p = minimize(objective, constraint)
 #-
 
 ## solve the problem
-solve!(p, SCS.Optimizer(verbose=0))
+solve!(p, () -> SCS.Optimizer(verbose=0))
 p.status
 
 #-
@@ -152,7 +152,7 @@ evaluate(objective)
 # to solve problem using a different solver, just import the solver package and pass the solver to the `solve!` method: eg
 #
 #     using Mosek
-#     solve!(p, Mosek.Optimizer())
+#     solve!(p, Mosek.Optimizer)
 
 #-
 
@@ -173,9 +173,9 @@ x = Variable(n)
 μ = 1
 problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1), 
                    x >= 0)
-@time solve!(problem, SCS.Optimizer(verbose=0))
+@time solve!(problem, () -> SCS.Optimizer(verbose=0))
 λ = 1.5
-@time solve!(problem, SCS.Optimizer(verbose=0), warmstart = true)
+@time solve!(problem, () -> SCS.Optimizer(verbose=0), warmstart = true)
 
 # # DCP examples
 

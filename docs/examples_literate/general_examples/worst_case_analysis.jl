@@ -18,7 +18,7 @@ w = Variable(n);
 ret = dot(r, w);
 risk = sum(quadform(w, Sigma_nom));
 problem = minimize(risk, [sum(w) == 1, ret >= 0.1, norm(w, 1) <= 2])
-solve!(problem, SCS.Optimizer(verbose=0));
+solve!(problem, () -> SCS.Optimizer(verbose=0));
 wval = vec(evaluate(w))
 
 #-
@@ -31,7 +31,7 @@ problem = maximize(risk, [Sigma == Sigma_nom + Delta,
                     diag(Delta) == 0,
                     abs(Delta) <= 0.2,
                     Delta == Delta']);
-solve!(problem, SCS.Optimizer(verbose=0));
+solve!(problem, () -> SCS.Optimizer(verbose=0));
 println("standard deviation = ", round(sqrt(wval' * Sigma_nom * wval), sigdigits=2));
 println("worst-case standard deviation = ", round(sqrt(evaluate(risk)), sigdigits=2));
 println("worst-case Delta = ");

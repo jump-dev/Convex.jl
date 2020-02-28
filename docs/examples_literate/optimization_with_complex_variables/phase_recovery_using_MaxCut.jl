@@ -69,7 +69,7 @@ objective = inner_product(U,M)
 c1 = diag(U) == 1 
 c2 = U in :SDP
 p = minimize(objective,c1,c2)
-solve!(p, SCS.Optimizer(verbose=0))
+solve!(p, () -> SCS.Optimizer(verbose=0))
 U.value
 
 #-

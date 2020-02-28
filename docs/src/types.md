@@ -73,7 +73,7 @@ y = Variable()
 z = Variable()
 expr = x + y + z
 problem = minimize(expr, x >= 1, y >= x, 4 * z >= y)
-solve!(problem, SCS.Optimizer())
+solve!(problem, SCS.Optimizer)
 
 # Once the problem is solved, we can call evaluate() on expr:
 evaluate(expr)

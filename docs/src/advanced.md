@@ -41,13 +41,13 @@ x = Variable(n)
 # first solve
 lambda = 100
 problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
-@time solve!(problem, SCS.Optimizer())
+@time solve!(problem, SCS.Optimizer)
 
 # now warmstart
 # if the solver takes advantage of warmstarts, 
 # this run will be faster
 lambda = 105
-@time solve!(problem, SCS.Optimizer(), warmstart=true)
+@time solve!(problem, SCS.Optimizer, warmstart=true)
 ```
 
 Fixing and freeing variables
@@ -89,12 +89,12 @@ for i=1:10
     # first solve for x
     # with y fixed, the problem is convex
     fix!(y)
-    solve!(problem, SCS.Optimizer(), warmstart = i > 1 ? true : false)
+    solve!(problem, SCS.Optimizer, warmstart = i > 1 ? true : false)
     free!(y)
 
     # now solve for y with x fixed at the previous solution
     fix!(x)
-    solve!(problem, SCS.Optimizer(), warmstart = true)
+    solve!(problem, SCS.Optimizer, warmstart = true)
     free!(x)
 end
 ```
