@@ -56,7 +56,7 @@ p = minimize( risk,
               w_lower <= w, 
               w <= w_upper )
 
-solve!(p, SCS.Optimizer())     #use SCS.Optimizer(verbose = false) to suppress printing
+solve!(p, () -> SCS.Optimizer())     #use SCS.Optimizer(verbose = false) to suppress printing
 
 #-
 

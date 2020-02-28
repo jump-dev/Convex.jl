@@ -30,5 +30,5 @@ constraints = [sum(X, dims=2) == 1, sum(X, dims=1) <= 10, sum(X, dims=1) >= 6]
 # students since the ranking of the first choice is 1.
 p = minimize(vec(X)' * vec(P), constraints)
 
-solve!(p, GLPK.Optimizer())
+solve!(p, GLPK.Optimizer)
 p.optval

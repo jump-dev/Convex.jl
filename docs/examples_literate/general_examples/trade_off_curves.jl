@@ -18,7 +18,7 @@ x = Variable(n);
 for i=1:length(gammas)
     cost = sumsquares(A*x - b) + gammas[i]*norm(x,1);
     problem = minimize(cost, [norm(x, Inf) <= 1]);
-    solve!(problem, SCS.Optimizer(verbose=0));
+    solve!(problem, () -> SCS.Optimizer(verbose=0));
     x_values[:,i] = evaluate(x);
 end
 

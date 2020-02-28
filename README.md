@@ -40,7 +40,7 @@ x = Variable(n)
 problem = minimize(sumsquares(A * x - b), [x >= 0])
 
 # Solve the problem by calling solve!
-solve!(problem, SCS.Optimizer())
+solve!(problem, SCS.Optimizer)
 
 # Check the status of the problem
 problem.status # :Optimal, :Infeasible, :Unbounded etc.

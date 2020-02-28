@@ -23,7 +23,7 @@ X = hcat(ones(size(iris, 1)), iris.SepalLength, iris.SepalWidth, iris.PetalLengt
 n, p = size(X)
 beta = Variable(p)
 problem = minimize(logisticloss(-Y.*(X*beta)))
-solve!(problem, SCS.Optimizer(verbose=false))
+solve!(problem, () -> SCS.Optimizer(verbose=false))
 
 # Let's see how well the model fits.
 using Plots

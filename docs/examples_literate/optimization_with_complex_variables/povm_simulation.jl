@@ -55,7 +55,7 @@ function get_visibility(K)
     constraints += t*K[3] + (1-t)*noise[3] == P[2][2] + P[4][2] + P[6][1]
     constraints += t*K[4] + (1-t)*noise[4] == P[3][2] + P[5][2] + P[6][2]
     p = maximize(t, constraints)
-    solve!(p, SCS.Optimizer(verbose=0))
+    solve!(p, () -> SCS.Optimizer(verbose=0))
     return p.optval
 end
 

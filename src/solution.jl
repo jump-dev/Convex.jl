@@ -188,6 +188,13 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
     return id_to_variables, conic_constr_to_constr, conic_constraints, var_to_indices, constraint_indices
 end
 
+function solve!(problem::Problem{T}, optimizer; kwargs...) where {T}
+    if Base.applicable(optimizer)
+        return solve!(problem, optimizer(); kwargs...)
+    else
+        throw(ArgumentError("MathProgBase solvers like `solve!(problem, SCSSolver())` are no longer supported. Use instead e.g. `solve!(problem, SCS.Optimizer)`."))
+    end
+end
 
 function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     check_vexity = true,

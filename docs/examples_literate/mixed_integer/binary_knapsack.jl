@@ -24,5 +24,5 @@ n = length(w)
 using Convex, GLPK
 x = Variable(n, :Bin)
 problem = maximize(dot(p, x), dot(w, x) <= C)
-solve!(problem, GLPK.Optimizer())
+solve!(problem, GLPK.Optimizer)
 evaluate(x)
