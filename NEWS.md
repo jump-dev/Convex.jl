@@ -7,6 +7,9 @@
   `SCS.Optimizer`, or `() -> SCS.Optimizer(verbose=false)`.
 * `lambdamin` and `lambdamax` have been deprecated in favor of `eigmin` and
   `eigmax`. ([#357](https://github.com/JuliaOpt/Convex.jl/pull/357))
+* Many "internal" functions and types are no longer exported, such as the atoms,
+  types corresponding to constraints and vexities, etc.
+  ([#357](https://github.com/JuliaOpt/Convex.jl/pull/357))
 * `evaluate(x::Variable)` and `evaluate(c::Constant)` now return scalars and
   vectors as appropriate, instead of `(1,1)`- and `(d,1)`-matrices.
   ([#359](https://github.com/JuliaOpt/Convex.jl/pull/359)). This affects
