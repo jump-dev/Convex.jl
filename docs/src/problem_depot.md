@@ -1,7 +1,7 @@
 Problem Depot
 =============
 
-Convex.jl has a submodule, `ProblemDepot` which holds a collection of convex optimization problems. The problems are used by Convex itself to test and benchmark its code, but can also be used by solvers to test and benchmark their code.
+Convex.jl has a submodule, `ProblemDepot` which holds a collection of convex optimization problems. The problems are used by Convex itself to test and benchmark its code, but can also be used by solvers to test and benchmark their code. These tests have been used with many solvers at [ConvexTests.jl](https://github.com/ericphanson/ConvexTests.jl).
 
 ProblemDepot has two main methods for accessing these problems: `Convex.ProblemDepot.run_tests` and `Convex.ProblemDepot.benchmark_suite`.
 
