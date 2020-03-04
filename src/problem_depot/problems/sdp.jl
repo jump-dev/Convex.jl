@@ -58,7 +58,6 @@
 end
 
 @add_problem sdp function sdp_sdp_constraints(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    # This test fails on Mosek
     x = Variable(Positive())
     y = Variable((3, 3))
     p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1; numeric_type = T)
