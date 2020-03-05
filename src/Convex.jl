@@ -46,7 +46,7 @@ of disciplined convex form. To turn warnings off, run
 
     Convex.DCP_WARNINGS[] = false
 """
-const DCP_WARNINGS = Threads.Atomic{Bool}(true)
+const DCP_WARNINGS = Ref(true)
 
 """
     MAXDEPTH
@@ -55,7 +55,7 @@ Controls depth of tree printing globally for Convex.jl; defaults to 3. Set via
 
     Convex.MAXDEPTH[] = 5
 """
-const MAXDEPTH = Threads.Atomic{Int}(3)
+const MAXDEPTH = Ref(3)
 
 """
     MAXWIDTH
@@ -64,7 +64,7 @@ Controls width of tree printing globally for Convex.jl; defaults to 15. Set via
 
     Convex.MAXWIDTH[] = 15
 """
-const MAXWIDTH= Threads.Atomic{Int}(15)
+const MAXWIDTH= Ref(15)
 
 ### modeling framework
 include("dcp.jl")
