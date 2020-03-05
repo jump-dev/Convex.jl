@@ -255,9 +255,9 @@ using Convex: AbstractExpr, ConicObj
         # default is to log
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
         
-        Convex.disable_DCP_warnings()
+        Convex.DCP_WARNINGS[] = false
         @test_logs  Convex.NotDcp()
-        Convex.enable_DCP_warnings()
+        Convex.DCP_WARNINGS[] = true
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
         
     end

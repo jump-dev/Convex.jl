@@ -34,13 +34,15 @@ export Positive, Negative, ComplexSign, NoSign
 # Problems
 export add_constraint!, add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
-const DCP_WARNINGS = Bool[]
+"""
+    const DCP_WARNINGS = Ref(true)
 
-function __init__()
-    resize!(DCP_WARNINGS, Threads.nthreads())
-    fill!(DCP_WARNINGS, true)
-end
+Controls whether or not warnings are emitted for when an expression fails to be
+of disciplined convex form. To turn warnings off, run
 
+    Convex.DCP_WARNINGS[] = false
+"""
+const DCP_WARNINGS = Ref(true)
 
 ### modeling framework
 include("dcp.jl")

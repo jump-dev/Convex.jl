@@ -13,14 +13,10 @@ y = Variable()
 x*y
 ```
 
-These warnings can be very useful to know if a problem has been formulated
-correctly. However, in some circumstances, one may wish to disable these
-warnings. To do so, call [`Convex.disable_DCP_warnings()`](@ref). To restore the
-warnings, call [`Convex.enable_DCP_warnings()`](@ref).
+To disable this, set the module-level parameter `DCP_WARNINGS` via
 
-```@docs
-Convex.enable_DCP_warnings()
-Convex.disable_DCP_warnings()
+```julia
+Convex.DCP_WARNINGS[] = false
 ```
 
 
