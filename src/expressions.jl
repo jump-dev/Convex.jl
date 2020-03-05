@@ -34,8 +34,18 @@ import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.conve
 abstract type AbstractExpr end
 abstract type Constraint end
 
-Base.isequal(a::AbstractExpr, b::AbstractExpr) = a.id_hash == b.id_hash && a.head == b.head
-Base.hash(a::AbstractExpr, h::UInt) = hash((a.id_hash, a.head), h)
+id_hash(x::AbstractExpr) = getfield(x, :id_hash)
+head(x::AbstractExpr) = getfield(x, :head)
+
+const hashaa_seed = hash(AbstractExpr)
+
+Base.hash(ex::AbstractExpr, h::UInt) = xor(id_hash(ex), hash(head(ex), h))::UInt
+
+function Base.hash(A::Array{<:AbstractExpr}, h::UInt)
+    h = xor(hashaa_seed, hash(size(A), h))
+    return mapreduce(hash, xor, A, init=h)
+end
+
 
 
 # If h(x)=f∘g(x), then (for single variable calculus)
