@@ -19,9 +19,31 @@ struct AffineVexity <: Vexity             end
 struct ConvexVexity <: Vexity             end
 struct ConcaveVexity <: Vexity            end
 
+
+"""
+    enable_DCP_warnings()
+
+Enable warnings from the current thread when an expression fails to be of
+disciplined convex form. This setting is enabled by default. See also
+[`disable_DCP_warnings`](@ref).
+"""
+function enable_DCP_warnings()
+    DCP_WARNINGS[Threads.threadid()] = true
+end
+
+"""
+    disable_DCP_warnings()
+
+Disable warnings from the current thread when an expression fails to be of
+disciplined convex form. See also [`enable_DCP_warnings`](@ref).
+"""
+function disable_DCP_warnings()
+    DCP_WARNINGS[Threads.threadid()] = false
+end
+
 struct NotDcp <: Vexity
     function NotDcp()
-        if DCP_WARNINGS[]
+        if DCP_WARNINGS[Threads.threadid()]
             @warn "Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior."
         end
         return new()
