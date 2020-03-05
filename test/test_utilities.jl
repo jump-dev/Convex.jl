@@ -250,4 +250,15 @@ using Convex: AbstractExpr, ConicObj
     #     x.value = [1 2 3; 4 5 6]
     #     @fact evaluate(s) --> 21
     # end
+
+    @testset "DCP warnings" begin
+        # default is to log
+        @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
+        
+        Convex.DCP_WARNINGS[] = false
+        @test_logs  Convex.NotDcp()
+        Convex.DCP_WARNINGS[] = true
+        @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
+        
+    end
 end

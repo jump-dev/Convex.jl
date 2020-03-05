@@ -1,6 +1,25 @@
 Advanced Features
 =================
 
+DCP warnings
+------------
+
+When an expression is created which is not of [DCP
+form](https://dcp.stanford.edu/), a warning is emitted. For example,
+
+```repl
+x = Variable()
+y = Variable()
+x*y
+```
+
+To disable this, set the module-level parameter `DCP_WARNINGS` via
+
+```julia
+Convex.DCP_WARNINGS[] = false
+```
+
+
 Dual Variables
 --------------
 
