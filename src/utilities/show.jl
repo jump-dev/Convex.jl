@@ -1,20 +1,6 @@
 import Base.show, Base.summary
 using .TreePrint
 
-"""
-    const MAXDEPTH = Ref(3)
-
-Controls depth of tree printing globally for Convex.jl
-"""
-const MAXDEPTH = Ref(3)
-
-"""
-    const MAXWIDTH = Ref(15)
-
-Controls width of tree printing globally for Convex.jl
-"""
-const MAXWIDTH= Ref(15)
-
 
 """
     show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3)
