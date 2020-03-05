@@ -21,6 +21,7 @@ export relative_entropy, scaledgeomean, sigmamax, square, sumlargest, sumlargest
 export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
 
 # Constraints
+export Constraint
 export isposdef, ⪰, ⪯ # PSD constraints
 export socp
 
