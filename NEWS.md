@@ -1,3 +1,8 @@
+# Changes in v0.13.1
+
+* Allow disabling DCP warnings ([#372](https://github.com/JuliaOpt/Convex.jl/pull/372))
+* Restore export of `Constraint` ([#371](https://github.com/JuliaOpt/Convex.jl/pull/371))
+
 # Major changes in v0.13.0
 
 * The intermediate layer has changed from MathProgBase.jl to
