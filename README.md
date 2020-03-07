@@ -15,8 +15,6 @@
 
 ## Quick Example
 
-Note: the following example uses the syntax of the master branch of Convex.jl. See the [stable docs](https://www.juliaopt.org/Convex.jl/stable) for examples for the current release.
-
 To run this example, first install Convex and at least one solver, such as SCS:
 ```julia
 using Pkg
