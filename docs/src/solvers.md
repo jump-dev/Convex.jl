@@ -8,18 +8,21 @@ types of functions used in the problem, the conic constraints may
 include linear, second-order, exponential, or semidefinite constraints,
 as well as any binary or integer constraints placed on the variables.
 
-By default, Convex.jl does not install any solvers. Many users use the
-solver [SCS](https://github.com/JuliaOpt/SCS.jl), which is able to solve
-problems with linear, second-order cone constraints (SOCPs), exponential
-constraints and semidefinite constraints (SDPs). Any other solver in
-[JuliaOpt](http://www.juliaopt.org/) may also be used, so long as it
-supports the conic constraints used to represent the problem. Most other
-solvers in the JuliaOpt ecosystem can be used to solve (mixed integer)
-linear programs (LPs and MILPs). Mosek and Gurobi can be used to solve
-SOCPs (even with binary or integer constraints), and Mosek can also
-solve SDPs. For up-to-date information about solver capabilities, please
-see the table [here](http://www.juliaopt.org/) describing which solvers
-can solve which kind of problems.
+By default, Convex.jl does not install any solvers. Many users use the solver
+[SCS](https://github.com/JuliaOpt/SCS.jl), which is able to solve problems with
+linear, second-order cone constraints (SOCPs), exponential constraints and
+semidefinite constraints (SDPs). Likewise,
+[COSMO](https://github.com/oxfordcontrol/COSMO.jl) is a pure-Julia solver which
+can handle every cone that Convex.jl itself supports. Any other solver in
+[JuliaOpt](http://www.juliaopt.org/) may also be used, so long as it supports
+the conic constraints used to represent the problem. Many other solvers in the
+JuliaOpt ecosystem can be used to solve (mixed integer) linear programs (LPs and
+MILPs). Mosek and Gurobi can be used to solve SOCPs (even with binary or integer
+constraints), and Mosek can also solve SDPs. For up-to-date information about
+solver capabilities, please see the table [here](http://www.juliaopt.org/)
+describing which solvers can solve which kind of problems. See also
+[ConvexTests.jl](https://ericphanson.github.io/ConvexTests.jl/dev/) to see the
+results of running test problems with Convex.jl for many solvers.
 
 Installing these solvers is very simple. Just follow the instructions in
 the documentation for that solver.
