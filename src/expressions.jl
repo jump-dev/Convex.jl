@@ -34,16 +34,18 @@ import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.conve
 abstract type AbstractExpr end
 abstract type Constraint end
 
+const hashaa_seed = hash(AbstractExpr)
+
 id_hash(x::AbstractExpr) = getfield(x, :id_hash)
 head(x::AbstractExpr) = getfield(x, :head)
-
-const hashaa_seed = hash(AbstractExpr)
+combinehash(x1, x2) = xor(x1*hashaa_seed, x2)
 
 Base.hash(ex::AbstractExpr, h::UInt) = xor(id_hash(ex), hash(head(ex), h))::UInt
 
 function Base.hash(A::Array{<:AbstractExpr}, h::UInt)
     h = xor(hashaa_seed, hash(size(A), h))
-    return mapreduce(hash, xor, A, init=h)
+    h ⊻= reduce(combinehash, map(id_hash, A))
+    return h
 end
 
 
