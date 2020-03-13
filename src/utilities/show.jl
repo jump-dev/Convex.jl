@@ -16,11 +16,15 @@ julia> Convex.show_id(stdout, x)
 id: 163…906
 ```
 """
-show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3) = print(io, show_id(x; digits=digits))
+show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = MAXDIGITS[]) = print(io, show_id(x; digits=digits))
 
-function show_id(x::Union{AbstractExpr, Constraint}; digits = 3)
+function show_id(x::Union{AbstractExpr, Constraint}; digits = MAXDIGITS[])
     hash_str = string(x.id_hash)
-    return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
+    if length(hash_str) > (2*digits + 1);
+        return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
+    else
+        return "id: " * hash_str
+    end
 end
 
 """
