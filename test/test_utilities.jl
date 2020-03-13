@@ -137,6 +137,21 @@ using Convex: AbstractExpr, ConicObj
                 termination status: OPTIMAL
                 primal status: FEASIBLE_POINT
                 dual status: FEASIBLE_POINT"""
+
+        # test small `MAXDIGITS`
+        x = Variable()
+        old_maxdigits = Convex.MAXDIGITS[]
+        Convex.MAXDIGITS[] = 2
+        @test length(Convex.show_id(x)) == length("id: ") + 5
+        Convex.MAXDIGITS[] = old_maxdigits
+
+        # test large `MAXDIGITS`
+        x = Variable()
+        old_maxdigits = Convex.MAXDIGITS[]
+        Convex.MAXDIGITS[] = 100
+        @test length(Convex.show_id(x)) == length("id: ") + length(string(x.id_hash))
+        Convex.MAXDIGITS[] = old_maxdigits
+
     end
 
     @testset "ConicObj with type $T" for T = [UInt32, UInt64]
