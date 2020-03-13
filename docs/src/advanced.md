@@ -143,6 +143,11 @@ only the first `MAXWIDTH` of the constraints will be printed. Vertical dots,
 "⋮", will be printed indicating that some constraints were omitted in the
 printing.
 
+A related setting is [`Convex.MAXDIGITS`](@ref), which controls
+printing the internal IDs of atoms: if the string representation of an
+ID is longer than double the value of `MAXDIGITS`, then it is
+shortened by printing only the first and last `MAXDIGITS` characters.
+
 The AbstractTrees methods can also be used to analyze the structure
 of a Convex.jl problem. For example,
 
@@ -197,4 +202,5 @@ Reference
 ```@docs
 Convex.MAXDEPTH
 Convex.MAXWIDTH
+Convex.MAXDIGITS
 ```
