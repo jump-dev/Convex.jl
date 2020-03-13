@@ -66,6 +66,23 @@ Controls width of tree printing globally for Convex.jl; defaults to 15. Set via
 """
 const MAXWIDTH= Ref(15)
 
+"""
+    MAXDIGITS
+
+When priting IDs of variables, only show the initial and final digits
+if the full ID has more than double the number of digits specified
+here.  So, with the default setting MAXDIGITS=3, any ID longer than 7
+digits would be shortened; for example, ID `14656210999710729289`
+would be printed as `146…289`.
+
+This setting controls tree printing globally for Convex.jl; defaults to 3.
+
+Set via:
+
+    Convex.MAXDIGITS[] = 3
+"""
+const MAXDIGITS= Ref(3)
+
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
