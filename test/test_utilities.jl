@@ -274,6 +274,23 @@ using Convex: AbstractExpr, ConicObj
         @test_logs  Convex.NotDcp()
         Convex.DCP_WARNINGS[] = true
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
-        
+
+    end
+
+    @testset "`add_constraints!` (#380)" begin
+        x = Variable(3, 3)
+        p = minimize(norm_1(x))
+        y = randn(3, 3)
+        c = (norm2(x-y) < 1)
+        @test length(p.constraints) == 0
+        add_constraint!(p, c)
+        @test length(p.constraints) == 1
+        empty!(p.constraints)
+        add_constraints!(p, c)
+        @test length(p.constraints) == 1
+        empty!(p.constraints)
+        c2 = (norm2(x-rand(3,3)) < 3)
+        add_constraints!(p, [c, c2])
+        @test length(p.constraints) == 2
     end
 end
