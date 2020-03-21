@@ -7,3 +7,4 @@
 Manifest.toml
 benchmark/*.json
 test/Project.toml
+dev
