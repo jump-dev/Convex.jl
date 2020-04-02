@@ -16,6 +16,8 @@ export conv, dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, i
 export log_perspective, logisticloss, logsumexp, matrixfrac, neg, norm2, norm_1, norm_inf, nuclearnorm
 export partialtrace, partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
 export relative_entropy, scaledgeomean, sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
+export GeomMeanHypoCone, GeomMeanEpiCone, relative_entropy_epicone, quantum_relative_entropy, quantum_entropy
+export trace_logm, trace_mpower, lieb_ando
 
 # rexports from LinearAlgebra
 export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
@@ -152,6 +154,14 @@ include("atoms/sdp_cone/operatornorm.jl")
 include("atoms/sdp_cone/eig_min_max.jl")
 include("atoms/sdp_cone/matrixfrac.jl")
 include("atoms/sdp_cone/sumlargesteigs.jl")
+include("atoms/sdp_cone/geom_mean_hypocone.jl")
+include("atoms/sdp_cone/geom_mean_epicone.jl")
+include("atoms/sdp_cone/relative_entropy_epicone.jl")
+include("atoms/sdp_cone/quantum_relative_entropy.jl")
+include("atoms/sdp_cone/quantum_entropy.jl")
+include("atoms/sdp_cone/trace_logm.jl")
+include("atoms/sdp_cone/trace_mpower.jl")
+include("atoms/sdp_cone/lieb_ando.jl")
 
 ### exponential atoms
 include("atoms/exp_cone/exp.jl")

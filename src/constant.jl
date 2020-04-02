@@ -53,6 +53,8 @@ end
 
 evaluate(x::Constant) = output(x.value)
 
+evaluate(x::Value) = output(x)
+
 sign(x::Constant) = x.sign
 
 # `real(::Real)` is a no-op and should be optimized out for `Constant{<:Real}`
