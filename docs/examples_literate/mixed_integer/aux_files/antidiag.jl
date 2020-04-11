@@ -9,7 +9,7 @@
 # Please read expressions.jl first.
 #############################################################################
 import Convex.sign, Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-using Convex: AbstractExpr, Nondecreasing, ConstVexity, UniqueConicForms, has_conic_form, cache_conic_form, get_conic_form
+using Convex: AbstractExpr, Nondecreasing, ConstVexity, UniqueConicForms, has_conic_form, cache_conic_form!, get_conic_form
 using LinearAlgebra, SparseArrays
 export antidiag
 
