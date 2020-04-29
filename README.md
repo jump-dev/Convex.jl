@@ -57,10 +57,10 @@ a zip file from [here](https://www.juliaopt.org/Convex.jl/stable/examples/notebo
 ## Citing this package
 
 If you use Convex.jl for published work, we encourage you to cite the software using the following BibTeX citation:
-```
+```bibtex
 @article{convexjl,
  title = {Convex Optimization in {J}ulia},
- author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
+ author = {Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
  year = {2014},
  journal = {SC14 Workshop on High Performance Technical Computing in Dynamic Languages},
  archivePrefix = "arXiv",
