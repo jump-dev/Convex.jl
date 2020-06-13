@@ -25,7 +25,7 @@ The Convex.jl package is licensed under the Simplified "2-clause" BSD License:
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The file src/problem_depot/problem_depot.jl contains some utilities copied from
-the MathOptInterface.jl package (https://github.com/JuliaOpt/MathOptInterface.jl)
+the MathOptInterface.jl package (https://github.com/jump-dev/MathOptInterface.jl)
 which is licensed under the following MIT License:
 
 >Copyright (c) 2017: Miles Lubin and contributors Copyright (c) 2017: Google Inc.

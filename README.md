@@ -1,16 +1,16 @@
 # Convex.jl
 
-[![Build Status](https://travis-ci.org/JuliaOpt/Convex.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/Convex.jl)
-[![Coverage Status](https://coveralls.io/repos/JuliaOpt/Convex.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaOpt/Convex.jl?branch=master)
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://www.juliaopt.org/Convex.jl/stable)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://www.juliaopt.org/Convex.jl/dev)
+[![Build Status](https://travis-ci.org/jump-dev/Convex.jl.svg?branch=master)](https://travis-ci.org/jump-dev/Convex.jl)
+[![Coverage Status](https://coveralls.io/repos/jump-dev/Convex.jl/badge.svg?branch=master)](https://coveralls.io/r/jump-dev/Convex.jl?branch=master)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://jump.dev/Convex.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jump.dev/Convex.jl/dev)
 
-**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/JuliaOpt/Gurobi.jl), [ECOS](https://github.com/JuliaOpt/ECOS.jl), [SCS](https://github.com/JuliaOpt/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through [MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl). It also supports optimization with complex variables and coefficients.
+**Convex.jl** is a [Julia](http://julialang.org) package for [Disciplined Convex Programming](http://dcp.stanford.edu/). Convex.jl can solve linear programs, mixed-integer linear programs, and DCP-compliant convex programs using a variety of solvers, including [Mosek](https://github.com/JuliaOpt/Mosek.jl), [Gurobi](https://github.com/jump-dev/Gurobi.jl), [ECOS](https://github.com/jump-dev/ECOS.jl), [SCS](https://github.com/jump-dev/SCS.jl), and  [GLPK](https://github.com/JuliaOpt/GLPK.jl), through [MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl). It also supports optimization with complex variables and coefficients.
 
 **Installation**: `julia> Pkg.add("Convex")`
 
-- **Detailed documentation and examples** for Convex.jl ([stable](https://juliaopt.github.io/Convex.jl/stable) | [development version](https://juliaopt.github.io/Convex.jl/dev)).
-- If you're running into **bugs or have feature requests**, please use the [Github Issue Tracker](https://github.com/JuliaOpt/Convex.jl/issues>).
+- **Detailed documentation and examples** for Convex.jl ([stable](https://jump.dev/Convex.jl/stable) | [development version](https://jump.dev/Convex.jl/dev)).
+- If you're running into **bugs or have feature requests**, please use the [Github Issue Tracker](https://github.com/jump-dev/Convex.jl/issues>).
 - For usage questions, please contact us via [Discourse](https://discourse.julialang.org/c/domain/opt).
 
 ## Quick Example
@@ -49,10 +49,10 @@ problem.optval
 
 ## More Examples
 
-A number of examples can be found [here](https://www.juliaopt.org/Convex.jl/stable/).
-The [basic usage notebook](https://www.juliaopt.org/Convex.jl/stable/examples/general_examples/basic_usage/)
+A number of examples can be found [here](https://jump.dev/Convex.jl/stable/).
+The [basic usage notebook](https://jump.dev/Convex.jl/stable/examples/general_examples/basic_usage/)
 gives a simple tutorial on problems that can be solved using Convex.jl. All examples can be downloaded as
-a zip file from [here](https://www.juliaopt.org/Convex.jl/stable/examples/notebooks.zip).
+a zip file from [here](https://jump.dev/Convex.jl/stable/examples/notebooks.zip).
 
 ## Citing this package
 

@@ -35,7 +35,7 @@ end
     include("deprecations.jl")
 
     @testset "SCS with warmstarts" begin
-        # We exclude `sdp_sdp_constraints` since it seems to hit a bug https://github.com/JuliaOpt/SCS.jl/issues/167
+        # We exclude `sdp_sdp_constraints` since it seems to hit a bug https://github.com/jump-dev/SCS.jl/issues/167
         run_tests(; exclude=[r"mip", r"sdp_sdp_constraints"]) do p
             solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6); warmstart = true)
         end

@@ -124,7 +124,7 @@ end
         @test evaluate(eigmax(y)) ≈ 4 atol=atol rtol=rtol
     end
 
-    # https://github.com/JuliaOpt/Convex.jl/issues/337
+    # https://github.com/jump-dev/Convex.jl/issues/337
     x = ComplexVariable(2, 2)
     p = minimize( eigmax(x), [ x[1,2] == im, x[2,2] == 1.0, x ⪰ - eye(2) ]; numeric_type = T)
     handle_problem!(p)
