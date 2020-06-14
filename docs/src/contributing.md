@@ -6,10 +6,10 @@ short instructions on how to get started. If you don't know what you'd
 like to contribute, you could
 
  -   take a look at the current
-     [issues](https://github.com/JuliaOpt/Convex.jl/issues) and pick
+     [issues](https://github.com/jump-dev/Convex.jl/issues) and pick
      one. (Feature requests are probably the easiest to tackle.)
  -   add a [usage
-     example](https://github.com/JuliaOpt/Convex.jl/tree/master/examples).
+     example](https://github.com/jump-dev/Convex.jl/tree/master/examples).
 
 Then submit a pull request (PR). (Let us know if it's a work in
 progress by putting \[WIP\] in the name of the PR.)
@@ -18,7 +18,7 @@ Adding examples
 ---------------
 
  -   Take a look at our exising [usage
-     examples](https://github.com/JuliaOpt/Convex.jl/tree/master/examples)
+     examples](https://github.com/jump-dev/Convex.jl/tree/master/examples)
      and add another in similar style.
  -   Submit a PR. (Let us know if it's a work in progress by putting
      \[WIP\] in the name of the PR.)
@@ -32,9 +32,9 @@ Here are the steps to add a new function or operation (atom) to
 Convex.jl. Let's say you're adding the new function $f$.
 
  -   Take a look at the [nuclear norm
-     atom](https://github.com/JuliaOpt/Convex.jl/blob/master/src/atoms/sdp_cone/nuclearnorm.jl)
+     atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/sdp_cone/nuclearnorm.jl)
      for an example of how to construct atoms, and see the [norm
-     atom](https://github.com/JuliaOpt/Convex.jl/blob/master/src/atoms/second_order_cone/norm.jl)
+     atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/second_order_cone/norm.jl)
      for an example of an atom that depends on a parameter.
  -   Copy paste (eg) the nuclear norm file, replace anything saying
      nuclear norm with the name of the atom $f$, fill in monotonicity,
@@ -72,15 +72,15 @@ Then read the conic form code:
 
  -   We define data structures for conic objectives and conic
      constraints, and simple ways of combining them, in
-     [conic\_form.jl](https://github.com/JuliaOpt/Convex.jl/blob/master/src/conic_form.jl)
+     [conic\_form.jl](https://github.com/jump-dev/Convex.jl/blob/master/src/conic_form.jl)
  -   We load the internal conic form representation into the
-     [MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl)
+     [MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl)
      model in the function
-     [load\_MOI\_model!](https://github.com/JuliaOpt/Convex.jl/blob/master/src/solution.jl#L151).
+     [load\_MOI\_model!](https://github.com/jump-dev/Convex.jl/blob/master/src/solution.jl#L151).
  -   We solve problems (that is, pass the standard form of the problem
      to a solver, and put the solution back into the values of the
      appropriate variables) in
-     [solve!](https://github.com/JuliaOpt/Convex.jl/blob/master/src/solution.jl#L205).
+     [solve!](https://github.com/jump-dev/Convex.jl/blob/master/src/solution.jl#L205).
 
 You're now armed and dangerous. Go ahead and open an issue (or comment
 on a previous one) if you can't figure something out, or submit a PR if
