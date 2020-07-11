@@ -97,8 +97,9 @@ satisfy(constraint::Constraint; numeric_type = Float64) = satisfy([constraint]; 
 # +(constraints, constraints) is defined in constraints.jl
 add_constraints!(p::Problem, constraints::Array{<:Constraint}) = append!(p.constraints, constraints)
 add_constraints!(p::Problem, constraint::Constraint) = add_constraints!(p, [constraint])
-const add_constraint! = add_constraints!
 
+add_constraint!(p::Problem, constraints::Array{<:Constraint}) = add_constraints!(p, constraints)
+add_constraint!(p::Problem, constraint::Constraint) = add_constraints!(p, constraint)
 
 # caches conic form of x when x is the solution to the optimization problem p
 function cache_conic_form!(conic_forms::UniqueConicForms, x::AbstractExpr, p::Problem)
