@@ -121,8 +121,8 @@ By making subtypes of [`Convex.AbstractVariable`](@ref) that conform to the appr
 interface (see the [`Convex.AbstractVariable`](@ref) docstring for details), one can
 easily provide custom variable types for specific constructions. These aren't
 always necessary though; for example, one can define the following function
-
 `probabilityvector`:
+
 ```@example prob
 using Convex
 
