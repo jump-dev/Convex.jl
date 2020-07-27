@@ -140,7 +140,6 @@ end
 
 
 # Some helpers for the constructors for `Variable`
-iscomplex(::Type{T}) where {T <: Number} = T != real(T)
 iscomplex(sign::Sign) = sign == ComplexSign()
 iscomplex(x::AbstractVariable) = iscomplex(sign(x))
 
@@ -260,11 +259,11 @@ ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1
 ComplexVariable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), ComplexSign(), first_set, more_sets...)
 
 
-Semidefinite(m::Integer, vt::VarType = ContVar) = Semidefinite(m, m, vt)
+Semidefinite(m::Integer) = Semidefinite(m, m)
 
-function Semidefinite(m::Integer, n::Integer, vt::VarType = ContVar)
+function Semidefinite(m::Integer, n::Integer)
     if m == n
-        x = Variable((m, m), NoSign(), vt)
+        x = Variable((m, m), NoSign(), ContVar)
         add_constraint!(x, x ⪰ 0)
         return x
     else
@@ -272,7 +271,7 @@ function Semidefinite(m::Integer, n::Integer, vt::VarType = ContVar)
     end
 end
 
-Semidefinite((m, n)::Tuple{Integer, Integer}, vt::VarType = ContVar) = Semidefinite(m, n, vt)
+Semidefinite((m, n)::Tuple{Integer, Integer}) = Semidefinite(m, n)
 
 function HermitianSemidefinite(m::Integer, n::Integer = m)
     if m == n

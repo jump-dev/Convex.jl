@@ -23,6 +23,27 @@ using Convex: AbstractExpr, ConicObj
         @test_throws ArgumentError solve!(p, SCSSolver())
     end
 
+    @testset "Complex objective function errors" begin
+        x = Variable()
+        @test_throws ErrorException minimize(x + im*x)
+    end
+
+    @testset "`optval` is nothing before `solve!`" begin
+        x = Variable()
+        p = minimize(x, x >= 0)
+        @test p.optval === nothing
+        solve!(p, () -> SCS.Optimizer(verbose=false))
+        @test p.optval ≈ 0.0 atol=1e-3
+        @test Convex.termination_status(p) == MOI.OPTIMAL
+        @test Convex.objective_value(p) ≈ 0.0 atol=1e-3
+    end
+
+    @testset "Default problem type is `Float64`" begin
+        x = Variable()
+        p = minimize(x, x >= 0)
+        @test p isa Convex.Problem{Float64}
+    end
+
     @testset "Show" begin
         x = Variable()
         @test sprint(show, x) == """
@@ -221,7 +242,64 @@ using Convex: AbstractExpr, ConicObj
             @test x isa Convex.AbstractVariable
             @test sign(x) == NoSign()
             @test x.sign == NoSign()
+
+            Convex.sign!(x, Positive())
+            @test sign(x) == Positive()
+            @test x.sign == Positive()
         end
+
+        # ComplexVariable
+        for x in    [   # tuple size
+                    ComplexVariable((2, 2)), 
+                    Variable((2, 2), ComplexSign()), 
+                    ComplexVariable((2, 2), :Semidefinite),
+                    # individual size 
+                    ComplexVariable(2, 2),
+                    Variable(2, 2, ComplexSign()),
+                    ComplexVariable(2, 2, :Semidefinite),
+                    # single dimension
+                    ComplexVariable(2),
+                    Variable(2, ComplexSign()),
+                    # no dimension
+                    ComplexVariable(),
+                    Variable(ComplexSign()),  ]
+            @test x isa Variable
+            @test x isa Convex.AbstractVariable
+            @test sign(x) == ComplexSign()
+            @test x.sign == ComplexSign()
+        end
+        
+        for vt in (BinVar, IntVar), V in (ComplexVariable, Semidefinite, HermitianSemidefinite)
+            @test_throws MethodError V(2; vartype=vt)
+        end
+
+        for vt in (:Bin, :Int), V in (Semidefinite, HermitianSemidefinite)
+            @test_throws MethodError V(2, vt)
+        end
+
+        for vt in (:Bin, :Int)
+            @test_throws ArgumentError ComplexVariable(2, vt)
+        end
+
+        # Semidefinite
+        for x in [
+                Variable((2,2), :Semidefinite),
+                Variable(2,2, :Semidefinite),
+                ComplexVariable((2,2), :Semidefinite),
+                ComplexVariable(2,2, :Semidefinite),
+                HermitianSemidefinite((2,2)),
+                HermitianSemidefinite(2, 2),
+                HermitianSemidefinite(2),
+                Semidefinite((2,2)),
+                Semidefinite(2, 2),
+                Semidefinite(2),
+            ]
+            @test length(constraints(x)) == 1
+            @test constraints(x)[] isa Convex.SDPConstraint
+        end
+
+        @test_throws ErrorException HermitianSemidefinite(2,3)
+        @test_throws ErrorException Semidefinite(2,3)
     end
 
     @testset "ConicObj" for T = [UInt32, UInt64]

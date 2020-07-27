@@ -20,7 +20,7 @@ function Base.getproperty(p::Problem, s::Symbol)
         if getfield(p, :status) == MOI.OPTIMIZE_NOT_CALLED
             return nothing
         else
-            return MOI.get(p.model, MOI.ObjectiveValue())
+            return objective_value(p)
         end
     else
         return getfield(p, s)
