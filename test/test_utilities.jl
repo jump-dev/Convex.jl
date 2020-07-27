@@ -270,15 +270,11 @@ using Convex: AbstractExpr, ConicObj
         end
         
         for vt in (BinVar, IntVar), V in (ComplexVariable, Semidefinite, HermitianSemidefinite)
-            @test_throws MethodError V(2; vartype=vt)
+            @test_throws Any V(2; vartype=vt)
         end
 
-        for vt in (:Bin, :Int), V in (Semidefinite, HermitianSemidefinite)
-            @test_throws MethodError V(2, vt)
-        end
-
-        for vt in (:Bin, :Int)
-            @test_throws ArgumentError ComplexVariable(2, vt)
+        for vt in (:Bin, :Int), V in (Semidefinite, HermitianSemidefinite, ComplexVariable)
+            @test_throws Any V(2, vt)
         end
 
         # Semidefinite
