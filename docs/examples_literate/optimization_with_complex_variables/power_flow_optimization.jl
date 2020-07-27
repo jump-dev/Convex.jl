@@ -36,12 +36,12 @@ output = matopen("Res.mat")
 names(output)
 outputData = read(output, "Wres");
 Wres = outputData
-real_diff = real(W.value) - real(Wres);
-imag_diff = imag(W.value) - imag(Wres);
+real_diff = real(evaluate(W)) - real(Wres);
+imag_diff = imag(evaluate(W)) - imag(Wres);
 @test real_diff ≈ zeros(n, n) atol = TOL
 @test imag_diff ≈ zeros(n, n) atol = TOL
 
-real_diff = real(W.value) - (real(W.value))';
-imag_sum = imag(W.value) + (imag(W.value))';
+real_diff = real(evaluate(W)) - (real(evaluate(W)))';
+imag_sum = imag(evaluate(W)) + (imag(evaluate(W)))';
 @test real_diff ≈ zeros(n, n) atol = TOL
 @test imag_diff ≈ zeros(n, n) atol = TOL

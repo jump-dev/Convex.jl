@@ -28,6 +28,6 @@ solve!(problem, () -> SCS.Optimizer(verbose=false))
 # Let's see how well the model fits.
 using Plots
 logistic(x::Real) = inv(exp(-x) + one(x))
-perm = sortperm(vec(X*beta.value))
+perm = sortperm(vec(X*evaluate(beta)))
 plot(1:n, (Y[perm] .+ 1)/2, st=:scatter)
-plot!(1:n, logistic.(X*beta.value)[perm])
+plot!(1:n, logistic.(X*evaluate(beta))[perm])

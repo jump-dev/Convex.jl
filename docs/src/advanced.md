@@ -72,26 +72,21 @@ lambda = 105
 Fixing and freeing variables
 ----------------------------
 
-Convex.jl allows you to fix a variable `x` to a value by
-calling the `fix!` method. Fixing the variable essentially
-turns it into a constant. Fixed variables are sometimes also called
-parameters.
+Convex.jl allows you to fix a variable `x` to a value by calling the `fix!`
+method. Fixing the variable essentially turns it into a constant. Fixed
+variables are sometimes also called parameters.
 
-`fix!(x, v)` fixes the variable `x` to the value
-`v`.
+`fix!(x, v)` fixes the variable `x` to the value `v`.
 
-`fix!(x)` fixes `x` to the value
-`x.value`, which might be the value obtained by solving
-another problem involving the variable `x`.
+`fix!(x)` fixes `x` to its current value, which might be the value obtained by
+solving another problem involving the variable `x`.
 
-To allow the variable `x` to vary again, call
-`free!(x)`.
+To allow the variable `x` to vary again, call `free!(x)`.
 
-Fixing and freeing variables can be particularly useful as a tool for
-performing alternating minimization on nonconvex problems. For example,
-we can find an approximate solution to a nonnegative matrix
-factorization problem with alternating minimization as follows. We use
-warmstarts to speed up the solution.
+Fixing and freeing variables can be particularly useful as a tool for performing
+alternating minimization on nonconvex problems. For example, we can find an
+approximate solution to a nonnegative matrix factorization problem with
+alternating minimization as follows. We use warmstarts to speed up the solution.
 
 ```julia
 # initialize nonconvex problem
@@ -102,7 +97,7 @@ y = Variable(k, n)
 problem = minimize(sum_squares(A - x*y), x>=0, y>=0)
 
 # initialize value of y
-y.value = rand(k, n)
+set_value!(y, rand(k, n))
 # we'll do 10 iterations of alternating minimization
 for i=1:10 
     # first solve for x
@@ -118,20 +113,103 @@ for i=1:10
 end
 ```
 
+
+Custom Variable Types
+---------------------
+
+By making subtypes of [`Convex.AbstractVariable`](@ref) that conform to the appropriate
+interface (see the [`Convex.AbstractVariable`](@ref) docstring for details), one can
+easily provide custom variable types for specific constructions. These aren't
+always necessary though; for example, one can define the following function
+`probabilityvector`:
+
+```@example prob
+using Convex
+
+function probabilityvector(d::Int)
+    x = Variable(d, Positive())
+    add_constraint!(x, sum(x) == 1)
+    return x
+end
+```
+and then use, say, `p = probabilityvector(3)` in any Convex.jl problem. The
+constraints that the entries of `p` are non-negative and sum to 1 will be
+automatically added to any problem `p` is used in.
+
+Custom types are necessary when one wants to dispatch on custom variables, use
+them as callable types, or provide a different implementation. Continuing with
+the probability vector example, let's say we often use probability vectors
+variables in taking expectation values, and we want to use function notation for
+this. To do so, we define
+ 
+```@example 1
+using Convex
+mutable struct ProbabilityVector <: Convex.AbstractVariable
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int, Int}
+    value::Convex.ValueOrNothing
+    vexity::Convex.Vexity
+    function ProbabilityVector(d)
+        this = new(:ProbabilityVector, 0, (d,1), nothing, Convex.AffineVexity())
+        this.id_hash = objectid(this)
+        this
+    end
+end
+
+Convex.constraints(p::ProbabilityVector) = [ sum(p) == 1 ]
+Convex.sign(::ProbabilityVector) = Convex.Positive()
+Convex.vartype(::ProbabilityVector) = Convex.ContVar
+
+(p::ProbabilityVector)(x) = dot(p, x)
+```
+
+Then one can call `p = ProbabilityVector(3)` to construct a our custom variable
+which can be used in Convex, which already encodes the appropriate constraints
+(non-negative and sums to 1), and which can act on constants via `p(x)`. For
+example,
+
+```@example 1
+using SCS
+p = ProbabilityVector(3)
+x = [1.0, 2.0, 3.0]
+prob = minimize( p(x) )
+solve!(prob, SCS.Optimizer(verbose=false))
+evaluate(p) # [1.0, 0.0, 0.0]
+```
+
+Subtypes of `AbstractVariable` must have the fields `head`, `id_hash`, and
+`size`, and `id_hash` must be populated as shown in the example. Then they must also
+
+* either have a field `value`, or implement [`Convex._value`](@ref) and
+  [`Convex.set_value!`](@ref)
+* either have a field `vexity`, or implement [`Convex.vexity`](@ref) and
+  [`Convex.vexity!`](@ref) (though the latter is only necessary if you wish to
+  support [`Convex.fix!`](@ref) and [`Convex.free!`](@ref)
+* have a field `constraints` or implement [`Convex.constraints`](@ref) (optionally,
+  implement [`Convex.add_constraint!`](@ref) to be able to add constraints to your
+  variable after its creation),
+* either have a field `sign` or implement [`Convex.sign`](@ref), and 
+* either have a field `vartype`, or implement [`Convex.vartype`](@ref) (optionally,
+  implement [`Convex.vartype!`](@ref) to be able to change a variables' `vartype`
+  after construction.)
+
+
 Printing and the tree structure
 -------------------------------
 
-A Convex problem is structured as a *tree*, with the *root* being the
-problem object, with branches to the objective and the set of constraints.
-The objective is an `AbstractExpr` which itself is a tree, with each atom
-being a node and having `children` which are other atoms, variables, or
-constants. Convex provides `children` methods from
+A Convex problem is structured as a *tree*, with the *root* being the problem
+object, with branches to the objective and the set of constraints. The objective
+is an `AbstractExpr` which itself is a tree, with each atom being a node and
+having `children` which are other atoms, variables, or constants. Convex
+provides `children` methods from
 [AbstractTrees.jl](https://github.com/Keno/AbstractTrees.jl) so that the
-tree-traversal functions of that package can be used with Convex.jl problems
-and structures. This is what allows powers the printing of problems, expressions,
+tree-traversal functions of that package can be used with Convex.jl problems and
+structures. This is what allows powers the printing of problems, expressions,
 and constraints. The depth to which the tree corresponding to a problem,
 expression, or constraint is printed is controlled by the global variable
-[`Convex.MAXDEPTH`](@ref), which defaults to 3. This can be changed by e.g. setting
+[`Convex.MAXDEPTH`](@ref), which defaults to 3. This can be changed by e.g.
+setting
 
 ```julia
 Convex.MAXDEPTH[] = 5

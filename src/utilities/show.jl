@@ -28,7 +28,7 @@ function show_id(x::Union{AbstractExpr, Constraint}; digits = MAXDIGITS[])
 end
 
 """
-    Base.summary(io::IO, x::Variable)
+    Base.summary(io::IO, x::AbstractVariable)
 
 Prints a one-line summary of a variable `x` to `io`.
 
@@ -40,7 +40,7 @@ julia> summary(stdout, x)
 3×2 complex variable (id: 732…737)
 ```
 """
-function Base.summary(io::IO, x::Variable)
+function Base.summary(io::IO, x::AbstractVariable)
     sgn = summary(sign(x))
     cst = vexity(x) == ConstVexity() ? " (fixed)" : ""
     cst = cst * " (" * sprint(show_id, x) * ")"
@@ -79,7 +79,7 @@ end
 
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
-show(io::IO, x::Constant) = print(io, x.value)
+show(io::IO, x::Constant) = print(io, evaluate(x))
 
 # A variable, for example, Variable(3, 4), will be displayed as:
 # julia> Variable(3,4)
@@ -89,7 +89,7 @@ show(io::IO, x::Constant) = print(io, x.value)
 # vexity: affine
 # id: 758…633
 # here, the `id` will change from run to run.
-function show(io::IO, x::Variable)
+function show(io::IO, x::AbstractVariable)
     print(io, "Variable")
     print(io, "\nsize: $(size(x))")
     print(io, "\nsign: ")
@@ -98,8 +98,8 @@ function show(io::IO, x::Variable)
     summary(io, vexity(x))
     println(io)
     show_id(io, x)
-    if x.value !== nothing
-        print(io, "\nvalue: $(x.value)")
+    if _value(x) !== nothing
+        print(io, "\nvalue: $(evaluate(x))")
     end
 end
 

@@ -7,7 +7,7 @@
     c = (rand(5,5) * α) * ones(1,5) 
 
     β = Variable(5)
-    β.value = ones(5)
+    set_value!(β, ones(5))
 
     problem = minimize(sum(c * β), [β >= 0]; numeric_type = T)
 
@@ -15,7 +15,7 @@
     if test
         @test problem.optval ≈ evaluate(sum(c * β)) atol=atol rtol=rtol
         @test problem.optval ≈ 0.0 atol=atol rtol=rtol
-        @test β.value ≈ zeros(5) atol=atol rtol=rtol
+        @test evaluate(β) ≈ zeros(5) atol=atol rtol=rtol
     end
 end
 

@@ -6,6 +6,7 @@ os:
 julia:
   - 1.0
   - 1.4
+if: branch = master OR tag IS present OR type = pull_request
 notifications:
   email: false
 jobs:

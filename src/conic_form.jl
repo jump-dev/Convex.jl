@@ -104,7 +104,7 @@ const UniqueConstrMap = OrderedDict{Tuple{Symbol, UInt64}, Int}
 # records each ConicConstr created
 const UniqueConstrList = Vector{ConicConstr}
 # map variables' hash to the variable itself 
-const IdToVariables = OrderedDict{UInt64, Variable}
+const IdToVariables = OrderedDict{UInt64, AbstractVariable}
 const ConicConstrToConstr = Dict{ConicConstr, Constraint}
 # UniqueConicForms caches all the conic forms of expressions we've parsed so far
 struct UniqueConicForms
@@ -147,6 +147,6 @@ function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, ne
     append!(conic_forms.constr_list, new_conic_forms)
 end
 
-function add_to_id_to_variables!(conic_forms::UniqueConicForms, var::Variable)
+function add_to_id_to_variables!(conic_forms::UniqueConicForms, var::AbstractVariable)
     conic_forms.id_to_variables[var.id_hash] = var
 end

@@ -61,8 +61,8 @@ solve!(p, () -> SCS.Optimizer())     #use SCS.Optimizer(verbose = false) to supp
 #-
 
 # Optimal portfolio weights:
-w.value
+evaluate(w)
 
 #-
 
-sum(w.value)
+sum(evaluate(w))

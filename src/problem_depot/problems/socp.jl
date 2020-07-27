@@ -172,7 +172,7 @@ end
 
     handle_problem!(p)
     if test
-        @test x.value ≈ fill(3.0, (3, 1)) atol=atol rtol=rtol
+        @test evaluate(x) ≈ fill(3.0, (3, 1)) atol=atol rtol=rtol
         @test p.optval ≈ 6 atol=atol rtol=rtol
         @test evaluate(sum((dot(/))([3, 6, 9], x))) ≈ 6 atol=atol rtol=rtol
     end
@@ -182,7 +182,7 @@ end
 
     handle_problem!(p)
     if test
-        @test x.value ≈ 3 atol=atol rtol=rtol
+        @test evaluate(x) ≈ 3 atol=atol rtol=rtol
         @test p.optval ≈ 6 atol=atol rtol=rtol
         @test evaluate(sum([3, 6, 9] / x)) ≈ 6 atol=atol rtol=rtol
     end
@@ -315,7 +315,7 @@ end
     
     if test
         # Compute gradient, check it is zero(ish)
-        x_opt = xvar.value
+        x_opt = evaluate(xvar)
         margins = A * x_opt - b
         qs = q / (q - 1);  # Conjugate
         denom = sum(abs.(margins).^q)^(1/qs)
@@ -328,7 +328,7 @@ end
 @add_problem socp function socp_norm_consistent_with_Base_for_matrix_variables(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     A = randn(4, 4)
     x = Variable(4, 4)
-    x.value = A
+    set_value!(x, A)
     # Matrix norm
     if test
         @test evaluate(opnorm(x)) ≈ opnorm(A) atol=atol rtol=rtol
@@ -358,7 +358,7 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
     end
 
-    y.value = 4
+    set_value!(y, 4)
     fix!(y)
     handle_problem!(p)
     if test

@@ -33,6 +33,7 @@ end
 @testset "Convex" begin
     include("test_utilities.jl")
     include("deprecations.jl")
+    include("test_abstract_variable.jl")
 
     @testset "SCS with warmstarts" begin
         # We exclude `sdp_sdp_constraints` since it seems to hit a bug https://github.com/jump-dev/SCS.jl/issues/167

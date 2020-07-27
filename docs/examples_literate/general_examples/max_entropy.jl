@@ -28,4 +28,4 @@ problem.optval
 
 #-
 
-x.value
+evaluate(x)

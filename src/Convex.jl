@@ -24,16 +24,19 @@ export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
 export Constraint
 export isposdef, ⪰, ⪯ # PSD constraints
 export socp
+export Constraint # useful for making abstractly-typed vectors via `Constraint[]`
 
 # Variables
 export Constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
 export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
+export BinVar, IntVar, ContVar, vartype, vartype!
+export constraints, add_constraint!, set_value!, evaluate
 
 # Signs
 export Positive, Negative, ComplexSign, NoSign
 
 # Problems
-export add_constraint!, add_constraints!, maximize, minimize, Problem, satisfy, solve!
+export add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
 
 # Module level globals

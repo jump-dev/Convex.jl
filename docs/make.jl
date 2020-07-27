@@ -144,6 +144,7 @@ makedocs(;
         "Problem Depot" => "problem_depot.md",
         "Contributing" => "contributing.md",
         "Credits" => "credits.md",
+        "Reference" => "reference.md",
         "Examples" => examples_nav,
     ],
     repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
