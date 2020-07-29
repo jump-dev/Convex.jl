@@ -89,7 +89,6 @@ function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, vaf::MOI.Vector
     @assert size(A,2) == MOI.output_dimension(vaf)
 
     # AB[i,l] = sum(A[i,j] * B[j, l] for j)
-    # @assert iszero(vaf.constant) # for now
     new_constant = A * vaf.constants
 
     vats = MOI.VectorAffineTerm{T}[]
@@ -107,16 +106,14 @@ end
 
 function MOIU.operate(::typeof(*), ::Type{T}, A::SparseMatrixCSC, vaf::MOI.VectorAffineFunction) where {T}
     @assert size(A,2) == MOI.output_dimension(vaf)
-    # @show size(A), typeof(A), nnz(A)
-    # @assert iszero(vaf.constant) # for now
     new_constant = A * vaf.constants
 
     vats = MOI.VectorAffineTerm{T}[]
 
     rows = rowvals(A)
     vals = nonzeros(A)
-    # AB[:,k] = sum(A[:,j] *B[j, k] for j)
 
+    # AB[:,k] = sum(A[:,j] *B[j, k] for j)
     for vat in vaf.terms
         j = vat.output_index
         Bjk = vat.scalar_term.coefficient
@@ -325,35 +322,12 @@ function template(A::AbsAtom, context)
     return t_obj
 end
 
-# function template(I::IndexAtom, subproblems, context)
-#     expr = only(subproblems)
-#     if I.rows !== nothing && I.cols !== nothing
-
-#     elseif I.inds !== nothing
-
-#     else
-#         error("indexing error")
-#     end
-
-#     T = context.T
-#     return ConicFormProblem(MOI.FEASIBILITY_SENSE, T.(real(C.value)), T.(imag(C.value)))
-# end
-
 function template(C::Constant, context)
     T = context.T
     return T.(C.value)
 end
 
 scalar_fn(x) = only(MOIU.scalarize(x))
-
-# function scalar_fn(v::MOI.VectorOfVariables)
-    # return MOI.SingleVariable(only(v.variables))
-# end
-
-# function scalar_fn(v::MOI.VectorAffineFunction{T}) where {T}
-    # MOI.output_dimension(v) == 1 || error("not scalar")
-    # return MOI.ScalarAffineFunction{T}([ vat.scalar_term for vat in  v.terms], only(v.constants))
-# end
 
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
