@@ -128,40 +128,6 @@ function MOIU.operate(::typeof(*), ::Type{T}, A::SparseMatrixCSC, vaf::MOI.Vecto
     end
 
     return MOI.VectorAffineFunction{T}(vats, new_constant)
-    for (j, saf) in enumerate(old_rows)
-        for n in nzrange(A, j)
-            i = rows[n]
-            Aij = vals[n]
-
-        end
-    end
-
-
-
-
-    old_rows = MOIU.scalarize(vaf)
-    new_rows = MOI.ScalarAffineFunction{T}[]
-
-    # algorithm:
-    # AB[i,:] = sum(A[i,j] *B[j, :] for j)
-    rows = rowvals(A)
-    vals = nonzeros(A)
-    for (j, saf) in enumerate(old_rows)
-        for n in nzrange(A, j)
-            i = rows[n]
-            Aij = vals[n]
-            new_row = MOIU.operate!(*, T, saf, Aij)
-            push!(new_rows, new_row)
-        end
-    end
-    return MOIU.vectorize(new_rows)
-    # I, J, V = findnz(A)
-    # for (i, j, v) in zip(I, J, V)
-        # Aij = v
-        # new_row = MOIU.operate!(*, T, old_rows[j], Aij)
-        # push!(new_rows, new_row)
-    # end
-    # return MOIU.vectorize(new_rows)
 end
 
 
@@ -227,26 +193,6 @@ function template(x::DotMultiplyAtom, context)
             s1, s2 = s2, s1
         end
     end
-
-    # A = s1
-    # vaf = s2
-    # @assert vaf isa VectorAffineFunction
-    # @assert A isa AbstractMatrix
-
-    # # AB[i,j] = A[i,j] * B[i, j]
-    # @assert iszero(vaf.constants) # for now
-
-
-    # vats = MOI.VectorAffineTerm{T}[]
-    # for v in vaf.terms
-    #     i = v.output_index
-    #     j = v.scalar_term.variable_index
-    #     Bij = v.scalar_term.coefficient
-    #     new_coefficient = A[i,j]*Bij
-    #     push!(vats, MOI.VectorAffineTerm{T}(i, MOI.ScalarAffineTerm{T}(new_coefficient, j)))
-    # end
-    # return MOI.VectorAffineFunction{T}(vats, copy(vaf.constants))
-
 
     # promote the size of the coefficient matrix, so eg
     # 3 .* x
