@@ -2,6 +2,41 @@ using SparseArrays
 using AbstractTrees: children
 export conic_form_problem_solve
 
+struct VectorAffineFunctionAsMatrix{M, B, V}
+    matrix::M
+    vector::B
+    variables::V
+end
+
+function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC}, context)
+    T = eltype(vaf_as_matrix.matrix)
+    I, J, V = findnz(vaf_as_matrix.matrix)
+    vats = MOI.VectorAffineTerm{T}[]
+    for n = eachindex(I, J, V)
+        i = I[n]
+        j = J[n]
+        v = V[n]
+        push!(vats, MOI.VectorAffineTerm{T}(i, MOI.ScalarAffineTerm{T}(v, vaf_as_matrix.variables[j])))
+    end
+
+    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.vector)
+end 
+
+
+function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
+    T = eltype(vaf_as_matrix.matrix)
+    vats = MOI.VectorAffineTerm{T}[]
+    M = vaf_as_matrix.matrix
+    for i = 1:size(M,1)
+        for j = 1:size(M,2)
+            iszero(M[i,j]) && continue
+            push!(vats, MOI.VectorAffineTerm{T}(i, MOI.ScalarAffineTerm{T}(M[i,j], vaf_as_matrix.variables[j])))
+        end
+    end
+    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.vector)
+end
+
+
 function template(p::Problem, context)
     obj_problem = template(p.objective, context)
     for c in p.constraints
@@ -45,8 +80,12 @@ function add_variables!(model, var::AbstractVariable)
     end
 end
 
+function MOI.output_dimension(v::VectorAffineFunctionAsMatrix)
+    size(v.matrix, 1)
+end
+
 function promote_size(values)
-    ds = unique( MOI.output_dimension(v) for v in values if v isa MOI.AbstractFunction)
+    ds = unique( MOI.output_dimension(v) for v in values if v isa MOI.AbstractFunction || v isa VectorAffineFunctionAsMatrix)
     d = only(ds)
     values2 = ( v isa Number ? fill(v, d) : v for v in values )
     values2, d
@@ -65,13 +104,35 @@ function template(A::NegateAtom, context)
     return obj
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, v::MOI.VectorOfVariables) where {T}
-    @assert size(A,2) == length(v.variables)
-    terms = MOI.VectorAffineTerm{T}[]
-    add_terms!(terms, A, 1:size(A,1), v.variables)
-    return MOI.VectorAffineFunction(terms, zeros(T, size(A, 1)))
+function MOIU.operate(::typeof(-), ::Type{T}, VectorAffineFunctionAsMatrix::VectorAffineFunctionAsMatrix) where {T}
+    return VectorAffineFunctionAsMatrix(-VectorAffineFunctionAsMatrix.matrix, -VectorAffineFunctionAsMatrix.vector, VectorAffineFunctionAsMatrix.variables)
 end
 
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, VectorAffineFunctionAsMatrix::VectorAffineFunctionAsMatrix) where {T}
+    return VectorAffineFunctionAsMatrix(VectorAffineFunctionAsMatrix.matrix, VectorAffineFunctionAsMatrix.vector + v, VectorAffineFunctionAsMatrix.variables)
+end
+
+function MOIU.operate(::typeof(-), ::Type{T}, VectorAffineFunctionAsMatrix::VectorAffineFunctionAsMatrix, v::AbstractVector) where {T}
+    # @show VectorAffineFunctionAsMatrix.vector
+    # @show size(v)
+    # @show size(VectorAffineFunctionAsMatrix.matrix)
+    # @show size(VectorAffineFunctionAsMatrix.vector)
+    return VectorAffineFunctionAsMatrix(VectorAffineFunctionAsMatrix.matrix, VectorAffineFunctionAsMatrix.vector - v, VectorAffineFunctionAsMatrix.variables)
+end
+
+# kind of hack for an unsized zero
+struct Zero end
+Base.:(+)(a, z::Zero) = a
+Base.:(+)(z::Zero, a) = a
+Base.:(-)(z::Zero, a) = -a
+Base.:(-)(a, z::Zero) = a
+Base.:(-)(z::Zero) = z
+Base.:(*)(A, z::Zero) = z
+
+function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, v::MOI.VectorOfVariables) where {T}
+    @assert size(A,2) == length(v.variables)
+    return VectorAffineFunctionAsMatrix(A, Zero(), v.variables)
+end
 
 function MOIU.operate(::typeof(+), ::Type{T}, v1::MOI.VectorOfVariables, v2::MOI.ScalarAffineFunction) where {T}
     MOIU.operate(+, T, scalar_fn(v1), v2)
@@ -85,71 +146,8 @@ function MOIU.operate!(::typeof(+), ::Type{T}, v1::MOI.VectorAffineFunction, v2:
     MOIU.operate!(+, T, scalar_fn(v1), v2)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, vaf::MOI.VectorAffineFunction) where {T}
-    @assert size(A,2) == MOI.output_dimension(vaf)
-
-    # AB[i,l] = sum(A[i,j] * B[j, l] for j)
-    new_constant = A * vaf.constants
-
-    vats = MOI.VectorAffineTerm{T}[]
-    for v in vaf.terms
-        j = v.output_index
-        l_ind = v.scalar_term.variable_index
-        Bjl = v.scalar_term.coefficient
-        for i in 1:size(A,1)
-            new_coefficient = A[i,j] * Bjl
-            push!(vats, MOI.VectorAffineTerm{T}(i, MOI.ScalarAffineTerm{T}(new_coefficient, l_ind)))
-        end
-    end
-    return MOI.VectorAffineFunction(vats, new_constant)
-end
-
-function MOIU.operate(::typeof(*), ::Type{T}, A::SparseMatrixCSC, vaf::MOI.VectorAffineFunction) where {T}
-    @assert size(A,2) == MOI.output_dimension(vaf)
-    new_constant = A * vaf.constants
-
-    vats = MOI.VectorAffineTerm{T}[]
-
-    rows = rowvals(A)
-    vals = nonzeros(A)
-
-    # AB[:,k] = sum(A[:,j] *B[j, k] for j)
-    for vat in vaf.terms
-        j = vat.output_index
-        Bjk = vat.scalar_term.coefficient
-        k = vat.scalar_term.variable_index
-
-        for n in nzrange(A, j)
-            i = rows[n]
-            Aij = vals[n]
-            new_vat=MOI.VectorAffineTerm{T}(i, MOI.ScalarAffineTerm{T}(Aij*Bjk, k))
-            push!(vats, new_vat)
-        end
-    end
-
-    return MOI.VectorAffineFunction{T}(vats, new_constant)
-end
-
-
-
-function MOIU.operate(::typeof(*), ::Type{T}, A::Diagonal, vaf::MOI.VectorAffineFunction) where {T}
-    @assert size(A,2) == MOI.output_dimension(vaf)
-    # @show size(A), typeof(A), nnz(A)
-    # @assert iszero(vaf.constant) # for now
-    v = diag(A)
-    new_constant = v .* vaf.constants
-
-    vats = MOI.VectorAffineTerm{T}[]
-
-    for vat in vaf.terms
-        j = vat.output_index
-        Bjk = vat.scalar_term.coefficient
-        k = vat.scalar_term.variable_index
-        new_vat=MOI.VectorAffineTerm{T}(j, MOI.ScalarAffineTerm{T}(v[j]*Bjk, k))
-        push!(vats, new_vat)
-    end
-
-    return MOI.VectorAffineFunction{T}(vats, new_constant)
+function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, vaf_as_matrix::VectorAffineFunctionAsMatrix) where {T}
+    return VectorAffineFunctionAsMatrix(A * vaf_as_matrix.matrix, A * vaf_as_matrix.vector, vaf_as_matrix.variables)
 end
 
 
@@ -210,7 +208,6 @@ function template(x::DotMultiplyAtom, context)
     end
 
     const_multiplier = Diagonal(vec(coeff))
-
     obj = MOIU.operate(*, context.T, const_multiplier, s2)
 
     return obj
@@ -227,6 +224,10 @@ function template(A::EucNormAtom, context)
     t_obj = template(Variable(), context)
 
     t_single_var_obj = MOI.SingleVariable(only(t_obj.variables))
+
+    if obj isa VectorAffineFunctionAsMatrix
+        obj = to_vaf(obj)
+    end
 
     f = MOIU.operate(vcat, context.T, t_single_var_obj, obj)
     set = MOI.SecondOrderCone(d+1)
@@ -315,7 +316,7 @@ function conic_form_problem_solve(p::Problem, optimizer)
             set_value!(var, nothing)
         end
     end
-    return context
+    return nothing
 end
 
 
@@ -326,6 +327,9 @@ function add_constraints_to_context(lt::GtConstraint, context)
     objectives, d = promote_size( (lhs, rhs) )
 
     f = MOIU.operate(-, T, objectives...)
+    if f isa VectorAffineFunctionAsMatrix
+        f = to_vaf(f)
+    end
     MOI.add_constraint(context.model, f, MOI.Nonnegatives(MOI.output_dimension(f)))
 
     return nothing

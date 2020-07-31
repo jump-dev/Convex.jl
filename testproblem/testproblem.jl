@@ -94,7 +94,7 @@ const γ2 = 1.0
 const ϵ = 0.0001
 MAX_ITERS = 2
 
-m, n, k = 75, 75, 5
+m, n, k = 150, 150, 5
 holdout = 0.80
 
 A = gen_data(m, n, k)
@@ -116,7 +116,11 @@ end
 
 @testset "Same results" begin
     @test evaluate(X1) ≈ evaluate(X2) atol=1e-2 rtol=1e-2
-    @test evaluate(X1) ≈ X3 atol=1e-2 rtol=1e-2
     @test evaluate(Y1) ≈ evaluate(Y2) atol=1e-2 rtol=1e-2
+
+    @test evaluate(X1) ≈ X3 atol=1e-2 rtol=1e-2
     @test evaluate(Y1) ≈ Y3 atol=1e-2 rtol=1e-2
+
+    @test evaluate(X2) ≈ X3 atol=1e-2 rtol=1e-2
+    @test evaluate(Y2) ≈ Y3 atol=1e-2 rtol=1e-2
 end
