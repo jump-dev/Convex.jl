@@ -8,6 +8,7 @@ struct VectorAffineFunctionAsMatrix{M, B, V}
     variables::V
 end
 
+# convert to a usual VAF
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC}, context)
     T = eltype(vaf_as_matrix.matrix)
     I, J, V = findnz(vaf_as_matrix.matrix)
@@ -29,6 +30,8 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
     M = vaf_as_matrix.matrix
     for i = 1:size(M,1)
         for j = 1:size(M,2)
+            # this check turns out to be key for performance on the test problem
+            # which means I suspect something is being densely represented when possibly it should be sparse
             iszero(M[i,j]) && continue
             push!(vats, MOI.VectorAffineTerm{T}(i, MOI.ScalarAffineTerm{T}(M[i,j], vaf_as_matrix.variables[j])))
         end
@@ -104,24 +107,20 @@ function template(A::NegateAtom, context)
     return obj
 end
 
-function MOIU.operate(::typeof(-), ::Type{T}, VectorAffineFunctionAsMatrix::VectorAffineFunctionAsMatrix) where {T}
-    return VectorAffineFunctionAsMatrix(-VectorAffineFunctionAsMatrix.matrix, -VectorAffineFunctionAsMatrix.vector, VectorAffineFunctionAsMatrix.variables)
+function MOIU.operate(::typeof(-), ::Type{T}, vafasmatrix::VectorAffineFunctionAsMatrix) where {T}
+    return VectorAffineFunctionAsMatrix(-vafasmatrix.matrix, -vafasmatrix.vector, vafasmatrix.variables)
 end
 
-function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, VectorAffineFunctionAsMatrix::VectorAffineFunctionAsMatrix) where {T}
-    return VectorAffineFunctionAsMatrix(VectorAffineFunctionAsMatrix.matrix, VectorAffineFunctionAsMatrix.vector + v, VectorAffineFunctionAsMatrix.variables)
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, vafasmatrix::VectorAffineFunctionAsMatrix) where {T}
+    return VectorAffineFunctionAsMatrix(vafasmatrix.matrix, vafasmatrix.vector + v, vafasmatrix.variables)
 end
 
-function MOIU.operate(::typeof(-), ::Type{T}, VectorAffineFunctionAsMatrix::VectorAffineFunctionAsMatrix, v::AbstractVector) where {T}
-    # @show VectorAffineFunctionAsMatrix.vector
-    # @show size(v)
-    # @show size(VectorAffineFunctionAsMatrix.matrix)
-    # @show size(VectorAffineFunctionAsMatrix.vector)
-    return VectorAffineFunctionAsMatrix(VectorAffineFunctionAsMatrix.matrix, VectorAffineFunctionAsMatrix.vector - v, VectorAffineFunctionAsMatrix.variables)
+function MOIU.operate(::typeof(-), ::Type{T}, vafasmatrix::VectorAffineFunctionAsMatrix, v::AbstractVector) where {T}
+    return VectorAffineFunctionAsMatrix(vafasmatrix.matrix, vafasmatrix.vector - v, vafasmatrix.variables)
 end
 
-# kind of hack for an unsized zero
 struct Zero end
+
 Base.:(+)(a, z::Zero) = a
 Base.:(+)(z::Zero, a) = a
 Base.:(-)(z::Zero, a) = -a
@@ -146,8 +145,8 @@ function MOIU.operate!(::typeof(+), ::Type{T}, v1::MOI.VectorAffineFunction, v2:
     MOIU.operate!(+, T, scalar_fn(v1), v2)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, vaf_as_matrix::VectorAffineFunctionAsMatrix) where {T}
-    return VectorAffineFunctionAsMatrix(A * vaf_as_matrix.matrix, A * vaf_as_matrix.vector, vaf_as_matrix.variables)
+function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix, vafasmatrix::VectorAffineFunctionAsMatrix) where {T}
+    return VectorAffineFunctionAsMatrix(A * vafasmatrix.matrix, A*vafasmatrix.vector, vafasmatrix.variables)
 end
 
 
