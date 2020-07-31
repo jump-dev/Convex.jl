@@ -2,6 +2,10 @@ using SparseArrays
 using AbstractTrees: children
 export conic_form_problem_solve
 
+# This is a proof of concept implementation of a different internal structure for Convex.jl
+# Currently, just the minimal amount of methods are implemented to solve `testproblem/testproblem.jl`.
+# Probably any other problem will error!
+
 # Some design notes
 
 # `template` basically has the same function as `conic_form!`:
