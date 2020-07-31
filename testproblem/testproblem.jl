@@ -101,14 +101,14 @@ A = gen_data(m, n, k)
 Mt, Mv = gen_masks(A, holdout)
 
 Y_init = rand(k,n)
-@info "Running with classic Convex.jl setup..." (m,n,k)
+@info "Running with classic `Convex.solve!`..." (m,n,k)
 @time p1, X1, Y1 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     solve!(problem, () -> ECOS.Optimizer(verbose=false))
 end
 
-@info "Running with `Convex.conic_form_problem_solve`..." (m,n,k)
+@info "Running with `Convex.solve2!`..." (m,n,k)
 @time p2, X2, Y2 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
-    conic_form_problem_solve(problem, ECOS.Optimizer(verbose=false))
+    solve2!(problem, ECOS.Optimizer(verbose=false))
 end
 
 @info "Running with JuMP..." (m,n,k)

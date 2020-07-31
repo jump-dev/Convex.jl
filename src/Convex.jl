@@ -4,7 +4,7 @@ module Convex
 using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
-using AbstractTrees: AbstractTrees
+using AbstractTrees: AbstractTrees, children
 
 using MathOptInterface
 const MOI = MathOptInterface
@@ -36,7 +36,7 @@ export constraints, add_constraint!, set_value!, evaluate
 export Positive, Negative, ComplexSign, NoSign
 
 # Problems
-export add_constraints!, maximize, minimize, Problem, satisfy, solve!
+export add_constraints!, maximize, minimize, Problem, satisfy, solve!, solve2!
 
 
 # Module level globals
@@ -168,7 +168,8 @@ include("utilities/iteration.jl")
 include("utilities/broadcast.jl")
 include("problem_depot/problem_depot.jl")
 
-include("ConicFormProblem.jl")
+include("solve2!.jl")
+include("VectorAffineFunctionAsMatrix.jl")
 
 # Deprecated workaround for memory leak (https://github.com/jump-dev/Convex.jl/issues/83)
 function clearmemory()

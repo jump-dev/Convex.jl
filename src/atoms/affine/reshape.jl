@@ -34,6 +34,9 @@ function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
     return conic_form!(x.children[1], unique_conic_forms)
 end
 
+function template(A::ReshapeAtom, context)
+    return template(only(children(A)), context)
+end
 
 reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
 vec(x::AbstractExpr) = reshape(x, length(x), 1)

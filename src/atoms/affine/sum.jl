@@ -55,6 +55,12 @@ function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
+function template(A::SumAtom, context)
+    subobj = template(only(children(A)), context)
+    obj = MOIU.operate(sum, context.T, subobj)
+    return obj
+end
+
 # Dispatch to an internal helper function that handles the dimension argument in
 # the same manner as Base, with dims=: denoting a regular sum
 sum(x::AbstractExpr; dims=:) = _sum(x, dims)

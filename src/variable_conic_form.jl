@@ -26,3 +26,12 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms)
     end
     return get_conic_form(unique_conic_forms, x)
 end
+
+
+function template(a::AbstractVariable, context)
+    var_inds = get!(context.var_id_to_moi_indices, a.id_hash) do
+        return add_variables!(context.model, a::Variable)
+    end
+    context.id_to_variables[a.id_hash] = a
+    return MOI.VectorOfVariables(var_inds)
+end

@@ -48,6 +48,29 @@ function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
+
+function template(A::EucNormAtom, context)
+    obj = template(only(children(A)), context)
+
+    x = only(children(A))
+    d = length(x)
+
+    t_obj = template(Variable(), context)
+
+    t_single_var_obj = MOI.SingleVariable(only(t_obj.variables))
+
+    # we're going to convert early since we haven't defined `vcat`...
+    if obj isa VectorAffineFunctionAsMatrix
+        obj = to_vaf(obj)
+    end
+
+    f = MOIU.operate(vcat, context.T, t_single_var_obj, obj)
+    set = MOI.SecondOrderCone(d + 1)
+    MOI_add_constraint(context.model, f, set)
+
+    return t_obj
+end
+
 function norm2(x::AbstractExpr)
     if sign(x) == ComplexSign()
         return EucNormAtom([real(x);imag(x)])

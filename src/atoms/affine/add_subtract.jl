@@ -47,6 +47,12 @@ function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
+function template(A::NegateAtom, context)
+    subobj = template(only(children(A)), context)
+    obj = MOIU.operate(-, context.T, subobj)
+    return obj
+end
+
 
 ### Addition
 struct AdditionAtom <: AbstractExpr
@@ -112,6 +118,13 @@ function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
         cache_conic_form!(unique_conic_forms, x, objective)
     end
     return get_conic_form(unique_conic_forms, x)
+end
+
+function template(A::AdditionAtom, context)
+    subproblems = template.(children(A), Ref(context))
+    objectives = promote_size(subproblems)
+    obj = MOIU.operate(+, context.T, objectives...)
+    return obj
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)

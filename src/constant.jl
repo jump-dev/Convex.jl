@@ -81,3 +81,9 @@ function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
     end
     return get_conic_form(unique_conic_forms, x)
 end
+
+# could be optimized
+function template(C::Constant, context)
+    T = context.T
+    return T.(C.value)
+end

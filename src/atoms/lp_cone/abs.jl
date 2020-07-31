@@ -54,5 +54,16 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
+function template(A::AbsAtom, context)
+    x = only(A.children)
+    
+    t = Variable(size(x))
+    t_obj = template(t, context)
+
+    add_constraints_to_context(t >= x, context)
+    add_constraints_to_context(t >= -x, context)
+    return t_obj
+end
+
 abs(x::AbstractExpr) = AbsAtom(x)
 abs2(x::AbstractExpr) = square(abs(x))
