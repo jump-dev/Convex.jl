@@ -16,15 +16,6 @@ struct VAFTape{T <: Tuple}
     variables::Vector{MOI.VariableIndex}
 end
 
-# A simple type representing a vector of zeros. Maybe should include the size or use FillArrays or similar.
-struct Zero end
-
-Base.:(+)(a, ::Zero) = a
-Base.:(+)(::Zero, a) = a
-Base.:(-)(::Zero, a) = -a
-Base.:(-)(a, ::Zero) = a
-Base.:(-)(::Zero) = Zero()
-Base.:(*)(A, ::Zero) = Zero()
 
 function MOI.output_dimension(v::VAFTape)
     t = v.operations
@@ -56,13 +47,34 @@ function compile!(tape::VAFTape)# -> AffineOperation
     while !isempty(t)
         newop, t = popfirst(t)
         # op.vector += op.matrix * newop.vector
-        vec = try_mul!!(vec, op.matrix, newop.vector, 1, 1)
+        vec = try_mul!!(vec, mat, newop.vector, 1, 1)
 
         # mat = mat * newop.matrix
         mat = try_mul!!(mat, newop.matrix)
     end
     return AffineOperation(mat, vec)
 end
+
+# function compile!(tape::VAFTape)# -> AffineOperation
+#     t = tape.operations
+#     op, t = popfirst(t)
+#     # we will modify op in place
+#     mat = op.matrix
+#     vec = op.vector
+#     while !isempty(t)
+#         newop, t = popfirst(t)
+#         # op.vector += op.matrix * newop.vector
+#         # @show typeof.((vec, mat, newop.vector))
+#         # @show size.((vec, mat, newop.vector))
+#         vec = vec + mat * newop.vector
+#         # vec = try_mul!!(vec, mat, newop.vector, 1, 1)
+
+#         # mat = mat * newop.matrix
+#         # mat = try_mul!!(mat, newop.matrix)
+#         mat = mat * newop.matrix
+#     end
+#     return AffineOperation(mat, vec)
+# end
 
 """
     try_mul!!(A, B)
@@ -75,21 +87,39 @@ function try_mul!!(C, A, B, α, β)
     mul!(C, A, B, α, β)
 end
 
-function try_mul!!(C, A, ::Zero, α, β)
-    try_mul!!(C, β)
-end
 
 function try_mul!!(A, B)
     rmul!(A, B)
 end
 
-function try_mul!!(A::UniformScaling, B)
-    lmul!(A.λ, B)
+
+
+function try_mul!!(A::LazyArrays.ApplyArray, B)
+    A*B
 end
 
+function try_mul!!(A, B::LazyArrays.ApplyArray)
+    A*B
+end
+
+function try_mul!!(A::Diagonal, B::LazyArrays.ApplyArray)
+    A*B
+end
+
+function try_mul!!(A::FillArrays.RectDiagonal, B::LazyArrays.ApplyArray)
+    A*B
+end
+
+function try_mul!!(A::UniformScaling, B::LazyArrays.ApplyArray)
+    A*B
+end
 
 function try_mul!!(A::Diagonal, B)
     lmul!(A, B)
+end
+
+function try_mul!!(A::UniformScaling, B)
+    lmul!(A.λ, B)
 end
 
 function try_mul!!(A, B::UniformScaling)
@@ -98,6 +128,18 @@ end
 
 function try_mul!!(A::UniformScaling, B::UniformScaling)
     (A.λ * B.λ)*I
+end
+
+function try_mul!!(A::FillArrays.RectDiagonal, B)
+    A*B
+end
+
+function try_mul!!(A, B::FillArrays.RectDiagonal)
+    A*B
+end
+
+function try_mul!!(A::FillArrays.RectDiagonal, B::FillArrays.RectDiagonal)
+    A*B
 end
 
 function to_vaf(tape::VAFTape)
@@ -161,28 +203,37 @@ add_operation(op::AffineOperation, tape::VAFTape) = VAFTape((op, tape.operations
 
 function MOIU.operate(::typeof(-), ::Type{T},
     tape::VAFTape) where {T}
-    return add_operation(AffineOperation(-I, Zero()), tape)
+    d = MOI.output_dimension(tape)
+    return add_operation(AffineOperation(-Eye(d), Zeros(d)), tape)
 end
 
 
 function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
                       tape::VAFTape) where {T}
-    return add_operation(AffineOperation(I, v), tape)
+    n = length(v)
+    m = MOI.output_dimension(tape)
+    return add_operation(AffineOperation(Eye(n, m), v), tape)
 end
 function MOIU.operate(::typeof(-), ::Type{T}, tape::VAFTape,
     v::AbstractVector) where {T}
-    return add_operation(AffineOperation(I, -v), tape)
+    n = length(v)
+    m = MOI.output_dimension(tape)
+    return add_operation(AffineOperation(Eye(n, m), -v), tape)
 end
 
 function MOIU.operate(::typeof(-), ::Type{T},
                       v::AbstractVector, tape::VAFTape) where {T}
-    return add_operation(AffineOperation(-I, v), tape)
+    n = length(v)
+    m = MOI.output_dimension(tape)
+    @assert n == m
+    return add_operation(AffineOperation(-Eye(n), v), tape)
 end
 
 function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
                       v::MOI.VectorOfVariables) where {T}
     @assert size(A, 2) == length(v.variables)
-    return VAFTape(tuple(AffineOperation(A, Zero())), v.variables)
+    n = size(A, 1)
+    return VAFTape(tuple(AffineOperation(A, Zeros(n))), v.variables)
 end
 
 function MOIU.operate(::typeof(+), ::Type{T}, v1::MOI.VectorOfVariables,
@@ -202,7 +253,9 @@ end
 
 function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
                       tape::VAFTape) where {T}
-    return add_operation(AffineOperation(A, Zero()), tape)
+
+    n = size(A, 1)
+    return add_operation(AffineOperation(A, Zeros(n)), tape)
 end
 
 # Other `MOIU.operate` methods

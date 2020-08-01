@@ -92,34 +92,34 @@ end
 const γ1 = 1.0
 const γ2 = 1.0
 const ϵ = 0.0001
-MAX_ITERS = 2
+MAX_ITERS = 1
 
-m, n, k = 150, 150, 5
+m, n, k = 50, 50, 5
 holdout = 0.80
 
 A = gen_data(m, n, k)
 Mt, Mv = gen_masks(A, holdout)
 
 Y_init = rand(k,n)
-@info "Running with classic `Convex.solve!`..." (m,n,k)
-@time p1, X1, Y1 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
-    solve!(problem, () -> ECOS.Optimizer(verbose=false))
-end
+# @info "Running with classic `Convex.solve!`..." (MAX_ITERS, m,n,k)
+# @time p1, X1, Y1 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
+    # solve!(problem, () -> ECOS.Optimizer(verbose=false))
+# end
 
-@info "Running with `Convex.solve2!`..." (m,n,k)
+@info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k)
 @time p2, X2, Y2 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     solve2!(problem, ECOS.Optimizer(verbose=false))
 end
 
-@info "Running with JuMP..." (m,n,k)
+@info "Running with JuMP..." (MAX_ITERS,m,n,k)
 @time model, X3, Y3 = alternating_minimization_JuMP(A, Mt, Y_init, k, MAX_ITERS);
 
 @testset "Same results" begin
-    @test evaluate(X1) ≈ evaluate(X2) atol=1e-2 rtol=1e-2
-    @test evaluate(Y1) ≈ evaluate(Y2) atol=1e-2 rtol=1e-2
+    # @test evaluate(X1) ≈ evaluate(X2) atol=1e-2 rtol=1e-2
+    # @test evaluate(Y1) ≈ evaluate(Y2) atol=1e-2 rtol=1e-2
 
-    @test evaluate(X1) ≈ X3 atol=1e-2 rtol=1e-2
-    @test evaluate(Y1) ≈ Y3 atol=1e-2 rtol=1e-2
+    # @test evaluate(X1) ≈ X3 atol=1e-2 rtol=1e-2
+    # @test evaluate(Y1) ≈ Y3 atol=1e-2 rtol=1e-2
 
     @test evaluate(X2) ≈ X3 atol=1e-2 rtol=1e-2
     @test evaluate(Y2) ≈ Y3 atol=1e-2 rtol=1e-2

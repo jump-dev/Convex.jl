@@ -5,6 +5,7 @@ using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
 using AbstractTrees: AbstractTrees, children
+using LazyArrays, FillArrays
 
 using MathOptInterface
 const MOI = MathOptInterface

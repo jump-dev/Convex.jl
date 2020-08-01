@@ -92,7 +92,6 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-
 function template(x::MultiplyAtom, context)
     subproblems = template.(children(x), Ref(context))
 
@@ -105,11 +104,11 @@ function template(x::MultiplyAtom, context)
     if size(children(x)[1], 2) > 1 && size(children(x)[2], 2) > 1
         A, B = children(x)
         if vexity(A) == ConstVexity()
-            left_mult_by_A = kron(sparse(1.0I, x.size[2], x.size[2]), evaluate(A))
+            left_mult_by_A = Kron(Eye(x.size[2]), evaluate(A))
             obj = MOIU.operate(*, context.T, left_mult_by_A, subproblems[2])
         elseif vexity(B) == ConstVexity()
-            right_mult_by_B = kron(transpose(evaluate(B)),
-                                   sparse(1.0I, x.size[1], x.size[1]))
+            right_mult_by_B = Kron(transpose(evaluate(B)),
+                                   Eye(x.size[1]))
             obj = MOIU.operate(*, context.T, right_mult_by_B, subproblems[1])
         else
             error("Not implemented yet")
