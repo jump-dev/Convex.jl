@@ -30,7 +30,7 @@ scalar_fn(v::MOI.AbstractScalarFunction) = v
 
 function solve2!(problem::Problem{T}, optimizer; kwargs...) where {T}
     if Base.applicable(optimizer)
-        return solve!(problem, optimizer(); kwargs...)
+        return solve2!(problem, optimizer(); kwargs...)
     else
         throw(ArgumentError("MathProgBase solvers like `solve!(problem, SCSSolver())` are no longer supported. Use instead e.g. `solve!(problem, SCS.Optimizer)`."))
     end

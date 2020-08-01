@@ -1,20 +1,42 @@
-# This is a variant of MOI.VectorAffineFunction which represents
-# the transformation `matrix * variables + vector` lazily.
-struct VectorAffineFunctionAsMatrix{M,B,V}
-    matrix::M
-    vector::B
-    variables::V
-end
-
 struct AffineOperation{M, V}
     matrix::M
     vector::V
 end
 
+function Base.isequal(A::AffineOperation, B::AffineOperation)
+    isequal(A.vector, B.vector) && isequal(A.matrix, B.matrix)
+end
+
+function Base.hash(a::AffineOperation{M, V}, h::UInt) where {M, V}
+    hash(a.matrix, hash(a.vector, hash(:AffineOperation, h)))
+end
+
+
+# This is a variant of MOI.VectorAffineFunction which represents
+# the transformation `matrix * variables + vector` lazily.
+struct VectorAffineFunctionAsMatrix{M,B,V}
+    aff::AffineOperation{M, B}
+    variables::V
+end
+
+function Base.isequal(A::VectorAffineFunctionAsMatrix, B::VectorAffineFunctionAsMatrix)
+    isequal(A.variables, B.variables) && isequal(A.aff, B.aff)
+end
+
+
 struct VAFTape{T <: Tuple}
     operations::T
     variables::Vector{MOI.VariableIndex}
 end
+
+function Base.isequal(a::VAFTape, b::VAFTape)
+    isequal(a.variables, b.variables) && isequal(a.operations, b.operations)
+end
+
+function Base.hash(a::VAFTape{T}, h::UInt) where {T}
+    hash(a.operations, hash(a.variables, hash(:VAFTape, h)))
+end
+
 
 # A simple type representing a vector of zeros. Maybe should include the size or use FillArrays or similar.
 struct Zero end
@@ -45,7 +67,8 @@ function popfirst(t::Tuple)
     return first(t), Base.tail(t)
 end
 
-function LinearAlgebra.lmul!(a::Number, D::Diagonal)
+# This should get upstreamed, or if it already is, version-gated
+function LinearAlgebra.lmul!(a::Number, D::LinearAlgebra.Diagonal)
     lmul!(a, D.diag)
     return D
 end
@@ -107,14 +130,14 @@ end
 
 function to_vaf(tape::VAFTape)
     op = compile!(tape)
-    to_vaf(VectorAffineFunctionAsMatrix(op.matrix, op.vector, tape.variables))
+    to_vaf(VectorAffineFunctionAsMatrix(op, tape.variables))
 end
 
 
 # convert to a usual VAF
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC})
     T = eltype(vaf_as_matrix.matrix)
-    I, J, V = findnz(vaf_as_matrix.matrix)
+    I, J, V = findnz(vaf_as_matrix.aff.matrix)
     vats = MOI.VectorAffineTerm{T}[]
     for n in eachindex(I, J, V)
         i = I[n]
@@ -126,13 +149,13 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC})
                                                               vaf_as_matrix.variables[j])))
     end
 
-    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.vector)
+    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
 end
 
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
     T = eltype(vaf_as_matrix.matrix)
     vats = MOI.VectorAffineTerm{T}[]
-    M = vaf_as_matrix.matrix
+    M = vaf_as_matrix.aff.matrix
     for i in 1:size(M, 1)
         for j in 1:size(M, 2)
             iszero(M[i, j]) && continue
@@ -142,7 +165,7 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
                                                                   vaf_as_matrix.variables[j])))
         end
     end
-    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.vector)
+    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
 end
 
 # method for adding constraints and coverting to standard VAFs as needed
@@ -155,10 +178,9 @@ end
 function MOI_add_constraint(model, f::VAFTape, set)
     return MOI.add_constraint(model, to_vaf(f), set)
 end
+
 # # `MOIU.operate` methods for `VAFTape`
-# function MOIU.operate(f::F, ::Type{T}, tape::VAFTape, args) where {F, T}
-#     return VAFTape((VAFOperation(f, T, args), tape.operations...), tape.vafasmatrix)
-# end
+
 
 add_operation(op::AffineOperation, tape::VAFTape) = VAFTape((op, tape.operations...), tape.variables)
 

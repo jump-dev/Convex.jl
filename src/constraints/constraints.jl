@@ -102,6 +102,17 @@ function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, c)
 end
 
+function add_constraints_to_context(lt::LtConstraint, context)
+    lhs = template(lt.lhs, context)
+    rhs = template(lt.rhs, context)
+    T = context.T
+    objectives = promote_size((lhs, rhs))
+    f = MOIU.operate(-, T, objectives...)
+    MOI_add_constraint(context.model, f, MOI.Nonpositives(MOI.output_dimension(f)))
+    return nothing
+end
+
+
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
 <=(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
 <=(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
