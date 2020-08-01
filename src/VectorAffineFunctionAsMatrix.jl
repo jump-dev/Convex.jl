@@ -45,6 +45,11 @@ function popfirst(t::Tuple)
     return first(t), Base.tail(t)
 end
 
+function LinearAlgebra.lmul!(a::Number, D::Diagonal)
+    lmul!(a, D.diag)
+    return D
+end
+
 # the order here is chosen deliberately: generally, the final output is 1-dimensional,
 # so we multiply from left to right.
 function compile!(tape::VAFTape)# -> AffineOperation
@@ -107,7 +112,7 @@ end
 
 
 # convert to a usual VAF
-function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC}, context)
+function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC})
     T = eltype(vaf_as_matrix.matrix)
     I, J, V = findnz(vaf_as_matrix.matrix)
     vats = MOI.VectorAffineTerm{T}[]
@@ -130,8 +135,6 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
     M = vaf_as_matrix.matrix
     for i in 1:size(M, 1)
         for j in 1:size(M, 2)
-            # this check turns out to be key for performance on the test problem
-            # which means I suspect something is being densely represented when possibly it should be sparse
             iszero(M[i, j]) && continue
             push!(vats,
                   MOI.VectorAffineTerm{T}(i,
