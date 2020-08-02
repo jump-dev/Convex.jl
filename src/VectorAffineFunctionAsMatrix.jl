@@ -1,20 +1,3 @@
-# This is a variant of MOI.VectorAffineFunction which represents
-# the transformation `matrix * variables + vector` lazily.
-struct VectorAffineFunctionAsMatrix{M,B,V}
-    aff::AffineOperation{M, B}
-    variables::V
-end
-
-function Base.isequal(A::VectorAffineFunctionAsMatrix, B::VectorAffineFunctionAsMatrix)
-    isequal(A.variables, B.variables) && isequal(A.aff, B.aff)
-end
-
-include("SparseVAFTape.jl")
-include("VAFTape.jl")
-
-const VAFTapes = Union{VAFTape, SparseVAFTape}
-
-
 # A simple type representing a vector of zeros. Maybe should include the size or use FillArrays or similar.
 struct Zero
     len::Int
@@ -29,6 +12,23 @@ Base.:(*)(A, z::Zero) = Zero(size(A, 1))
 Base.size(z::Zero) = (z.len,)
 Base.length(z::Zero) = z.len
 SparseArrays.sparse(z::Zero) = spzeros(z.len)
+
+include("VAFTape.jl")
+include("SparseVAFTape.jl")
+const VAFTapes = Union{VAFTape, SparseVAFTape}
+
+# This is a variant of MOI.VectorAffineFunction which represents
+# the transformation `matrix * variables + vector` lazily.
+struct VectorAffineFunctionAsMatrix{M,B,V}
+    aff::AffineOperation{M, B}
+    variables::V
+end
+
+function Base.isequal(A::VectorAffineFunctionAsMatrix, B::VectorAffineFunctionAsMatrix)
+    isequal(A.variables, B.variables) && isequal(A.aff, B.aff)
+end
+
+
 
 
 function MOI.output_dimension(v::VectorAffineFunctionAsMatrix)
