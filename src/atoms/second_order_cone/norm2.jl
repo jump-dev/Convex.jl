@@ -60,7 +60,7 @@ function template(A::EucNormAtom, context)
     t_single_var_obj = MOI.SingleVariable(only(t_obj.variables))
 
     # we're going to convert early since we haven't defined `vcat`...
-    if obj isa VectorAffineFunctionAsMatrix || obj isa VAFTape
+    if obj isa VectorAffineFunctionAsMatrix || obj isa VAFTape || obj isa SparseVAFTape
         obj = to_vaf(obj)
     end
 

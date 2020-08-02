@@ -21,7 +21,7 @@ end
 function promote_size(values)
     d = only(unique(MOI.output_dimension(v)
                 for v in values
-                if v isa MOI.AbstractFunction || v isa VectorAffineFunctionAsMatrix || v isa VAFTape))
+                if v isa MOI.AbstractFunction || v isa VectorAffineFunctionAsMatrix || v isa VAFTape || v isa SparseVAFTape))
     return (v isa Number ? fill(v, d) : v for v in values)
 end
 

@@ -6,6 +6,46 @@ struct AffineOperation{M, V}
     vector::V
 end
 
+struct SparseAffineOperation{T <: AbstractSparseMatrix}
+    matrix::T
+end
+
+using SuiteSparse
+USE_CHOLMOD() = false
+
+
+SparseAffineOperation(A,b::AbstractSparseVector) = SparseAffineOperation(sparse(A), b)
+SparseAffineOperation(A::AbstractSparseMatrix,b) = SparseAffineOperation(A, sparse(b))
+SparseAffineOperation(A, b) = SparseAffineOperation(sparse(A), sparse(b))
+
+function SparseAffineOperation(A::Union{SparseMatrixCSC, SuiteSparse.CHOLMOD.Sparse}, b::Union{SparseVector, SuiteSparse.CHOLMOD.Sparse})
+    T = eltype(A)
+    # construct a sparse matrix representation of `Ax+b`
+    # via `[A b; 0 1] * [x; 1] == [Ax+b; 1]`.
+    n, m = size(A)
+    A = sparse(A)
+    mat = [A b; transpose(spzeros(T, m)) one(T)]
+    if USE_CHOLMOD()
+        mat = SuiteSparse.CHOLMOD.Sparse(mat)
+    end
+    SparseAffineOperation(mat)
+end
+
+struct SparseVAFTape{T}
+    operations::Vector{SparseAffineOperation{T}}
+    variables::Vector{MOI.VariableIndex}
+end
+
+_unwrap(a::SparseAffineOperation) = a.matrix
+_unwrap(a::AbstractSparseArray) = a
+
+function AffineOperation!(sparse_tape::SparseVAFTape)
+    mat = foldl((a,b) -> _unwrap(a) * _unwrap(b), sparse_tape.operations)
+    b = mat[1:end-1, end]
+    A = mat[1:end-1, 1:end-1]
+    AffineOperation(A, b)
+end
+
 
 function Base.isequal(A::AffineOperation, B::AffineOperation)
     isequal(A.vector, B.vector) && isequal(A.matrix, B.matrix)
@@ -42,6 +82,9 @@ struct VAFTape{T <: Tuple}
     end
 end
 
+const VAFTapes = Union{VAFTape, SparseVAFTape}
+
+
 function Base.isequal(a::VAFTape, b::VAFTape)
     isequal(a.variables, b.variables) && isequal(a.operations, b.operations)
 end
@@ -64,6 +107,7 @@ Base.:(-)(z::Zero) = z
 Base.:(*)(A, z::Zero) = Zero(size(A, 1))
 Base.size(z::Zero) = (z.len,)
 Base.length(z::Zero) = z.len
+SparseArrays.sparse(z::Zero) = spzeros(z.len)
 
 function MOI.output_dimension(v::VAFTape)
     t = v.operations
@@ -75,6 +119,8 @@ function MOI.output_dimension(v::VAFTape)
     end
     return length(v.variables)
 end
+
+MOI.output_dimension(v::SparseVAFTape) = size(v.operations[1].matrix, 1) - 1
 
 function MOI.output_dimension(v::VectorAffineFunctionAsMatrix)
     return size(v.matrix, 1)
@@ -179,14 +225,14 @@ function try_mul!!(A::UniformScaling, B::UniformScaling)
     (A.λ * B.λ)*I
 end
 
-function to_vaf(tape::VAFTape)
+function to_vaf(tape::VAFTapes)
     op = AffineOperation!(tape)
     to_vaf(VectorAffineFunctionAsMatrix(op, tape.variables))
 end
 
 
 # convert to a usual VAF
-function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:SparseMatrixCSC})
+function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractSparseArray})
     T = eltype(vaf_as_matrix.aff.matrix)
     I, J, V = findnz(vaf_as_matrix.aff.matrix)
     vats = MOI.VectorAffineTerm{T}[]
@@ -226,7 +272,7 @@ function MOI_add_constraint(model, f::VectorAffineFunctionAsMatrix, set)
     return MOI.add_constraint(model, to_vaf(f), set)
 end
 
-function MOI_add_constraint(model, f::VAFTape, set)
+function MOI_add_constraint(model, f::VAFTapes, set)
     return MOI.add_constraint(model, to_vaf(f), set)
 end
 
@@ -241,25 +287,75 @@ function MOIU.operate(::typeof(-), ::Type{T},
     return add_operation(AffineOperation(-I, Zero(d)), tape)
 end
 
-
 function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
-                      tape::VAFTape) where {T}
+                            tape::VAFTape) where {T}
     return add_operation(AffineOperation(I, v), tape)
 end
+
 function MOIU.operate(::typeof(-), ::Type{T}, tape::VAFTape,
     v::AbstractVector) where {T}
     return add_operation(AffineOperation(I, -v), tape)
 end
 
 function MOIU.operate(::typeof(-), ::Type{T},
-                      v::AbstractVector, tape::VAFTape) where {T}
+                    v::AbstractVector, tape::VAFTape) where {T}
     return add_operation(AffineOperation(-I, v), tape)
 end
 
 function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
+    tape::VAFTape) where {T}
+    return add_operation(AffineOperation(A, Zero(size(A,1))), tape)
+end
+
+#### SparseVAFTape
+
+function add_operation!(tape::SparseVAFTape, op::SparseAffineOperation)
+    pushfirst!(tape.operations, op)
+    tape
+end
+
+# these aren't right, since they're mutating...
+function MOIU.operate(::typeof(-), ::Type{T},
+    tape::SparseVAFTape) where {T}
+    d = MOI.output_dimension(tape)
+    return add_operation!(tape, SparseAffineOperation(-sparse(1.0I, d, d), Zero(d)))
+end
+
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
+                            tape::SparseVAFTape) where {T}
+    d = length(v)
+    return add_operation!(tape, SparseAffineOperation(sparse(1.0I, d, d), v))
+end
+
+function MOIU.operate(::typeof(-), ::Type{T}, tape::SparseVAFTape,
+    v::AbstractVector) where {T}
+    d = length(v)
+    return add_operation!(tape, SparseAffineOperation(sparse(1.0I, d, d), -v))
+end
+
+function MOIU.operate(::typeof(-), ::Type{T},
+                    v::AbstractVector, tape::SparseVAFTape) where {T}
+    d = length(v)
+    return add_operation!(tape, SparseAffineOperation(sparse(-1.0I, d, d), v))
+end
+
+function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
+    tape::SparseVAFTape) where {T}
+    return add_operation!(tape, SparseAffineOperation(A, Zero(size(A,1))))
+end
+####
+
+USE_SPARSE() = true
+
+function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
                       v::MOI.VectorOfVariables) where {T}
     @assert size(A, 2) == length(v.variables)
-    return VAFTape(tuple(AffineOperation(A, Zero(size(A,1)))), v.variables)
+    if USE_SPARSE()
+        return SparseVAFTape([SparseAffineOperation(A, Zero(size(A,1)))], v.variables)
+
+    else
+        return VAFTape(tuple(AffineOperation(A, Zero(size(A,1)))), v.variables)
+    end
 end
 
 function MOIU.operate(::typeof(+), ::Type{T}, v1::MOI.VectorOfVariables,
@@ -277,10 +373,7 @@ function MOIU.operate!(::typeof(+), ::Type{T}, v1::MOI.VectorAffineFunction,
     return MOIU.operate!(+, T, scalar_fn(v1), v2)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
-                      tape::VAFTape) where {T}
-    return add_operation(AffineOperation(A, Zero(size(A,1))), tape)
-end
+
 
 # Other `MOIU.operate` methods
 

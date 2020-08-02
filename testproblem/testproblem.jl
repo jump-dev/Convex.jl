@@ -106,24 +106,26 @@ Y_init = rand(k,n)
 #     solve!(problem, () -> ECOS.Optimizer(verbose=false))
 # end
 
-Convex.USE_CHAIN() = true
+Convex.USE_SPARSE() = true
+
+Convex.USE_CHOLMOD() = true
 # recompile
 alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     solve2!(problem, ECOS.Optimizer(verbose=false))
 end
 
-@info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k, Convex.USE_CHAIN())
+@info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k, Convex.USE_CHOLMOD())
 @time p2c, X2c, Y2c = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     solve2!(problem, ECOS.Optimizer(verbose=false))
 end
 
-Convex.USE_CHAIN() = false
+Convex.USE_CHOLMOD() = false
 # recompile
 alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     solve2!(problem, ECOS.Optimizer(verbose=false))
 end
 
-@info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k, Convex.USE_CHAIN())
+@info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k, Convex.USE_CHOLMOD())
 @time p2, X2, Y2 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     solve2!(problem, ECOS.Optimizer(verbose=false))
 end
