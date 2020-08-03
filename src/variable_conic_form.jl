@@ -28,7 +28,7 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms)
 end
 
 
-function template(a::AbstractVariable, context)
+function template(a::AbstractVariable, context::Context)
     var_inds = get!(context.var_id_to_moi_indices, a.id_hash) do
         return add_variables!(context.model, a::Variable)
     end

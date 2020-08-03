@@ -55,9 +55,9 @@ function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-function template(A::SumAtom, context)
+function template(A::SumAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
-    obj = MOIU.operate(sum, context.T, subobj)
+    obj = MOIU.operate(sum, T, subobj)
     return obj
 end
 

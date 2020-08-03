@@ -54,7 +54,7 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-function template(A::AbsAtom, context)
+function template(A::AbsAtom, context::Context)
     x = only(A.children)
     
     t = Variable(size(x))

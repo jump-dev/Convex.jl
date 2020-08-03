@@ -83,7 +83,9 @@ function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
 end
 
 # could be optimized
-function template(C::Constant, context)
-    T = context.T
-    return T.(C.value)
+function template(C::Constant, ::Context{T}) where T
+    if eltype(C.value) != T
+        C = Constant( T.(C.value) )
+    end
+    return C.value
 end

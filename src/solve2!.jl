@@ -1,12 +1,3 @@
-function create_context(::Problem{T}, optimizer) where {T}
-    model = MOIB.full_bridge_optimizer(MOIU.CachingOptimizer(MOIU.UniversalFallback(MOIU.Model{T}()),
-                                                             optimizer), T)
-
-    return (var_id_to_moi_indices=OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
-            model=model, T=T, id_to_variables=OrderedDict{UInt64,AbstractVariable}())
-end
-
-
 function add_variables!(model, var::AbstractVariable)
     var.id_hash == objectid(:constant) && error("Internal error: constant used as variable")
     return if sign(var) == ComplexSign()
@@ -36,8 +27,8 @@ function solve2!(problem::Problem{T}, optimizer; kwargs...) where {T}
     end
 end
 
-function solve2!(p::Problem, optimizer::MOI.ModelLike)
-    context = create_context(p, optimizer)
+function solve2!(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
+    context = Context{T}(optimizer)
     cfp = template(p, context)
 
     obj = scalar_fn(cfp)

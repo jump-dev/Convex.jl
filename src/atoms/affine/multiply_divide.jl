@@ -53,71 +53,42 @@ function evaluate(x::MultiplyAtom)
     return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        # scalar multiplication
-        if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
-            if vexity(x.children[1]) == ConstVexity()
-                const_child = x.children[1]
-                expr_child = x.children[2]
-            elseif vexity(x.children[2]) == ConstVexity()
-                const_child = x.children[2]
-                expr_child = x.children[1]
-            else
-                error("multiplication of two non-constant expressions is not DCP compliant")
-            end
-            objective = conic_form!(expr_child, unique_conic_forms)
-
-            # make sure all 1x1 sized objects are interpreted as scalars, since
-            # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
-            if const_child.size == (1, 1)
-                const_multiplier = evaluate(const_child)[1]
-            else
-                const_multiplier = reshape(evaluate(const_child), length(const_child), 1)
-            end
-
-            objective = const_multiplier * objective
-
-        # left matrix multiplication
-        elseif vexity(x.children[1]) == ConstVexity()
-            objective = conic_form!(x.children[2], unique_conic_forms)
-            objective = kron(sparse(1.0I, x.size[2], x.size[2]), evaluate(x.children[1])) * objective
-        # right matrix multiplication
+function template(x::MultiplyAtom, context::Context{T}) where T
+    # scalar multiplication
+    if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
+        if vexity(x.children[1]) == ConstVexity()
+            const_child = x.children[1]
+            expr_child = x.children[2]
+        elseif vexity(x.children[2]) == ConstVexity()
+            const_child = x.children[2]
+            expr_child = x.children[1]
         else
-            objective = conic_form!(x.children[1], unique_conic_forms)
-            objective = kron(transpose(evaluate(x.children[2])), sparse(1.0I, x.size[1], x.size[1])) * objective
+            error("multiplication of two non-constant expressions is not DCP compliant")
         end
-        cache_conic_form!(unique_conic_forms, x, objective)
+        objective = template(expr_child, context)
+
+        # make sure all 1x1 sized objects are interpreted as scalars, since
+        # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
+        if const_child.size == (1, 1)
+            const_multiplier = evaluate(const_child)[1]
+        else
+            const_multiplier = reshape(evaluate(const_child), length(const_child), 1)
+        end
+
+        return  MOIU.operate(*, T, const_multiplier, objective)
+
+    # left matrix multiplication
+    elseif vexity(x.children[1]) == ConstVexity()
+        objective = template(x.children[2], context)
+        return  MOIU.operate(*, T, kron(sparse(one(T)*I, x.size[2], x.size[2]), evaluate(x.children[1])), objective)
+
+    # right matrix multiplication
+    else
+        objective = template(x.children[1], context)
+        return MOIU.operate(*, T, kron(transpose(evaluate(x.children[2])), sparse(one(T)*I, x.size[1], x.size[1])), objective)
     end
-    return get_conic_form(unique_conic_forms, x)
 end
 
-
-function template(x::MultiplyAtom, context)
-    subproblems = template.(children(x), Ref(context))
-
-    @assert length(children(x)) == length(subproblems) == 2
-
-    if children(x)[1].size == (1, 1) || children(x)[2].size == (1, 1)
-        obj = MOIU.operate(*, context.T, subproblems...)
-    end
-
-    if size(children(x)[1], 2) > 1 && size(children(x)[2], 2) > 1
-        A, B = children(x)
-        if vexity(A) == ConstVexity()
-            left_mult_by_A = kron(sparse(1.0I, x.size[2], x.size[2]), evaluate(A))
-            obj = MOIU.operate(*, context.T, left_mult_by_A, subproblems[2])
-        elseif vexity(B) == ConstVexity()
-            right_mult_by_B = kron(transpose(evaluate(B)),
-                                   sparse(1.0I, x.size[1], x.size[1]))
-            obj = MOIU.operate(*, context.T, right_mult_by_B, subproblems[1])
-        else
-            error("Not implemented yet")
-        end
-    end
-
-    return obj
-end
 
 function *(x::AbstractExpr, y::AbstractExpr)
     if hash(x) == hash(y) && x.size == (1, 1)
@@ -171,39 +142,7 @@ function evaluate(x::DotMultiplyAtom)
     return evaluate(x.children[1]) .* evaluate(x.children[2])
 end
 
-function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        if vexity(x.children[1]) != ConstVexity()
-            if vexity(x.children[2]) != ConstVexity()
-                error("multiplication of two non-constant expressions is not DCP compliant")
-            else
-                # make sure first child is the one that's constant
-                x.children[1], x.children[2] = x.children[2], x.children[1]
-            end
-        end
-        # promote the size of the coefficient matrix, so eg
-        # 3 .* x
-        # works regardless of the size of x
-        coeff = evaluate(x.children[1]) .* ones(size(x.children[2]))
-        # promote the size of the variable
-        # we've previously ensured neither x nor y is 1x1
-        # and that the sizes are compatible,
-        # so if the sizes aren't equal the smaller one is size 1
-        var = x.children[2]
-        if size(var, 1) < size(coeff, 1)
-            var = ones(size(coeff, 1)) * var
-        elseif size(var, 2) < size(coeff, 2)
-            var = var * ones(1, size(coeff, 1))
-        end
-
-        const_multiplier = spdiagm(0 => vec(coeff))
-        objective = const_multiplier * conic_form!(var, unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
-end
-
-function template(x::DotMultiplyAtom, context)
+function template(x::DotMultiplyAtom, context::Context{T}) where T
     subproblems = template.(children(x), Ref(context))
 
     @assert length(children(x)) == length(subproblems) == 2
@@ -221,7 +160,7 @@ function template(x::DotMultiplyAtom, context)
     # promote the size of the coefficient matrix, so eg
     # 3 .* x
     # works regardless of the size of x
-    coeff = evaluate(x.children[1]) .* ones(size(x.children[2]))
+    coeff = evaluate(x.children[1]) .* ones(T, size(x.children[2]))
     # promote the size of the variable
     # we've previously ensured neither x nor y is 1x1
     # and that the sizes are compatible,
@@ -234,7 +173,7 @@ function template(x::DotMultiplyAtom, context)
     end
 
     const_multiplier = Diagonal(vec(coeff))
-    obj = MOIU.operate(*, context.T, const_multiplier, s2)
+    obj = MOIU.operate(*, T, const_multiplier, s2)
 
     return obj
 end

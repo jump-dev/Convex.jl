@@ -46,34 +46,33 @@ function evaluate(x::IndexAtom)
     end
 end
 
-function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        m = length(x)
-        n = length(x.children[1])
+function template(x::IndexAtom, context::Context{T}) where T
+    obj = template(only(children(x)), context)
 
-        if x.inds === nothing
-            sz = length(x.cols) * length(x.rows)
-            J = Array{Int}(undef, sz)
-            k = 1
+    m = length(x)
+    n = length(x.children[1])
 
-            num_rows = x.children[1].size[1]
-            for c in x.cols
-                for r in x.rows
-                    J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
-                    k += 1
-                end
+    if x.inds === nothing
+        sz = length(x.cols) * length(x.rows)
+        J = Array{Int}(undef, sz)
+        k = 1
+
+        num_rows = x.children[1].size[1]
+        for c in x.cols
+            for r in x.rows
+                J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
+                k += 1
             end
-
-            index_matrix = sparse(1:sz, J, 1.0, m, n)
-        else
-            index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
         end
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        objective = index_matrix * objective
-        cache_conic_form!(unique_conic_forms, x, objective)
+
+        index_matrix = sparse(1:sz, J, one(T), m, n)
+    else
+        index_matrix = sparse(1:length(x.inds), x.inds, one(T), m, n)
     end
-    return get_conic_form(unique_conic_forms, x)
+
+    return MOIU.operate(*, T, index_matrix, obj)
 end
+
 
 ## API Definition begins
 

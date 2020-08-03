@@ -85,7 +85,7 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
     return objective, objective_var.id_hash
 end
 
-function template(p::Problem, context)
+function template(p::Problem, context::Context)
     obj_problem = template(p.objective, context)
     for c in p.constraints
         add_constraints_to_context(c, context)

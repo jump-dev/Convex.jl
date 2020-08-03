@@ -47,9 +47,9 @@ function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-function template(A::NegateAtom, context)
+function template(A::NegateAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
-    obj = MOIU.operate(-, context.T, subobj)
+    obj = MOIU.operate(-, T, subobj)
     return obj
 end
 
@@ -105,25 +105,11 @@ function evaluate(x::AdditionAtom)
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
-function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = ConicObj()
-        for child in x.children
-            child_objective = conic_form!(child, unique_conic_forms)
-            if x.size != child.size
-                child_objective = promote_size(child_objective, length(x))
-            end
-            objective += child_objective
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
-end
 
-function template(A::AdditionAtom, context)
-    subproblems = template.(children(A), Ref(context))
+function template(x::AdditionAtom, context::Context{T}) where T
+    subproblems = template.(children(x), Ref(context))
     objectives = promote_size(subproblems)
-    obj = MOIU.operate(+, context.T, objectives...)
+    obj = MOIU.operate(+, T, objectives...)
     return obj
 end
 

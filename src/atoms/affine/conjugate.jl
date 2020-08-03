@@ -1,4 +1,3 @@
-import Base.conj
 struct ConjugateAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
@@ -41,5 +40,5 @@ function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms)
 end
 
 
-conj(x::AbstractExpr) = ConjugateAtom(x)
-conj(x::Constant) = Constant(conj(x.value))
+Base.conj(x::AbstractExpr) = ConjugateAtom(x)
+Base.conj(x::Constant) = Constant(conj(x.value))

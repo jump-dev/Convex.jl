@@ -54,16 +54,11 @@ function diagm((d, x)::Pair{<:Integer, <:AbstractExpr})
 end
 Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 
-function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        sz = x.size[1]
+function template(x::DiagMatrixAtom, context::Context{T}) where T
+    obj = template(only(children(x)), context)
 
-        I = 1:sz+1:sz*sz
-        J = 1:sz
-        coeff = sparse(I, J, 1.0, sz * sz, sz)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = coeff * objective
-        cache_conic_form!(unique_conic_forms, x, new_obj)
-    end
-    return get_conic_form(unique_conic_forms, x)
+    sz = x.size[1]
+    coeff = sparse(1:sz+1:sz*sz, 1:sz, one(T), sz * sz, sz)
+
+    return MOIU.operate(*, T, coeff, obj)
 end

@@ -136,9 +136,8 @@ function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
     return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
 end
 
-function MOIU.operate(::typeof(sum), ::Type{T}, tape::MOI.VAFTape) where {T}
+function MOIU.operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T}
     d = MOI.output_dimension(tape)
-    # doesn't seem ideal for a sparse representation...
     A = ones(T, 1, d) 
     return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
 end

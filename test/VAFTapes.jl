@@ -9,6 +9,8 @@ using SparseArrays, LinearAlgebra
     input = rand(T, d_in)
     A = sprand(T, d_in, d_in, .1)
     b = sprand(T, d_in, .8)
+    A_init = copy(A)
+    b_init = copy(b)
     op = Convex.SparseAffineOperation(A,b)
     tape = Convex.SparseVAFTape([op], variables)
     collapsed_tape = Convex.AffineOperation!(tape)
@@ -24,6 +26,8 @@ using SparseArrays, LinearAlgebra
     collapsed_tape3 = Convex.AffineOperation!(tape)
     @test collapsed_tape3.matrix * input + collapsed_tape3.vector ≈ [sum(A*input)]
     
+    @test A_init ≈ A
+    @test b_init ≈ b
 end
 
 @testset "VAFTape with type $T" for T in (Float64, Float32, BigFloat)
@@ -58,4 +62,27 @@ end
     
     @test A_init ≈ A
     @test b_init ≈ b
+end
+
+@testset "MOIU.operate with type $T" for T in (Float32, Float64, BigFloat) begin
+    d_in = 5
+
+    optimizer = SCS.Optimizer()
+    model = MOIB.full_bridge_optimizer(MOIU.CachingOptimizer(MOIU.UniversalFallback(MOIU.Model{T}()),
+        optimizer), T)
+    variables = MOI.add_variables(model, d_in)
+
+    A = rand(T, d_in, d_in)
+    b = rand(T, d_in)
+    A_init = copy(A)
+    b_init = copy(b)
+    tape = Convex.VAFTape(tuple(Convex.AffineOperation(A,b)), variables)
+    sparse_tape = Convex.SparseVAFTape([Convex.SparseAffineOperation(A,b)], variables)
+
+
+    B = rand(T, d_in, d_in)
+    # MOIU.operate(+, T, B, tape)
+
+    # MOIU.operate(+, T, B, tape)
+
 end

@@ -6,7 +6,6 @@
 #############################################################################
 
 # k >= min(num_cols, num_rows) || k <= -min(num_rows, num_cols)
-import LinearAlgebra.diag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
@@ -53,43 +52,29 @@ function evaluate(x::DiagAtom)
 end
 
 ## API begins
-diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
+LinearAlgebra.diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
 ## API ends
 
-# Finds the "k"-th diagonal of x as a column vector
-# If k == 0, it returns the main diagonal and so on
-# Let x be of size m x n and d be the diagonal
-# Since x is vectorized, the way canonicalization works is:
-#
-# 1. We calculate the size of the diagonal (sz_diag) and the first index
-# of vectorized x that will be part of d
-# 2. We create the coefficient matrix for vectorized x, called coeff of size
-# sz_diag x mn
-# 3. We populate coeff with 1s at the correct indices
-# The canonical form will then be:
-# coeff * x - d = 0
-function conic_form!(x::DiagAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        (num_rows, num_cols) = x.children[1].size
-        k = x.k
+function template(x::DiagAtom, context::Context{T}) where T
+    (num_rows, num_cols) = x.children[1].size
+    k = x.k
 
-        if k >= 0
-            start_index = k * num_rows + 1
-            sz_diag = Base.min(num_rows, num_cols - k)
-        else
-            start_index = -k + 1
-            sz_diag = Base.min(num_rows + k, num_cols)
-        end
-
-        select_diag = spzeros(sz_diag, length(x.children[1]))
-        for i in 1:sz_diag
-            select_diag[i, start_index] = 1
-            start_index += num_rows + 1
-        end
-
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = select_diag * objective
-        cache_conic_form!(unique_conic_forms, x, new_obj)
+    if k >= 0
+        start_index = k * num_rows + 1
+        sz_diag = Base.min(num_rows, num_cols - k)
+    else
+        start_index = -k + 1
+        sz_diag = Base.min(num_rows + k, num_cols)
     end
-    return get_conic_form(unique_conic_forms, x)
+
+    select_diag = spzeros(T, sz_diag, length(x.children[1]))
+    for i in 1:sz_diag
+        select_diag[i, start_index] = 1
+        start_index += num_rows + 1
+    end
+
+    
+    child_obj = template(only(children(x)), context)
+    obj = MOIU.operate(*, T, select_diag, child_obj)
+    return obj
 end

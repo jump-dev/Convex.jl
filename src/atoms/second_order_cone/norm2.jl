@@ -49,7 +49,7 @@ function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
 end
 
 
-function template(A::EucNormAtom, context)
+function template(A::EucNormAtom, context::Context{T}) where T
     obj = template(only(children(A)), context)
 
     x = only(children(A))
@@ -60,11 +60,11 @@ function template(A::EucNormAtom, context)
     t_single_var_obj = MOI.SingleVariable(only(t_obj.variables))
 
     # we're going to convert early since we haven't defined `vcat`...
-    if obj isa VectorAffineFunctionAsMatrix || obj isa VAFTape || obj isa SparseVAFTape
+    if obj isa VectorAffineFunctionAsMatrix || obj isa VAFTapes
         obj = to_vaf(obj)
     end
 
-    f = MOIU.operate(vcat, context.T, t_single_var_obj, obj)
+    f = MOIU.operate(vcat, T, t_single_var_obj, obj)
     set = MOI.SecondOrderCone(d + 1)
     MOI_add_constraint(context.model, f, set)
 
