@@ -31,26 +31,12 @@ function vexity(c::EqConstraint)
     return vex
 end
 
-function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        if !(sign(c.lhs) == ComplexSign() || sign(c.rhs) == ComplexSign())
-
-            expr = c.lhs - c.rhs
-            objective = conic_form!(expr, unique_conic_forms)
-            new_constraint = ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        else
-            real_expr = real(c.lhs - c.rhs)
-            imag_expr = imag(c.lhs - c.rhs)
-            real_objective = conic_form!(real_expr, unique_conic_forms)
-            imag_objective = conic_form!(imag_expr, unique_conic_forms)
-            new_constraint = ConicConstr([real_objective, imag_objective], :Zero, [c.size[1] * c.size[2], c.size[1] * c.size[2]])
-            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        end
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
-    end
-    return get_conic_form(unique_conic_forms, c)
+function add_constraints_to_context(eq::EqConstraint, context::Context{T}) where T
+    f = template(eq.lhs - eq.rhs, context)
+    MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
+    return nothing
 end
+
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
 ==(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
@@ -91,22 +77,8 @@ function vexity(c::LtConstraint)
     return vex
 end
 
-function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        expr = c.rhs - c.lhs
-        objective = conic_form!(expr, unique_conic_forms)
-        new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
-    end
-    return get_conic_form(unique_conic_forms, c)
-end
-
 function add_constraints_to_context(lt::LtConstraint, context::Context{T}) where T
-    lhs = template(lt.lhs, context)
-    rhs = template(lt.rhs, context)
-    objectives = promote_size((lhs, rhs))
-    f = MOIU.operate(-, T, objectives...)
+    f = template(lt.lhs - lt.rhs, context)
     MOI_add_constraint(context.model, f, MOI.Nonpositives(MOI.output_dimension(f)))
     return nothing
 end
@@ -153,22 +125,8 @@ function vexity(c::GtConstraint)
     return vex
 end
 
-function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        expr = c.lhs - c.rhs
-        objective = conic_form!(expr, unique_conic_forms)
-        new_constraint = ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
-    end
-    return get_conic_form(unique_conic_forms, c)
-end
-
-function add_constraints_to_context(lt::GtConstraint, context::Context{T}) where T
-    lhs = template(lt.lhs, context)
-    rhs = template(lt.rhs, context)
-    objectives = promote_size((lhs, rhs))
-    f = MOIU.operate(-, T, objectives...)
+function add_constraints_to_context(gt::GtConstraint, context::Context{T}) where T
+    f = template(gt.lhs - gt.rhs, context)
     MOI_add_constraint(context.model, f, MOI.Nonnegatives(MOI.output_dimension(f)))
     return nothing
 end

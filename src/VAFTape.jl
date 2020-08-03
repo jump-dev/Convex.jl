@@ -116,10 +116,45 @@ function MOIU.operate(::typeof(-), ::Type{T},
     return add_operation(tape, AffineOperation(-one(T)*I, Zero(d)))
 end
 
+# We need to revisit these... need to be able to handle any number of vectors, any number of `VAFTape`s, in any order....
+###
 function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
                             tape::VAFTape) where {T}
     return add_operation(tape, AffineOperation(one(T)*I, v))
 end
+
+function MOIU.operate(::typeof(+), ::Type{T}, tape::VAFTape, vs::AbstractVector...) where {T}
+    v = sum(vs)
+    d = length(v)
+    return add_operation(tape, AffineOperation(one(T)*I, v))
+end
+
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape, vs::AbstractVector...) where {T}
+    return MOIU.operate(+, T, tape, v + sum(vs))
+end
+
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape) where {T}
+    return MOIU.operate(+, T, tape, v)
+end
+
+function MOIU.operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T}
+    ops = AffineOperation.(tapes)
+    if all(op -> op.matrix isa UniformScaling, ops)
+        # if they are all UniformScaling, we can't `hcat` since it doesn't know the size
+        # but we know the size, so we'll instantiate an `I(d)` and use that
+        d= length(ops[end].vector)
+        λ = ops[end].matrix.λ 
+        A = hcat( (op.matrix for op in ops[1:end-1])..., λ*I(d))
+    else
+        A = hcat( (op.matrix for op in ops)...)
+    end
+    b = +( (op.vector for op in ops)...)
+    x = vcat( (tape.variables for tape in tapes)...)
+    return VAFTape(tuple(AffineOperation(A, b)), x)
+end
+
+####
+
 
 function MOIU.operate(::typeof(-), ::Type{T}, tape::VAFTape,
     v::AbstractVector) where {T}
@@ -140,4 +175,23 @@ function MOIU.operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T}
     d = MOI.output_dimension(tape)
     A = ones(T, 1, d) 
     return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
+end
+
+function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::VAFTape,
+    tape2::VAFTape) where {T}
+    op1 = AffineOperation(tape1)
+    op2 = AffineOperation(tape2)
+    M1 = op1.matrix
+    M2 = op2.matrix
+    Z1 = zeros(T, size(M2, 1), size(M1, 2))
+    Z2 = zeros(T, size(M1, 1), size(M2, 2))
+    A = [M1 Z1; Z2 M2]
+    b = vcat(op1.vector, op2.vector)
+    x = vcat(tape1.variables, tape2.variables)
+    return VAFTape(tuple(AffineOperation(A, b)), x)
+end
+
+function MOIU.operate(::typeof(*), ::Type{T}, x::Number, tape::VAFTape) where {T}
+    d = MOI.output_dimension(tape)
+    return add_operation(tape, AffineOperation(T(x)*I, Zero(d)))
 end

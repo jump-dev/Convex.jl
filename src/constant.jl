@@ -84,8 +84,9 @@ end
 
 # could be optimized
 function template(C::Constant, ::Context{T}) where T
-    if eltype(C.value) != T
-        C = Constant( T.(C.value) )
-    end
-    return C.value
+    # this should happen at `Constant` creation
+    # if eltype(C.value) != T
+    #     C = Constant( T.(C.value) )
+    # end 
+    return vectorize(C.value)
 end

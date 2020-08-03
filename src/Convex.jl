@@ -87,6 +87,12 @@ Set via:
 const MAXDIGITS= Ref(3)
 
 
+# where do these go?
+# used so far only in `Constant`
+vectorize(v::AbstractVector) = v
+vectorize(v::Number) = [v]
+vectorize(v::AbstractMatrix) = vec(v)
+
 include("Context.jl")
 ### modeling framework
 include("dcp.jl")
@@ -104,6 +110,7 @@ include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
 include("solution.jl")
+include("VectorAffineFunctionAsMatrix.jl")
 include("solve2!.jl")
 
 ### affine atoms
@@ -171,7 +178,6 @@ include("utilities/iteration.jl")
 include("utilities/broadcast.jl")
 include("problem_depot/problem_depot.jl")
 
-include("VectorAffineFunctionAsMatrix.jl")
 
 # Deprecated workaround for memory leak (https://github.com/jump-dev/Convex.jl/issues/83)
 function clearmemory()

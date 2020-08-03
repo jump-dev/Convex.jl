@@ -5,13 +5,16 @@ struct Zero
 
 Base.:(+)(a, ::Zero) = a
 Base.:(+)(::Zero, a) = a
+Base.:(+)(z1::Zero, z2::Zero) = (@assert z1.len == z2.len; z1)
 Base.:(-)(::Zero, a) = -a
 Base.:(-)(a, ::Zero) = a
 Base.:(-)(z::Zero) = z
 Base.:(*)(A, z::Zero) = Zero(size(A, 1))
+Base.:(*)(::LinearAlgebra.UniformScaling, z::Zero) = z
 Base.size(z::Zero) = (z.len,)
 Base.length(z::Zero) = z.len
 SparseArrays.sparse(z::Zero) = spzeros(z.len)
+Base.convert(::Type{Vector{T}}, z::Zero) where {T} = zeros(T, z.len)
 
 include("VAFTape.jl")
 include("SparseVAFTape.jl")
@@ -73,6 +76,20 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
     return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
 end
 
+
+function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:UniformScaling})
+    T = eltype(vaf_as_matrix.aff.matrix)
+    vats = MOI.VectorAffineTerm{T}[]
+    x = I.λ
+    for i in 1:length(vaf_as_matrix.variables)
+        push!(vats,
+                MOI.VectorAffineTerm{T}(i,
+                                        MOI.ScalarAffineTerm{T}(x,
+                                                                vaf_as_matrix.variables[i])))
+    end
+    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
+end
+
 # method for adding constraints and coverting to standard VAFs as needed
 MOI_add_constraint(model, f, set) = MOI.add_constraint(model, f, set)
 
@@ -82,57 +99,4 @@ end
 
 function MOI_add_constraint(model, f::VAFTapes, set)
     return MOI.add_constraint(model, to_vaf(f), set)
-end
-
-
-USE_SPARSE() = true
-# This is the entry point into the `VAFTape`-land.
-# `USE_SPARSE` governs which path is taken.
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
-                      v::MOI.VectorOfVariables) where {T}
-    @assert size(A, 2) == length(v.variables)
-    if USE_SPARSE()
-        return SparseVAFTape([SparseAffineOperation(A, Zero(size(A,1)))], v.variables)
-
-    else
-        return VAFTape(tuple(AffineOperation(A, Zero(size(A,1)))), v.variables)
-    end
-end
-
-# I think this is right...
-function MOIU.operate(::typeof(+), ::Type{T}, A::AbstractMatrix,
-                      v::MOI.VectorOfVariables) where {T}
-    if USE_SPARSE()
-        return SparseVAFTape([SparseAffineOperation(I, vec(A))], v.variables)
-    else
-        return VAFTape(tuple(AffineOperation(I, vec(A))), v.variables)
-    end
-end
-
-
-# Other `MOIU.operate` methods
-
-function MOIU.operate(::typeof(+), ::Type{T}, v1::MOI.VectorOfVariables,
-    v2::MOI.ScalarAffineFunction) where {T}
-return MOIU.operate(+, T, scalar_fn(v1), v2)
-end
-
-function MOIU.operate(::typeof(+), ::Type{T}, v1::MOI.VectorAffineFunction,
-    v2::MOI.ScalarAffineFunction) where {T}
-return MOIU.operate(+, T, scalar_fn(v1), v2)
-end
-
-function MOIU.operate!(::typeof(+), ::Type{T}, v1::MOI.VectorAffineFunction,
-     v2::MOI.ScalarAffineFunction) where {T}
-return MOIU.operate!(+, T, scalar_fn(v1), v2)
-end
-
-function MOIU.operate(::typeof(sum), ::Type{T}, vaf::MOI.VectorAffineFunction) where {T}
-    return MOI.ScalarAffineFunction([vat.scalar_term for vat in vaf.terms],
-                                    sum(vaf.constants))
-end
-
-function MOIU.operate(::typeof(sum), ::Type{T}, v::MOI.VectorOfVariables) where {T}
-    return MOI.ScalarAffineFunction([MOI.ScalarAffineTerm{T}(one(T), vi)
-                                     for vi in v.variables], zero(T))
 end

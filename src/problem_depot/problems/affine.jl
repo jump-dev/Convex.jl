@@ -125,7 +125,7 @@ end
     end
 
     x = Variable(1)
-    p = minimize(x, [eye(2) + x >= eye(2)]; numeric_type = T)
+    p = minimize(x, [eye(2) + x*ones(2,2) >= eye(2)]; numeric_type = T)
 
     if test
         @test vexity(p) == AffineVexity()
@@ -133,7 +133,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol=atol rtol=rtol
-        @test evaluate(eye(2) + x) ≈ eye(2) atol=atol rtol=rtol
+        @test evaluate(eye(2) + x*ones(2,2)) ≈ eye(2) atol=atol rtol=rtol
     end
 
     y = Variable()

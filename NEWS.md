@@ -1,3 +1,9 @@
+# Changes in v0.14.0
+
+Breaking changes:
+
+* `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`. 
+
 # Changes in v0.13.4
 
 * You can now create your own variable types by subtyping `AbstractVariable`.

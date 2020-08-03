@@ -62,10 +62,19 @@ function MOIU.operate(::typeof(-), ::Type{T},
     return add_operation!(tape, SparseAffineOperation(sparse(-one(T)*I, d, d), Zero(d)))
 end
 
-function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
-                            tape::SparseVAFTape) where {T}
+function MOIU.operate(::typeof(+), ::Type{T}, tape::SparseVAFTape, vs::AbstractVector...) where {T}
+    v = sum(vs)
     d = length(v)
     return add_operation!(tape, SparseAffineOperation(sparse(one(T)*I, d, d), v))
+end
+
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::SparseVAFTape, vs::AbstractVector...) where {T}
+    return MOIU.operate(+, T, tape, v + sum(vs))
+end
+
+
+function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::SparseVAFTape) where {T}
+    return MOIU.operate(+, T, tape, v)
 end
 
 function MOIU.operate(::typeof(-), ::Type{T}, tape::SparseVAFTape,
@@ -90,4 +99,30 @@ function MOIU.operate(::typeof(sum), ::Type{T}, tape::SparseVAFTape) where {T}
     # doesn't seem ideal for a sparse representation...
     A = ones(T, 1, d) 
     return add_operation!(tape, SparseAffineOperation(A, Zero(size(A,1))))
+end
+
+
+function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::SparseVAFTape,
+    tape2::SparseVAFTape) where {T}
+
+    op1 = AffineOperation(tape1)
+    op2 = AffineOperation(tape2)
+
+    A = blockdiag(op1.matrix, op2.matrix)
+    b = vcat(op1.vector, op2.vector)
+    x = vcat(tape1.variables, tape2.variables)
+    return SparseVAFTape([SparseAffineOperation(A, b)], x)
+end
+
+function MOIU.operate(::typeof(+), ::Type{T}, tapes::SparseVAFTape...) where {T}
+    ops = AffineOperation.(tapes)
+    A = hcat( (op.matrix for op in ops)...)
+    b = +( (op.vector for op in ops)...)
+    x = vcat( (tape.variables for tape in tapes)...)
+    return SparseVAFTape([SparseAffineOperation(A, b)], x)
+end
+
+function MOIU.operate(::typeof(*), ::Type{T}, x::Number, tape::SparseVAFTape) where {T}
+    d = MOI.output_dimension(tape)
+    return add_operation!(tape, SparseAffineOperation(sparse(T(x)*I, d, d), Zero(d)))
 end

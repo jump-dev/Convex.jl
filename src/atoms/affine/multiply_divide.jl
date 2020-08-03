@@ -101,109 +101,60 @@ end
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
 /(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1 ./ y))
 
-### .*
-# All constructors of this check (and so this function requires)
-# that the first child be constant to have the expression be DCP
-struct DotMultiplyAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
 
-    function DotMultiplyAtom(x::AbstractExpr, y::AbstractExpr)
-        # check that the sizes of x and y are compatible
-        try
-            ones(size(x)) .* ones(size(y))
-        catch
-            error("cannot compute $x .* $y: sizes are not compatible")
-        end
-        children = (x, y)
-        return new(:.*, hash(children), children, y.size)
-    end
-end
-
-function sign(x::DotMultiplyAtom)
-    return sign(x.children[1]) * sign(x.children[2])
-end
-
-function monotonicity(x::DotMultiplyAtom)
-    return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
-end
-
-function curvature(x::DotMultiplyAtom)
-    if vexity(x.children[1]) == ConstVexity()
-        return ConstVexity()
-    else
-        return NotDcp()
-    end
-end
-
-function evaluate(x::DotMultiplyAtom)
-    return evaluate(x.children[1]) .* evaluate(x.children[2])
-end
-
-function template(x::DotMultiplyAtom, context::Context{T}) where T
-    subproblems = template.(children(x), Ref(context))
-
-    @assert length(children(x)) == length(subproblems) == 2
-    s1, s2 = subproblems
-    if vexity(x.children[1]) != ConstVexity()
-        if vexity(x.children[2]) != ConstVexity()
+function dotmultiply(x,y)
+    if vexity(x) != ConstVexity()
+        if vexity(y) != ConstVexity()
             error("multiplication of two non-constant expressions is not DCP compliant")
         else
-            # make sure first child is the one that's constant
-            x.children[1], x.children[2] = x.children[2], x.children[1]
-            s1, s2 = s2, s1
+            x,y = y,x
         end
     end
 
     # promote the size of the coefficient matrix, so eg
     # 3 .* x
     # works regardless of the size of x
-    coeff = evaluate(x.children[1]) .* ones(T, size(x.children[2]))
+    coeff = evaluate(x) .* ones(size(y))
     # promote the size of the variable
     # we've previously ensured neither x nor y is 1x1
     # and that the sizes are compatible,
     # so if the sizes aren't equal the smaller one is size 1
-    var = x.children[2]
+    var = y
     if size(var, 1) < size(coeff, 1)
         var = ones(size(coeff, 1)) * var
     elseif size(var, 2) < size(coeff, 2)
         var = var * ones(1, size(coeff, 1))
     end
-
     const_multiplier = Diagonal(vec(coeff))
-    obj = MOIU.operate(*, T, const_multiplier, s2)
-
-    return obj
+    return reshape(const_multiplier * vec(var), size(var)...)
 end
 
 function broadcasted(::typeof(*), x::Constant, y::AbstractExpr)
     if x.size == (1, 1) || y.size == (1, 1)
         return x * y
     elseif size(y, 1) < size(x, 1) && size(y, 1) == 1
-        return DotMultiplyAtom(x, ones(size(x, 1)) * y)
+        return dotmultiply(x, ones(size(x, 1)) * y)
     elseif size(y, 2) < size(x, 2) && size(y, 2) == 1
-        return DotMultiplyAtom(x, y * ones(1, size(x, 1)))
+        return dotmultiply(x, y * ones(1, size(x, 1)))
     else
-        return DotMultiplyAtom(x, y)
+        return dotmultiply(x, y)
     end
 end
-broadcasted(::typeof(*), y::AbstractExpr, x::Constant) = DotMultiplyAtom(x, y)
+broadcasted(::typeof(*), y::AbstractExpr, x::Constant) = dotmultiply(x, y)
 
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
 function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
     if x.size == (1, 1) || y.size == (1, 1)
         return x * y
     elseif vexity(x) == ConstVexity()
-        return DotMultiplyAtom(x, y)
+        return dotmultiply(x, y)
     elseif hash(x) == hash(y)
         return square(x)
     else
-        return DotMultiplyAtom(y, x)
+        return dotmultiply(y, x)
     end
 end
-broadcasted(::typeof(*), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
-broadcasted(::typeof(*), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
-broadcasted(::typeof(/), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1 ./ y), x)
+broadcasted(::typeof(*), x::Value, y::AbstractExpr) = dotmultiply(Constant(x), y)
+broadcasted(::typeof(*), x::AbstractExpr, y::Value) = dotmultiply(Constant(y), x)
+broadcasted(::typeof(/), x::AbstractExpr, y::Value) = dotmultiply(Constant(1 ./ y), x)
 # x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl

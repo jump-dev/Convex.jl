@@ -16,7 +16,9 @@ function promote_size(values)
     return (v isa Number ? fill(v, d) : v for v in values)
 end
 
+scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
 scalar_fn(x) = only(MOIU.scalarize(x))
+scalar_fn(x::VAFTapes) = scalar_fn(to_vaf(x))
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
 function solve2!(problem::Problem{T}, optimizer; kwargs...) where {T}

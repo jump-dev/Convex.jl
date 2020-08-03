@@ -37,20 +37,15 @@ function evaluate(x::NegateAtom)
 end
 
 -(x::AbstractExpr) = NegateAtom(x)
-
-function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        objective = -objective
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
-end
+-(x::Constant) = Constant(-x.value)
 
 function template(A::NegateAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
-    obj = MOIU.operate(-, T, subobj)
-    return obj
+    if subobj isa Value
+        return -subobj
+    else
+        return MOIU.operate(-, T, subobj)
+    end
 end
 
 
@@ -70,6 +65,15 @@ struct AdditionAtom <: AbstractExpr
         else
             error("Cannot add expressions of sizes $(x.size) and $(y.size)")
         end
+
+        if x.size != y.size
+            if (x isa Constant) && (x.size == (1,1))
+                x = Constant(fill(x.value, y.size))
+            elseif (y isa Constant) && (y.size == (1,1))
+                    y = Constant(fill(y.value, x.size))
+            end
+        end
+
         # see if we're forming a sum of more than two terms and condense them
         children = AbstractExpr[]
         if isa(x, AdditionAtom)
@@ -108,8 +112,8 @@ end
 
 function template(x::AdditionAtom, context::Context{T}) where T
     subproblems = template.(children(x), Ref(context))
-    objectives = promote_size(subproblems)
-    obj = MOIU.operate(+, T, objectives...)
+    # objectives = promote_size(subproblems)
+    obj = MOIU.operate(+, T, subproblems...)
     return obj
 end
 
