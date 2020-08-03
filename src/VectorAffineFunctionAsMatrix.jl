@@ -29,14 +29,12 @@ function Base.isequal(A::VectorAffineFunctionAsMatrix, B::VectorAffineFunctionAs
 end
 
 
-
-
 function MOI.output_dimension(v::VectorAffineFunctionAsMatrix)
     return size(v.matrix, 1)
 end
 
 function to_vaf(tape::VAFTapes)
-    op = AffineOperation!(tape)
+    op = AffineOperation(tape)
     to_vaf(VectorAffineFunctionAsMatrix(op, tape.variables))
 end
 
@@ -98,6 +96,16 @@ function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
 
     else
         return VAFTape(tuple(AffineOperation(A, Zero(size(A,1)))), v.variables)
+    end
+end
+
+# I think this is right...
+function MOIU.operate(::typeof(+), ::Type{T}, A::AbstractMatrix,
+                      v::MOI.VectorOfVariables) where {T}
+    if USE_SPARSE()
+        return SparseVAFTape([SparseAffineOperation(I, vec(A))], v.variables)
+    else
+        return VAFTape(tuple(AffineOperation(I, vec(A))), v.variables)
     end
 end
 

@@ -35,9 +35,12 @@ MOI.output_dimension(v::SparseVAFTape) = size(v.operations[1].matrix, 1) - 1
 _unwrap(a::SparseAffineOperation) = a.matrix
 _unwrap(a::AbstractSparseArray) = a
 
-# this one isn't mutating, so doesn't need the `!`
-function AffineOperation!(sparse_tape::SparseVAFTape)
-    mat = foldl((a,b) -> _unwrap(a) * _unwrap(b), sparse_tape.operations)
+function AffineOperation(sparse_tape::SparseVAFTape)
+    if length(sparse_tape.operations) > 1
+        mat = foldl((a,b) -> _unwrap(a) * _unwrap(b), sparse_tape.operations)
+    else
+        mat = only(sparse_tape.operations).matrix
+    end
     b = mat[1:end-1, end]
     A = mat[1:end-1, 1:end-1]
     AffineOperation(A, b)
@@ -56,28 +59,35 @@ end
 function MOIU.operate(::typeof(-), ::Type{T},
     tape::SparseVAFTape) where {T}
     d = MOI.output_dimension(tape)
-    return add_operation!(tape, SparseAffineOperation(-sparse(1.0I, d, d), Zero(d)))
+    return add_operation!(tape, SparseAffineOperation(sparse(-one(T)*I, d, d), Zero(d)))
 end
 
 function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
                             tape::SparseVAFTape) where {T}
     d = length(v)
-    return add_operation!(tape, SparseAffineOperation(sparse(1.0I, d, d), v))
+    return add_operation!(tape, SparseAffineOperation(sparse(one(T)*I, d, d), v))
 end
 
 function MOIU.operate(::typeof(-), ::Type{T}, tape::SparseVAFTape,
     v::AbstractVector) where {T}
     d = length(v)
-    return add_operation!(tape, SparseAffineOperation(sparse(1.0I, d, d), -v))
+    return add_operation!(tape, SparseAffineOperation(sparse(one(T)*I, d, d), -v))
 end
 
 function MOIU.operate(::typeof(-), ::Type{T},
                     v::AbstractVector, tape::SparseVAFTape) where {T}
     d = length(v)
-    return add_operation!(tape, SparseAffineOperation(sparse(-1.0I, d, d), v))
+    return add_operation!(tape, SparseAffineOperation(sparse(-one(T)*I, d, d), v))
 end
 
 function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
     tape::SparseVAFTape) where {T}
+    return add_operation!(tape, SparseAffineOperation(A, Zero(size(A,1))))
+end
+
+function MOIU.operate(::typeof(sum), ::Type{T}, tape::MOI.SparseVAFTape) where {T}
+    d = MOI.output_dimension(tape)
+    # doesn't seem ideal for a sparse representation...
+    A = ones(T, 1, d) 
     return add_operation!(tape, SparseAffineOperation(A, Zero(size(A,1))))
 end

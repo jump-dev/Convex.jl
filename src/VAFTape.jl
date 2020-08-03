@@ -45,7 +45,6 @@ function Base.hash(a::VAFTape{T}, h::UInt) where {T}
 end
 
 
-
 function MOI.output_dimension(v::VAFTape)
     t = v.operations
     while !isempty(t)
@@ -62,11 +61,6 @@ function popfirst(t::Tuple)
     return first(t), Base.tail(t)
 end
 
-# This should get upstreamed, or if it already is, version-gated
-function LinearAlgebra.lmul!(a::Number, D::LinearAlgebra.Diagonal)
-    lmul!(a, D.diag)
-    return D
-end
 
 using MatrixChainMultiply
 
@@ -79,83 +73,34 @@ MatrixChainMultiply.msize(a::AffineOperation) = size(a.matrix)
 MatrixChainMultiply.msize(a::AffineOperation{<:UniformScaling}) = (length(a.vector), length(a.vector))
 
 # Override by `Convex.USE_CHAIN() = false`, which will trigger recompilation of the methods.
-USE_CHAIN() = true
+USE_CHAIN() = false
 
-function AffineOperation!(tape::VAFTape)# -> AffineOperation
+function AffineOperation(tape::VAFTape)# -> AffineOperation
     if USE_CHAIN()
-        op = matrixchainmultiply(compose!!, tape.operations...)
+        # this will be inherently type-unstable...
+        op = matrixchainmultiply(compose, tape.operations...)
     else
-        # left-to-right order
+        # left-to-right order; should be type stable
         t = tape.operations
         op, t = popfirst(t)
         while !isempty(t)
             newop, t = popfirst(t)
-            op = compose!!(op, newop)
+            op = compose(op, newop)
         end
     end
     return op
 end
 
-function compose!!(A::AffineOperation, B::AffineOperation)
-    vec = try_mul!!(A.vector, A.matrix, B.vector, 1, 1)
-    mat = try_mul!!(A.matrix, B.matrix)
+
+function compose(A::AffineOperation, B::AffineOperation)
+    vec = A.vector + A.matrix * B.vector
+    mat = A.matrix * B.matrix
     AffineOperation(mat, vec)
 end
 
-function collapse!(tape::VAFTape) # -> VAFTape
-    op = AffineOperation!(tape)
+function collapse(tape::VAFTape) # -> VAFTape
+    op = AffineOperation(tape)
     return VAFTape(tuple(op), tape.variables)
-end
-
-
-
-# What is the deal with this `try_mul!!`? The problem is that often
-# one of the arguments is `LinearAlgebra.I`, or `Zero`, and we haven't actually
-# allocated any memory there to do an inplace update. If we have allocated memory
-# for the other argument, then we want to use that memory instead. The idea is that
-# everything is scratch, and the return value just has to point to the right memory.
-#
-# We will need to be careful not to mutate user-inputted arrays!
-"""
-    try_mul!!(A, B)
-
-Performs `A*B` and returns the result, possibly overwriting either `A` or `B`.
-"""
-function try_mul!!(A, B)
-    rmul!(A, B)
-end
-
-LinearAlgebra.rmul!(z::Zero, a) = z
-LinearAlgebra.lmul!(a, z::Zero) = z
-
-"""
-    try_mul!!(C, A, B, α, β)
-
-Combined matrix-matrix or matrix-vector multiply-add A B α + C β, possibly `C` or `B`, returning the result.
-"""
-function try_mul!!(C, A, B, α, β)
-    mul!(C, A, B, α, β)
-end
-
-function try_mul!!(C, A, ::Zero, α, β)
-    try_mul!!(C, β)
-end
-
-function try_mul!!(A::UniformScaling, B)
-    lmul!(A.λ, B)
-end
-
-
-function try_mul!!(A::Diagonal, B)
-    lmul!(A, B)
-end
-
-function try_mul!!(A, B::UniformScaling)
-    rmul!(A, B.λ)
-end
-
-function try_mul!!(A::UniformScaling, B::UniformScaling)
-    (A.λ * B.λ)*I
 end
 
 
@@ -163,30 +108,37 @@ end
 # # `MOIU.operate` methods for `VAFTape`
 
 
-add_operation(op::AffineOperation, tape::VAFTape) = VAFTape((op, tape.operations...), tape.variables)
+add_operation(tape::VAFTape, op::AffineOperation) = VAFTape((op, tape.operations...), tape.variables)
 
 function MOIU.operate(::typeof(-), ::Type{T},
     tape::VAFTape) where {T}
     d = MOI.output_dimension(tape)
-    return add_operation(AffineOperation(-I, Zero(d)), tape)
+    return add_operation(tape, AffineOperation(-one(T)*I, Zero(d)))
 end
 
 function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
                             tape::VAFTape) where {T}
-    return add_operation(AffineOperation(I, v), tape)
+    return add_operation(tape, AffineOperation(one(T)*I, v))
 end
 
 function MOIU.operate(::typeof(-), ::Type{T}, tape::VAFTape,
     v::AbstractVector) where {T}
-    return add_operation(AffineOperation(I, -v), tape)
+    return add_operation(tape, AffineOperation(one(T)*I, -v))
 end
 
 function MOIU.operate(::typeof(-), ::Type{T},
                     v::AbstractVector, tape::VAFTape) where {T}
-    return add_operation(AffineOperation(-I, v), tape)
+    return add_operation(tape, AffineOperation(-one(T)*I, v))
 end
 
 function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
     tape::VAFTape) where {T}
-    return add_operation(AffineOperation(A, Zero(size(A,1))), tape)
+    return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
+end
+
+function MOIU.operate(::typeof(sum), ::Type{T}, tape::MOI.VAFTape) where {T}
+    d = MOI.output_dimension(tape)
+    # doesn't seem ideal for a sparse representation...
+    A = ones(T, 1, d) 
+    return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
 end

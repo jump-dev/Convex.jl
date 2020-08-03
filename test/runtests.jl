@@ -6,10 +6,13 @@ using SCS, ECOS, GLPK
 using MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
+const MOIB = MOI.Bridges
 
 # Seed random number stream to improve test reliability
 using Random
 Random.seed!(2)
+
+include("VAFTapes.jl")
 
 @testset "ProblemDepot" begin
     @testset "Problems can run without `solve!`ing if `test==false`; T=$T" for T in (Float64, BigFloat)
