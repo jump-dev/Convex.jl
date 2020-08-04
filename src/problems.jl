@@ -117,9 +117,9 @@ maximize(objective::Value, constraints::Array{<:Constraint}=Constraint[]; numeri
     maximize(convert(AbstractExpr, objective), constraints; numeric_type = numeric_type)
 
 # Allow users to simply type satisfy (if there is no objective)
-satisfy(constraints::Constraint...; numeric_type = Float64) = Problem{numeric_type}(:minimize, Constant(0), [constraints...])
+satisfy(constraints::Constraint...; numeric_type = Float64) = Problem{numeric_type}(:minimize, constant(0), [constraints...])
 satisfy(constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
-    Problem{numeric_type}(:minimize, Constant(0), constraints)
+    Problem{numeric_type}(:minimize, constant(0), constraints)
 satisfy(constraint::Constraint; numeric_type = Float64) = satisfy([constraint]; numeric_type = numeric_type)
 
 # +(constraints, constraints) is defined in constraints.jl

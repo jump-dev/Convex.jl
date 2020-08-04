@@ -30,7 +30,7 @@ struct VAFTape{T <: Tuple}
         tape = new{T}(operations, variables)
         # don't let our tuples get too long!
         if length(operations) > COLLAPSE_DEPTH()
-            tape = collapse!(tape)
+            tape = collapse(tape)
         end
         return tape
     end
@@ -189,7 +189,7 @@ function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::VAFTape,
     return VAFTape(tuple(AffineOperation(A, b)), x)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, x::Number, tape::VAFTape) where {T}
+function MOIU.operate(::typeof(*), ::Type{T}, x::Real, tape::VAFTape) where {T}
     d = MOI.output_dimension(tape)
     return add_operation(tape, AffineOperation(T(x)*I, Zero(d)))
 end

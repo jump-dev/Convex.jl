@@ -39,24 +39,14 @@ function evaluate(x::RealAtom)
     return real.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        new_objective = ConicObj()
-        objective = conic_form!(x.children[1], unique_conic_forms)
-
-        for var in keys(objective)
-            re = real.(objective[var][1])
-            im = real.(objective[var][2])
-            new_objective[var] = (re,im)
-        end
-
-        cache_conic_form!(unique_conic_forms, x, new_objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::RealAtom, context::Context{T}) where T
+    obj = template(only(children(x)), context)
+    return MOIU.operate(real, T, obj)
 end
 
 real(x::AbstractExpr) = RealAtom(x)
-real(x::Value) = RealAtom(Constant(x))
+real(x::Value) = Constant(real(x))
+real(x::ComplexVariable) = x.real_var
 
 
 
@@ -90,21 +80,11 @@ function evaluate(x::ImaginaryAtom)
     return imag.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        new_objective = ConicObj()
-        objective = conic_form!(x.children[1], unique_conic_forms)
-
-
-        for var in keys(objective)
-            re = imag.(objective[var][1])
-            im = imag.(objective[var][2])
-            new_objective[var] = (re,im)
-        end
-        cache_conic_form!(unique_conic_forms, x, new_objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::ImaginaryAtom, context::Context{T}) where T
+    obj = template(only(children(x)), context)
+    return MOIU.operate(imag, T, obj)
 end
 
 imag(x::AbstractExpr) = ImaginaryAtom(x)
-imag(x::Value) = ImaginaryAtom(Constant(x))
+imag(x::Value) = Constant(imag(x)) # is this `Constant` needed?
+imag(x::ComplexVariable) = x.imag_var

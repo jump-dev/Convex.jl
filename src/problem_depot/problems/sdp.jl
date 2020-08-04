@@ -337,11 +337,8 @@ end
     handle_problem!(p2)
 
     if test
-        real_diff = real(x1) - evaluate(xr)
-        @test real_diff ≈ zeros(10, 1) atol=atol rtol=rtol
-
-        imag_diff = imag(x1) - evaluate(xi)
-        @test imag_diff ≈ zeros(10, 1) atol=atol rtol=rtol
+        @test real(x1) ≈ evaluate(xr) atol=atol rtol=rtol
+        @test imag(x1) ≈ evaluate(xi) atol=atol rtol=rtol
     end
 end
 
@@ -370,10 +367,8 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(objective) ≈ 0 atol=atol rtol=rtol
 
-        real_diff = real(evaluate(x)) - real(a)
-        imag_diff = imag(evaluate(x)) - imag(a)
-        @test real_diff ≈ 0 atol=atol rtol=rtol
-        @test imag_diff ≈ 0 atol=atol rtol=rtol
+        @test real(evaluate(x)) ≈ real(a) atol=atol rtol=rtol
+        @test imag(evaluate(x)) ≈ imag(a) atol=atol rtol=rtol
     end
 end
 
@@ -389,10 +384,8 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(objective) ≈ 0.0 atol=atol rtol=rtol
 
-        real_diff = real.(evaluate(x)) - real.(a)
-        imag_diff = imag.(evaluate(x)) - imag.(a)
-        @test real_diff ≈ zeros(2, 1) atol=atol rtol=rtol
-        @test imag_diff ≈ zeros(2, 1) atol=atol rtol=rtol
+        @test real.(evaluate(x)) ≈ real.(a) atol=atol rtol=rtol
+        @test imag.(evaluate(x)) ≈ imag.(a) atol=atol rtol=rtol
     end
 end
 
@@ -408,10 +401,8 @@ end
         @test p.optval ≈ 0 atol=atol rtol=rtol
         @test evaluate(objective) ≈ 0.0 atol=atol rtol=rtol
 
-        real_diff = real(evaluate(x)) .- real(a)
-        imag_diff = imag(evaluate(x)) .- imag(a)
-        @test real_diff ≈ 0.0 atol=atol rtol=rtol
-        @test imag_diff ≈ 0.0 atol=atol rtol=rtol
+        @test real(evaluate(x)) ≈ real(a) atol=atol rtol=rtol
+        @test imag(evaluate(x)) ≈ imag(a) atol=atol rtol=rtol
     end
 end
 
@@ -431,9 +422,7 @@ end
 
     
     if test
-        real_diff = real.(evaluate(x)) - real.(posA)
-        imag_diff = imag.(evaluate(x)) - imag.(posA)
-        @test real_diff ≈ zeros(n, n) atol=atol rtol=rtol
-        @test imag_diff ≈ zeros(n, n) atol=atol rtol=rtol
+        @test real.(evaluate(x)) ≈ real.(posA) atol=atol rtol=rtol
+        @test imag.(evaluate(x)) ≈ imag.(posA) atol=atol rtol=rtol
     end
 end

@@ -195,28 +195,83 @@ mutable struct Variable <: AbstractVariable
         return this
     end
 end
+
+
+struct ComplexVariable{T1, T2} <: AbstractVariable
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int,Int}
+    real_var::T1
+    imag_var::T2
+    function ComplexVariable(v1::AbstractVariable, v2::AbstractVariable)
+        size(v1) == size(v2) || throw(ArgumentError("Real and imaginary parts must have the same size"))
+        if sign(v1) == ComplexSign() || sign(v2) == ComplexSign()
+            throw(ArgumentError("Real and imaginary parts must be real, not complex."))
+        end
+        new{typeof(v1), typeof(v2)}(:_ComplexVariable, rand(UInt64), size(v1), v1, v2)
+    end
+end
+
+vartype(::ComplexVariable) = ContVar()
+sign(::ComplexVariable) = ComplexSign()
+vexity(c::ComplexVariable) = vexity(c.real_var) + vexity(c.imag_var)
+function vexity!(c::ComplexVariable, v::Vexity)
+    vexity!(c.real_var, v)
+    vexity!(c.imag_var, v)
+    return nothing
+end
+
+function _value(c::ComplexVariable)
+    if _value(c.real_var) === nothing || _value(c.imag_var) === nothing
+        return nothing
+    else
+        return _value(c.real_var) + im*_value(c.imag_var)
+    end
+end
+
+function set_value!(c::ComplexVariable, val::Number) 
+    set_value!(c.real_var, real(val))
+    set_value!(c.imag_var, imag(val))
+    return nothing
+end
+
+function set_value!(c::ComplexVariable, val::AbstractVector) 
+    set_value!(c.real_var, real(val))
+    set_value!(c.imag_var, imag(val))
+    return nothing
+end
+
+
+function set_value!(c::ComplexVariable, val::AbstractArray) 
+    set_value!(c.real_var, real(val))
+    set_value!(c.imag_var, imag(val))
+    return nothing
+end
+
+
 Variable(size::Tuple{Int, Int}, sign::Sign) = Variable(size, sign, ContVar)
 Variable(size::Tuple{Int, Int}, vartype::VarType) = Variable(size, NoSign(), vartype)
 Variable(size::Tuple{Int, Int}) = Variable(size, NoSign(), ContVar)
-ComplexVariable(size::Tuple{Int, Int}) = Variable(size, ComplexSign(), ContVar)
+ComplexVariable(size::Tuple{Int, Int}) = ComplexVariable(Variable(size), Variable(size))
 
 Variable(m::Int, n::Int, sign::Sign, vartype::VarType) = Variable((m,n), sign, vartype)
 Variable(m::Int, n::Int, sign::Sign) = Variable((m,n), sign, ContVar)
 Variable(m::Int, n::Int, vartype::VarType) = Variable((m,n), NoSign(), vartype)
 Variable(m::Int, n::Int) = Variable((m,n), NoSign(), ContVar)
-ComplexVariable(m::Int, n::Int) = Variable((m,n), ComplexSign(), ContVar)
+ComplexVariable(m::Int, n::Int) =  ComplexVariable(Variable(m, n), Variable(m, n))
 
 Variable(m::Int, sign::Sign, vartype::VarType) = Variable((m,1), sign, vartype)
 Variable(m::Int, sign::Sign) = Variable((m,1), sign, ContVar)
 Variable(m::Int, vartype::VarType) = Variable((m,1), NoSign(), vartype)
 Variable(m::Int) = Variable((m,1), NoSign(), ContVar)
-ComplexVariable(m::Int) = Variable((m,1), ComplexSign(), ContVar)
+ComplexVariable(m::Int) =  ComplexVariable(Variable(m), Variable(m))
+
 
 Variable(sign::Sign, vartype::VarType) = Variable((1,1), sign, vartype)
 Variable(sign::Sign) = Variable((1,1), sign, ContVar)
 Variable(vartype::VarType) = Variable((1,1), NoSign(), vartype)
 Variable() = Variable((1,1), NoSign(), ContVar)
-ComplexVariable() = Variable((1,1), ComplexSign(), ContVar)
+ComplexVariable() =  ComplexVariable(Variable(), Variable())
 
 
 ###
@@ -253,10 +308,10 @@ Variable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), NoSi
 Variable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), NoSign(), first_set, more_sets...)
 
 # Case 3: ComplexVariable
-ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...) = Variable(size, ComplexSign(), first_set, more_sets...)
-ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), ComplexSign(), first_set, more_sets...)
-ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), ComplexSign(), first_set, more_sets...)
-ComplexVariable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), ComplexSign(), first_set, more_sets...)
+# ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...) = Variable(size, ComplexSign(), first_set, more_sets...)
+# ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), ComplexSign(), first_set, more_sets...)
+# ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), ComplexSign(), first_set, more_sets...)
+# ComplexVariable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), ComplexSign(), first_set, more_sets...)
 
 
 Semidefinite(m::Integer) = Semidefinite(m, m)
@@ -275,7 +330,7 @@ Semidefinite((m, n)::Tuple{Integer, Integer}) = Semidefinite(m, n)
 
 function HermitianSemidefinite(m::Integer, n::Integer = m)
     if m == n
-        x = Variable((m, n), ComplexSign(), ContVar)
+        x = ComplexVariable((m, n))
         add_constraint!(x, x ⪰ 0)
         return x
     else

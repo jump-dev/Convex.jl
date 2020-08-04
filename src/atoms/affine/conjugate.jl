@@ -26,19 +26,19 @@ function evaluate(x::ConjugateAtom)
     return conj(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        for var in keys(objective)
-            x1 = conj(objective[var][1])
-            x2 = conj(objective[var][2])
-            objective[var] = (x1,x2)
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+
+function template(x::ConjugateAtom, context::Context{T}) where {T}
+    objective = template(only(children(x)), context)
+    return MOIU.operate(conj, T, objective)
 end
 
 
-Base.conj(x::AbstractExpr) = ConjugateAtom(x)
-Base.conj(x::Constant) = Constant(conj(x.value))
+function Base.conj(x::AbstractExpr)
+    if sign(x) == ComplexSign()
+        return ConjugateAtom(x)
+    else
+        return x
+    end
+end
+Base.conj(x::Constant) = x
+Base.conj(x::ComplexConstant) = ComplexConstant(real(x), -imag(x))

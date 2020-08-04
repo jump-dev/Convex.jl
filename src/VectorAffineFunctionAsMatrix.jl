@@ -18,6 +18,8 @@ Base.convert(::Type{Vector{T}}, z::Zero) where {T} = zeros(T, z.len)
 
 include("VAFTape.jl")
 include("SparseVAFTape.jl")
+
+
 const VAFTapes = Union{VAFTape, SparseVAFTape}
 
 # This is a variant of MOI.VectorAffineFunction which represents
@@ -76,6 +78,30 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:AbstractMatrix})
     return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
 end
 
+## this may be wrong
+# function to_vaf_as_matrix(vaf::MOI.VectorAffineFunction{T}) where T
+#     I = Int[]
+#     J = Int[]
+#     V = T[]
+#     variables = MOI.VariableIndex[]
+#     var_dict = Dict{MOI.VariableIndex, Int}()
+#     for term in vaf.terms
+#         push!(I, term.output_index)
+#         push!(V, term.scalar_term.coefficient)
+#         var = term.scalar_term.variable_index
+#         if haskey(var_dict, var)
+#             j = var_dict[var]
+#         else
+#             push!(variables, var)
+#             var_dict[var] = j = length(variables)
+#         end
+#         push!(J, j)
+#     end
+#     n = length(variables)
+#     m = MOI.output_dimension(vaf)
+#     return VectorAffineFunctionAsMatrix(AffineOperation(sparse(I, J, V, m, n), vaf.constants), variables)
+# end
+
 
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:UniformScaling})
     T = eltype(vaf_as_matrix.aff.matrix)
@@ -91,12 +117,12 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{<:UniformScaling})
 end
 
 # method for adding constraints and coverting to standard VAFs as needed
-MOI_add_constraint(model, f, set) = MOI.add_constraint(model, f, set)
-
-function MOI_add_constraint(model, f::VectorAffineFunctionAsMatrix, set)
-    return MOI.add_constraint(model, to_vaf(f), set)
+function MOI_add_constraint(model, f, set)
+    MOI.add_constraint(model, f, set)
+    return nothing
 end
 
-function MOI_add_constraint(model, f::VAFTapes, set)
-    return MOI.add_constraint(model, to_vaf(f), set)
+function MOI_add_constraint(model, f::Union{VectorAffineFunctionAsMatrix, VAFTapes}, set)
+    MOI_add_constraint(model, to_vaf(f), set)
+    return nothing
 end

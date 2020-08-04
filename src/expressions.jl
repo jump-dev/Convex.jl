@@ -96,7 +96,7 @@ const Value = Union{Number, AbstractArray}
 const ValueOrNothing = Union{Value, Nothing}
 const AbstractExprOrValue = Union{AbstractExpr, Value}
 
-convert(::Type{AbstractExpr}, x::Value) = Constant(x)
+convert(::Type{AbstractExpr}, x::Value) = constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
 function size(x::AbstractExpr, dim::Integer)

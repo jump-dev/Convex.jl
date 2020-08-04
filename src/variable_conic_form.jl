@@ -57,4 +57,20 @@ function to_tape(v::MOI.VectorOfVariables, context::Context{T}) where T
 end
 
 # get the usual tape
-template(a::AbstractVariable, context::Context) = to_tape(_template(a, context), context)
+function template(a::AbstractVariable, context::Context)
+    if vexity(a) == ConstVexity()
+        return template(constant(evaluate(a)), context)
+    end
+    return to_tape(_template(a, context), context)
+end
+
+
+
+function template(c::ComplexVariable, context::Context)
+    if vexity(c) == ConstVexity()
+        return template(constant(evaluate(c)), context)
+    end
+    re = template(c.real_var, context)
+    im = template(c.imag_var, context)
+    return ComplexTape(re, im)
+end

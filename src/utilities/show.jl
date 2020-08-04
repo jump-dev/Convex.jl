@@ -53,6 +53,17 @@ function Base.summary(io::IO, x::AbstractVariable)
     end
 end
 
+function Base.summary(io::IO, x::Union{Constant, ComplexConstant})
+    sgn = summary(sign(x))
+    if size(x) == (1,1)
+        print(io, "$(sgn) constant")
+    elseif size(x,2) == 1
+        print(io, "$(size(x,1))-element $(sgn) constant")
+    else
+        print(io, "$(size(x,1))×$(size(x,2)) $(sgn) constant")
+    end
+end
+
 Base.summary(io::IO, ::AffineVexity) = print(io, "affine")
 Base.summary(io::IO, ::ConvexVexity) = print(io, "convex")
 Base.summary(io::IO, ::ConcaveVexity) = print(io, "concave")
@@ -79,7 +90,7 @@ end
 
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
-show(io::IO, x::Constant) = print(io, evaluate(x))
+show(io::IO, x::Union{Constant, ComplexConstant}) = print(io, evaluate(x))
 
 # A variable, for example, Variable(3, 4), will be displayed as:
 # julia> Variable(3,4)

@@ -100,6 +100,7 @@ include("expressions.jl")
 # need to define `Variable` before `UniqueConicForms`
 include("variable.jl")
 include("conic_form.jl")
+
 # need to define `conic_form!` for `Variable`s after `UniqueConicForms`
 include("variable_conic_form.jl")
 include("constant.jl")
@@ -111,6 +112,7 @@ include("constraints/sdp_constraints.jl")
 include("problems.jl")
 include("solution.jl")
 include("VectorAffineFunctionAsMatrix.jl")
+include("complex.jl")
 include("solve2!.jl")
 
 ### affine atoms

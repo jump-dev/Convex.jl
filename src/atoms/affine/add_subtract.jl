@@ -37,7 +37,7 @@ function evaluate(x::NegateAtom)
 end
 
 -(x::AbstractExpr) = NegateAtom(x)
--(x::Constant) = Constant(-x.value)
+-(x::Constant) = constant(-x.value)
 
 function template(A::NegateAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
@@ -67,10 +67,10 @@ struct AdditionAtom <: AbstractExpr
         end
 
         if x.size != y.size
-            if (x isa Constant) && (x.size == (1,1))
-                x = Constant(fill(x.value, y.size))
-            elseif (y isa Constant) && (y.size == (1,1))
-                    y = Constant(fill(y.value, x.size))
+            if (x isa Constant || x isa ComplexConstant) && (x.size == (1,1))
+                x = constant(fill(evaluate(x), y.size))
+            elseif (y isa Constant || y isa ComplexConstant) && (y.size == (1,1))
+                y = constant(fill(evaluate(y), x.size))
             end
         end
 
@@ -118,8 +118,8 @@ function template(x::AdditionAtom, context::Context{T}) where T
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
-+(x::Value, y::AbstractExpr) = AdditionAtom(Constant(x), y)
-+(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
++(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
++(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
 -(x::AbstractExpr, y::AbstractExpr) = x + (-y)
--(x::Value, y::AbstractExpr) = Constant(x) + (-y)
--(x::AbstractExpr, y::Value) = x + Constant(-y)
+-(x::Value, y::AbstractExpr) = constant(x) + (-y)
+-(x::AbstractExpr, y::Value) = x + constant(-y)

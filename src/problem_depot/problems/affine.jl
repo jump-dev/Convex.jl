@@ -396,6 +396,8 @@ end
     # Broadcast fusion works
     x = Variable(5, 5)
     a = 2.0 .* x .* ones(Int, 5)
+
+    xval = rand(5,5)
     if test
         @test a isa Convex.DotMultiplyAtom
     end
