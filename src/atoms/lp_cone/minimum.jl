@@ -42,16 +42,11 @@ function evaluate(x::MinimumAtom)
     return Base.minimum(evaluate(x.children[1]))
 end
 
-# x >= this if minimum(x) = this
-# so, x - this will be in the :NonNeg cone
-function conic_form!(x::MinimumAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        this = Variable()
-        objective = conic_form!(this, unique_conic_forms)
-        conic_form!(this <= x.children[1], unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+
+function template(x::MinimumAtom, context::Context)
+    t = Variable()
+    add_constraints_to_context(t <= x.children[1], context)
+    return template(t, context)
 end
 
 minimum(x::AbstractExpr) = MinimumAtom(x)

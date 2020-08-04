@@ -102,6 +102,21 @@ function MOIU.operate(::typeof(sum), ::Type{T}, tape::SparseVAFTape) where {T}
 end
 
 
+function MOIU.operate(::typeof(+), ::Type{T}, tapes::SparseVAFTape...) where {T}
+    ops = AffineOperation.(tapes)
+    A = hcat( (op.matrix for op in ops)...)
+    b = +( (op.vector for op in ops)...)
+    x = vcat( (tape.variables for tape in tapes)...)
+    return SparseVAFTape([SparseAffineOperation(A, b)], x)
+end
+
+function MOIU.operate(::typeof(*), ::Type{T}, x::Number, tape::SparseVAFTape) where {T}
+    d = MOI.output_dimension(tape)
+    return add_operation!(tape, SparseAffineOperation(sparse(T(x)*I, d, d), Zero(d)))
+end
+
+
+# we do all pairs of `SparseVAFTape` and `AbstractVector{<:Number}`, and then do 3+ arguments by iterating
 function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::SparseVAFTape,
     tape2::SparseVAFTape) where {T}
 
@@ -114,15 +129,31 @@ function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::SparseVAFTape,
     return SparseVAFTape([SparseAffineOperation(A, b)], x)
 end
 
-function MOIU.operate(::typeof(+), ::Type{T}, tapes::SparseVAFTape...) where {T}
-    ops = AffineOperation.(tapes)
-    A = hcat( (op.matrix for op in ops)...)
-    b = +( (op.vector for op in ops)...)
-    x = vcat( (tape.variables for tape in tapes)...)
-    return SparseVAFTape([SparseAffineOperation(A, b)], x)
+function MOIU.operate(::typeof(vcat), ::Type{T}, tape::SparseVAFTape,
+    v::AbstractVector{<:Number}) where {T}
+    op = AffineOperation(tape)
+    n = length(v)
+    m = size(op.matrix, 2) # bad for uniformscaling    
+    Z = spzeros(T, n, m)
+    A = vcat(op.matrix, Z)
+    b = vcat(op.vector, v)
+    return SparseVAFTape([SparseAffineOperation(A, b)], tape.variables)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, x::Number, tape::SparseVAFTape) where {T}
-    d = MOI.output_dimension(tape)
-    return add_operation!(tape, SparseAffineOperation(sparse(T(x)*I, d, d), Zero(d)))
+function MOIU.operate(::typeof(vcat), ::Type{T}, v::AbstractVector{<:Number}, tape::SparseVAFTape) where {T}
+    op = AffineOperation(tape)
+    n = length(v)
+    m = size(op.matrix, 2) # bad for uniformscaling    
+    Z = spzeros(T, n, m)
+    A = vcat(Z, op.matrix)
+    b = vcat(v, op.vector)
+    return SparseVAFTape([SparseAffineOperation(A, b)], tape.variables)
+end
+
+
+const SparseVAFTapeOrVec = Union{SparseVAFTape, AbstractVector{<:Number}}
+
+function MOIU.operate(::typeof(vcat), ::Type{T}, arg1::SparseVAFTapeOrVec, arg2::SparseVAFTapeOrVec, arg3::SparseVAFTapeOrVec, args::Vararg{<:SparseVAFTapeOrVec}) where {T}
+    all_args = (arg1, arg2, arg3, args...)
+    foldl((a,b) -> MOIU.operate(vcat, T, a, b), all_args)
 end

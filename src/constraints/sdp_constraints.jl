@@ -76,6 +76,13 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, c)
 end
 
+function add_constraints_to_context(c::SDPConstraint, context::Context)
+    f = template(c.child, context)
+    d = c.size[1]
+    MOI_add_constraint(context.model, f, MOI.PositiveSemidefiniteConeSquare(d))
+    return nothing
+end
+
 # TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
 function isposdef(x::AbstractExpr)
     if sign(x) == ComplexSign()

@@ -29,18 +29,32 @@ end
 
 
 USE_SPARSE() = true
-function template(a::AbstractVariable, context::Context{T}) where {T}
+
+# It might be useful to get a direct VOV sometimes...
+function _template(a::AbstractVariable, context::Context{T}) where {T}
     var_inds = get!(context.var_id_to_moi_indices, a.id_hash) do
         return add_variables!(context.model, a::Variable)
     end
     context.id_to_variables[a.id_hash] = a
+
+    for constraint in constraints(a)
+        add_constraints_to_context(constraint, context)
+    end
+
+    return MOI.VectorOfVariables(var_inds)
+end
+
+function to_tape(v::MOI.VectorOfVariables, context::Context{T}) where T
+    var_inds = v.variables
     d = length(var_inds)
+
     if USE_SPARSE()
         return SparseVAFTape([SparseAffineOperation(sparse(one(T)*I, d, d), Zero(d))], var_inds)
 
     else
         return VAFTape(tuple(AffineOperation(one(T)*I, Zero(d))), var_inds)
     end
-
-        
 end
+
+# get the usual tape
+template(a::AbstractVariable, context::Context) = to_tape(_template(a, context), context)

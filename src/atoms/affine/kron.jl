@@ -1,6 +1,4 @@
-import LinearAlgebra.kron
-
-function kron(a::Value, b::AbstractExpr)
+function LinearAlgebra.kron(a::Value, b::AbstractExpr)
     rows = AbstractExpr[]
     for i in 1:size(a)[1]
         row = AbstractExpr[]
@@ -17,7 +15,7 @@ function kron(a::Value, b::AbstractExpr)
 end
 
 
-function kron(a::AbstractExpr, b::Value)
+function LinearAlgebra.kron(a::AbstractExpr, b::Value)
     rows = AbstractExpr[]
     for i in 1:size(a)[1]
         row = AbstractExpr[]

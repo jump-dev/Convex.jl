@@ -61,17 +61,14 @@ function evaluate(x::MaxAtom)
     return max.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-# x <= this and y <= this if max(x, y) = this
-function conic_form!(x::MaxAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        this = Variable(x.size[1], x.size[2])
-        objective = conic_form!(this, unique_conic_forms)
-        for child in x.children
-            conic_form!(this >= child, unique_conic_forms)
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
+
+function template(x::MaxAtom, context::Context)
+    t = Variable(x.size)
+    for child in children(x)
+        add_constraints_to_context(t >= child, context)
     end
-    return get_conic_form(unique_conic_forms, x)
+    return template(t, context)
+
 end
 
 max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)

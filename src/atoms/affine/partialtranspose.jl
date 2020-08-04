@@ -47,14 +47,14 @@ function partialtranspose(x::AbstractExpr, sys::Int, dims::Vector)
     if size(x,1) ≠ prod(dims)
             throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))
     end
-    n = length(x.dims)
-    d = prod(x.dims)
-    s = n - x.sys + 1
+    n = length(dims)
+    d = prod(dims)
+    s = n - sys + 1
     p = collect(1:2n)
     p[s] = n + s
     p[n + s] = s
 
-    rdims = reverse(x.dims)
+    rdims = reverse(dims)
 
     partialtranspose_matrix = permutedims_matrix((rdims...,rdims...),p)
 

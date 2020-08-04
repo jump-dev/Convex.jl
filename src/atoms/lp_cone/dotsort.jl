@@ -54,26 +54,24 @@ function evaluate(x::DotSortAtom)
     return sum(sort(vec(evaluate(x.children[1])), rev=true) .* sort(vec(x.w), rev=true))
 end
 
-function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        y = x.children[1]
-        w = x.w
-        sy = size(y)
-        if sy[1] > 1 && sy[2] > 1
-            y = vec(y)
-        end
-        mu = Variable(size(y))
-        nu = Variable(size(y))
-        onesvec = ones(size(y))
-        # given by the solution to
-        # minimize sum(mu) + sum(nu)
-        # subject to y*w' <= onesvec*nu' + mu*onesvec'
-        objective = conic_form!(sum(mu) + sum(nu), unique_conic_forms)
-        conic_form!(y*w' <= onesvec*nu' + mu*onesvec', unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
+function template(x::DotSortAtom, context::Context{T}) where {T}
+    y = only(x.children)
+    w = x.w
+    sy = size(y)
+    if sy[1] > 1 && sy[2] > 1
+        y = vec(y)
     end
-    return get_conic_form(unique_conic_forms, x)
+    mu = Variable(size(y))
+    nu = Variable(size(y))
+    onesvec = ones(size(y))
+    # given by the solution to
+    # minimize sum(mu) + sum(nu)
+    # subject to y*w' <= onesvec*nu' + mu*onesvec'
+    add_constraint_to_context(y*w' <= onesvec*nu' + mu*onesvec', context)
+    objective = template(sum(mu) + sum(nu), context)
+    return objective
 end
+
 
 dotsort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)
 dotsort(b::Value, a::AbstractExpr) = DotSortAtom(a, b)

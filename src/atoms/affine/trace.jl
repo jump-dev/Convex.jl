@@ -1,5 +1,3 @@
-import LinearAlgebra.tr
-
-function tr(e::AbstractExpr)
+function LinearAlgebra.tr(e::AbstractExpr)
     return sum(diag(e))
 end

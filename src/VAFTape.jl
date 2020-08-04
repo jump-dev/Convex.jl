@@ -133,9 +133,7 @@ function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape, 
     return MOIU.operate(+, T, tape, v + sum(vs))
 end
 
-function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape) where {T}
-    return MOIU.operate(+, T, tape, v)
-end
+
 
 function MOIU.operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T}
     ops = AffineOperation.(tapes)

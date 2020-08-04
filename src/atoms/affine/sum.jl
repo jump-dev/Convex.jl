@@ -38,22 +38,6 @@ function evaluate(x::SumAtom)
     return sum(evaluate(x.children[1]))
 end
 
-# Suppose x was of the form
-# x = Ay where A was a coefficient. Then sum(x) can also be considered
-# sum(A, 1) * y
-function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = copy(objective)
-        for var in keys(new_obj)
-            re = sum(new_obj[var][1], dims=1)
-            im = sum(new_obj[var][2], dims=1)
-            new_obj[var] = (re,im)
-        end
-        cache_conic_form!(unique_conic_forms, x, new_obj)
-    end
-    return get_conic_form(unique_conic_forms, x)
-end
 
 function template(A::SumAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
