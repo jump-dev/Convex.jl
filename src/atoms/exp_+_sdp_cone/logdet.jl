@@ -36,6 +36,9 @@ function template(x::LogDetAtom, context::Context{T}) where {T}
     # We vectorize and take the upper triangle
     v = vec_triu(A)
 
+    # ensure symmetry
+    add_constraints_to_context(v == vec_tril(A), context)
+
     # We pass to MOI
     X = template(v, context)
 
@@ -54,6 +57,13 @@ function vec_triu(M)
     L = LinearIndices(size(M))
     n, m = size(M)
     inds = [ L[i,j] for i = 1:n for j = i:m ]
+    return M[inds]
+end
+
+function vec_tril(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [ L[i,j]  for i = 1:n for j = 1:i ]
     return M[inds]
 end
 
