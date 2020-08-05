@@ -40,19 +40,15 @@ function evaluate(x::HuberAtom)
     return c
 end
 
-function conic_form!(x::HuberAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        c = x.children[1]
-        s = Variable(c.size)
-        n = Variable(c.size)
+function template(x::HuberAtom, context::Context)
+    c = x.children[1]
+    s = Variable(c.size)
+    n = Variable(c.size)
 
-        # objective given by s.^2 + 2 * M * |n|
-        objective = conic_form!(square(s) + 2 * x.M * abs(n), unique_conic_forms)
-        conic_form!(c == s + n, unique_conic_forms)
-
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+    # objective given by s.^2 + 2 * M * |n|
+    objective = template(square(s) + 2 * x.M * abs(n), context)
+    add_constraints_to_context(c == s + n, context)
+    return objective
 end
 
 huber(x::AbstractExpr, M::Real=1.0) = HuberAtom(x, M)
