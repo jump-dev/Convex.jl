@@ -33,11 +33,17 @@ function solve2!(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
     context = Context{T}(optimizer)
     cfp = template(p, context)
 
-    obj = scalar_fn(cfp)
     model = context.model
-    MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
-    MOI.set(model, MOI.ObjectiveSense(),
-            p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE)
+
+    if p.head == :satisfy
+        MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
+    else
+        obj = scalar_fn(cfp)
+        MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+        MOI.set(model, MOI.ObjectiveSense(),
+                p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE)
+    end
+    
 
     MOI.optimize!(model)
     p.model = model

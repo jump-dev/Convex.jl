@@ -18,7 +18,7 @@ struct RelativeEntropyAtom <: AbstractExpr
             error("Both the arguments should be real but these are instead $(sign(x)) and $(sign(y))")
         else
             children = (x, y)
-            return new(:entropy, hash(children), children, size(x))
+            return new(:relative_entropy, hash(children), children, (1,1))
         end
     end
 end
@@ -36,15 +36,15 @@ function curvature(x::RelativeEntropyAtom)
 end
 
 function evaluate(e::RelativeEntropyAtom)
-    x = evaluate(e.children[1])
-    y = evaluate(e.children[2])
+    x = vectorize(evaluate(e.children[1]))
+    y = vectorize(evaluate(e.children[2]))
     if any(isnan, y) return Inf end
 
     out = x.*log.(x./y)
     # fix value when x=0:
     # out will only be NaN if x=0, in which case the correct value is 0
-    out[isnan.(out)] = 0
-    return out
+    out[isnan.(out)] .= 0
+    return sum(out)
 end
 
 function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForms)
@@ -73,6 +73,51 @@ function conic_form!(e::RelativeEntropyAtom, unique_conic_forms::UniqueConicForm
     return get_conic_form(unique_conic_forms, e)
 end
 
-relative_entropy(x::AbstractExpr, y::AbstractExpr) = sum(RelativeEntropyAtom(x, y))
+
+function test(optimizer)
+    model = Convex.Context{Float64}(optimizer).model
+    u = MOI.add_variable(model)
+    v = MOI.add_variable(model)
+    w = MOI.add_variable(model)
+    # f = MOI.VectorOfVariables([u, v, w])
+    f = MOI.VectorAffineFunction{Float64}([MOI.VectorAffineTerm{Float64}(1, MOI.ScalarAffineTerm{Float64}(1.0, u)), MOI.VectorAffineTerm{Float64}(2, MOI.ScalarAffineTerm{Float64}(1.0, v)), MOI.VectorAffineTerm{Float64}(3, MOI.ScalarAffineTerm{Float64}(1.0, w))], 
+    [0.0, 0.0, 0.0])
+    MOI.add_constraint(model, f, MOI.RelativeEntropyCone(1))
+
+    g2 = MOI.VectorAffineFunction{Float64}([MOI.VectorAffineTerm{Float64}(1, MOI.ScalarAffineTerm{Float64}(1.0, v))], 
+    [-5.0])
+    MOI.add_constraint(model, g2, MOI.Zeros(1))
+
+    g1 = MOI.VectorAffineFunction{Float64}([MOI.VectorAffineTerm{Float64}(1, MOI.ScalarAffineTerm{Float64}(1.0, w))], 
+    [-10.0])
+    MOI.add_constraint(model, g1, MOI.Nonpositives(1))
+    # MOI.add_constraint(model, MOI.SingleVariable(v), MOI.EqualTo(5.0))
+    # MOI.add_constraint(model, MOI.SingleVariable(w), MOI.LessThan(10.0))
+    # o=MOI.SingleVariable(u)
+    o = MOI.ScalarAffineFunction{Float64}(MOI.ScalarAffineTerm{Float64}[MOI.ScalarAffineTerm{Float64}(-1.0, u)], 0.0)
+    MOI.set(model, MOI.ObjectiveFunction{typeof(o)}(), o)
+    MOI.set(model, MOI.ObjectiveSense(), MOI.MAX_SENSE)
+    MOI.optimize!(model)
+    obj_val= MOI.get(model, MOI.ObjectiveValue())
+    u_val = MOI.get(model, MOI.VariablePrimal(), u)
+    return obj_val, u_val
+end
+
+function template(e::RelativeEntropyAtom, context::Context{T}) where {T}
+    # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) ) 
+    w = template(e.children[1], context)
+    v = template(e.children[2], context)
+    u = template(Variable(), context)
+    f = operate(vcat, T, u, v, w)
+    d = MOI.output_dimension(w)
+    @assert d == MOI.output_dimension(v)
+    MOI_add_constraint(context.model, f, MOI.RelativeEntropyCone(2d+1))
+    return u
+end
+# fallback
+operate(op::F, ::Type{T}, args...) where {F, T} = op(args...)
+
+
+relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)
 # y*log(x/y)
 log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy(y, x)

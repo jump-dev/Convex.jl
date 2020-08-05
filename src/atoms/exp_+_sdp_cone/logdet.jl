@@ -43,28 +43,13 @@ function template(x::LogDetAtom, context::Context{T}) where {T}
     X = template(v, context)
 
     t = template(Variable(), context)
-    f = MOIU.operate(vcat, T, t, [1], X)
+    f = operate(vcat, T, t, [1], X)
     side_dimension = size(only(children(x)), 1)
 
     set =  MOI.LogDetConeTriangle(side_dimension)
 
     MOI_add_constraint(context.model, f,set)
     return t
-end
-
-
-function vec_triu(M)
-    L = LinearIndices(size(M))
-    n, m = size(M)
-    inds = [ L[i,j] for i = 1:n for j = i:m ]
-    return M[inds]
-end
-
-function vec_tril(M)
-    L = LinearIndices(size(M))
-    n, m = size(M)
-    inds = [ L[i,j]  for i = 1:n for j = 1:i ]
-    return M[inds]
 end
 
 logdet(x::AbstractExpr) = LogDetAtom(x)

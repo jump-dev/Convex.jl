@@ -3,6 +3,7 @@
 Breaking changes:
 
 * `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`. 
+* The objective function can no longer be a constant; e.g., `maximize(1, constraints)` is no longer the same as `satisfy(constraints)`. One needs to use `satisfy` directly for feasability problems.
 
 # Changes in v0.13.4
 

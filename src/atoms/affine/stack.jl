@@ -37,7 +37,7 @@ end
 
 function template(x::HcatAtom, context::Context{T}) where {T}
     objectives = template.(children(x), Ref(context))
-    MOIU.operate(vcat, T, objectives...)
+    operate(vcat, T, objectives...)
 end
 
 hcat(args::AbstractExpr...) = HcatAtom(args...)

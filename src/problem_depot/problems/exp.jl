@@ -84,7 +84,7 @@ end
 
 @add_problem exp function exp_log_sum_exp_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable(5)
-    p = minimize(logsumexp(y), y>=1; numeric_type = T)
+    p = minimize(logsumexp(y), y >= 1; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()

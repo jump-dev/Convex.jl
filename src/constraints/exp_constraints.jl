@@ -35,6 +35,17 @@ function vexity(c::ExpConstraint)
     return ConvexVexity()
 end
 
+function add_constraints_to_context(c::ExpConstraint, context::Context{T}) where {T}
+    x, y, z = c.children
+    t = a -> template(a, context)
+    for i = 1:size(x,1), j = 1:size(x,2)
+        terms = (t(x[i,j]), t(y[i,j]), t(z[i,j]))
+        obj = operate(vcat, T, terms...)
+        MOI_add_constraint(context.model, obj, MOI.ExponentialCone())
+    end
+    return nothing
+end
+
 function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, c)
         conic_constrs = ConicConstr[]

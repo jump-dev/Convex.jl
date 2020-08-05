@@ -75,17 +75,17 @@ function template(x::MultiplyAtom, context::Context{T}) where T
             const_multiplier = reshape(evaluate(const_child), length(const_child), 1)
         end
 
-        return  MOIU.operate(*, T, const_multiplier, objective)
+        return  operate(*, T, const_multiplier, objective)
 
     # left matrix multiplication
     elseif vexity(x.children[1]) == ConstVexity()
         objective = template(x.children[2], context)
-        return  MOIU.operate(*, T, kron(sparse(one(T)*I, x.size[2], x.size[2]), evaluate(x.children[1])), objective)
+        return  operate(*, T, kron(sparse(one(T)*I, x.size[2], x.size[2]), evaluate(x.children[1])), objective)
 
     # right matrix multiplication
     else
         objective = template(x.children[1], context)
-        return MOIU.operate(*, T, kron(transpose(evaluate(x.children[2])), sparse(one(T)*I, x.size[1], x.size[1])), objective)
+        return operate(*, T, kron(transpose(evaluate(x.children[2])), sparse(one(T)*I, x.size[1], x.size[1])), objective)
     end
 end
 

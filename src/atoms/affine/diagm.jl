@@ -60,5 +60,5 @@ function template(x::DiagMatrixAtom, context::Context{T}) where T
     sz = x.size[1]
     coeff = sparse(1:sz+1:sz*sz, 1:sz, one(T), sz * sz, sz)
 
-    return MOIU.operate(*, T, coeff, obj)
+    return operate(*, T, coeff, obj)
 end

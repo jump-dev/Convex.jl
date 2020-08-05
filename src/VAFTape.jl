@@ -40,7 +40,7 @@ function Base.isequal(a::VAFTape, b::VAFTape)
     isequal(a.variables, b.variables) && isequal(a.operations, b.operations)
 end
 
-function Base.hash(a::VAFTape{T}, h::UInt) where {T}
+function Base.hash(a::VAFTape{T}, h::UInt) where {T <: Real}
     hash(a.operations, hash(a.variables, hash(:VAFTape, h)))
 end
 
@@ -105,37 +105,37 @@ end
 
 
 
-# # `MOIU.operate` methods for `VAFTape`
+# # `operate` methods for `VAFTape`
 
 
 add_operation(tape::VAFTape, op::AffineOperation) = VAFTape((op, tape.operations...), tape.variables)
 
-function MOIU.operate(::typeof(-), ::Type{T},
-    tape::VAFTape) where {T}
+function operate(::typeof(-), ::Type{T},
+    tape::VAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
     return add_operation(tape, AffineOperation(-one(T)*I, Zero(d)))
 end
 
 # We need to revisit these... need to be able to handle any number of vectors, any number of `VAFTape`s, in any order....
 ###
-function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector,
-                            tape::VAFTape) where {T}
+function operate(::typeof(+), ::Type{T}, v::AbstractVector,
+                            tape::VAFTape) where {T <: Real}
     return add_operation(tape, AffineOperation(one(T)*I, v))
 end
 
-function MOIU.operate(::typeof(+), ::Type{T}, tape::VAFTape, vs::AbstractVector...) where {T}
+function operate(::typeof(+), ::Type{T}, tape::VAFTape, vs::AbstractVector...) where {T <: Real}
     v = sum(vs)
     d = length(v)
     return add_operation(tape, AffineOperation(one(T)*I, v))
 end
 
-function MOIU.operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape, vs::AbstractVector...) where {T}
-    return MOIU.operate(+, T, tape, v + sum(vs))
+function operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape, vs::AbstractVector...) where {T <: Real}
+    return operate(+, T, tape, v + sum(vs))
 end
 
 
 
-function MOIU.operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T}
+function operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T <: Real}
     ops = AffineOperation.(tapes)
     if all(op -> op.matrix isa UniformScaling, ops)
         # if they are all UniformScaling, we can't `hcat` since it doesn't know the size
@@ -154,29 +154,29 @@ end
 ####
 
 
-function MOIU.operate(::typeof(-), ::Type{T}, tape::VAFTape,
-    v::AbstractVector) where {T}
+function operate(::typeof(-), ::Type{T}, tape::VAFTape,
+    v::AbstractVector) where {T <: Real}
     return add_operation(tape, AffineOperation(one(T)*I, -v))
 end
 
-function MOIU.operate(::typeof(-), ::Type{T},
-                    v::AbstractVector, tape::VAFTape) where {T}
+function operate(::typeof(-), ::Type{T},
+                    v::AbstractVector, tape::VAFTape) where {T <: Real}
     return add_operation(tape, AffineOperation(-one(T)*I, v))
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
-    tape::VAFTape) where {T}
+function operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
+    tape::VAFTape) where {T <: Real}
     return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
 end
 
-function MOIU.operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T}
+function operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
     A = ones(T, 1, d) 
     return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
 end
 
-function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::VAFTape,
-    tape2::VAFTape) where {T}
+function operate(::typeof(vcat), ::Type{T}, tape1::VAFTape,
+    tape2::VAFTape) where {T <: Real}
     op1 = AffineOperation(tape1)
     op2 = AffineOperation(tape2)
     M1 = op1.matrix
@@ -189,7 +189,7 @@ function MOIU.operate(::typeof(vcat), ::Type{T}, tape1::VAFTape,
     return VAFTape(tuple(AffineOperation(A, b)), x)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, x::Real, tape::VAFTape) where {T}
+function operate(::typeof(*), ::Type{T}, x::Real, tape::VAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
     return add_operation(tape, AffineOperation(T(x)*I, Zero(d)))
 end

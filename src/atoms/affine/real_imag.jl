@@ -41,7 +41,7 @@ end
 
 function template(x::RealAtom, context::Context{T}) where T
     obj = template(only(children(x)), context)
-    return MOIU.operate(real, T, obj)
+    return operate(real, T, obj)
 end
 
 real(x::AbstractExpr) = RealAtom(x)
@@ -82,7 +82,7 @@ end
 
 function template(x::ImaginaryAtom, context::Context{T}) where T
     obj = template(only(children(x)), context)
-    return MOIU.operate(imag, T, obj)
+    return operate(imag, T, obj)
 end
 
 imag(x::AbstractExpr) = ImaginaryAtom(x)

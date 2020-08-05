@@ -93,6 +93,22 @@ vectorize(v::AbstractVector) = v
 vectorize(v::Number) = [v]
 vectorize(v::AbstractMatrix) = vec(v)
 
+# where should these go?
+function vec_triu(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [ L[i,j] for i = 1:n for j = i:m ]
+    return M[inds]
+end
+
+function vec_tril(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [ L[i,j]  for i = 1:n for j = 1:i ]
+    return M[inds]
+end
+
+
 include("Context.jl")
 ### modeling framework
 include("dcp.jl")

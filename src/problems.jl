@@ -1,13 +1,13 @@
 mutable struct Problem{T<:Real} <: AbstractExpr
     head::Symbol
-    objective::AbstractExpr
+    objective::Union{AbstractExpr, Nothing}
     constraints::Array{Constraint}
     status::MOI.TerminationStatusCode
     model::Union{MOI.ModelLike, Nothing}
     id_hash::UInt64
-    function Problem{T}(head::Symbol, objective::AbstractExpr,
+    function Problem{T}(head::Symbol, objective::Union{AbstractExpr, Nothing},
                      constraints::Array=Constraint[]) where {T <: Real}
-        if sign(objective)== Convex.ComplexSign()
+        if objective !== nothing && sign(objective) == Convex.ComplexSign()
             error("Objective cannot be a complex expression")
         else
             p = new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing)
@@ -53,24 +53,25 @@ function vexity(p::Problem)
         typeof(vex) in bad_vex && @warn "Problem not DCP compliant: constraint $i is not DCP"
         constr_vex += vex
     end
-    problem_vex = problem_vexity(p.head, obj_vex, constr_vex)
+    # problem_vex = problem_vexity(p.head, obj_vex, constr_vex)
+    problem_vex = obj_vex + constr_vex
     # this check is redundant
     # typeof(problem_vex) in bad_vex && warn("Problem not DCP compliant")
     return problem_vex
 end
 
 # is this right?
-function problem_vexity(sense, obj_vexity, constr_vexity)
-    if constr_vexity == ConstVexity()
-        return obj_vexity
-    end
+# function problem_vexity(sense, obj_vexity, constr_vexity)
+#     if constr_vexity == ConstVexity()
+#         return obj_vexity
+#     end
 
-    if constr_vexity == AffineVexity() && obj_vexity == AffineVexity()
-        return sense === :maximize ? ConcaveVexity() : ConvexVexity()
-    end
+#     if constr_vexity == AffineVexity() && obj_vexity == AffineVexity()
+#         return sense === :maximize ? ConcaveVexity() : ConvexVexity()
+#     end
 
-    return obj_vexity + constr_vexity
-end
+#     return obj_vexity + constr_vexity
+# end
 
 sign(p::Problem) = sign(p.objective)
 monotonicity(p::Problem) = monotonicity(p.objective)
@@ -86,11 +87,14 @@ function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
 end
 
 function template(p::Problem, context::Context)
-    obj_problem = template(p.objective, context)
     for c in p.constraints
         add_constraints_to_context(c, context)
     end
-    return obj_problem
+    if p.head !== :satisfy
+        return template(p.objective, context)
+    else
+        return nothing
+    end
 end
 
 Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Real} =
@@ -117,9 +121,9 @@ maximize(objective::Value, constraints::Array{<:Constraint}=Constraint[]; numeri
     maximize(convert(AbstractExpr, objective), constraints; numeric_type = numeric_type)
 
 # Allow users to simply type satisfy (if there is no objective)
-satisfy(constraints::Constraint...; numeric_type = Float64) = Problem{numeric_type}(:minimize, constant(0), [constraints...])
+satisfy(constraints::Constraint...; numeric_type = Float64) = Problem{numeric_type}(:satisfy, nothing, [constraints...])
 satisfy(constraints::Array{<:Constraint}=Constraint[]; numeric_type = Float64) =
-    Problem{numeric_type}(:minimize, constant(0), constraints)
+    Problem{numeric_type}(:satisfy, nothing, constraints)
 satisfy(constraint::Constraint; numeric_type = Float64) = satisfy([constraint]; numeric_type = numeric_type)
 
 # +(constraints, constraints) is defined in constraints.jl

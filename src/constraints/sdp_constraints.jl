@@ -92,7 +92,6 @@ function isposdef(x::AbstractExpr)
     end
 end
 
-# TODO: Throw error if symbol is invalid.
 function in(x::AbstractExpr, y::Symbol)
     if y == :semidefinite || y == :SDP
         if sign(x) == ComplexSign()
@@ -100,6 +99,8 @@ function in(x::AbstractExpr, y::Symbol)
         else
             SDPConstraint(x)
         end
+    else
+        error("Set $y not understood")
     end
 end
 

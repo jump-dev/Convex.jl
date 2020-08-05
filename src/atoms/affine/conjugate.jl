@@ -29,7 +29,7 @@ end
 
 function template(x::ConjugateAtom, context::Context{T}) where {T}
     objective = template(only(children(x)), context)
-    return MOIU.operate(conj, T, objective)
+    return operate(conj, T, objective)
 end
 
 

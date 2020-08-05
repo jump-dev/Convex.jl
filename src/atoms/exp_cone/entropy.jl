@@ -44,20 +44,13 @@ function evaluate(x::EntropyAtom)
     return -c .* log.(c)
 end
 
-function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, e)
-        # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
-        t = Variable(e.size)
-        x = e.children[1]
-        objective = conic_form!(t, unique_conic_forms)
-        for i = 1:size(x, 1)
-            for j = 1:size(x, 2)
-                conic_form!(ExpConstraint(t[i, j], x[i, j], 1), unique_conic_forms)
-            end
-        end
-        cache_conic_form!(unique_conic_forms, e, objective)
-    end
-    return get_conic_form(unique_conic_forms, e)
-end
-
 entropy(x::AbstractExpr) = sum(EntropyAtom(x))
+
+function template(e::EntropyAtom, context::Context)
+    # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
+    t = Variable(e.size)
+    x = e.children[1]
+    add_constraints_to_context(ExpConstraint(t, x, ones(e.size...)), context)
+
+    return template(t, context)
+end

@@ -41,7 +41,7 @@ end
 
 function template(A::SumAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
-    obj = MOIU.operate(sum, T, subobj)
+    obj = operate(sum, T, subobj)
     return obj
 end
 

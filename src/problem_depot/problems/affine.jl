@@ -568,7 +568,7 @@ end
         @test p.status == MOI.OPTIMAL
     end
 
-    p = maximize(1, [x >= 1, x <= 2]; numeric_type = T)
+    p = satisfy([x >= 1, x <= 2]; numeric_type = T)
 
     handle_problem!(p)
     if test

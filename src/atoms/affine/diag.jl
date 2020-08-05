@@ -75,6 +75,6 @@ function template(x::DiagAtom, context::Context{T}) where T
 
     
     child_obj = template(only(children(x)), context)
-    obj = MOIU.operate(*, T, select_diag, child_obj)
+    obj = operate(*, T, select_diag, child_obj)
     return obj
 end

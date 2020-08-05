@@ -44,7 +44,7 @@ function template(A::NegateAtom, context::Context{T}) where T
     if subobj isa Value
         return -subobj
     else
-        return MOIU.operate(-, T, subobj)
+        return operate(-, T, subobj)
     end
 end
 
@@ -113,7 +113,7 @@ end
 function template(x::AdditionAtom, context::Context{T}) where T
     subproblems = template.(children(x), Ref(context))
     # objectives = promote_size(subproblems)
-    obj = MOIU.operate(+, T, subproblems...)
+    obj = operate(+, T, subproblems...)
     return obj
 end
 

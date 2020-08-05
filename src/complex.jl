@@ -12,58 +12,66 @@ MOI.output_dimension(c::ComplexTape) = MOI.output_dimension(c.real_tape) # same 
 Base.real(c::ComplexTape) = c.real_tape
 Base.imag(c::ComplexTape) = c.imag_tape
 
-function MOIU.operate(::typeof(+), ::Type{T}, args::Union{<:ComplexTape, <:ComplexStructOfVec, <:VAFTapes, <:AbstractVector{<:Real}}...) where {T}
-    re = MOIU.operate(+, T, (real(a) for a in args)...)
-    im = MOIU.operate(+, T, (imag(a) for a in args)...)
+
+const ComplexTapeOrVec = Union{<:ComplexTape, <:ComplexStructOfVec, <:VAFTapes, <:AbstractVector{<:Real}}
+const TapeOrVec = Union{<:VAFTapes, <:AbstractVector{<:Real}}
+
+function operate(::typeof(+), ::Type{T}, args::ComplexTapeOrVec...) where {T}
+    re = real_operate(+, T, (real(a) for a in args)...)
+    im = real_operate(+, T, (imag(a) for a in args)...)
     return ComplexTape(re, im)
 end
 
-function MOIU.operate(::typeof(conj), ::Type{T}, c::ComplexTape) where {T}
-    im = MOIU.operate(-, T, imag(c))
+function operate(::typeof(+), ::Type{T}, args::TapeOrVec...) where {T}
+    return real_operate(+, T, args...)
+end
+
+function operate(::typeof(conj), ::Type{T}, c::ComplexTape) where {T}
+    im = operate(-, T, imag(c))
     return ComplexTape(real(c), im)
 end
 
-function MOIU.operate(::typeof(conj), ::Type{T}, tape::VAFTapes) where {T}
+function operate(::typeof(conj), ::Type{T}, tape::VAFTapes) where {T}
     return tape
 end
 
-function MOIU.operate(::typeof(real), ::Type{T}, c::ComplexTape) where {T}
+function operate(::typeof(real), ::Type{T}, c::ComplexTape) where {T}
     return real(c)
 end
 
-function MOIU.operate(::typeof(real), ::Type{T}, tape::VAFTapes) where {T}
+function operate(::typeof(real), ::Type{T}, tape::VAFTapes) where {T}
     return tape
 end
 
-function MOIU.operate(::typeof(imag), ::Type{T}, c::ComplexTape) where {T}
+function operate(::typeof(imag), ::Type{T}, c::ComplexTape) where {T}
     return imag(c)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, A::AbstractArray{<:Real}, c::ComplexTape) where {T}
-    re = MOIU.operate(*, T, A, real(c))
-    im = MOIU.operate(*, T, A, imag(c))
+function operate(::typeof(*), ::Type{T}, A::AbstractArray{<:Real}, c::ComplexTape) where {T}
+    re = operate(*, T, A, real(c))
+    im = operate(*, T, A, imag(c))
     return ComplexTape(re, im)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, x::Real, c::ComplexTape) where {T}
-    re = MOIU.operate(*, T, x, real(c))
-    im = MOIU.operate(*, T, x, imag(c))
+function operate(::typeof(*), ::Type{T}, x::Real, c::ComplexTape) where {T}
+    re = operate(*, T, x, real(c))
+    im = operate(*, T, x, imag(c))
     return ComplexTape(re, im)
 end
 
-function MOIU.operate(::typeof(sum), ::Type{T}, c::ComplexTape) where {T}
-    re = MOIU.operate(sum, T, real(c))
-    im = MOIU.operate(sum, T, imag(c))
+function operate(::typeof(sum), ::Type{T}, c::ComplexTape) where {T}
+    re = operate(sum, T, real(c))
+    im = operate(sum, T, imag(c))
     return ComplexTape(re, im)
 end
 
 
 const ComplexValue = Union{<:Complex, AbstractArray{<:Complex}}
 
-function MOIU.operate(::typeof(*), ::Type{T}, z::ComplexValue, tape::VAFTapes) where {T}
+function operate(::typeof(*), ::Type{T}, z::ComplexValue, tape::VAFTapes) where {T}
     tape = collapse(tape)
-    re = MOIU.operate(*, T, real(z), tape)
-    im = MOIU.operate(*, T, imag(z), tape)
+    re = operate(*, T, real(z), tape)
+    im = operate(*, T, imag(z), tape)
     return ComplexTape(re, im)
 end
 
@@ -73,16 +81,16 @@ function collapse(tape::ComplexTape)
     return ComplexTape(re, im)
 end
 
-function MOIU.operate(::typeof(*), ::Type{T}, z::ComplexValue, tape::ComplexTape) where {T}
+function operate(::typeof(*), ::Type{T}, z::ComplexValue, tape::ComplexTape) where {T}
     tape = collapse(tape)
-    re1 = MOIU.operate(*, T, real(z), real(tape))
-    re2 = MOIU.operate(*, T, imag(z), imag(tape))
-    re2neg = MOIU.operate(-, T, re2)
-    re = MOIU.operate(+, T, re1, re2neg)
+    re1 = operate(*, T, real(z), real(tape))
+    re2 = operate(*, T, imag(z), imag(tape))
+    re2neg = operate(-, T, re2)
+    re = operate(+, T, re1, re2neg)
     
-    im1 = MOIU.operate(*, T, imag(z), real(tape))
-    im2 = MOIU.operate(*, T, real(z), imag(tape))
-    im = MOIU.operate(+, T, im1, im2)
+    im1 = operate(*, T, imag(z), real(tape))
+    im2 = operate(*, T, real(z), imag(tape))
+    im = operate(+, T, im1, im2)
     
     return ComplexTape(re, im)
 end

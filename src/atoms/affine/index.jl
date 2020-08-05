@@ -70,7 +70,7 @@ function template(x::IndexAtom, context::Context{T}) where T
         index_matrix = sparse(1:length(x.inds), x.inds, one(T), m, n)
     end
 
-    return MOIU.operate(*, T, index_matrix, obj)
+    return operate(*, T, index_matrix, obj)
 end
 
 
