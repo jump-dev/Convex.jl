@@ -117,16 +117,16 @@ end
     solve2!(problem, ECOS.Optimizer(verbose=false))
 end
 
-Convex.USE_SPARSE() = false
-# recompile
-alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
-    solve2!(problem, ECOS.Optimizer(verbose=false))
-end
+# Convex.USE_SPARSE() = false
+# # recompile
+# alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
+#     solve2!(problem, ECOS.Optimizer(verbose=false))
+# end
 
-@info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k, Convex.USE_SPARSE())
-@time p2, X2, Y2 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
-    solve2!(problem, ECOS.Optimizer(verbose=false))
-end
+# @info "Running with `Convex.solve2!`..." (MAX_ITERS,m,n,k, Convex.USE_SPARSE())
+# @time p2, X2, Y2 = alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
+#     solve2!(problem, ECOS.Optimizer(verbose=false))
+# end
 
 @info "Running with JuMP..." (MAX_ITERS,m,n,k)
 @time model, X3, Y3 = alternating_minimization_JuMP(A, Mt, Y_init, k, MAX_ITERS);
@@ -138,9 +138,9 @@ end
     # @test evaluate(X1) ≈ X3 atol=1e-2 rtol=1e-2
     # @test evaluate(Y1) ≈ Y3 atol=1e-2 rtol=1e-2
 
-    @test evaluate(X2c) ≈ evaluate(X2) atol=1e-2 rtol=1e-2
-    @test evaluate(Y2c) ≈ evaluate(Y2) atol=1e-2 rtol=1e-2
+    # @test evaluate(X2c) ≈ evaluate(X2) atol=1e-2 rtol=1e-2
+    # @test evaluate(Y2c) ≈ evaluate(Y2) atol=1e-2 rtol=1e-2
 
-    @test evaluate(X2) ≈ X3 atol=1e-2 rtol=1e-2
-    @test evaluate(Y2) ≈ Y3 atol=1e-2 rtol=1e-2
+    @test evaluate(X2c) ≈ X3 atol=1e-2 rtol=1e-2
+    @test evaluate(Y2c) ≈ Y3 atol=1e-2 rtol=1e-2
 end

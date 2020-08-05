@@ -57,14 +57,7 @@ function template(A::EucNormAtom, context::Context{T}) where T
 
     t_obj = template(Variable(), context)
 
-    t_single_var_obj = MOI.SingleVariable(only(t_obj.variables))
-
-    # we're going to convert early since we haven't defined `vcat`...
-    if obj isa VectorAffineFunctionAsMatrix || obj isa VAFTapes
-        obj = to_vaf(obj)
-    end
-
-    f = operate(vcat, T, t_single_var_obj, obj)
+    f = operate(vcat, T, t_obj, obj)
     set = MOI.SecondOrderCone(d + 1)
     MOI_add_constraint(context.model, f, set)
 
