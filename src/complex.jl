@@ -10,16 +10,24 @@ end
 
 MOI.output_dimension(c::ComplexTape) = MOI.output_dimension(c.real_tape) # same value as for imag
 Base.real(c::ComplexTape) = c.real_tape
+Base.real(tape::VAFTapes) = tape
 Base.imag(c::ComplexTape) = c.imag_tape
 
 
 const ComplexTapeOrVec = Union{<:ComplexTape, <:ComplexStructOfVec, <:VAFTapes, <:AbstractVector{<:Real}}
 const TapeOrVec = Union{<:VAFTapes, <:AbstractVector{<:Real}}
 
+# this is pretty ugly...
 function operate(::typeof(+), ::Type{T}, args::ComplexTapeOrVec...) where {T}
     re = real_operate(+, T, (real(a) for a in args)...)
-    im = real_operate(+, T, (imag(a) for a in args)...)
-    return ComplexTape(re, im)
+    # `imag` not defined for VAFTapes
+    imag_parts =  (imag(a) for a in args if a isa ComplexTape || a isa ComplexStructOfVec)
+    if isempty(imag_parts)
+        error("Wrong dispatch hit?")
+    else
+        im = real_operate(+, T, imag_parts...)
+        return ComplexTape(re, im)
+    end
 end
 
 function operate(::typeof(+), ::Type{T}, args::TapeOrVec...) where {T}
@@ -45,6 +53,12 @@ end
 
 function operate(::typeof(imag), ::Type{T}, c::ComplexTape) where {T}
     return imag(c)
+end
+
+function operate(::typeof(-), ::Type{T}, c::ComplexTape) where {T}
+    re = operate(-, T, real(c))
+    im = operate(-, T, imag(c))
+    return ComplexTape(re, im)
 end
 
 function operate(::typeof(*), ::Type{T}, A::AbstractArray{<:Real}, c::ComplexTape) where {T}
@@ -96,6 +110,13 @@ function operate(::typeof(*), ::Type{T}, z::ComplexValue, tape::ComplexTape) whe
 end
 
 function MOI_add_constraint(model, f::ComplexTape, set::Union{MOI.Zeros, MOI.Nonnegatives, MOI.Nonpositives})
+    MOI_add_constraint(model, to_vaf(real(f)), set)
+    MOI_add_constraint(model, to_vaf(imag(f)), set)
+    return nothing
+end
+
+function MOI_add_constraint(model, f::ComplexTape, set::MOI.NormOneCone)
+
     MOI_add_constraint(model, to_vaf(real(f)), set)
     MOI_add_constraint(model, to_vaf(imag(f)), set)
     return nothing

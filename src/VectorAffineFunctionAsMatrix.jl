@@ -18,9 +18,11 @@ Base.convert(::Type{Vector{T}}, z::Zero) where {T} = zeros(T, z.len)
 
 include("VAFTape.jl")
 include("SparseVAFTape.jl")
+include("SparseVAFTape2.jl")
+include("SparseVAFTape3.jl")
 
 
-const VAFTapes = Union{VAFTape, SparseVAFTape}
+const VAFTapes = Union{VAFTape, SparseVAFTape, SparseVAFTape2, SparseVAFTape3}
 
 # This is a variant of MOI.VectorAffineFunction which represents
 # the transformation `matrix * variables + vector` lazily.

@@ -46,6 +46,8 @@ end
 
 real(x::AbstractExpr) = RealAtom(x)
 real(x::Value) = Constant(real(x))
+real(x::ComplexConstant) = x.real_constant
+real(x::Constant) = x
 real(x::ComplexVariable) = x.real_var
 
 
@@ -88,3 +90,5 @@ end
 imag(x::AbstractExpr) = ImaginaryAtom(x)
 imag(x::Value) = Constant(imag(x)) # is this `Constant` needed?
 imag(x::ComplexVariable) = x.imag_var
+imag(x::ComplexConstant) = x.imag_constant
+imag(x::Constant) = Constant(zero(x.value))

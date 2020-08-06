@@ -50,8 +50,8 @@ qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 broadcasted(::typeof(^),x::AbstractExpr,k::Int) = k==2 ? QolElemAtom(x, Constant(ones(x.size[1], x.size[2]))) : error("raising variables to powers other than 2 is not implemented")
 
 invpos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
-broadcasted(::typeof(/), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), invpos(y))
-/(x::Value, y::AbstractExpr) = size(y) == (1,1) ? MultiplyAtom(Constant(x), invpos(y)) : error("cannot divide by a variable of size $(size(y))")
+broadcasted(::typeof(/), x::Value, y::AbstractExpr) = DotMultiplyAtom(constant(x), invpos(y))
+/(x::Value, y::AbstractExpr) = size(y) == (1,1) ? MultiplyAtom(constant(x), invpos(y)) : error("cannot divide by a variable of size $(size(y))")
 sumsquares(x::AbstractExpr) = square(norm2(x))
 
 function square(x::AbstractExpr)

@@ -52,18 +52,14 @@ sumlargesteigs(x::AbstractExpr, k::Int) = SumLargestEigs(x, Constant(k))
 #            Z + sI ⪰ A
 # See Ben-Tal and Nemirovski, "Lectures on Modern Convex Optimization"
 # Example 18.c
-
-function conic_form!(x::SumLargestEigs, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        k = x.children[2]
-        m, n = size(A)
-        Z = Variable(n, n)
-        s = Variable()
-        p = minimize(s*k + tr(Z),
-                     Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
-                     A ⪰ 0, Z ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::SumLargestEigs, context::Context{T}) where T
+    A = x.children[1]
+    k = x.children[2]
+    m, n = size(A)
+    Z = Variable(n, n)
+    s = Variable()
+    p = minimize(s*k + tr(Z),
+                    Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
+                    A ⪰ 0, Z ⪰ 0)
+    return template(p, context)
 end

@@ -46,7 +46,7 @@ function template(x::LogDetAtom, context::Context{T}) where {T}
     f = operate(vcat, T, t, [1], X)
     side_dimension = size(only(children(x)), 1)
 
-    set =  MOI.LogDetConeTriangle(side_dimension)
+    set = MOI.LogDetConeTriangle(side_dimension)
 
     MOI_add_constraint(context.model, f,set)
     return t

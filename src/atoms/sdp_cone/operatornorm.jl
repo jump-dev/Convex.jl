@@ -58,19 +58,25 @@ end
 
 Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
 
-# Create the equivalent conic problem:
-#   minimize t
-#   subject to
-#            [tI_m A; A' tI_n] is positive semidefinite
-# see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
-# http://arxiv.org/pdf/0706.4138v1.pdf
-function conic_form!(x::OperatorNormAtom, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
+
+function template(x::OperatorNormAtom, context::Context{T}) where T
+    A = x.children[1]
+    if sign(A) == ComplexSign()
+        # Create the equivalent conic problem:
+        #   minimize t
+        #   subject to
+        #            [tI_m A; A' tI_n] is positive semidefinite
+        # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
+        # http://arxiv.org/pdf/0706.4138v1.pdf
         m, n = size(A)
         t = Variable()
         p = minimize(t, [t*sparse(1.0I, m, m) A; A' t*sparse(1.0I, n, n)] ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
+        return template(p, context)
+    else
+        t = template(Variable(), context)
+        f = operate(vcat, T, t, template(A, context))
+        m, n = size(A)
+        MOI_add_constraint(context.model, f, MOI.NormSpectralCone(m,n))
+        return t
     end
-    return get_conic_form(unique_conic_forms, x)
 end

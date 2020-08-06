@@ -46,6 +46,11 @@ function AffineOperation(sparse_tape::SparseVAFTape)
     AffineOperation(A, b)
 end
 
+function SparseAffineOperation(sparse_tape::SparseVAFTape)
+    sparse_tape = collapse(sparse_tape)
+    return sparse_tape.operations[]
+end
+
 function collapse(sparse_tape::SparseVAFTape) # -> SparseVAFTape
     # @show size.(_unwrap.(sparse_tape.operations))
     if length(sparse_tape.operations) > 1
@@ -58,16 +63,16 @@ function collapse(sparse_tape::SparseVAFTape) # -> SparseVAFTape
 end
 #### SparseVAFTape
 
-function add_operation(tape::SparseVAFTape, op::SparseAffineOperation)
+function add_operation(tape::SparseVAFTape{T}, op::SparseAffineOperation) where T
     tape2 = SparseVAFTape(copy(tape.operations), tape.variables)
     pushfirst!(tape2.operations, op)
-    return tape2
+    return tape2::SparseVAFTape{T}
 end
 
 function operate(::typeof(-), ::Type{T},
     tape::SparseVAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
-    return add_operation(tape, SparseAffineOperation(sparse(-one(T)*I, d, d), Zero(d)))
+    return add_operation(tape, SparseAffineOperation(sparse(-one(T)*I, d, d), zeros(T, d)))
 end
 
 function real_operate(::typeof(+), ::Type{T}, tape::SparseVAFTape, v::AbstractVector{<:Real}) where {T <: Real}
@@ -83,7 +88,7 @@ function real_operate(::typeof(+), ::Type{T}, args::SparseVAFTapeOrVec...) where
     vec_args = (a for a in args if a isa AbstractVector)
     tape_args = (a for a in args if a isa SparseVAFTape)
     if isempty(tape_args)
-        return sum(vec_args)
+        error()
     else
         tape = foldl((a,b) -> operate(+, T, a, b), tape_args)
     end
@@ -109,14 +114,14 @@ end
 
 function operate(::typeof(*), ::Type{T}, A::AbstractMatrix{<:Real},
     tape::SparseVAFTape) where {T <: Real}
-    return add_operation(tape, SparseAffineOperation(A, Zero(size(A,1))))
+    return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A,1))))
 end
 
 function operate(::typeof(sum), ::Type{T}, tape::SparseVAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
     # doesn't seem ideal for a sparse representation...
     A = ones(T, 1, d) 
-    return add_operation(tape, SparseAffineOperation(A, Zero(size(A,1))))
+    return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A,1))))
 end
 
 
@@ -130,7 +135,7 @@ end
 
 function operate(::typeof(*), ::Type{T}, x::Real, tape::SparseVAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
-    return add_operation(tape, SparseAffineOperation(sparse(T(x)*I, d, d), Zero(d)))
+    return add_operation(tape, SparseAffineOperation(sparse(T(x)*I, d, d), zeros(T, d)))
 end
 
 # we do all pairs of `SparseVAFTape` and `AbstractVector{<:Real}`, and then do 3+ arguments by iterating
@@ -170,7 +175,7 @@ end
 
 function operate(::typeof(vcat), ::Type{T}, arg1::SparseVAFTapeOrVec, arg2::SparseVAFTapeOrVec, arg3::SparseVAFTapeOrVec, args::Vararg{<:SparseVAFTapeOrVec}) where {T <: Real}
     all_args = (arg1, arg2, arg3, args...)
-    foldl((a,b) -> operate(vcat, T, a, b), all_args)
+    foldl((a,b) -> operate(vcat, T, a, b), all_args)::SparseVAFTape{T}
 end
 
 

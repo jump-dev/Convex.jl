@@ -37,7 +37,7 @@ function evaluate(x::NegateAtom)
 end
 
 -(x::AbstractExpr) = NegateAtom(x)
--(x::Constant) = constant(-x.value)
+-(x::Union{Constant, ComplexConstant}) = constant(-evaluate(x))
 
 function template(A::NegateAtom, context::Context{T}) where T
     subobj = template(only(children(A)), context)
@@ -111,9 +111,7 @@ end
 
 
 function template(x::AdditionAtom, context::Context{T}) where T
-    subproblems = template.(children(x), Ref(context))
-    # objectives = promote_size(subproblems)
-    obj = operate(+, T, subproblems...)
+    obj = operate(+, T, (template(c, context) for c in children(x))...)
     return obj
 end
 

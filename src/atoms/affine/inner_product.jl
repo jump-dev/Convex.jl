@@ -6,5 +6,5 @@ function inner_product(x::AbstractExpr, y::AbstractExpr)
     end
 end
 
-inner_product(x::Value, y::AbstractExpr) = inner_product(Constant(x),y)
-inner_product(x::AbstractExpr, y::Value) = inner_product(x,Constant(y))
+inner_product(x::Value, y::AbstractExpr) = inner_product(constant(x),y)
+inner_product(x::AbstractExpr, y::Value) = inner_product(x,constant(y))

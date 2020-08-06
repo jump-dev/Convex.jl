@@ -50,15 +50,12 @@ eigmax(x::AbstractExpr) = EigMaxAtom(x)
 #   subject to
 #            tI - A is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(x::EigMaxAtom, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        m, n = size(A)
-        t = Variable()
-        p = minimize(t, t*Matrix(1.0I, n, n) - A ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::EigMaxAtom, context::Context)
+    A = x.children[1]
+    m, n = size(A)
+    t = Variable()
+    p = minimize(t, t*Matrix(1.0I, n, n) - A ⪰ 0)
+    return template(p, context)
 end
 
 ### Eig min
@@ -103,13 +100,10 @@ eigmin(x::AbstractExpr) = EigMinAtom(x)
 #   subject to
 #            A - tI is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(x::EigMinAtom, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        m, n = size(A)
-        t = Variable()
-        p = maximize(t, A - t*Matrix(1.0I, n, n) ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::EigMinAtom, context::Context)
+    A = x.children[1]
+    m, n = size(A)
+    t = Variable()
+    p = maximize(t, A - t*Matrix(1.0I, n, n) ⪰ 0)
+    return template(p, context)
 end

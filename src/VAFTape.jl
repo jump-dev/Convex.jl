@@ -35,6 +35,7 @@ struct VAFTape{T <: Tuple}
         return tape
     end
 end
+const VAFTapeOrVec = Union{VAFTape, AbstractVector{<:Real}}
 
 function Base.isequal(a::VAFTape, b::VAFTape)
     isequal(a.variables, b.variables) && isequal(a.operations, b.operations)
@@ -113,29 +114,45 @@ add_operation(tape::VAFTape, op::AffineOperation) = VAFTape((op, tape.operations
 function operate(::typeof(-), ::Type{T},
     tape::VAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
-    return add_operation(tape, AffineOperation(-one(T)*I, Zero(d)))
+    return add_operation(tape, AffineOperation(-one(T)*I, zeros(T, d)))
 end
 
 # We need to revisit these... need to be able to handle any number of vectors, any number of `VAFTape`s, in any order....
 ###
-function operate(::typeof(+), ::Type{T}, v::AbstractVector,
+
+function real_operate(::typeof(+), ::Type{T}, v::AbstractVector,
                             tape::VAFTape) where {T <: Real}
     return add_operation(tape, AffineOperation(one(T)*I, v))
 end
 
-function operate(::typeof(+), ::Type{T}, tape::VAFTape, vs::AbstractVector...) where {T <: Real}
-    v = sum(vs)
+function real_operate(::typeof(+), ::Type{T}, tape::VAFTape, v::AbstractVector{T}) where {T <: Real}
     d = length(v)
     return add_operation(tape, AffineOperation(one(T)*I, v))
 end
 
-function operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape, vs::AbstractVector...) where {T <: Real}
-    return operate(+, T, tape, v + sum(vs))
+# function real_operate(::typeof(+), ::Type{T}, v::AbstractVector, tape::VAFTape, vs::AbstractVector...) where {T <: Real}
+    # return real_operate(+, T, tape, v + sum(vs))
+# end
+
+
+function real_operate(::typeof(+), ::Type{T}, args::VAFTapeOrVec...) where {T <: Real}
+    vec_args = (a for a in args if a isa AbstractVector)
+    tape_args = (a for a in args if a isa VAFTape)
+    if isempty(tape_args)
+        return sum(vec_args)
+    else
+        tape = foldl((a,b) -> real_operate(+, T, a, b), tape_args)
+    end
+    if isempty(vec_args)
+        return tape
+    else
+        v = sum(vec_args)
+        return real_operate(+, T, tape, v)
+    end
 end
 
 
-
-function operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T <: Real}
+function real_operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T <: Real}
     ops = AffineOperation.(tapes)
     if all(op -> op.matrix isa UniformScaling, ops)
         # if they are all UniformScaling, we can't `hcat` since it doesn't know the size
@@ -166,23 +183,71 @@ end
 
 function operate(::typeof(*), ::Type{T}, A::AbstractMatrix,
     tape::VAFTape) where {T <: Real}
-    return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
+    return add_operation(tape, AffineOperation(A, zeros(T, size(A,1))))
 end
 
 function operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
     A = ones(T, 1, d) 
-    return add_operation(tape, AffineOperation(A, Zero(size(A,1))))
+    return add_operation(tape, AffineOperation(A, zeros(T, size(A,1))))
 end
 
-function operate(::typeof(vcat), ::Type{T}, tape1::VAFTape,
-    tape2::VAFTape) where {T <: Real}
+
+# we do all pairs of `SparseVAFTape` and `AbstractVector{<:Real}`, and then do 3+ arguments by iterating
+
+
+function operate(::typeof(vcat), ::Type{T}, tape::VAFTape,
+    v::AbstractVector{<:Real}) where {T <: Real}
+    op = AffineOperation(tape)
+    n = length(v)
+    if op.matrix isa UniformScaling
+        m = n
+    else
+        m = size(op.matrix, 2)  
+    end
+    Z = spzeros(T, n, m)
+    A = vcat(op.matrix, Z)
+    b = vcat(op.vector, v)
+    return VAFTape(tuple(AffineOperation(A, b)), tape.variables)
+end
+
+function operate(::typeof(vcat), ::Type{T}, v::AbstractVector{<:Real}, tape::VAFTape) where {T <: Real}
+    op = AffineOperation(tape)
+    n = length(v)
+    if op.matrix isa UniformScaling
+        m = n
+    else
+        m = size(op.matrix, 2)  
+    end
+    Z = spzeros(T, n, m)
+    A = vcat(Z, op.matrix)
+    b = vcat(v, op.vector)
+    return VAFTape(tuple(AffineOperation(A, b)), tape.variables)
+end
+
+
+function operate(::typeof(vcat), ::Type{T}, arg1::VAFTapeOrVec, arg2::VAFTapeOrVec, arg3::VAFTapeOrVec, args::Vararg{<:VAFTapeOrVec}) where {T <: Real}
+    all_args = (arg1, arg2, arg3, args...)
+    foldl((a,b) -> operate(vcat, T, a, b), all_args)
+end
+
+function operate(::typeof(vcat), ::Type{T}, tape1::VAFTape, tape2::VAFTape) where {T <: Real}
     op1 = AffineOperation(tape1)
     op2 = AffineOperation(tape2)
     M1 = op1.matrix
     M2 = op2.matrix
-    Z1 = zeros(T, size(M2, 1), size(M1, 2))
-    Z2 = zeros(T, size(M1, 1), size(M2, 2))
+    if M2 isa UniformScaling
+        m2 = n2 = length(op2.vector)
+    else
+        m2, n2 = size(M2)
+    end
+    if M1 isa UniformScaling
+        m1 = n1 = length(op1.vector)
+    else
+        m1, n1 = size(M1)
+    end
+    Z1 = zeros(T, m1, n2)
+    Z2 = zeros(T, m2, n1)
     A = [M1 Z1; Z2 M2]
     b = vcat(op1.vector, op2.vector)
     x = vcat(tape1.variables, tape2.variables)
@@ -191,5 +256,5 @@ end
 
 function operate(::typeof(*), ::Type{T}, x::Real, tape::VAFTape) where {T <: Real}
     d = MOI.output_dimension(tape)
-    return add_operation(tape, AffineOperation(T(x)*I, Zero(d)))
+    return add_operation(tape, AffineOperation(T(x)*I, zeros(T, d)))
 end

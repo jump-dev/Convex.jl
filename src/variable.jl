@@ -203,12 +203,13 @@ struct ComplexVariable{T1, T2} <: AbstractVariable
     size::Tuple{Int,Int}
     real_var::T1
     imag_var::T2
+    constraints::Vector{Constraint}
     function ComplexVariable(v1::AbstractVariable, v2::AbstractVariable)
         size(v1) == size(v2) || throw(ArgumentError("Real and imaginary parts must have the same size"))
         if sign(v1) == ComplexSign() || sign(v2) == ComplexSign()
             throw(ArgumentError("Real and imaginary parts must be real, not complex."))
         end
-        new{typeof(v1), typeof(v2)}(:_ComplexVariable, rand(UInt64), size(v1), v1, v2)
+        new{typeof(v1), typeof(v2)}(:ComplexVariable, rand(UInt64), size(v1), v1, v2, Constraint[])
     end
 end
 

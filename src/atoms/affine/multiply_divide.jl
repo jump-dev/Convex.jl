@@ -97,9 +97,9 @@ function *(x::AbstractExpr, y::AbstractExpr)
     return MultiplyAtom(x, y)
 end
 
-*(x::Value, y::AbstractExpr) = MultiplyAtom(Constant(x), y)
-*(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(y))
-/(x::AbstractExpr, y::Value) = MultiplyAtom(x, Constant(1 ./ y))
+*(x::Value, y::AbstractExpr) = MultiplyAtom(constant(x), y)
+*(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
+/(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))
 
 
 function dotmultiply(x,y)
@@ -129,7 +129,7 @@ function dotmultiply(x,y)
     return reshape(const_multiplier * vec(var), size(var)...)
 end
 
-function broadcasted(::typeof(*), x::Constant, y::AbstractExpr)
+function broadcasted(::typeof(*), x::Union{Constant, ComplexConstant}, y::AbstractExpr)
     if x.size == (1, 1) || y.size == (1, 1)
         return x * y
     elseif size(y, 1) < size(x, 1) && size(y, 1) == 1
@@ -140,7 +140,7 @@ function broadcasted(::typeof(*), x::Constant, y::AbstractExpr)
         return dotmultiply(x, y)
     end
 end
-broadcasted(::typeof(*), y::AbstractExpr, x::Constant) = dotmultiply(x, y)
+broadcasted(::typeof(*), y::AbstractExpr, x::Union{Constant, ComplexConstant}) = dotmultiply(x, y)
 
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
 function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
@@ -154,7 +154,7 @@ function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
         return dotmultiply(y, x)
     end
 end
-broadcasted(::typeof(*), x::Value, y::AbstractExpr) = dotmultiply(Constant(x), y)
-broadcasted(::typeof(*), x::AbstractExpr, y::Value) = dotmultiply(Constant(y), x)
-broadcasted(::typeof(/), x::AbstractExpr, y::Value) = dotmultiply(Constant(1 ./ y), x)
+broadcasted(::typeof(*), x::Value, y::AbstractExpr) = dotmultiply(constant(x), y)
+broadcasted(::typeof(*), x::AbstractExpr, y::Value) = dotmultiply(constant(y), x)
+broadcasted(::typeof(/), x::AbstractExpr, y::Value) = dotmultiply(constant(1 ./ y), x)
 # x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl

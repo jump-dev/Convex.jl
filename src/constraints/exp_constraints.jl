@@ -17,9 +17,9 @@ struct ExpConstraint <: Constraint
     end
 end
 
-ExpConstraint(x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(x, Constant(y), z)
-ExpConstraint(x::AbstractExpr, y::AbstractExpr, z) = ExpConstraint(x, y, Constant(z))
-ExpConstraint(x, y::AbstractExpr, z::AbstractExpr) = ExpConstraint(Constant(x), y, z)
+ExpConstraint(x::AbstractExpr, y, z::AbstractExpr) = ExpConstraint(x, constant(y), z)
+ExpConstraint(x::AbstractExpr, y::AbstractExpr, z) = ExpConstraint(x, y, constant(z))
+ExpConstraint(x, y::AbstractExpr, z::AbstractExpr) = ExpConstraint(constant(x), y, z)
 
 function vexity(c::ExpConstraint)
     # TODO: check these...
@@ -35,7 +35,7 @@ function vexity(c::ExpConstraint)
     return ConvexVexity()
 end
 
-function add_constraints_to_context(c::ExpConstraint, context::Context{T}) where {T}
+function _add_constraints_to_context(c::ExpConstraint, context::Context{T}) where {T}
     x, y, z = c.children
     t = a -> template(a, context)
     for i = 1:size(x,1), j = 1:size(x,2)

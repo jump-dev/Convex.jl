@@ -76,7 +76,7 @@ function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, c)
 end
 
-function add_constraints_to_context(c::SDPConstraint, context::Context)
+function _add_constraints_to_context(c::SDPConstraint, context::Context)
     f = template(c.child, context)
     d = c.size[1]
     MOI_add_constraint(context.model, f, MOI.PositiveSemidefiniteConeSquare(d))
@@ -122,33 +122,33 @@ end
 
 function ⪰(x::AbstractExpr, y::Value)
     if sign(x) == ComplexSign() || !isreal(y)
-        all(y .== 0) ? SDPConstraint([real(x) -imag(x);imag(x) real(x)]) : SDPConstraint([real(x-Constant(y)) -imag(x-Constant(y));imag(x-Constant(y)) real(x-Constant(y))])
+        all(y .== 0) ? SDPConstraint([real(x) -imag(x);imag(x) real(x)]) : SDPConstraint([real(x-constant(y)) -imag(x-constant(y));imag(x-constant(y)) real(x-constant(y))])
     else
-        all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
+        all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - constant(y))
     end
 
 end
 
 function ⪰(x::Value, y::AbstractExpr)
     if sign(y) == ComplexSign() || !isreal(x)
-        all(x .== 0) ? SDPConstraint([real(-y) -imag(-y);imag(-y) real(-y)]) : SDPConstraint([real(Constant(x)-y) -imag(Constant(x)-y);imag(Constant(x)-y) real(Constant(x)-y)])
+        all(x .== 0) ? SDPConstraint([real(-y) -imag(-y);imag(-y) real(-y)]) : SDPConstraint([real(constant(x)-y) -imag(constant(x)-y);imag(constant(x)-y) real(constant(x)-y)])
     else
-        all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(Constant(x) - y)
+        all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(constant(x) - y)
     end
 end
 
 function ⪯(x::Value, y::AbstractExpr)
     if sign(y) == ComplexSign() || !isreal(x)
-        all(x .== 0) ? SDPConstraint([real(y) -imag(y);imag(y) real(y)]) : SDPConstraint([real(y-Constant(x)) -imag(y-Constant(x));imag(y-Constant(x)) real(y-Constant(x))])
+        all(x .== 0) ? SDPConstraint([real(y) -imag(y);imag(y) real(y)]) : SDPConstraint([real(y-constant(x)) -imag(y-constant(x));imag(y-constant(x)) real(y-constant(x))])
     else
-        all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - Constant(x))
+        all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - constant(x))
     end
 end
 
 function ⪯(x::AbstractExpr, y::Value)
     if sign(x) == ComplexSign() || !isreal(y)
-        all(y .== 0) ? SDPConstraint([real(-x) -imag(-x);imag(-x) real(-x)]) : SDPConstraint([real(Constant(y)-x) -imag(Constant(y)-x);imag(Constant(y)-x) real(Constant(y)-x)])
+        all(y .== 0) ? SDPConstraint([real(-x) -imag(-x);imag(-x) real(-x)]) : SDPConstraint([real(constant(y)-x) -imag(constant(y)-x);imag(constant(y)-x) real(constant(y)-x)])
     else
-        all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(Constant(y) - x)
+        all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(constant(y) - x)
     end
 end

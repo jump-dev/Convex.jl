@@ -1,6 +1,13 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
 const CONSTANT_CONSTRAINT_TOL = Ref(1e-2)
 
+
+function add_constraints_to_context(c::Constraint, context::Context)
+    # c.id_hash ∈ keys(context.constraint_id_to_constraint) && return
+    # push!(context.constraint_hashes, c.id_hash)
+    _add_constraints_to_context(c, context)
+end
+
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint
     head::Symbol
@@ -32,7 +39,7 @@ function vexity(c::EqConstraint)
     return vex
 end
 
-function add_constraints_to_context(eq::EqConstraint, context::Context{T}) where T
+function _add_constraints_to_context(eq::EqConstraint, context::Context{T}) where T
     f = template(eq.lhs - eq.rhs, context)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 == 0`
@@ -48,8 +55,8 @@ end
 
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
-==(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
-==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
+==(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
+==(lhs::Value, rhs::AbstractExpr) = ==(constant(lhs), rhs)
 
 
 ### Linear inequality constraints
@@ -86,7 +93,7 @@ function vexity(c::LtConstraint)
     return vex
 end
 
-function add_constraints_to_context(lt::LtConstraint, context::Context{T}) where T
+function _add_constraints_to_context(lt::LtConstraint, context::Context{T}) where T
     f = template(lt.lhs - lt.rhs, context)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
@@ -102,11 +109,11 @@ end
 
 
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
-<=(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 <(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
-<(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+<(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 
 
 mutable struct GtConstraint <: Constraint
@@ -143,7 +150,7 @@ function vexity(c::GtConstraint)
 end
 
 
-function add_constraints_to_context(gt::GtConstraint, context::Context{T}) where T
+function _add_constraints_to_context(gt::GtConstraint, context::Context{T}) where T
     f = template(gt.lhs - gt.rhs, context)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
@@ -158,11 +165,11 @@ function add_constraints_to_context(gt::GtConstraint, context::Context{T}) where
 end
 
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->=(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
->=(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
+>=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+>=(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 >(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
->(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
+>(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+>(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 
 function +(constraints_one::Array{<:Constraint}, constraints_two::Array{<:Constraint})
     constraints = append!(Constraint[], constraints_one)

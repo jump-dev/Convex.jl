@@ -50,9 +50,6 @@ struct ComplexConstant{T<:Value} <: AbstractExpr
     end
 end
 
-Base.real(c::ComplexConstant) = c.real_constant
-Base.imag(c::ComplexConstant) = c.imag_constant
-
 AbstractTrees.children(c::ComplexConstant) = tuple()
 vexity(::ComplexConstant) = ConstVexity()
 sign(::ComplexConstant) = ComplexSign()

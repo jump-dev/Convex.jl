@@ -22,8 +22,8 @@ function LinearAlgebra.transpose(x::AbstractExpr)
 end
 
 
-LinearAlgebra.transpose(x::Constant) = Constant(transpose(x.value))
+LinearAlgebra.transpose(x::Union{Constant, ComplexConstant}) = constant(transpose(x.value))
 
 
 LinearAlgebra.adjoint(x::AbstractExpr) = transpose(conj(x))
-LinearAlgebra.adjoint(x::Constant) = Constant(x.value')
+LinearAlgebra.adjoint(x::Union{Constant, ComplexConstant}) = constant(x.value')

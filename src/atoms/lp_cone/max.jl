@@ -72,7 +72,7 @@ function template(x::MaxAtom, context::Context)
 end
 
 max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
-max(x::AbstractExpr, y::Value) = max(x, Constant(y))
-max(x::Value, y::AbstractExpr) = max(Constant(x), y)
-pos(x::AbstractExpr) = max(x, Constant(0, Positive()))
+max(x::AbstractExpr, y::Value) = max(x, constant(y))
+max(x::Value, y::AbstractExpr) = max(constant(x), y)
+pos(x::AbstractExpr) = max(x, constant(0, Positive()))
 hinge_loss(x::AbstractExpr) = pos(1 - x)
