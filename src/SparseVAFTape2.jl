@@ -21,9 +21,8 @@ const SparseVAFTape2OrVec = Union{SparseVAFTape2, AbstractVector{<:Real}}
 
 MOI.output_dimension(v::SparseVAFTape2) = size(v.operations[1].matrix, 1)
 
-using Transducers
 function SparseAffineOperation2(tape::SparseVAFTape2)# -> AffineOperation
-    return foldxt(compose, tape.operations)
+    return foldl(compose, tape.operations)
 end
 
 function compose(A::SparseAffineOperation2, B::SparseAffineOperation2)

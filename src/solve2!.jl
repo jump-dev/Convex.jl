@@ -30,7 +30,7 @@ function solve2!(problem::Problem{T}, optimizer; kwargs...) where {T}
 end
 
 function solve2!(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
-    context = Context{T}(optimizer)
+    global context = Context{T}(optimizer)
     cfp = template(p, context)
 
     model = context.model
@@ -75,5 +75,22 @@ function solve2!(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
             set_value!(var, nothing)
         end
     end
+    
+
+    if dual_status != MOI.NO_SOLUTION
+        for (constr, MOI_constr_indices) in pairs(context.constr_to_moi_inds)
+            populate_dual!(model, constr, MOI_constr_indices)
+        end
+    else
+        populate_dual!(model, constr, nothing)
+
+    end
+
+
+    return nothing
+end
+
+function populate_dual!(model::MOI.ModelLike, constr::Constraint, ::Nothing)
+    constr.dual = nothing
     return nothing
 end

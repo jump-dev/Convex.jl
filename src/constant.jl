@@ -109,17 +109,6 @@ imag_conic_form(x::Constant{<:AbstractVecOrMat{<:Complex}}) = im * vec(imag(x.va
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
 length(x::Constant) = length(x.value)
 
-function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        #real_Value = real_conic_form(x)
-        #imag_Value = imag_conic_form(x)
-        objective = ConicObj()
-        objective[objectid(:constant)] = (real_conic_form(x), imag_conic_form(x))
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
-end
-
 function template(C::Constant, ::Context{T}) where T
     # this should happen at `Constant` creation?
     # No, we don't have access to `T` yet; that's problem-specific

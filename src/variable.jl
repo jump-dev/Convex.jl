@@ -141,7 +141,11 @@ end
 
 # Some helpers for the constructors for `Variable`
 iscomplex(sign::Sign) = sign == ComplexSign()
-iscomplex(x::AbstractVariable) = iscomplex(sign(x))
+iscomplex(x::AbstractExpr) = iscomplex(sign(x))
+iscomplex(x::Complex) = true
+iscomplex(x::Real) = false
+iscomplex(x::AbstractArray{<:Complex}) = true
+iscomplex(x::AbstractArray{<:Real}) = false
 
 # A concrete implementation of the `AbstractVariable` interface
 mutable struct Variable <: AbstractVariable

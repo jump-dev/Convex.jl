@@ -120,11 +120,9 @@ end
 
 # method for adding constraints and coverting to standard VAFs as needed
 function MOI_add_constraint(model, f, set)
-    MOI.add_constraint(model, f, set)
-    return nothing
+    return MOI.add_constraint(model, f, set)
 end
 
 function MOI_add_constraint(model, f::Union{VectorAffineFunctionAsMatrix, VAFTapes}, set)
-    MOI_add_constraint(model, to_vaf(f), set)
-    return nothing
+    return MOI_add_constraint(model, to_vaf(f), set)
 end

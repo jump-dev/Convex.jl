@@ -110,14 +110,13 @@ function operate(::typeof(*), ::Type{T}, z::ComplexValue, tape::ComplexTape) whe
 end
 
 function MOI_add_constraint(model, f::ComplexTape, set::Union{MOI.Zeros, MOI.Nonnegatives, MOI.Nonpositives})
-    MOI_add_constraint(model, to_vaf(real(f)), set)
-    MOI_add_constraint(model, to_vaf(imag(f)), set)
-    return nothing
+    re_inds = MOI_add_constraint(model, to_vaf(real(f)), set)
+    im_inds = MOI_add_constraint(model, to_vaf(imag(f)), set)
+    return (re_inds, im_inds)
 end
 
 function MOI_add_constraint(model, f::ComplexTape, set::MOI.NormOneCone)
-
-    MOI_add_constraint(model, to_vaf(real(f)), set)
-    MOI_add_constraint(model, to_vaf(imag(f)), set)
-    return nothing
+    re_inds = MOI_add_constraint(model, to_vaf(real(f)), set)
+    im_inds = MOI_add_constraint(model, to_vaf(imag(f)), set)
+    return (re_inds, im_inds)
 end

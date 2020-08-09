@@ -1,10 +1,13 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
 const CONSTANT_CONSTRAINT_TOL = Ref(1e-2)
 
+function iscomplex(constr::Constraint)
+    iscomplex(constr.lhs) || iscomplex(constr.rhs)
+end
+
 
 function add_constraints_to_context(c::Constraint, context::Context)
-    # c.id_hash ∈ keys(context.constraint_id_to_constraint) && return
-    # push!(context.constraint_hashes, c.id_hash)
+    c ∈ keys(context.constr_to_moi_inds) && return
     _add_constraints_to_context(c, context)
 end
 
@@ -49,9 +52,10 @@ function _add_constraints_to_context(eq::EqConstraint, context::Context{T}) wher
             error("Constant constraint is violated")
         end
     end
-    MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
+    context.constr_to_moi_inds[eq] = MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
     return nothing
 end
+
 
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
@@ -103,7 +107,7 @@ function _add_constraints_to_context(lt::LtConstraint, context::Context{T}) wher
             error("Constant constraint is violated")
         end
     end
-    MOI_add_constraint(context.model, f, MOI.Nonpositives(MOI.output_dimension(f)))
+    context.constr_to_moi_inds[lt] = MOI_add_constraint(context.model, f, MOI.Nonpositives(MOI.output_dimension(f)))
     return nothing
 end
 
@@ -160,7 +164,7 @@ function _add_constraints_to_context(gt::GtConstraint, context::Context{T}) wher
             error("Constant constraint is violated")
         end
     end
-    MOI_add_constraint(context.model, f, MOI.Nonnegatives(MOI.output_dimension(f)))
+    context.constr_to_moi_inds[gt] = MOI_add_constraint(context.model, f, MOI.Nonnegatives(MOI.output_dimension(f)))
     return nothing
 end
 
@@ -180,3 +184,13 @@ end
     [constraint_one] + constraints_two
 +(constraints_one::Array{<:Constraint}, constraint_two::Constraint) =
     constraints_one + [constraint_two]
+
+function populate_dual!(model::MOI.ModelLike, constr::Union{EqConstraint, GtConstraint, LtConstraint}, MOI_constr_indices)
+    if iscomplex(constr)
+        re = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[1])
+        imag = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[2])
+        constr.dual = output(reshape(re + im * imag, constr.size))
+    else
+        constr.dual = output(reshape(MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices), constr.size))
+    end
+end
