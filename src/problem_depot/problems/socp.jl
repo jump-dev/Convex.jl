@@ -254,7 +254,7 @@ end
     x = Variable(n)
     H = Semidefinite(n)
     Hval = randn(n,n)
-    Hval .= Hval'*Hval+10*diagm(ones(n)) # symmetric positive definite
+    Hval .= Hval'*Hval+10*diagm(0 => ones(n)) # symmetric positive definite
     fix!(H, Hval)
     p = minimize(x'b + quadform(x,H), [x >= 0]; numeric_type = T)
     handle_problem!(p)
