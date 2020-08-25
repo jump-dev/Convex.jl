@@ -246,6 +246,27 @@ end
         @test p.optval ≈ 3.7713 atol=atol rtol=rtol
         @test evaluate(quadform(x, A)) ≈ -1 atol=atol rtol=rtol
     end
+
+
+    # https://github.com/jump-dev/Convex.jl/issues/398
+    n = 3
+    b = randn(n) 
+    x = Variable(n)
+    H = Semidefinite(n)
+    Hval = randn(n,n)
+    Hval .= Hval'*Hval+10*diagm(ones(n)) # symmetric positive definite
+    fix!(H, Hval)
+    p = minimize(x'b + quadform(x,H), [x >= 0]; numeric_type = T)
+    handle_problem!(p)
+
+    p2 = minimize(x'b + quadform(x,Hval), [x >= 0]; numeric_type = T)
+    handle_problem!(p2)
+
+    if test
+        @test p.optval ≈ p2.optval atol=atol rtol=rtol
+        @test evaluate(H) ≈ Hval atol=atol rtol=rtol
+    end
+
 end
 
 @add_problem socp function socp_huber_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}

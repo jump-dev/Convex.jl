@@ -1,3 +1,7 @@
+# Changes in v0.13.5
+
+* fix [#398](https://github.com/jump-dev/Convex.jl/issues/398) by allowing `fix!`'d variables in `quadform`.
+
 # Changes in v0.13.4
 
 * You can now create your own variable types by subtyping `AbstractVariable`.
