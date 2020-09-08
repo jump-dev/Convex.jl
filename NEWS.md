@@ -1,3 +1,7 @@
+# Changes in v0.13.6
+
+* fix [#401](https://github.com/jump-dev/Convex.jl/issues/401) by allowing `diagm(x)`.
+* 
 # Changes in v0.13.5
 
 * fix [#398](https://github.com/jump-dev/Convex.jl/issues/398) by allowing `fix!`'d variables in `quadform`.
