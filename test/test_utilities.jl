@@ -437,4 +437,9 @@ using Convex: AbstractExpr, ConicObj
         add_constraints!(p, [c, c2])
         @test length(p.constraints) == 2
     end
+
+    @testset "`diagm` (#401)" begin
+        x = Variable(3)
+        @test diagm(x) isa AbstractExpr
+    end
 end

@@ -5,7 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import LinearAlgebra.diagm, LinearAlgebra.Diagonal
 
 struct DiagMatrixAtom <: AbstractExpr
     head::Symbol
@@ -48,11 +47,12 @@ function evaluate(x::DiagMatrixAtom)
     return Diagonal(vec(evaluate(x.children[1])))
 end
 
-function diagm((d, x)::Pair{<:Integer, <:AbstractExpr})
+function LinearAlgebra.diagm((d, x)::Pair{<:Integer, <:AbstractExpr})
     d == 0 || throw(ArgumentError("only the main diagonal is supported"))
     return DiagMatrixAtom(x)
 end
-Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
+LinearAlgebra.Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 
 function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
