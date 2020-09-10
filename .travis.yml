@@ -5,29 +5,11 @@ os:
   - osx
 julia:
   - 1.0
-  - 1.4
+  - 1.5
 if: branch = master OR tag IS present OR type = pull_request
 notifications:
   email: false
 jobs:
-  include:
-    - name: "Benchmark"
-      julia: 1.4
-      os: linux
-      before_script:
-        - git fetch origin '+refs/heads/master:refs/remotes/origin/master'
-        - git branch baseline origin/master
-        # Run benchmark outside `script` so that it's hidden by default:
-        - julia --project=benchmark -e '
-              using Pkg; Pkg.instantiate();
-              include("benchmark/runjudge.jl");'
-
-      script:
-        - julia --project=benchmark -e '
-              using Pkg; Pkg.instantiate();
-              include("benchmark/pprintjudge.jl");'
-      after_success: skip
-      if: type = pull_request
     - stage: Documentation
       julia: 1.0
       script: julia --project=docs -e '

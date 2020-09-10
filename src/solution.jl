@@ -195,10 +195,30 @@ function solve!(problem::Problem{T}, optimizer; kwargs...) where {T}
     end
 end
 
+"""
+    solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
+        check_vexity::Bool = true,
+        verbose::Bool = true,
+        warmstart::Bool = false,
+        silent_solver::Bool = false) where {T}
+
+Solves the problem, populating `problem.optval` with the optimal value,
+as well as the values of the variables (accessed by [`evaluate`](@ref))
+and constraint duals (accessed by `cons.dual`), where applicable.
+
+Optional keyword arguments:
+
+* `check_vexity` (default: `true`): emits a warning if the problem is not DCP
+* `verbose` (default: `true`): emits a warning if the problem was not solved optimally or `warmstart=true` but is not supported by the solver.
+* `warmstart` (default: `false`): whether the solver should start the optimization from a previous optimal value (according to the current value of the variables in the problem, which can be set by [`value!`](@ref) and accessed by [`evaluate`](@ref)).
+* `silent_solver`: whether the solver should be silent (and not emit output or logs) during the solution process.
+
+"""
 function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
-    check_vexity = true,
-    verbose = true,
-    warmstart = false) where {T}
+    check_vexity::Bool = true,
+    verbose::Bool = true,
+    warmstart::Bool = false,
+    silent_solver::Bool = false) where {T}
 
     if check_vexity
         vex = vexity(problem)
@@ -217,7 +237,11 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     if warmstart
         warmstart_variables!(model, var_to_indices, id_to_variables, T, verbose)
     end
- 
+
+    if silent_solver
+        MOI.set(model, MOI.Silent(), true)
+    end
+
     MOI.optimize!(model)
     problem.model = model
 
