@@ -1,5 +1,22 @@
 using Convex: AbstractExpr, ConicObj
 
+# It's not super easy to capture the output
+# I ended up using this pattern from Suppressor:
+# https://github.com/JuliaIO/Suppressor.jl/blob/b4ff08f0fe795a2ce9e592734a758c9e6d8e2bc4/src/Suppressor.jl#L124-L152
+function solve_and_return_output(problem, solver; kwargs...)
+        original_stdout = stdout
+        rd, wr = redirect_stdout()
+        out_task = @async read(rd, String)
+        try
+            solve!(problem, solver; kwargs...)
+        finally
+            Base.Libc.flush_cstdio() #  https://github.com/JuliaLang/julia/issues/31236
+            redirect_stdout(original_stdout)
+            close(wr)
+        end
+        return fetch(out_task)
+end
+
 @testset "Utilities" begin
 
     @testset "`solve!` does not return anything" begin
@@ -7,6 +24,15 @@ using Convex: AbstractExpr, ConicObj
         p = satisfy(x >= 0)
         output = solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6))
         @test output === nothing
+    end
+
+    @testset "`silent_solver` works" begin
+        x = Variable()
+        p = satisfy(x >= 0)
+        output_non_silent = solve_and_return_output(p, () -> SCS.Optimizer(eps=1e-6))
+        @test output_non_silent != ""
+        output_silent = solve_and_return_output(p, () -> SCS.Optimizer(eps=1e-6), silent_solver=true)
+        @test output_silent == ""
     end
 
     # This might get deprecated later.

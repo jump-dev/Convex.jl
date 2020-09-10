@@ -23,4 +23,5 @@ Functions:
 Convex.fix!
 Convex.free!
 Convex.evaluate
+Convex.solve!
 ```

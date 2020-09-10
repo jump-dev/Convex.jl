@@ -98,10 +98,12 @@ sign!(x::AbstractVariable, s::Sign) = x.sign = s
 
 
 """
-    evaluate(x::AbstractVariable)
+    evaluate(x::AbstractExpr)
 
 Returns the current value of `x` if assigned; errors otherwise.
 """
+evaluate
+
 evaluate(x::AbstractVariable) = _value(x) === nothing ? error("Value of the variable is yet to be calculated") : output(_value(x))
 
 """
