@@ -3,18 +3,16 @@ on:
   push:
     branches: [master]
     tags: '*'
-    paths-ignore:
-      - 'LICENSE.md'
-      - 'README.md'
-      - '.github/workflows/CompatHelper.yml'
-      - '.github/workflows/TagBot.yml'
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'src/**'
+      - 'docs/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignore:
-      - 'LICENSE.md'
-      - 'README.md'
-      - '.github/workflows/CompatHelper.yml'
-      - '.github/workflows/TagBot.yml'
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'src/**'
+      - 'docs/**'
 jobs:
   build:
     runs-on: ubuntu-latest
