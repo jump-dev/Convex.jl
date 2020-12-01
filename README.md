@@ -1,6 +1,6 @@
 # Convex.jl
 
-[![Build Status](https://travis-ci.org/jump-dev/Convex.jl.svg?branch=master)](https://travis-ci.org/jump-dev/Convex.jl)
+[![Build Status](https://github.com/jump-dev/Convex.jl/workflows/CI/badge.svg)](https://github.com/jump-dev/Convex.jl/actions?query=workflow%3ACI)
 [![Coverage](https://codecov.io/gh/jump-dev/Convex.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/jump-dev/Convex.jl)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://jump.dev/Convex.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jump.dev/Convex.jl/dev)
