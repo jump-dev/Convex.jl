@@ -1,3 +1,7 @@
+# Changes in v0.13.8
+
+* add unary `+` for `Sign` and `ComplexSign` to allow single-argument `hcat` and `vcat` to work [#405](https://github.com/jump-dev/Convex.jl/pull/405). Thanks to @dstahlke!
+
 # Changes in v0.13.7
 
 * fix [#403](https://github.com/jump-dev/Convex.jl/issues/403) by adding the keyword argument `silent_solver` to `solve!`.
@@ -32,7 +36,7 @@
 
 # Changes in v0.13.2
 
-* Add [`Convex.MAXDIGITS`](https://github.com/jump-dev/Convex.jl/pull/379)
+* Add [`Convex.MAXDIGITS`](https://github.com/jump-dev/Convex.jl/pull/379). Thanks to @riccardomurri!
 
 # Changes in v0.13.1
 
