@@ -84,6 +84,7 @@ struct ComplexSign <: Sign                end
 +(v::ConvexVexity, w::ConcaveVexity) = NotDcp()
 
 #+(::Convex.Positive, ::Convex.NoSign)
++(s::Sign) = s
 +(s::Positive, t::Positive) = s
 +(s::Negative, t::Negative) = s
 +(s::Positive, t::Negative) = NoSign()
@@ -95,6 +96,7 @@ struct ComplexSign <: Sign                end
 +(t::Negative, s::NoSign) = s+t
 
 # Any sign + ComplexSign = ComplexSign
++(s::ComplexSign) = s
 +(s::ComplexSign, t::ComplexSign) = s
 +(s::Sign, t::ComplexSign) = t
 +(t::ComplexSign, s::Sign) = s+t
