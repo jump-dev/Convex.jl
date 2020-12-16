@@ -229,6 +229,20 @@ end
         @test p.optval ≈ 8.4853 atol=atol rtol=rtol
     end
 
+    A = [1   -2im  3   4
+         2im  7    3im 5
+         3   -3im  2   9
+         4    5    9   4]
+
+    x = ComplexVariable(4, 4)
+    p = minimize(sumlargesteigs(x, 3), [x == A]...; numeric_type = T)
+
+    handle_problem!(p)
+
+    if test
+        @test p.optval ≈ sum(eigvals(A)[2:end]) atol=atol rtol=rtol
+    end
+
     x1 = Semidefinite(3)
     p1 = minimize(eigmax(x1), x1[1,1]>=4; numeric_type = T)
 

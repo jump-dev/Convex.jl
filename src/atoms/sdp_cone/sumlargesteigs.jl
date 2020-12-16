@@ -58,11 +58,15 @@ function conic_form!(x::SumLargestEigs, unique_conic_forms)
         A = x.children[1]
         k = x.children[2]
         m, n = size(A)
-        Z = Variable(n, n)
+        if sign(A) == ComplexSign()
+            Z = ComplexVariable(n, n)
+        else
+            Z = Variable(n, n)
+        end
         s = Variable()
-        p = minimize(s*k + tr(Z),
+        p = minimize(s*k + real(tr(Z)),
                      Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
-                     A ⪰ 0, Z ⪰ 0)
+                     Z ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)
