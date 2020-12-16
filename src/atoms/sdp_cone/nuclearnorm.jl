@@ -48,9 +48,14 @@ function conic_form!(x::NuclearNormAtom, unique_conic_forms)
     if !has_conic_form(unique_conic_forms, x)
         A = x.children[1]
         m, n = size(A)
-        U = Variable(m,m)
-        V = Variable(n,n)
-        p = minimize(.5*(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
+        if sign(A) == ComplexSign()
+            U = ComplexVariable(m,m)
+            V = ComplexVariable(n,n)
+        else
+            U = Variable(m,m)
+            V = Variable(n,n)
+        end
+        p = minimize(.5*real(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)
