@@ -235,7 +235,7 @@ end
          4    5    9   4]
 
     x = ComplexVariable(4, 4)
-    p = minimize(sumlargesteigs(x, 3), [x == A]...; numeric_type = T)
+    p = minimize(sumlargesteigs(x, 3), x == A; numeric_type = T)
 
     handle_problem!(p)
 
