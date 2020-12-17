@@ -1,7 +1,7 @@
 #############################################################################
 # sumlargesteigs.jl
-# Handles top k eigenvalues of a symmetric positive definite matrix
-# (and imposes the constraint that its argument be PSD)
+# Handles top k eigenvalues of a symmetric or Hermitian matrix
+# (and imposes the constraint that its argument be symmetric or Hermitian)
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
@@ -64,6 +64,8 @@ function conic_form!(x::SumLargestEigs, unique_conic_forms)
             Z = Variable(n, n)
         end
         s = Variable()
+        # The two inequality constraints have the side effect of constraining A to be symmetric,
+        # since only symmetric matrices can be positive semidefinite.
         p = minimize(s*k + real(tr(Z)),
                      Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
                      Z ⪰ 0)
