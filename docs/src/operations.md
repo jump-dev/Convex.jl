@@ -106,13 +106,14 @@ Semidefinite Program Representable Functions
 An optimization problem using these functions can be solved by any SDP
 solver (including SCS and Mosek).
 
-| operation          | description                       | vexity  | slope         | notes                          |
-| ------------------ | --------------------------------- | ------- | ------------- | ------------------------------ |
-| `nuclearnorm(x)`   | sum of singular values of $x$ | convex  | not monotonic | none                           |
-| `operatornorm(x)`  | max of singular values of $x$ | convex  | not monotonic | none                           |
-| `eigmax(x)`     | max eigenvalue of $x$         | convex  | not monotonic | none                           |
-| `eigmin(x)`     | min eigenvalue of $x$         | concave | not monotonic | none                           |
-| `matrixfrac(x, P)` | $x^TP^{-1}x$                  | convex  | not monotonic | IC: P is positive semidefinite |
+| operation              | description                       | vexity  | slope         | notes                          |
+| ------------------     | --------------------------------- | ------- | ------------- | ------------------------------ |
+| `nuclearnorm(x)`       | sum of singular values of $x$     | convex  | not monotonic | none                           |
+| `operatornorm(x)`      | max of singular values of $x$     | convex  | not monotonic | none                           |
+| `eigmax(x)`            | max eigenvalue of $x$             | convex  | not monotonic | none                           |
+| `eigmin(x)`            | min eigenvalue of $x$             | concave | not monotonic | none                           |
+| `matrixfrac(x, P)`     | $x^TP^{-1}x$                      | convex  | not monotonic | IC: P is positive semidefinite |
+| `sumlargesteigs(x, k)` | sum of top $k$ eigenvalues of $x$ | convex  | not monotonic | IC: P symmetric                |
 
 Exponential + SDP representable Functions
 -----------------------------------------
