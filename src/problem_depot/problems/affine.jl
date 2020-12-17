@@ -500,26 +500,6 @@ end
     end
 end
 
-@add_problem affine function affine_single_hcat_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    x = Variable(4, 4)
-    p = maximize(tr(hcat(x)), hcat(x) <= 2; numeric_type = T)
-
-    handle_problem!(p)
-    if test
-        @test p.optval ≈ 8 atol=atol rtol=rtol
-    end
-end
-
-@add_problem affine function affine_single_vcat_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    x = Variable(4, 4)
-    p = maximize(tr(vcat(x)), vcat(x) <= 2; numeric_type = T)
-
-    handle_problem!(p)
-    if test
-        @test p.optval ≈ 8 atol=atol rtol=rtol
-    end
-end
-
 @add_problem affine function affine_Diagonal_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2, 2)
     if test
