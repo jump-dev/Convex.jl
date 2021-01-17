@@ -171,12 +171,5 @@ include("utilities/iteration.jl")
 include("utilities/broadcast.jl")
 include("problem_depot/problem_depot.jl")
 
-# Deprecated workaround for memory leak (https://github.com/jump-dev/Convex.jl/issues/83)
-function clearmemory()
-    Base.depwarn("Convex.clearmemory() is deprecated, as the memory leak it works around has been closed (in https://github.com/jump-dev/Convex.jl/pull/322). This function no longer does anything and will be removed in a future Convex.jl release.", :clearmemory )
-end
-
-@deprecate lambdamin eigmin
-@deprecate lambdamax eigmax
 
 end

@@ -7,8 +7,8 @@ if big_example
     n = 300
     number_tests = 50
 else
-    n = 100
-    number_tests = 20
+    n = 50
+    number_tests = 10
 end
 
 # Generate data for Huber regression.

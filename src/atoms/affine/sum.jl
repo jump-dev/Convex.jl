@@ -71,4 +71,3 @@ function _sum(x::AbstractExpr, dimension::Integer)
     end
 end
 
-Base.@deprecate sum(x::AbstractExpr, dim::Int) sum(x, dims=dim)

@@ -32,7 +32,6 @@ end
 
 @testset "Convex" begin
     include("test_utilities.jl")
-    include("deprecations.jl")
     include("test_abstract_variable.jl")
 
     @testset "SCS with warmstarts" begin
