@@ -44,13 +44,22 @@ nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 #            [U A; A' V] ⪰ 0
 # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
 # http://arxiv.org/pdf/0706.4138v1.pdf
+#
+# The complex case is example 1.20 of Watrous' "The Theory of Quantum Information"
+# (the operator A is negated but this doesn't affect the norm)
+# https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf
 function conic_form!(x::NuclearNormAtom, unique_conic_forms)
     if !has_conic_form(unique_conic_forms, x)
         A = x.children[1]
         m, n = size(A)
-        U = Variable(m,m)
-        V = Variable(n,n)
-        p = minimize(.5*(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
+        if sign(A) == ComplexSign()
+            U = ComplexVariable(m,m)
+            V = ComplexVariable(n,n)
+        else
+            U = Variable(m,m)
+            V = Variable(n,n)
+        end
+        p = minimize(.5*real(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)

@@ -1,7 +1,7 @@
 #############################################################################
 # sumlargesteigs.jl
-# Handles top k eigenvalues of a symmetric positive definite matrix
-# (and imposes the constraint that its argument be PSD)
+# Handles top k eigenvalues of a symmetric or Hermitian matrix
+# (and imposes the constraint that its argument be symmetric or Hermitian)
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
@@ -27,7 +27,7 @@ struct SumLargestEigs <: AbstractExpr
 end
 
 function sign(x::SumLargestEigs)
-    return Positive()
+    return NoSign()
 end
 
 function monotonicity(x::SumLargestEigs)
@@ -58,11 +58,17 @@ function conic_form!(x::SumLargestEigs, unique_conic_forms)
         A = x.children[1]
         k = x.children[2]
         m, n = size(A)
-        Z = Variable(n, n)
+        if sign(A) == ComplexSign()
+            Z = ComplexVariable(n, n)
+        else
+            Z = Variable(n, n)
+        end
         s = Variable()
-        p = minimize(s*k + tr(Z),
+        # The two inequality constraints have the side effect of constraining A to be symmetric,
+        # since only symmetric matrices can be positive semidefinite.
+        p = minimize(s*k + real(tr(Z)),
                      Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
-                     A ⪰ 0, Z ⪰ 0)
+                     Z ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)

@@ -83,6 +83,21 @@ end
     end
 end
 
+@add_problem sdp function sdp_nuclear_norm_atom_complex(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    A = [1 2im 3 4; 4im 3im 2 1; 4 5 6 7]
+    y = ComplexVariable(3, 4)
+    p = minimize(nuclearnorm(y), y == A; numeric_type = T)
+
+    if test
+        @test vexity(p) == ConvexVexity()
+    end
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ sum(svdvals(A)) atol=atol rtol=rtol
+        @test evaluate(nuclearnorm(y)) ≈ sum(svdvals(A)) atol=atol rtol=rtol
+    end
+end
+
 @add_problem sdp function sdp_operator_norm_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     y = Variable((3,3))
     p = minimize(opnorm(y), y[2,1]<=4, y[2,2]>=3, sum(y)>=12; numeric_type = T)
@@ -94,6 +109,21 @@ end
     if test
         @test p.optval ≈ 4 atol=atol rtol=rtol
         @test evaluate(opnorm(y)) ≈ 4 atol=atol rtol=rtol
+    end
+end
+
+@add_problem sdp function sdp_operator_norm_atom_complex(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    A = [1 2im 3 4; 4im 3im 2 1; 4 5 6 7]
+    y = ComplexVariable(3, 4)
+    p = minimize(opnorm(y), y == A; numeric_type = T)
+
+    if test
+        @test vexity(p) == ConvexVexity()
+    end
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ maximum(svdvals(A)) atol=atol rtol=rtol
+        @test evaluate(opnorm(y)) ≈ maximum(svdvals(A)) atol=atol rtol=rtol
     end
 end
 
@@ -197,6 +227,20 @@ end
 
     if test
         @test p.optval ≈ 8.4853 atol=atol rtol=rtol
+    end
+
+    A = [1   -2im  3   4
+         2im  7    3im 5
+         3   -3im  2   9
+         4    5    9   4]
+
+    x = ComplexVariable(4, 4)
+    p = minimize(sumlargesteigs(x, 3), x == A; numeric_type = T)
+
+    handle_problem!(p)
+
+    if test
+        @test p.optval ≈ sum(eigvals(A)[2:end]) atol=atol rtol=rtol
     end
 
     x1 = Semidefinite(3)
