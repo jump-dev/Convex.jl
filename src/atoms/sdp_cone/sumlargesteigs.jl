@@ -27,7 +27,7 @@ struct SumLargestEigs <: AbstractExpr
 end
 
 function sign(x::SumLargestEigs)
-    return Positive()
+    return NoSign()
 end
 
 function monotonicity(x::SumLargestEigs)
