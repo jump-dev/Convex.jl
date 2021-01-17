@@ -68,8 +68,11 @@ end
 
 """
     permutedims_matrix(dims, p)
+
 Returns a matrix `M` so that for any vector `v` of length `prod(dims)`,
+
     M*v == vec(permutedims(reshape(v, dims), p))
+
 """
 function permutedims_matrix(dims, p)
     d = prod(dims)

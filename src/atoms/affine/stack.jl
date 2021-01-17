@@ -107,6 +107,11 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
+# TODO: fix piracy!
+
+# * `Value` is not owned by Convex.jl
+# * splatting creates zero-argument functions, which again are not owned by Convex.jl
+
 hcat(args::AbstractExpr...) = HcatAtom(args...)
 hcat(args::AbstractExprOrValue...) = HcatAtom(map(arg -> convert(AbstractExpr, arg), args)...)
 hcat(args::Value...) = Base.cat(args..., dims=Val(2))
