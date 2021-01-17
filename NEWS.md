@@ -1,3 +1,22 @@
+# Changes in v0.14.0
+
+## Breaking changes
+
+* Changes to the `sign` of atoms:
+    * The sign of `sumlargesteigs` has been changed from `Positive` to  `NoSign()` instead of `Positive()`, to allow non-positive-semidefinite inputs. This has the potential
+  to break code that required that sign to be positive. If you run into this problem, please file an issue so we can figure out a workaround. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+    * The sign of `eigmin` has been changed from `Positive` to  `NoSign()`. This is a bugfix because in general `eigmin` does not need to return a positive quantity (for non-positive-semidefinite inputs). Again, this has the potential
+  to break code that required that sign to be positive. If you run into this problem, please file an issue so we can figure out a workaround. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+* Removal of deprecations
+    * `lambdamin` and `lambdamax` has been deprecated to `eigmin` and `eigmax` since Convex v0.13.0. This deprecation has been removed, so your code must be updated to call `eigmin` or `eigmax` instead. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+    * `norm(x, p)` where `x` is a matrix expression has been deprecated to `opnorm(x,p)` since Convex v0.8.0. This deprecation has been removed, so your code must be updated to call `opnorm(x, p)` instead. Currently, `norm(x,p)` for a matrix
+    expression `x` will error, but in Convex.jl v0.15.0 it will return `norm(vec(x), p)`. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+    * `Convex.clearmemory()` has been deprecated and unnecessary since Convex v0.12.5. This deprecation has been removed, so if this function is in your code, just delete it. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+
+## Other changes
+
+* updated `nuclearnorm` and `sumlargesteigs` to allow complex variables, and allow the argument of `sumlargesteigs` to be non-positive-semi-definite [#409](https://github.com/jump-dev/Convex.jl/pull/409). Thanks to @dstahlke!
+
 # Changes in v0.13.8
 
 * add unary `+` for `Sign` and `ComplexSign` to allow single-argument `hcat` and `vcat` to work [#405](https://github.com/jump-dev/Convex.jl/pull/405). Thanks to @dstahlke!

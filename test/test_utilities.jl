@@ -469,25 +469,4 @@ end
         x = Variable(3)
         @test diagm(x) isa AbstractExpr
     end
-
-    @testset "Norm consistency" begin
-        # test that `norm` and `opnorm` do the same thing for expression vectors and matrices
-        # as for numeric expressions and matrices.
-
-        for p in (1,2,4,Inf)
-            x = Variable(3)
-            x_val = randn(3)
-            problem = minimize(norm(x, p), x == x_val)
-            solve!(problem, () -> SCS.Optimizer(verbose=0, eps=1e-6))
-            @test problem.optval ≈ norm(x_val, p) atol=1e-3
-        end
-
-        for p in (1,2,Inf), n in (norm, opnorm)
-            x = Variable(3, 3)
-            x_val = randn(3, 3)
-            problem = minimize(n(x, p), x == x_val)
-            solve!(problem, () -> SCS.Optimizer(verbose=0, eps=1e-6))
-            @test problem.optval ≈ n(x_val, p) atol=1e-3
-        end
-    end
 end

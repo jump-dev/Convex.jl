@@ -358,11 +358,12 @@ end
         @test evaluate(opnorm(x, Inf)) ≈ opnorm(A, Inf) atol=atol rtol=rtol
     end
     # Vector norm
+    # TODO: Once the deprecation for norm on matrices is removed, remove the `vec` calls
     if test
-        @test evaluate(norm(x, 1)) ≈ norm(vec(A), 1) atol=atol rtol=rtol
-        @test evaluate(norm(x, 2)) ≈ norm(vec(A), 2) atol=atol rtol=rtol
-        @test evaluate(norm(x, 7)) ≈ norm(vec(A), 7) atol=atol rtol=rtol
-        @test evaluate(norm(x, Inf)) ≈ norm(vec(A), Inf) atol=atol rtol=rtol
+        @test evaluate(norm(vec(x), 1)) ≈ norm(vec(A), 1) atol=atol rtol=rtol
+        @test evaluate(norm(vec(x), 2)) ≈ norm(vec(A), 2) atol=atol rtol=rtol
+        @test evaluate(norm(vec(x), 7)) ≈ norm(vec(A), 7) atol=atol rtol=rtol
+        @test evaluate(norm(vec(x), Inf)) ≈ norm(vec(A), Inf) atol=atol rtol=rtol
     end
 end
 

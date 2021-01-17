@@ -9,8 +9,6 @@ norm_fro(x::AbstractExpr) = norm2(vec(x))
     norm(x::AbstractExpr, p::Real=2)
 
 Computes the `p`-norm `‖x‖ₚ = (∑ᵢ |xᵢ|^p)^(1/p)` of a vector expression `x`.
-For a matrix expression, returns `‖vec(x)‖ₚ`, matching the behavior of [`norm`](@ref)
-for numeric matrices.
 
 This function uses specialized methods for `p=1, 2, Inf`. For `p > 1` otherwise,
 this function uses the procedure documented at
@@ -21,7 +19,9 @@ Mathematical Programming, Series B, 95:3-51, 2001.
 !!! warning
     For versions of Convex.jl prior to v0.14.0, `norm` on a matrix expression returned
     the operator norm ([`opnorm`](@ref)), which matches Julia v0.6 behavior. This functionality
-    was deprecated since Convex.jl v0.8.0.
+    was deprecated since Convex.jl v0.8.0, and has been removed. In the future,
+    `norm(x, p)` will return `‖vec(x)‖ₚ`, matching the behavior of [`norm`](@ref)
+    for numeric matrices.
 """
 function LinearAlgebra.norm(x::AbstractExpr, p::Real=2)
     if length(size(x)) <= 1 || minimum(size(x))==1
@@ -39,6 +39,6 @@ function LinearAlgebra.norm(x::AbstractExpr, p::Real=2)
             error("vector p-norms not defined for p < 1")
         end
     else
-        return norm(vec(x), p)
+        error("In Convex.jl v0.13 and below, `norm(x, p)` meant `opnorm(x, p)` (but was deprecated since v0.8.0). In the future, `norm(x,p)` for matrices will be equivalent to `norm(vec(x),p)`. This is currently an error to ensure you update your code!")
     end
 end
