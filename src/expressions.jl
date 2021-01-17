@@ -115,5 +115,3 @@ lastindex(x::AbstractExpr) = length(x)
 axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
 axes(x::AbstractExpr, n::Integer) = axes(x)[n]
 lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))
-
-@deprecate get_vectorized_size(x::AbstractExpr) length(x)

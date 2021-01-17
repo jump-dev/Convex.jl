@@ -56,8 +56,6 @@ function opnorm(x::AbstractExpr, p::Real=2)
     end
 end
 
-Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
-
 # Create the equivalent conic problem:
 #   minimize t
 #   subject to
