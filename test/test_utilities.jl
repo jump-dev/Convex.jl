@@ -440,9 +440,9 @@ end
         # default is to log
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
         
-        Convex.DCP_WARNINGS[] = false
+        @eval Convex.emit_dcp_warnings() = false
         @test_logs  Convex.NotDcp()
-        Convex.DCP_WARNINGS[] = true
+        @eval Convex.emit_dcp_warnings() = true
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
 
     end

@@ -42,14 +42,17 @@ export add_constraints!, maximize, minimize, Problem, satisfy, solve!
 # Module level globals
 
 """
-    DCP_WARNINGS
+    emit_dcp_warnings
 
 Controls whether or not warnings are emitted for when an expression fails to be
-of disciplined convex form. To turn warnings off, run
+of disciplined convex form. To turn warnings off, override the method via
 
-    Convex.DCP_WARNINGS[] = false
+    Convex.emit_dcp_warnings() = false
+
+This will cause Julia's method invalidation to recompile any functions emitting
+DCP warnings and remove them. This should be run from top-level (not within a function).
 """
-const DCP_WARNINGS = Ref(true)
+emit_dcp_warnings() = true
 
 """
     MAXDEPTH

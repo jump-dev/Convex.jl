@@ -21,7 +21,7 @@ struct ConcaveVexity <: Vexity            end
 
 struct NotDcp <: Vexity
     function NotDcp()
-        if DCP_WARNINGS[]
+        if emit_dcp_warnings()
             @warn "Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior."
         end
         return new()

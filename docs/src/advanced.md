@@ -13,11 +13,12 @@ y = Variable()
 x*y
 ```
 
-To disable this, set the module-level parameter `DCP_WARNINGS` via
+To disable this, run
 
 ```julia
-Convex.DCP_WARNINGS[] = false
+Convex.emit_dcp_warnings() = false
 ```
+to redefine the method. See [`Convex.emit_dcp_warnings`](@ref) for more details.
 
 
 Dual Variables
