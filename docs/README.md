@@ -14,7 +14,8 @@ julia --project=docs -e 'using Pkg; Pkg.instantiate(); include("docs/make.jl")'
 to generate the examples notebooks (which will be placed in `docs/notebooks`)
 and the documentation itself, which is generated into the `doc/build` folder,
 and can be previewed by opening a webserver there. Note that this command can
-take some time.
+take some time. To generate the documentation without updating the examples,
+set `ENV["CONVEX_SKIP_EXAMPLES"]="true"` before including `docs/make.jl`.
 
 To generate a single Jupyter notebook, run e.g.
 
