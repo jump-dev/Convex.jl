@@ -11,6 +11,7 @@
     * `norm(x, p)` where `x` is a matrix expression has been deprecated to `opnorm(x,p)` since Convex v0.8.0. This deprecation has been removed, so your code must be updated to call `opnorm(x, p)` instead. Currently, `norm(x,p)` for a matrix
     expression `x` will error, but in Convex.jl v0.15.0 it will return `norm(vec(x), p)`. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
     * `Convex.clearmemory()` has been deprecated and unnecessary since Convex v0.12.5. This deprecation has been removed, so if this function is in your code, just delete it. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+    * `vecnorm(x, p)` has been deprecated to `norm(vec(x), p)` since Convex v0.8.0. This deprecation has been removed, so your code must be updated to call `norm(vec(x),p)` instead.
 
 ## Other changes
 
