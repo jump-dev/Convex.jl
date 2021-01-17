@@ -5,6 +5,7 @@
 * Changes to the `sign` of atoms:
     * The sign of `sumlargesteigs` has been changed from `Positive` to  `NoSign()` instead of `Positive()`, to allow non-positive-semidefinite inputs. This has the potential
   to break code that required that sign to be positive. If you run into this problem, please file an issue so we can figure out a workaround. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
+    * The sign of `eigmin` and `eigmax` has been changed from `Positive` to  `NoSign()`. This is a bugfix because in general `eigmin` and `eigmax` do not need to return a positive quantity (for non-positive-semidefinite inputs). Again, this has the potential to break code that required that sign to be positive. If you run into this problem, please file an issue so we can figure out a workaround. [#412](https://github.com/jump-dev/Convex.jl/pull/413)
 * Removal of deprecations
     * `lambdamin` and `lambdamax` has been deprecated to `eigmin` and `eigmax` since Convex v0.13.0. This deprecation has been removed, so your code must be updated to call `eigmin` or `eigmax` instead. [#412](https://github.com/jump-dev/Convex.jl/pull/412)
     * `norm(x, p)` where `x` is a matrix expression has been deprecated to `opnorm(x,p)` since Convex v0.8.0. This deprecation has been removed, so your code must be updated to call `opnorm(x, p)` instead. Currently, `norm(x,p)` for a matrix

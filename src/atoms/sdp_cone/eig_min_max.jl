@@ -28,7 +28,7 @@ struct EigMaxAtom <: AbstractExpr
 end
 
 function sign(x::EigMaxAtom)
-    return Positive()
+    return NoSign()
 end
 
 function monotonicity(x::EigMaxAtom)
@@ -81,7 +81,7 @@ struct EigMinAtom <: AbstractExpr
 end
 
 function sign(x::EigMinAtom)
-    return Positive()
+    return NoSign()
 end
 
 function monotonicity(x::EigMinAtom)
