@@ -1,5 +1,4 @@
 using Convex: AbstractExpr, ConicObj
-using LinearAlgebra
 
 # It's not super easy to capture the output
 # I ended up using this pattern from Suppressor:
