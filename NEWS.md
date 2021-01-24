@@ -1,6 +1,6 @@
 # Changes in v0.14.1
 
-* fixed [#416](https://github.com/jump-dev/Convex.jl/issues/416): there was a bug causing `conj` to act in-place, which has been fixed in [#417](https://github.com/jump-dev/Convex.jl/pull/417). This bug appears to have existed since the introduction of `conj` in Convex.jl v0.5.0.
+* there was a bug causing `conj` to act in-place (reported in [#416](https://github.com/jump-dev/Convex.jl/issues/416)), which has been fixed ([#417](https://github.com/jump-dev/Convex.jl/pull/417)). This bug appears to have existed since the introduction of `conj` in Convex.jl v0.5.0.
 
 # Changes in v0.14.0
 
