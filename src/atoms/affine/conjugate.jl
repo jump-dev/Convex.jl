@@ -30,12 +30,13 @@ end
 function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         objective = conic_form!(x.children[1], unique_conic_forms)
+        new_obj = ConicObj()
         for var in keys(objective)
             x1 = conj(objective[var][1])
             x2 = conj(objective[var][2])
-            objective[var] = (x1,x2)
+            new_obj[var] = (x1,x2)
         end
-        cache_conic_form!(unique_conic_forms, x, objective)
+        cache_conic_form!(unique_conic_forms, x, new_obj)
     end
     return get_conic_form(unique_conic_forms, x)
 end
