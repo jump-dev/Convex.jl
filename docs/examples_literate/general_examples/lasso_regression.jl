@@ -102,12 +102,11 @@ end
 
 #-
 
-p1 = plot( log.(γM),bLasso',
-           title = "Lasso regression coefficients",
-           xlabel = "log(γ)",
-           label = permutedims(xNames),
-           size = (600,400) )
-display(p1)
+plot(log.(γM),bLasso',
+     title = "Lasso regression coefficients",
+     xlabel = "log(γ)",
+     label = permutedims(xNames),
+     size = (600,400))
 
 # # Ridge Regression
 #
@@ -123,12 +122,11 @@ end
 
 #-
 
-p2 = plot( log.(λM),bRidge',
-           title = "Ridge regression coefficients",
-           xlabel = "log(λ)",
-           label = permutedims(xNames),
-           size = (600,400) )
-display(p2)
+plot(log.(λM),bRidge',
+     title = "Ridge regression coefficients",
+     xlabel = "log(λ)",
+     label = permutedims(xNames),
+     size = (600,400))
 
 # # Elastic Net Regression
 
@@ -142,10 +140,9 @@ end
 
 #-
 
-p3 = plot( log.(γM),bEN',
-           title = "Elastic Net regression coefficients",
-           xlabel = "log(γ)",
-           label = permutedims(xNames),
-           size = (600,400) )
-display(p3)
+plot(log.(γM),bEN',
+     title = "Elastic Net regression coefficients",
+     xlabel = "log(γ)",
+     label = permutedims(xNames),
+     size = (600,400))
 #-
