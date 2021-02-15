@@ -53,7 +53,7 @@ println(evaluate(x[1] + x[4] - x[2]))
 X = Variable(2, 2)
 y = Variable()
 ## X is a 2 x 2 variable, and y is scalar. X' + y promotes y to a 2 x 2 variable before adding them
-p = minimize(norm(X) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
+p = minimize(norm(vec(X)) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
 solve!(p, solver)
 println(round.(evaluate(X), digits=2))
 println(evaluate(y))
