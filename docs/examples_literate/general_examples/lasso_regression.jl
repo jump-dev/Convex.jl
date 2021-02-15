@@ -6,7 +6,7 @@
 
 # ## Load Packages and Extra Functions
 
-using DelimitedFiles, LinearAlgebra, Statistics, Plots, LaTeXStrings, Convex, SCS
+using DelimitedFiles, LinearAlgebra, Statistics, Plots, Convex, SCS
 
 import MathOptInterface
 const MOI = MathOptInterface
@@ -104,7 +104,7 @@ end
 
 p1 = plot( log.(γM),bLasso',
            title = "Lasso regression coefficients",
-           xlabel = L"\log(\gamma)",
+           xlabel = "log(γ)",
            label = permutedims(xNames),
            size = (600,400) )
 display(p1)
@@ -125,7 +125,7 @@ end
 
 p2 = plot( log.(λM),bRidge',
            title = "Ridge regression coefficients",
-           xlabel = L"\log(\lambda)",
+           xlabel = "log(λ)",
            label = permutedims(xNames),
            size = (600,400) )
 display(p2)
@@ -144,10 +144,8 @@ end
 
 p3 = plot( log.(γM),bEN',
            title = "Elastic Net regression coefficients",
-           xlabel = L"\log(\gamma)",
+           xlabel = "log(γ)",
            label = permutedims(xNames),
            size = (600,400) )
 display(p3)
 #-
-
-
