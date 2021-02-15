@@ -93,7 +93,7 @@ display([["" "OLS" "Lasso"];xNames b_ls b])
 # Remark: it would be quicker to put this loop inside the `LassoEN()` function so as to not recreate `L1`-`L4`.
 
 nγ = 101
-γM = range(0,600,length=nγ)             #different γ values
+γM = range(0; stop=600, length=nγ)             #different γ values
 
 bLasso   = fill(NaN,size(X,2),nγ)       #results for γM[i] are in bLasso[:,i]
 for i = 1:nγ
@@ -114,7 +114,7 @@ display(p1)
 # We use the same function to do a ridge regression. Alternatively, do `b = inv(X'X + λ*I)*X'Y`.
 
 nλ = 101
-λM = range(0,3000,length=nλ)
+λM = range(0; stop=3000, length=nλ)
 
 bRidge  = fill(NaN,size(X,2),nλ)
 for i = 1:nλ
@@ -149,6 +149,5 @@ p3 = plot( log.(γM),bEN',
            size = (600,400) )
 display(p3)
 #-
-
 
 
