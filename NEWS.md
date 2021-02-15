@@ -1,3 +1,7 @@
+# Changes in v0.14.2
+
+* added lasso, ridge, and elastic net regression examples ([420](https://github.com/jump-dev/Convex.jl/pull/420)). Thanks to @PaulSoderlind!
+
 # Changes in v0.14.1
 
 * there was a bug causing `conj` to act in-place (reported in [#416](https://github.com/jump-dev/Convex.jl/issues/416)), which has been fixed ([#417](https://github.com/jump-dev/Convex.jl/pull/417)). This bug appears to have existed since the introduction of `conj` in Convex.jl v0.5.0.
