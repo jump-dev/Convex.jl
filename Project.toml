@@ -1,6 +1,6 @@
 name = "Convex"
 uuid = "f65535da-76fb-5f13-bab9-19810c17039a"
-version = "0.14.2"
+version = "0.14.3"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
