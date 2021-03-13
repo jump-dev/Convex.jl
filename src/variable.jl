@@ -125,18 +125,27 @@ set_value!(x::AbstractVariable, ::Nothing) = x.value = nothing
 
 function set_value!(x::AbstractVariable, v::AbstractArray)
     size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = sign(x) == ComplexSign() ? convert(Array{ComplexF64}, v) : convert(Array{Float64}, v)
+    if iscomplex(x) && !(eltype(v) <: Complex)
+        v = complex.(v)
+    end
+    x.value = v
 end
 
 function set_value!(x::AbstractVariable, v::AbstractVector)
     size(x, 2) == 1 || throw(DimensionMismatch("Cannot set value of a variable of size $(size(x)) to a vector"))
     size(x, 1) == length(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = sign(x) == ComplexSign() ? convert(Array{ComplexF64}, v) : convert(Array{Float64}, v)
+    if iscomplex(x) && !(eltype(v) <: Complex)
+        v = complex.(v)
+    end
+    x.value = v
 end
 
 function set_value!(x::AbstractVariable, v::Number)
     size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
-    x.value = sign(x) == ComplexSign() ? convert(ComplexF64, v) : convert(Float64, v)
+    if sign(x) == ComplexSign() && !(v isa Complex)
+        v = complex(v)
+    end
+    x.value = v
 end
 # End of `AbstractVariable` interface
 
