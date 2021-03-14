@@ -56,7 +56,7 @@ end
 
     @testset "GLPK" begin
         run_tests(; exclude=[r"exp", r"sdp", r"socp"]) do p
-            solve!(p, () -> GLPK.Optimizer(msg_lev = GLPK.OFF))
+            solve!(p, () -> GLPK.Optimizer(msg_lev = GLPK.GLP_MSG_OFF))
         end
     end
 end
