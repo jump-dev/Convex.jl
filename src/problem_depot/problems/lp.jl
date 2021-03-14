@@ -147,7 +147,7 @@ end
 
 @add_problem lp function lp_sumlargest_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(2)
-    p = minimize(sumlargest(x, 2), x >= [1; 1]; numeric_type = T)
+    p = minimize(sumlargest(x, 2) + sumlargest(x,0), x >= [1; 1]; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()
@@ -173,7 +173,7 @@ end
 
 @add_problem lp function lp_sumsmallest_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     x = Variable(4, 4)
-    p = minimize(sumlargest(x, 2), sumsmallest(x, 4) >= 1; numeric_type = T)
+    p = minimize(sumlargest(x, 2) + sumsmallest(x,0), sumsmallest(x, 4) >= 1; numeric_type = T)
 
     if test
         @test vexity(p) == ConvexVexity()

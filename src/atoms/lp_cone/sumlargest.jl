@@ -60,5 +60,5 @@ function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-sumlargest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
-sumsmallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)
+sumlargest(x::AbstractExpr, k::Int) = k == 0 ? Constant(0) : SumLargestAtom(x, k)
+sumsmallest(x::AbstractExpr, k::Int) = k == 0 ? Constant(0) : -SumLargestAtom(-x, k)
