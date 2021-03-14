@@ -1,6 +1,10 @@
+# Changes in v0.14.3
+
+* fixed a bug where the values of variables were being converted to `Float64` even if the problem was solved in high precision. ([#427](https://github.com/jump-dev/Convex.jl/pull/427)).
+
 # Changes in v0.14.2
 
-* added lasso, ridge, and elastic net regression examples ([420](https://github.com/jump-dev/Convex.jl/pull/420)). Thanks to @PaulSoderlind!
+* added lasso, ridge, and elastic net regression examples ([#420](https://github.com/jump-dev/Convex.jl/pull/420)). Thanks to @PaulSoderlind!
 
 # Changes in v0.14.1
 
