@@ -42,7 +42,7 @@ function evaluate(x::SumLargestEigs)
     eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
 end
 
-sumlargesteigs(x::AbstractExpr, k::Int) = SumLargestEigs(x, Constant(k))
+sumlargesteigs(x::AbstractExpr, k::Int) = k == 0 ? Constant(0) : SumLargestEigs(x, Constant(k))
 
 # Create the equivalent conic problem:
 #   minimize sk + Tr(Z)

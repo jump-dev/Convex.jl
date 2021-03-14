@@ -420,6 +420,10 @@ end
         c = 1.0
         @test evaluate(Constant(c)) ≈ c
         @test Constant(c).size == (1,1)
+
+        @test evaluate(sumlargesteigs(Variable(4, 4), 0)) == 0
+        @test evaluate(sumlargest(Variable(4), 0)) == 0
+        @test evaluate(sumsmallest(Variable(4), 0)) == 0
     end
 
     @testset "Base.vect" begin

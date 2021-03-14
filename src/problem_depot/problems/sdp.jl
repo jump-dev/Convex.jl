@@ -221,7 +221,7 @@ end
     end
 
     x = Semidefinite(3)
-    p = minimize(sumlargesteigs(x, 2), [x[i,:] >= i for i=1:3]...; numeric_type = T)
+    p = minimize(sumlargesteigs(x, 2) + sumlargesteigs(x,0), [x[i,:] >= i for i=1:3]...; numeric_type = T)
 
     handle_problem!(p)
 
