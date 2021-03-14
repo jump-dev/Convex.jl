@@ -71,6 +71,20 @@ end
         @test p isa Convex.Problem{Float64}
     end
 
+    @testset "`set_value!` doesn't convert to `Float64`" begin
+        x = Variable()
+        set_value!(x, big"1.0")
+        @test evaluate(x) isa BigFloat
+
+        x = Variable(2)
+        set_value!(x, big.([1.0, 2.0]))
+        @test evaluate(x) isa Vector{BigFloat}
+
+        x = Variable(2, 2)
+        set_value!(x, big.([1.0 2.0; 3.0 4.0]))
+        @test evaluate(x) isa Matrix{BigFloat}
+    end
+
     @testset "Show" begin
         x = Variable()
         @test sprint(show, x) == """
