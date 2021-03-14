@@ -50,13 +50,13 @@ end
 
     @testset "ECOS" begin
         run_tests(; exclude=[r"mip", r"sdp"]) do p
-            solve!(p, () -> ECOS.Optimizer(verbose=0))
+            solve!(p, ECOS.Optimizer; silent_solver=true)
         end
     end
 
     @testset "GLPK" begin
         run_tests(; exclude=[r"exp", r"sdp", r"socp"]) do p
-            solve!(p, () -> GLPK.Optimizer(msg_lev = GLPK.GLP_MSG_OFF))
+            solve!(p, GLPK.Optimizer; silent_solver=true)
         end
     end
 end
