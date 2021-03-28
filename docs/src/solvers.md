@@ -38,15 +38,15 @@ solve!(p, SCS.Optimizer)
 ```
 
 (Of course, the solver must be installed first.) For example, we can use
-GLPK to solve a MILP
-
+GLPK to solve a MILP:
 ```julia
 using GLPK
 solve!(p, GLPK.Optimizer)
 ```
 
 Many of the solvers also allow options to be passed using 
-`MOI.OptimizerWithAttributes`. For example:
+`MOI.OptimizerWithAttributes`. For example, to set a time limit (in 
+milliseconds) with GLPK, use:
 ```julia
 using Convex, GLPK
 const MOI = Convex.MOI
@@ -65,6 +65,12 @@ const MOI = Convex.MOI
 
 opt = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() => false)
 solve!(p, opt)
+```
+
+Another option is to use the solver-independent `silent_solver` 
+keyword argument to `solve!`:
+```julia
+solve!(p, SCS.Optimizer; silent_solver=true)
 ```
 
 See each solver's documentation for more information on solver-dependent
