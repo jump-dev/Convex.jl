@@ -45,39 +45,35 @@ using GLPK
 solve!(p, GLPK.Optimizer)
 ```
 
-Many of the solvers also allow options to be passed in. More details can
-be found in each solver's documentation.
-
-For example, if we wish to turn off printing for the SCS solver (ie, run
-in quiet mode), we can do so by
-
+Many of the solvers also allow options to be passed using 
+`MOI.OptimizerWithAttributes`. For example:
 ```julia
-using SCS
-opt = () -> SCS.Optimizer(verbose=false)
+using Convex, GLPK
+const MOI = Convex.MOI
+
+solve!(
+    p, 
+    MOI.OptimizerWithAttributes(GLPK.Optimizer, "tm_lim" => 60_000.0)
+)
+```
+
+As another example, if we wish to turn off printing for the SCS solver 
+(i.e., run in quiet mode), we can do so as follows:
+```julia
+using Convex, SCS
+const MOI = Convex.MOI
+
+opt = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() => false)
 solve!(p, opt)
 ```
 
-or equivalently,
-
-```julia
-solve!(p, () -> SCS.Optimizer(verbose=false))
-```
-
-If we wish to increase the maximum number of iterations for ECOS or SCS,
-we can do so by
-
-```julia
-using ECOS
-solve!(p, () -> ECOS.Optimizer(maxit=10000))
-using SCS
-solve!(p, () -> SCS.Optimizer(max_iters=10000))
-```
+See each solver's documentation for more information on solver-dependent
+options.
 
 To turn off the problem status warning issued by Convex when a solver is
 not able to solve a problem to optimality, use the keyword argument
-`verbose=false` of the solve method, along with any desired
-solver parameters:
+`verbose=false` of the solve method:
 
 ```julia
-solve!(p, () -> SCS.Optimizer(verbose=false), verbose=false)
+solve!(p, SCS.Optimizer, verbose=false)
 ```
