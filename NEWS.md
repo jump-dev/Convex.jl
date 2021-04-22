@@ -1,3 +1,7 @@
+# Changes in v0.14.7
+
+* declare compatibility with BenchmarkTools v0.7 [#434](https://github.com/jump-dev/Convex.jl/pull/434)
+
 # Changes in v0.14.6
 
 * Use `MOI.instantiate` to create the optimizer, which allows users to pass an [`MOI.OptimizerWithAttributes`](https://jump.dev/MathOptInterface.jl/stable/apireference/#MathOptInterface.OptimizerWithAttributes) to configure solver settings [#431](https://github.com/jump-dev/Convex.jl/pull/431). Thanks @odow!
