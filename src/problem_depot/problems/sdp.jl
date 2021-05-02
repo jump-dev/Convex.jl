@@ -520,6 +520,24 @@ end
     end
 end
 
+@add_problem sdp function sdp_geom_mean_hypocone_real_0(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 4
+    A = Variable(n,n)
+    B = randn(n,n)
+    B = B * B' # now A is positive semidefinite
+    B += 0.2 * I # prevent numerical instability
+
+    c1 = eye(n) in GeomMeanHypoCone(A, B, 0)
+    objective = tr(A)
+    p = minimize(objective, c1; numeric_type = T)
+
+    handle_problem!(p)
+
+    if test
+        @test A.value ≈ eye(n) atol=atol rtol=rtol
+    end
+end
+
 @add_problem sdp function sdp_geom_mean_hypocone_real_1_2(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     n = 4
     A = randn(n,n)
@@ -734,7 +752,7 @@ end
     end
 end
 
-function sdp_quantum_relative_entropy_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}, lowrank::Bool, mode::Integer) where {T, test}
+@add_problem sdp function sdp_quantum_relative_entropy_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     if test
         @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,3),    zeros(2,3))
         @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,3), Variable(2,3))
@@ -745,6 +763,19 @@ function sdp_quantum_relative_entropy_argcheck(handle_problem!, ::Val{test}, ato
         @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,2), Variable(3,3))
         @test_throws DimensionMismatch quantum_relative_entropy(Variable(2,2),    zeros(3,3))
         @test_throws DimensionMismatch quantum_relative_entropy(Variable(2,2), Variable(2,3))
+
+        z = zeros(2,2)
+        v = Variable(2,2)
+        nh = [ 1 1 ; 0 1 ] # not hermitian
+        np = [ 1 2 ; 2 1 ] # not positive semidefinite
+        @test_throws DomainError quantum_relative_entropy(z, nh)
+        @test_throws DomainError quantum_relative_entropy(z, np)
+        @test_throws DomainError quantum_relative_entropy(nh, z)
+        @test_throws DomainError quantum_relative_entropy(np, z)
+        @test_throws DomainError quantum_relative_entropy(v, nh)
+        @test_throws DomainError quantum_relative_entropy(v, np)
+        @test_throws DomainError quantum_relative_entropy(nh, v)
+        @test_throws DomainError quantum_relative_entropy(np, v)
     end
 end
 
@@ -860,6 +891,7 @@ end
 
     if test
         @test p.optval ≈ v atol=atol rtol=rtol
+        @test evaluate(objective) ≈ v atol=atol rtol=rtol
 
         @test_throws DimensionMismatch quantum_entropy(Variable(2, 3))
     end
@@ -874,6 +906,11 @@ end
         @test_throws DimensionMismatch trace_mpower(Variable(2,2), 1//2, zeros(3,3))
 
         @test_throws DomainError trace_mpower(Variable(3,3),  5//2, zeros(3,3))
+
+        nh = [ 1 1 ; 0 1 ] # not hermitian
+        np = [ 1 2 ; 2 1 ] # not positive semidefinite
+        @test_throws DomainError trace_mpower(Variable(2,2), 1//2, nh)
+        @test_throws DomainError trace_mpower(Variable(2,2), 1//2, np)
     end
 end
 
