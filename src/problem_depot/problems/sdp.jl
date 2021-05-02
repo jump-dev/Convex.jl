@@ -482,6 +482,44 @@ end
     end
 end
 
+@add_problem sdp function sdp_geom_mean_hypocone_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test_throws DimensionMismatch GeomMeanHypoCone(   zeros(2,3),    zeros(2,3), 1//2)
+        @test_throws DimensionMismatch GeomMeanHypoCone(   zeros(2,3), Variable(2,3), 1//2)
+        @test_throws DimensionMismatch GeomMeanHypoCone(Variable(2,3),    zeros(2,3), 1//2)
+        @test_throws DimensionMismatch GeomMeanHypoCone(Variable(2,3), Variable(2,3), 1//2)
+
+        @test_throws DimensionMismatch GeomMeanHypoCone(   zeros(2,2),    zeros(3,3), 1//2)
+        @test_throws DimensionMismatch GeomMeanHypoCone(   zeros(2,2), Variable(3,3), 1//2)
+        @test_throws DimensionMismatch GeomMeanHypoCone(Variable(2,2),    zeros(3,3), 1//2)
+        @test_throws DimensionMismatch GeomMeanHypoCone(Variable(2,2), Variable(2,3), 1//2)
+
+        @test_throws DimensionMismatch Variable(2,2) in GeomMeanHypoCone(Variable(3,3), Variable(3,3), 1//2)
+
+        @test_throws DomainError GeomMeanHypoCone(Variable(3,3), Variable(3,3), -1//2)
+        @test_throws DomainError GeomMeanHypoCone(Variable(3,3), Variable(3,3), 3//2)
+    end
+end
+
+@add_problem sdp function sdp_geom_mean_epicone_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test_throws DimensionMismatch GeomMeanEpiCone(   zeros(2,3),    zeros(2,3), -1//2)
+        @test_throws DimensionMismatch GeomMeanEpiCone(   zeros(2,3), Variable(2,3), -1//2)
+        @test_throws DimensionMismatch GeomMeanEpiCone(Variable(2,3),    zeros(2,3), -1//2)
+        @test_throws DimensionMismatch GeomMeanEpiCone(Variable(2,3), Variable(2,3), -1//2)
+
+        @test_throws DimensionMismatch GeomMeanEpiCone(   zeros(2,2),    zeros(3,3), -1//2)
+        @test_throws DimensionMismatch GeomMeanEpiCone(   zeros(2,2), Variable(3,3), -1//2)
+        @test_throws DimensionMismatch GeomMeanEpiCone(Variable(2,2),    zeros(3,3), -1//2)
+        @test_throws DimensionMismatch GeomMeanEpiCone(Variable(2,2), Variable(2,3), -1//2)
+
+        @test_throws DimensionMismatch Variable(2,2) in GeomMeanEpiCone(Variable(3,3), Variable(3,3), -1//2)
+        @test_throws DomainError GeomMeanEpiCone(Variable(3,3), Variable(3,3), -3//2)
+        @test_throws DomainError GeomMeanEpiCone(Variable(3,3), Variable(3,3), 1//2)
+        @test_throws DomainError GeomMeanEpiCone(Variable(3,3), Variable(3,3), 5//2)
+    end
+end
+
 @add_problem sdp function sdp_geom_mean_hypocone_real_1_2(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     n = 4
     A = randn(n,n)
@@ -696,6 +734,20 @@ end
     end
 end
 
+function sdp_quantum_relative_entropy_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}, lowrank::Bool, mode::Integer) where {T, test}
+    if test
+        @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,3),    zeros(2,3))
+        @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,3), Variable(2,3))
+        @test_throws DimensionMismatch quantum_relative_entropy(Variable(2,3),    zeros(2,3))
+        @test_throws DimensionMismatch quantum_relative_entropy(Variable(2,3), Variable(2,3))
+
+        @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,2),    zeros(3,3))
+        @test_throws DimensionMismatch quantum_relative_entropy(   zeros(2,2), Variable(3,3))
+        @test_throws DimensionMismatch quantum_relative_entropy(Variable(2,2),    zeros(3,3))
+        @test_throws DimensionMismatch quantum_relative_entropy(Variable(2,2), Variable(2,3))
+    end
+end
+
 function sdp_quantum_relative_entropy_impl(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}, lowrank::Bool, mode::Integer) where {T, test}
     # Too slow for n>3.  Anything that can be done to speed it up?
     n = 3
@@ -808,6 +860,20 @@ end
 
     if test
         @test p.optval ≈ v atol=atol rtol=rtol
+
+        @test_throws DimensionMismatch quantum_entropy(Variable(2, 3))
+    end
+end
+
+@add_problem sdp function sdp_trace_mpower_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test_throws DimensionMismatch trace_mpower(   zeros(2,3), 1//2, zeros(2,3))
+        @test_throws DimensionMismatch trace_mpower(Variable(2,3), 1//2, zeros(2,3))
+
+        @test_throws DimensionMismatch trace_mpower(   zeros(2,2), 1//2, zeros(3,3))
+        @test_throws DimensionMismatch trace_mpower(Variable(2,2), 1//2, zeros(3,3))
+
+        @test_throws DomainError trace_mpower(Variable(3,3),  5//2, zeros(3,3))
     end
 end
 
@@ -982,6 +1048,17 @@ end
 end
 
 @add_problem sdp function sdp_lieb_ando(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test_throws DomainError lieb_ando(   zeros(3,3),    zeros(3,3), eye(3), -3//2)
+        @test_throws DomainError lieb_ando(   zeros(3,3),    zeros(3,3), eye(3), 5//2)
+        @test_throws DomainError lieb_ando(   zeros(3,3), Variable(3,3), eye(3), -3//2)
+        @test_throws DomainError lieb_ando(   zeros(3,3), Variable(3,3), eye(3), 5//2)
+        @test_throws DomainError lieb_ando(Variable(3,3),    zeros(3,3), eye(3), -3//2)
+        @test_throws DomainError lieb_ando(Variable(3,3),    zeros(3,3), eye(3), 5//2)
+        @test_throws DomainError lieb_ando(Variable(3,3), Variable(3,3), eye(3), -3//2)
+        @test_throws DomainError lieb_ando(Variable(3,3), Variable(3,3), eye(3), 5//2)
+    end
+
     for n in [2, 3]
         for t in [1//2, 1//4, 3//4, 1//8, 3//2, 5//4]
             for cplx in [false, true]

@@ -19,16 +19,25 @@
 const MatrixOrConstant = Union{AbstractMatrix, Constant}
 
 function lieb_ando(A::MatrixOrConstant, B::MatrixOrConstant, K::MatrixOrConstant, t::Rational)
+    if t < -1 || t > 2
+        throw(DomainError(t, "t must be between -1 and 2"))
+    end
     return real(tr(K' * A^(1-t) * K * B^t))
 end
 
 function lieb_ando(A::MatrixOrConstant, B::AbstractExpr, K::MatrixOrConstant, t::Rational)
+    if t < -1 || t > 2
+        throw(DomainError(t, "t must be between -1 and 2"))
+    end
     KAK = K' * A^(1-t) * K
     KAK = (KAK+KAK')/2
     return trace_mpower(B, t, KAK)
 end
 
 function lieb_ando(A::AbstractExpr, B::MatrixOrConstant, K::MatrixOrConstant, t::Rational)
+    if t < -1 || t > 2
+        throw(DomainError(t, "t must be between -1 and 2"))
+    end
     KBK = K * B^t * K'
     KBK = (KBK+KBK')/2
     return trace_mpower(A, 1-t, KBK)
