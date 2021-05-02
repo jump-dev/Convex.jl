@@ -68,7 +68,8 @@ function AbstractTrees.children(constraint::GeomMeanEpiConeConstraint)
     return (constraint.T, constraint.cone.A, constraint.cone.B, "t=$(constraint.cone.t)")
 end
 
-# FIXME what is the meaning of the vexity of a variable? of a constraint?  Is this correct?
+# For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex (arxiv:1512.03401).
+# So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
 function vexity(constraint::GeomMeanEpiConeConstraint)
     A = vexity(constraint.cone.A)
     B = vexity(constraint.cone.B)
