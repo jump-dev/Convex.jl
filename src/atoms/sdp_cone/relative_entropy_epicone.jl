@@ -29,17 +29,17 @@ struct RelativeEntropyEpiCone <: AbstractExpr
     function RelativeEntropyEpiCone(X::AbstractExpr, Y::AbstractExpr, m::Integer, k::Integer, e::AbstractArray)
         children = (X, Y)
         if size(X) != size(Y)
-            error("X and Y must be the same size")
+            throw(DimensionMismatch("X and Y must be the same size"))
         end
         n = size(X)[1]
         if size(X) != (n, n)
-            error("X and Y must be square")
+            throw(DimensionMismatch("X and Y must be square"))
         end
         if size(e) == (n,)
             e = reshape(e, (n, 1))
         end
         if ndims(e) != 2 || size(e)[1] != n
-            error("e matrix must have n rows")
+            throw(DimensionMismatch("e matrix must have n rows"))
         end
         return new(:relative_entropy_epicone, hash(children), children, (n, n), m, k, e)
     end

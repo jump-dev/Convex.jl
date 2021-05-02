@@ -35,11 +35,11 @@ struct TraceLogm <: AbstractExpr
     function TraceLogm(X::AbstractExpr, C::AbstractMatrix, m::Integer, k::Integer)
         children = (X,)
         if size(X) != size(C)
-            error("X and C must be the same size")
+            throw(DimensionMismatch("X and C must be the same size"))
         end
         n = size(X)[1]
         if size(X) != (n, n)
-            error("X and C must be square")
+            throw(DimensionMismatch("X and C must be square"))
         end
         if norm(C - C') > 1e-6
             error("C must be Hermitian")

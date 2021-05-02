@@ -35,11 +35,11 @@ struct QuantumRelativeEntropy1 <: AbstractExpr
     function QuantumRelativeEntropy1(A::AbstractExpr, B::AbstractExpr, m::Integer, k::Integer)
         children = (A, B)
         if size(A) != size(B)
-            error("A and B must be the same size")
+            throw(DimensionMismatch("A and B must be the same size"))
         end
         n = size(A)[1]
         if size(A) != (n, n)
-            error("A and B must be square")
+            throw(DimensionMismatch("A and B must be square"))
         end
         return new(:quantum_relative_entropy, hash(children), children, (1, 1), m, k)
     end
@@ -60,11 +60,11 @@ struct QuantumRelativeEntropy2 <: AbstractExpr
         children = (A, )
 
         if size(A) != size(B)
-            error("A and B must be the same size")
+            throw(DimensionMismatch("A and B must be the same size"))
         end
         n = size(A)[1]
         if size(A) != (n, n)
-            error("A and B must be square")
+            throw(DimensionMismatch("A and B must be square"))
         end
         if norm(B - B') > nullspace_tol
             error("B must be Hermitian")
@@ -122,10 +122,10 @@ function quantum_relative_entropy(A::MatrixOrConstant, B::MatrixOrConstant, m::I
     B = evaluate(B)
 
     if size(A) != size(B)
-        error("A and B must be the same size")
+        throw(DimensionMismatch("A and B must be the same size"))
     end
     if size(A) != (size(A)[1], size(A)[1])
-        error("A and B must be square")
+        throw(DimensionMismatch("A and B must be square"))
     end
     if norm(A - A') > nullspace_tol
         error("A must be Hermitian")

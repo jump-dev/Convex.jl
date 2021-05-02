@@ -35,7 +35,7 @@ struct QuantumEntropy <: AbstractExpr
         children = (X,)
         n = size(X)[1]
         if size(X) != (n, n)
-            error("X must be square")
+            throw(DimensionMismatch("X must be square"))
         end
         return new(:quantum_entropy, hash(children), children, (1, 1), m, k)
     end

@@ -25,11 +25,11 @@ struct TraceMpower <: AbstractExpr
     function TraceMpower(A::AbstractExpr, t::Rational, C::AbstractMatrix)
         children = (A,)
         if size(A) != size(C)
-            error("A and C must be the same size")
+            throw(DimensionMismatch("A and C must be the same size"))
         end
         n = size(A)[1]
         if size(A) != (n, n)
-            error("A and C must be square")
+            throw(DimensionMismatch("A and C must be square"))
         end
         if norm(C - C') > 1e-6
             error("C must be Hermitian")

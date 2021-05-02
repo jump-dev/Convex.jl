@@ -35,11 +35,11 @@ struct GeomMeanHypoCone
 
     function GeomMeanHypoCone(A::AbstractExpr, B::AbstractExpr, t::Rational, fullhyp::Bool=true)
         if size(A) != size(B)
-            error("A and B must be the same size")
+            throw(DimensionMismatch("A and B must be the same size"))
         end
         n = size(A)[1]
         if size(A) != (n, n)
-            error("A and B must be square")
+            throw(DimensionMismatch("A and B must be square"))
         end
         if t < 0 || t > 1
             error("t must be in the range [0, 1]")
@@ -60,7 +60,7 @@ struct GeomMeanHypoConeConstraint <: Constraint
 
     function GeomMeanHypoConeConstraint(T::AbstractExpr, cone::GeomMeanHypoCone)
         if size(T) != cone.size
-            error("T must be size $(cone.size)")
+            throw(DimensionMismatch("T must be size $(cone.size)"))
         end
         id_hash = hash((cone.A, cone.B, cone.t, :GeomMeanHypoCone))
         return new(:GeomMeanHypoCone, id_hash, T, cone)
