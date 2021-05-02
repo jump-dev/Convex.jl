@@ -42,7 +42,7 @@ struct GeomMeanHypoCone
             throw(DimensionMismatch("A and B must be square"))
         end
         if t < 0 || t > 1
-            error("t must be in the range [0, 1]")
+            throw(DomainError(t, "t must be in the range [0, 1]"))
         end
         return new(A, B, t, (n, n), fullhyp)
     end

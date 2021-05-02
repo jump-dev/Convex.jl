@@ -67,13 +67,13 @@ struct QuantumRelativeEntropy2 <: AbstractExpr
             throw(DimensionMismatch("A and B must be square"))
         end
         if norm(B - B') > nullspace_tol
-            error("B must be Hermitian")
+            throw(DomainError(B, "B must be Hermitian"))
         end
 
         # nullspace of A must contain nullspace of B
         v,U = eigen(Hermitian(B))
         if any(v .< -nullspace_tol)
-            error("B must be positive semidefinite")
+            throw(DomainError(B, "B must be positive semidefinite"))
         end
         J = U'[v .> nullspace_tol, :]
         K = U'[v .< nullspace_tol, :]
@@ -128,19 +128,19 @@ function quantum_relative_entropy(A::MatrixOrConstant, B::MatrixOrConstant, m::I
         throw(DimensionMismatch("A and B must be square"))
     end
     if norm(A - A') > nullspace_tol
-        error("A must be Hermitian")
+        throw(DomainError(A, "A must be Hermitian"))
     end
     if norm(B - B') > nullspace_tol
-        error("B must be Hermitian")
+        throw(DomainError(B, "B must be Hermitian"))
     end
 
     # need to project down to support of A
     v,U = eigen(Hermitian(A))
     if any(v .< -nullspace_tol)
-        error("A must be positive semidefinite")
+        throw(DomainError(A, "A must be positive semidefinite"))
     end
     if any(eigvals(Hermitian(B)) .< -nullspace_tol)
-        error("B must be positive semidefinite")
+        throw(DomainError(B, "B must be positive semidefinite"))
     end
     J = U'[v .> nullspace_tol, :]
     Ap = Hermitian(J * A * J')

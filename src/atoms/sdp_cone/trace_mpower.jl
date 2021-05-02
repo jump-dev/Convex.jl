@@ -32,13 +32,13 @@ struct TraceMpower <: AbstractExpr
             throw(DimensionMismatch("A and C must be square"))
         end
         if norm(C - C') > 1e-6
-            error("C must be Hermitian")
+            throw(DomainError(C, "C must be Hermitian"))
         end
         if any(eigvals(Hermitian(C)) .< -1e-6)
-            error("C must be positive semidefinite")
+            throw(DomainError(C, "C must be positive semidefinite"))
         end
         if t < -1 || t > 2
-            error("t must be in the range [-1, 2]")
+            throw(DomainError(t, "t must be in the range [-1, 2]"))
         end
         return new(:trace_mpower, hash(children), children, (1, 1), C, t)
     end

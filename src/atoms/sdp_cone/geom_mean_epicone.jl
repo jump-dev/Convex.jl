@@ -35,7 +35,7 @@ struct GeomMeanEpiCone
             throw(DimensionMismatch("A and B must be square"))
         end
         if t < -1 || (t > 0 && t < 1) || t > 2
-            error("t must be in the range [-1, 0] or [1, 2]")
+            throw(DomainError(t, "t must be in the range [-1, 0] or [1, 2]"))
         end
         return new(A, B, t, (n, n))
     end
@@ -112,7 +112,7 @@ function conic_form!(constraint::GeomMeanEpiConeConstraint, unique_conic_forms::
             conic_form!([T B; B Z] ⪰ 0, unique_conic_forms)
             conic_form!(Z in GeomMeanHypoCone(A, B, 2-t, false), unique_conic_forms)
         else
-            error("t must be in the range [-1, 0] or [1, 2]")
+            throw(DomainError(t, "t must be in the range [-1, 0] or [1, 2]"))
         end
 
         cache_conic_form!(unique_conic_forms, constraint, Array{Convex.ConicConstr,1}())

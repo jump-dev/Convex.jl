@@ -59,6 +59,6 @@ function lieb_ando(A::AbstractExpr, B::AbstractExpr, K::MatrixOrConstant, t::Rat
         add_constraint!(T, T in GeomMeanEpiCone(kron(A,Im), kron(In,conj(B)), t, false))
         return real(tr(KvKv * T))
     else
-        error("t must be between -1 and 2")
+        throw(DomainError(t, "t must be between -1 and 2"))
     end
 end
