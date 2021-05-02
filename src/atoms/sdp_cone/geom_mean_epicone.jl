@@ -108,11 +108,10 @@ function conic_form!(constraint::GeomMeanEpiConeConstraint, unique_conic_forms::
         if t <= 0
             conic_form!([T A; A Z] ⪰ 0, unique_conic_forms)
             conic_form!(Z in GeomMeanHypoCone(A, B, -t, false), unique_conic_forms)
-        elseif t >= 1
+        else
+            @assert t >= 1 # range of t checked in GeomMeanEpiCone constructor
             conic_form!([T B; B Z] ⪰ 0, unique_conic_forms)
             conic_form!(Z in GeomMeanHypoCone(A, B, 2-t, false), unique_conic_forms)
-        else
-            @assert false # unreachable: range of t checked in GeomMeanEpiCone constructor
         end
 
         cache_conic_form!(unique_conic_forms, constraint, Array{Convex.ConicConstr,1}())
