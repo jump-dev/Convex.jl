@@ -1,7 +1,7 @@
 #############################################################################
 # relative_entropy_epicone.jl
 # Returns τ constrained to
-#   e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e <= τ
+#   e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e \preceq τ
 #
 # This function implements the semidefinite programming approximation given in
 # the reference below.  Parameters m and k control the accuracy of this
@@ -12,9 +12,9 @@
 # Please read expressions.jl first.
 #
 #REFERENCE
-#   Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-#   theorem, matrix geometric means and semidefinite optimization" by Hamza
-#   Fawzi and James Saunderson (arXiv:1512.03401)
+#   Ported from CVXQUAD which is based on the paper: "Semidefinite
+#   approximations of matrix logarithm" by Hamza Fawzi, James Saunderson and
+#   Pablo A. Parrilo (arXiv:1705.00812)
 #############################################################################
 
 struct RelativeEntropyEpiCone <: AbstractExpr
