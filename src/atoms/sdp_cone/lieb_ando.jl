@@ -71,3 +71,5 @@ function lieb_ando(A::AbstractExpr, B::AbstractExpr, K::MatrixOrConstant, t::Rat
         throw(DomainError(t, "t must be between -1 and 2"))
     end
 end
+
+lieb_ando(A::AbstractExprOrValue, B::AbstractExprOrValue, K::MatrixOrConstant, t::Integer) = lieb_ando(A, B, K, t//1)

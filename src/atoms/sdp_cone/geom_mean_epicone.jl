@@ -43,6 +43,8 @@ struct GeomMeanEpiCone
     GeomMeanEpiCone(A::Value,        B::AbstractExpr, t::Rational, fullhyp::Bool=true) = GeomMeanEpiCone(Constant(A), B, t, fullhyp)
     GeomMeanEpiCone(A::AbstractExpr, B::Value,        t::Rational, fullhyp::Bool=true) = GeomMeanEpiCone(A, Constant(B), t, fullhyp)
     GeomMeanEpiCone(A::Value,        B::Value,        t::Rational, fullhyp::Bool=true) = GeomMeanEpiCone(Constant(A), Constant(B), t, fullhyp)
+
+    GeomMeanEpiCone(A::AbstractExprOrValue, B::AbstractExprOrValue, t::Integer, fullhyp::Bool=true) = GeomMeanEpiCone(A, B, t//1, fullhyp)
 end
 
 struct GeomMeanEpiConeConstraint <: Constraint

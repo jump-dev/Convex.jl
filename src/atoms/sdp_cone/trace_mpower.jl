@@ -78,6 +78,8 @@ function trace_mpower(A::MatrixOrConstant, t::Rational, C::MatrixOrConstant)
     return tr(C * A^t)
 end
 
+trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant) = trace_mpower(A, t//1, C)
+
 function conic_form!(atom::TraceMpower, unique_conic_forms)
     if !has_conic_form(unique_conic_forms, atom)
         A = atom.children[1]

@@ -50,6 +50,8 @@ struct GeomMeanHypoCone
     GeomMeanHypoCone(A::Value,        B::AbstractExpr, t::Rational, fullhyp::Bool=true) = GeomMeanHypoCone(Constant(A), B, t, fullhyp)
     GeomMeanHypoCone(A::AbstractExpr, B::Value,        t::Rational, fullhyp::Bool=true) = GeomMeanHypoCone(A, Constant(B), t, fullhyp)
     GeomMeanHypoCone(A::Value,        B::Value,        t::Rational, fullhyp::Bool=true) = GeomMeanHypoCone(Constant(A), Constant(B), t, fullhyp)
+
+    GeomMeanHypoCone(A::AbstractExprOrValue, B::AbstractExprOrValue, t::Integer, fullhyp::Bool=true) = GeomMeanHypoCone(A, B, t//1, fullhyp)
 end
 
 struct GeomMeanHypoConeConstraint <: Constraint
