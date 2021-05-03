@@ -167,10 +167,9 @@ function conic_form!(atom::QuantumRelativeEntropy1, unique_conic_forms)
         conic_form!(A ⪰ 0, unique_conic_forms)
         conic_form!(B ⪰ 0, unique_conic_forms)
 
-        τ = relative_entropy_epicone(kron(A, eye), kron(eye, conj(B)), m, k, e)
+        τ = Variable()
+        conic_form!(τ in RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e), unique_conic_forms)
 
-        # It's already a real mathematically, but need to make it a real type.
-        τ = real(τ)
         cache_conic_form!(unique_conic_forms, atom, minimize(τ))
     end
     return get_conic_form(unique_conic_forms, atom)

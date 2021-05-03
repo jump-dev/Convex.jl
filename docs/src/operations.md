@@ -123,7 +123,7 @@ solver (including SCS and Mosek).
 | `trace_logm(X, C)`                             | $\textrm{Tr}(C \log X)$                                        | concave in X                                                           | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant; uses natural log |
 | `trace_mpower(A, t, C)`                        | $\textrm{Tr}(C A^t)$                                           | concave in A for $t \in [0,1]$, convex for $t \in [-1,0] \cup [1,2]$   | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant, $t \in [-1, 2]$  |
 | `lieb_ando(A, B, K, t)`                        | $\textrm{Tr}(K' A^{1-t} K B^t)$                                | concave in A,B for $t \in [0,1]$, convex for $t \in [-1,0] \cup [1,2]$ | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $K$ constant, $t \in [-1, 2]$  |
-| `T = relative_entropy_epicone(X, Y, m, k, e)`  | $T \succeq e' X^{1/2} \log(X^{1/2} Y^{-1} X^{1/2}) X^{1/2} e$  | concave in X,Y                                                         | not monotonic | IC: $e$ constant; uses natural log                               |
+| `T in RelativeEntropyEpiCone(X, Y, m, k, e)`   | $T \succeq e' X^{1/2} \log(X^{1/2} Y^{-1} X^{1/2}) X^{1/2} e$  | convex                                                                 | not monotonic | IC: $e$ constant; uses natural log                               |
 
 Exponential + SDP representable Functions
 -----------------------------------------

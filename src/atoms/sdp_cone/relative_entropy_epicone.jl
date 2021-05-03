@@ -1,7 +1,7 @@
 #############################################################################
 # relative_entropy_epicone.jl
-# Returns τ constrained to
-#   e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e \preceq τ
+# Constrains τ to
+#   τ ⪰ e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e
 #
 # This function implements the semidefinite programming approximation given in
 # the reference below.  Parameters m and k control the accuracy of this
@@ -17,17 +17,15 @@
 #   Pablo A. Parrilo (arXiv:1705.00812)
 #############################################################################
 
-struct RelativeEntropyEpiCone <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+struct RelativeEntropyEpiCone
+    X::AbstractExpr
+    Y::AbstractExpr
     m::Integer
     k::Integer
     e::AbstractMatrix
+    size::Tuple{Int, Int}
 
-    function RelativeEntropyEpiCone(X::AbstractExpr, Y::AbstractExpr, m::Integer, k::Integer, e::AbstractArray)
-        children = (X, Y)
+    function RelativeEntropyEpiCone(X::AbstractExpr, Y::AbstractExpr, m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X)))
         if size(X) != size(Y)
             throw(DimensionMismatch("X and Y must be the same size"))
         end
@@ -38,43 +36,62 @@ struct RelativeEntropyEpiCone <: AbstractExpr
         if size(e) == (n,)
             e = reshape(e, (n, 1))
         end
-        if ndims(e) != 2 || size(e)[1] != n
+        erows, ecols = size(e)
+        if ndims(e) != 2 || erows != n
             throw(DimensionMismatch("e matrix must have n rows"))
         end
-        return new(:relative_entropy_epicone, hash(children), children, (n, n), m, k, e)
+        return new(X, Y, m, k, e, (ecols, ecols))
     end
+
+    RelativeEntropyEpiCone(X::Value,        Y::AbstractExpr, m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Y, m, k, e)
+    RelativeEntropyEpiCone(X::AbstractExpr, Y::Value,        m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(X, Constant(Y), m, k, e)
+    RelativeEntropyEpiCone(X::Value,        Y::Value,        m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Constant(Y), m, k, e)
 end
 
-function sign(atom::RelativeEntropyEpiCone)
-    X = atom.children[1]
-    Y = atom.children[2]
-    # Result is PSD, but it looks like Semidefinite is supposed to be NoSign.
-    if sign(X) == ComplexSign() || sign(Y) == ComplexSign() || sign(Constant(atom.e)) == ComplexSign()
-        return ComplexSign()
-    else
-        return NoSign()
+struct RelativeEntropyEpiConeConstraint <: Constraint
+    head::Symbol
+    id_hash::UInt64
+    τ::AbstractExpr
+    cone::RelativeEntropyEpiCone
+
+    function RelativeEntropyEpiConeConstraint(τ::AbstractExpr, cone::RelativeEntropyEpiCone)
+        if size(τ) != cone.size
+            throw(DimensionMismatch("τ must be size $(cone.size)"))
+        end
+        id_hash = hash((cone.X, cone.Y, cone.m, cone.k, cone.e, :RelativeEntropyEpiCone))
+        return new(:RelativeEntropyEpiCone, id_hash, τ, cone)
     end
+
+    RelativeEntropyEpiConeConstraint(τ::Value, cone::RelativeEntropyEpiCone) = RelativeEntropyEpiConeConstraint(Constant(τ), cone)
 end
 
-function monotonicity(atom::RelativeEntropyEpiCone)
-    return (NoMonotonicity(), NoMonotonicity())
+in(τ, cone::RelativeEntropyEpiCone) = RelativeEntropyEpiConeConstraint(τ, cone)
+
+function AbstractTrees.children(constraint::RelativeEntropyEpiConeConstraint)
+    return (constraint.τ, constraint.cone.X, constraint.cone.Y)
 end
 
-function curvature(atom::RelativeEntropyEpiCone)
-    return ConvexVexity()
-end
+# This negative relative entropy function is matrix convex (arxiv:1705.00812).
+# So if X and Y are convex sets, then τ ⪰ -D_op(X || Y) will be a convex set.
+function vexity(constraint::RelativeEntropyEpiConeConstraint)
+    X = vexity(constraint.cone.X)
+    Y = vexity(constraint.cone.Y)
+    τ = vexity(constraint.τ)
 
-function evaluate(atom::RelativeEntropyEpiCone)
-    X = evaluate(atom.children[1])
-    Y = evaluate(atom.children[2])
-    rX = sqrt(X)
-    return rX * log(rX * Y^-1 * rX) * rX
+    # NOTE: can't say X == NotDcp() because the NotDcp constructor prints a warning message.
+    if typeof(X) == ConcaveVexity || typeof(X) == NotDcp
+        return NotDcp()
+    end
+    if typeof(Y) == ConcaveVexity || typeof(Y) == NotDcp
+        return NotDcp()
+    end
+    # Copied from vexity(c::GtConstraint)
+    vex = ConvexVexity() + (-τ)
+    if vex == ConcaveVexity()
+        vex = NotDcp()
+    end
+    return vex
 end
-
-relative_entropy_epicone(X::AbstractExpr,   Y::AbstractExpr,   m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(X, Y, m, k, e)
-relative_entropy_epicone(X::AbstractMatrix, Y::AbstractExpr,   m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Y, m, k, e)
-relative_entropy_epicone(X::AbstractExpr,   Y::AbstractMatrix, m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(X, Constant(Y), m, k, e)
-relative_entropy_epicone(X::AbstractMatrix, Y::AbstractMatrix, m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Constant(Y), m, k, e)
 
 function glquad(m)
     # Compute Gauss-Legendre quadrature nodes and weights on [0, 1]
@@ -91,24 +108,24 @@ function glquad(m)
     return s, w
 end
 
-function conic_form!(atom::RelativeEntropyEpiCone, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, atom)
-        X = atom.children[1]
-        Y = atom.children[2]
-        m = atom.m
-        k = atom.k
-        e = atom.e
+function conic_form!(constraint::RelativeEntropyEpiConeConstraint, unique_conic_forms::UniqueConicForms)
+    if !has_conic_form(unique_conic_forms, constraint)
+        X = constraint.cone.X
+        Y = constraint.cone.Y
+        m = constraint.cone.m
+        k = constraint.cone.k
+        e = constraint.cone.e
+        τ = constraint.τ
         n = size(X)[1]
         r = size(e)[2]
 
         s, w = glquad(m)
 
-        if sign(atom) == ComplexSign()
-            τ = ComplexVariable(r, r)
+        is_complex = sign(X) == ComplexSign() || sign(Y) == ComplexSign() || sign(e) == ComplexSign()
+        if is_complex
             Z = ComplexVariable(n, n)
             T = [ ComplexVariable(r, r) for i in 1:m ]
         else
-            τ = Variable(r, r)
             Z = Variable(n, n)
             T = [ Variable(r, r) for i in 1:m ]
         end
@@ -129,7 +146,7 @@ function conic_form!(atom::RelativeEntropyEpiCone, unique_conic_forms)
 
         conic_form!((2^k)*sum(T) + τ ⪰ 0, unique_conic_forms)
 
-        cache_conic_form!(unique_conic_forms, atom, conic_form!(τ, unique_conic_forms))
+        cache_conic_form!(unique_conic_forms, constraint, Array{Convex.ConicConstr,1}())
     end
-    return get_conic_form(unique_conic_forms, atom)
+    return get_conic_form(unique_conic_forms, constraint)
 end

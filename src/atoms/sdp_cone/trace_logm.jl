@@ -89,7 +89,13 @@ function conic_form!(atom::TraceLogm, unique_conic_forms)
         k = atom.k
         eye = Matrix(1.0*I, size(X))
 
-        τ = relative_entropy_epicone(eye, X, m, k)
+        is_complex = sign(X) == ComplexSign() || sign(C) == ComplexSign()
+        if is_complex
+            τ = ComplexVariable(size(X))
+        else
+            τ = Variable(size(X))
+        end
+        conic_form!(τ in RelativeEntropyEpiCone(eye, X, m, k), unique_conic_forms)
 
         # It's already a real mathematically, but need to make it a real type.
         t = real(-tr(C * τ))

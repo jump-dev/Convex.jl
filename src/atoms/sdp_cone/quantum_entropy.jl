@@ -80,7 +80,13 @@ function conic_form!(atom::QuantumEntropy, unique_conic_forms)
 
         conic_form!(X ⪰ 0, unique_conic_forms)
 
-        τ = relative_entropy_epicone(X, eye, m, k)
+        is_complex = sign(X) == ComplexSign()
+        if is_complex
+            τ = ComplexVariable(n, n)
+        else
+            τ = Variable(n, n)
+        end
+        conic_form!(τ in RelativeEntropyEpiCone(X, eye, m, k), unique_conic_forms)
 
         # It's already a real mathematically, but need to make it a real type.
         τ = real(-tr(τ))

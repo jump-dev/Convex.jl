@@ -16,7 +16,7 @@ export conv, dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, i
 export log_perspective, logisticloss, logsumexp, matrixfrac, neg, norm2, norm_1, norm_inf, nuclearnorm
 export partialtrace, partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
 export relative_entropy, scaledgeomean, sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
-export GeomMeanHypoCone, GeomMeanEpiCone, relative_entropy_epicone, quantum_relative_entropy, quantum_entropy
+export GeomMeanHypoCone, GeomMeanEpiCone, RelativeEntropyEpiCone, quantum_relative_entropy, quantum_entropy
 export trace_logm, trace_mpower, lieb_ando
 
 # rexports from LinearAlgebra
