@@ -121,7 +121,7 @@ function conic_form!(constraint::RelativeEntropyEpiConeConstraint, unique_conic_
 
         s, w = glquad(m)
 
-        is_complex = sign(X) == ComplexSign() || sign(Y) == ComplexSign() || sign(e) == ComplexSign()
+        is_complex = sign(X) == ComplexSign() || sign(Y) == ComplexSign() || sign(Constant(e)) == ComplexSign()
         if is_complex
             Z = ComplexVariable(n, n)
             T = [ ComplexVariable(r, r) for i in 1:m ]

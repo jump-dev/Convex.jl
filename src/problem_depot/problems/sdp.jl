@@ -979,29 +979,36 @@ end
 
     n = 3
 
-    ψ1 = normalize(randn(ComplexF64, n))
-    ψ2 = normalize(randn(ComplexF64, n))
-    ρ1 = ψ1 * ψ1'
-    ρ2 = ψ2 * ψ2'
+    for cplx in [false, true]
+        if cplx
+            ψ1 = normalize(randn(ComplexF64, n))
+            ψ2 = normalize(randn(ComplexF64, n))
+        else
+            ψ1 = normalize(randn(Float64, n))
+            ψ2 = normalize(randn(Float64, n))
+        end
+        ρ1 = ψ1 * ψ1'
+        ρ2 = ψ2 * ψ2'
 
-    p1 = Variable()
-    p2 = Variable()
+        p1 = Variable()
+        p2 = Variable()
 
-    objective = (quantum_entropy(p1*ρ1 + p2*ρ2) - p1*quantum_entropy(ρ1) - p2*quantum_entropy(ρ2)) / log(2)
-    constraints = [ p1 >= 0, p2 >= 0, p1+p2 == 1 ]
-    p = maximize(objective, constraints; numeric_type = T)
-    handle_problem!(p)
+        objective = (quantum_entropy(p1*ρ1 + p2*ρ2) - p1*quantum_entropy(ρ1) - p2*quantum_entropy(ρ2)) / log(2)
+        constraints = [ p1 >= 0, p2 >= 0, p1+p2 == 1 ]
+        p = maximize(objective, constraints; numeric_type = T)
+        handle_problem!(p)
 
-    ϵ = abs(ψ1' * ψ2)
-    q = (1 + ϵ)/2
-    r = [q, 1-q]
-    v = -r' * log2.(r)
+        ϵ = abs(ψ1' * ψ2)
+        q = (1 + ϵ)/2
+        r = [q, 1-q]
+        v = -r' * log2.(r)
 
-    if test
-        @test p.optval ≈ v atol=atol rtol=rtol
-        @test evaluate(objective) ≈ v atol=atol rtol=rtol
+        if test
+            @test p.optval ≈ v atol=atol rtol=rtol
+            @test evaluate(objective) ≈ v atol=atol rtol=rtol
 
-        @test_throws DimensionMismatch quantum_entropy(Variable(2, 3))
+            @test_throws DimensionMismatch quantum_entropy(Variable(2, 3))
+        end
     end
 end
 
