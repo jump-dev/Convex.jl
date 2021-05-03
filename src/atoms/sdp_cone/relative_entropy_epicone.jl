@@ -25,7 +25,7 @@ struct RelativeEntropyEpiCone
     e::AbstractMatrix
     size::Tuple{Int, Int}
 
-    function RelativeEntropyEpiCone(X::AbstractExpr, Y::AbstractExpr, m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X)))
+    function RelativeEntropyEpiCone(X::AbstractExpr, Y::AbstractExpr, m::Integer=3, k::Integer=3, e::AbstractArray = Matrix(1.0*I, size(X)))
         if size(X) != size(Y)
             throw(DimensionMismatch("X and Y must be the same size"))
         end
@@ -43,9 +43,9 @@ struct RelativeEntropyEpiCone
         return new(X, Y, m, k, e, (ecols, ecols))
     end
 
-    RelativeEntropyEpiCone(X::Value,        Y::AbstractExpr, m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Y, m, k, e)
-    RelativeEntropyEpiCone(X::AbstractExpr, Y::Value,        m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(X, Constant(Y), m, k, e)
-    RelativeEntropyEpiCone(X::Value,        Y::Value,        m::Integer, k::Integer, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Constant(Y), m, k, e)
+    RelativeEntropyEpiCone(X::Value,        Y::AbstractExpr, m::Integer=3, k::Integer=3, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Y, m, k, e)
+    RelativeEntropyEpiCone(X::AbstractExpr, Y::Value,        m::Integer=3, k::Integer=3, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(X, Constant(Y), m, k, e)
+    RelativeEntropyEpiCone(X::Value,        Y::Value,        m::Integer=3, k::Integer=3, e::AbstractArray = Matrix(1.0*I, size(X))) = RelativeEntropyEpiCone(Constant(X), Constant(Y), m, k, e)
 end
 
 struct RelativeEntropyEpiConeConstraint <: Constraint

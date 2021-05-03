@@ -551,6 +551,28 @@ end
     end
 end
 
+@add_problem sdp function sdp_relative_entropy(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    for cplx in [false, true]
+        n = 4
+        X = eye(n)
+        if cplx
+            Y = ComplexVariable(n,n)
+        else
+            Y = Variable(n,n)
+        end
+
+        c1 = eye(n) in RelativeEntropyEpiCone(X, Y)
+        objective = real(tr(Y))
+        p = minimize(objective, c1; numeric_type = T)
+
+        handle_problem!(p)
+
+        if test
+            @test Y.value ≈ eye(n)*exp(-1) atol=atol rtol=rtol
+        end
+    end
+end
+
 @add_problem sdp function sdp_geom_mean_hypocone_real_0(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     n = 4
     A = Variable(n,n)
