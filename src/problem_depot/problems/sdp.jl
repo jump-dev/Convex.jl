@@ -965,10 +965,10 @@ end
 
 @add_problem sdp function sdp_quantum_relative_entropy_const(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     if test
-        @test quantum_relative_entropy(diagm([0.5, 0.5]), diagm([0.5, 0.5])) ≈ 0 atol=atol rtol=rtol
-        @test quantum_relative_entropy(diagm([1.0, 0.0]), diagm([1.0, 0.0])) ≈ 0 atol=atol rtol=rtol
-        @test quantum_relative_entropy(diagm([1.0, 0.0]), diagm([0.5, 0.5])) ≈ log(2) atol=atol rtol=rtol
-        @test isinf(quantum_relative_entropy(diagm([0.5, 0.5]), diagm([1.0, 0.0])))
+        @test quantum_relative_entropy(diagm(0=>[0.5, 0.5]), diagm(0=>[0.5, 0.5])) ≈ 0 atol=atol rtol=rtol
+        @test quantum_relative_entropy(diagm(0=>[1.0, 0.0]), diagm(0=>[1.0, 0.0])) ≈ 0 atol=atol rtol=rtol
+        @test quantum_relative_entropy(diagm(0=>[1.0, 0.0]), diagm(0=>[0.5, 0.5])) ≈ log(2) atol=atol rtol=rtol
+        @test isinf(quantum_relative_entropy(diagm(0=>[0.5, 0.5]), diagm(0=>[1.0, 0.0])))
     end
 end
 
