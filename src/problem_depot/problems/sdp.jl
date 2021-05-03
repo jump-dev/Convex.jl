@@ -520,6 +520,37 @@ end
     end
 end
 
+@add_problem sdp function sdp_relative_entropy_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(2,3),    zeros(2,3), 3, 3, eye(2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(2,3), Variable(2,3), 3, 3, eye(2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(2,3),    zeros(2,3), 3, 3, eye(2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(2,3), Variable(2,3), 3, 3, eye(2))
+
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(2,2),    zeros(3,3), 3, 3)
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(2,2), Variable(3,3), 3, 3)
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(2,2),    zeros(3,3), 3, 3)
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(2,2), Variable(2,3), 3, 3)
+
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(3,3),    zeros(3,3), 3, 3, zeros(2, 2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(3,3), Variable(3,3), 3, 3, zeros(2, 2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(3,3),    zeros(3,3), 3, 3, zeros(2, 2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(3,3), Variable(2,3), 3, 3, zeros(2, 2))
+
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(3,3),    zeros(3,3), 3, 3, zeros(2, 3))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(3,3), Variable(3,3), 3, 3, zeros(2, 3))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(3,3),    zeros(3,3), 3, 3, zeros(2, 3))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(3,3), Variable(2,3), 3, 3, zeros(2, 3))
+
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(3,3),    zeros(3,3), 3, 3, zeros(2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(   zeros(3,3), Variable(3,3), 3, 3, zeros(2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(3,3),    zeros(3,3), 3, 3, zeros(2))
+        @test_throws DimensionMismatch RelativeEntropyEpiCone(Variable(3,3), Variable(2,3), 3, 3, zeros(2))
+
+        @test_throws DimensionMismatch Variable(2,2) in RelativeEntropyEpiCone(Variable(3,3), Variable(3,3), 3, 3)
+    end
+end
+
 @add_problem sdp function sdp_geom_mean_hypocone_real_0(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     n = 4
     A = Variable(n,n)
@@ -528,6 +559,24 @@ end
     B += 0.2 * I # prevent numerical instability
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 0)
+    objective = tr(A)
+    p = minimize(objective, c1; numeric_type = T)
+
+    handle_problem!(p)
+
+    if test
+        @test A.value ≈ eye(n) atol=atol rtol=rtol
+    end
+end
+
+@add_problem sdp function sdp_geom_mean_hypocone_real_1(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 4
+    A = Variable(n,n)
+    B = randn(n,n)
+    B = B * B' # now A is positive semidefinite
+    B += 0.2 * I # prevent numerical instability
+
+    c1 = eye(n) in GeomMeanHypoCone(B, A, 1)
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -671,6 +720,45 @@ end
     handle_problem!(p)
     if test
         @test p.status == MOI.OPTIMAL
+    end
+end
+
+@add_problem sdp function sdp_geom_mean_epicone_real_neg1_optA(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 3
+    B = randn(n,n)
+    B = B * B' # now B is positive semidefinite
+    B += 0.2 * I # prevent numerical instability
+    A = Variable(n,n)
+
+    c1 = eye(n) in GeomMeanEpiCone(A, B, -1)
+    objective = tr(A)
+    p = maximize(objective, c1; numeric_type = T)
+
+    handle_problem!(p)
+
+    # A #_t B = I  =>  B = A^(1-1/t)
+    if test
+        @test B ≈ A.value^2 atol=atol rtol=rtol
+    end
+end
+
+@add_problem sdp function sdp_geom_mean_epicone_real_neg1_optB(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 3
+    A = randn(n,n)
+    A = A * A' # now A is positive semidefinite
+    A += 0.2 * I # prevent numerical instability
+    A /= tr(A) # solver has problems if B is large
+    B = Variable(n,n)
+
+    c1 = eye(n) in GeomMeanEpiCone(A, B, -1)
+    objective = tr(B)
+    p = minimize(objective, c1; numeric_type = T)
+
+    handle_problem!(p)
+
+    # A #_t B = I  =>  B = A^(1-1/t)
+    if test
+        @test B.value ≈ A^2 atol=atol rtol=rtol
     end
 end
 
@@ -821,6 +909,17 @@ function sdp_quantum_relative_entropy_impl(handle_problem!, ::Val{test}, atol, r
             @test imag.(evaluate(B)) ≈ imag.(X) atol=atol rtol=rtol
         end
         @test p.optval ≈ 0 atol=atol rtol=rtol
+        if mode == 1
+            @test p.optval ≈ evaluate(quantum_relative_entropy(A, B)) atol=atol rtol=rtol
+        elseif mode == 2
+            @test p.optval ≈ evaluate(quantum_relative_entropy(X, B)) atol=atol rtol=rtol
+        elseif mode == 3
+            @test p.optval ≈ evaluate(quantum_relative_entropy(B, A)) atol=atol rtol=rtol
+        elseif mode == 4
+            @test p.optval ≈ evaluate(quantum_relative_entropy(B, X)) atol=atol rtol=rtol
+        elseif mode == 5
+            @test p.optval ≈ evaluate(quantum_relative_entropy(X, X)) atol=atol rtol=rtol
+        end
     end
 end
 
@@ -862,6 +961,15 @@ end
 
 @add_problem sdp function sdp_quantum_relative_entropy5_lowrank(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     sdp_quantum_relative_entropy_impl(handle_problem!, Val(test), atol, rtol, T, true, 5)
+end
+
+@add_problem sdp function sdp_quantum_relative_entropy_const(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test quantum_relative_entropy(diagm([0.5, 0.5]), diagm([0.5, 0.5])) ≈ 0 atol=atol rtol=rtol
+        @test quantum_relative_entropy(diagm([1.0, 0.0]), diagm([1.0, 0.0])) ≈ 0 atol=atol rtol=rtol
+        @test quantum_relative_entropy(diagm([1.0, 0.0]), diagm([0.5, 0.5])) ≈ log(2) atol=atol rtol=rtol
+        @test isinf(quantum_relative_entropy(diagm([0.5, 0.5]), diagm([1.0, 0.0])))
+    end
 end
 
 @add_problem sdp function sdp_quantum_channel_capacity(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
@@ -938,6 +1046,7 @@ end
         @test imag.(B.value) ≈ imag.(A) atol=atol rtol=rtol
         @test p.optval ≈ tr(C*A^t) atol=atol rtol=rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol=atol rtol=rtol
     end
 end
 
@@ -965,6 +1074,7 @@ end
         @test imag.(B.value) ≈ imag.(A) atol=atol rtol=rtol
         @test p.optval ≈ tr(C*A^t) atol=atol rtol=rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol=atol rtol=rtol
     end
 end
 
@@ -994,6 +1104,7 @@ end
         @test imag.(B.value) ≈ imag.(A) atol=atol rtol=rtol
         @test p.optval ≈ tr(C*A^t) atol=atol rtol=rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol=atol rtol=rtol
     end
 end
 
@@ -1023,6 +1134,7 @@ end
         @test imag.(B.value) ≈ imag.(A) atol=atol rtol=rtol
         @test p.optval ≈ tr(C*A^t) atol=atol rtol=rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol=atol rtol=rtol
     end
 end
 
@@ -1052,6 +1164,7 @@ end
         @test imag.(B.value) ≈ imag.(A) atol=atol rtol=rtol
         @test p.optval ≈ tr(C*A^t) atol=atol rtol=rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol=atol rtol=rtol
     end
 end
 
@@ -1081,6 +1194,7 @@ end
         @test imag.(B.value) ≈ imag.(A) atol=atol rtol=rtol
         @test p.optval ≈ tr(C*A^t) atol=atol rtol=rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol=atol rtol=rtol
     end
 end
 

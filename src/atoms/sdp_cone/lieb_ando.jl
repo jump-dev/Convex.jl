@@ -7,6 +7,8 @@
 #    lieb_ando(A,B,K,t) is concave in (A,B) for t in [0,1], and convex
 #    in (A,B) for t in [-1,0] or [1,2]. K is a fixed matrix.
 #
+# Seems numerically unstable when t is on the endpoints of these ranges.
+#
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #
@@ -71,5 +73,3 @@ function lieb_ando(A::AbstractExpr, B::AbstractExpr, K::MatrixOrConstant, t::Rat
         throw(DomainError(t, "t must be between -1 and 2"))
     end
 end
-
-lieb_ando(A::AbstractExprOrValue, B::AbstractExprOrValue, K::MatrixOrConstant, t::Integer) = lieb_ando(A, B, K, t//1)

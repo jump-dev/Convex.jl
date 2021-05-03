@@ -33,8 +33,8 @@ struct RelativeEntropyEpiCone
         if size(X) != (n, n)
             throw(DimensionMismatch("X and Y must be square"))
         end
-        if size(e) == (n,)
-            e = reshape(e, (n, 1))
+        if length(size(e)) == 1
+            e = reshape(e, (size(e)[1], 1))
         end
         erows, ecols = size(e)
         if ndims(e) != 2 || erows != n
