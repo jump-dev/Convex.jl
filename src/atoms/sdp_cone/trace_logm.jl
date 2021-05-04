@@ -89,7 +89,7 @@ function conic_form!(atom::TraceLogm, unique_conic_forms)
         k = atom.k
         eye = Matrix(1.0*I, size(X))
 
-        is_complex = sign(X) == ComplexSign() || sign(C) == ComplexSign()
+        is_complex = sign(X) == ComplexSign() || sign(Constant(C)) == ComplexSign()
         if is_complex
             τ = ComplexVariable(size(X))
         else
