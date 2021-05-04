@@ -1227,6 +1227,69 @@ end
     end
 end
 
+@add_problem sdp function sdp_trace_logm_argcheck(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    if test
+        @test_throws DimensionMismatch trace_logm(   zeros(2,3), zeros(2,3))
+        @test_throws DimensionMismatch trace_logm(Variable(2,3), zeros(2,3))
+
+        @test_throws DimensionMismatch trace_logm(   zeros(2,2), zeros(3,3))
+        @test_throws DimensionMismatch trace_logm(Variable(2,2), zeros(3,3))
+
+        nh = [ 1 1 ; 0 1 ] # not hermitian
+        np = [ 1 2 ; 2 1 ] # not positive semidefinite
+        @test_throws DomainError trace_logm(Variable(2,2), nh)
+        @test_throws DomainError trace_logm(Variable(2,2), np)
+    end
+end
+
+@add_problem sdp function sdp_trace_logm_real(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 3
+    C = randn(Float64, n, n)
+    C = C * C' # now C is positive semidefinite
+
+    X = Variable(n,n)
+
+    constraints = [
+        X ⪯ eye(n)
+    ]
+    objective = trace_logm(X, C)
+    p = maximize(objective, constraints; numeric_type = T)
+
+    handle_problem!(p)
+
+    if test
+        @test real.(X.value) ≈ real.(eye(n)) atol=atol rtol=rtol
+        @test imag.(X.value) ≈ imag.(eye(n)) atol=atol rtol=rtol
+        @test p.optval ≈ tr(C*log(evaluate(X))) atol=atol rtol=rtol
+        @test p.optval ≈ trace_logm(evaluate(X), C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_logm(X, C)) atol=atol rtol=rtol
+    end
+end
+
+@add_problem sdp function sdp_trace_logm_cplx(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    n = 3
+    C = randn(ComplexF64, n, n)
+    C = C * C' # now C is positive semidefinite
+
+    X = ComplexVariable(n,n)
+
+    constraints = [
+        X ⪯ eye(n)
+    ]
+    objective = trace_logm(X, C)
+    p = maximize(objective, constraints; numeric_type = T)
+
+    handle_problem!(p)
+
+    if test
+        @test real.(X.value) ≈ real.(eye(n)) atol=atol rtol=rtol
+        @test imag.(X.value) ≈ imag.(eye(n)) atol=atol rtol=rtol
+        @test p.optval ≈ tr(C*log(evaluate(X))) atol=atol rtol=rtol
+        @test p.optval ≈ trace_logm(evaluate(X), C) atol=atol rtol=rtol
+        @test p.optval ≈ evaluate(trace_logm(X, C)) atol=atol rtol=rtol
+    end
+end
+
 @add_problem sdp function sdp_lieb_ando(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     if test
         @test_throws DomainError lieb_ando(   zeros(3,3),    zeros(3,3), eye(3), -3//2)
