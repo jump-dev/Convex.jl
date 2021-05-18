@@ -26,7 +26,10 @@
         @test p.constraints[2].dual ≈ 1 atol=atol rtol=rtol
         @test p.constraints[3].dual[1,1] ≈ 0 atol=atol rtol=rtol
         @test p.constraints[3].dual[2,2] ≈ 0 atol=atol rtol=rtol
-        @test p.constraints[3].dual[1,2] ≈ p.constraints[3].dual[2,1] atol=atol rtol=rtol
+        @test p.constraints[3].dual[1,2] <= 1 + atol
+        @test p.constraints[3].dual[2,1] <= 1 + atol
+        @test p.constraints[3].dual[1,2] >= -atol
+        @test p.constraints[3].dual[2,1] >= -atol
     end
 end
 
