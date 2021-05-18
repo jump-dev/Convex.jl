@@ -1,3 +1,7 @@
+# Changes in v0.14.9
+
+* fix some tests in `lp_dual_abs_atom` [#439](https://github.com/jump-dev/Convex.jl/pull/439). Thanks @moehle!
+
 # Changes in v0.14.8
 
 * a complete port of [cvxquad](https://github.com/hfawzi/cvxquad) thanks to @dstahlke, yielding new functions `quantum_relative_entropy`, `quantum_entropy`, `trace_logm`, `trace_mpower`, and `lieb_ando`, and cones `GeomMeanHypoCone`, `GeomMeanEpiCone`, and `RelativeEntropyEpiCone` ([#418](https://github.com/jump-dev/Convex.jl/pull/418)). Thanks a ton for the awesome contribution @dstahlke!
