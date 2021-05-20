@@ -1,3 +1,7 @@
+# Changes in v0.14.10
+
+* declare compatibility with BenchmarkTools v1.0 [#441](https://github.com/jump-dev/Convex.jl/pull/441)
+
 # Changes in v0.14.9
 
 * fix some tests in `lp_dual_abs_atom` [#439](https://github.com/jump-dev/Convex.jl/pull/439). Thanks @moehle!
