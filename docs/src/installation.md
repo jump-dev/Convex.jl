@@ -4,6 +4,7 @@ Installation
 Installing Convex.jl is a one step process. Open up Julia and type :
 
 ```julia
+using Pkg
 Pkg.update()
 Pkg.add("Convex")
 ```
