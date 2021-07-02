@@ -17,7 +17,7 @@ function quadform(x::AbstractExpr, A::Value)
         error("Quadratic forms supported only for semidefinite matrices")
     end
 
-    P = real(sqrt(Hermitian(factor * A)))
+    P = sqrt(Hermitian(factor * A))
     return factor * square(norm2(P * x))
 end
 
