@@ -6,8 +6,8 @@ function quadform(x::AbstractExpr, A::Value)
     if length(size(A)) != 2 || size(A, 1) != size(A, 2)
         error("Quadratic form only takes square matrices")
     end
-    if !issymmetric(A)
-        error("Quadratic form only defined for symmetric matrices")
+    if !ishermitian(A)
+        error("Quadratic form only defined for Hermitian matrices")
     end
     if isposdef(A)
         factor = 1
