@@ -1,3 +1,7 @@
+# Changes in v0.14.11
+
+* fix `quadform` in the complex case [#444](https://github.com/jump-dev/Convex.jl/pull/444). Thanks @lrnv!
+
 # Changes in v0.14.10
 
 * declare compatibility with BenchmarkTools v1.0 [#441](https://github.com/jump-dev/Convex.jl/pull/441)
