@@ -267,6 +267,18 @@ end
         @test evaluate(H) ≈ Hval atol=atol rtol=rtol
     end
 
+    # https://github.com/jump-dev/Convex.jl/pull/444
+    x = Variable(3)
+    a,b,c,d,e,f = rand(6)
+    M = [2 a-b*im c-d*im;
+         a+b*im 2 e-f*im
+         c+d*im e+f*im 2]
+    y = rand(3)
+    p = minimize(quadform(x-y,M); numeric_type = T)
+    if test 
+        @test evaluate(x) ≈ y
+    end
+    
 end
 
 @add_problem socp function socp_huber_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
