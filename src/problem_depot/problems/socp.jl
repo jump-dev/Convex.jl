@@ -275,8 +275,9 @@ end
          c+d*im e+f*im 2]
     y = rand(3)
     p = minimize(quadform(x-y,M); numeric_type = T)
+    handle_problem!(p)
     if test 
-        @test evaluate(x) ≈ y
+        @test evaluate(x) ≈ y atol=atol rtol=rtol
     end
     
 end
