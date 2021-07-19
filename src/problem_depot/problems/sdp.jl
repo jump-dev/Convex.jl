@@ -1383,7 +1383,7 @@ end
 
     A = A₀ + A₁*x[1] + A₂*x[2]
 
-    p = minimize(λ,A⪯λ)
+    p = minimize(λ,A⪯λ; numeric_type=T)
 
     handle_problem!(p)
 
