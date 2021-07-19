@@ -1,3 +1,7 @@
+# Changes in v0.14.12
+
+* fix size of result of `evaluate` on `IndexAtom`s [#448](https://github.com/jump-dev/Convex.jl/pull/448). Thanks @hurak!
+
 # Changes in v0.14.11
 
 * fix `quadform` in the complex case [#444](https://github.com/jump-dev/Convex.jl/pull/444). Thanks @lrnv!
