@@ -39,11 +39,13 @@ function curvature(x::IndexAtom)
 end
 
 function evaluate(x::IndexAtom)
-    if x.inds === nothing
-        return output(getindex(evaluate(x.children[1]), x.rows, x.cols)) # output() needed to convert a 1-element vector to a scalar, see the link to the Issue below.
+    result = if x.inds === nothing
+        getindex(evaluate(x.children[1]), x.rows, x.cols)
     else
-        return output(getindex(evaluate(x.children[1]), x.inds)) # output() needed to convert a 1-element vector to a scalar. In response to https://github.com/jump-dev/Convex.jl/issues/447.
+        getindex(evaluate(x.children[1]), x.inds)
     end
+    # `output` needed to convert a 1-element array to a scalar (https://github.com/jump-dev/Convex.jl/issues/447)
+    return output(result)
 end
 
 function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
