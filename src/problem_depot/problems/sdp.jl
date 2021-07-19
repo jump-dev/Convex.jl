@@ -1388,8 +1388,8 @@ end
     handle_problem!(p)
 
     if test
-        @test λ.value ≈ 2.0 atol=atol rtol=rtol
-        @test x.value ≈ [1.0, 0.0] atol=atol rtol=rtol
-        @test evaluate(A) ≈ [2.0 2.0; 2.0 2.0] atol=atol rtol=rtol
+        @test λ.value ≈ 2.400000051025101 atol=atol rtol=rtol
+        @test x.value ≈ [3.0000000535867315, -0.4000000018585541] atol=atol rtol=rtol
+        @test evaluate(A) ≈ [2.400000046152515 -9.292770553059881e-9; -9.292770553059881e-9 2.399999957564593] atol=atol rtol=rtol
     end
 end
