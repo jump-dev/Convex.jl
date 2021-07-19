@@ -40,9 +40,9 @@ end
 
 function evaluate(x::IndexAtom)
     if x.inds === nothing
-        return getindex(evaluate(x.children[1]), x.rows, x.cols)
+        return output(getindex(evaluate(x.children[1]), x.rows, x.cols)) # output() needed to convert a 1-element vector to a scalar, see the link to the Issue below.
     else
-        return getindex(evaluate(x.children[1]), x.inds)
+        return output(getindex(evaluate(x.children[1]), x.inds)) # output() needed to convert a 1-element vector to a scalar. In response to https://github.com/jump-dev/Convex.jl/issues/447.
     end
 end
 

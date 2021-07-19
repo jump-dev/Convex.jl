@@ -473,7 +473,7 @@ end
     l,v = eigen(A)
     posA = v*Diagonal(max.(l,0))*v'
 
-    
+
     if test
         real_diff = real.(evaluate(x)) - real.(posA)
         imag_diff = imag.(evaluate(x)) - imag.(posA)
@@ -1359,5 +1359,37 @@ end
                 end
             end
         end
+    end
+end
+
+@add_problem sdp function sdp_min_maxeig_canon_lmi(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+    # Minimize the maximum eigenvalue of an affine matrix function of a vector argument. Formulated
+    # as a linear optimization subject to a canonical LMI (SDP) constraint:
+    #
+    # minimize      λ
+    # subject to    A(x)⪯λ
+    # where x is a vector in Rⁿ and the matrix function A(x) = A₀ + A₁x₁ + A₂x₂ + … + Aₙxₙ.
+    #
+    # Besides serving as a benchmark, it also tests the solution of the Issue
+    # https://github.com/jump-dev/Convex.jl/issues/447
+    # (the issues boils down to  evaluation of `A₁x₁`, because `x₁` was a matrix of size (1,1)).
+
+    A₀ = [1.0 2.0; 2.0 3.0]
+    A₁ = [1.0 0.0; 0.0 -1.0]
+    A₂ = [4.0 5.0; 5.0 -6.0]
+
+    x = Variable(2)
+    λ = Variable()
+
+    A = A₀ + A₁*x[1] + A₂*x[2]
+
+    p = minimize(λ,A⪯λ)
+
+    handle_problem!(p)
+
+    if test
+        @test λ.value ≈ 2.0 atol=atol rtol=rtol
+        @test x.value ≈ [1.0, 0.0] atol=atol rtol=rtol
+        @test evaluate(A) ≈ [2.0 2.0; 2.0 2.0] atol=atol rtol=rtol
     end
 end
