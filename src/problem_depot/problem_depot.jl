@@ -21,9 +21,9 @@ eye(n) = Matrix{Float64}(I, n, n)
 
 A "depot" of Convex.jl problems, subdivided into categories.
 Each problem is stored as a function with the signature
-    
+
     f(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-    
+
 where `handle_problem!` specifies what to do with the `Problem` instance
 (e.g., `solve!` it with a chosen solver), an option `test` to choose
 whether or not to test the values (assuming it has been solved),
@@ -45,10 +45,10 @@ const PROBLEMS = Dict{String, Dict{String, Function}}()
 
 """
     foreach_problem(apply::Function, [class::String],
-        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
         exclude::Vector{Regex} = Regex[])
 
-Provides a convience method for iterating over problems in [`PROBLEMS`](@ref). 
+Provides a convience method for iterating over problems in [`PROBLEMS`](@ref).
 For each problem in [`PROBLEMS`](@ref), apply the function `apply`, which
 takes two arguments: the name of the function associated to the problem,
 and the function associated to the problem itself.
@@ -58,8 +58,8 @@ problems (`class` should satsify `class ∈ keys(PROBLEMS)`), and pass third
 argument `problems` to only allow certain problems (specified by exact names or
 regex). Use the `exclude` keyword argument to exclude problems by regex.
 """
-function foreach_problem(   apply::Function, 
-                            problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+function foreach_problem(   apply::Function,
+                            problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
                             exclude::Vector{Regex} = Regex[])
     for class in keys(PROBLEMS)
         any(occursin.(exclude, Ref(class))) && continue
@@ -67,7 +67,7 @@ function foreach_problem(   apply::Function,
     end
 end
 
-function foreach_problem(   apply::Function, 
+function foreach_problem(   apply::Function,
                             class::String,
                             problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
                             exclude::Vector{Regex} = Regex[])
@@ -85,9 +85,9 @@ end
 """
     run_tests(
         handle_problem!::Function;
-        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
         exclude::Vector{Regex} = Regex[],
-        T=Float64, atol=1e-3, rtol=0.0, 
+        T=Float64, atol=1e-3, rtol=0.0,
     )
 
 Run a set of tests. `handle_problem!` should be a function that takes one
@@ -105,12 +105,12 @@ MathOptInterface model, but not for the actual problem data.
 
 ```julia
 run_tests(exclude=[r"mip"]) do p
-    solve!(p, SCSSolver(verbose=0))
+    solve!(p, () -> SCS.Optimizer(verbose=0))
 end
 ```
 """
-function run_tests( handle_problem!::Function, 
-                    problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+function run_tests( handle_problem!::Function,
+                    problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
                     exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
     push!(exclude, r"benchmark")
     for class in keys(PROBLEMS)
@@ -129,10 +129,10 @@ end
 """
     benchmark_suite(
         handle_problem!::Function,
-        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+        problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
         exclude::Vector{Regex} = Regex[],
         test = Val(false),
-        T=Float64, atol=1e-3, rtol=0.0, 
+        T=Float64, atol=1e-3, rtol=0.0,
     )
 
 Create a benchmark_suite of benchmarks. `handle_problem!` should be a function
@@ -151,12 +151,12 @@ MathOptInterface model, but not for the actual problem data.
 
 ```julia
 benchmark_suite(exclude=[r"mip"]) do p
-    solve!(p, SCSSolver(verbose=0))
+    solve!(p, () -> SCS.Optimizer(verbose=0))
 end
 ```
 """
 function benchmark_suite(handle_problem!::Function,
-                         problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing; 
+                         problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
                          exclude::Vector{Regex} = Regex[],
                          T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
     group = BenchmarkGroup()
