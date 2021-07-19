@@ -105,7 +105,7 @@ MathOptInterface model, but not for the actual problem data.
 
 ```julia
 run_tests(exclude=[r"mip"]) do p
-    solve!(p, () -> SCS.Optimizer(verbose=0))
+    solve!(p, SCS.Optimizer; silent_solver=true)
 end
 ```
 """
@@ -151,7 +151,7 @@ MathOptInterface model, but not for the actual problem data.
 
 ```julia
 benchmark_suite(exclude=[r"mip"]) do p
-    solve!(p, () -> SCS.Optimizer(verbose=0))
+    solve!(p, SCS.Optimizer; silent_solver=true)
 end
 ```
 """

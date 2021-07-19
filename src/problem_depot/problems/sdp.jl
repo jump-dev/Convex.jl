@@ -1367,7 +1367,7 @@ end
     # as a linear optimization subject to a canonical LMI (SDP) constraint:
     #
     # minimize      λ
-    # subject to    A(x)⪯λ
+    # subject to    A(x) ⪯ λ*I
     # where x is a vector in Rⁿ and the matrix function A(x) = A₀ + A₁x₁ + A₂x₂ + … + Aₙxₙ.
     #
     # Besides serving as a benchmark, it also tests the solution of the Issue
@@ -1383,7 +1383,7 @@ end
 
     A = A₀ + A₁*x[1] + A₂*x[2]
 
-    p = minimize(λ,A⪯λ; numeric_type=T)
+    p = minimize(λ,A⪯λ*eye(2); numeric_type=T)
 
     handle_problem!(p)
 
