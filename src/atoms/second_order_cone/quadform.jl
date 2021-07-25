@@ -2,7 +2,7 @@ function quadform(x::Value, A::AbstractExpr)
     return x' * A * x
 end
 
-is_psd(A::AbstractMatrix{T}) where {T} = isposdef(A + eps(float(T))*Matrix{T}(I, size(A)...))
+is_psd(A::AbstractMatrix{T}) where {T} = isposdef(A + eps(float(real(T)))*Matrix{T}(I, size(A)...))
 
 function quadform(x::AbstractExpr, A::Value)
     if length(size(A)) != 2 || size(A, 1) != size(A, 2)

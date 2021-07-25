@@ -487,4 +487,12 @@ end
         x = Variable(3)
         @test diagm(x) isa AbstractExpr
     end
+
+    @testset "`is_psd` with type $T" for T in (Float64, Float32, Int, ComplexF64, BigFloat, Rational{BigInt}, Complex{Rational{BigInt}})
+        A = zeros(T, 3, 3)
+        A[1,1] = one(T)
+        @test Convex.is_psd(A)
+        B = A .- one(T) / T(10000)
+        @test !Convex.is_psd(B)
+    end
 end
