@@ -1,3 +1,7 @@
+# Changes in v0.14.13
+
+* fix `quadform` for positive semi-definite matrices (fixes a regression introduced in v0.14.11 that required strictly positive semi-definite inputs).
+
 # Changes in v0.14.12
 
 * fix size of result of `evaluate` on `IndexAtom`s [#448](https://github.com/jump-dev/Convex.jl/pull/448). Thanks @hurak!

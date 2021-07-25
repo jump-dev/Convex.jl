@@ -279,7 +279,16 @@ end
     if test 
         @test evaluate(x) ≈ y atol=atol rtol=rtol
     end
-    
+
+    # https://github.com/jump-dev/Convex.jl/issues/446
+    x = Variable(3)
+    A = zeros(3, 3)
+    A[1,1] = 1.0
+    p = minimize(quadform(x, A) - 2*x[2] - x[3], norm(x,1) <= 1; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test evaluate(x) ≈ [0.0, 1.0, 0.0] atol=atol rtol=rtol
+    end
 end
 
 @add_problem socp function socp_huber_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
