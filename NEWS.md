@@ -1,6 +1,6 @@
 # Changes in v0.14.13
 
-* fix `quadform` for positive semi-definite matrices (fixes a regression introduced in v0.14.11 that required strictly positive semi-definite inputs).
+* fix `quadform` for positive semi-definite matrices (fixes a regression introduced in v0.14.11 that required strictly positive semi-definite inputs) [#450](https://github.com/jump-dev/Convex.jl/pull/450).
 
 # Changes in v0.14.12
 
