@@ -492,7 +492,7 @@ end
         A = zeros(T, 3, 3)
         A[1,1] = one(T)
         @test Convex.is_psd(A)
-        B = A .- one(T) / T(10000)
+        B = A .- one(T) / T(5000)
         @test !Convex.is_psd(B)
 
         # See https://github.com/jump-dev/Convex.jl/issues/452 for details
