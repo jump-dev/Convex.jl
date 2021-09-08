@@ -1,3 +1,7 @@
+# Changes in v0.14.14
+
+* Increase the tolerance used in checking if a matrix is positive-semi definite in `quadform` ([#453](https://github.com/jump-dev/Convex.jl/pull/453)). Thanks @numbermaniac!
+
 # Changes in v0.14.13
 
 * fix `quadform` for positive semi-definite matrices (fixes a regression introduced in v0.14.11 that required strictly positive semi-definite inputs) [#450](https://github.com/jump-dev/Convex.jl/pull/450).
