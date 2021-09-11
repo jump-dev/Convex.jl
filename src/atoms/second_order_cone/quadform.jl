@@ -7,7 +7,7 @@ end
 
 Check whether `A` is positive semi-definite by computing a LDLᵀ factorization of `A + tol*I`
 """
-function is_psd(A; tol=sqrt(eps(loat(real(eltype(A))))))
+function is_psd(A; tol=sqrt(eps(float(real(eltype(A))))))
     T = eltype(A)
     # If `A` is neither a Matrix nor SparseMatrixCSC, we do the following:
     # * sparse fallback if the arithmetic is supported
@@ -18,10 +18,9 @@ function is_psd(A; tol=sqrt(eps(loat(real(eltype(A))))))
         return is_psd(Matrix(A); tol=tol)
     end
 end
-is_psd(A::SparseMatrixCSC{Complex{T}}; tol=sqrt(eps(T))) where{T<:LinearAlgebra.BlasReal} = isposdef(A + tol*I)
+is_psd(A::SparseMatrixCSC{Complex{T}}; tol::T=sqrt(eps(T))) where{T<:LinearAlgebra.BlasReal} = isposdef(A + tol*I)
 function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:Real}
     # LDLFactorizations requires the input matrix to only have the upper triangle.
-    F = lu(A - shift * I)
     A_ = Symmetric(sparse(UpperTriangular(A)) + tol*I)
     try
         F = ldl(A_)
@@ -30,7 +29,7 @@ function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:Real}
     catch err
         # If the matrix could not be factorized, then it is not PSD
         isa(err, LDLFactorizations.SQDException) && return false
-        rethrow(err)  # Something else happened
+        rethrow()  # Something else happened
     end
 end
 is_psd(A::Matrix; tol=sqrt(eps(float(real(eltype(A)))))) = isposdef(A + tol*I)
