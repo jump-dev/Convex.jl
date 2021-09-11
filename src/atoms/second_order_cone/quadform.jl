@@ -2,7 +2,38 @@ function quadform(x::Value, A::AbstractExpr; assume_psd=false)
     return x' * A * x
 end
 
-is_psd(A::AbstractMatrix{T}) where {T} = isposdef(A + sqrt(eps(float(real(T))))*Matrix{T}(I, size(A)...))
+"""
+    is_psd(A; tol)
+
+Check whether `A` is positive semi-definite by computing a LDLᵀ factorization of `A + tol*I`
+"""
+function is_psd(A; tol=sqrt(eps(loat(real(eltype(A))))))
+    T = eltype(A)
+    # If `A` is neither a Matrix nor SparseMatrixCSC, we do the following:
+    # * sparse fallback if the arithmetic is supported
+    # * dense fallack otherwise
+    if T <: Real || T <: LinearAlgebra.BlasFloat
+        return is_psd(sparse(A); tol=tol)
+    else
+        return is_psd(Matrix(A); tol=tol)
+    end
+end
+is_psd(A::SparseMatrixCSC{Complex{T}}; tol=sqrt(eps(T))) where{T<:LinearAlgebra.BlasReal} = isposdef(A + tol*I)
+function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:Real}
+    # LDLFactorizations requires the input matrix to only have the upper triangle.
+    F = lu(A - shift * I)
+    A_ = Symmetric(sparse(UpperTriangular(A)) + tol*I)
+    try
+        F = ldl(A_)
+        d = F.D.diag
+        return minimum(d) >= 0
+    catch err
+        # If the matrix could not be factorized, then it is not PSD
+        isa(err, LDLFactorizations.SQDException) && return false
+        rethrow(err)  # Something else happened
+    end
+end
+is_psd(A::Matrix; tol=sqrt(eps(float(real(eltype(A)))))) = isposdef(A + tol*I)
 
 function quadform(x::AbstractExpr, A::Value; assume_psd=false)
     if length(size(A)) != 2 || size(A, 1) != size(A, 2)

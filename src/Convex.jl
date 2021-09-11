@@ -4,6 +4,7 @@ module Convex
 using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
+using LDLFactorizations
 using AbstractTrees: AbstractTrees
 
 using MathOptInterface
