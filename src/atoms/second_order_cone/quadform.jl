@@ -12,14 +12,14 @@ function is_psd(A; tol=sqrt(eps(float(real(eltype(A))))))
     # If `A` is neither a Matrix nor SparseMatrixCSC, we do the following:
     # * sparse fallback if the arithmetic is supported
     # * dense fallack otherwise
-    if T <: Real || T <: LinearAlgebra.BlasFloat
+    if T <: AbstractFloat || T <: LinearAlgebra.BlasFloat
         return is_psd(sparse(A); tol=tol)
     else
         return is_psd(Matrix(A); tol=tol)
     end
 end
 is_psd(A::SparseMatrixCSC{Complex{T}}; tol::T=sqrt(eps(T))) where{T<:LinearAlgebra.BlasReal} = isposdef(A + tol*I)
-function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:Real}
+function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:AbstractFloat}
     # LDLFactorizations requires the input matrix to only have the upper triangle.
     A_ = Symmetric(sparse(UpperTriangular(A)) + tol*I)
     try
