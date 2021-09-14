@@ -1,3 +1,9 @@
+# Changes in v0.14.15
+
+* Use sparse factorization for checking for positive semi-definiteness in `quadform` when possible ([#457](https://github.com/jump-dev/Convex.jl/pull/457)). Thanks @mtanneau!
+* Add `assume_psd=false` argument to skip checking for positive semi-definiteness in `quadform` ([#456](https://github.com/jump-dev/Convex.jl/pull/456)).
+
+
 # Changes in v0.14.14
 
 * Increase the tolerance used in checking if a matrix is positive-semi definite in `quadform` ([#453](https://github.com/jump-dev/Convex.jl/pull/453)). Thanks @numbermaniac!
