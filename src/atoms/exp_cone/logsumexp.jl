@@ -39,8 +39,10 @@ end
 
 function evaluate(x::LogSumExpAtom)
     _x = evaluate(x.children[1])
+    @show _x
     max_x = maximum(_x)
-    return max_x .+ log(sum(exp.(_x .- max_x)))
+    @show max_x
+    return max_x + log(sum(exp.(_x - max_x)))
 end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
