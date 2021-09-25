@@ -512,4 +512,9 @@ end
         @test_throws ErrorException quadform(x, A; assume_psd=false)
         @test quadform(x, A; assume_psd=true) isa Convex.AbstractExpr
     end
+
+    @testset "`logsumexp` stability" begin
+        v = Convex.Constant([1000, 1000, 1000])
+        @test Convex.evaluate(Convex.logsumexp(v)) ≈ 1001.098612
+    end
 end
