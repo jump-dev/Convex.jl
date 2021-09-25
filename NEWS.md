@@ -1,3 +1,7 @@
+# Changes in v0.14.16
+
+* Improve numerical stability when evaluating `logsumexp` ([#457](https://github.com/jump-dev/Convex.jl/pull/462)). Thanks @JinraeKim!
+
 # Changes in v0.14.15
 
 * Use sparse factorization for checking for positive semi-definiteness in `quadform` when possible ([#457](https://github.com/jump-dev/Convex.jl/pull/457)). Thanks @mtanneau!
