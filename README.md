@@ -1,4 +1,4 @@
-# Please read: Convex.jl needs a new maintainer
+x# Please read: Convex.jl needs a new maintainer
 
 Hi there! Convex.jl is an old Julia package that has had a number of maintainers
 and [contributors over the years](https://github.com/jump-dev/Convex.jl/graphs/contributors).
@@ -12,7 +12,7 @@ There are still a number of community members who can review and merge pull
 requests, but they will not be doing any active development.
 
 If you would like to get involved and help revive Convex.jl:
- * Join the JuMP developer chatroom at [https://gitter.im/JuliaOpt/JuMP.jl](https://gitter.im/JuliaOpt/JuMP.jl)
+ * Join the JuMP developer chatroom at [https://gitter.im/JuliaOpt/JuMP-dev](https://gitter.im/JuliaOpt/JuMP-dev)
    to say hi. If you have questions relating to Convex.jl, we may be able to help.
  * Start by making some small pull requests to fix any of the open issues.
 
