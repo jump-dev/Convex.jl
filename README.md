@@ -1,3 +1,21 @@
+# Please read: Convex.jl needs a new maintainer
+
+Hi there! Convex.jl is an old Julia package that has had a number of maintainers
+and [contributors over the years](https://github.com/jump-dev/Convex.jl/graphs/contributors).
+Most typically, these have been procrastinating graduate students who work on
+Convex.jl instead of finishing their thesis. However, we can't all be students
+forever, and so is Convex.jl in need of a new maintainer. 
+
+Therefore, **Convex.jl is in maintenance mode.**
+
+There are still a number of community members who can review and merge pull
+requests, but they will not be doing any active development.
+
+If you would like to get involved and help revive Convex.jl:
+ * Join the JuMP developer chatroom at [https://gitter.im/JuliaOpt/JuMP.jl](https://gitter.im/JuliaOpt/JuMP.jl)
+   to say hi. If you have questions relating to Convex.jl, we may be able to help.
+ * Start by making some small pull requests to fix any of the open issues.
+
 # Convex.jl
 
 [![Build Status](https://github.com/jump-dev/Convex.jl/workflows/CI/badge.svg)](https://github.com/jump-dev/Convex.jl/actions?query=workflow%3ACI)
