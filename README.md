@@ -1,4 +1,4 @@
-x# Please read: Convex.jl needs a new maintainer
+# Please read: Convex.jl needs a new maintainer
 
 Hi there! Convex.jl is an old Julia package that has had a number of maintainers
 and [contributors over the years](https://github.com/jump-dev/Convex.jl/graphs/contributors).
