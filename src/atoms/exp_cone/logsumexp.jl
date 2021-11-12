@@ -38,7 +38,9 @@ function curvature(x::LogSumExpAtom)
 end
 
 function evaluate(x::LogSumExpAtom)
-    return log(sum(exp.(evaluate(x.children[1]))))
+    _x = evaluate(x.children[1])
+    max_x = maximum(_x)
+    return max_x + log(sum(exp.(_x .- max_x)))
 end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
