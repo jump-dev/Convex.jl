@@ -136,7 +136,7 @@ end
 
 makedocs(;
     modules = [Convex],
-    format = Documenter.HTML(),
+    format = Documenter.HTML(; ansicolor=true),
     pages = [
         "Home" => "index.md",
         "Installation" => "installation.md",
