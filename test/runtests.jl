@@ -35,15 +35,13 @@ end
     include("test_abstract_variable.jl")
 
     @testset "SCS with warmstarts" begin
-        # We exclude `sdp_sdp_constraints` since it seems to hit a bug https://github.com/jump-dev/SCS.jl/issues/167
-        run_tests(; exclude=[r"mip", r"sdp_sdp_constraints"]) do p
+        run_tests(; exclude=[r"mip"]) do p
             solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6); warmstart = true)
         end
     end
 
     @testset "SCS" begin
-        # Exclusions same as for "SCS with warmstarts"
-        run_tests(; exclude=[r"mip", r"sdp_sdp_constraints"]) do p
+        run_tests(; exclude=[r"mip"]) do p
             solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6))
         end
     end
@@ -55,7 +53,9 @@ end
     end
 
     @testset "GLPK" begin
-        run_tests(; exclude=[r"exp", r"sdp", r"socp"]) do p
+        # Note this is an inclusion, not exclusion;
+        # we only test GLPK with MIPs, since those we can't test elsewhere.
+        run_tests([r"mip"]) do p
             solve!(p, GLPK.Optimizer; silent_solver=true)
         end
     end
