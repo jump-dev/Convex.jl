@@ -5,7 +5,13 @@
 
 # in MOI v0.9, we need to use `MOI.SingleVariable`. In MOI v0.10,
 # we don't. We use this flag to tell which scenario we are in.
-const MOI_USE_SINGLE_VARIABLE = try MOI.SingleVariable <: MOI.AbstractScalarFunction catch false end
+const MOI_USE_SINGLE_VARIABLE = try
+        # MOI v0.9
+        MOI.SingleVariable <: MOI.AbstractScalarFunction
+    catch
+        # MOI v0.10
+        false
+    end
 
 # at the type level, we need to choose between MOI.SingleVariable and MOI.VariableIndex
 const SV_OR_VI = MOI_USE_SINGLE_VARIABLE ? MOI.SingleVariable : MOI.VariableIndex
