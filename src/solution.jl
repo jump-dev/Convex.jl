@@ -1,24 +1,14 @@
 ### MOI compatibility hacks
 # Here, we hack in compatibility for both MOI v0.9 and v0.10.
-# When we drop MOI v0.9 compat, we should drop both of these
-# in favor of only the changes from https://github.com/jump-dev/Convex.jl/pull/467.
-
-# in MOI v0.9, we need to use `MOI.SingleVariable`. In MOI v0.10,
-# we don't. We use this flag to tell which scenario we are in.
-const MOI_USE_SINGLE_VARIABLE = try
-        # MOI v0.9
-        MOI.SingleVariable <: MOI.AbstractScalarFunction
-    catch
-        # MOI v0.10
-        false
-    end
-
-# at the type level, we need to choose between MOI.SingleVariable and MOI.VariableIndex
-const SV_OR_VI = MOI_USE_SINGLE_VARIABLE ? MOI.SingleVariable : MOI.VariableIndex
-
-# at the value level, we need to choose whether or not to convert our MOI.VariableIndex's
-# to MOI.SingleVariable's.
-const SV_OR_IDENTITY = MOI_USE_SINGLE_VARIABLE ? MOI.SingleVariable : identity
+# When we drop MOI v0.9 compat, we should drop these
+# (in favor of only the changes from https://github.com/jump-dev/Convex.jl/pull/467).
+if !isdefined(MOI, :SingleVariable) || MOI.SingleVariable isa Function
+    # MOI v0.10: should not use `SingleVariable` and instead `VariableIndex` directly.
+    const SV_OR_VI, SV_OR_IDENTITY = MOI.VariableIndex, identity
+else
+    # MOI v0.9: need to use `SingleVariable`
+    const SV_OR_VI, SV_OR_IDENTITY = MOI.SingleVariable, MOI.SingleVariable
+end
 ###
 
 # Convert from sets used within Convex to MOI sets
