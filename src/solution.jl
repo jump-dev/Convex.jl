@@ -1,5 +1,5 @@
-### MOI compatability hacks
-# Here, we hack in compatability for both MOI v0.9 and v0.10.
+### MOI compatibility hacks
+# Here, we hack in compatibility for both MOI v0.9 and v0.10.
 # When we drop MOI v0.9 compat, we should drop both of these
 # in favor of only the changes from https://github.com/jump-dev/Convex.jl/pull/467.
 
