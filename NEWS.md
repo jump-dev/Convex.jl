@@ -1,3 +1,7 @@
+# Changes in v0.14.18
+
+* Fix typo in `logisticloss` for length-1 expressions which caused errors (reported in [#458](https://github.com/jump-dev/Convex.jl/issues/458), fixed in [#469]([#458](https://github.com/jump-dev/Convex.jl/issues/469))).
+
 # Changes in v0.14.17
 
 * Updated to become compatible with MathOptInterface v0.10, which enables compatibility with the latest version of many solvers

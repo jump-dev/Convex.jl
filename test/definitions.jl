@@ -23,3 +23,12 @@ end
     solve!(p, () -> SCS.Optimizer(verbose=1, eps=1e-6))
     @test evaluate(X) ≈ A atol=1e-3
 end
+
+@testset "`logisticloss` (issue #458)" begin
+    x = Variable()
+    expr = logisticloss(x)
+    @test expr isa Convex.AbstractExpr
+
+    set_value!(x, 1.5)
+    @test evaluate(expr) ≈ log(1 + exp(1.5))
+end
