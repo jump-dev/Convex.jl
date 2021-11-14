@@ -1,7 +1,7 @@
 # Changes in v0.14.17
 
 * Updated to become compatible with MathOptInterface v0.10, which enables compatibility with the latest version of many solvers
-  ([#467](https://github.com/jump-dev/Convex.jl/pull/467)).
+  ([#467](https://github.com/jump-dev/Convex.jl/pull/467), [#468](https://github.com/jump-dev/Convex.jl/pull/468)).
 
 # Changes in v0.14.16
 
