@@ -1,6 +1,6 @@
 # Changes in v0.14.18
 
-* Fix typo in `logisticloss` for length-1 expressions which caused errors (reported in [#458](https://github.com/jump-dev/Convex.jl/issues/458), fixed in [#469]([#458](https://github.com/jump-dev/Convex.jl/issues/469))).
+* Fix typo in `logisticloss` for length-1 expressions which caused errors (reported in [#458](https://github.com/jump-dev/Convex.jl/issues/458), fixed in [#469](https://github.com/jump-dev/Convex.jl/pull/469)).
 
 # Changes in v0.14.17
 
