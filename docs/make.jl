@@ -152,6 +152,7 @@ makedocs(;
         "Contributing" => "contributing.md",
         "Credits" => "credits.md",
         "Reference" => "reference.md",
+        "Release notes" => "release_notes.md",
         "Examples" => examples_nav,
     ],
     repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
