@@ -45,12 +45,6 @@ end
         @test output === nothing
     end
 
-    @testset "`solve!` with MPB solver errors" begin
-        x = Variable()
-        p = satisfy(x >= 0)
-        @test_throws ErrorException solve!(p, SCSSolver())
-    end
-
     @testset "Complex objective function errors" begin
         x = Variable()
         @test_throws ErrorException minimize(x + im*x)

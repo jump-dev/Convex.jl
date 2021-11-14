@@ -103,15 +103,16 @@ else
                 out_path = joinpath(build_path, dir, file)
             if endswith(file, ".jl")
                 postprocess = function(content)
+                    block_name = replace(filename(file), r"\s+" => "_")
                     """
                     All of the examples can be found in Jupyter notebook form [here](../$(filename(zip_path)).zip).
 
-                    ```@setup $(filename(file))
+                    ```@setup $(block_name)
                     __START_TIME = time_ns()
                     @info "Starting example $(filename(file))"
                     ```
                     """ * content * """
-                    ```@setup $(filename(file))
+                    ```@setup $(block_name)
                     __END_TIME = time_ns()
                     elapsed = string(round((__END_TIME - __START_TIME)*1e-9; sigdigits = 3), "s")
                     @info "Finished example $(filename(file)) after " * elapsed
@@ -136,7 +137,7 @@ end
 
 makedocs(;
     modules = [Convex],
-    format = Documenter.HTML(),
+    format = Documenter.HTML(; ansicolor=true),
     pages = [
         "Home" => "index.md",
         "Installation" => "installation.md",

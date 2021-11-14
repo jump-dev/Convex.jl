@@ -151,11 +151,11 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
 
     # the objective: maximize or minimize a scalar variable
     objective_index = var_to_indices[objective_var_id][] # get the `MOI.VariableIndex` corresponding to the objective
-    MOI.set(model, MOI.ObjectiveFunction{MOI.SingleVariable}(), MOI.SingleVariable(objective_index))
+    MOI.set(model, MOI.ObjectiveFunction{MOI.VariableIndex}(), objective_index)
     MOI.set(model, MOI.ObjectiveSense(), problem.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE)
 
     # Constraints: Generate a MOI function and a MOI sets for each `ConicConstr` object in the problem
-    MOI_constr_fn = Union{MOI.VectorAffineFunction{T},MOI.SingleVariable}[]
+    MOI_constr_fn = Union{MOI.VectorAffineFunction{T},MOI.VariableIndex}[]
     MOI_sets = Any[]
     for conic_constr in conic_constraints
         set, constr_fn = make_MOI_constr(conic_constr, var_to_indices, id_to_variables, T)
@@ -169,13 +169,13 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
         if vartype(variable) == IntVar
             var_indices = var_to_indices[var_id]
             for idx = eachindex(var_indices)
-                push!(MOI_constr_fn, MOI.SingleVariable(var_indices[idx]))
+                push!(MOI_constr_fn, var_indices[idx])
                 push!(MOI_sets, MOI.Integer())
             end
         elseif vartype(variable) == BinVar
             var_indices = var_to_indices[var_id]
             for idx in eachindex(var_indices)
-                push!(MOI_constr_fn, MOI.SingleVariable(var_indices[idx]))
+                push!(MOI_constr_fn, var_indices[idx])
                 push!(MOI_sets, MOI.ZeroOne())
             end
         end
