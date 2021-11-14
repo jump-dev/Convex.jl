@@ -11,17 +11,17 @@
 
 ## v0.14.16 (September 25, 2021)
 
-* Improve numerical stability when evaluating `logsumexp` ([#457](https://github.com/jump-dev/Convex.jl/pull/462)). Thanks @JinraeKim!
+* Improve numerical stability when evaluating `logsumexp` ([#457](https://github.com/jump-dev/Convex.jl/pull/462)). Thanks `@JinraeKim`!
 
 ## v0.14.15 (September 15, 2021)
 
-* Use sparse factorization for checking for positive semi-definiteness in `quadform` when possible ([#457](https://github.com/jump-dev/Convex.jl/pull/457)). Thanks @mtanneau!
+* Use sparse factorization for checking for positive semi-definiteness in `quadform` when possible ([#457](https://github.com/jump-dev/Convex.jl/pull/457)). Thanks `@mtanneau`!
 * Add `assume_psd=false` argument to skip checking for positive semi-definiteness in `quadform` ([#456](https://github.com/jump-dev/Convex.jl/pull/456)).
 
 
 ## v0.14.14 (September 8, 2021)
 
-* Increase the tolerance used in checking if a matrix is positive-semi definite in `quadform` ([#453](https://github.com/jump-dev/Convex.jl/pull/453)). Thanks @numbermaniac!
+* Increase the tolerance used in checking if a matrix is positive-semi definite in `quadform` ([#453](https://github.com/jump-dev/Convex.jl/pull/453)). Thanks `@numbermaniac`!
 
 ## v0.14.13 (July 25, 2021)
 
@@ -29,11 +29,11 @@
 
 ## v0.14.12 (July 19, 2021)
 
-* fix size of result of `evaluate` on `IndexAtom`s [#448](https://github.com/jump-dev/Convex.jl/pull/448). Thanks @hurak!
+* fix size of result of `evaluate` on `IndexAtom`s [#448](https://github.com/jump-dev/Convex.jl/pull/448). Thanks `@hurak`!
 
 ## v0.14.11 (July 5, 2021)
 
-* fix `quadform` in the complex case [#444](https://github.com/jump-dev/Convex.jl/pull/444). Thanks @lrnv!
+* fix `quadform` in the complex case [#444](https://github.com/jump-dev/Convex.jl/pull/444). Thanks `@lrnv`!
 
 ## v0.14.10 (May 20, 2021)
 
@@ -41,11 +41,11 @@
 
 ## v0.14.9 (May 18, 2021)
 
-* fix some tests in `lp_dual_abs_atom` [#439](https://github.com/jump-dev/Convex.jl/pull/439). Thanks @moehle!
+* fix some tests in `lp_dual_abs_atom` [#439](https://github.com/jump-dev/Convex.jl/pull/439). Thanks `@moehle`!
 
 ## v0.14.8 (May 4, 2021)
 
-* a complete port of [cvxquad](https://github.com/hfawzi/cvxquad) thanks to @dstahlke, yielding new functions `quantum_relative_entropy`, `quantum_entropy`, `trace_logm`, `trace_mpower`, and `lieb_ando`, and cones `GeomMeanHypoCone`, `GeomMeanEpiCone`, and `RelativeEntropyEpiCone` ([#418](https://github.com/jump-dev/Convex.jl/pull/418)). Thanks a ton for the awesome contribution @dstahlke!
+* a complete port of [cvxquad](https://github.com/hfawzi/cvxquad) thanks to `@dstahlke`, yielding new functions `quantum_relative_entropy`, `quantum_entropy`, `trace_logm`, `trace_mpower`, and `lieb_ando`, and cones `GeomMeanHypoCone`, `GeomMeanEpiCone`, and `RelativeEntropyEpiCone` ([#418](https://github.com/jump-dev/Convex.jl/pull/418)). Thanks a ton for the awesome contribution `@dstahlke`!
 
 ## v0.14.7 (April 22, 2021)
 
@@ -53,7 +53,7 @@
 
 ## v0.14.6 (March 28, 2021)
 
-* Use `MOI.instantiate` to create the optimizer, which allows users to pass an [`MOI.OptimizerWithAttributes`](https://jump.dev/MathOptInterface.jl/stable/apireference/#MathOptInterface.OptimizerWithAttributes) to configure solver settings [#431](https://github.com/jump-dev/Convex.jl/pull/431). Thanks @odow!
+* Use `MOI.instantiate` to create the optimizer, which allows users to pass an [`MOI.OptimizerWithAttributes`](https://jump.dev/MathOptInterface.jl/stable/apireference/#MathOptInterface.OptimizerWithAttributes) to configure solver settings [#431](https://github.com/jump-dev/Convex.jl/pull/431). Thanks `@odow`!
 
 ## v0.14.5 (March 14, 2021)
 
@@ -69,7 +69,7 @@
 
 ## v0.14.2 (February 15, 2021)
 
-* added lasso, ridge, and elastic net regression examples ([#420](https://github.com/jump-dev/Convex.jl/pull/420)). Thanks to @PaulSoderlind!
+* added lasso, ridge, and elastic net regression examples ([#420](https://github.com/jump-dev/Convex.jl/pull/420)). Thanks to `@PaulSoderlind`!
 
 ## v0.14.1 (January 24, 2021)
 
@@ -93,11 +93,11 @@
 
 ### Other changes
 
-* updated `nuclearnorm` and `sumlargesteigs` to allow complex variables, and allow the argument of `sumlargesteigs` to be non-positive-semi-definite ([#409](https://github.com/jump-dev/Convex.jl/pull/409)). Thanks to @dstahlke!
+* updated `nuclearnorm` and `sumlargesteigs` to allow complex variables, and allow the argument of `sumlargesteigs` to be non-positive-semi-definite ([#409](https://github.com/jump-dev/Convex.jl/pull/409)). Thanks to `@dstahlke`!
 
 ## v0.13.8 (December 2, 2020)
 
-* add unary `+` for `Sign` and `ComplexSign` to allow single-argument `hcat` and `vcat` to work ([#405](https://github.com/jump-dev/Convex.jl/pull/405)). Thanks to @dstahlke!
+* add unary `+` for `Sign` and `ComplexSign` to allow single-argument `hcat` and `vcat` to work ([#405](https://github.com/jump-dev/Convex.jl/pull/405)). Thanks to `@dstahlke`!
 
 ## v0.13.7 (September 11, 2020)
 
@@ -132,7 +132,7 @@
 
 ## v0.13.2 (March 14, 2020)
 
-* Add [`Convex.MAXDIGITS`](https://github.com/jump-dev/Convex.jl/pull/379). Thanks to @riccardomurri!
+* Add [`Convex.MAXDIGITS`](https://github.com/jump-dev/Convex.jl/pull/379). Thanks to `@riccardomurri`!
 
 ## v0.13.1 (March 6, 2020)
 
