@@ -1,0 +1,20 @@
+# This workflow cancels existing CI runs that are on the same branch, so
+# only the latest one runs.
+name: Cancel
+on:
+  push:
+jobs:
+  cancel:
+    name: 'Cancel Previous Runs'
+    runs-on: ubuntu-latest
+    # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#permissions
+    # we only need actions write:
+    permissions:
+      actions: write
+    timeout-minutes: 3
+    steps:
+      - uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          workflow_id: ci.yml, docs.yml, nightly_ci.yml
+          access_token: ${{ github.token }}
+          all_but_latest: true

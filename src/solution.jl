@@ -1,3 +1,16 @@
+### MOI compatibility hacks
+# Here, we hack in compatibility for both MOI v0.9 and v0.10.
+# When we drop MOI v0.9 compat, we should drop these
+# (in favor of only the changes from https://github.com/jump-dev/Convex.jl/pull/467).
+if !isdefined(MOI, :SingleVariable) || MOI.SingleVariable isa Function
+    # MOI v0.10: should not use `SingleVariable` and instead `VariableIndex` directly.
+    const SV_OR_VI, SV_OR_IDENTITY = MOI.VariableIndex, identity
+else
+    # MOI v0.9: need to use `SingleVariable`
+    const SV_OR_VI, SV_OR_IDENTITY = MOI.SingleVariable, MOI.SingleVariable
+end
+###
+
 # Convert from sets used within Convex to MOI sets
 function get_MOI_set(cone, length_inds)
     if cone == :SDP
@@ -151,11 +164,11 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
 
     # the objective: maximize or minimize a scalar variable
     objective_index = var_to_indices[objective_var_id][] # get the `MOI.VariableIndex` corresponding to the objective
-    MOI.set(model, MOI.ObjectiveFunction{MOI.VariableIndex}(), objective_index)
+    MOI.set(model, MOI.ObjectiveFunction{SV_OR_VI}(), SV_OR_IDENTITY(objective_index))
     MOI.set(model, MOI.ObjectiveSense(), problem.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE)
 
     # Constraints: Generate a MOI function and a MOI sets for each `ConicConstr` object in the problem
-    MOI_constr_fn = Union{MOI.VectorAffineFunction{T},MOI.VariableIndex}[]
+    MOI_constr_fn = Union{MOI.VectorAffineFunction{T},SV_OR_VI}[]
     MOI_sets = Any[]
     for conic_constr in conic_constraints
         set, constr_fn = make_MOI_constr(conic_constr, var_to_indices, id_to_variables, T)
@@ -169,13 +182,13 @@ function load_MOI_model!(model, problem::Problem{T}) where {T}
         if vartype(variable) == IntVar
             var_indices = var_to_indices[var_id]
             for idx = eachindex(var_indices)
-                push!(MOI_constr_fn, var_indices[idx])
+                push!(MOI_constr_fn, SV_OR_IDENTITY(var_indices[idx]))
                 push!(MOI_sets, MOI.Integer())
             end
         elseif vartype(variable) == BinVar
             var_indices = var_to_indices[var_id]
             for idx in eachindex(var_indices)
-                push!(MOI_constr_fn, var_indices[idx])
+                push!(MOI_constr_fn, SV_OR_IDENTITY(var_indices[idx]))
                 push!(MOI_sets, MOI.ZeroOne())
             end
         end

@@ -18,11 +18,14 @@ on:
       - 'Project.toml'
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    name: Julia ${{ matrix.version }} - MOI ${{ matrix.moi-version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        moi-version:
+          - '0.9'
+          - '0.10'
         version:
           - '1'
           - '1.0'
@@ -37,6 +40,11 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
+      - name: "Install MOI version"
+        shell: julia --color=yes --project=. {0}
+        run: |
+          using Pkg
+          Pkg.add(Pkg.PackageSpec(; name="MathOptInterface", version="${{ matrix.moi-version }}"))
       - uses: actions/cache@v1
         env:
           cache-name: cache-artifacts
