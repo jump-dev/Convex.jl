@@ -43,7 +43,7 @@ that does not ensure convexity, the extended formulations are often invalid. As
 a simple example, consider the problem
 
 ```julia
-minimize( abs(x), x >= 1, x <= 2)
+minimize(abs(x), x >= 1, x <= 2)
 ```
 
 Obviously, the optimum occurs at `x=1`, but let us imagine we want to solve this
@@ -69,7 +69,7 @@ Why? Well, let us consider the same reformulation for a maximization problem.
 The original problem is now
 
 ```julia
-maximize( abs(x), x >= 1, x <= 2)
+maximize(abs(x), x >= 1, x <= 2)
 ```
 
 and trivially the optimum is 2, obtained at `x=2`. If we do the same
