@@ -41,7 +41,7 @@ end
     @testset "`solve!` can take an optimizer directly" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "abs_eps" => 1e-6))
+        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
         @test output === nothing
     end
 
@@ -182,7 +182,7 @@ end
         # solved problem
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "abs_eps" => 1e-6))
+        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
         @test sprint(show, p) == """
                 minimize
                 └─ 0

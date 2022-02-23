@@ -54,12 +54,12 @@ import .DictVectors
     y = DictVectors.DictVector{BigFloat}(1)
     p = minimize(x + y, [x >= 3, y >= 2])
     @test vexity(p) == Convex.AffineVexity()
-    solve!(p, solver())
+    solve!(p, solver)
     @test p.optval ≈ 5 atol=TOL
     @test evaluate(x + y) ≈ 5 atol=TOL
 
     add_constraint!(x, x >= 4)
-    solve!(p, solver())
+    solve!(p, solver)
     @test p.optval ≈ 6 atol=TOL
     @test evaluate(x + y) ≈ 6 atol=TOL
     @test length(constraints(x)) == 1
@@ -106,7 +106,7 @@ import LinearAlgebra
     ρ = DensityMatricies.DensityMatrix(4)
 
     prob = maximize( real(tr(ρ*X)) )
-    solve!(prob, solver())
+    solve!(prob, solver)
 
     @test prob.optval ≈ e_val atol = TOL
     @test evaluate(ρ) ≈ proj atol = TOL
@@ -144,7 +144,7 @@ using .ProbabilityVectors
     @test p(x) isa AbstractExpr
     @test sign(p) == Positive()
     prob = minimize( p(x) )
-    solve!(prob, solver())
+    solve!(prob, solver)
     @test prob.optval ≈ 1.0 atol=TOL
     @test evaluate(p(x)) ≈ 1.0 atol=TOL
     @test evaluate(p) ≈ [1.0, 0.0, 0.0] atol=TOL
