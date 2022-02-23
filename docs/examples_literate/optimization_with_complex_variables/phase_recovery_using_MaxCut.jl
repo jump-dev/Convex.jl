@@ -1,5 +1,5 @@
 # # Phase recovery using MaxCut
-# 
+#
 # In this example, we relax the phase retrieval problem similar to the classical
 # [MaxCut](http://www-math.mit.edu/~goemans/PAPERS/maxcut-jacm.pdf) semidefinite
 # program and recover the phase of the signal given the magnitude of the linear
@@ -29,7 +29,7 @@
 # Given a linear operator $A$ and a vector $b= |Ax|$ of measured amplitudes,
 # in the noiseless case, we can write $Ax = \text{diag}(b)u$ where
 # $u \in \mathbb{C}^n$  is a phase vector, satisfying
-# $|\mathbb{u}_i| = 1$ for $i = 1,\ldots, n$. 
+# $|\mathbb{u}_i| = 1$ for $i = 1,\ldots, n$.
 #
 # We relax this problem as Complex Semidefinite Programming.
 #
@@ -66,10 +66,10 @@ b = abs.(A*x) + rand(n)
 M = diagm(b)*(I(n)-A*A')*diagm(b)
 U = ComplexVariable(n,n)
 objective = inner_product(U,M)
-c1 = diag(U) == 1 
+c1 = diag(U) == 1
 c2 = U in :SDP
 p = minimize(objective,c1,c2)
-solve!(p, () -> SCS.Optimizer(verbose=0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 evaluate(U)
 
 
@@ -79,7 +79,7 @@ evaluate(U)
 B, C = eigen(evaluate(U));
 length([e for e in B if(abs(real(e))>1e-4)])
 
-#- 
+#-
 
 # Decompose $U = uu^*$ where $u$ is the phase of $Ax$
 u = C[:,1];

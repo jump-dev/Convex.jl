@@ -8,7 +8,7 @@ end
 
 using SCS
 ## passing in verbose=0 to hide output from SCS
-solver = () -> SCS.Optimizer(verbose=0)
+solver = MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0)
 
 # ### Linear program
 #

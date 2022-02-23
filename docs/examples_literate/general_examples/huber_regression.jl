@@ -34,24 +34,24 @@ for i=1:length(p_vals)
     ## Generate the sign changes.
     factor = 2 * rand(Binomial(1, 1-p), number_samples) .- 1;
     Y = factor .* X' * beta_true + v;
-    
+
     ## Form and solve a standard regression problem.
     beta = Variable(n);
     fit = norm(beta - beta_true) / norm(beta_true);
     cost = norm(X' * beta - Y);
     prob = minimize(cost);
-    solve!(prob, () -> SCS.Optimizer(verbose=0));
+    solve!(prob, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
     lsq_data[i] = evaluate(fit);
-    
+
     ## Form and solve a prescient regression problem,
     ## i.e., where the sign changes are known.
     cost = norm(factor .* (X'*beta) - Y);
-    solve!(minimize(cost), () -> SCS.Optimizer(verbose=0))
+    solve!(minimize(cost), MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
     prescient_data[i] = evaluate(fit);
-    
+
     ## Form and solve the Huber regression problem.
     cost = sum(huber(X' * beta - Y, 1));
-    solve!(minimize(cost), () -> SCS.Optimizer(verbose=0))
+    solve!(minimize(cost), MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
     huber_data[i] = evaluate(fit);
 end
 

@@ -27,8 +27,8 @@ SCALE = 10000;
 B = rand(LogNormal(8), m) .+ 10000;
 B = round.(B, digits=3); # Budget
 
-P_ad = rand(m); 
-P_time = rand(1,n); 
+P_ad = rand(m);
+P_time = rand(1,n);
 P = P_ad * P_time;
 
 T = sin.(range(-2*pi/2, stop=2*pi-2*pi/2, length=n)) * SCALE;
@@ -46,7 +46,7 @@ D = Variable(m, n);
 Si = [min(R[i]*dot(P[i,:], D[i,:]'), B[i]) for i=1:m];
 problem = maximize(sum(Si),
                [D >= 0, sum(D, dims=1)' <= T, sum(D, dims=2) >= c]);
-solve!(problem, () -> SCS.Optimizer(verbose=0));
+solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
 
 #-
 

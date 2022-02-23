@@ -25,7 +25,7 @@ using Convex, SCS
        34  64   4;
        58   4 100]/100^2
 
-n = length(μ)                   #number of assets 
+n = length(μ)                   #number of assets
 
 R_target = 0.1
 w_lower = 0
@@ -50,13 +50,13 @@ w    = Variable(n)
 ret  = dot(w,μ)
 risk = quadform(w,Σ)
 
-p = minimize( risk, 
-              ret >= R_target, 
-              sum(w) == 1, 
-              w_lower <= w, 
+p = minimize( risk,
+              ret >= R_target,
+              sum(w) == 1,
+              w_lower <= w,
               w <= w_upper )
 
-solve!(p, () -> SCS.Optimizer())     #use SCS.Optimizer(verbose = false) to suppress printing
+solve!(p, SCS.Optimizer)
 
 #-
 

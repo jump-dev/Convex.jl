@@ -24,16 +24,16 @@ end
     @testset "`solve!` does not return anything" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6))
+        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
         @test output === nothing
     end
 
     @testset "`silent_solver` works" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output_non_silent = solve_and_return_output(p, () -> SCS.Optimizer(eps=1e-6))
+        output_non_silent = solve_and_return_output(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6))
         @test output_non_silent != ""
-        output_silent = solve_and_return_output(p, () -> SCS.Optimizer(eps=1e-6), silent_solver=true)
+        output_silent = solve_and_return_output(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6), silent_solver=true)
         @test output_silent == ""
     end
 
@@ -41,7 +41,7 @@ end
     @testset "`solve!` can take an optimizer directly" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
+        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
         @test output === nothing
     end
 
@@ -54,7 +54,7 @@ end
         x = Variable()
         p = minimize(x, x >= 0)
         @test p.optval === nothing
-        solve!(p, () -> SCS.Optimizer(verbose=false))
+        solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
         @test p.optval ≈ 0.0 atol=1e-3
         @test Convex.termination_status(p) == MOI.OPTIMAL
         @test Convex.objective_value(p) ≈ 0.0 atol=1e-3
@@ -182,7 +182,7 @@ end
         # solved problem
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
+        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
         @test sprint(show, p) == """
                 minimize
                 └─ 0

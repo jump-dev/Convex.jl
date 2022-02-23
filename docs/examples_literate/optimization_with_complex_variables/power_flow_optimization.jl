@@ -1,5 +1,5 @@
 # # Power flow optimization
-# The data for example is taken from [MATPOWER](http://www.pserc.cornell.edu/matpower/) website. MATPOWER is Matlab package for solving power flow and optimal power flow problems.  
+# The data for example is taken from [MATPOWER](http://www.pserc.cornell.edu/matpower/) website. MATPOWER is Matlab package for solving power flow and optimal power flow problems.
 
 using Convex, SCS
 using Test
@@ -25,7 +25,7 @@ c3 = real(W[1,1]) == 1.06^2;
 push!(c1, c2)
 push!(c1, c3)
 p = maximize(objective, c1);
-solve!(p, () -> SCS.Optimizer(verbose = 0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 p.optval
 #15.125857662600703
 evaluate(objective)

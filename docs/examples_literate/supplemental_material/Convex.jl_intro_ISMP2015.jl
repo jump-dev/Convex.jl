@@ -37,11 +37,11 @@ x = Variable(n)
 ## nonnegative elastic net with regularization
 λ = 1
 μ = 1
-problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1), 
+problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
                    x >= 0)
 
 ## Solve the problem by calling solve!
-solve!(problem, () -> SCS.Optimizer(verbose=0))
+solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 
 println("problem status is ", problem.status) # :Optimal, :Infeasible, :Unbounded etc.
 println("optimal value is ", problem.optval)
@@ -54,7 +54,7 @@ using Interact, Plots
     global A
     problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
                    x >= 0)
-    solve!(problem, () -> SCS.Optimizer(verbose=0))
+    solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
     histogram(evaluate(x), xlims=(0,3.5), label="x")
 end
 
@@ -111,7 +111,7 @@ square(x) <= sum(y)
 
 #-
 
-M = Z 
+M = Z
 for i = 1:length(y)
     global M += rand(size(Z)...)*y[i]
 end
@@ -128,7 +128,7 @@ p = minimize(objective, constraint)
 #-
 
 ## solve the problem
-solve!(p, () -> SCS.Optimizer(verbose=0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 p.status
 
 #-
@@ -171,11 +171,11 @@ x = Variable(n)
 ## nonnegative elastic net with regularization
 λ = 1
 μ = 1
-problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1), 
+problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
                    x >= 0)
-@time solve!(problem, () -> SCS.Optimizer(verbose=0))
+@time solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 λ = 1.5
-@time solve!(problem, () -> SCS.Optimizer(verbose=0), warmstart = true)
+@time solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0), warmstart = true)
 
 # # DCP examples
 
@@ -200,10 +200,10 @@ square(pos(x))
 
 #-
 
-## $f$ is convex decreasing and $g$ is concave 
+## $f$ is convex decreasing and $g$ is concave
 invpos(sqrt(x))
 
 #-
 
-## $f$ is concave increasing and $g$ is concave 
+## $f$ is concave increasing and $g$ is concave
 sqrt(sqrt(x))

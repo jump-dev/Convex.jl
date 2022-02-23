@@ -121,14 +121,14 @@ push!(constraints, velocity[:, T] == 0)
 
 ## Solve the problem
 problem = minimize(sumsquares(force), constraints)
-solve!(problem, () -> SCS.Optimizer(verbose=0))
+solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 
 # We can plot the trajectory taken by the object.
 
 pos = evaluate(position)
 plot([pos[1, 1]], [pos[2, 1]], st=:scatter, label="initial point")
 plot!([pos[1, T]], [pos[2, T]], st=:scatter, label="final point")
-plot!(pos[1, :], pos[2, :], label="trajectory") 
+plot!(pos[1, :], pos[2, :], label="trajectory")
 
 # We can also see how the magnitude of the force changes over time.
 

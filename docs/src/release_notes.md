@@ -147,7 +147,7 @@
   [MathOptInterface.jl](https://github.com/JuliaOpt/MathOptInterface.jl)
   ([#330](https://github.com/JuliaOpt/Convex.jl/pull/330)). To solve problems,
   one should pass a MathOptInterface optimizer constructor, such as
-  `SCS.Optimizer`, or `() -> SCS.Optimizer(verbose=false)`.
+  `SCS.Optimizer`, or `MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0)`.
 * `lambdamin` and `lambdamax` have been deprecated in favor of `eigmin` and
   `eigmax` ([#357](https://github.com/JuliaOpt/Convex.jl/pull/357)).
 * Many "internal" functions and types are no longer exported, such as the atoms,
