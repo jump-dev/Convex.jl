@@ -11,10 +11,10 @@ struct MaximumAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function MaximumAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("Argument should be real instead it is $(sign(x))")
         else
             children = (x,)

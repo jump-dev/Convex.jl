@@ -80,7 +80,6 @@
 #
 # The following code builds and solves our control example:
 
-
 using Convex, SCS, Plots
 
 ## Some constraints on our motion
@@ -103,12 +102,13 @@ force = Variable(2, T - 1)
 mu = 1
 
 ## Add constraints on our variables
-constraints = Constraint[ position[:, i + 1] == position[:, i] + h * velocity[:, i] for i in 1 : T - 1]
+constraints = Constraint[
+    position[:, i+1] == position[:, i] + h * velocity[:, i] for i in 1:T-1
+]
 
-
-for i in 1 : T - 1
-  acceleration = force[:, i]/mass + g - drag * velocity[:, i]
-  push!(constraints, velocity[:, i + 1] == velocity[:, i] + h * acceleration)
+for i in 1:T-1
+    acceleration = force[:, i] / mass + g - drag * velocity[:, i]
+    push!(constraints, velocity[:, i+1] == velocity[:, i] + h * acceleration)
 end
 
 ## Add position constraints
@@ -126,10 +126,10 @@ solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 # We can plot the trajectory taken by the object.
 
 pos = evaluate(position)
-plot([pos[1, 1]], [pos[2, 1]], st=:scatter, label="initial point")
-plot!([pos[1, T]], [pos[2, T]], st=:scatter, label="final point")
-plot!(pos[1, :], pos[2, :], label="trajectory")
+plot([pos[1, 1]], [pos[2, 1]], st = :scatter, label = "initial point")
+plot!([pos[1, T]], [pos[2, T]], st = :scatter, label = "final point")
+plot!(pos[1, :], pos[2, :], label = "trajectory")
 
 # We can also see how the magnitude of the force changes over time.
 
-plot(vec(sum(evaluate(force).^2, dims=1)), label="force (magnitude)")
+plot(vec(sum(evaluate(force) .^ 2, dims = 1)), label = "force (magnitude)")

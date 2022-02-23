@@ -14,10 +14,10 @@ import Base.-, Base.+, Base.*, Base./
 
 # Vexity subtypes
 abstract type Vexity end
-struct ConstVexity <: Vexity              end
-struct AffineVexity <: Vexity             end
-struct ConvexVexity <: Vexity             end
-struct ConcaveVexity <: Vexity            end
+struct ConstVexity <: Vexity end
+struct AffineVexity <: Vexity end
+struct ConvexVexity <: Vexity end
+struct ConcaveVexity <: Vexity end
 
 struct NotDcp <: Vexity
     function NotDcp()
@@ -30,22 +30,21 @@ end
 
 # Monotonocity subtypes
 abstract type Monotonicity end
-struct Nonincreasing <: Monotonicity      end
-struct Nondecreasing <: Monotonicity      end
-struct ConstMonotonicity <: Monotonicity  end
-struct NoMonotonicity <: Monotonicity     end
+struct Nonincreasing <: Monotonicity end
+struct Nondecreasing <: Monotonicity end
+struct ConstMonotonicity <: Monotonicity end
+struct NoMonotonicity <: Monotonicity end
 
 # Sign subtypes
 abstract type Sign end
-struct Positive <: Sign                   end
-struct Negative <: Sign                   end
-struct NoSign <: Sign                     end
+struct Positive <: Sign end
+struct Negative <: Sign end
+struct NoSign <: Sign end
 
 # New coded
 
 # Also create a new subtype of Sign "NotDefined to handle the ComplexSign case"
-struct ComplexSign <: Sign                end
-
+struct ComplexSign <: Sign end
 
 -(v::Vexity) = v
 -(v::ConcaveVexity) = ConvexVexity()
@@ -59,8 +58,6 @@ struct ComplexSign <: Sign                end
 -(s::Positive) = Negative()
 -(s::Negative) = Positive()
 -(s::ComplexSign) = ComplexSign()
-
-
 
 +(v::NotDcp, w::NotDcp) = v
 +(v::NotDcp, w::Vexity) = v
@@ -91,15 +88,15 @@ struct ComplexSign <: Sign                end
 +(s::Negative, t::Positive) = NoSign()
 +(s::NoSign, t::NoSign) = s
 +(s::NoSign, t::Positive) = s
-+(t::Positive, s::NoSign) = s+t
++(t::Positive, s::NoSign) = s + t
 +(s::NoSign, t::Negative) = s
-+(t::Negative, s::NoSign) = s+t
++(t::Negative, s::NoSign) = s + t
 
 # Any sign + ComplexSign = ComplexSign
 +(s::ComplexSign) = s
 +(s::ComplexSign, t::ComplexSign) = s
 +(s::Sign, t::ComplexSign) = t
-+(t::ComplexSign, s::Sign) = s+t
++(t::ComplexSign, s::Sign) = s + t
 
 *(s::NoSign, t::NoSign) = s
 *(s::NoSign, t::Positive) = s
@@ -130,7 +127,6 @@ struct ComplexSign <: Sign                end
 *(m::NoMonotonicity, v::ConvexVexity) = NotDcp()
 *(m::NoMonotonicity, v::ConcaveVexity) = NotDcp()
 
-
 # ComplexSign * Affine = Affine
 # ComplexSign * Concave = NotDcp
 # ComplexSign * NotDcp = NotDcp
@@ -140,4 +136,4 @@ struct ComplexSign <: Sign                end
 *(s::ComplexSign, v::ConvexVexity) = NotDcp()
 *(s::ComplexSign, v::ConcaveVexity) = NotDcp()
 *(s::ComplexSign, v::NotDcp) = v
-*(v::Vexity, s::ComplexSign) = s*v
+*(v::Vexity, s::ComplexSign) = s * v

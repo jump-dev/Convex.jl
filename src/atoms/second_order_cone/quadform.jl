@@ -1,4 +1,4 @@
-function quadform(x::Value, A::AbstractExpr; assume_psd=false)
+function quadform(x::Value, A::AbstractExpr; assume_psd = false)
     return x' * A * x
 end
 
@@ -7,21 +7,29 @@ end
 
 Check whether `A` is positive semi-definite by computing a LDLᵀ factorization of `A + tol*I`
 """
-function is_psd(A; tol=sqrt(eps(float(real(eltype(A))))))
+function is_psd(A; tol = sqrt(eps(float(real(eltype(A))))))
     T = eltype(A)
     # If `A` is neither a Matrix nor SparseMatrixCSC, we do the following:
     # * sparse fallback if the arithmetic is supported
     # * dense fallack otherwise
     if T <: AbstractFloat || T <: LinearAlgebra.BlasFloat
-        return is_psd(sparse(A); tol=tol)
+        return is_psd(sparse(A); tol = tol)
     else
-        return is_psd(Matrix(A); tol=tol)
+        return is_psd(Matrix(A); tol = tol)
     end
 end
-is_psd(A::SparseMatrixCSC{Complex{T}}; tol::T=sqrt(eps(T))) where{T<:LinearAlgebra.BlasReal} = isposdef(A + tol*I)
-function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:AbstractFloat}
+function is_psd(
+    A::SparseMatrixCSC{Complex{T}};
+    tol::T = sqrt(eps(T)),
+) where {T<:LinearAlgebra.BlasReal}
+    return isposdef(A + tol * I)
+end
+function is_psd(
+    A::SparseMatrixCSC{T};
+    tol::T = sqrt(eps(T)),
+) where {T<:AbstractFloat}
     # LDLFactorizations requires the input matrix to only have the upper triangle.
-    A_ = Symmetric(sparse(UpperTriangular(A)) + tol*I)
+    A_ = Symmetric(sparse(UpperTriangular(A)) + tol * I)
     try
         F = ldl(A_)
         d = F.D.diag
@@ -32,9 +40,11 @@ function is_psd(A::SparseMatrixCSC{T}; tol::T=sqrt(eps(T))) where{T<:AbstractFlo
         rethrow()  # Something else happened
     end
 end
-is_psd(A::Matrix; tol=sqrt(eps(float(real(eltype(A)))))) = isposdef(A + tol*I)
+function is_psd(A::Matrix; tol = sqrt(eps(float(real(eltype(A))))))
+    return isposdef(A + tol * I)
+end
 
-function quadform(x::AbstractExpr, A::Value; assume_psd=false)
+function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     if length(size(A)) != 2 || size(A, 1) != size(A, 2)
         error("Quadratic form only takes square matrices")
     end
@@ -67,11 +77,11 @@ Represents `x' * A * x` where either:
 * or `A` is a matrix-valued variable and `x` is a vector.
 
 """
-function quadform(x::AbstractExpr, A::AbstractExpr; assume_psd=false)
+function quadform(x::AbstractExpr, A::AbstractExpr; assume_psd = false)
     if vexity(x) == ConstVexity()
-        return quadform(evaluate(x), A; assume_psd=assume_psd)
+        return quadform(evaluate(x), A; assume_psd = assume_psd)
     elseif vexity(A) == ConstVexity()
-        return quadform(x, evaluate(A); assume_psd=assume_psd)
+        return quadform(x, evaluate(A); assume_psd = assume_psd)
     else
         error("Either `x` or `A` must be constant in `quadform(x,A)`.")
     end

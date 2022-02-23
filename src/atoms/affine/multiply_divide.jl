@@ -13,18 +13,20 @@ import Base.Broadcast.broadcasted
 struct MultiplyAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr,AbstractExpr}
+    size::Tuple{Int,Int}
 
     function MultiplyAtom(x::AbstractExpr, y::AbstractExpr)
         if x.size == (1, 1)
             sz = y.size
         elseif y.size == (1, 1)
             sz = x.size
-        elseif x.size[2] ==  y.size[1]
+        elseif x.size[2] == y.size[1]
             sz = (x.size[1], y.size[2])
         else
-            error("Cannot multiply two expressions of sizes $(x.size) and $(y.size)")
+            error(
+                "Cannot multiply two expressions of sizes $(x.size) and $(y.size)",
+            )
         end
         children = (x, y)
         return new(:*, hash(children), children, sz)
@@ -36,13 +38,17 @@ function sign(x::MultiplyAtom)
 end
 
 function monotonicity(x::MultiplyAtom)
-    return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
+    return (
+        sign(x.children[2]) * Nondecreasing(),
+        sign(x.children[1]) * Nondecreasing(),
+    )
 end
 
 # Multiplication has an indefinite hessian, so if neither children are constants,
 # the curvature of the atom will violate DCP.
 function curvature(x::MultiplyAtom)
-    if vexity(x.children[1]) != ConstVexity() && vexity(x.children[2]) != ConstVexity()
+    if vexity(x.children[1]) != ConstVexity() &&
+       vexity(x.children[2]) != ConstVexity()
         return NotDcp()
     else
         return ConstVexity()
@@ -64,7 +70,9 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
                 const_child = x.children[2]
                 expr_child = x.children[1]
             else
-                error("multiplication of two non-constant expressions is not DCP compliant")
+                error(
+                    "multiplication of two non-constant expressions is not DCP compliant",
+                )
             end
             objective = conic_form!(expr_child, unique_conic_forms)
 
@@ -73,19 +81,28 @@ function conic_form!(x::MultiplyAtom, unique_conic_forms::UniqueConicForms)
             if const_child.size == (1, 1)
                 const_multiplier = evaluate(const_child)[1]
             else
-                const_multiplier = reshape(evaluate(const_child), length(const_child), 1)
+                const_multiplier =
+                    reshape(evaluate(const_child), length(const_child), 1)
             end
 
             objective = const_multiplier * objective
 
-        # left matrix multiplication
+            # left matrix multiplication
         elseif vexity(x.children[1]) == ConstVexity()
             objective = conic_form!(x.children[2], unique_conic_forms)
-            objective = kron(sparse(1.0I, x.size[2], x.size[2]), evaluate(x.children[1])) * objective
-        # right matrix multiplication
+            objective =
+                kron(
+                    sparse(1.0I, x.size[2], x.size[2]),
+                    evaluate(x.children[1]),
+                ) * objective
+            # right matrix multiplication
         else
             objective = conic_form!(x.children[1], unique_conic_forms)
-            objective = kron(transpose(evaluate(x.children[2])), sparse(1.0I, x.size[1], x.size[1])) * objective
+            objective =
+                kron(
+                    transpose(evaluate(x.children[2])),
+                    sparse(1.0I, x.size[1], x.size[1]),
+                ) * objective
         end
         cache_conic_form!(unique_conic_forms, x, objective)
     end
@@ -109,8 +126,8 @@ end
 struct DotMultiplyAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr,AbstractExpr}
+    size::Tuple{Int,Int}
 
     function DotMultiplyAtom(x::AbstractExpr, y::AbstractExpr)
         # check that the sizes of x and y are compatible
@@ -129,7 +146,10 @@ function sign(x::DotMultiplyAtom)
 end
 
 function monotonicity(x::DotMultiplyAtom)
-    return (sign(x.children[2]) * Nondecreasing(), sign(x.children[1]) * Nondecreasing())
+    return (
+        sign(x.children[2]) * Nondecreasing(),
+        sign(x.children[1]) * Nondecreasing(),
+    )
 end
 
 function curvature(x::DotMultiplyAtom)
@@ -148,7 +168,9 @@ function conic_form!(x::DotMultiplyAtom, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, x)
         if vexity(x.children[1]) != ConstVexity()
             if vexity(x.children[2]) != ConstVexity()
-                error("multiplication of two non-constant expressions is not DCP compliant")
+                error(
+                    "multiplication of two non-constant expressions is not DCP compliant",
+                )
             else
                 # make sure first child is the one that's constant
                 x.children[1], x.children[2] = x.children[2], x.children[1]
@@ -201,7 +223,13 @@ function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
         return DotMultiplyAtom(y, x)
     end
 end
-broadcasted(::typeof(*), x::Value, y::AbstractExpr) = DotMultiplyAtom(Constant(x), y)
-broadcasted(::typeof(*), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(y), x)
-broadcasted(::typeof(/), x::AbstractExpr, y::Value) = DotMultiplyAtom(Constant(1 ./ y), x)
+function broadcasted(::typeof(*), x::Value, y::AbstractExpr)
+    return DotMultiplyAtom(Constant(x), y)
+end
+function broadcasted(::typeof(*), x::AbstractExpr, y::Value)
+    return DotMultiplyAtom(Constant(y), x)
+end
+function broadcasted(::typeof(/), x::AbstractExpr, y::Value)
+    return DotMultiplyAtom(Constant(1 ./ y), x)
+end
 # x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl

@@ -13,11 +13,32 @@ const MOIU = MOI.Utilities
 const MOIB = MOI.Bridges
 
 # Functions
-export conv, dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, invpos
-export log_perspective, logisticloss, logsumexp, matrixfrac, neg, norm2, norm_1, norm_inf, nuclearnorm
-export partialtrace, partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
-export relative_entropy, scaledgeomean, sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
-export GeomMeanHypoCone, GeomMeanEpiCone, RelativeEntropyEpiCone, quantum_relative_entropy, quantum_entropy
+export conv,
+    dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, invpos
+export log_perspective,
+    logisticloss,
+    logsumexp,
+    matrixfrac,
+    neg,
+    norm2,
+    norm_1,
+    norm_inf,
+    nuclearnorm
+export partialtrace,
+    partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
+export relative_entropy,
+    scaledgeomean,
+    sigmamax,
+    square,
+    sumlargest,
+    sumlargesteigs,
+    sumsmallest,
+    sumsquares
+export GeomMeanHypoCone,
+    GeomMeanEpiCone,
+    RelativeEntropyEpiCone,
+    quantum_relative_entropy,
+    quantum_entropy
 export trace_logm, trace_mpower, lieb_ando
 
 # rexports from LinearAlgebra
@@ -40,7 +61,6 @@ export Positive, Negative, ComplexSign, NoSign
 
 # Problems
 export add_constraints!, maximize, minimize, Problem, satisfy, solve!
-
 
 # Module level globals
 
@@ -73,7 +93,7 @@ Controls width of tree printing globally for Convex.jl; defaults to 15. Set via
 
     Convex.MAXWIDTH[] = 15
 """
-const MAXWIDTH= Ref(15)
+const MAXWIDTH = Ref(15)
 
 """
     MAXDIGITS
@@ -90,7 +110,7 @@ Set via:
 
     Convex.MAXDIGITS[] = 3
 """
-const MAXDIGITS= Ref(3)
+const MAXDIGITS = Ref(3)
 
 ### modeling framework
 include("dcp.jl")
@@ -181,6 +201,5 @@ include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("utilities/broadcast.jl")
 include("problem_depot/problem_depot.jl")
-
 
 end

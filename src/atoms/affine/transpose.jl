@@ -11,7 +11,7 @@ struct TransposeAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function TransposeAtom(x::AbstractExpr)
         children = (x,)
@@ -50,8 +50,8 @@ function conic_form!(x::TransposeAtom, unique_conic_forms::UniqueConicForms)
         J = Array{Int}(undef, sz)
 
         k = 1
-        for r = 1:num_rows
-            for c = 1:num_cols
+        for r in 1:num_rows
+            for c in 1:num_cols
                 I[k] = (c - 1) * num_rows + r
                 J[k] = (r - 1) * num_cols + c
                 k += 1
@@ -68,13 +68,11 @@ end
 
 transpose(x::AbstractExpr) = TransposeAtom(x)
 
-
-
 struct AdjointAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function AdjointAtom(x::AbstractExpr)
         children = (x,)
@@ -113,8 +111,8 @@ function conic_form!(x::AdjointAtom, unique_conic_forms::UniqueConicForms)
         J = Array{Int}(undef, sz)
 
         k = 1
-        for r = 1:num_rows
-            for c = 1:num_cols
+        for r in 1:num_rows
+            for c in 1:num_cols
                 I[k] = (c - 1) * num_rows + r
                 J[k] = (r - 1) * num_cols + c
                 k += 1
@@ -127,7 +125,7 @@ function conic_form!(x::AdjointAtom, unique_conic_forms::UniqueConicForms)
         for var in keys(objective)
             x1 = conj(objective[var][1])
             x2 = conj(objective[var][2])
-            objective[var] = (x1,x2)
+            objective[var] = (x1, x2)
         end
         cache_conic_form!(unique_conic_forms, x, objective)
     end

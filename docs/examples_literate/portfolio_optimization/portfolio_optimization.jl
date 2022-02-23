@@ -20,10 +20,12 @@
 using Convex, SCS
 
 ## generate problem data
-μ = [11.5; 9.5; 6]/100          #expected returns
-Σ  = [166  34  58;              #covariance matrix
-       34  64   4;
-       58   4 100]/100^2
+μ = [11.5; 9.5; 6] / 100          #expected returns
+Σ = [
+    166 34 58              #covariance matrix
+    34 64 4
+    58 4 100
+] / 100^2
 
 n = length(μ)                   #number of assets
 
@@ -46,15 +48,11 @@ A = randn(n,n)
 
 #-
 
-w    = Variable(n)
-ret  = dot(w,μ)
-risk = quadform(w,Σ)
+w = Variable(n)
+ret = dot(w, μ)
+risk = quadform(w, Σ)
 
-p = minimize( risk,
-              ret >= R_target,
-              sum(w) == 1,
-              w_lower <= w,
-              w <= w_upper )
+p = minimize(risk, ret >= R_target, sum(w) == 1, w_lower <= w, w <= w_upper)
 
 solve!(p, SCS.Optimizer)
 

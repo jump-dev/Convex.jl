@@ -2,8 +2,10 @@
 # which is available under an MIT license (see LICENSE).
 using PkgBenchmark
 include("pprinthelper.jl")
-group_target = PkgBenchmark.readresults(joinpath(@__DIR__, "result-target.json"))
-group_baseline = PkgBenchmark.readresults(joinpath(@__DIR__, "result-baseline.json"))
+group_target =
+    PkgBenchmark.readresults(joinpath(@__DIR__, "result-target.json"))
+group_baseline =
+    PkgBenchmark.readresults(joinpath(@__DIR__, "result-baseline.json"))
 judgement = judge(group_target, group_baseline)
 
 displayresult(judgement)

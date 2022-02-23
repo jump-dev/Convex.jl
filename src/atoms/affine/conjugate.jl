@@ -3,7 +3,7 @@ struct ConjugateAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function ConjugateAtom(x::AbstractExpr)
         children = (x,)
@@ -34,13 +34,12 @@ function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms)
         for var in keys(objective)
             x1 = conj(objective[var][1])
             x2 = conj(objective[var][2])
-            new_obj[var] = (x1,x2)
+            new_obj[var] = (x1, x2)
         end
         cache_conic_form!(unique_conic_forms, x, new_obj)
     end
     return get_conic_form(unique_conic_forms, x)
 end
-
 
 conj(x::AbstractExpr) = ConjugateAtom(x)
 conj(x::Constant) = Constant(conj(x.value))

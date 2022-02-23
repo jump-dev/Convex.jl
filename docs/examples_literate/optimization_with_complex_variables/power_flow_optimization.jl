@@ -17,11 +17,11 @@ inj = Data[1];
 W = ComplexVariable(n, n);
 objective = real(sum(diag(W)));
 c1 = Constraint[];
-for i = 2:n
-    push!(c1, sum(W[i,:] .* (Y[i,:]')) == inj[i]);
+for i in 2:n
+    push!(c1, sum(W[i, :] .* (Y[i, :]')) == inj[i])
 end
 c2 = W in :SDP
-c3 = real(W[1,1]) == 1.06^2;
+c3 = real(W[1, 1]) == 1.06^2;
 push!(c1, c2)
 push!(c1, c3)
 p = maximize(objective, c1);
@@ -30,7 +30,6 @@ p.optval
 #15.125857662600703
 evaluate(objective)
 #15.1258578588357
-
 
 output = matopen("Res.mat")
 names(output)

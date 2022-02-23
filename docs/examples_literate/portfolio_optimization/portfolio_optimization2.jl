@@ -18,10 +18,12 @@
 using Convex, SCS    #We are using SCS solver. Install using Pkg.add("SCS")
 
 ## generate problem data
-μ = [11.5; 9.5; 6]/100          #expected returns
-Σ  = [166  34  58;              #covariance matrix
-       34  64   4;
-       58   4 100]/100^2
+μ = [11.5; 9.5; 6] / 100          #expected returns
+Σ = [
+    166 34 58              #covariance matrix
+    34 64 4
+    58 4 100
+] / 100^2
 
 n = length(μ)                   #number of assets
 
@@ -41,19 +43,18 @@ A = randn(n,n)
 # First we solve without any bounds on $w$
 
 N = 101
-λ_vals = range(0.01,stop=0.99,length=N)
+λ_vals = range(0.01, stop = 0.99, length = N)
 
-w    = Variable(n)
-ret  = dot(w,μ)
-risk = quadform(w,Σ)
+w = Variable(n)
+ret = dot(w, μ)
+risk = quadform(w, Σ)
 
-MeanVarA = zeros(N,2)
-for i = 1:N
+MeanVarA = zeros(N, 2)
+for i in 1:N
     λ = λ_vals[i]
-    p = minimize( λ*risk - (1-λ)*ret,
-                  sum(w) == 1 )
+    p = minimize(λ * risk - (1 - λ) * ret, sum(w) == 1)
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    MeanVarA[i,:]= [evaluate(ret),evaluate(risk)]
+    MeanVarA[i, :] = [evaluate(ret), evaluate(risk)]
 end
 
 # Now we solve with the bounds $0\le w_i \le 1$
@@ -61,54 +62,62 @@ end
 w_lower = 0                     #bounds on w
 w_upper = 1
 
-MeanVarB = zeros(N,2)   #repeat, but with 0<w[i]<1
-for i = 1:N
+MeanVarB = zeros(N, 2)   #repeat, but with 0<w[i]<1
+for i in 1:N
     λ = λ_vals[i]
-    p = minimize( λ*risk - (1-λ)*ret,
-                  sum(w) == 1,
-                  w_lower <= w,     #w[i] is bounded
-                  w <= w_upper )
+    p = minimize(
+        λ * risk - (1 - λ) * ret,
+        sum(w) == 1,
+        w_lower <= w,     #w[i] is bounded
+        w <= w_upper,
+    )
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    MeanVarB[i,:]= [evaluate(ret),evaluate(risk)]
+    MeanVarB[i, :] = [evaluate(ret), evaluate(risk)]
 end
 
 #-
 
 using Plots
-plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2]]),
-      [MeanVarA[:,1] MeanVarB[:,1]],
-      xlim = (0,0.25),
-      ylim = (0,0.15),
-      title = "Markowitz Efficient Frontier",
-      xlabel = "Standard deviation",
-      ylabel = "Expected return",
-      label = ["no bounds on w" "with 0<w<1"])
-scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
+plot(
+    sqrt.([MeanVarA[:, 2] MeanVarB[:, 2]]),
+    [MeanVarA[:, 1] MeanVarB[:, 1]],
+    xlim = (0, 0.25),
+    ylim = (0, 0.15),
+    title = "Markowitz Efficient Frontier",
+    xlabel = "Standard deviation",
+    ylabel = "Expected return",
+    label = ["no bounds on w" "with 0<w<1"],
+)
+scatter!(sqrt.(diag(Σ)), μ, color = :red, label = "assets")
 
 # We now instead impose a restriction on  $\sum_i |w_i| - 1$, allowing for varying degrees of "leverage".
 
 Lmax = 0.5
 
-MeanVarC = zeros(N,2)   #repeat, but with restriction on Sum(|w[i]|)
-for i = 1:N
+MeanVarC = zeros(N, 2)   #repeat, but with restriction on Sum(|w[i]|)
+for i in 1:N
     λ = λ_vals[i]
-    p = minimize( λ*risk - (1-λ)*ret,
-                  sum(w) == 1,
-                  (norm(w, 1)-1) <= Lmax)
+    p = minimize(
+        λ * risk - (1 - λ) * ret,
+        sum(w) == 1,
+        (norm(w, 1) - 1) <= Lmax,
+    )
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    MeanVarC[i,:]= [evaluate(ret),evaluate(risk)]
+    MeanVarC[i, :] = [evaluate(ret), evaluate(risk)]
 end
 
 #-
 
-plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2] MeanVarC[:,2]]),
-      [MeanVarA[:,1] MeanVarB[:,1] MeanVarC[:,1]],
-      xlim = (0,0.25),
-      ylim = (0,0.15),
-      title = "Markowitz Efficient Frontier",
-      xlabel = "Standard deviation",
-      ylabel = "Expected return",
-      label = ["no bounds on w" "with 0<w<1" "restriction on sum(|w|)"])
-scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")
+plot(
+    sqrt.([MeanVarA[:, 2] MeanVarB[:, 2] MeanVarC[:, 2]]),
+    [MeanVarA[:, 1] MeanVarB[:, 1] MeanVarC[:, 1]],
+    xlim = (0, 0.25),
+    ylim = (0, 0.15),
+    title = "Markowitz Efficient Frontier",
+    xlabel = "Standard deviation",
+    ylabel = "Expected return",
+    label = ["no bounds on w" "with 0<w<1" "restriction on sum(|w|)"],
+)
+scatter!(sqrt.(diag(Σ)), μ, color = :red, label = "assets")
 
 #-

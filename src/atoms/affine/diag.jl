@@ -15,23 +15,28 @@ struct DiagAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     k::Int
 
-    function DiagAtom(x::AbstractExpr, k::Int=0)
+    function DiagAtom(x::AbstractExpr, k::Int = 0)
         (num_rows, num_cols) = x.size
 
         if k >= min(num_rows, num_cols) || k <= -min(num_rows, num_cols)
             error("Bounds error in calling diag")
         end
 
-        children = (x, )
-        return new(:diag, hash((children, k)), children, (min(num_rows, num_cols) - k, 1), k)
+        children = (x,)
+        return new(
+            :diag,
+            hash((children, k)),
+            children,
+            (min(num_rows, num_cols) - k, 1),
+            k,
+        )
     end
 end
 
 ## Type Definition Ends
-
 
 function sign(x::DiagAtom)
     return sign(x.children[1])
@@ -53,7 +58,7 @@ function evaluate(x::DiagAtom)
 end
 
 ## API begins
-diag(x::AbstractExpr, k::Int=0) = DiagAtom(x, k)
+diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
 ## API ends
 
 # Finds the "k"-th diagonal of x as a column vector

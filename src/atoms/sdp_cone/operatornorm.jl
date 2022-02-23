@@ -12,11 +12,11 @@ struct OperatorNormAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function OperatorNormAtom(x::AbstractExpr)
         children = (x,)
-        return new(:opnorm, hash(children), children, (1,1))
+        return new(:opnorm, hash(children), children, (1, 1))
     end
 end
 
@@ -35,24 +35,25 @@ end
 
 # in julia, `norm` on matrices is the operator norm
 function evaluate(x::OperatorNormAtom)
-    opnorm(evaluate(x.children[1]), 2)
+    return opnorm(evaluate(x.children[1]), 2)
 end
 
 sigmamax(x::AbstractExpr) = OperatorNormAtom(x)
 
-
-function LinearAlgebra.opnorm(x::AbstractExpr, p::Real=2)
+function LinearAlgebra.opnorm(x::AbstractExpr, p::Real = 2)
     if length(size(x)) <= 1 || minimum(size(x)) == 1
         throw(ArgumentError("argument to `opnorm` must be a matrix"))
     end
     if p == 1
-        return maximum(sum(abs(x), dims=1))
+        return maximum(sum(abs(x), dims = 1))
     elseif p == 2
         return OperatorNormAtom(x)
     elseif p == Inf
-        return maximum(sum(abs(x), dims=2))
+        return maximum(sum(abs(x), dims = 2))
     else
-        throw(ArgumentError("matrix p-norms only defined for p = 1, 2, and Inf"))
+        throw(
+            ArgumentError("matrix p-norms only defined for p = 1, 2, and Inf"),
+        )
     end
 end
 

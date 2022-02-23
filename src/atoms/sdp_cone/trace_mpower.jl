@@ -17,8 +17,8 @@
 struct TraceMpower <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr,}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr}
+    size::Tuple{Int,Int}
     C::AbstractMatrix
     t::Rational
 
@@ -66,7 +66,7 @@ function evaluate(atom::TraceMpower)
     return trace_mpower(A, atom.t, atom.C)
 end
 
-const MatrixOrConstant = Union{AbstractMatrix, Constant}
+const MatrixOrConstant = Union{AbstractMatrix,Constant}
 
 function trace_mpower(A::AbstractExpr, t::Rational, C::MatrixOrConstant)
     #println("trace_mpower general case")
@@ -78,14 +78,16 @@ function trace_mpower(A::MatrixOrConstant, t::Rational, C::MatrixOrConstant)
     return tr(C * A^t)
 end
 
-trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant) = trace_mpower(A, t//1, C)
+function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
+    return trace_mpower(A, t // 1, C)
+end
 
 function conic_form!(atom::TraceMpower, unique_conic_forms)
     if !has_conic_form(unique_conic_forms, atom)
         A = atom.children[1]
         C = atom.C
         t = atom.t
-        eye = Matrix(1.0*I, size(A))
+        eye = Matrix(1.0 * I, size(A))
 
         is_complex = sign(A) == ComplexSign()
         if is_complex
@@ -97,12 +99,18 @@ function conic_form!(atom::TraceMpower, unique_conic_forms)
         T = make_temporary()
 
         if t >= 0 && t <= 1
-            conic_form!(T in GeomMeanHypoCone(eye, A, t, false), unique_conic_forms)
+            conic_form!(
+                T in GeomMeanHypoCone(eye, A, t, false),
+                unique_conic_forms,
+            )
             # It's already a real mathematically, but need to make it a real type.
             u = real(tr(C * T))
             cache_conic_form!(unique_conic_forms, atom, maximize(u))
         else
-            conic_form!(T in GeomMeanEpiCone(eye, A, t, false), unique_conic_forms)
+            conic_form!(
+                T in GeomMeanEpiCone(eye, A, t, false),
+                unique_conic_forms,
+            )
             # It's already a real mathematically, but need to make it a real type.
             u = real(tr(C * T))
             cache_conic_form!(unique_conic_forms, atom, minimize(u))

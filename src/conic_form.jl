@@ -7,14 +7,16 @@
 # so for example, {unique_id(x)=>5, unique_id(y)=>6} represents the function 5x + 6y
 # we store the affine functions in this form for efficient manipulation of sparse affine functions
 struct ConicObj
-    mapping::OrderedDict{UInt64, Tuple{Value,Value}}
+    mapping::OrderedDict{UInt64,Tuple{Value,Value}}
 end
 ConicObj() = ConicObj(OrderedDict{UInt64,Tuple{Value,Value}}())
 Base.iterate(c::ConicObj, s...) = iterate(c.mapping, s...)
 Base.keys(c::ConicObj) = keys(c.mapping)
 Base.haskey(c::ConicObj, var::Integer) = haskey(c.mapping, UInt64(var))
 Base.getindex(c::ConicObj, var::Integer) = c.mapping[UInt64(var)]
-Base.setindex!(c::ConicObj, val, var::Integer) = setindex!(c.mapping, val, UInt64(var))
+function Base.setindex!(c::ConicObj, val, var::Integer)
+    return setindex!(c.mapping, val, UInt64(var))
+end
 Base.copy(c::ConicObj) = ConicObj(copy(c.mapping))
 
 # helper function to negate conic objectives
@@ -22,9 +24,9 @@ Base.copy(c::ConicObj) = ConicObj(copy(c.mapping))
 function Base.:-(c::ConicObj)
     new_obj = copy(c)
     for var in keys(new_obj)
-        x1 = new_obj[var][1]*(-1)
-        x2 = new_obj[var][2]*(-1)
-        new_obj[var] = (x1,x2)
+        x1 = new_obj[var][1] * (-1)
+        x2 = new_obj[var][2] * (-1)
+        new_obj[var] = (x1, x2)
     end
     return new_obj
 end
@@ -47,7 +49,7 @@ function Base.:+(c::ConicObj, d::ConicObj)
             else
                 x2 = broadcast(+, new_obj[var][2], d[var][2])
             end
-            new_obj[var] = (x1,x2)
+            new_obj[var] = (x1, x2)
         end
     end
     return new_obj
@@ -58,7 +60,7 @@ function get_row(c::ConicObj, row::Int)
     for (var, coeff) in c
         x1 = coeff[1][row, :]
         x2 = coeff[2][row, :]
-        new_obj[var] = (x1,x2)
+        new_obj[var] = (x1, x2)
     end
     return new_obj
 end
@@ -69,7 +71,7 @@ function Base.:*(v::Value, c::ConicObj)
     for var in keys(new_obj)
         x1 = v * new_obj[var][1]
         x2 = v * new_obj[var][2]
-        new_obj[var] = (x1,x2)
+        new_obj[var] = (x1, x2)
     end
     return new_obj
 end
@@ -79,7 +81,7 @@ function promote_size(c::ConicObj, vectorized_size::Int)
     for var in keys(new_obj)
         x1 = repeat(new_obj[var][1], vectorized_size, 1)
         x2 = repeat(new_obj[var][2], vectorized_size, 1)
-        new_obj[var] = (x1,x2)
+        new_obj[var] = (x1, x2)
     end
     return new_obj
 end
@@ -98,14 +100,14 @@ end
 
 # in conic form, every expression e is represented by a ConicObj together with a collection of ConicConstrs
 # for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to that expression's ConicObj
-const UniqueExpMap = OrderedDict{Tuple{Symbol, UInt64}, ConicObj}
+const UniqueExpMap = OrderedDict{Tuple{Symbol,UInt64},ConicObj}
 # for each expression e, UniqueExpMap maps (e.head, unique_id(e)) to the index of expression's ConicConstr in UniqueConstrList
-const UniqueConstrMap = OrderedDict{Tuple{Symbol, UInt64}, Int}
+const UniqueConstrMap = OrderedDict{Tuple{Symbol,UInt64},Int}
 # records each ConicConstr created
 const UniqueConstrList = Vector{ConicConstr}
 # map variables' hash to the variable itself 
-const IdToVariables = OrderedDict{UInt64, AbstractVariable}
-const ConicConstrToConstr = Dict{ConicConstr, Constraint}
+const IdToVariables = OrderedDict{UInt64,AbstractVariable}
+const ConicConstrToConstr = Dict{ConicConstr,Constraint}
 # UniqueConicForms caches all the conic forms of expressions we've parsed so far
 struct UniqueConicForms
     exp_map::UniqueExpMap
@@ -115,7 +117,15 @@ struct UniqueConicForms
     conic_constr_to_constr::ConicConstrToConstr
 end
 
-UniqueConicForms() = UniqueConicForms(UniqueExpMap(), UniqueConstrMap(), ConicConstr[], IdToVariables(), ConicConstrToConstr())
+function UniqueConicForms()
+    return UniqueConicForms(
+        UniqueExpMap(),
+        UniqueConstrMap(),
+        ConicConstr[],
+        IdToVariables(),
+        ConicConstrToConstr(),
+    )
+end
 
 function has_conic_form(conic_forms::UniqueConicForms, exp::AbstractExpr)
     return haskey(conic_forms.exp_map, (exp.head, exp.id_hash))
@@ -133,20 +143,35 @@ function get_conic_form(conic_forms::UniqueConicForms, constr::Constraint)
     return conic_forms.constr_map[(constr.head, constr.id_hash)]
 end
 
-function cache_conic_form!(conic_forms::UniqueConicForms, exp::AbstractExpr, new_conic_form::ConicObj)
-    conic_forms.exp_map[(exp.head, exp.id_hash)] = new_conic_form
+function cache_conic_form!(
+    conic_forms::UniqueConicForms,
+    exp::AbstractExpr,
+    new_conic_form::ConicObj,
+)
+    return conic_forms.exp_map[(exp.head, exp.id_hash)] = new_conic_form
 end
 
-function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_form::ConicConstr)
+function cache_conic_form!(
+    conic_forms::UniqueConicForms,
+    constr::Constraint,
+    new_conic_form::ConicConstr,
+)
     conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
-    push!(conic_forms.constr_list, new_conic_form)
+    return push!(conic_forms.constr_list, new_conic_form)
 end
 
-function cache_conic_form!(conic_forms::UniqueConicForms, constr::Constraint, new_conic_forms::UniqueConstrList)
+function cache_conic_form!(
+    conic_forms::UniqueConicForms,
+    constr::Constraint,
+    new_conic_forms::UniqueConstrList,
+)
     conic_forms.constr_map[(constr.head, constr.id_hash)] = 0
-    append!(conic_forms.constr_list, new_conic_forms)
+    return append!(conic_forms.constr_list, new_conic_forms)
 end
 
-function add_to_id_to_variables!(conic_forms::UniqueConicForms, var::AbstractVariable)
-    conic_forms.id_to_variables[var.id_hash] = var
+function add_to_id_to_variables!(
+    conic_forms::UniqueConicForms,
+    var::AbstractVariable,
+)
+    return conic_forms.id_to_variables[var.id_hash] = var
 end

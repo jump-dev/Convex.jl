@@ -11,7 +11,7 @@ struct RealAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function RealAtom(x::AbstractExpr)
         children = (x,)
@@ -47,7 +47,7 @@ function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
         for var in keys(objective)
             re = real.(objective[var][1])
             im = real.(objective[var][2])
-            new_objective[var] = (re,im)
+            new_objective[var] = (re, im)
         end
 
         cache_conic_form!(unique_conic_forms, x, new_objective)
@@ -58,14 +58,12 @@ end
 real(x::AbstractExpr) = RealAtom(x)
 real(x::Value) = RealAtom(Constant(x))
 
-
-
 ### Imaginary
 struct ImaginaryAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function ImaginaryAtom(x::AbstractExpr)
         children = (x,)
@@ -95,11 +93,10 @@ function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
         new_objective = ConicObj()
         objective = conic_form!(x.children[1], unique_conic_forms)
 
-
         for var in keys(objective)
             re = imag.(objective[var][1])
             im = imag.(objective[var][2])
-            new_objective[var] = (re,im)
+            new_objective[var] = (re, im)
         end
         cache_conic_form!(unique_conic_forms, x, new_objective)
     end

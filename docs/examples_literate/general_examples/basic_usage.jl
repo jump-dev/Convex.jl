@@ -33,8 +33,8 @@ p.constraints += A * x <= b
 p.constraints += [x >= 1; x <= 10; x[2] <= 5; x[1] + x[4] - x[2] <= 10]
 solve!(p, solver)
 
-println(round(p.optval, digits=2))
-println(round.(evaluate(x), digits=2))
+println(round(p.optval, digits = 2))
+println(round.(evaluate(x), digits = 2))
 println(evaluate(x[1] + x[4] - x[2]))
 
 # ### Matrix Variables and promotions
@@ -55,7 +55,7 @@ y = Variable()
 ## X is a 2 x 2 variable, and y is scalar. X' + y promotes y to a 2 x 2 variable before adding them
 p = minimize(norm(vec(X)) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
 solve!(p, solver)
-println(round.(evaluate(X), digits=2))
+println(round.(evaluate(X), digits = 2))
 println(evaluate(y))
 p.optval
 
@@ -72,16 +72,20 @@ p.optval
 #
 
 x = Variable(4)
-p = satisfy(norm(x) <= 100, exp(x[1]) <= 5, x[2] >= 7, geomean(x[3], x[4]) >= x[2])
+p = satisfy(
+    norm(x) <= 100,
+    exp(x[1]) <= 5,
+    x[2] >= 7,
+    geomean(x[3], x[4]) >= x[2],
+)
 solve!(p, solver)
 println(p.status)
 evaluate(x)
 
 # ### SDP cone and Eigenvalues
 
-
 y = Semidefinite(2)
-p = maximize(eigmin(y), tr(y)<=6)
+p = maximize(eigmin(y), tr(y) <= 6)
 solve!(p, solver)
 p.optval
 

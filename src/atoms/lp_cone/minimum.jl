@@ -11,7 +11,7 @@ struct MinimumAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function MinimumAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()

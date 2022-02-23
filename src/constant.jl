@@ -27,11 +27,15 @@ struct Constant{T<:Value} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     value::T
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     sign::Sign
 
-    Constant(x::Value, sign::Sign) = new{typeof(x)}(:constant, objectid(x), x, _size(x), sign)
-    Constant(x::Value, check_sign::Bool=true) = Constant(x, check_sign ? _sign(x) : NoSign())
+    function Constant(x::Value, sign::Sign)
+        return new{typeof(x)}(:constant, objectid(x), x, _size(x), sign)
+    end
+    function Constant(x::Value, check_sign::Bool = true)
+        return Constant(x, check_sign ? _sign(x) : NoSign())
+    end
 end
 
 #### Constant Definition end     #####
@@ -65,9 +69,13 @@ real_conic_form(x::Constant{<:AbstractVecOrMat}) = vec(real(x.value))
 # by multiplication with `im` and just use an explicit call to `zeros` with the appropriate
 # length
 imag_conic_form(x::Constant{T}) where {T<:Real} = zeros(Complex{T}, 1)
-imag_conic_form(x::Constant{<:AbstractVecOrMat{T}}) where {T<:Real} = zeros(Complex{T}, length(x))
+function imag_conic_form(x::Constant{<:AbstractVecOrMat{T}}) where {T<:Real}
+    return zeros(Complex{T}, length(x))
+end
 imag_conic_form(x::Constant{<:Complex}) = [im * imag(x.value)]
-imag_conic_form(x::Constant{<:AbstractVecOrMat{<:Complex}}) = im * vec(imag(x.value))
+function imag_conic_form(x::Constant{<:AbstractVecOrMat{<:Complex}})
+    return im * vec(imag(x.value))
+end
 
 # We can more efficiently get the length of a constant by asking for the length of its
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
@@ -78,7 +86,8 @@ function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
         #real_Value = real_conic_form(x)
         #imag_Value = imag_conic_form(x)
         objective = ConicObj()
-        objective[objectid(:constant)] = (real_conic_form(x), imag_conic_form(x))
+        objective[objectid(:constant)] =
+            (real_conic_form(x), imag_conic_form(x))
         cache_conic_form!(unique_conic_forms, x, objective)
     end
     return get_conic_form(unique_conic_forms, x)

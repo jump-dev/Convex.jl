@@ -12,7 +12,7 @@ struct ExpAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function ExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()

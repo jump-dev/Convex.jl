@@ -52,9 +52,9 @@ line_mat = spzeros(length(line_vals), num_pixels)
 num_vals = length(line_mat_val)
 
 for i in 1:num_vals
-  x = Int(line_mat_x[i])
-  y = Int(line_mat_y[i])
-  line_mat[x + 1, y + 1] = line_mat_val[i]
+    x = Int(line_mat_x[i])
+    y = Int(line_mat_y[i])
+    line_mat[x+1, y+1] = line_mat_val[i]
 end
 
 pixel_colors = Variable(num_pixels)
@@ -64,17 +64,23 @@ objective = sumsquares(line_mat * pixel_colors - line_vals)
 problem = minimize(objective)
 solve!(problem, MOI.OptimizerWIthAttributes(ECOS.Optimizer, "verbose" => 0))
 
-rows = zeros(img_size*img_size)
-cols = zeros(img_size*img_size)
-for i = 1:img_size
-  for j = 1:img_size
-    rows[(i-1)*img_size + j] = i
-    cols[(i-1)*img_size + j] = img_size + 1 - j
-  end
+rows = zeros(img_size * img_size)
+cols = zeros(img_size * img_size)
+for i in 1:img_size
+    for j in 1:img_size
+        rows[(i-1)*img_size+j] = i
+        cols[(i-1)*img_size+j] = img_size + 1 - j
+    end
 end
 
 # Plot the image using the pixel values obtained!
 
 using Plots
 image = reshape(evaluate(pixel_colors), img_size, img_size)
-heatmap(image, yflip=true, aspect_ratio=1, colorbar=nothing, color=:grays)
+heatmap(
+    image,
+    yflip = true,
+    aspect_ratio = 1,
+    colorbar = nothing,
+    color = :grays,
+)

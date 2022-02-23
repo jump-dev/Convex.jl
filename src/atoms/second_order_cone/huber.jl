@@ -2,7 +2,7 @@ struct HuberAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     M::Real
 
     function HuberAtom(x::AbstractExpr, M::Real)
@@ -34,7 +34,7 @@ function evaluate(x::HuberAtom)
         if c[i] <= x.M
             c[i] = c[i]^2
         else
-            c[i] = 2*x.M*c[i] - x.M^2
+            c[i] = 2 * x.M * c[i] - x.M^2
         end
     end
     return c
@@ -47,7 +47,8 @@ function conic_form!(x::HuberAtom, unique_conic_forms::UniqueConicForms)
         n = Variable(c.size)
 
         # objective given by s.^2 + 2 * M * |n|
-        objective = conic_form!(square(s) + 2 * x.M * abs(n), unique_conic_forms)
+        objective =
+            conic_form!(square(s) + 2 * x.M * abs(n), unique_conic_forms)
         conic_form!(c == s + n, unique_conic_forms)
 
         cache_conic_form!(unique_conic_forms, x, objective)
@@ -55,4 +56,4 @@ function conic_form!(x::HuberAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-huber(x::AbstractExpr, M::Real=1.0) = HuberAtom(x, M)
+huber(x::AbstractExpr, M::Real = 1.0) = HuberAtom(x, M)

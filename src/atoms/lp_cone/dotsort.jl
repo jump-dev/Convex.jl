@@ -11,7 +11,7 @@ struct DotSortAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     w::Value
 
     function DotSortAtom(x::AbstractExpr, w::Value)
@@ -23,7 +23,7 @@ struct DotSortAtom <: AbstractExpr
             end
             children = (x,)
             vecw = reshape(w, length(x))
-            return new(:dotsort, hash((children, vecw)), children, (1,1), vecw)
+            return new(:dotsort, hash((children, vecw)), children, (1, 1), vecw)
         end
     end
 end
@@ -40,9 +40,9 @@ end
 
 function monotonicity(x::DotSortAtom)
     if all(x.w .>= 0)
-        return (Nondecreasing(), )
+        return (Nondecreasing(),)
     else
-        return (NoMonotonicity(), )
+        return (NoMonotonicity(),)
     end
 end
 
@@ -51,7 +51,10 @@ function curvature(x::DotSortAtom)
 end
 
 function evaluate(x::DotSortAtom)
-    return sum(sort(vec(evaluate(x.children[1])), rev=true) .* sort(vec(x.w), rev=true))
+    return sum(
+        sort(vec(evaluate(x.children[1])), rev = true) .*
+        sort(vec(x.w), rev = true),
+    )
 end
 
 function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
@@ -69,7 +72,7 @@ function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
         # minimize sum(mu) + sum(nu)
         # subject to y*w' <= onesvec*nu' + mu*onesvec'
         objective = conic_form!(sum(mu) + sum(nu), unique_conic_forms)
-        conic_form!(y*w' <= onesvec*nu' + mu*onesvec', unique_conic_forms)
+        conic_form!(y * w' <= onesvec * nu' + mu * onesvec', unique_conic_forms)
         cache_conic_form!(unique_conic_forms, x, objective)
     end
     return get_conic_form(unique_conic_forms, x)

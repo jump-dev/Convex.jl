@@ -11,7 +11,7 @@ struct SumAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function SumAtom(x::AbstractExpr)
         children = (x,)
@@ -46,9 +46,9 @@ function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms)
         objective = conic_form!(x.children[1], unique_conic_forms)
         new_obj = copy(objective)
         for var in keys(new_obj)
-            re = sum(new_obj[var][1], dims=1)
-            im = sum(new_obj[var][2], dims=1)
-            new_obj[var] = (re,im)
+            re = sum(new_obj[var][1], dims = 1)
+            im = sum(new_obj[var][2], dims = 1)
+            new_obj[var] = (re, im)
         end
         cache_conic_form!(unique_conic_forms, x, new_obj)
     end
@@ -57,7 +57,7 @@ end
 
 # Dispatch to an internal helper function that handles the dimension argument in
 # the same manner as Base, with dims=: denoting a regular sum
-sum(x::AbstractExpr; dims=:) = _sum(x, dims)
+sum(x::AbstractExpr; dims = :) = _sum(x, dims)
 
 _sum(x::AbstractExpr, ::Colon) = SumAtom(x)
 
@@ -70,4 +70,3 @@ function _sum(x::AbstractExpr, dimension::Integer)
         error("Sum not implemented for dimension $dimension")
     end
 end
-

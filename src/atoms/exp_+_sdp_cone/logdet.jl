@@ -4,7 +4,7 @@ struct LogDetAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function LogDetAtom(x::AbstractExpr)
         children = (x,)
@@ -41,10 +41,10 @@ function conic_form!(x::LogDetAtom, unique_conic_forms::UniqueConicForms)
         for i in 1:A.size[1]
             for j in 1:A.size[2]
                 if i != j
-                    conic_form!(D[i,j] == 0, unique_conic_forms)
+                    conic_form!(D[i, j] == 0, unique_conic_forms)
                 end
                 if i > j
-                    conic_form!(U[i,j] == 0, unique_conic_forms)
+                    conic_form!(U[i, j] == 0, unique_conic_forms)
                 end
             end
         end

@@ -15,8 +15,8 @@
 
 ## Data taken from http://people.sc.fsu.edu/~jburkardt/datasets/knapsack_01/knapsack_01.html
 w = [23; 31; 29; 44; 53; 38; 63; 85; 89; 82]
-C = 165 
-p =  [92; 57; 49; 68; 60; 43; 67; 84; 87; 72];
+C = 165
+p = [92; 57; 49; 68; 60; 43; 67; 84; 87; 72];
 n = length(w)
 
 #-

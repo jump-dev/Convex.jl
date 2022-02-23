@@ -25,11 +25,12 @@ using Convex, SparseArrays, LinearAlgebra
 using SCS # first order splitting conic solver [O'Donoghue et al., 2014]
 
 ## Generate random problem data
-m = 50;  n = 100
+m = 50;
+n = 100;
 A = randn(m, n)
-x♮ = sprand(n, 1, .5) # true (sparse nonnegative) parameter vector
-noise = .1*randn(m)    # gaussian noise
-b = A*x♮ + noise      # noisy linear observations
+x♮ = sprand(n, 1, 0.5) # true (sparse nonnegative) parameter vector
+noise = 0.1 * randn(m)    # gaussian noise
+b = A * x♮ + noise      # noisy linear observations
 
 ## Create a (column vector) variable of size n.
 x = Variable(n)
@@ -37,8 +38,10 @@ x = Variable(n)
 ## nonnegative elastic net with regularization
 λ = 1
 μ = 1
-problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
-                   x >= 0)
+problem = minimize(
+    square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
+    x >= 0,
+)
 
 ## Solve the problem by calling solve!
 solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
@@ -50,12 +53,14 @@ println("optimal value is ", problem.optval)
 
 using Interact, Plots
 ## Interact.WebIO.install_jupyter_nbextension() # might be helpful if you see `WebIO` warnings in Jupyter
-@manipulate throttle=.1 for λ=0:.1:5, μ=0:.1:5
+@manipulate throttle = 0.1 for λ in 0:0.1:5, μ in 0:0.1:5
     global A
-    problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
-                   x >= 0)
+    problem = minimize(
+        square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
+        x >= 0,
+    )
     solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    histogram(evaluate(x), xlims=(0,3.5), label="x")
+    histogram(evaluate(x), xlims = (0, 3.5), label = "x")
 end
 
 # # Quick convex prototyping
@@ -112,8 +117,8 @@ square(x) <= sum(y)
 #-
 
 M = Z
-for i = 1:length(y)
-    global M += rand(size(Z)...)*y[i]
+for i in 1:length(y)
+    global M += rand(size(Z)...) * y[i]
 end
 M ⪰ 0
 
@@ -121,7 +126,7 @@ M ⪰ 0
 
 x = Variable()
 y = Variable(4)
-objective = 2*x + 1 - sqrt(sum(y))
+objective = 2 * x + 1 - sqrt(sum(y))
 constraint = x >= maximum(y)
 p = minimize(objective, constraint)
 
@@ -159,11 +164,12 @@ evaluate(objective)
 # ## Warmstart
 
 ## Generate random problem data
-m = 50;  n = 100
+m = 50;
+n = 100;
 A = randn(m, n)
-x♮ = sprand(n, 1, .5) # true (sparse nonnegative) parameter vector
-noise = .1*randn(m)    # gaussian noise
-b = A*x♮ + noise      # noisy linear observations
+x♮ = sprand(n, 1, 0.5) # true (sparse nonnegative) parameter vector
+noise = 0.1 * randn(m)    # gaussian noise
+b = A * x♮ + noise      # noisy linear observations
 
 ## Create a (column vector) variable of size n.
 x = Variable(n)
@@ -171,11 +177,20 @@ x = Variable(n)
 ## nonnegative elastic net with regularization
 λ = 1
 μ = 1
-problem = minimize(square(norm(A * x - b)) + λ*square(norm(x)) + μ*norm(x, 1),
-                   x >= 0)
-@time solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+problem = minimize(
+    square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
+    x >= 0,
+)
+@time solve!(
+    problem,
+    MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0),
+)
 λ = 1.5
-@time solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0), warmstart = true)
+@time solve!(
+    problem,
+    MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0),
+    warmstart = true,
+)
 
 # # DCP examples
 
@@ -186,7 +201,7 @@ sum(x) + y[2]
 
 #-
 
-2*maximum(x) + 4*sum(y) - sqrt(y[1] + x[1]) - 7 * minimum(x[2:4])
+2 * maximum(x) + 4 * sum(y) - sqrt(y[1] + x[1]) - 7 * minimum(x[2:4])
 
 #-
 

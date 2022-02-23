@@ -28,7 +28,8 @@
 #
 #############################################################################
 
-import Base.sign, Base.size, Base.length, Base.lastindex, Base.ndims, Base.convert, Base.axes
+import Base.sign,
+    Base.size, Base.length, Base.lastindex, Base.ndims, Base.convert, Base.axes
 
 ### Abstract types
 abstract type AbstractExpr end
@@ -48,39 +49,36 @@ function hash(a::Array{AbstractExpr}, h::UInt)
     return h
 end
 
-
 # If h(x)=f∘g(x), then (for single variable calculus)
 # h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 # We calculate the vexity according to this
 function vexity(x::AbstractExpr)
     monotonicities = monotonicity(x)
     vex = curvature(x)
-    for i = 1:length(x.children)
+    for i in 1:length(x.children)
         vex += monotonicities[i] * vexity(x.children[i])
     end
     return vex
 end
 
-
-
 # This function should never be reached
 function monotonicity(x::AbstractExpr)
-    error("monotonicity not implemented for $(x.head).")
+    return error("monotonicity not implemented for $(x.head).")
 end
 
 # This function should never be reached
 function curvature(x::AbstractExpr)
-    error("curvature not implemented for $(x.head).")
+    return error("curvature not implemented for $(x.head).")
 end
 
 # This function should never be reached
 function evaluate(x::AbstractExpr)
-    error("evaluate not implemented for $(x.head).")
+    return error("evaluate not implemented for $(x.head).")
 end
 
 # This function should never be reached
 function sign(x::AbstractExpr)
-    error("sign not implemented for $(x.head).")
+    return error("sign not implemented for $(x.head).")
 end
 
 function size(x::AbstractExpr)
@@ -92,9 +90,9 @@ function length(x::AbstractExpr)
 end
 
 ### User-defined Unions
-const Value = Union{Number, AbstractArray}
-const ValueOrNothing = Union{Value, Nothing}
-const AbstractExprOrValue = Union{AbstractExpr, Value}
+const Value = Union{Number,AbstractArray}
+const ValueOrNothing = Union{Value,Nothing}
+const AbstractExprOrValue = Union{AbstractExpr,Value}
 
 convert(::Type{AbstractExpr}, x::Value) = Constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x

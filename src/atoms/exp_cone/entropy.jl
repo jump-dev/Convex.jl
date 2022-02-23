@@ -14,7 +14,7 @@ mutable struct EntropyAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function EntropyAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
@@ -50,9 +50,12 @@ function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms)
         t = Variable(e.size)
         x = e.children[1]
         objective = conic_form!(t, unique_conic_forms)
-        for i = 1:size(x, 1)
-            for j = 1:size(x, 2)
-                conic_form!(ExpConstraint(t[i, j], x[i, j], 1), unique_conic_forms)
+        for i in 1:size(x, 1)
+            for j in 1:size(x, 2)
+                conic_form!(
+                    ExpConstraint(t[i, j], x[i, j], 1),
+                    unique_conic_forms,
+                )
             end
         end
         cache_conic_form!(unique_conic_forms, e, objective)

@@ -1,7 +1,6 @@
 import Base.show, Base.summary
 using .TreePrint
 
-
 """
     show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3)
 
@@ -16,11 +15,17 @@ julia> Convex.show_id(stdout, x)
 id: 163…906
 ```
 """
-show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = MAXDIGITS[]) = print(io, show_id(x; digits=digits))
+function show_id(
+    io::IO,
+    x::Union{AbstractExpr,Constraint};
+    digits = MAXDIGITS[],
+)
+    return print(io, show_id(x; digits = digits))
+end
 
-function show_id(x::Union{AbstractExpr, Constraint}; digits = MAXDIGITS[])
+function show_id(x::Union{AbstractExpr,Constraint}; digits = MAXDIGITS[])
     hash_str = string(x.id_hash)
-    if length(hash_str) > (2*digits + 1);
+    if length(hash_str) > (2 * digits + 1)
         return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
     else
         return "id: " * hash_str
@@ -44,9 +49,9 @@ function Base.summary(io::IO, x::AbstractVariable)
     sgn = summary(sign(x))
     cst = vexity(x) == ConstVexity() ? " (fixed)" : ""
     cst = cst * " (" * sprint(show_id, x) * ")"
-    if size(x) == (1,1)
+    if size(x) == (1, 1)
         print(io, "$(sgn) variable$(cst)")
-    elseif size(x,2) == 1
+    elseif size(x, 2) == 1
         print(io, "$(size(x,1))-element $(sgn) variable$(cst)")
     else
         print(io, "$(size(x,1))×$(size(x,2)) $(sgn) variable$(cst)")
@@ -66,7 +71,7 @@ Base.summary(io::IO, ::ComplexSign) = print(io, "complex")
 function Base.summary(io::IO, c::Constraint)
     print(io, "$(c.head) constraint (")
     summary(io, vexity(c))
-    print(io, ")")
+    return print(io, ")")
 end
 
 function Base.summary(io::IO, e::AbstractExpr)
@@ -74,7 +79,7 @@ function Base.summary(io::IO, e::AbstractExpr)
     summary(io, vexity(e))
     print(io, "; ")
     summary(io, sign(e))
-    print(io, ")")
+    return print(io, ")")
 end
 
 # A Constant is simply a wrapper around a native Julia constant
@@ -112,7 +117,7 @@ invoke `print_tree`.
 """
 function print_tree_rstrip(io::IO, x)
     str = sprint(TreePrint.print_tree, x, MAXDEPTH[], MAXWIDTH[])
-    print(io, rstrip(str))
+    return print(io, rstrip(str))
 end
 
 # This object is used to work around the fact that
@@ -130,22 +135,28 @@ struct ConstraintRoot
     constraint::Constraint
 end
 
-TreePrint.print_tree(io::IO, c::Constraint, args...; kwargs...) = TreePrint.print_tree(io, ConstraintRoot(c), args...; kwargs...)
+function TreePrint.print_tree(io::IO, c::Constraint, args...; kwargs...)
+    return TreePrint.print_tree(io, ConstraintRoot(c), args...; kwargs...)
+end
 AbstractTrees.children(c::ConstraintRoot) = AbstractTrees.children(c.constraint)
-AbstractTrees.printnode(io::IO, c::ConstraintRoot) = AbstractTrees.printnode(io, c.constraint)
+function AbstractTrees.printnode(io::IO, c::ConstraintRoot)
+    return AbstractTrees.printnode(io, c.constraint)
+end
 
 show(io::IO, c::Constraint) = print_tree_rstrip(io, c)
 
 struct ExprRoot
     expr::AbstractExpr
 end
-TreePrint.print_tree(io::IO, e::AbstractExpr, args...; kwargs...) = TreePrint.print_tree(io, ExprRoot(e), args...; kwargs...)
+function TreePrint.print_tree(io::IO, e::AbstractExpr, args...; kwargs...)
+    return TreePrint.print_tree(io, ExprRoot(e), args...; kwargs...)
+end
 AbstractTrees.children(e::ExprRoot) = AbstractTrees.children(e.expr)
-AbstractTrees.printnode(io::IO, e::ExprRoot) = AbstractTrees.printnode(io, e.expr)
-
+function AbstractTrees.printnode(io::IO, e::ExprRoot)
+    return AbstractTrees.printnode(io, e.expr)
+end
 
 show(io::IO, e::AbstractExpr) = print_tree_rstrip(io, e)
-
 
 struct ProblemObjectiveRoot
     head::Symbol
@@ -153,20 +164,33 @@ struct ProblemObjectiveRoot
 end
 
 AbstractTrees.children(p::ProblemObjectiveRoot) = (p.objective,)
-AbstractTrees.printnode(io::IO, p::ProblemObjectiveRoot) =  print(io, string(p.head))
+function AbstractTrees.printnode(io::IO, p::ProblemObjectiveRoot)
+    return print(io, string(p.head))
+end
 
 struct ProblemConstraintsRoot
     constraints::Vector{Constraint}
 end
 
 AbstractTrees.children(p::ProblemConstraintsRoot) = p.constraints
-AbstractTrees.printnode(io::IO, p::ProblemConstraintsRoot) = print(io, "subject to")
-
+function AbstractTrees.printnode(io::IO, p::ProblemConstraintsRoot)
+    return print(io, "subject to")
+end
 
 function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
-    TreePrint.print_tree(io, ProblemObjectiveRoot(p.head, p.objective), args...; kwargs...)
+    TreePrint.print_tree(
+        io,
+        ProblemObjectiveRoot(p.head, p.objective),
+        args...;
+        kwargs...,
+    )
     if !(isempty(p.constraints))
-        TreePrint.print_tree(io, ProblemConstraintsRoot(p.constraints), args...; kwargs...)
+        TreePrint.print_tree(
+            io,
+            ProblemConstraintsRoot(p.constraints),
+            args...;
+            kwargs...,
+        )
     end
 end
 

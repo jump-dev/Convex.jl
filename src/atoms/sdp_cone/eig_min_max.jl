@@ -14,7 +14,7 @@ struct EigMaxAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function EigMaxAtom(x::AbstractExpr)
         children = (x,)
@@ -40,7 +40,7 @@ function curvature(x::EigMaxAtom)
 end
 
 function evaluate(x::EigMaxAtom)
-    eigmax(evaluate(x.children[1]))
+    return eigmax(evaluate(x.children[1]))
 end
 
 eigmax(x::AbstractExpr) = EigMaxAtom(x)
@@ -55,7 +55,7 @@ function conic_form!(x::EigMaxAtom, unique_conic_forms)
         A = x.children[1]
         m, n = size(A)
         t = Variable()
-        p = minimize(t, t*Matrix(1.0I, n, n) - A ⪰ 0)
+        p = minimize(t, t * Matrix(1.0I, n, n) - A ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)
@@ -67,13 +67,13 @@ struct EigMinAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function EigMinAtom(x::AbstractExpr)
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:eigmin, hash(children), children, (1,1))
+            return new(:eigmin, hash(children), children, (1, 1))
         else
             error("eigmin can only be applied to a square matrix.")
         end
@@ -93,7 +93,7 @@ function curvature(x::EigMinAtom)
 end
 
 function evaluate(x::EigMinAtom)
-    eigmin(evaluate(x.children[1]))
+    return eigmin(evaluate(x.children[1]))
 end
 
 eigmin(x::AbstractExpr) = EigMinAtom(x)
@@ -108,7 +108,7 @@ function conic_form!(x::EigMinAtom, unique_conic_forms)
         A = x.children[1]
         m, n = size(A)
         t = Variable()
-        p = maximize(t, A - t*Matrix(1.0I, n, n) ⪰ 0)
+        p = maximize(t, A - t * Matrix(1.0I, n, n) ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)

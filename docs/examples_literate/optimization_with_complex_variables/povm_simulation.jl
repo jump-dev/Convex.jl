@@ -12,7 +12,7 @@
 using Convex, SCS, LinearAlgebra
 if VERSION < v"1.2.0-DEV.0"
     (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
-     LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
+    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
 end
 
 # For the qubit case, a four outcome qubit POVM $\mathbf{M} \in\mathcal{P}(2,4)$ is simulable if and only if
@@ -42,18 +42,18 @@ end
 # We organize these constraints in a function that takes a four-output qubit POVM as its argument:
 
 function get_visibility(K)
-    noise = real([tr(K[i])*I(2)/2 for i=1:size(K, 1)])
-    P = [[ComplexVariable(2, 2) for i=1:2] for j=1:6]
+    noise = real([tr(K[i]) * I(2) / 2 for i in 1:size(K, 1)])
+    P = [[ComplexVariable(2, 2) for i in 1:2] for j in 1:6]
     q = Variable(6, Positive())
     t = Variable(1, Positive())
-    constraints = [P[i][j] in :SDP for i=1:6 for j=1:2]
-    constraints += sum(q)==1
-    constraints += t<=1
-    constraints += [P[i][1]+P[i][2] == q[i]*I(2) for i=1:6]
-    constraints += t*K[1] + (1-t)*noise[1] == P[1][1] + P[2][1] + P[3][1]
-    constraints += t*K[2] + (1-t)*noise[2] == P[1][2] + P[4][1] + P[5][1]
-    constraints += t*K[3] + (1-t)*noise[3] == P[2][2] + P[4][2] + P[6][1]
-    constraints += t*K[4] + (1-t)*noise[4] == P[3][2] + P[5][2] + P[6][2]
+    constraints = [P[i][j] in :SDP for i in 1:6 for j in 1:2]
+    constraints += sum(q) == 1
+    constraints += t <= 1
+    constraints += [P[i][1] + P[i][2] == q[i] * I(2) for i in 1:6]
+    constraints += t * K[1] + (1 - t) * noise[1] == P[1][1] + P[2][1] + P[3][1]
+    constraints += t * K[2] + (1 - t) * noise[2] == P[1][2] + P[4][1] + P[5][1]
+    constraints += t * K[3] + (1 - t) * noise[3] == P[2][2] + P[4][2] + P[6][1]
+    constraints += t * K[4] + (1 - t) * noise[4] == P[3][2] + P[5][2] + P[6][2]
     p = maximize(t, constraints)
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
     return p.optval
@@ -62,13 +62,15 @@ end
 # We check this function using the tetrahedron measurement (see Appendix B in [arXiv:quant-ph/0702021](https://arxiv.org/abs/quant-ph/0702021)). This measurement is non-simulable, so we expect a value below one.
 
 function dp(v)
-    I(2) + v[1]*[0 1; 1 0] + v[2]*[0 -im; im 0] + v[3]*[1 0; 0 -1]
+    return I(2) + v[1] * [0 1; 1 0] + v[2] * [0 -im; im 0] + v[3] * [1 0; 0 -1]
 end
-b = [ 1  1  1;
-     -1 -1  1;
-     -1  1 -1;
-      1 -1 -1]/sqrt(3)
-M = [dp(b[i, :]) for i=1:size(b,1)]/4;
+b = [
+    1 1 1
+    -1 -1 1
+    -1 1 -1
+    1 -1 -1
+] / sqrt(3)
+M = [dp(b[i, :]) for i in 1:size(b, 1)] / 4;
 get_visibility(M)
 
 # This value matches the one [we obtained](https://github.com/peterwittek/ipython-notebooks/blob/master/Simulating_POVMs.ipynb) using [PICOS](http://picos.zib.de/).
