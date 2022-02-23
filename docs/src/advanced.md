@@ -59,14 +59,15 @@ y = rand(n)
 x = Variable(n)
 
 # first solve
-lambda = 100
+lambda = Variable(Positive())
+fix!(lambda, 100)
 problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
 @time solve!(problem, SCS.Optimizer)
 
 # now warmstart
 # if the solver takes advantage of warmstarts, 
 # this run will be faster
-lambda = 105
+fix!(lambda, 105)
 @time solve!(problem, SCS.Optimizer, warmstart=true)
 ```
 
