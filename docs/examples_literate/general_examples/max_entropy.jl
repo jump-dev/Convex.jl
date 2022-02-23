@@ -18,12 +18,12 @@ using Convex, SCS
 
 n = 25;
 m = 15;
-A = randn(m, n); 
-b = rand(m, 1); 
+A = randn(m, n);
+b = rand(m, 1);
 
 x = Variable(n);
 problem = maximize(entropy(x), sum(x) == 1, A * x <= b)
-solve!(problem, () -> SCS.Optimizer(verbose=false))
+solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 problem.optval
 
 #-

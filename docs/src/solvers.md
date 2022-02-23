@@ -44,20 +44,20 @@ using GLPK
 solve!(p, GLPK.Optimizer)
 ```
 
-Many of the solvers also allow options to be passed using 
-`MOI.OptimizerWithAttributes`. For example, to set a time limit (in 
+Many of the solvers also allow options to be passed using
+`MOI.OptimizerWithAttributes`. For example, to set a time limit (in
 milliseconds) with GLPK, use:
 ```julia
 using Convex, GLPK
 const MOI = Convex.MOI
 
 solve!(
-    p, 
+    p,
     MOI.OptimizerWithAttributes(GLPK.Optimizer, "tm_lim" => 60_000.0)
 )
 ```
 
-As another example, if we wish to turn off printing for the SCS solver 
+As another example, if we wish to turn off printing for the SCS solver
 (i.e., run in quiet mode), we can do so as follows:
 ```julia
 using Convex, SCS
@@ -67,7 +67,7 @@ opt = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() => false)
 solve!(p, opt)
 ```
 
-Another option is to use the solver-independent `silent_solver` 
+Another option is to use the solver-independent `silent_solver`
 keyword argument to `solve!`:
 ```julia
 solve!(p, SCS.Optimizer; silent_solver=true)

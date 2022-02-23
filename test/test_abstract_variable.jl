@@ -1,6 +1,6 @@
 # We provide a non-`Variable` implementation of the `AbstractVariable` interface
 # to test that only the interface is used (and not, e.g. direct field access).
-solver = () -> SCS.Optimizer(verbose=false)
+solver = MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0)
 TOL = 1e-3
 module DictVectors
 using Convex
@@ -18,7 +18,7 @@ mutable struct DictVector{T} <: Convex.AbstractVariable
         this = new(:DictVector, 0, (d,1))
         this.id_hash = objectid(this)
         global_cache[this.id_hash] = Dict(  :value => nothing,
-                                            :sign => T <: Complex ? ComplexSign() : NoSign(), 
+                                            :sign => T <: Complex ? ComplexSign() : NoSign(),
                                             :vartype => ContVar,
                                             :constraints => Constraint[],
                                             :vexity => Convex.AffineVexity())
@@ -68,7 +68,7 @@ end
 
 
 # Let us do another example of custom variable types, but using field access for simplicity
-  
+
 module DensityMatricies
 using Convex
 
@@ -104,7 +104,7 @@ import LinearAlgebra
 
     # found it! Now let us do it again via an SDP
     ρ = DensityMatricies.DensityMatrix(4)
-    
+
     prob = maximize( real(tr(ρ*X)) )
     solve!(prob, solver())
 

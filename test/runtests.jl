@@ -43,13 +43,13 @@ end
         #
         # "sdp_sdp_constraints" is failing with MOI v0.9 on ubuntu.
         run_tests(; exclude=[r"mip", r"sdp_lieb_ando", r"sdp_sdp_constraints"]) do p
-            solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6); warmstart = true)
+            solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6); warmstart = true)
         end
     end
 
     @testset "SCS" begin
         run_tests(; exclude=[r"mip", r"sdp_lieb_ando", r"sdp_sdp_constraints"]) do p
-            solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6))
+            solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
         end
     end
 

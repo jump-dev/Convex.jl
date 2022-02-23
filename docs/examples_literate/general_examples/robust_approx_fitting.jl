@@ -43,18 +43,18 @@ x = Variable(n)
 
 # Case 1: Nominal optimal solution
 p = minimize(norm(A * x - b, 2))
-solve!(p, () -> SCS.Optimizer(verbose=0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 x_nom = evaluate(x)
 
 # Case 2: Stochastic robust approximation
 P = 1 / 3 * B' * B;
 p = minimize(square(pos(norm(A * x - b))) + quadform(x, Symmetric(P)))
-solve!(p, () -> SCS.Optimizer(verbose=0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 x_stoch = evaluate(x)
 
 # Case 3: Worst-case robust approximation
 p = minimize(max(norm((A - B) * x - b), norm((A + B) * x - b)))
-solve!(p, () -> SCS.Optimizer(verbose=0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 x_wc = evaluate(x)
 
 # Plot residuals:

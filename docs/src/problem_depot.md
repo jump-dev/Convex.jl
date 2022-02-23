@@ -11,7 +11,7 @@ For example, to test the solver SCS on all the problems of the depot except the 
 using Convex, SCS, Test
 @testset "SCS" begin
     Convex.ProblemDepot.run_tests(; exclude=[r"mip"]) do p
-        solve!(p, () -> SCS.Optimizer(verbose=0, eps=1e-6))
+        solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
     end
 end
 ```

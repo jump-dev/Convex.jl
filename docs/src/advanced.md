@@ -33,7 +33,7 @@ using Convex, SCS
 x = Variable()
 constraint = x >= 0
 p = minimize(x, constraint)
-solve!(p, SCS.Optimizer())
+solve!(p, SCS.Optimizer)
 
 # Get the dual value for the constraint
 p.constraints[1].dual
@@ -64,7 +64,7 @@ problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
 @time solve!(problem, SCS.Optimizer)
 
 # now warmstart
-# if the solver takes advantage of warmstarts, 
+# if the solver takes advantage of warmstarts,
 # this run will be faster
 lambda = 105
 @time solve!(problem, SCS.Optimizer, warmstart=true)
@@ -100,7 +100,7 @@ problem = minimize(sum_squares(A - x*y), x>=0, y>=0)
 # initialize value of y
 set_value!(y, rand(k, n))
 # we'll do 10 iterations of alternating minimization
-for i=1:10 
+for i=1:10
     # first solve for x
     # with y fixed, the problem is convex
     fix!(y)
@@ -142,7 +142,7 @@ them as callable types, or provide a different implementation. Continuing with
 the probability vector example, let's say we often use probability vectors
 variables in taking expectation values, and we want to use function notation for
 this. To do so, we define
- 
+
 ```@example 1
 using Convex
 mutable struct ProbabilityVector <: Convex.AbstractVariable
@@ -175,7 +175,7 @@ using SCS
 p = ProbabilityVector(3)
 x = [1.0, 2.0, 3.0]
 prob = minimize( p(x) )
-solve!(prob, SCS.Optimizer(verbose=false))
+solve!(prob, SCS.Optimizer)
 evaluate(p) # [1.0, 0.0, 0.0]
 ```
 
@@ -190,7 +190,7 @@ Subtypes of `AbstractVariable` must have the fields `head`, `id_hash`, and
 * have a field `constraints` or implement [`Convex.constraints`](@ref) (optionally,
   implement [`Convex.add_constraint!`](@ref) to be able to add constraints to your
   variable after its creation),
-* either have a field `sign` or implement [`Convex.sign`](@ref), and 
+* either have a field `sign` or implement [`Convex.sign`](@ref), and
 * either have a field `vartype`, or implement [`Convex.vartype`](@ref) (optionally,
   implement [`Convex.vartype!`](@ref) to be able to change a variables' `vartype`
   after construction.)

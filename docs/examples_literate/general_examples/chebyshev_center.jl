@@ -25,7 +25,7 @@ p.constraints += a1' * x_c + r * norm(a1, 2) <= b[1];
 p.constraints += a2' * x_c + r * norm(a2, 2) <= b[2];
 p.constraints += a3' * x_c + r * norm(a3, 2) <= b[3];
 p.constraints += a4' * x_c + r * norm(a4, 2) <= b[4];
-solve!(p, () -> SCS.Optimizer(verbose=0))
+solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 p.optval
 
 # Generate the figure
