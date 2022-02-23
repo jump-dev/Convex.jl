@@ -12,14 +12,14 @@ import LinearAlgebra.eigvals
 struct SumLargestEigs <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr,AbstractExpr}
+    size::Tuple{Int,Int}
 
     function SumLargestEigs(x::AbstractExpr, k::AbstractExpr)
         children = (x, k)
         m, n = size(x)
         if m == n
-            return new(:sumlargesteigs, hash(children), children, (1,1))
+            return new(:sumlargesteigs, hash(children), children, (1, 1))
         else
             error("sumlargesteigs can only be applied to a square matrix.")
         end
@@ -39,10 +39,12 @@ function curvature(x::SumLargestEigs)
 end
 
 function evaluate(x::SumLargestEigs)
-    eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
+    return eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
 end
 
-sumlargesteigs(x::AbstractExpr, k::Int) = k == 0 ? Constant(0) : SumLargestEigs(x, Constant(k))
+function sumlargesteigs(x::AbstractExpr, k::Int)
+    return k == 0 ? Constant(0) : SumLargestEigs(x, Constant(k))
+end
 
 # Create the equivalent conic problem:
 #   minimize sk + Tr(Z)
@@ -66,9 +68,11 @@ function conic_form!(x::SumLargestEigs, unique_conic_forms)
         s = Variable()
         # The two inequality constraints have the side effect of constraining A to be symmetric,
         # since only symmetric matrices can be positive semidefinite.
-        p = minimize(s*k + real(tr(Z)),
-                     Z + s*Matrix(1.0I, n, n) - A ⪰ 0,
-                     Z ⪰ 0)
+        p = minimize(
+            s * k + real(tr(Z)),
+            Z + s * Matrix(1.0I, n, n) - A ⪰ 0,
+            Z ⪰ 0,
+        )
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)

@@ -9,7 +9,7 @@ struct SumLargestAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     k::Int
 
     function SumLargestAtom(x::AbstractExpr, k::Int)
@@ -17,13 +17,15 @@ struct SumLargestAtom <: AbstractExpr
             error("Argument should be real instead it is $(sign(x))")
         else
             if k <= 0
-                error("sumlargest and sumsmallest only support positive values of k")
+                error(
+                    "sumlargest and sumsmallest only support positive values of k",
+                )
             end
             if k > length(x)
                 error("k cannot be larger than the number of entries in x")
             end
             children = (x,)
-            return new(:sumlargest, hash((children, k)), children, (1,1), k)
+            return new(:sumlargest, hash((children, k)), children, (1, 1), k)
         end
     end
 end
@@ -33,7 +35,7 @@ function sign(x::SumLargestAtom)
 end
 
 function monotonicity(x::SumLargestAtom)
-    return (Nondecreasing(), )
+    return (Nondecreasing(),)
 end
 
 function curvature(x::SumLargestAtom)
@@ -41,7 +43,7 @@ function curvature(x::SumLargestAtom)
 end
 
 function evaluate(x::SumLargestAtom)
-    return sum(sort(vec(evaluate(x.children[1])), rev=true)[1:x.k])
+    return sum(sort(vec(evaluate(x.children[1])), rev = true)[1:x.k])
 end
 
 function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
@@ -52,7 +54,7 @@ function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
         # sum k largest given by the solution to
         # minimize sum(t) + k*q
         # subject to c <= t + q, t >= 0
-        objective = conic_form!(sum(t) + x.k*q, unique_conic_forms)
+        objective = conic_form!(sum(t) + x.k * q, unique_conic_forms)
         conic_form!(c <= t + q, unique_conic_forms)
         conic_form!(t >= 0, unique_conic_forms)
         cache_conic_form!(unique_conic_forms, x, objective)
@@ -60,5 +62,9 @@ function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-sumlargest(x::AbstractExpr, k::Int) = k == 0 ? Constant(0) : SumLargestAtom(x, k)
-sumsmallest(x::AbstractExpr, k::Int) = k == 0 ? Constant(0) : -SumLargestAtom(-x, k)
+function sumlargest(x::AbstractExpr, k::Int)
+    return k == 0 ? Constant(0) : SumLargestAtom(x, k)
+end
+function sumsmallest(x::AbstractExpr, k::Int)
+    return k == 0 ? Constant(0) : -SumLargestAtom(-x, k)
+end

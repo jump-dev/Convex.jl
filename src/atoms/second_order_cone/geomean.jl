@@ -3,14 +3,16 @@ import Base.sqrt
 struct GeoMeanAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr,AbstractExpr}
+    size::Tuple{Int,Int}
 
     function GeoMeanAtom(x::AbstractExpr, y::AbstractExpr)
         if x.size != y.size
             error("geo mean must take two arguments of the same size")
         elseif sign(x) == ComplexSign() || sign(y) == ComplexSign()
-            error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
+            error(
+                "Both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
+            )
         else
             children = (x, y)
             return new(:geomean, hash(children), children, x.size)

@@ -26,8 +26,8 @@
 struct QuantumEntropy <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr,}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr}
+    size::Tuple{Int,Int}
     m::Integer
     k::Integer
 
@@ -58,16 +58,16 @@ function evaluate(atom::QuantumEntropy)
     return quantum_entropy(X)
 end
 
-const MatrixOrConstant = Union{AbstractMatrix, Constant}
+const MatrixOrConstant = Union{AbstractMatrix,Constant}
 
-function quantum_entropy(X::AbstractExpr, m::Integer=3, k::Integer=3)
+function quantum_entropy(X::AbstractExpr, m::Integer = 3, k::Integer = 3)
     #println("quantum_entropy general case")
     return QuantumEntropy(X, m, k)
 end
 
-function quantum_entropy(X::MatrixOrConstant, m::Integer=0, k::Integer=0)
+function quantum_entropy(X::MatrixOrConstant, m::Integer = 0, k::Integer = 0)
     #println("quantum_entropy constant X")
-    return -quantum_relative_entropy(X, Matrix(1.0*I, size(X)))
+    return -quantum_relative_entropy(X, Matrix(1.0 * I, size(X)))
 end
 
 function conic_form!(atom::QuantumEntropy, unique_conic_forms)
@@ -76,7 +76,7 @@ function conic_form!(atom::QuantumEntropy, unique_conic_forms)
         m = atom.m
         k = atom.k
         n = size(X)[1]
-        eye = Matrix(1.0*I, n, n)
+        eye = Matrix(1.0 * I, n, n)
 
         conic_form!(X ⪰ 0, unique_conic_forms)
 
@@ -86,7 +86,10 @@ function conic_form!(atom::QuantumEntropy, unique_conic_forms)
         else
             τ = Variable(n, n)
         end
-        conic_form!(τ in RelativeEntropyEpiCone(X, eye, m, k), unique_conic_forms)
+        conic_form!(
+            τ in RelativeEntropyEpiCone(X, eye, m, k),
+            unique_conic_forms,
+        )
 
         # It's already a real mathematically, but need to make it a real type.
         τ = real(-tr(τ))

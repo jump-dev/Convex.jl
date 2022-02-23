@@ -12,7 +12,7 @@ struct AbsAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function AbsAtom(x::AbstractExpr)
         children = (x,)
@@ -43,7 +43,10 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
         objective = conic_form!(t, unique_conic_forms)
         if sign(x.children[1]) == ComplexSign()
             for i in 1:length(vec(t))
-                conic_form!(t[i]>=norm2([real(c[i]);imag(c[i])]), unique_conic_forms)
+                conic_form!(
+                    t[i] >= norm2([real(c[i]); imag(c[i])]),
+                    unique_conic_forms,
+                )
             end
         else
             conic_form!(c <= t, unique_conic_forms)

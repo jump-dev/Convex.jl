@@ -20,39 +20,38 @@ using Random
 using Distributions: LogNormal
 Random.seed!(1);
 
-
 m = 5; # number of adverts
 n = 24; # number of timeslots
 SCALE = 10000;
 B = rand(LogNormal(8), m) .+ 10000;
-B = round.(B, digits=3); # Budget
+B = round.(B, digits = 3); # Budget
 
 P_ad = rand(m);
-P_time = rand(1,n);
+P_time = rand(1, n);
 P = P_ad * P_time;
 
-T = sin.(range(-2*pi/2, stop=2*pi-2*pi/2, length=n)) * SCALE;
+T = sin.(range(-2 * pi / 2, stop = 2 * pi - 2 * pi / 2, length = n)) * SCALE;
 T .+= -minimum(T) + SCALE; # traffic
 c = rand(m); # contractual minimum
-c *= 0.6*sum(T)/sum(c);
-c = round.(c, digits=3);
-R = [rand(LogNormal(minimum(c)/c[i]), 1) for i=1:m]; # revenue
+c *= 0.6 * sum(T) / sum(c);
+c = round.(c, digits = 3);
+R = [rand(LogNormal(minimum(c) / c[i]), 1) for i in 1:m]; # revenue
 
 #-
 
 ## Form and solve the optimal advertising problem.
 using Convex, SCS;
 D = Variable(m, n);
-Si = [min(R[i]*dot(P[i,:], D[i,:]'), B[i]) for i=1:m];
-problem = maximize(sum(Si),
-               [D >= 0, sum(D, dims=1)' <= T, sum(D, dims=2) >= c]);
+Si = [min(R[i] * dot(P[i, :], D[i, :]'), B[i]) for i in 1:m];
+problem =
+    maximize(sum(Si), [D >= 0, sum(D, dims = 1)' <= T, sum(D, dims = 2) >= c]);
 solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
 
 #-
 
 # Plot traffic.
 using Plots
-plot(1:length(T), T, xlabel="hour", ylabel="Traffic")
+plot(1:length(T), T, xlabel = "hour", ylabel = "Traffic")
 
 #-
 

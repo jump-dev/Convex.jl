@@ -5,12 +5,11 @@
 # Please read expressions.jl first.
 #############################################################################
 
-
 struct DiagMatrixAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function DiagMatrixAtom(x::AbstractExpr)
         (num_rows, num_cols) = x.size
@@ -20,10 +19,14 @@ struct DiagMatrixAtom <: AbstractExpr
         elseif num_cols == 1
             sz = num_rows
         else
-            throw(ArgumentError("Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?"))
+            throw(
+                ArgumentError(
+                    "Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?",
+                ),
+            )
         end
 
-        children = (x, )
+        children = (x,)
         return new(:diagm, hash(children), children, (sz, sz))
     end
 end
@@ -47,7 +50,7 @@ function evaluate(x::DiagMatrixAtom)
     return Diagonal(vec(evaluate(x.children[1])))
 end
 
-function LinearAlgebra.diagm((d, x)::Pair{<:Integer, <:AbstractExpr})
+function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
     d == 0 || throw(ArgumentError("only the main diagonal is supported"))
     return DiagMatrixAtom(x)
 end

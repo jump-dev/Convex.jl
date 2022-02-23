@@ -1,6 +1,8 @@
 import LinearAlgebra.dot
 
-ismatrix(x::AbstractExpr) = (s = size(x); length(s) == 2 && s[1] > 1 && s[2] > 1)
+function ismatrix(x::AbstractExpr)
+    return (s = size(x); length(s) == 2 && s[1] > 1 && s[2] > 1)
+end
 ismatrix(::AbstractMatrix) = true
 ismatrix(::Any) = false
 

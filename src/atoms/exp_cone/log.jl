@@ -12,10 +12,10 @@ mutable struct LogAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function LogAtom(x::AbstractExpr)
-        if sign(x)==ComplexSign()
+        if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
         else
             children = (x,)

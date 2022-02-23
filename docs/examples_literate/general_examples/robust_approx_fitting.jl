@@ -25,14 +25,14 @@
 #
 using Convex, LinearAlgebra, SCS
 if VERSION < v"1.2.0-DEV.0"
-     LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
+    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
 end
 # Input Data
 m = 20;
 n = 10;
-A = randn(m,n);
-(U,S,V) = svd(A);
-S = diagm(exp10.(range(-1, stop=1, length=n)));
+A = randn(m, n);
+(U, S, V) = svd(A);
+S = diagm(exp10.(range(-1, stop = 1, length = n)));
 A = U[:, 1:n] * S * V';
 
 B = randn(m, n);
@@ -58,16 +58,19 @@ solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 x_wc = evaluate(x)
 
 # Plot residuals:
-parvals = range(-2, stop=2, length=100);
+parvals = range(-2, stop = 2, length = 100);
 
-errvals(x) = [ norm((A + parvals[k] * B) * x - b) for k = eachindex(parvals)]
+errvals(x) = [norm((A + parvals[k] * B) * x - b) for k in eachindex(parvals)]
 errvals_ls = errvals(x_nom)
 errvals_stoch = errvals(x_stoch)
 errvals_wc = errvals(x_wc)
 
-
 using Plots
-plot(parvals, errvals_ls, label="Nominal problem")
-plot!(parvals, errvals_stoch, label="Stochastic Robust Approximation")
-plot!(parvals, errvals_wc, label="Worst-Case Robust Approximation")
-plot!(title="Residual r(u) vs a parameter u for three approximate solutions", xlabel="u", ylabel="r(u) = ||A(u)x-b||_2")
+plot(parvals, errvals_ls, label = "Nominal problem")
+plot!(parvals, errvals_stoch, label = "Stochastic Robust Approximation")
+plot!(parvals, errvals_wc, label = "Worst-Case Robust Approximation")
+plot!(
+    title = "Residual r(u) vs a parameter u for three approximate solutions",
+    xlabel = "u",
+    ylabel = "r(u) = ||A(u)x-b||_2",
+)

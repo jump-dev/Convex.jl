@@ -4,7 +4,7 @@ using Random
 
 Random.seed!(2);
 n = 5;
-r = abs.(randn(n, 1))/15;
+r = abs.(randn(n, 1)) / 15;
 Sigma = 0.9 * rand(n, n) .- 0.15;
 Sigma_nom = Sigma' * Sigma;
 Sigma_nom .-= (maximum(Sigma_nom) - 0.9)
@@ -27,12 +27,23 @@ wval = vec(evaluate(w))
 Sigma = Semidefinite(n);
 Delta = Variable(n, n);
 risk = sum(quadform(wval, Sigma));
-problem = maximize(risk, [Sigma == Sigma_nom + Delta,
-                    diag(Delta) == 0,
-                    abs(Delta) <= 0.2,
-                    Delta == Delta']);
+problem = maximize(
+    risk,
+    [
+        Sigma == Sigma_nom + Delta,
+        diag(Delta) == 0,
+        abs(Delta) <= 0.2,
+        Delta == Delta',
+    ],
+);
 solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
-println("standard deviation = ", round(sqrt(wval' * Sigma_nom * wval), sigdigits=2));
-println("worst-case standard deviation = ", round(sqrt(evaluate(risk)), sigdigits=2));
+println(
+    "standard deviation = ",
+    round(sqrt(wval' * Sigma_nom * wval), sigdigits = 2),
+);
+println(
+    "worst-case standard deviation = ",
+    round(sqrt(evaluate(risk)), sigdigits = 2),
+);
 println("worst-case Delta = ");
-println(round.(evaluate(Delta), sigdigits=2));
+println(round.(evaluate(Delta), sigdigits = 2));

@@ -4,7 +4,7 @@ struct ReshapeAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function ReshapeAtom(x::AbstractExpr, m::Int, n::Int)
         if m * n != length(x)
@@ -33,7 +33,6 @@ end
 function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
     return conic_form!(x.children[1], unique_conic_forms)
 end
-
 
 reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
 vec(x::AbstractExpr) = reshape(x, length(x), 1)

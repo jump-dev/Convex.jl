@@ -11,11 +11,11 @@ struct NuclearNormAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function NuclearNormAtom(x::AbstractExpr)
         children = (x,)
-        return new(:nuclearnorm, hash(children), children, (1,1))
+        return new(:nuclearnorm, hash(children), children, (1, 1))
     end
 end
 
@@ -53,13 +53,13 @@ function conic_form!(x::NuclearNormAtom, unique_conic_forms)
         A = x.children[1]
         m, n = size(A)
         if sign(A) == ComplexSign()
-            U = ComplexVariable(m,m)
-            V = ComplexVariable(n,n)
+            U = ComplexVariable(m, m)
+            V = ComplexVariable(n, n)
         else
-            U = Variable(m,m)
-            V = Variable(n,n)
+            U = Variable(m, m)
+            V = Variable(n, n)
         end
-        p = minimize(.5*real(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
+        p = minimize(0.5 * real(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
         cache_conic_form!(unique_conic_forms, x, p)
     end
     return get_conic_form(unique_conic_forms, x)

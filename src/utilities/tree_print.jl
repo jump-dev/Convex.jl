@@ -8,25 +8,27 @@ module TreePrint
 
 using AbstractTrees: printnode, treekind, IndexedTree, children
 
-
 # Printing
 struct TreeCharSet
-    mid
-    terminator
-    skip
-    dash
-    ellipsis
+    mid::Any
+    terminator::Any
+    skip::Any
+    dash::Any
+    ellipsis::Any
 end
 
 # Default charset
-TreeCharSet() = TreeCharSet('├','└','│','─','…')
+TreeCharSet() = TreeCharSet('├', '└', '│', '─', '…')
 
 function print_prefix(io, depth, charset, active_levels)
     for current_depth in 0:(depth-1)
         if current_depth in active_levels
-            print(io,charset.skip," "^(textwidth(charset.dash)+1))
+            print(io, charset.skip, " "^(textwidth(charset.dash) + 1))
         else
-            print(io," "^(textwidth(charset.skip)+textwidth(charset.dash)+1))
+            print(
+                io,
+                " "^(textwidth(charset.skip) + textwidth(charset.dash) + 1),
+            )
         end
     end
 end
@@ -61,28 +63,43 @@ Dict{String,Any}("b"=>['c','d'],"a"=>"b")
 """
 print_tree
 
-function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5, maxwidth = Inf; depth = 0, active_levels = Int[],
-    charset = TreeCharSet(), withinds = false, inds = [], from = nothing, to = nothing, roottree = tree)
+function _print_tree(
+    printnode::Function,
+    io::IO,
+    tree,
+    maxdepth = 5,
+    maxwidth = Inf;
+    depth = 0,
+    active_levels = Int[],
+    charset = TreeCharSet(),
+    withinds = false,
+    inds = [],
+    from = nothing,
+    to = nothing,
+    roottree = tree,
+)
     nodebuf = IOBuffer()
     isa(io, IOContext) && (nodebuf = IOContext(nodebuf, io))
     if withinds
         printnode(nodebuf, tree, inds)
     else
         tree != roottree && isa(treekind(roottree), IndexedTree) ?
-            printnode(nodebuf, roottree[tree]) :
-            printnode(nodebuf, tree)
+        printnode(nodebuf, roottree[tree]) : printnode(nodebuf, tree)
     end
     str = String(take!(isa(nodebuf, IOContext) ? nodebuf.io : nodebuf))
-    for (i,line) in enumerate(split(str, '\n'))
+    for (i, line) in enumerate(split(str, '\n'))
         i != 1 && print_prefix(io, depth, charset, active_levels)
         println(io, line)
     end
     depth > maxdepth && return
-    c = isa(treekind(roottree), IndexedTree) ?
-        childindices(roottree, tree) : children(roottree, tree)
+    c =
+        isa(treekind(roottree), IndexedTree) ? childindices(roottree, tree) :
+        children(roottree, tree)
     if c !== ()
         width = 0
-        s = Iterators.Stateful(from === nothing ? pairs(c) : Iterators.Rest(pairs(c), from))
+        s = Iterators.Stateful(
+            from === nothing ? pairs(c) : Iterators.Rest(pairs(c), from),
+        )
         while !isempty(s) && width < maxwidth
             width += 1
             ind, child = popfirst!(s)
@@ -97,10 +114,20 @@ function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5, maxwidth =
                 child_active_levels = push!(copy(active_levels), depth)
             end
             print(io, charset.dash, ' ')
-            print_tree(depth == maxdepth ? (io, val) -> print(io, charset.ellipsis) : printnode,
-                io, child, maxdepth, maxwidth; depth = depth + 1,
-                active_levels = child_active_levels, charset = charset, withinds=withinds,
-                inds = withinds ? [inds; ind] : [], roottree = roottree)
+            print_tree(
+                depth == maxdepth ? (io, val) -> print(io, charset.ellipsis) :
+                printnode,
+                io,
+                child,
+                maxdepth,
+                maxwidth;
+                depth = depth + 1,
+                active_levels = child_active_levels,
+                charset = charset,
+                withinds = withinds,
+                inds = withinds ? [inds; ind] : [],
+                roottree = roottree,
+            )
         end
         if !isempty(s)
             print_prefix(io, depth, charset, active_levels)
@@ -108,7 +135,13 @@ function _print_tree(printnode::Function, io::IO, tree, maxdepth = 5, maxwidth =
         end
     end
 end
-print_tree(f::Function, io::IO, tree, args...; kwargs...) = _print_tree(f, io, tree, args...; kwargs...)
-print_tree(io::IO, tree, args...; kwargs...) = print_tree(printnode, io, tree, args...; kwargs...)
-print_tree(tree, args...; kwargs...) = print_tree(stdout::IO, tree, args...; kwargs...)
+function print_tree(f::Function, io::IO, tree, args...; kwargs...)
+    return _print_tree(f, io, tree, args...; kwargs...)
+end
+function print_tree(io::IO, tree, args...; kwargs...)
+    return print_tree(printnode, io, tree, args...; kwargs...)
+end
+function print_tree(tree, args...; kwargs...)
+    return print_tree(stdout::IO, tree, args...; kwargs...)
+end
 end

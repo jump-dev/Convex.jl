@@ -12,7 +12,7 @@ struct NegateAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function NegateAtom(x::AbstractExpr)
         children = (x,)
@@ -47,13 +47,12 @@ function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-
 ### Addition
 struct AdditionAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Array{AbstractExpr, 1}
-    size::Tuple{Int, Int}
+    children::Array{AbstractExpr,1}
+    size::Tuple{Int,Int}
 
     function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
         # find the size of the expression = max of size of x and size of y

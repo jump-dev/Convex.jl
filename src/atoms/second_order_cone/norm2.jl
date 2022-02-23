@@ -6,12 +6,11 @@
 #############################################################################
 import LinearAlgebra.norm2
 
-
 struct EucNormAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr}
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
 
     function EucNormAtom(x::AbstractExpr)
         children = (x,)
@@ -35,7 +34,6 @@ function evaluate(x::EucNormAtom)
     return norm(vec(evaluate(x.children[1])))
 end
 
-
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
@@ -50,7 +48,7 @@ end
 
 function norm2(x::AbstractExpr)
     if sign(x) == ComplexSign()
-        return EucNormAtom([real(x);imag(x)])
+        return EucNormAtom([real(x); imag(x)])
     else
         return EucNormAtom(x)
     end

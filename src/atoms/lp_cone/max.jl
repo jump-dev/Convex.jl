@@ -11,12 +11,14 @@ import Base.max
 struct MaxAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr,AbstractExpr}
+    size::Tuple{Int,Int}
 
     function MaxAtom(x::AbstractExpr, y::AbstractExpr)
         if sign(x) == ComplexSign() || sign(y) == ComplexSign()
-            error("Both the arguments should be real instead they are $(sign(x)) and $(sign(y))")
+            error(
+                "Both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
+            )
         else
             if x.size == y.size
                 sz = x.size
@@ -25,7 +27,9 @@ struct MaxAtom <: AbstractExpr
             elseif y.size == (1, 1)
                 sz = x.size
             else
-                error("Got different sizes for x as $(x.size) and y as $(y.size)")
+                error(
+                    "Got different sizes for x as $(x.size) and y as $(y.size)",
+                )
             end
         end
 

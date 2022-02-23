@@ -21,27 +21,27 @@
 
 using Convex, SCS, LinearAlgebra
 if VERSION < v"1.2.0-DEV.0"
-     LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
+    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
 end
 
 n = 20
-P = randn(n,n) + im*randn(n,n)
-P = P*P'
-Q = randn(n,n) + im*randn(n,n)
-Q = Q*Q'
-Z = ComplexVariable(n,n)
-objective = 0.5*real(tr(Z+Z'))
-constraint = [P Z;Z' Q] ⪰ 0
-problem = maximize(objective,constraint)
+P = randn(n, n) + im * randn(n, n)
+P = P * P'
+Q = randn(n, n) + im * randn(n, n)
+Q = Q * Q'
+Z = ComplexVariable(n, n)
+objective = 0.5 * real(tr(Z + Z'))
+constraint = [P Z; Z' Q] ⪰ 0
+problem = maximize(objective, constraint)
 solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 computed_fidelity = evaluate(objective)
 
 #-
 
 ## Verify that computer fidelity is equal to actual fidelity
-P1,P2 = eigen(P)
+P1, P2 = eigen(P)
 sqP = P2 * diagm([p1^0.5 for p1 in P1]) * P2'
-Q1,Q2 = eigen(Q)
+Q1, Q2 = eigen(Q)
 sqQ = Q2 * diagm([q1^0.5 for q1 in Q1]) * Q2'
 
 #-

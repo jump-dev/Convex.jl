@@ -17,13 +17,13 @@ const MOI = MathOptInterface
 #
 # All data series are standardised (see below) to have zero means and unit standard deviation, which improves the numerical stability. (Efron et al do not standardise the scale of the response variable.)
 
-(x,header) = readdlm("aux_files/diabetes.csv",',',header=true)
+(x, header) = readdlm("aux_files/diabetes.csv", ',', header = true)
 #display(header)
 #display(x)
 
-x = (x .- mean(x,dims=1))./std(x,dims=1)          #standardise
+x = (x .- mean(x, dims = 1)) ./ std(x, dims = 1)          #standardise
 
-(Y,X) = (x[:,end],x[:,1:end-1]);                  #to get traditional names
+(Y, X) = (x[:, end], x[:, 1:end-1]);                  #to get traditional names
 xNames = header[1:end-1];
 
 # # Lasso, Ridge and Elastic Net Regressions
@@ -51,39 +51,36 @@ Do Lasso (set γ>0,λ=0), ridge (set γ=0,λ>0) or elastic net regression (set �
 - `λ::Number`:     penalty on sum(b.^2)
 
 """
-function LassoEN(Y,X,γ,λ=0.0)
+function LassoEN(Y, X, γ, λ = 0.0)
+    K = size(X, 2)
 
-    K = size(X,2)
+    b_ls = X \ Y                    #LS estimate of weights, no restrictions
 
-    b_ls = X\Y                    #LS estimate of weights, no restrictions
+    Q = X'X
+    c = X'Y                      #c'b = Y'X*b
 
-    Q  = X'X
-    c  = X'Y                      #c'b = Y'X*b
-
-    b  = Variable(K)              #define variables to optimize over
-    L1 = quadform(b,Q)            #b'Q*b
-    L2 = dot(c,b)                 #c'b
-    L3 = norm(b,1)                #sum(|b|)
+    b = Variable(K)              #define variables to optimize over
+    L1 = quadform(b, Q)            #b'Q*b
+    L2 = dot(c, b)                 #c'b
+    L3 = norm(b, 1)                #sum(|b|)
     L4 = sumsquares(b)            #sum(b^2)
 
-    Sol = minimize(L1-2*L2+γ*L3+λ*L4)      #u'u + γ*sum(|b|) + λsum(b^2), where u = Y-Xb
+    Sol = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)      #u'u + γ*sum(|b|) + λsum(b^2), where u = Y-Xb
     solve!(Sol, SCS.Optimizer)
     Sol.status == MOI.OPTIMAL ? b_i = vec(evaluate(b)) : b_i = NaN
 
     return b_i, b_ls
-
 end
 
 # The next cell makes a Lasso regression for a single value of γ.
 
-
-K = size(X,2)
+K = size(X, 2)
 γ = 100
 
-(b,b_ls) = LassoEN(Y,X,γ)
+(b, b_ls) = LassoEN(Y, X, γ)
 
 println("OLS and Lasso coeffs (with γ=$γ)")
-display([["" "OLS" "Lasso"];xNames b_ls b])
+display([["" "OLS" "Lasso"]; xNames b_ls b])
 
 # # Redo the Lasso Regression with Different Gamma Values
 #
@@ -93,56 +90,65 @@ display([["" "OLS" "Lasso"];xNames b_ls b])
 # Remark: it would be quicker to put this loop inside the `LassoEN()` function so as to not recreate `L1`-`L4`.
 
 nγ = 101
-γM = range(0; stop=600, length=nγ)             #different γ values
+γM = range(0; stop = 600, length = nγ)             #different γ values
 
-bLasso   = fill(NaN,size(X,2),nγ)       #results for γM[i] are in bLasso[:,i]
-for i = 1:nγ
-    bLasso[:,i], = LassoEN(Y,X,γM[i])
+bLasso = fill(NaN, size(X, 2), nγ)       #results for γM[i] are in bLasso[:,i]
+for i in 1:nγ
+    bLasso[:, i], = LassoEN(Y, X, γM[i])
 end
 
 #-
 
-plot(log.(γM),bLasso',
-     title = "Lasso regression coefficients",
-     xlabel = "log(γ)",
-     label = permutedims(xNames),
-     size = (600,400))
+plot(
+    log.(γM),
+    bLasso',
+    title = "Lasso regression coefficients",
+    xlabel = "log(γ)",
+    label = permutedims(xNames),
+    size = (600, 400),
+)
 
 # # Ridge Regression
 #
 # We use the same function to do a ridge regression. Alternatively, do `b = inv(X'X + λ*I)*X'Y`.
 
 nλ = 101
-λM = range(0; stop=3000, length=nλ)
+λM = range(0; stop = 3000, length = nλ)
 
-bRidge  = fill(NaN,size(X,2),nλ)
-for i = 1:nλ
-    bRidge[:,i], = LassoEN(Y,X,0,λM[i])
+bRidge = fill(NaN, size(X, 2), nλ)
+for i in 1:nλ
+    bRidge[:, i], = LassoEN(Y, X, 0, λM[i])
 end
 
 #-
 
-plot(log.(λM),bRidge',
-     title = "Ridge regression coefficients",
-     xlabel = "log(λ)",
-     label = permutedims(xNames),
-     size = (600,400))
+plot(
+    log.(λM),
+    bRidge',
+    title = "Ridge regression coefficients",
+    xlabel = "log(λ)",
+    label = permutedims(xNames),
+    size = (600, 400),
+)
 
 # # Elastic Net Regression
 
 λ = 200
 println("redo the Lasso regression, but with λ=$λ: an elastic net regression")
 
-bEN   = fill(NaN,size(X,2),nγ)
-for i = 1:nγ
-    bEN[:,i], = LassoEN(Y,X,γM[i],λ)
+bEN = fill(NaN, size(X, 2), nγ)
+for i in 1:nγ
+    bEN[:, i], = LassoEN(Y, X, γM[i], λ)
 end
 
 #-
 
-plot(log.(γM),bEN',
-     title = "Elastic Net regression coefficients",
-     xlabel = "log(γ)",
-     label = permutedims(xNames),
-     size = (600,400))
+plot(
+    log.(γM),
+    bEN',
+    title = "Elastic Net regression coefficients",
+    xlabel = "log(γ)",
+    label = permutedims(xNames),
+    size = (600, 400),
+)
 #-

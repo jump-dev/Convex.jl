@@ -9,8 +9,8 @@
 struct MatrixFracAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr, AbstractExpr}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr,AbstractExpr}
+    size::Tuple{Int,Int}
 
     function MatrixFracAtom(x::AbstractExpr, P::AbstractExpr)
         if x.size[2] != 1
@@ -21,7 +21,7 @@ struct MatrixFracAtom <: AbstractExpr
             error("sizes must agree for arguments of matrix frac")
         end
         children = (x, P)
-        return new(:matrixfrac, hash(children), children, (1,1))
+        return new(:matrixfrac, hash(children), children, (1, 1))
     end
 end
 
@@ -39,7 +39,7 @@ end
 
 function evaluate(m::MatrixFracAtom)
     x = evaluate(m.children[1])
-    return x'*inv(evaluate(m.children[2]))*x
+    return x' * inv(evaluate(m.children[2])) * x
 end
 
 matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)

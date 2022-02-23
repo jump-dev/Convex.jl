@@ -10,8 +10,8 @@ function _term(x, j::Int, sys, dims)
     for (i_sys, dim) in enumerate(dims)
         if i_sys == sys
             # create a vector that is only 1 at its jth component
-            v = spzeros(dim, 1);
-            v[j] = 1;
+            v = spzeros(dim, 1)
+            v[j] = 1
             a = kron(a, v')
             b = kron(b, v)
         else
@@ -31,11 +31,19 @@ function partialtrace(x, sys::Int, dims::Vector)
     if size(x, 1) ≠ size(x, 2)
         throw(ArgumentError("Only square matrices are supported"))
     end
-    if ! (1 ≤ sys ≤ length(dims))
-        throw(ArgumentError("Invalid system index, should between 1 and $(length(dims)), got $sys"))
+    if !(1 ≤ sys ≤ length(dims))
+        throw(
+            ArgumentError(
+                "Invalid system index, should between 1 and $(length(dims)), got $sys",
+            ),
+        )
     end
     if size(x, 1) ≠ prod(dims)
-        throw(ArgumentError("Dimension of system doesn't correspond to dimension of subsystems"))
+        throw(
+            ArgumentError(
+                "Dimension of system doesn't correspond to dimension of subsystems",
+            ),
+        )
     end
 
     return sum(j -> _term(x, j, sys, dims), 1:dims[sys])

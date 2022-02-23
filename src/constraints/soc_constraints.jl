@@ -16,10 +16,14 @@ end
 function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
     if !has_conic_form(unique_conic_forms, c)
         objectives = Vector{ConicObj}(undef, length(c.children))
-        @inbounds for iobj = 1:length(c.children)
+        @inbounds for iobj in 1:length(c.children)
             objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
         end
-        cache_conic_form!(unique_conic_forms, c, ConicConstr(objectives, :SOC, [length(x) for x in c.children]))
+        cache_conic_form!(
+            unique_conic_forms,
+            c,
+            ConicConstr(objectives, :SOC, [length(x) for x in c.children]),
+        )
     end
     return get_conic_form(unique_conic_forms, c)
 end
@@ -46,10 +50,10 @@ function conic_form!(c::SOCElemConstraint, unique_conic_forms::UniqueConicForms)
         num_children = length(c.children)
         conic_constrs = Vector{ConicConstr}(undef, num_constrs)
         objectives = Vector{ConicObj}(undef, num_children)
-        @inbounds for iobj = 1:num_children
+        @inbounds for iobj in 1:num_children
             objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
         end
-        @inbounds for row = 1:num_constrs
+        @inbounds for row in 1:num_constrs
             objectives_by_row = [get_row(obj, row) for obj in objectives]
             conic_constrs[row] = ConicConstr(objectives_by_row, :SOC, [1, 1, 1])
         end

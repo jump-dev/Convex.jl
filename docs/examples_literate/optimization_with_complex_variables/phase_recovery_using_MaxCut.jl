@@ -54,36 +54,35 @@
 using Convex, SCS, LinearAlgebra
 if VERSION < v"1.2.0-DEV.0"
     (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
-     LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
+    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
 end
 
 n = 20
 p = 2
-A = rand(n,p) + im*randn(n,p)
-x = rand(p) + im*randn(p)
-b = abs.(A*x) + rand(n)
+A = rand(n, p) + im * randn(n, p)
+x = rand(p) + im * randn(p)
+b = abs.(A * x) + rand(n)
 
-M = diagm(b)*(I(n)-A*A')*diagm(b)
-U = ComplexVariable(n,n)
-objective = inner_product(U,M)
+M = diagm(b) * (I(n) - A * A') * diagm(b)
+U = ComplexVariable(n, n)
+objective = inner_product(U, M)
 c1 = diag(U) == 1
 c2 = U in :SDP
-p = minimize(objective,c1,c2)
+p = minimize(objective, c1, c2)
 solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 evaluate(U)
-
 
 #-
 
 # Verify if the rank of $U$ is 1:
 B, C = eigen(evaluate(U));
-length([e for e in B if(abs(real(e))>1e-4)])
+length([e for e in B if (abs(real(e)) > 1e-4)])
 
 #-
 
 # Decompose $U = uu^*$ where $u$ is the phase of $Ax$
-u = C[:,1];
+u = C[:, 1];
 for i in 1:n
-    u[i] = u[i]/abs(u[i])
+    u[i] = u[i] / abs(u[i])
 end
 u

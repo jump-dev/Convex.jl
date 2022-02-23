@@ -41,7 +41,7 @@ julia> PROBLEMS["affine"]["affine_diag_atom"]
 affine_diag_atom (generic function with 1 method)
 ```
 """
-const PROBLEMS = Dict{String, Dict{String, Function}}()
+const PROBLEMS = Dict{String,Dict{String,Function}}()
 
 """
     foreach_problem(apply::Function, [class::String],
@@ -58,29 +58,34 @@ problems (`class` should satsify `class ∈ keys(PROBLEMS)`), and pass third
 argument `problems` to only allow certain problems (specified by exact names or
 regex). Use the `exclude` keyword argument to exclude problems by regex.
 """
-function foreach_problem(   apply::Function,
-                            problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
-                            exclude::Vector{Regex} = Regex[])
+function foreach_problem(
+    apply::Function,
+    problems::Union{Nothing,Vector{String},Vector{Regex}} = nothing;
+    exclude::Vector{Regex} = Regex[],
+)
     for class in keys(PROBLEMS)
         any(occursin.(exclude, Ref(class))) && continue
-        foreach_problem(apply, class, problems; exclude=exclude)
+        foreach_problem(apply, class, problems; exclude = exclude)
     end
 end
 
-function foreach_problem(   apply::Function,
-                            class::String,
-                            problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
-                            exclude::Vector{Regex} = Regex[])
+function foreach_problem(
+    apply::Function,
+    class::String,
+    problems::Union{Nothing,Vector{String},Vector{Regex}} = nothing;
+    exclude::Vector{Regex} = Regex[],
+)
     for (name, func) in PROBLEMS[class]
         any(occursin.(exclude, Ref(name))) && continue
         if problems !== nothing
             problems isa Vector{String} && !(name ∈ problems) && continue
-            problems isa Vector{Regex} && !any(occursin.(problems, Ref(name))) && continue
+            problems isa Vector{Regex} &&
+                !any(occursin.(problems, Ref(name))) &&
+                continue
         end
         apply(name, func)
     end
 end
-
 
 """
     run_tests(
@@ -109,14 +114,23 @@ run_tests(exclude=[r"mip"]) do p
 end
 ```
 """
-function run_tests( handle_problem!::Function,
-                    problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
-                    exclude::Vector{Regex} = Regex[], T=Float64, atol=1e-3, rtol=0.0)
+function run_tests(
+    handle_problem!::Function,
+    problems::Union{Nothing,Vector{String},Vector{Regex}} = nothing;
+    exclude::Vector{Regex} = Regex[],
+    T = Float64,
+    atol = 1e-3,
+    rtol = 0.0,
+)
     push!(exclude, r"benchmark")
     for class in keys(PROBLEMS)
         any(occursin.(exclude, Ref(class))) && continue
         @testset "$class" begin
-            foreach_problem(class, problems; exclude=exclude) do name, problem_func
+            foreach_problem(
+                class,
+                problems;
+                exclude = exclude,
+            ) do name, problem_func
                 @testset "$name" begin
                     problem_func(handle_problem!, Val(true), atol, rtol, T)
                 end
@@ -124,7 +138,6 @@ function run_tests( handle_problem!::Function,
         end
     end
 end
-
 
 """
     benchmark_suite(
@@ -155,21 +168,35 @@ benchmark_suite(exclude=[r"mip"]) do p
 end
 ```
 """
-function benchmark_suite(handle_problem!::Function,
-                         problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
-                         exclude::Vector{Regex} = Regex[],
-                         T=Float64, atol=1e-3, rtol=0.0, test = Val(false))
+function benchmark_suite(
+    handle_problem!::Function,
+    problems::Union{Nothing,Vector{String},Vector{Regex}} = nothing;
+    exclude::Vector{Regex} = Regex[],
+    T = Float64,
+    atol = 1e-3,
+    rtol = 0.0,
+    test = Val(false),
+)
     group = BenchmarkGroup()
     for class in keys(PROBLEMS)
         any(occursin.(exclude, Ref(class))) && continue
         group[class] = BenchmarkGroup()
-        foreach_problem(class, problems; exclude=exclude) do name, problem_func
-            group[class][name] = @benchmarkable $problem_func($handle_problem!, $test, $atol, $rtol, $T)
+        foreach_problem(
+            class,
+            problems;
+            exclude = exclude,
+        ) do name, problem_func
+            return group[class][name] = @benchmarkable $problem_func(
+                $handle_problem!,
+                $test,
+                $atol,
+                $rtol,
+                $T,
+            )
         end
     end
     return group
 end
-
 
 macro add_problem(prefix, q)
     @assert prefix isa Symbol
@@ -186,7 +213,11 @@ macro add_problem(prefix, q)
     end
     return quote
         $(esc(f))
-        dict = get!(PROBLEMS, String($(Base.Meta.quot(prefix))), Dict{String,Function}())
+        dict = get!(
+            PROBLEMS,
+            String($(Base.Meta.quot(prefix))),
+            Dict{String,Function}(),
+        )
         dict[String($(Base.Meta.quot(name)))] = $(esc(name))
     end
 end

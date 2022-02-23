@@ -96,7 +96,6 @@ Sets the current sign of `x` to `s`.
 """
 sign!(x::AbstractVariable, s::Sign) = x.sign = s
 
-
 """
     evaluate(x::AbstractExpr)
 
@@ -104,7 +103,11 @@ Returns the current value of `x` if assigned; errors otherwise.
 """
 evaluate
 
-evaluate(x::AbstractVariable) = _value(x) === nothing ? error("Value of the variable is yet to be calculated") : output(_value(x))
+function evaluate(x::AbstractVariable)
+    return _value(x) === nothing ?
+           error("Value of the variable is yet to be calculated") :
+           output(_value(x))
+end
 
 """
     _value(x::AbstractVariable)
@@ -112,7 +115,6 @@ evaluate(x::AbstractVariable) = _value(x) === nothing ? error("Value of the vari
 Raw access to the current value of `x`; used internally by Convex.jl.
 """
 _value(x::AbstractVariable) = x.value
-
 
 """
     set_value!(x::AbstractVariable, v)
@@ -124,31 +126,37 @@ function set_value! end
 set_value!(x::AbstractVariable, ::Nothing) = x.value = nothing
 
 function set_value!(x::AbstractVariable, v::AbstractArray)
-    size(x) == size(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    size(x) == size(v) ||
+        throw(DimensionMismatch("Variable and value sizes do not match!"))
     if iscomplex(x) && !(eltype(v) <: Complex)
         v = complex.(v)
     end
-    x.value = v
+    return x.value = v
 end
 
 function set_value!(x::AbstractVariable, v::AbstractVector)
-    size(x, 2) == 1 || throw(DimensionMismatch("Cannot set value of a variable of size $(size(x)) to a vector"))
-    size(x, 1) == length(v) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    size(x, 2) == 1 || throw(
+        DimensionMismatch(
+            "Cannot set value of a variable of size $(size(x)) to a vector",
+        ),
+    )
+    size(x, 1) == length(v) ||
+        throw(DimensionMismatch("Variable and value sizes do not match!"))
     if iscomplex(x) && !(eltype(v) <: Complex)
         v = complex.(v)
     end
-    x.value = v
+    return x.value = v
 end
 
 function set_value!(x::AbstractVariable, v::Number)
-    size(x) == (1,1) || throw(DimensionMismatch("Variable and value sizes do not match!"))
+    size(x) == (1, 1) ||
+        throw(DimensionMismatch("Variable and value sizes do not match!"))
     if sign(x) == ComplexSign() && !(v isa Complex)
         v = complex(v)
     end
-    x.value = v
+    return x.value = v
 end
 # End of `AbstractVariable` interface
-
 
 # Some helpers for the constructors for `Variable`
 iscomplex(sign::Sign) = sign == ComplexSign()
@@ -176,7 +184,7 @@ mutable struct Variable <: AbstractVariable
     `d`-dimensional vectors have size `(d, 1)`, and `n` by `m` matrices
     have size `(n,m)`.
     """
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     """
     `AffineVexity()` unless the variable is `fix!`'d, in which case it is
     `ConstVexity()`. Accessed by `vexity(v::Variable)`. To check if a
@@ -197,38 +205,54 @@ mutable struct Variable <: AbstractVariable
     The `VarType` of the variable (binary, integer, or continuous).
     """
     vartype::VarType
-    function Variable(size::Tuple{Int, Int}, sign::Sign, vartype::VarType)
+    function Variable(size::Tuple{Int,Int}, sign::Sign, vartype::VarType)
         if iscomplex(sign) && vartype != ContVar
-            throw(ArgumentError("vartype must be `ContVar` for complex variables; got vartype = $vartype"))
+            throw(
+                ArgumentError(
+                    "vartype must be `ContVar` for complex variables; got vartype = $vartype",
+                ),
+            )
         end
-        this = new(:variable, 0, nothing, size, AffineVexity(), sign, Constraint[], vartype)
+        this = new(
+            :variable,
+            0,
+            nothing,
+            size,
+            AffineVexity(),
+            sign,
+            Constraint[],
+            vartype,
+        )
         this.id_hash = objectid(this)
         return this
     end
 end
-Variable(size::Tuple{Int, Int}, sign::Sign) = Variable(size, sign, ContVar)
-Variable(size::Tuple{Int, Int}, vartype::VarType) = Variable(size, NoSign(), vartype)
-Variable(size::Tuple{Int, Int}) = Variable(size, NoSign(), ContVar)
-ComplexVariable(size::Tuple{Int, Int}) = Variable(size, ComplexSign(), ContVar)
+Variable(size::Tuple{Int,Int}, sign::Sign) = Variable(size, sign, ContVar)
+function Variable(size::Tuple{Int,Int}, vartype::VarType)
+    return Variable(size, NoSign(), vartype)
+end
+Variable(size::Tuple{Int,Int}) = Variable(size, NoSign(), ContVar)
+ComplexVariable(size::Tuple{Int,Int}) = Variable(size, ComplexSign(), ContVar)
 
-Variable(m::Int, n::Int, sign::Sign, vartype::VarType) = Variable((m,n), sign, vartype)
-Variable(m::Int, n::Int, sign::Sign) = Variable((m,n), sign, ContVar)
-Variable(m::Int, n::Int, vartype::VarType) = Variable((m,n), NoSign(), vartype)
-Variable(m::Int, n::Int) = Variable((m,n), NoSign(), ContVar)
-ComplexVariable(m::Int, n::Int) = Variable((m,n), ComplexSign(), ContVar)
+function Variable(m::Int, n::Int, sign::Sign, vartype::VarType)
+    return Variable((m, n), sign, vartype)
+end
+Variable(m::Int, n::Int, sign::Sign) = Variable((m, n), sign, ContVar)
+Variable(m::Int, n::Int, vartype::VarType) = Variable((m, n), NoSign(), vartype)
+Variable(m::Int, n::Int) = Variable((m, n), NoSign(), ContVar)
+ComplexVariable(m::Int, n::Int) = Variable((m, n), ComplexSign(), ContVar)
 
-Variable(m::Int, sign::Sign, vartype::VarType) = Variable((m,1), sign, vartype)
-Variable(m::Int, sign::Sign) = Variable((m,1), sign, ContVar)
-Variable(m::Int, vartype::VarType) = Variable((m,1), NoSign(), vartype)
-Variable(m::Int) = Variable((m,1), NoSign(), ContVar)
-ComplexVariable(m::Int) = Variable((m,1), ComplexSign(), ContVar)
+Variable(m::Int, sign::Sign, vartype::VarType) = Variable((m, 1), sign, vartype)
+Variable(m::Int, sign::Sign) = Variable((m, 1), sign, ContVar)
+Variable(m::Int, vartype::VarType) = Variable((m, 1), NoSign(), vartype)
+Variable(m::Int) = Variable((m, 1), NoSign(), ContVar)
+ComplexVariable(m::Int) = Variable((m, 1), ComplexSign(), ContVar)
 
-Variable(sign::Sign, vartype::VarType) = Variable((1,1), sign, vartype)
-Variable(sign::Sign) = Variable((1,1), sign, ContVar)
-Variable(vartype::VarType) = Variable((1,1), NoSign(), vartype)
-Variable() = Variable((1,1), NoSign(), ContVar)
-ComplexVariable() = Variable((1,1), ComplexSign(), ContVar)
-
+Variable(sign::Sign, vartype::VarType) = Variable((1, 1), sign, vartype)
+Variable(sign::Sign) = Variable((1, 1), sign, ContVar)
+Variable(vartype::VarType) = Variable((1, 1), NoSign(), vartype)
+Variable() = Variable((1, 1), NoSign(), ContVar)
+ComplexVariable() = Variable((1, 1), ComplexSign(), ContVar)
 
 ###
 # Compatability with old `sets` model
@@ -237,7 +261,12 @@ ComplexVariable() = Variable((1,1), ComplexSign(), ContVar)
 # There are choices of sign, no sign, or `ComplexVariable` and various
 # ways to enter the size for each. We will start with:
 # Case 1: with sign
-function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_sets::Symbol...)
+function Variable(
+    size::Tuple{Int,Int},
+    sign::Sign,
+    first_set::Symbol,
+    more_sets::Symbol...,
+)
     sets = [first_set]
     append!(sets, more_sets)
     if :Bin in sets
@@ -253,22 +282,58 @@ function Variable(size::Tuple{Int, Int}, sign::Sign, first_set::Symbol, more_set
     end
     return x
 end
-Variable(m::Int, n::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), sign, first_set, more_sets...)
-Variable(m::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), sign, first_set, more_sets...)
-Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...) = Variable((1,1), sign, first_set, more_sets...)
+function Variable(
+    m::Int,
+    n::Int,
+    sign::Sign,
+    first_set::Symbol,
+    more_sets::Symbol...,
+)
+    return Variable((m, n), sign, first_set, more_sets...)
+end
+function Variable(m::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...)
+    return Variable((m, 1), sign, first_set, more_sets...)
+end
+function Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...)
+    return Variable((1, 1), sign, first_set, more_sets...)
+end
 
 # Case 2: no sign
-Variable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...) = Variable(size, NoSign(), first_set, more_sets...)
-Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), NoSign(), first_set, more_sets...)
-Variable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), NoSign(), first_set, more_sets...)
-Variable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), NoSign(), first_set, more_sets...)
+function Variable(size::Tuple{Int,Int}, first_set::Symbol, more_sets::Symbol...)
+    return Variable(size, NoSign(), first_set, more_sets...)
+end
+function Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...)
+    return Variable((m, n), NoSign(), first_set, more_sets...)
+end
+function Variable(m::Int, first_set::Symbol, more_sets::Symbol...)
+    return Variable((m, 1), NoSign(), first_set, more_sets...)
+end
+function Variable(first_set::Symbol, more_sets::Symbol...)
+    return Variable((1, 1), NoSign(), first_set, more_sets...)
+end
 
 # Case 3: ComplexVariable
-ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...) = Variable(size, ComplexSign(), first_set, more_sets...)
-ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), ComplexSign(), first_set, more_sets...)
-ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), ComplexSign(), first_set, more_sets...)
-ComplexVariable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), ComplexSign(), first_set, more_sets...)
-
+function ComplexVariable(
+    size::Tuple{Int,Int},
+    first_set::Symbol,
+    more_sets::Symbol...,
+)
+    return Variable(size, ComplexSign(), first_set, more_sets...)
+end
+function ComplexVariable(
+    m::Int,
+    n::Int,
+    first_set::Symbol,
+    more_sets::Symbol...,
+)
+    return Variable((m, n), ComplexSign(), first_set, more_sets...)
+end
+function ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...)
+    return Variable((m, 1), ComplexSign(), first_set, more_sets...)
+end
+function ComplexVariable(first_set::Symbol, more_sets::Symbol...)
+    return Variable((1, 1), ComplexSign(), first_set, more_sets...)
+end
 
 Semidefinite(m::Integer) = Semidefinite(m, m)
 
@@ -282,7 +347,7 @@ function Semidefinite(m::Integer, n::Integer)
     end
 end
 
-Semidefinite((m, n)::Tuple{Integer, Integer}) = Semidefinite(m, n)
+Semidefinite((m, n)::Tuple{Integer,Integer}) = Semidefinite(m, n)
 
 function HermitianSemidefinite(m::Integer, n::Integer = m)
     if m == n
@@ -294,7 +359,9 @@ function HermitianSemidefinite(m::Integer, n::Integer = m)
     end
 end
 
-HermitianSemidefinite((m, n)::Tuple{Integer, Integer}) = HermitianSemidefinite(m, n)
+function HermitianSemidefinite((m, n)::Tuple{Integer,Integer})
+    return HermitianSemidefinite(m, n)
+end
 
 function real_conic_form(x::AbstractVariable)
     vec_size = length(x)
@@ -304,7 +371,7 @@ end
 function imag_conic_form(x::AbstractVariable)
     vec_size = length(x)
     if sign(x) == ComplexSign()
-        return im*sparse(1.0I, vec_size, vec_size)
+        return im * sparse(1.0I, vec_size, vec_size)
     else
         return spzeros(vec_size, vec_size)
     end
@@ -319,14 +386,15 @@ optimization problems. See also [`free!`](@ref).
 function fix! end
 
 function fix!(x::AbstractVariable)
-    _value(x) === nothing && error("This variable has no value yet; cannot fix value to nothing!")
+    _value(x) === nothing &&
+        error("This variable has no value yet; cannot fix value to nothing!")
     vexity!(x, ConstVexity())
-    x
+    return x
 end
 
 function fix!(x::AbstractVariable, v)
     set_value!(x, v)
-    fix!(x)
+    return fix!(x)
 end
 
 """
@@ -339,5 +407,5 @@ function free! end
 
 function free!(x::AbstractVariable)
     vexity!(x, AffineVexity())
-    x
+    return x
 end

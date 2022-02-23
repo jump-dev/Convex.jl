@@ -11,9 +11,9 @@
 using Convex, LinearAlgebra, SCS
 
 # Generate the input data
-a1 = [ 2;  1];
-a2 = [ 2; -1];
-a3 = [-1;  2];
+a1 = [2; 1];
+a2 = [2; -1];
+a3 = [-1; 2];
 a4 = [-1; -2];
 b = ones(4, 1);
 
@@ -29,12 +29,19 @@ solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
 p.optval
 
 # Generate the figure
-x = range(-1.5, stop=1.5, length=100);
+x = range(-1.5, stop = 1.5, length = 100);
 theta = 0:pi/100:2*pi;
 using Plots
 plot(x, x -> -x * a1[1] / a1[2] + b[1] / a1[2])
-plot!(x, x -> -x * a2[1]/ a2[2] + b[2] / a2[2])
-plot!(x, x -> -x * a3[1]/ a3[2] + b[3] / a3[2])
-plot!(x, x -> -x * a4[1]/ a4[2] + b[4] / a4[2])
-plot!(evaluate(x_c)[1] .+ evaluate(r) * cos.(theta), evaluate(x_c)[2] .+ evaluate(r) * sin.(theta), linewidth = 2)
-plot!(title ="Largest Euclidean ball lying in a 2D polyhedron", legend = nothing)
+plot!(x, x -> -x * a2[1] / a2[2] + b[2] / a2[2])
+plot!(x, x -> -x * a3[1] / a3[2] + b[3] / a3[2])
+plot!(x, x -> -x * a4[1] / a4[2] + b[4] / a4[2])
+plot!(
+    evaluate(x_c)[1] .+ evaluate(r) * cos.(theta),
+    evaluate(x_c)[2] .+ evaluate(r) * sin.(theta),
+    linewidth = 2,
+)
+plot!(
+    title = "Largest Euclidean ball lying in a 2D polyhedron",
+    legend = nothing,
+)

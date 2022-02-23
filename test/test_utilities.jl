@@ -6,34 +6,47 @@ using SparseArrays
 # I ended up using this pattern from Suppressor:
 # https://github.com/JuliaIO/Suppressor.jl/blob/b4ff08f0fe795a2ce9e592734a758c9e6d8e2bc4/src/Suppressor.jl#L124-L152
 function solve_and_return_output(problem, solver; kwargs...)
-        original_stdout = stdout
-        rd, wr = redirect_stdout()
-        out_task = @async read(rd, String)
-        try
-            solve!(problem, solver; kwargs...)
-        finally
-            Base.Libc.flush_cstdio() #  https://github.com/JuliaLang/julia/issues/31236
-            redirect_stdout(original_stdout)
-            close(wr)
-        end
-        return fetch(out_task)
+    original_stdout = stdout
+    rd, wr = redirect_stdout()
+    out_task = @async read(rd, String)
+    try
+        solve!(problem, solver; kwargs...)
+    finally
+        Base.Libc.flush_cstdio() #  https://github.com/JuliaLang/julia/issues/31236
+        redirect_stdout(original_stdout)
+        close(wr)
+    end
+    return fetch(out_task)
 end
 
 @testset "Utilities" begin
-
     @testset "`solve!` does not return anything" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
+        output = solve!(
+            p,
+            MOI.OptimizerWithAttributes(
+                SCS.Optimizer,
+                "verbose" => 0,
+                "eps_abs" => 1e-6,
+            ),
+        )
         @test output === nothing
     end
 
     @testset "`silent_solver` works" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output_non_silent = solve_and_return_output(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6))
+        output_non_silent = solve_and_return_output(
+            p,
+            MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6),
+        )
         @test output_non_silent != ""
-        output_silent = solve_and_return_output(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6), silent_solver=true)
+        output_silent = solve_and_return_output(
+            p,
+            MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6),
+            silent_solver = true,
+        )
         @test output_silent == ""
     end
 
@@ -41,13 +54,20 @@ end
     @testset "`solve!` can take an optimizer directly" begin
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
+        output = solve!(
+            p,
+            MOI.OptimizerWithAttributes(
+                SCS.Optimizer,
+                "verbose" => 0,
+                "eps_abs" => 1e-6,
+            ),
+        )
         @test output === nothing
     end
 
     @testset "Complex objective function errors" begin
         x = Variable()
-        @test_throws ErrorException minimize(x + im*x)
+        @test_throws ErrorException minimize(x + im * x)
     end
 
     @testset "`optval` is nothing before `solve!`" begin
@@ -55,9 +75,9 @@ end
         p = minimize(x, x >= 0)
         @test p.optval === nothing
         solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-        @test p.optval ≈ 0.0 atol=1e-3
+        @test p.optval ≈ 0.0 atol = 1e-3
         @test Convex.termination_status(p) == MOI.OPTIMAL
-        @test Convex.objective_value(p) ≈ 0.0 atol=1e-3
+        @test Convex.objective_value(p) ≈ 0.0 atol = 1e-3
     end
 
     @testset "Default problem type is `Float64`" begin
@@ -97,13 +117,13 @@ end
         $(Convex.show_id(x))
         value: 1.0"""
 
-        @test sprint(show, 2*x) == """
-        * (constant; real)
-        ├─ 2
-        └─ real variable (fixed) ($(Convex.show_id(x)))"""
+        @test sprint(show, 2 * x) == """
+          * (constant; real)
+          ├─ 2
+          └─ real variable (fixed) ($(Convex.show_id(x)))"""
 
         free!(x)
-        p = maximize( log(x), x >= 1, x <= 3 )
+        p = maximize(log(x), x >= 1, x <= 3)
 
         @test sprint(show, p) == """
         maximize
@@ -119,7 +139,7 @@ end
 
         status: `solve!` not called yet"""
 
-        x = ComplexVariable(2,3)
+        x = ComplexVariable(2, 3)
         @test sprint(show, x) == """
         Variable
         size: (2, 3)
@@ -132,7 +152,7 @@ end
         # to make sure it gets truncated appropriately.
         x = Variable(2)
         y = Variable(2)
-        level3 = hcat(x,y)
+        level3 = hcat(x, y)
         level2 = hcat(level3, level3)
         root = hcat(level2, level2)
         p = minimize(sum(x), root == root)
@@ -161,7 +181,7 @@ end
 
         # test `MAXWIDTH`
         x = Variable()
-        p = satisfy([ x == i for i = 1:100])
+        p = satisfy([x == i for i in 1:100])
         old_maxwidth = Convex.MAXWIDTH[]
         Convex.MAXWIDTH[] = 2
         @test sprint(show, p) == """
@@ -182,7 +202,14 @@ end
         # solved problem
         x = Variable()
         p = satisfy(x >= 0)
-        output = solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))
+        output = solve!(
+            p,
+            MOI.OptimizerWithAttributes(
+                SCS.Optimizer,
+                "verbose" => 0,
+                "eps_abs" => 1e-6,
+            ),
+        )
         @test sprint(show, p) == """
                 minimize
                 └─ 0
@@ -206,9 +233,9 @@ end
         x = Variable()
         old_maxdigits = Convex.MAXDIGITS[]
         Convex.MAXDIGITS[] = 100
-        @test length(Convex.show_id(x)) == length("id: ") + length(string(x.id_hash))
+        @test length(Convex.show_id(x)) ==
+              length("id: ") + length(string(x.id_hash))
         Convex.MAXDIGITS[] = old_maxdigits
-
     end
 
     @testset "vartype and set_vartype" begin
@@ -226,7 +253,6 @@ end
             vartype!(x, ContVar)
             @test vartype(x) == ContVar
             @test x.vartype == ContVar
-
         end
     end
 
@@ -234,22 +260,23 @@ end
 
         # Constructors with sign
         for sgn in (Positive(), NoSign())
-            for x in    [   # tuple size
-                            Variable((2, 2), sgn),
-                            Variable((2, 2), sgn, BinVar),
-                            Variable((2, 2), sgn, :Bin),
-                            # individual size
-                            Variable(2, 2, sgn),
-                            Variable(2, 2, sgn, BinVar),
-                            Variable(2, 2, sgn, :Bin),
-                            # single dimension
-                            Variable(2, sgn),
-                            Variable(2, sgn, BinVar),
-                            Variable(2, sgn, :Bin),
-                            # no dimension
-                            Variable(sgn),
-                            Variable(sgn, BinVar),
-                            Variable(sgn, :Bin),  ]
+            for x in [   # tuple size
+                Variable((2, 2), sgn),
+                Variable((2, 2), sgn, BinVar),
+                Variable((2, 2), sgn, :Bin),
+                # individual size
+                Variable(2, 2, sgn),
+                Variable(2, 2, sgn, BinVar),
+                Variable(2, 2, sgn, :Bin),
+                # single dimension
+                Variable(2, sgn),
+                Variable(2, sgn, BinVar),
+                Variable(2, sgn, :Bin),
+                # no dimension
+                Variable(sgn),
+                Variable(sgn, BinVar),
+                Variable(sgn, :Bin),
+            ]
                 @test x isa Variable
                 @test x isa Convex.AbstractVariable
                 @test sign(x) == sgn
@@ -258,22 +285,23 @@ end
         end
 
         # constructors without sign
-        for x in    [   # tuple size
-                        Variable((2, 2)),
-                        Variable((2, 2), BinVar),
-                        Variable((2, 2), :Bin),
-                        # individual size
-                        Variable(2, 2),
-                        Variable(2, 2, BinVar),
-                        Variable(2, 2, :Bin),
-                        # single dimension
-                        Variable(2),
-                        Variable(2, BinVar),
-                        Variable(2, :Bin),
-                        # no dimension
-                        Variable(),
-                        Variable(BinVar),
-                        Variable(:Bin),  ]
+        for x in [   # tuple size
+            Variable((2, 2)),
+            Variable((2, 2), BinVar),
+            Variable((2, 2), :Bin),
+            # individual size
+            Variable(2, 2),
+            Variable(2, 2, BinVar),
+            Variable(2, 2, :Bin),
+            # single dimension
+            Variable(2),
+            Variable(2, BinVar),
+            Variable(2, :Bin),
+            # no dimension
+            Variable(),
+            Variable(BinVar),
+            Variable(:Bin),
+        ]
             @test x isa Variable
             @test x isa Convex.AbstractVariable
             @test sign(x) == NoSign()
@@ -285,56 +313,61 @@ end
         end
 
         # ComplexVariable
-        for x in    [   # tuple size
-                    ComplexVariable((2, 2)),
-                    Variable((2, 2), ComplexSign()),
-                    ComplexVariable((2, 2), :Semidefinite),
-                    # individual size
-                    ComplexVariable(2, 2),
-                    Variable(2, 2, ComplexSign()),
-                    ComplexVariable(2, 2, :Semidefinite),
-                    # single dimension
-                    ComplexVariable(2),
-                    Variable(2, ComplexSign()),
-                    # no dimension
-                    ComplexVariable(),
-                    Variable(ComplexSign()),  ]
+        for x in [   # tuple size
+            ComplexVariable((2, 2)),
+            Variable((2, 2), ComplexSign()),
+            ComplexVariable((2, 2), :Semidefinite),
+            # individual size
+            ComplexVariable(2, 2),
+            Variable(2, 2, ComplexSign()),
+            ComplexVariable(2, 2, :Semidefinite),
+            # single dimension
+            ComplexVariable(2),
+            Variable(2, ComplexSign()),
+            # no dimension
+            ComplexVariable(),
+            Variable(ComplexSign()),
+        ]
             @test x isa Variable
             @test x isa Convex.AbstractVariable
             @test sign(x) == ComplexSign()
             @test x.sign == ComplexSign()
         end
 
-        for vt in (BinVar, IntVar), V in (ComplexVariable, Semidefinite, HermitianSemidefinite)
-            @test_throws Any V(2; vartype=vt)
+        for vt in (BinVar, IntVar),
+            V in (ComplexVariable, Semidefinite, HermitianSemidefinite)
+
+            @test_throws Any V(2; vartype = vt)
         end
 
-        for vt in (:Bin, :Int), V in (Semidefinite, HermitianSemidefinite, ComplexVariable)
+        for vt in (:Bin, :Int),
+            V in (Semidefinite, HermitianSemidefinite, ComplexVariable)
+
             @test_throws Any V(2, vt)
         end
 
         # Semidefinite
         for x in [
-                Variable((2,2), :Semidefinite),
-                Variable(2,2, :Semidefinite),
-                ComplexVariable((2,2), :Semidefinite),
-                ComplexVariable(2,2, :Semidefinite),
-                HermitianSemidefinite((2,2)),
-                HermitianSemidefinite(2, 2),
-                HermitianSemidefinite(2),
-                Semidefinite((2,2)),
-                Semidefinite(2, 2),
-                Semidefinite(2),
-            ]
+            Variable((2, 2), :Semidefinite),
+            Variable(2, 2, :Semidefinite),
+            ComplexVariable((2, 2), :Semidefinite),
+            ComplexVariable(2, 2, :Semidefinite),
+            HermitianSemidefinite((2, 2)),
+            HermitianSemidefinite(2, 2),
+            HermitianSemidefinite(2),
+            Semidefinite((2, 2)),
+            Semidefinite(2, 2),
+            Semidefinite(2),
+        ]
             @test length(constraints(x)) == 1
             @test constraints(x)[] isa Convex.SDPConstraint
         end
 
-        @test_throws ErrorException HermitianSemidefinite(2,3)
-        @test_throws ErrorException Semidefinite(2,3)
+        @test_throws ErrorException HermitianSemidefinite(2, 3)
+        @test_throws ErrorException Semidefinite(2, 3)
     end
 
-    @testset "ConicObj" for T = [UInt32, UInt64]
+    @testset "ConicObj" for T in [UInt32, UInt64]
         c = ConicObj()
         z = zero(T)
         @test !haskey(c, z)
@@ -371,7 +404,7 @@ end
         @test axes(x, 1) == Base.OneTo(2)
         @test lastindex(x) == 6
         @test lastindex(x, 2) == 3
-        y = x[:,end]
+        y = x[:, end]
         @test y isa AbstractExpr
         @test size(y) == (2, 1)
     end
@@ -384,18 +417,18 @@ end
         @test Convex.ispos(1)
         @test Convex.ispos(0)
         @test !Convex.ispos(-1)
-        @test Convex.ispos([0,1,0])
-        @test !Convex.ispos([0,-1,0])
+        @test Convex.ispos([0, 1, 0])
+        @test !Convex.ispos([0, -1, 0])
         @test Convex.isneg(-1)
         @test Convex.isneg(0)
         @test !Convex.isneg(1)
-        @test Convex.isneg([0,-1,0])
-        @test !Convex.isneg([0,1,0])
+        @test Convex.isneg([0, -1, 0])
+        @test !Convex.isneg([0, 1, 0])
         @test Convex._size(3) == (1, 1)
         @test Convex._sign(3) == Positive()
-        @test Convex._size([-1,1,1]) == (3, 1)
-        @test Convex._sign([-1,1,1]) == NoSign()
-        @test Convex._sign([-1,-1,-1]) == Negative()
+        @test Convex._size([-1, 1, 1]) == (3, 1)
+        @test Convex._sign([-1, 1, 1]) == NoSign()
+        @test Convex._sign([-1, -1, -1]) == Negative()
         @test Convex._size([0 0; 0 0]) == (2, 2)
         @test Convex._sign([0 0; 0 0]) == Positive()
         @test Convex._size(0 + 1im) == (1, 1)
@@ -406,15 +439,15 @@ end
     end
 
     @testset "#341: Evaluate for constants" begin
-        A = rand(4,4)
+        A = rand(4, 4)
         @test evaluate(Constant(A)) ≈ copy(A)
-        @test Constant(A).size == (4,4)
+        @test Constant(A).size == (4, 4)
         b = rand(4)
         @test evaluate(Constant(b)) ≈ copy(b)
-        @test Constant(b).size == (4,1)
+        @test Constant(b).size == (4, 1)
         c = 1.0
         @test evaluate(Constant(c)) ≈ c
-        @test Constant(c).size == (1,1)
+        @test Constant(c).size == (1, 1)
 
         @test evaluate(sumlargesteigs(Variable(4, 4), 0)) == 0
         @test evaluate(sumlargest(Variable(4), 0)) == 0
@@ -422,7 +455,7 @@ end
     end
 
     @testset "Base.vect" begin
-    # Issue #223: ensure we can make vectors of variables
+        # Issue #223: ensure we can make vectors of variables
         @test size([Variable(2), Variable(3, 4)]) == (2,)
     end
 
@@ -455,17 +488,16 @@ end
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
 
         @eval Convex.emit_dcp_warnings() = false
-        @test_logs  Convex.NotDcp()
+        @test_logs Convex.NotDcp()
         @eval Convex.emit_dcp_warnings() = true
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
-
     end
 
     @testset "`add_constraints!` (#380)" begin
         x = Variable(3, 3)
         p = minimize(norm_1(x))
         y = randn(3, 3)
-        c = (norm2(x-y) < 1)
+        c = (norm2(x - y) < 1)
         @test length(p.constraints) == 0
         add_constraint!(p, c)
         @test length(p.constraints) == 1
@@ -473,7 +505,7 @@ end
         add_constraints!(p, c)
         @test length(p.constraints) == 1
         empty!(p.constraints)
-        c2 = (norm2(x-rand(3,3)) < 3)
+        c2 = (norm2(x - rand(3, 3)) < 3)
         add_constraints!(p, [c, c2])
         @test length(p.constraints) == 2
     end
@@ -483,9 +515,17 @@ end
         @test diagm(x) isa AbstractExpr
     end
 
-    @testset "`is_psd` with type $T" for T in (Float64, Float32, Int, ComplexF64, BigFloat, Rational{BigInt}, Complex{Rational{BigInt}})
+    @testset "`is_psd` with type $T" for T in (
+        Float64,
+        Float32,
+        Int,
+        ComplexF64,
+        BigFloat,
+        Rational{BigInt},
+        Complex{Rational{BigInt}},
+    )
         A = zeros(T, 3, 3)
-        A[1,1] = one(T)
+        A[1, 1] = one(T)
         @test Convex.is_psd(A)
         @test Convex.is_psd(sparse(A))
         B = A .- one(T) / T(5000)
@@ -493,7 +533,46 @@ end
         @test !Convex.is_psd(sparse(B))
 
         # See https://github.com/jump-dev/Convex.jl/issues/452 for details
-        C = [70.12718378756115 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; -70.12718378756115 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 277.05985725905305 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 70.12718378756115 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 277.05985725905305 -103.46633673574595; 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595]
+        C = [
+            70.12718378756115 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            -70.12718378756115 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 277.05985725905305 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 70.12718378756115 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 347.1870410466142 -103.46633673574595 0.0 -70.12718378756115 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595 0.0 0.0 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 103.46633673574595 -103.46633673574595 0.0
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 277.05985725905305 -103.46633673574595
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595
+        ]
         @test Convex.is_psd(C)
         @test Convex.is_psd(sparse(C))
     end
@@ -503,8 +582,8 @@ end
         x = Variable(2)
 
         @test_throws ErrorException quadform(x, A) # default
-        @test_throws ErrorException quadform(x, A; assume_psd=false)
-        @test quadform(x, A; assume_psd=true) isa Convex.AbstractExpr
+        @test_throws ErrorException quadform(x, A; assume_psd = false)
+        @test quadform(x, A; assume_psd = true) isa Convex.AbstractExpr
     end
 
     @testset "`logsumexp` stability" begin

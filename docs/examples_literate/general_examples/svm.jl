@@ -34,12 +34,19 @@ neg_data = rand(MvNormal([-1.0, 2.0], 1.0), M);
 
 #-
 
-function svm(pos_data, neg_data, solver=MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+function svm(
+    pos_data,
+    neg_data,
+    solver = MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0),
+)
     ## Create variables for the separating hyperplane w'*x = b.
     w = Variable(n)
     b = Variable()
     ## Form the objective.
-    obj = sumsquares(w) + C*sum(max(1+b-w'*pos_data, 0)) + C*sum(max(1-b+w'*neg_data, 0))
+    obj =
+        sumsquares(w) +
+        C * sum(max(1 + b - w' * pos_data, 0)) +
+        C * sum(max(1 - b + w' * neg_data, 0))
     ## Form and solve problem.
     problem = minimize(obj)
     solve!(problem, solver)
@@ -56,8 +63,8 @@ w, b = svm(pos_data, neg_data);
 using Plots
 # Generate the separating hyperplane
 line_x = -2:0.1:2;
-line_y = (-w[1] * line_x .+ b)/w[2];
+line_y = (-w[1] * line_x .+ b) / w[2];
 # Plot the positive points, negative points, and separating hyperplane.
-plot(pos_data[1,:], pos_data[2,:], st=:scatter, label="Positive points")
-plot!(neg_data[1,:], neg_data[2,:], st=:scatter, label="Negative points")
-plot!(line_x, line_y, label="Separating hyperplane")
+plot(pos_data[1, :], pos_data[2, :], st = :scatter, label = "Positive points")
+plot!(neg_data[1, :], neg_data[2, :], st = :scatter, label = "Negative points")
+plot!(line_x, line_y, label = "Separating hyperplane")

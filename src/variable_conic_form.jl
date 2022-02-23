@@ -4,14 +4,16 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms)
         if vexity(x) == ConstVexity()
             # do exactly what we would for a constant
             objective = ConicObj()
-            objective[objectid(:constant)] = (vec([real(evaluate(x));]),vec([imag(evaluate(x));]))
+            objective[objectid(:constant)] =
+                (vec([real(evaluate(x));]), vec([imag(evaluate(x));]))
             cache_conic_form!(unique_conic_forms, x, objective)
         else
             objective = ConicObj()
             vec_size = length(x)
 
             objective[x.id_hash] = (real_conic_form(x), imag_conic_form(x))
-            objective[objectid(:constant)] = (spzeros(vec_size, 1), spzeros(vec_size, 1))
+            objective[objectid(:constant)] =
+                (spzeros(vec_size, 1), spzeros(vec_size, 1))
             # placeholder values in unique constraints prevent infinite recursion depth
             cache_conic_form!(unique_conic_forms, x, objective)
             if !(sign(x) == NoSign() || sign(x) == ComplexSign())

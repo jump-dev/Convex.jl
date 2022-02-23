@@ -23,8 +23,8 @@ Mathematical Programming, Series B, 95:3-51, 2001.
     `norm(x, p)` will return `‖vec(x)‖ₚ`, matching the behavior of [`norm`](@ref)
     for numeric matrices.
 """
-function LinearAlgebra.norm(x::AbstractExpr, p::Real=2)
-    if length(size(x)) <= 1 || minimum(size(x))==1
+function LinearAlgebra.norm(x::AbstractExpr, p::Real = 2)
+    if length(size(x)) <= 1 || minimum(size(x)) == 1
         # x is a vector
         if p == 1
             return norm_1(x)
@@ -39,6 +39,8 @@ function LinearAlgebra.norm(x::AbstractExpr, p::Real=2)
             error("vector p-norms not defined for p < 1")
         end
     else
-        error("In Convex.jl v0.13 and below, `norm(x, p)` meant `opnorm(x, p)` (but was deprecated since v0.8.0). In the future, `norm(x,p)` for matrices will be equivalent to `norm(vec(x),p)`. This is currently an error to ensure you update your code!")
+        error(
+            "In Convex.jl v0.13 and below, `norm(x, p)` meant `opnorm(x, p)` (but was deprecated since v0.8.0). In the future, `norm(x,p)` for matrices will be equivalent to `norm(vec(x),p)`. This is currently an error to ensure you update your code!",
+        )
     end
 end

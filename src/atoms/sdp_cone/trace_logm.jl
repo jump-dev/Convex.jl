@@ -26,13 +26,18 @@
 struct TraceLogm <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr,}
-    size::Tuple{Int, Int}
+    children::Tuple{AbstractExpr}
+    size::Tuple{Int,Int}
     C::AbstractMatrix
     m::Integer
     k::Integer
 
-    function TraceLogm(X::AbstractExpr, C::AbstractMatrix, m::Integer, k::Integer)
+    function TraceLogm(
+        X::AbstractExpr,
+        C::AbstractMatrix,
+        m::Integer,
+        k::Integer,
+    )
         children = (X,)
         if size(X) != size(C)
             throw(DimensionMismatch("X and C must be the same size"))
@@ -68,17 +73,27 @@ function evaluate(atom::TraceLogm)
     return trace_logm(X, atom.C)
 end
 
-const MatrixOrConstant = Union{AbstractMatrix, Constant}
+const MatrixOrConstant = Union{AbstractMatrix,Constant}
 
-function trace_logm(X::AbstractExpr, C::MatrixOrConstant, m::Integer=3, k::Integer=3)
+function trace_logm(
+    X::AbstractExpr,
+    C::MatrixOrConstant,
+    m::Integer = 3,
+    k::Integer = 3,
+)
     #println("trace_logm general case")
     return TraceLogm(X, evaluate(C), m, k)
 end
 
-function trace_logm(X::MatrixOrConstant, C::MatrixOrConstant, m::Integer=3, k::Integer=3)
+function trace_logm(
+    X::MatrixOrConstant,
+    C::MatrixOrConstant,
+    m::Integer = 3,
+    k::Integer = 3,
+)
     #println("trace_logm constant X")
-    eye = Matrix(1.0*I, size(X))
-    return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye);
+    eye = Matrix(1.0 * I, size(X))
+    return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
 function conic_form!(atom::TraceLogm, unique_conic_forms)
@@ -87,15 +102,19 @@ function conic_form!(atom::TraceLogm, unique_conic_forms)
         C = atom.C
         m = atom.m
         k = atom.k
-        eye = Matrix(1.0*I, size(X))
+        eye = Matrix(1.0 * I, size(X))
 
-        is_complex = sign(X) == ComplexSign() || sign(Constant(C)) == ComplexSign()
+        is_complex =
+            sign(X) == ComplexSign() || sign(Constant(C)) == ComplexSign()
         if is_complex
             τ = ComplexVariable(size(X))
         else
             τ = Variable(size(X))
         end
-        conic_form!(τ in RelativeEntropyEpiCone(eye, X, m, k), unique_conic_forms)
+        conic_form!(
+            τ in RelativeEntropyEpiCone(eye, X, m, k),
+            unique_conic_forms,
+        )
 
         # It's already a real mathematically, but need to make it a real type.
         t = real(-tr(C * τ))

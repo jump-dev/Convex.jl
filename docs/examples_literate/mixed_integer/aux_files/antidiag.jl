@@ -8,51 +8,64 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Convex.sign, Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-using Convex: AbstractExpr, ConstVexity, Nondecreasing, has_conic_form, cache_conic_form!, get_conic_form
+import Convex.sign,
+    Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
+using Convex:
+    AbstractExpr,
+    ConstVexity,
+    Nondecreasing,
+    has_conic_form,
+    cache_conic_form!,
+    get_conic_form
 export antidiag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 struct AntidiagAtom <: AbstractExpr
-  head::Symbol
-  id_hash::UInt64
-  children::Tuple{AbstractExpr}
-  size::Tuple{Int, Int}
-  k::Int
+    head::Symbol
+    id_hash::UInt64
+    children::Tuple{AbstractExpr}
+    size::Tuple{Int,Int}
+    k::Int
 
-  function AntidiagAtom(x::AbstractExpr, k::Int=0)
-    (num_rows, num_cols) = x.size
+    function AntidiagAtom(x::AbstractExpr, k::Int = 0)
+        (num_rows, num_cols) = x.size
 
-    if k >= num_cols || k <= -num_rows
-      error("Bounds error in calling diag")
+        if k >= num_cols || k <= -num_rows
+            error("Bounds error in calling diag")
+        end
+
+        children = (x,)
+        return new(
+            :antidiag,
+            hash((children, k)),
+            children,
+            (minimum(x.size) - k, 1),
+            k,
+        )
     end
-
-    children = (x, )
-    return new(:antidiag, hash((children, k)), children, (minimum(x.size) - k, 1), k)
-  end
 end
 
 function sign(x::AntidiagAtom)
-  return sign(x.children[1])
+    return sign(x.children[1])
 end
 
 # The monotonicity
 function monotonicity(x::AntidiagAtom)
-  return (Nondecreasing(),)
+    return (Nondecreasing(),)
 end
 
 # If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
 # this represents the first term
 function curvature(x::AntidiagAtom)
-  return ConstVexity()
+    return ConstVexity()
 end
 
 function evaluate(x::AntidiagAtom)
-  return diag(reverse(evaluate(x.children[1]),dims=1), x.k)
+    return diag(reverse(evaluate(x.children[1]), dims = 1), x.k)
 end
 
-antidiag(x::AbstractExpr, k::Int=0) = AntidiagAtom(x, k)
+antidiag(x::AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
 
 # Finds the "k"-th diagonal of x as a column vector
 # If k == 0, it returns the main diagonal and so on
@@ -66,28 +79,31 @@ antidiag(x::AbstractExpr, k::Int=0) = AntidiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(x::AntidiagAtom, unique_conic_forms::Convex.UniqueConicForms)
-  if !has_conic_form(unique_conic_forms, x)
-    (num_rows, num_cols) = x.children[1].size
-    k = x.k
+function conic_form!(
+    x::AntidiagAtom,
+    unique_conic_forms::Convex.UniqueConicForms,
+)
+    if !has_conic_form(unique_conic_forms, x)
+        (num_rows, num_cols) = x.children[1].size
+        k = x.k
 
-    if k >= 0
-      start_index = k * num_rows + num_rows
-      sz_diag = Base.min(num_rows, num_cols - k)
-    else
-      start_index = num_rows + k
-      sz_diag = Base.min(num_rows + k, num_cols)
+        if k >= 0
+            start_index = k * num_rows + num_rows
+            sz_diag = Base.min(num_rows, num_cols - k)
+        else
+            start_index = num_rows + k
+            sz_diag = Base.min(num_rows + k, num_cols)
+        end
+
+        select_diag = spzeros(sz_diag, length(x.children[1]))
+        for i in 1:sz_diag
+            select_diag[i, start_index] = 1
+            start_index += num_rows - 1
+        end
+
+        objective = conic_form!(x.children[1], unique_conic_forms)
+        new_obj = select_diag * objective
+        cache_conic_form!(unique_conic_forms, x, new_obj)
     end
-
-    select_diag = spzeros(sz_diag, length(x.children[1]))
-    for i in 1:sz_diag
-      select_diag[i, start_index] = 1
-      start_index += num_rows - 1
-    end
-
-    objective = conic_form!(x.children[1], unique_conic_forms)
-    new_obj = select_diag * objective
-    cache_conic_form!(unique_conic_forms, x, new_obj)
-  end
-  return get_conic_form(unique_conic_forms, x)
+    return get_conic_form(unique_conic_forms, x)
 end

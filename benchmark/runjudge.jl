@@ -2,13 +2,9 @@
 # which is available under an MIT license (see LICENSE).
 using PkgBenchmark
 
-mkconfig(; kwargs...) =
-    BenchmarkConfig(
-        env = Dict(
-            "JULIA_NUM_THREADS" => "1",
-        );
-        kwargs...
-    )
+function mkconfig(; kwargs...)
+    return BenchmarkConfig(env = Dict("JULIA_NUM_THREADS" => "1"); kwargs...)
+end
 
 group_target = benchmarkpkg(
     dirname(@__DIR__),
