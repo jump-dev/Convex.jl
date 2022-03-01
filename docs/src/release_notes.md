@@ -1,5 +1,15 @@
 # Release notes
 
+## v0.15.0 (March 2, 2022)
+
+### Breaking changes
+
+ * Minimum required version of Julia is now v1.6
+ * Updated to MathOptInterface v1.0
+   * As a consequence, many previously deprecated solver calls may stop working.
+     For example, instead of `() -> SCS.Optimizer(verbose = 0)`, use
+     `MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0)`.
+
 ## v0.14.18 (November 14, 2021)
 
 * Fix typo in `logisticloss` for length-1 expressions which caused errors (reported in [#458](https://github.com/jump-dev/Convex.jl/issues/458), fixed in [#469](https://github.com/jump-dev/Convex.jl/pull/469)).
