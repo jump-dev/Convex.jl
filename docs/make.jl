@@ -1,3 +1,4 @@
+using Convex
 import Documenter
 import Literate
 
