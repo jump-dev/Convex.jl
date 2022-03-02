@@ -162,7 +162,8 @@ end
 Documenter.makedocs(
     sitename = "Convex.jl",
     repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
-    modules = [Convex],
+    # TODO(odow): uncomment this once all docstrings are in the manual
+    # modules = [Convex],
     format = Documenter.HTML(; ansicolor = true),
     strict = true,
     pages = [
