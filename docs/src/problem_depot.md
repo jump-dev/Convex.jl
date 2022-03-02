@@ -9,6 +9,7 @@ For example, to test the solver SCS on all the problems of the depot except the 
 
 ```julia
 using Convex, SCS, Test
+const MOI = Convex.MOI
 @testset "SCS" begin
     Convex.ProblemDepot.run_tests(; exclude=[r"mip"]) do p
         solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0, "eps_abs" => 1e-6))

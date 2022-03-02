@@ -121,7 +121,7 @@ push!(constraints, velocity[:, T] == 0)
 
 ## Solve the problem
 problem = minimize(sumsquares(force), constraints)
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(problem, SCS.Optimizer; silent_solver = true)
 
 # We can plot the trajectory taken by the object.
 

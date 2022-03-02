@@ -17,7 +17,7 @@ x = Variable(n);
 for i in 1:length(gammas)
     cost = sumsquares(A * x - b) + gammas[i] * norm(x, 1)
     problem = minimize(cost, [norm(x, Inf) <= 1])
-    solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+    solve!(problem, SCS.Optimizer; silent_solver = true)
     x_values[:, i] = evaluate(x)
 end
 

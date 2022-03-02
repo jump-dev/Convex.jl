@@ -53,7 +53,7 @@ MeanVarA = zeros(N, 2)
 for i in 1:N
     λ = λ_vals[i]
     p = minimize(λ * risk - (1 - λ) * ret, sum(w) == 1)
-    solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+    solve!(p, SCS.Optimizer; silent_solver = true)
     MeanVarA[i, :] = [evaluate(ret), evaluate(risk)]
 end
 
@@ -71,7 +71,7 @@ for i in 1:N
         w_lower <= w,     #w[i] is bounded
         w <= w_upper,
     )
-    solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+    solve!(p, SCS.Optimizer; silent_solver = true)
     MeanVarB[i, :] = [evaluate(ret), evaluate(risk)]
 end
 
@@ -102,7 +102,7 @@ for i in 1:N
         sum(w) == 1,
         (norm(w, 1) - 1) <= Lmax,
     )
-    solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+    solve!(p, SCS.Optimizer; silent_solver = true)
     MeanVarC[i, :] = [evaluate(ret), evaluate(risk)]
 end
 

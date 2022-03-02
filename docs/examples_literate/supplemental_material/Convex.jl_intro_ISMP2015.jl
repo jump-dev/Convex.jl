@@ -44,7 +44,7 @@ problem = minimize(
 )
 
 ## Solve the problem by calling solve!
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(problem, SCS.Optimizer; silent_solver = true)
 
 println("problem status is ", problem.status) # :Optimal, :Infeasible, :Unbounded etc.
 println("optimal value is ", problem.optval)
@@ -59,7 +59,7 @@ using Interact, Plots
         square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
         x >= 0,
     )
-    solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+    solve!(problem, SCS.Optimizer; silent_solver = true)
     histogram(evaluate(x), xlims = (0, 3.5), label = "x")
 end
 
@@ -133,7 +133,7 @@ p = minimize(objective, constraint)
 #-
 
 ## solve the problem
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 p.status
 
 #-
@@ -181,16 +181,9 @@ problem = minimize(
     square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
     x >= 0,
 )
-@time solve!(
-    problem,
-    MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0),
-)
+@time solve!(problem, SCS.Optimizer; silent_solver = true)
 λ = 1.5
-@time solve!(
-    problem,
-    MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0),
-    warmstart = true,
-)
+@time solve!(problem, SCS.Optimizer; silent_solver = true, warmstart = true)
 
 # # DCP examples
 
