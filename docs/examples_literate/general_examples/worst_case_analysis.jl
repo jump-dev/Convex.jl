@@ -18,7 +18,7 @@ w = Variable(n);
 ret = dot(r, w);
 risk = sum(quadform(w, Sigma_nom));
 problem = minimize(risk, [sum(w) == 1, ret >= 0.1, norm(w, 1) <= 2])
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
+solve!(problem, SCS.Optimizer; silent_solver = true)
 wval = vec(evaluate(w))
 
 #-
@@ -36,7 +36,7 @@ problem = maximize(
         Delta == Delta',
     ],
 );
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
+solve!(problem, SCS.Optimizer; silent_solver = true)
 println(
     "standard deviation = ",
     round(sqrt(wval' * Sigma_nom * wval), sigdigits = 2),

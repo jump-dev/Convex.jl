@@ -2,13 +2,7 @@
 
 using Convex
 using LinearAlgebra
-if VERSION < v"1.2.0-DEV.0"
-    (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
-end
-
 using SCS
-## passing in verbose=0 to hide output from SCS
-solver = MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0)
 
 # ### Linear program
 #
@@ -31,7 +25,7 @@ b = [10; 10; 10; 10]
 p = minimize(dot(c, x)) # or c' * x
 p.constraints += A * x <= b
 p.constraints += [x >= 1; x <= 10; x[2] <= 5; x[1] + x[4] - x[2] <= 10]
-solve!(p, solver)
+solve!(p, SCS.Optimizer; silent_solver = true)
 
 println(round(p.optval, digits = 2))
 println(round.(evaluate(x), digits = 2))
@@ -54,7 +48,7 @@ X = Variable(2, 2)
 y = Variable()
 ## X is a 2 x 2 variable, and y is scalar. X' + y promotes y to a 2 x 2 variable before adding them
 p = minimize(norm(vec(X)) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
-solve!(p, solver)
+solve!(p, SCS.Optimizer; silent_solver = true)
 println(round.(evaluate(X), digits = 2))
 println(evaluate(y))
 p.optval
@@ -78,7 +72,7 @@ p = satisfy(
     x[2] >= 7,
     geomean(x[3], x[4]) >= x[2],
 )
-solve!(p, solver)
+solve!(p, SCS.Optimizer; silent_solver = true)
 println(p.status)
 evaluate(x)
 
@@ -86,7 +80,7 @@ evaluate(x)
 
 y = Semidefinite(2)
 p = maximize(eigmin(y), tr(y) <= 6)
-solve!(p, solver)
+solve!(p, SCS.Optimizer; silent_solver = true)
 p.optval
 
 #-
@@ -95,7 +89,7 @@ x = Variable()
 y = Variable((2, 2))
 ## SDP constraints
 p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1)
-solve!(p, solver)
+solve!(p, SCS.Optimizer; silent_solver = true)
 evaluate(y)
 
 # ### Mixed integer program
@@ -112,6 +106,6 @@ evaluate(y)
 using GLPK
 x = Variable(4, :Int)
 p = minimize(sum(x), x >= 0.5)
-solve!(p, GLPK.Optimizer)
+solve!(p, GLPK.Optimizer; silent_solver = true)
 evaluate(x)
 #-

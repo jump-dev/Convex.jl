@@ -34,11 +34,7 @@ neg_data = rand(MvNormal([-1.0, 2.0], 1.0), M);
 
 #-
 
-function svm(
-    pos_data,
-    neg_data,
-    solver = MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0),
-)
+function svm(pos_data, neg_data)
     ## Create variables for the separating hyperplane w'*x = b.
     w = Variable(n)
     b = Variable()
@@ -49,7 +45,7 @@ function svm(
         C * sum(max(1 - b + w' * neg_data, 0))
     ## Form and solve problem.
     problem = minimize(obj)
-    solve!(problem, solver)
+    solve!(problem, SCS.Optimizer; silent_solver = true)
     return evaluate(w), evaluate(b)
 end;
 

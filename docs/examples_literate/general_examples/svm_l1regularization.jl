@@ -34,7 +34,7 @@ beta_vals = zeros(length(beta), TRIALS);
 for i in 1:TRIALS
     lambda = lambda_vals[i]
     problem = minimize(loss / m + lambda * reg)
-    solve!(problem, MOI.OptimizerWIthAttributes(ECOS.Optimizer, "verbose" => 0))
+    solve!(problem, SCS.Optimizer; silent_solver = true)
     train_error[i] =
         sum(
             float(

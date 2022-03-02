@@ -1,46 +1,49 @@
-using Documenter, Convex, Literate, Pkg
+using Convex
+import Documenter
+import Literate
 
-# Needed to run GR headless on Travis
-previous_GKSwstype = get(ENV, "GKSwstype", "")
-ENV["GKSwstype"] = "100"
+const SKIP_EXAMPLES = get(ENV, "CONVEX_SKIP_EXAMPLES", false) == "true"
+const BUILD_PATH = joinpath(@__DIR__, "src", "examples")
+const LITERATE_PATH = joinpath(@__DIR__(), "examples_literate")
+const NOTEBOOKS_PATH = joinpath(@__DIR__, "notebooks")
 
-build_path = joinpath(@__DIR__, "src", "examples")
-rm(build_path; force = true, recursive = true)
-isdir(build_path) || mkdir(build_path)
-
-literate_path = joinpath(@__DIR__(), "examples_literate")
-notebooks_path = joinpath(@__DIR__, "notebooks")
+rm(BUILD_PATH; force = true, recursive = true)
+if !isdir(BUILD_PATH)
+    mkdir(BUILD_PATH)
+end
 
 filename(str) = first(splitext(last(splitdir(str))))
+
 function filename_to_name(str)
     return uppercasefirst(
         replace(replace(filename(str), "-" => " "), "_" => " "),
     )
 end
+
 fix_math_md(content) = replace(content, r"\$\$(.*?)\$\$"s => s"```math\1```")
 
-SKIP_EXAMPLES = get(ENV, "CONVEX_SKIP_EXAMPLES", false) == "true"
+examples_nav = Any[]
 
 if SKIP_EXAMPLES
     @info "Skipping examples"
-    examples_nav = String[]
 else
     @info "Building examples..."
-
     @info "[Examples] Preparing notebooks..."
-
-    rm(notebooks_path, recursive = true, force = true)
-    mkdir(notebooks_path)
-
-    for dir in readdir(literate_path)
-        dir_path = joinpath(literate_path, dir)
-        isdir(dir_path) || continue
+    rm(NOTEBOOKS_PATH, recursive = true, force = true)
+    mkdir(NOTEBOOKS_PATH)
+    for dir in readdir(LITERATE_PATH)
+        dir_path = joinpath(LITERATE_PATH, dir)
+        if !isdir(dir_path)
+            continue
+        end
         @info "Processing directory $dir"
-        notebook_dir = joinpath(notebooks_path, dir)
-        isdir(notebook_dir) || mkdir(notebook_dir)
+        notebook_dir = joinpath(NOTEBOOKS_PATH, dir)
+        if !isdir(notebook_dir)
+            mkdir(notebook_dir)
+        end
         for file in readdir(dir_path)
             file_path = joinpath(dir_path, file)
-            out_path = joinpath(notebooks_path, dir, file)
+            out_path = joinpath(NOTEBOOKS_PATH, dir, file)
             if endswith(file, ".jl")
                 Literate.notebook(file_path, notebook_dir, execute = false)
             else
@@ -48,42 +51,35 @@ else
             end
         end
     end
-
     # Copy `Project.toml` to notebooks
     cp(
         joinpath(@__DIR__, "Project.toml"),
-        joinpath(notebooks_path, "Project.toml"),
+        joinpath(NOTEBOOKS_PATH, "Project.toml"),
     )
-
     # Add a README file to notebooks
-    open(joinpath(notebooks_path, "README.md"), "w") do io
-        return print(
+    open(joinpath(NOTEBOOKS_PATH, "README.md"), "w") do io
+        print(
             io,
             """
   # Convex.jl example notebooks
 
   Start Julia in this directory and set the project flag to point to this directory. E.g. run the command
-
   ```julia
   julia --project=.
   ```
-
   in this directory.
 
   Then add `IJulia` if it's not installed already in your global environment by
-
   ```julia
   pkg> add IJulia
   ```
 
   Also call `instantiate` to download the required packages:
-
   ```julia
   pkg> instantiate
   ```
 
   Then launch Jupyter:
-
   ```julia
   julia> using IJulia
 
@@ -93,43 +89,46 @@ else
   This should allow you to try any of the notebooks.
   """,
         )
+        return
     end
-
     # zip up the notebooks directory
-    zip_path = joinpath(build_path, "notebooks.zip")
+    zip_path = joinpath(BUILD_PATH, "notebooks.zip")
     run(Cmd(`zip $zip_path -r notebooks`; dir = @__DIR__))
-
     @info "[Examples] Preparing markdown files..."
-
-    for dir in readdir(literate_path)
-        dir_path = joinpath(literate_path, dir)
-        isdir(dir_path) || continue
+    for dir in readdir(LITERATE_PATH)
+        dir_path = joinpath(LITERATE_PATH, dir)
+        if !isdir(dir_path)
+            continue
+        end
         @info "Processing directory $dir"
-        build_dir = joinpath(build_path, dir)
-        isdir(build_dir) || mkdir(build_dir)
+        build_dir = joinpath(BUILD_PATH, dir)
+        if !isdir(build_dir)
+            mkdir(build_dir)
+        end
         for file in readdir(dir_path)
             file_path = joinpath(dir_path, file)
-            out_path = joinpath(build_path, dir, file)
+            out_path = joinpath(BUILD_PATH, dir, file)
             if endswith(file, ".jl")
-                postprocess = function (content)
-                    block_name = replace(filename(file), r"\s+" => "_")
-                    return """
-                           All of the examples can be found in Jupyter notebook form [here](../$(filename(zip_path)).zip).
+                postprocess =
+                    (content) -> begin
+                        block_name = replace(filename(file), r"\s+" => "_")
+                        return """
+                               All of the examples can be found in Jupyter notebook form [here](../$(filename(zip_path)).zip).
 
-                           ```@setup $(block_name)
-                           __START_TIME = time_ns()
-                           @info "Starting example $(filename(file))"
-                           ```
-                           """ *
-                           content *
-                           """
-           ```@setup $(block_name)
-           __END_TIME = time_ns()
-           elapsed = string(round((__END_TIME - __START_TIME)*1e-9; sigdigits = 3), "s")
-           @info "Finished example $(filename(file)) after " * elapsed
-           ```
-           """
-                end
+                               ```@setup $(block_name)
+                               __START_TIME = time_ns()
+                               @info "Starting example $(filename(file))"
+                               ```
+                               """ *
+                               content *
+                               """
+               ```@setup $(block_name)
+               __END_TIME = time_ns()
+               elapsed = string(round((__END_TIME - __START_TIME)*1e-9; sigdigits = 3), "s")
+               @info "Finished example $(filename(file)) after " * elapsed
+               ```
+               """
+                    end
                 Literate.markdown(
                     file_path,
                     build_dir;
@@ -149,18 +148,21 @@ else
             file in readdir(path) if endswith(file, ".md") && file != "index.md"
         ])
     end
-
-    examples_nav = [
-        filename_to_name(dir) => nav_dir(dir, joinpath(build_path, dir)) for
-        dir in readdir(build_path) if isdir(joinpath(build_path, dir))
-    ]
+    for dir in readdir(BUILD_PATH)
+        path = joinpath(BUILD_PATH, dir)
+        if isdir(path)
+            push!(examples_nav, filename_to_name(dir) => nav_dir(dir, path))
+        end
+    end
 end
 
-@info "Starting `makedocs`"
-
-makedocs(;
-    modules = [Convex],
+Documenter.makedocs(
+    sitename = "Convex.jl",
+    repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
+    # TODO(odow): uncomment this once all docstrings are in the manual
+    # modules = [Convex],
     format = Documenter.HTML(; ansicolor = true),
+    strict = true,
     pages = [
         "Home" => "index.md",
         "Installation" => "installation.md",
@@ -178,11 +180,9 @@ makedocs(;
         "Release notes" => "release_notes.md",
         "Examples" => examples_nav,
     ],
-    repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
-    sitename = "Convex.jl",
 )
 
-deploydocs(repo = "github.com/jump-dev/Convex.jl.git", push_preview = true)
-
-# restore the environmental variable `GKSwstype`.
-ENV["GKSwstype"] = previous_GKSwstype;
+Documenter.deploydocs(
+    repo = "github.com/jump-dev/Convex.jl.git",
+    push_preview = true,
+)

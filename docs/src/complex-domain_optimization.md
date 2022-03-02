@@ -106,7 +106,7 @@ constraints = [partialtrace(ρ, 1, [2; 2]) == [1 0; 0 0]
                tr(ρ) == 1
                ρ in :SDP]
 p = satisfy(constraints)
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 p.status
 ```
 

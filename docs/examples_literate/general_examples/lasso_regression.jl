@@ -66,7 +66,7 @@ function LassoEN(Y, X, γ, λ = 0.0)
     L4 = sumsquares(b)            #sum(b^2)
 
     Sol = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)      #u'u + γ*sum(|b|) + λsum(b^2), where u = Y-Xb
-    solve!(Sol, SCS.Optimizer)
+    solve!(Sol, SCS.Optimizer; silent_solver = true)
     Sol.status == MOI.OPTIMAL ? b_i = vec(evaluate(b)) : b_i = NaN
 
     return b_i, b_ls
@@ -94,7 +94,8 @@ nγ = 101
 
 bLasso = fill(NaN, size(X, 2), nγ)       #results for γM[i] are in bLasso[:,i]
 for i in 1:nγ
-    bLasso[:, i], = LassoEN(Y, X, γM[i])
+    sol, _ = LassoEN(Y, X, γM[i])
+    bLasso[:, i] .= sol
 end
 
 #-
@@ -117,7 +118,8 @@ nλ = 101
 
 bRidge = fill(NaN, size(X, 2), nλ)
 for i in 1:nλ
-    bRidge[:, i], = LassoEN(Y, X, 0, λM[i])
+    sol, _ = LassoEN(Y, X, 0, λM[i])
+    bRidge[:, i] .= sol
 end
 
 #-
@@ -138,7 +140,8 @@ println("redo the Lasso regression, but with λ=$λ: an elastic net regression")
 
 bEN = fill(NaN, size(X, 2), nγ)
 for i in 1:nγ
-    bEN[:, i], = LassoEN(Y, X, γM[i], λ)
+    sol, _ = LassoEN(Y, X, γM[i], λ)
+    bEN[:, i] .= sol
 end
 
 #-

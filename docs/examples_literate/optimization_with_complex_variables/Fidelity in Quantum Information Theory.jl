@@ -20,9 +20,6 @@
 #
 
 using Convex, SCS, LinearAlgebra
-if VERSION < v"1.2.0-DEV.0"
-    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
-end
 
 n = 20
 P = randn(n, n) + im * randn(n, n)
@@ -33,7 +30,7 @@ Z = ComplexVariable(n, n)
 objective = 0.5 * real(tr(Z + Z'))
 constraint = [P Z; Z' Q] ⪰ 0
 problem = maximize(objective, constraint)
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(problem, SCS.Optimizer; silent_solver = true)
 computed_fidelity = evaluate(objective)
 
 #-

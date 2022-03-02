@@ -52,10 +52,6 @@
 # to approximate the solution.
 
 using Convex, SCS, LinearAlgebra
-if VERSION < v"1.2.0-DEV.0"
-    (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
-    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
-end
 
 n = 20
 p = 2
@@ -69,7 +65,7 @@ objective = inner_product(U, M)
 c1 = diag(U) == 1
 c2 = U in :SDP
 p = minimize(objective, c1, c2)
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 evaluate(U)
 
 #-

@@ -8,7 +8,9 @@
 # radius) that lies in a polyhedron described by affine inequalites in this
 # fashion: $P = \{x : a_i'*x \leq b_i, i=1,\ldots,m \}$ where $x \in \mathbb{R}^2$.
 
-using Convex, LinearAlgebra, SCS
+using Convex
+using LinearAlgebra
+import SCS
 
 # Generate the input data
 a1 = [2; 1];
@@ -25,7 +27,7 @@ p.constraints += a1' * x_c + r * norm(a1, 2) <= b[1];
 p.constraints += a2' * x_c + r * norm(a2, 2) <= b[2];
 p.constraints += a3' * x_c + r * norm(a3, 2) <= b[3];
 p.constraints += a4' * x_c + r * norm(a4, 2) <= b[4];
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 p.optval
 
 # Generate the figure

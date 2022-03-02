@@ -10,10 +10,6 @@
 # We will use Convex.jl to solve the SDP problem.
 
 using Convex, SCS, LinearAlgebra
-if VERSION < v"1.2.0-DEV.0"
-    (I::UniformScaling)(n::Integer) = Diagonal(fill(I.λ, n))
-    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
-end
 
 # For the qubit case, a four outcome qubit POVM $\mathbf{M} \in\mathcal{P}(2,4)$ is simulable if and only if
 #
@@ -55,7 +51,7 @@ function get_visibility(K)
     constraints += t * K[3] + (1 - t) * noise[3] == P[2][2] + P[4][2] + P[6][1]
     constraints += t * K[4] + (1 - t) * noise[4] == P[3][2] + P[5][2] + P[6][2]
     p = maximize(t, constraints)
-    solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+    solve!(p, SCS.Optimizer; silent_solver = true)
     return p.optval
 end
 

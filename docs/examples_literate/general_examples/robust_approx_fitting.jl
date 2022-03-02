@@ -24,9 +24,7 @@
 #      (reduces to minimizing $\max\{\|(A-B)x - b\|_2, \|(A+B)x - b\|_2\}$ ).
 #
 using Convex, LinearAlgebra, SCS
-if VERSION < v"1.2.0-DEV.0"
-    LinearAlgebra.diagm(v::AbstractVector) = diagm(0 => v)
-end
+
 # Input Data
 m = 20;
 n = 10;
@@ -43,18 +41,18 @@ x = Variable(n)
 
 # Case 1: Nominal optimal solution
 p = minimize(norm(A * x - b, 2))
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 x_nom = evaluate(x)
 
 # Case 2: Stochastic robust approximation
 P = 1 / 3 * B' * B;
 p = minimize(square(pos(norm(A * x - b))) + quadform(x, Symmetric(P)))
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 x_stoch = evaluate(x)
 
 # Case 3: Worst-case robust approximation
 p = minimize(max(norm((A - B) * x - b), norm((A + B) * x - b)))
-solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(p, SCS.Optimizer; silent_solver = true)
 x_wc = evaluate(x)
 
 # Plot residuals:

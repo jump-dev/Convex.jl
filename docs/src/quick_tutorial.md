@@ -17,7 +17,7 @@ $A \in \mathbf{R}^{m \times n}$, $b \in \mathbf{R}^{m}$.
 
 This problem can be solved in Convex.jl as follows: :
 
-```@repl
+```@example
 # Make the Convex.jl module available
 using Convex, SCS
 
@@ -33,7 +33,7 @@ x = Variable(n)
 problem = minimize(sumsquares(A * x - b), [x >= 0])
 
 # Solve the problem by calling solve!
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
+solve!(problem, SCS.Optimizer; silent_solver = true)
 
 # Check the status of the problem
 problem.status # :Optimal, :Infeasible, :Unbounded etc.

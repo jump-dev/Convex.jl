@@ -45,7 +45,7 @@ D = Variable(m, n);
 Si = [min(R[i] * dot(P[i, :], D[i, :]'), B[i]) for i in 1:m];
 problem =
     maximize(sum(Si), [D >= 0, sum(D, dims = 1)' <= T, sum(D, dims = 2) >= c]);
-solve!(problem, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0));
+solve!(problem, SCS.Optimizer; silent_solver = true)
 
 #-
 
