@@ -66,7 +66,7 @@ function LassoEN(Y, X, γ, λ = 0.0)
     L4 = sumsquares(b)            #sum(b^2)
 
     Sol = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)      #u'u + γ*sum(|b|) + λsum(b^2), where u = Y-Xb
-    solve!(Sol, SCS.Optimizer)
+    solve!(Sol, SCS.Optimizer; silent_solver = true)
     Sol.status == MOI.OPTIMAL ? b_i = vec(evaluate(b)) : b_i = NaN
 
     return b_i, b_ls
