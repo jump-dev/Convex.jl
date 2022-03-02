@@ -1,12 +1,10 @@
-using Documenter
-using Convex
-using Literate
-using Pkg
+import Documenter
+import Literate
 
-SKIP_EXAMPLES = get(ENV, "CONVEX_SKIP_EXAMPLES", false) == "true"
-BUILD_PATH = joinpath(@__DIR__, "src", "examples")
-LITERATE_PATH = joinpath(@__DIR__(), "examples_literate")
-NOTEBOOKS_PATH = joinpath(@__DIR__, "notebooks")
+const SKIP_EXAMPLES = get(ENV, "CONVEX_SKIP_EXAMPLES", false) == "true"
+const BUILD_PATH = joinpath(@__DIR__, "src", "examples")
+const LITERATE_PATH = joinpath(@__DIR__(), "examples_literate")
+const NOTEBOOKS_PATH = joinpath(@__DIR__, "notebooks")
 
 rm(BUILD_PATH; force = true, recursive = true)
 if !isdir(BUILD_PATH)
@@ -24,6 +22,7 @@ end
 fix_math_md(content) = replace(content, r"\$\$(.*?)\$\$"s => s"```math\1```")
 
 examples_nav = Any[]
+
 if SKIP_EXAMPLES
     @info "Skipping examples"
 else
@@ -58,33 +57,28 @@ else
     )
     # Add a README file to notebooks
     open(joinpath(NOTEBOOKS_PATH, "README.md"), "w") do io
-        return print(
+        print(
             io,
             """
   # Convex.jl example notebooks
 
   Start Julia in this directory and set the project flag to point to this directory. E.g. run the command
-
   ```julia
   julia --project=.
   ```
-
   in this directory.
 
   Then add `IJulia` if it's not installed already in your global environment by
-
   ```julia
   pkg> add IJulia
   ```
 
   Also call `instantiate` to download the required packages:
-
   ```julia
   pkg> instantiate
   ```
 
   Then launch Jupyter:
-
   ```julia
   julia> using IJulia
 
@@ -94,6 +88,7 @@ else
   This should allow you to try any of the notebooks.
   """,
         )
+        return
     end
     # zip up the notebooks directory
     zip_path = joinpath(BUILD_PATH, "notebooks.zip")
@@ -113,25 +108,26 @@ else
             file_path = joinpath(dir_path, file)
             out_path = joinpath(BUILD_PATH, dir, file)
             if endswith(file, ".jl")
-                postprocess = (content) -> begin
-                    block_name = replace(filename(file), r"\s+" => "_")
-                    return """
-                           All of the examples can be found in Jupyter notebook form [here](../$(filename(zip_path)).zip).
+                postprocess =
+                    (content) -> begin
+                        block_name = replace(filename(file), r"\s+" => "_")
+                        return """
+                               All of the examples can be found in Jupyter notebook form [here](../$(filename(zip_path)).zip).
 
-                           ```@setup $(block_name)
-                           __START_TIME = time_ns()
-                           @info "Starting example $(filename(file))"
-                           ```
-                           """ *
-                           content *
-                           """
-           ```@setup $(block_name)
-           __END_TIME = time_ns()
-           elapsed = string(round((__END_TIME - __START_TIME)*1e-9; sigdigits = 3), "s")
-           @info "Finished example $(filename(file)) after " * elapsed
-           ```
-           """
-                end
+                               ```@setup $(block_name)
+                               __START_TIME = time_ns()
+                               @info "Starting example $(filename(file))"
+                               ```
+                               """ *
+                               content *
+                               """
+               ```@setup $(block_name)
+               __END_TIME = time_ns()
+               elapsed = string(round((__END_TIME - __START_TIME)*1e-9; sigdigits = 3), "s")
+               @info "Finished example $(filename(file)) after " * elapsed
+               ```
+               """
+                    end
                 Literate.markdown(
                     file_path,
                     build_dir;
