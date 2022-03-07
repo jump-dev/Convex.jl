@@ -49,12 +49,12 @@ Do Lasso (set γ>0,λ=0), ridge (set γ=0,λ>0) or elastic net regression (set �
 
 """
 function LassoEN(Y, X, γ, λ = 0)
-    (T,K) = (size(X, 1),size(X, 2))
+    (T, K) = (size(X, 1), size(X, 2))
 
     b_ls = X \ Y                    #LS estimate of weights, no restrictions
 
-    Q = X'X/T
-    c = X'Y/T                      #c'b = Y'X*b
+    Q = X'X / T
+    c = X'Y / T                      #c'b = Y'X*b
 
     b = Variable(K)              #define variables to optimize over
     L1 = quadform(b, Q)            #b'Q*b
@@ -63,7 +63,7 @@ function LassoEN(Y, X, γ, λ = 0)
     L4 = sumsquares(b)            #sum(b^2)
 
     if λ > 0
-        Sol = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)      #u'u/T + γ*sum(|b|) + λsum(b^2), where u = Y-Xb
+        Sol = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)      #u'u/T + γ*sum(|b|) + λ*sum(b^2), where u = Y-Xb
     else
         Sol = minimize(L1 - 2 * L2 + γ * L3)               #u'u/T + γ*sum(|b|) where u = Y-Xb
     end
