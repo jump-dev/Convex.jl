@@ -1,5 +1,8 @@
 # Release notes
 
+## v0.15.1 (March 28, 2022)
+* Use `OrderedDict` internally for reproducible results, issue: [#488](https://github.com/jump-dev/Convex.jl/issues/488), fix: [#489](https://github.com/jump-dev/Convex.jl/pull/489).
+
 ## v0.15.0 (March 2, 2022)
 
 ### Breaking changes
