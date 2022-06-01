@@ -1,12 +1,12 @@
-# This module is needed until AbstractTrees.jl#37 is fixed.
-# (PR: https://github.com/Keno/AbstractTrees.jl/pull/38)
-# because currently `print_tree` does not respect `maxdepth`.
-# This just implements the changes in the above PR.
+# This module originally existed for AbstractTrees.jl#37,
+# but has since diverged from the functionality of
+# AbstractTrees.print_tree.  It is now a separate implementation
+# of tree printing
 # Code in this file is modified from AbstractTrees.jl
 # See LICENSE for a copy of its MIT license.
 module TreePrint
 
-using AbstractTrees: printnode, treekind, IndexedTree, children
+using AbstractTrees: children, printnode
 
 # Printing
 struct TreeCharSet
@@ -83,8 +83,7 @@ function _print_tree(
     if withinds
         printnode(nodebuf, tree, inds)
     else
-        tree != roottree && isa(treekind(roottree), IndexedTree) ?
-        printnode(nodebuf, roottree[tree]) : printnode(nodebuf, tree)
+        printnode(nodebuf, tree)
     end
     str = String(take!(isa(nodebuf, IOContext) ? nodebuf.io : nodebuf))
     for (i, line) in enumerate(split(str, '\n'))
@@ -92,10 +91,8 @@ function _print_tree(
         println(io, line)
     end
     depth > maxdepth && return
-    c =
-        isa(treekind(roottree), IndexedTree) ? childindices(roottree, tree) :
-        children(roottree, tree)
-    if c !== ()
+    c = children(tree)
+    if !isempty(c)
         width = 0
         s = Iterators.Stateful(
             from === nothing ? pairs(c) : Iterators.Rest(pairs(c), from),
