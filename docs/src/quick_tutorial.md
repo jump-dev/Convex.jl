@@ -23,7 +23,7 @@ using Convex, SCS
 
 # Generate random problem data
 m = 4;  n = 5
-A = randn(m, n); b = randn(m, 1)
+A = randn(m, n); b = randn(m)
 
 # Create a (column vector) variable of size n x 1.
 x = Variable(n)
