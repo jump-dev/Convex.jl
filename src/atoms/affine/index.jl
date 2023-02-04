@@ -133,4 +133,7 @@ getindex(x::AbstractExpr, cln_r::Colon, col) = getindex(x, 1:size(x)[1], col)
 # All columns for this row(s)
 getindex(x::AbstractExpr, row, cln_c::Colon) = getindex(x, row, 1:size(x)[2])
 
+# Cartesian Index
+Convex.getindex(x::Variable, c::CartesianIndex{2}) = x[c[1], c[2]]
+
 ## API Definition ends
