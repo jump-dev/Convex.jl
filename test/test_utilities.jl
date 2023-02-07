@@ -414,8 +414,8 @@ end
         for ind in CartesianIndices(zeros(3, 2))
             @test x[ind] === x[ind[1], ind[2]]
         end
-        y = [1.0 2 3; 4 5 6] * x 
-        for ind in CartesianIndices(zeros(2,2))
+        y = [1.0 2 3; 4 5 6] * x
+        for ind in CartesianIndices(zeros(2, 2))
             @test y[ind] === y[ind[1], ind[2]]
         end
     end
