@@ -409,6 +409,17 @@ end
         @test size(y) == (2, 1)
     end
 
+    @testset "Cartesian index" begin
+        x = Variable(3, 2)
+        for ind in CartesianIndices(zeros(3, 2))
+            @test x[ind] === x[ind[1], ind[2]]
+        end
+        y = [1.0 2 3; 4 5 6] * x 
+        for ind in CartesianIndices(zeros(2,2))
+            @test y[ind] === y[ind[1], ind[2]]
+        end
+    end
+
     @testset "Parametric constants" begin
         z = Constant([1.0 0.0im; 0.0 1.0])
         @test z isa Constant{Matrix{Complex{Float64}}}
