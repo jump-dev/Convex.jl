@@ -1,5 +1,16 @@
 # Release notes
 
+## v0.15.3 (February 11, 2023)
+
+ * Add support for LDLFactorizations v0.10 [#496](https://github.com/jump-dev/Convex.jl/pull/496).
+ * Replace `randn(m, 1)` with `randn(m)` to be more Julian [#498](https://github.com/jump-dev/Convex.jl/pull/498).
+ * Add support for indexing expressions with `CartesianIndex` [#500](https://github.com/jump-dev/Convex.jl/pull/500).
+
+## v0.15.2 (August 10, 2022)
+
+ * Add support for LDLFactorizations v0.9 [#493](https://github.com/jump-dev/Convex.jl/pull/493).
+ * Fix use of deprecated functions from `AbstractTrees` [#494](https://github.com/jump-dev/Convex.jl/pull/494).
+
 ## v0.15.1 (March 28, 2022)
 * Use `OrderedDict` internally for reproducible results, issue: [#488](https://github.com/jump-dev/Convex.jl/issues/488), fix: [#489](https://github.com/jump-dev/Convex.jl/pull/489).
 
