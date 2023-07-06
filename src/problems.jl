@@ -87,16 +87,6 @@ end
 sign(p::Problem) = sign(p.objective)
 monotonicity(p::Problem) = monotonicity(p.objective)
 
-function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
-    objective_var = Variable()
-    objective = conic_form!(objective_var, unique_conic_forms)
-    conic_form!(p.objective - objective_var == 0, unique_conic_forms)
-    for constraint in p.constraints
-        conic_form!(constraint, unique_conic_forms)
-    end
-    return objective, objective_var.id_hash
-end
-
 function template(p::Problem, context::Context)
     for c in p.constraints
         add_constraints_to_context(c, context)
@@ -219,17 +209,4 @@ function add_constraint!(p::Problem, constraints::Array{<:Constraint})
 end
 function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
-end
-
-# caches conic form of x when x is the solution to the optimization problem p
-function cache_conic_form!(
-    conic_forms::UniqueConicForms,
-    x::AbstractExpr,
-    p::Problem,
-)
-    objective = conic_form!(p.objective, conic_forms)
-    for c in p.constraints
-        conic_form!(c, conic_forms)
-    end
-    return cache_conic_form!(conic_forms, x, objective)
 end

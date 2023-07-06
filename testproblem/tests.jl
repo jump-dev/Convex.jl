@@ -15,7 +15,7 @@ run_tests(
         r"dual"
     ],
 ) do p
-    return solve2!(
+    return solve!(
         p,
         MOI.OptimizerWithAttributes(
             SCS.Optimizer,

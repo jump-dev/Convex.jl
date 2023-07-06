@@ -60,7 +60,7 @@ export constraints, add_constraint!, set_value!, evaluate
 export Positive, Negative, ComplexSign, NoSign
 
 # Problems
-export add_constraints!, maximize, minimize, Problem, satisfy, solve!, solve2!
+export add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
 # Module level globals
 
@@ -140,7 +140,6 @@ include("expressions.jl")
 # need to define `Variable` before `UniqueConicForms`
 include("variable.jl")
 include("conic_form.jl")
-# need to define `conic_form!` for `Variable`s after `UniqueConicForms`
 include("variable_conic_form.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
@@ -148,12 +147,12 @@ include("constraints/soc_constraints.jl")
 include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
-include("solution.jl")
 include("VAFTape.jl")
 include("SparseVAFTape.jl")
 include("VectorAffineFunctionAsMatrix.jl")
 include("complex.jl")
 include("solve2!.jl")
+include("solution.jl")
 include("MOI_wrapper.jl")
 
 ### affine atoms

@@ -65,7 +65,7 @@ function populate_dual!(
     constr::ExpConstraint,
     MOI_constr_indices,
 )
-    x = first(children(c))
+    x = first(children(constr))
     constr.dual = output([
         MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[i, j]) for
         i in 1:size(x, 1), j in 1:size(x, 2)
