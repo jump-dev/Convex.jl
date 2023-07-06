@@ -16,10 +16,7 @@ Base.length(z::Zero) = z.len
 SparseArrays.sparse(z::Zero) = spzeros(z.len)
 Base.convert(::Type{Vector{T}}, z::Zero) where {T} = zeros(T, z.len)
 
-include("VAFTape.jl")
-include("SparseVAFTape2.jl")
-
-const VAFTapes = Union{VAFTape,SparseVAFTape2}
+const VAFTapes = Union{VAFTape,SparseVAFTape}
 
 # This is a variant of MOI.VectorAffineFunction which represents
 # the transformation `matrix * variables + vector` lazily.

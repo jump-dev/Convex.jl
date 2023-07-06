@@ -18,8 +18,6 @@ function promote_size(values)
             v isa VectorAffineFunctionAsMatrix ||
             v isa VAFTape ||
             v isa SparseVAFTape ||
-            v isa SparseVAFTape2 ||
-            v isa SparseVAFTape3
         ),
     )
     return (v isa Number ? fill(v, d) : v for v in values)
