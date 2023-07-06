@@ -1,0 +1,11 @@
+[deps]
+COSMO = "1e616198-aa4e-51ec-90a2-23f7fbd31d8d"
+Clarabel = "61c947e1-3e6d-4ee4-985a-eec8c727bd6e"
+Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
+Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
+Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+PProf = "e4faabce-9ead-11e9-39d9-4379958e3056"
+SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"

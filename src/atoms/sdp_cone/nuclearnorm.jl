@@ -38,29 +38,25 @@ end
 
 nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 
-# Create the equivalent conic problem:
-#   minimize (tr(U) + tr(V))/2
-#   subject to
-#            [U A; A' V] ⪰ 0
-# see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
-# http://arxiv.org/pdf/0706.4138v1.pdf
-#
-# The complex case is example 1.20 of Watrous' "The Theory of Quantum Information"
-# (the operator A is negated but this doesn't affect the norm)
-# https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf
-function conic_form!(x::NuclearNormAtom, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
+function template(x::NuclearNormAtom, context::Context{T}) where {T}
+    A = only(children(x))
+    if sign(A) == ComplexSign()
+        # I'm not sure how to use MOI's `NormNuclearCone` in this case, so we'll just do the extended formulation as an SDP ourselves:
+        #   minimize (tr(U) + tr(V))/2
+        #   subject to
+        #            [U A; A' V] ⪰ 0
+        # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
+        # http://arxiv.org/pdf/0706.4138v1.pdf
         m, n = size(A)
-        if sign(A) == ComplexSign()
-            U = ComplexVariable(m, m)
-            V = ComplexVariable(n, n)
-        else
-            U = Variable(m, m)
-            V = Variable(n, n)
-        end
-        p = minimize(0.5 * real(tr(U) + tr(V)), [U A; A' V] ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
+        U = Variable(m, m)
+        V = Variable(n, n)
+        p = minimize((tr(U) + tr(V)) / 2, [U A; A' V] ⪰ 0)
+        return template(p, context)
+    else
+        t = template(Variable(), context)
+        f = operate(vcat, T, t, template(A, context))
+        m, n = size(A)
+        MOI_add_constraint(context.model, f, MOI.NormNuclearCone(m, n))
+        return t
     end
-    return get_conic_form(unique_conic_forms, x)
 end

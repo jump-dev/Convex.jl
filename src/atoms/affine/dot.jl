@@ -15,3 +15,10 @@ _vecdot(x, y) = sum(broadcast(*, asvec(x), asvec(y)))
 dot(x::AbstractExpr, y::AbstractExpr) = _vecdot(x, y)
 dot(x::Value, y::AbstractExpr) = _vecdot(x, y)
 dot(x::AbstractExpr, y::Value) = _vecdot(x, y)
+
+if isdefined(LinearAlgebra, :vecdot) # defined but deprecated
+    import LinearAlgebra: vecdot
+end
+Base.@deprecate vecdot(x::AbstractExpr, y::AbstractExpr) dot(x, y)
+Base.@deprecate vecdot(x::Value, y::AbstractExpr) dot(x, y)
+Base.@deprecate vecdot(x::AbstractExpr, y::Value) dot(x, y)

@@ -1,5 +1,5 @@
-import Base.reshape, Base.vec
-
+# We process all objects on a vectorized level. The `ReshapeAtom` therefore
+# is simply in charge of remembering the new size.
 struct ReshapeAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
@@ -30,9 +30,9 @@ function evaluate(x::ReshapeAtom)
     return reshape(evaluate(x.children[1]), x.size[1], x.size[2])
 end
 
-function conic_form!(x::ReshapeAtom, unique_conic_forms::UniqueConicForms)
-    return conic_form!(x.children[1], unique_conic_forms)
+function template(A::ReshapeAtom, context::Context)
+    return template(only(children(A)), context)
 end
 
-reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
-vec(x::AbstractExpr) = reshape(x, length(x), 1)
+Base.reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
+Base.vec(x::AbstractExpr) = reshape(x, length(x), 1)

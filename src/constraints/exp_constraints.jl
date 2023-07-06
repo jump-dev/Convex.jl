@@ -1,5 +1,5 @@
 ### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
-struct ExpConstraint <: Constraint
+mutable struct ExpConstraint <: Constraint
     head::Symbol
     id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr,AbstractExpr} # (x, y, z)
@@ -20,13 +20,13 @@ struct ExpConstraint <: Constraint
 end
 
 function ExpConstraint(x::AbstractExpr, y, z::AbstractExpr)
-    return ExpConstraint(x, Constant(y), z)
+    return ExpConstraint(x, constant(y), z)
 end
 function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z)
-    return ExpConstraint(x, y, Constant(z))
+    return ExpConstraint(x, y, constant(z))
 end
 function ExpConstraint(x, y::AbstractExpr, z::AbstractExpr)
-    return ExpConstraint(Constant(x), y, z)
+    return ExpConstraint(constant(x), y, z)
 end
 
 function vexity(c::ExpConstraint)
@@ -43,34 +43,32 @@ function vexity(c::ExpConstraint)
     return ConvexVexity()
 end
 
-function conic_form!(c::ExpConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        conic_constrs = ConicConstr[]
-        if c.size == (1, 1)
-            objectives = Vector{ConicObj}(undef, 3)
-            @inbounds for iobj in 1:3
-                objectives[iobj] =
-                    conic_form!(c.children[iobj], unique_conic_forms)
-            end
-            push!(conic_constrs, ConicConstr(objectives, :ExpPrimal, [1, 1, 1]))
-        else
-            for i in 1:c.size[1]
-                for j in 1:c.size[2]
-                    objectives = Vector{ConicObj}(undef, 3)
-                    @inbounds for iobj in 1:3
-                        objectives[iobj] = conic_form!(
-                            c.children[iobj][i, j],
-                            unique_conic_forms,
-                        )
-                    end
-                    push!(
-                        conic_constrs,
-                        ConicConstr(objectives, :ExpPrimal, [1, 1, 1]),
-                    )
-                end
-            end
-        end
-        cache_conic_form!(unique_conic_forms, c, conic_constrs)
-    end
-    return get_conic_form(unique_conic_forms, c)
+function _add_constraints_to_context(
+    c::ExpConstraint,
+    context::Context{T},
+) where {T}
+    x, y, z = c.children
+    t = a -> template(a, context)
+    inds = [
+        begin
+            terms = (t(x[i, j]), t(y[i, j]), t(z[i, j]))
+            obj = operate(vcat, T, terms...)
+            MOI_add_constraint(context.model, obj, MOI.ExponentialCone())
+        end for i in 1:size(x, 1), j in 1:size(x, 2)
+    ]
+    context.constr_to_moi_inds[c] = inds
+    return nothing
+end
+
+function populate_dual!(
+    model::MOI.ModelLike,
+    constr::ExpConstraint,
+    MOI_constr_indices,
+)
+    x = first(children(c))
+    constr.dual = output([
+        MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[i, j]) for
+        i in 1:size(x, 1), j in 1:size(x, 2)
+    ])
+    return nothing
 end

@@ -1,5 +1,15 @@
 # Release notes
 
+## v0.16.0
+
+Breaking changes:
+
+* `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`.
+* The objective function can no longer be a constant; e.g., `maximize(1, constraints)` is no longer the same as `satisfy(constraints)`. One needs to use `satisfy` directly for feasability problems.
+* The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
+* SDP and exponential constraints now have dual values populated
+
+
 ## v0.15.3 (February 11, 2023)
 
  * Add support for LDLFactorizations v0.10 [#496](https://github.com/jump-dev/Convex.jl/pull/496).

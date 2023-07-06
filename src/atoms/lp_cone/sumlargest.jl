@@ -46,25 +46,18 @@ function evaluate(x::SumLargestAtom)
     return sum(sort(vec(evaluate(x.children[1])), rev = true)[1:x.k])
 end
 
-function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        c = x.children[1]
-        t = Variable(size(c))
-        q = Variable()
-        # sum k largest given by the solution to
-        # minimize sum(t) + k*q
-        # subject to c <= t + q, t >= 0
-        objective = conic_form!(sum(t) + x.k * q, unique_conic_forms)
-        conic_form!(c <= t + q, unique_conic_forms)
-        conic_form!(t >= 0, unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::SumLargestAtom, context::Context)
+    c = x.children[1]
+    t = Variable(size(c))
+    q = Variable()
+    # sum k largest given by the solution to
+    # minimize sum(t) + k*q
+    # subject to c <= t + q, t >= 0
+    objective = template(sum(t) + x.k * q, context)
+    add_constraints_to_context(c <= t + q, context)
+    add_constraints_to_context(t >= 0, context)
+    return objective
 end
 
-function sumlargest(x::AbstractExpr, k::Int)
-    return k == 0 ? Constant(0) : SumLargestAtom(x, k)
-end
-function sumsmallest(x::AbstractExpr, k::Int)
-    return k == 0 ? Constant(0) : -SumLargestAtom(-x, k)
-end
+sumlargest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
+sumsmallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)

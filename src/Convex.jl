@@ -5,7 +5,7 @@ using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
 using LDLFactorizations
-using AbstractTrees: AbstractTrees
+using AbstractTrees: AbstractTrees, children
 
 using MathOptInterface
 const MOI = MathOptInterface
@@ -51,7 +51,7 @@ export socp
 export Constraint # useful for making abstractly-typed vectors via `Constraint[]`
 
 # Variables
-export Constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
+export constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
 export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
 export BinVar, IntVar, ContVar, vartype, vartype!
 export constraints, add_constraint!, set_value!, evaluate
@@ -60,7 +60,7 @@ export constraints, add_constraint!, set_value!, evaluate
 export Positive, Negative, ComplexSign, NoSign
 
 # Problems
-export add_constraints!, maximize, minimize, Problem, satisfy, solve!
+export add_constraints!, maximize, minimize, Problem, satisfy, solve!, solve2!
 
 # Module level globals
 
@@ -112,6 +112,28 @@ Set via:
 """
 const MAXDIGITS = Ref(3)
 
+# where do these go?
+# used so far only in `Constant`
+vectorize(v::AbstractVector) = v
+vectorize(v::Number) = [v]
+vectorize(v::AbstractMatrix) = vec(v)
+
+# where should these go?
+function vec_triu(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [L[i, j] for i in 1:n for j in i:m]
+    return M[inds]
+end
+
+function vec_tril(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [L[i, j] for i in 1:n for j in 1:i]
+    return M[inds]
+end
+
+include("Context.jl")
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
@@ -122,12 +144,14 @@ include("conic_form.jl")
 include("variable_conic_form.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
-include("constraints/signs_and_sets.jl")
 include("constraints/soc_constraints.jl")
 include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
 include("solution.jl")
+include("VectorAffineFunctionAsMatrix.jl")
+include("complex.jl")
+include("solve2!.jl")
 
 ### affine atoms
 include("atoms/affine/add_subtract.jl")

@@ -56,10 +56,10 @@ end
 
 invpos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
 function broadcasted(::typeof(/), x::Value, y::AbstractExpr)
-    return DotMultiplyAtom(Constant(x), invpos(y))
+    return DotMultiplyAtom(constant(x), invpos(y))
 end
 function /(x::Value, y::AbstractExpr)
-    return size(y) == (1, 1) ? MultiplyAtom(Constant(x), invpos(y)) :
+    return size(y) == (1, 1) ? MultiplyAtom(constant(x), invpos(y)) :
            error("cannot divide by a variable of size $(size(y))")
 end
 sumsquares(x::AbstractExpr) = square(norm2(x))
