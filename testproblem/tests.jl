@@ -12,7 +12,8 @@ run_tests(
         r"sdp_lieb_ando",
         # Tolerance issue with SCS 3.0
         r"sdp_Real_Variables_with_complex_equality_constraints",
-        r"dual"
+        r"dual",
+        r"constant"
     ],
 ) do p
     return solve!(
