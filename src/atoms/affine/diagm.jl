@@ -5,6 +5,8 @@
 # Please read expressions.jl first.
 #############################################################################
 
+import LinearAlgebra.diagm, LinearAlgebra.Diagonal
+
 struct DiagMatrixAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
@@ -50,23 +52,17 @@ function evaluate(x::DiagMatrixAtom)
     return Diagonal(vec(evaluate(x.children[1])))
 end
 
-function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
+function diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
     d == 0 || throw(ArgumentError("only the main diagonal is supported"))
     return DiagMatrixAtom(x)
 end
-LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
-LinearAlgebra.Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 
-function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        sz = x.size[1]
+function template(x::DiagMatrixAtom, context::Context{T}) where {T}
+    obj = template(only(children(x)), context)
 
-        I = 1:sz+1:sz*sz
-        J = 1:sz
-        coeff = sparse(I, J, 1.0, sz * sz, sz)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = coeff * objective
-        cache_conic_form!(unique_conic_forms, x, new_obj)
-    end
-    return get_conic_form(unique_conic_forms, x)
+    sz = x.size[1]
+    coeff = sparse(1:sz+1:sz*sz, 1:sz, one(T), sz * sz, sz)
+
+    return operate(*, T, coeff, obj)
 end

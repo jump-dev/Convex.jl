@@ -57,5 +57,61 @@ function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
+function template(A::AbsAtom, context::Context)
+    x = only(A.children)
+
+    t = Variable(size(x))
+    t_obj = template(t, context)
+
+    add_constraints_to_context(t >= x, context)
+    add_constraints_to_context(t >= -x, context)
+    return t_obj
+end
+
 abs(x::AbstractExpr) = AbsAtom(x)
 abs2(x::AbstractExpr) = square(abs(x))
+
+## Alternate version: no atom, just a DCPPromise:
+
+# # A lightweight atom
+# struct DCPPromiseWrapper <: AbstractExpr
+#     x::AbstractVariable
+#     sign::Sign
+#     monotonicity::Monotonicity
+#     curvature::Vexity
+#     evaluate::Any
+# end
+
+# function DCPPromiseWrapper(x::AbstractVariable;
+#         sign::Sign = sign(x),
+#         monotonicity::Monotonicity = monotonicity(x),
+#         curvature::Vexity = curvature(x),
+#         evaluate = () -> evaluate(x))
+#         DCPPromise(tuple(x), sign, monotonicity, curvature, evaluate)
+# end
+
+# sign(d::DCPPromiseWrapper) = d.sign
+# monotonicity(d::DCPPromiseWrapper) = d.monotonicity
+# curvature(d::DCPPromiseWrapper) = d.curvature
+
+# # No children! it is a leaf type
+# AbstractTrees.children(::DCPPromiseWrapper) = ()
+
+# Base.size(d::DCPPromiseWrapper) = size(d.x)
+# evaluate(d::DCPPromiseWrapper) = d.evaluate()
+
+# template(D::DCPPromiseWrapper, context::Context) = template(D.x, context)
+
+# function abs(x::AbstractExpr)
+#     t = Variable(size(x), Positive())
+#     add_constraint!(t, t >= x)
+#     add_constraint!(t, t >= -x)
+#     return DCPPromise(
+#         t,
+#         monotonicity = Nondecreasing() * sign(x),
+#         curvature = ConvexVexity(),
+#         evaluate = () -> abs.(evaluate(x)),
+#     )
+# end
+
+# Base.abs2(x::AbstractExpr) = square(abs(x))

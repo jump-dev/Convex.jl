@@ -1,5 +1,14 @@
 # Release notes
 
+## v0.16.0
+
+Breaking changes:
+
+* `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`.
+* The objective function can no longer be a constant; e.g., `maximize(1, constraints)` is no longer the same as `satisfy(constraints)`. One needs to use `satisfy` directly for feasability problems.
+* The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
+* SDP and exponential constraints now have dual values populated
+
 ## v0.15.4 (October 24, 2023)
 
 * Convex's piracy of `hcat` and `vcat` was made less severe, allowing precompilation of Convex.jl on Julia 1.10.

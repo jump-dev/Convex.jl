@@ -35,6 +35,7 @@ end
 end
 
 @testset "Convex" begin
+    include("VAFTapes.jl")
     include("test_utilities.jl")
     include("test_abstract_variable.jl")
 

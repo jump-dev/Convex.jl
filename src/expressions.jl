@@ -94,7 +94,7 @@ const Value = Union{Number,AbstractArray}
 const ValueOrNothing = Union{Value,Nothing}
 const AbstractExprOrValue = Union{AbstractExpr,Value}
 
-convert(::Type{AbstractExpr}, x::Value) = Constant(x)
+convert(::Type{AbstractExpr}, x::Value) = constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
 function size(x::AbstractExpr, dim::Integer)
@@ -113,3 +113,5 @@ lastindex(x::AbstractExpr) = length(x)
 axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
 axes(x::AbstractExpr, n::Integer) = axes(x)[n]
 lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))
+
+@deprecate get_vectorized_size(x::AbstractExpr) length(x)

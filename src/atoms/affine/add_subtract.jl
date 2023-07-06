@@ -37,14 +37,15 @@ function evaluate(x::NegateAtom)
 end
 
 -(x::AbstractExpr) = NegateAtom(x)
+-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
-function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        objective = -objective
-        cache_conic_form!(unique_conic_forms, x, objective)
+function template(A::NegateAtom, context::Context{T}) where {T}
+    subobj = template(only(children(A)), context)
+    if subobj isa Value
+        return -subobj
+    else
+        return operate(-, T, subobj)
     end
-    return get_conic_form(unique_conic_forms, x)
 end
 
 ### Addition
@@ -63,6 +64,16 @@ struct AdditionAtom <: AbstractExpr
         else
             error("Cannot add expressions of sizes $(x.size) and $(y.size)")
         end
+
+        if x.size != y.size
+            if (x isa Constant || x isa ComplexConstant) && (x.size == (1, 1))
+                x = constant(fill(evaluate(x), y.size))
+            elseif (y isa Constant || y isa ComplexConstant) &&
+                   (y.size == (1, 1))
+                y = constant(fill(evaluate(y), x.size))
+            end
+        end
+
         # see if we're forming a sum of more than two terms and condense them
         children = AbstractExpr[]
         if isa(x, AdditionAtom)
@@ -98,24 +109,14 @@ function evaluate(x::AdditionAtom)
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
-function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = ConicObj()
-        for child in x.children
-            child_objective = conic_form!(child, unique_conic_forms)
-            if x.size != child.size
-                child_objective = promote_size(child_objective, length(x))
-            end
-            objective += child_objective
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::AdditionAtom, context::Context{T}) where {T}
+    obj = operate(+, T, (template(c, context) for c in children(x))...)
+    return obj
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
-+(x::Value, y::AbstractExpr) = AdditionAtom(Constant(x), y)
-+(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
++(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
++(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
 -(x::AbstractExpr, y::AbstractExpr) = x + (-y)
--(x::Value, y::AbstractExpr) = Constant(x) + (-y)
--(x::AbstractExpr, y::Value) = x + Constant(-y)
+-(x::Value, y::AbstractExpr) = constant(x) + (-y)
+-(x::AbstractExpr, y::Value) = x + constant(-y)

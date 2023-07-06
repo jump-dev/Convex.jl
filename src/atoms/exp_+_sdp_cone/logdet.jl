@@ -28,37 +28,27 @@ function evaluate(x::LogDetAtom)
     return log(det(evaluate(x.children[1])))
 end
 
-function conic_form!(x::LogDetAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        D = Variable(size(A)) # diagonal matrix
-        U = Variable(size(A)) # upper triangular matrix
+function template(x::LogDetAtom, context::Context{T}) where {T}
+    # the object we want the logdet of. Should be a PSD matrix, but may not be a `AbstractVariable` itself.
+    A = only(children(x))
 
-        # objective given by the sum of the log of diagonal matrix D
-        objective = conic_form!(sum(log(diag(D))), unique_conic_forms)
+    # We vectorize and take the upper triangle
+    v = vec_triu(A)
 
-        # enforce D and U to be diagonal and upper triangular
-        for i in 1:A.size[1]
-            for j in 1:A.size[2]
-                if i != j
-                    conic_form!(D[i, j] == 0, unique_conic_forms)
-                end
-                if i > j
-                    conic_form!(U[i, j] == 0, unique_conic_forms)
-                end
-            end
-        end
+    # ensure symmetry
+    add_constraints_to_context(v == vec_tril(A), context)
 
-        # diagonals of D and U are the same
-        conic_form!(diag(D) == diag(U), unique_conic_forms)
+    # We pass to MOI
+    X = template(v, context)
 
-        # A and [D U; U' A] need to be positive semidefinite
-        conic_form!(isposdef(A), unique_conic_forms)
-        conic_form!(isposdef([D U; U' A]), unique_conic_forms)
+    t = template(Variable(), context)
+    f = operate(vcat, T, t, [1], X)
+    side_dimension = size(only(children(x)), 1)
 
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+    set = MOI.LogDetConeTriangle(side_dimension)
+
+    MOI_add_constraint(context.model, f, set)
+    return t
 end
 
 logdet(x::AbstractExpr) = LogDetAtom(x)

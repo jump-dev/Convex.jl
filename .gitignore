@@ -8,3 +8,4 @@ Manifest.toml
 benchmark/*.json
 test/Project.toml
 dev
+testproblem/D0W.jls

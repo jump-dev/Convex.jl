@@ -1,4 +1,3 @@
-import Base.conj
 struct ConjugateAtom <: AbstractExpr
     head::Symbol
     id_hash::UInt64
@@ -27,19 +26,17 @@ function evaluate(x::ConjugateAtom)
     return conj(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ConjugateAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = ConicObj()
-        for var in keys(objective)
-            x1 = conj(objective[var][1])
-            x2 = conj(objective[var][2])
-            new_obj[var] = (x1, x2)
-        end
-        cache_conic_form!(unique_conic_forms, x, new_obj)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function template(x::ConjugateAtom, context::Context{T}) where {T}
+    objective = template(only(children(x)), context)
+    return operate(conj, T, objective)
 end
 
-conj(x::AbstractExpr) = ConjugateAtom(x)
-conj(x::Constant) = Constant(conj(x.value))
+function Base.conj(x::AbstractExpr)
+    if sign(x) == ComplexSign()
+        return ConjugateAtom(x)
+    else
+        return x
+    end
+end
+Base.conj(x::Constant) = x
+Base.conj(x::ComplexConstant) = ComplexConstant(real(x), -imag(x))

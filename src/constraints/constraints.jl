@@ -1,4 +1,14 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
+const CONSTANT_CONSTRAINT_TOL = Ref(1e-2)
+
+function iscomplex(constr::Constraint)
+    return iscomplex(constr.lhs) || iscomplex(constr.rhs)
+end
+
+function add_constraints_to_context(c::Constraint, context::Context)
+    c ∈ keys(context.constr_to_moi_inds) && return
+    return _add_constraints_to_context(c, context)
+end
 
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint
@@ -33,34 +43,27 @@ function vexity(c::EqConstraint)
     return vex
 end
 
-function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        if !(sign(c.lhs) == ComplexSign() || sign(c.rhs) == ComplexSign())
-            expr = c.lhs - c.rhs
-            objective = conic_form!(expr, unique_conic_forms)
-            new_constraint =
-                ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
+function _add_constraints_to_context(
+    eq::EqConstraint,
+    context::Context{T},
+) where {T}
+    f = template(eq.lhs - eq.rhs, context)
+    if f isa AbstractVector
+        # a trivial constraint without variables like `5 == 0`
+        if all(abs.(f) .<= CONSTANT_CONSTRAINT_TOL[])
+            return nothing
         else
-            real_expr = real(c.lhs - c.rhs)
-            imag_expr = imag(c.lhs - c.rhs)
-            real_objective = conic_form!(real_expr, unique_conic_forms)
-            imag_objective = conic_form!(imag_expr, unique_conic_forms)
-            new_constraint = ConicConstr(
-                [real_objective, imag_objective],
-                :Zero,
-                [c.size[1] * c.size[2], c.size[1] * c.size[2]],
-            )
-            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
+            error("Constant constraint is violated")
         end
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
     end
-    return get_conic_form(unique_conic_forms, c)
+    context.constr_to_moi_inds[eq] =
+        MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
+    return nothing
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
-==(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
-==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
+==(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
+==(lhs::Value, rhs::AbstractExpr) = ==(constant(lhs), rhs)
 
 ### Linear inequality constraints
 mutable struct LtConstraint <: Constraint
@@ -100,24 +103,33 @@ function vexity(c::LtConstraint)
     return vex
 end
 
-function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        expr = c.rhs - c.lhs
-        objective = conic_form!(expr, unique_conic_forms)
-        new_constraint =
-            ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
+function _add_constraints_to_context(
+    lt::LtConstraint,
+    context::Context{T},
+) where {T}
+    f = template(lt.lhs - lt.rhs, context)
+    if f isa AbstractVector
+        # a trivial constraint without variables like `5 >= 0`
+        if all(f .<= CONSTANT_CONSTRAINT_TOL[])
+            return nothing
+        else
+            error("Constant constraint is violated")
+        end
     end
-    return get_conic_form(unique_conic_forms, c)
+    context.constr_to_moi_inds[lt] = MOI_add_constraint(
+        context.model,
+        f,
+        MOI.Nonpositives(MOI.output_dimension(f)),
+    )
+    return nothing
 end
 
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
-<=(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 <(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
-<(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+<(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 
 mutable struct GtConstraint <: Constraint
     head::Symbol
@@ -156,24 +168,33 @@ function vexity(c::GtConstraint)
     return vex
 end
 
-function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        expr = c.lhs - c.rhs
-        objective = conic_form!(expr, unique_conic_forms)
-        new_constraint =
-            ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
+function _add_constraints_to_context(
+    gt::GtConstraint,
+    context::Context{T},
+) where {T}
+    f = template(gt.lhs - gt.rhs, context)
+    if f isa AbstractVector
+        # a trivial constraint without variables like `5 >= 0`
+        if all(f .>= -CONSTANT_CONSTRAINT_TOL[])
+            return nothing
+        else
+            error("Constant constraint is violated")
+        end
     end
-    return get_conic_form(unique_conic_forms, c)
+    context.constr_to_moi_inds[gt] = MOI_add_constraint(
+        context.model,
+        f,
+        MOI.Nonnegatives(MOI.output_dimension(f)),
+    )
+    return nothing
 end
 
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->=(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
->=(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
+>=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+>=(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 >(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
->(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
+>(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+>(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 
 function +(
     constraints_one::Array{<:Constraint},
@@ -190,4 +211,23 @@ function +(constraint_one::Constraint, constraints_two::Array{<:Constraint})
 end
 function +(constraints_one::Array{<:Constraint}, constraint_two::Constraint)
     return constraints_one + [constraint_two]
+end
+
+function populate_dual!(
+    model::MOI.ModelLike,
+    constr::Union{EqConstraint,GtConstraint,LtConstraint},
+    MOI_constr_indices,
+)
+    if iscomplex(constr)
+        re = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[1])
+        imag = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[2])
+        constr.dual = output(reshape(re + im * imag, constr.size))
+    else
+        constr.dual = output(
+            reshape(
+                MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices),
+                constr.size,
+            ),
+        )
+    end
 end
