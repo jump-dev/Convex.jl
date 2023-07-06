@@ -56,7 +56,7 @@ end
 
 invpos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
 function broadcasted(::typeof(/), x::Value, y::AbstractExpr)
-    return DotMultiplyAtom(constant(x), invpos(y))
+    return dotmultiply(constant(x), invpos(y))
 end
 function /(x::Value, y::AbstractExpr)
     return size(y) == (1, 1) ? MultiplyAtom(constant(x), invpos(y)) :

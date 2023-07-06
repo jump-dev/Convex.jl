@@ -39,6 +39,7 @@ end
 
 function template(x::HcatAtom, context::Context{T}) where {T}
     objectives = template.(children(x), Ref(context))
+    # Is this right? Should it be `hcat`?
     return operate(vcat, T, objectives...)
 end
 # TODO: fix piracy!
