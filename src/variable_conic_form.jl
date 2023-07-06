@@ -29,9 +29,7 @@ function conic_form!(x::AbstractVariable, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-USE_SPARSE() = false
 USE_SPARSE2() = true
-USE_SPARSE3() = false
 
 # It might be useful to get a direct VOV sometimes...
 function _template(a::AbstractVariable, context::Context{T}) where {T}
@@ -76,19 +74,9 @@ end
 function to_tape(v::MOI.VectorOfVariables, context::Context{T}) where {T}
     var_inds = v.variables
     d = length(var_inds)
-    if USE_SPARSE3()
-        return SparseVAFTape3(
-            [SparseAffineOperation3((one(T) * I)(d), zeros(T, d))],
-            var_inds,
-        )
-    elseif USE_SPARSE2()
+   if USE_SPARSE2()
         return SparseVAFTape2(
             [SparseAffineOperation2(sparse(one(T) * I, d, d), zeros(T, d))],
-            var_inds,
-        )
-    elseif USE_SPARSE()
-        return SparseVAFTape(
-            [SparseAffineOperation(sparse(one(T) * I, d, d), zeros(T, d))],
             var_inds,
         )
     else
