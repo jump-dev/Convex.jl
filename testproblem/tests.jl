@@ -1,9 +1,7 @@
 using Convex, SCS, Test, Clarabel
 using Convex.ProblemDepot: run_tests
 import MathOptInterface as MOI
-Convex.USE_SPARSE() = false
 Convex.USE_SPARSE2() = true
-Convex.USE_SPARSE3() = false
 
 @testset "SCS without duals" begin
 

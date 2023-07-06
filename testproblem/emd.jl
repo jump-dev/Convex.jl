@@ -33,32 +33,10 @@ using Distances, Serialization
 
 (D0, W) = deserialize(joinpath(@__DIR__, "D0W.jls"))
 
-@info "With USE_SPARSE3"
-Convex.USE_SPARSE() = true
-Convex.USE_SPARSE2() = true
-Convex.USE_SPARSE3() = true
-complete_distmat(D0, W);
-@time D2, S = complete_distmat(D0, W);
-# @profview complete_distmat(D0, W);
-
 # error()
 @info "With USE_SPARSE2"
-Convex.USE_SPARSE() = true
 Convex.USE_SPARSE2() = true
-Convex.USE_SPARSE3() = false
 
 complete_distmat(D0, W);
 @time D2, S = complete_distmat(D0, W);
-# @profview complete_distmat(D0, W);
-
-@info "With USE_SPARSE"
-Convex.USE_SPARSE() = true
-Convex.USE_SPARSE2() = false
-Convex.USE_SPARSE3() = false
-complete_distmat(D0, W);
-@time D2, S = complete_distmat(D0, W);
-nothing
-# @show (norm(D-D2)/norm(D))
-# @show (norm(W .* (D-D2))/norm(D))
-
 # @profview complete_distmat(D0, W);

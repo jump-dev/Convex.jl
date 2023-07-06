@@ -108,7 +108,6 @@ Y_init = rand(k, n)
 #     solve!(problem, () -> ECOS.Optimizer(verbose=false))
 # end
 
-Convex.USE_SPARSE() = true
 # recompile
 alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     return solve2!(problem, ECOS.Optimizer(verbose = false))
@@ -119,14 +118,12 @@ end
     m,
     n,
     k,
-    Convex.USE_SPARSE(),
 )
 @time p2c, X2c, Y2c =
     alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
         return solve2!(problem, ECOS.Optimizer(verbose = false))
     end
 
-# Convex.USE_SPARSE() = false
 # # recompile
 # alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
 #     solve2!(problem, ECOS.Optimizer(verbose=false))
