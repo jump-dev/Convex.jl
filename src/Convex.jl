@@ -140,7 +140,7 @@ include("expressions.jl")
 # need to define `Variable` before `UniqueConicForms`
 include("variable.jl")
 include("conic_form.jl")
-include("variable_conic_form.jl")
+include("variable_template.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
 include("constraints/soc_constraints.jl")
