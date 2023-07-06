@@ -104,22 +104,6 @@ evaluate(x::Constant) = output(x.value)
 
 sign(x::Constant) = x.sign
 
-# `real(::Real)` is a no-op and should be optimized out for `Constant{<:Real}`
-real_conic_form(x::Constant{<:Number}) = [real(x.value)]
-real_conic_form(x::Constant{<:AbstractVecOrMat}) = vec(real(x.value))
-
-# `imag(::Real)` always returns 0, so we can avoid the implicit conversion to `Complex`
-# by multiplication with `im` and just use an explicit call to `zeros` with the appropriate
-# length
-imag_conic_form(x::Constant{T}) where {T<:Real} = zeros(Complex{T}, 1)
-function imag_conic_form(x::Constant{<:AbstractVecOrMat{T}}) where {T<:Real}
-    return zeros(Complex{T}, length(x))
-end
-imag_conic_form(x::Constant{<:Complex}) = [im * imag(x.value)]
-function imag_conic_form(x::Constant{<:AbstractVecOrMat{<:Complex}})
-    return im * vec(imag(x.value))
-end
-
 # We can more efficiently get the length of a constant by asking for the length of its
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
 length(x::Constant) = length(x.value)

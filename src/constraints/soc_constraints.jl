@@ -13,20 +13,20 @@ struct SOCConstraint <: Constraint
     end
 end
 
-function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        objectives = Vector{ConicObj}(undef, length(c.children))
-        @inbounds for iobj in 1:length(c.children)
-            objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
-        end
-        cache_conic_form!(
-            unique_conic_forms,
-            c,
-            ConicConstr(objectives, :SOC, [length(x) for x in c.children]),
-        )
-    end
-    return get_conic_form(unique_conic_forms, c)
-end
+# function conic_form!(c::SOCConstraint, unique_conic_forms::UniqueConicForms)
+#     if !has_conic_form(unique_conic_forms, c)
+#         objectives = Vector{ConicObj}(undef, length(c.children))
+#         @inbounds for iobj in 1:length(c.children)
+#             objectives[iobj] = conic_form!(c.children[iobj], unique_conic_forms)
+#         end
+#         cache_conic_form!(
+#             unique_conic_forms,
+#             c,
+#             ConicConstr(objectives, :SOC, [length(x) for x in c.children]),
+#         )
+#     end
+#     return get_conic_form(unique_conic_forms, c)
+# end
 
 # For debugging created this constraint
 socp(args::AbstractExpr...) = SOCConstraint(args::AbstractExpr...)

@@ -418,20 +418,6 @@ function HermitianSemidefinite((m, n)::Tuple{Integer,Integer})
     return HermitianSemidefinite(m, n)
 end
 
-function real_conic_form(x::AbstractVariable)
-    vec_size = length(x)
-    return sparse(1.0I, vec_size, vec_size)
-end
-
-function imag_conic_form(x::AbstractVariable)
-    vec_size = length(x)
-    if sign(x) == ComplexSign()
-        return im * sparse(1.0I, vec_size, vec_size)
-    else
-        return spzeros(vec_size, vec_size)
-    end
-end
-
 """
     fix!(x::AbstractVariable, v = value(x))
 
