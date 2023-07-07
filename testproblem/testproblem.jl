@@ -113,12 +113,7 @@ alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
     return solve2!(problem, ECOS.Optimizer(verbose = false))
 end
 
-@info "Running with `Convex.solve2!`..." (
-    MAX_ITERS,
-    m,
-    n,
-    k,
-)
+@info "Running with `Convex.solve2!`..." (MAX_ITERS, m, n, k)
 @time p2c, X2c, Y2c =
     alternating_minimization(A, Mt, Y_init, k, MAX_ITERS) do problem
         return solve2!(problem, ECOS.Optimizer(verbose = false))

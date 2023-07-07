@@ -33,18 +33,14 @@ function evaluate(q::QolElemAtom)
     return (evaluate(q.children[1]) .^ 2) ./ evaluate(q.children[2])
 end
 
-function conic_form!(q::QolElemAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, q)
-        sz = q.children[1].size
-        t = Variable(sz[1], sz[2])
-        qol_objective = conic_form!(t, unique_conic_forms)
-        x, y = q.children
-        conic_form!(SOCElemConstraint(y + t, y - t, 2 * x), unique_conic_forms)
-        # add implicit constraint y >= 0
-        conic_form!(y >= 0, unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, q, qol_objective)
-    end
-    return get_conic_form(unique_conic_forms, q)
+function template(q::QolElemAtom, context::Context{T}) where {T}
+    sz = q.children[1].size
+    t = Variable(sz[1], sz[2])
+    t_obj = template(t, context)
+    x, y = q.children
+    add_constraints_to_context(SOCElemConstraint(y + t, y - t, 2 * x), context)
+    add_constraints_to_context(y >= 0, context)
+    return t_obj
 end
 
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)

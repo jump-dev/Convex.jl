@@ -4,7 +4,7 @@ struct SparseAffineOperation{T}
 end
 
 function SparseAffineOperation(A::AbstractSparseMatrix, b)
-    return SparseAffineOperation(A, b)
+    return SparseAffineOperation(SparseMatrixCSC(A), b)
 end
 SparseAffineOperation(A, b) = SparseAffineOperation(sparse(A), b)
 
