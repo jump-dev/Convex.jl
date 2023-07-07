@@ -36,35 +36,23 @@ function evaluate(x::AbsAtom)
     return abs.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::AbsAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        c = x.children[1]
-        t = Variable(size(c))
-        objective = conic_form!(t, unique_conic_forms)
-        if sign(x.children[1]) == ComplexSign()
-            for i in 1:length(vec(t))
-                conic_form!(
-                    t[i] >= norm2([real(c[i]); imag(c[i])]),
-                    unique_conic_forms,
-                )
-            end
-        else
-            conic_form!(c <= t, unique_conic_forms)
-            conic_form!(c >= -t, unique_conic_forms)
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
-end
-
 function template(A::AbsAtom, context::Context)
     x = only(A.children)
 
     t = Variable(size(x))
     t_obj = template(t, context)
 
-    add_constraints_to_context(t >= x, context)
-    add_constraints_to_context(t >= -x, context)
+    if sign(x) == ComplexSign()
+        for i in 1:length(vec(t))
+            add_constraints_to_context(
+                t[i] >= norm2([real(x[i]); imag(x[i])]),
+                context,
+            )
+        end
+    else
+        add_constraints_to_context(t >= x, context)
+        add_constraints_to_context(t >= -x, context)
+    end
     return t_obj
 end
 

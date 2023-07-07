@@ -112,7 +112,6 @@ function populate_dual!(model::MOI.ModelLike, constr::Constraint, ::Nothing)
     return nothing
 end
 
-
 # This is type unstable!
 function unpackvec(v::AbstractVector, size::Tuple{Int,Int}, iscomplex::Bool)
     if iscomplex && length(v) == 2

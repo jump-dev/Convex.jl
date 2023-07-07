@@ -43,7 +43,7 @@ end
 function to_tape(v::MOI.VectorOfVariables, context::Context{T}) where {T}
     var_inds = v.variables
     d = length(var_inds)
-   if USE_SPARSE2()
+    if USE_SPARSE2()
         return SparseVAFTape(
             [SparseAffineOperation(sparse(one(T) * I, d, d), zeros(T, d))],
             var_inds,
