@@ -32,6 +32,7 @@ end
 function _add_constraints_to_context(c::SDPConstraint, context::Context)
     f = template(c.child, context)
     d = c.size[1]
+    @assert d == sqrt(MOI.output_dimension(f))
     context.constr_to_moi_inds[c] = MOI_add_constraint(
         context.model,
         f,
