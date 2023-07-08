@@ -5,7 +5,8 @@ struct HcatAtom <: AbstractExpr
     children::Tuple
     size::Tuple{Int,Int}
 
-    function HcatAtom(args::AbstractExpr...)
+    function HcatAtom(args...)
+        args = map(arg -> convert(AbstractExpr, arg), args)
         num_rows = args[1].size[1]
         num_cols = 0
         for arg in args
@@ -39,7 +40,30 @@ end
 
 function template(x::HcatAtom, context::Context{T}) where {T}
     objectives = template.(children(x), Ref(context))
-    # Is this right? Should it be `hcat`?
+    # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
+        #  e1: x => 1 2 3
+        #           4 5 6
+        #      y => 2 4
+        #           7 8
+        #  e2: x => 1 1 1
+        #           2 2 2
+        #           3 3 3
+        #           4 4 4
+        # The objective of [e1 e2] will look like
+        #            x => 1 2 3
+        #                 4 5 6
+        #                 1 1 1
+        #                 2 2 2
+        #                 3 3 3
+        #                 4 4 4
+        #            y => 2 4
+        #                 7 8
+        #                 0 0
+        #                 0 0
+        #                 0 0
+        #                 0 0
+        # builds the objective by aggregating a list of coefficients for each variable
+        # from each child objective, and then vertically concatenating them
     return operate(vcat, T, objectives...)
 end
 # TODO: fix piracy!
@@ -52,7 +76,7 @@ function Base.hcat(args::AbstractExprOrValue...)
     if all(Base.Fix2(isa, Value), args)
         return Base.cat(args..., dims = Val(2))
     end
-    return HcatAtom(map(arg -> convert(AbstractExpr, arg), args)...)
+    return HcatAtom(args...)
 end
 
 # TODO: implement vertical concatenation in a more efficient way
@@ -61,9 +85,7 @@ function vcat(args::AbstractExprOrValue...)
     if all(Base.Fix2(isa, Value), args)
         return Base.cat(args..., dims = Val(1))
     end
-    return transpose(
-        HcatAtom(map(arg -> transpose(convert(AbstractExpr, arg)), args)...),
-    )
+    return transpose(HcatAtom(map(transpose, args)...))
 end
 
 function hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
@@ -71,7 +93,7 @@ function hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
     rs = Vector{Any}(undef, nbr)
     a = 1
     for i in 1:nbr
-        rs[i] = hcat(args[a:a-1+rows[i]]...)
+        rs[i] = HcatAtom(args[a:a-1+rows[i]]...)
         a += rows[i]
     end
     return vcat(rs...)
