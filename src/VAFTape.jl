@@ -5,6 +5,9 @@
 # but can be more cumbersome / error prone to ensure optimized dispatches are all hit,
 # and because type stability can be an issue.
 
+# fallback
+operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
+
 struct AffineOperation{M,V}
     matrix::M
     vector::V

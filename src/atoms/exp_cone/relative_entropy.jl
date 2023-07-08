@@ -145,7 +145,7 @@ function test(optimizer)
 end
 
 function template(e::RelativeEntropyAtom, context::Context{T}) where {T}
-    # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) ) 
+    # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
     w = template(e.children[1], context)
     v = template(e.children[2], context)
     u = template(Variable(), context)
@@ -155,8 +155,6 @@ function template(e::RelativeEntropyAtom, context::Context{T}) where {T}
     MOI_add_constraint(context.model, f, MOI.RelativeEntropyCone(2d + 1))
     return u
 end
-# fallback
-operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
 
 relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)
 # y*log(x/y)
