@@ -1016,7 +1016,7 @@ end
     handle_problem!(p)
 
     if test
-        @test A.value ≈ eye(n) atol = atol rtol = rtol
+        @test evaluate(A) ≈ eye(n) atol = atol rtol = rtol
     end
 end
 
@@ -1040,7 +1040,7 @@ end
     handle_problem!(p)
 
     if test
-        @test A.value ≈ eye(n) atol = atol rtol = rtol
+        @test evaluate(A) ≈ eye(n) atol = atol rtol = rtol
     end
 end
 
@@ -1064,7 +1064,7 @@ end
     handle_problem!(p)
 
     if test
-        @test B.value ≈ A^-1 atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^-1 atol = atol rtol = rtol
     end
 end
 
@@ -1089,7 +1089,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(-5 // 3) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(-5 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1114,7 +1114,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(-2 // 3) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(-2 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1138,8 +1138,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A^-1) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A^-1) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A^-1) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A^-1) atol = atol rtol = rtol
     end
 end
 
@@ -1164,8 +1164,8 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test real.(B.value) ≈ real.(A^(-5 // 3)) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A^(-5 // 3)) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A^(-5 // 3)) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A^(-5 // 3)) atol = atol rtol = rtol
     end
 end
 
@@ -1190,8 +1190,8 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test real.(B.value) ≈ real.(A^(-2 // 3)) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A^(-2 // 3)) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A^(-2 // 3)) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A^(-2 // 3)) atol = atol rtol = rtol
     end
 end
 
@@ -1251,7 +1251,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B ≈ A.value^2 atol = atol rtol = rtol
+        @test B ≈ evaluate(A)^2 atol = atol rtol = rtol
     end
 end
 
@@ -1277,7 +1277,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^2 atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^2 atol = atol rtol = rtol
     end
 end
 
@@ -1302,7 +1302,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B ≈ A.value^(8 // 3) atol = atol rtol = rtol
+        @test B ≈ evaluate(A)^(8 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1328,7 +1328,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(8 // 3) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(8 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1354,7 +1354,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B ≈ A.value^(3 // 8) atol = atol rtol = rtol
+        @test B ≈ evaluate(A)^(3 // 8) atol = atol rtol = rtol
     end
 end
 
@@ -1379,7 +1379,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(3 // 8) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(3 // 8) atol = atol rtol = rtol
     end
 end
 
@@ -1833,8 +1833,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1865,8 +1865,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1901,8 +1901,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1937,8 +1937,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1973,8 +1973,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -2009,8 +2009,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -2058,8 +2058,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(X.value) ≈ real.(eye(n)) atol = atol rtol = rtol
-        @test imag.(X.value) ≈ imag.(eye(n)) atol = atol rtol = rtol
+        @test real.(evaluate(X)) ≈ real.(eye(n)) atol = atol rtol = rtol
+        @test imag.(evaluate(X)) ≈ imag.(eye(n)) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * log(evaluate(X))) atol = atol rtol = rtol
         @test p.optval ≈ trace_logm(evaluate(X), C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_logm(X, C)) atol = atol rtol = rtol
@@ -2086,8 +2086,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(X.value) ≈ real.(eye(n)) atol = atol rtol = rtol
-        @test imag.(X.value) ≈ imag.(eye(n)) atol = atol rtol = rtol
+        @test real.(evaluate(X)) ≈ real.(eye(n)) atol = atol rtol = rtol
+        @test imag.(evaluate(X)) ≈ imag.(eye(n)) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * log(evaluate(X))) atol = atol rtol = rtol
         @test p.optval ≈ trace_logm(evaluate(X), C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_logm(X, C)) atol = atol rtol = rtol
@@ -2244,8 +2244,8 @@ end
     handle_problem!(p)
 
     if test
-        @test λ.value ≈ 2.400000051025101 atol = atol rtol = rtol
-        @test x.value ≈ [3.0000000535867315, -0.4000000018585541] atol = atol rtol =
+        @test evaluate(λ) ≈ 2.400000051025101 atol = atol rtol = rtol
+        @test evaluate(X) ≈ [3.0000000535867315, -0.4000000018585541] atol = atol rtol =
             rtol
         @test evaluate(A) ≈ [
             2.400000046152515 -9.292770553059881e-9
