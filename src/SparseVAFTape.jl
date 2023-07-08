@@ -175,11 +175,20 @@ function operate(
 ) where {T<:Real}
     op1 = AffineOperation(tape1)
     op2 = AffineOperation(tape2)
-
     A = blockdiag(op1.matrix, op2.matrix)
     b = vcat(op1.vector, op2.vector)
     x = vcat(tape1.variables, tape2.variables)
     return SparseVAFTape([SparseAffineOperation(A, b)], x)
+end
+
+
+# 1-arg does nothing
+function operate(
+    ::typeof(vcat),
+    ::Type{T},
+    tape::SparseVAFTape,
+) where {T<:Real}
+    return tape
 end
 
 function operate(
