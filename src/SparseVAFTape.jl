@@ -181,13 +181,8 @@ function operate(
     return SparseVAFTape([SparseAffineOperation(A, b)], x)
 end
 
-
 # 1-arg does nothing
-function operate(
-    ::typeof(vcat),
-    ::Type{T},
-    tape::SparseVAFTape,
-) where {T<:Real}
+function operate(::typeof(vcat), ::Type{T}, tape::SparseVAFTape) where {T<:Real}
     return tape
 end
 
