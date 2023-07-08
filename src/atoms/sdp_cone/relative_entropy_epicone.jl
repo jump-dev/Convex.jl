@@ -153,60 +153,53 @@ function glquad(m)
     return s, w
 end
 
-function conic_form!(
+function _add_constraints_to_context(
     constraint::RelativeEntropyEpiConeConstraint,
-    unique_conic_forms::UniqueConicForms,
+    context::Context,
 )
-    if !has_conic_form(unique_conic_forms, constraint)
-        X = constraint.cone.X
-        Y = constraint.cone.Y
-        m = constraint.cone.m
-        k = constraint.cone.k
-        e = constraint.cone.e
-        τ = constraint.τ
-        n = size(X)[1]
-        r = size(e)[2]
+    X = constraint.cone.X
+    Y = constraint.cone.Y
+    m = constraint.cone.m
+    k = constraint.cone.k
+    e = constraint.cone.e
+    τ = constraint.τ
+    n = size(X)[1]
+    r = size(e)[2]
 
-        s, w = glquad(m)
+    s, w = glquad(m)
 
-        is_complex =
-            sign(X) == ComplexSign() ||
-            sign(Y) == ComplexSign() ||
-            sign(Constant(e)) == ComplexSign()
-        if is_complex
-            Z = ComplexVariable(n, n)
-            T = [ComplexVariable(r, r) for i in 1:m]
-        else
-            Z = Variable(n, n)
-            T = [Variable(r, r) for i in 1:m]
-        end
+    is_complex =
+        sign(X) == ComplexSign() ||
+        sign(Y) == ComplexSign() ||
+        sign(Constant(e)) == ComplexSign()
+    if is_complex
+        Z = ComplexVariable(n, n)
+        T = [ComplexVariable(r, r) for i in 1:m]
+    else
+        Z = Variable(n, n)
+        T = [Variable(r, r) for i in 1:m]
+    end
 
-        conic_form!(
-            Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false),
-            unique_conic_forms,
-        )
+    add_constraints_to_context(
+        Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false),
+        context
+    )
 
-        for ii in 1:m
-            # Note that we are dividing by w here because it is easier
-            # to do this than to do sum w_i T(:,...,:,ii) later (cf. line that
-            # involves τ)
+    for ii in 1:m
+        # Note that we are dividing by w here because it is easier
+        # to do this than to do sum w_i T(:,...,:,ii) later (cf. line that
+        # involves τ)
 
-            conic_form!(
-                [
-                    e'*X*e-s[ii]*T[ii]/w[ii] e'*X
-                    X*e (1-s[ii])*X+s[ii]*Z
-                ] ⪰ 0,
-                unique_conic_forms,
-            )
-        end
-
-        conic_form!((2^k) * sum(T) + τ ⪰ 0, unique_conic_forms)
-
-        cache_conic_form!(
-            unique_conic_forms,
-            constraint,
-            Array{Convex.ConicConstr,1}(),
+        add_constraints_to_context(
+            [
+                e'*X*e-s[ii]*T[ii]/w[ii] e'*X
+                X*e (1-s[ii])*X+s[ii]*Z
+            ] ⪰ 0,
+            context,
         )
     end
-    return get_conic_form(unique_conic_forms, constraint)
+
+    add_constraints_to_context((2^k) * sum(T) + τ ⪰ 0, context)
+
+    return nothing
 end

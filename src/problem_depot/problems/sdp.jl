@@ -991,7 +991,7 @@ end
         handle_problem!(p)
 
         if test
-            @test Y.value ≈ eye(n) * exp(-1) atol = atol rtol = rtol
+            @test evaluate(Y) ≈ eye(n) * exp(-1) atol = atol rtol = rtol
         end
     end
 end
