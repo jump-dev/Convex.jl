@@ -107,7 +107,7 @@ function _add_constraints_to_context(
     lt::LtConstraint,
     context::Context{T},
 ) where {T}
-    f = template(lt.lhs - lt.rhs, context)
+    f = template(lt.rhs - lt.lhs, context)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
         if all(f .<= CONSTANT_CONSTRAINT_TOL[])
@@ -119,7 +119,7 @@ function _add_constraints_to_context(
     context.constr_to_moi_inds[lt] = MOI_add_constraint(
         context.model,
         f,
-        MOI.Nonpositives(MOI.output_dimension(f)),
+        MOI.Nonnegatives(MOI.output_dimension(f)),
     )
     return nothing
 end
