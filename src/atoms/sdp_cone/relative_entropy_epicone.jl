@@ -182,7 +182,7 @@ function _add_constraints_to_context(
 
     add_constraints_to_context(
         Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false),
-        context
+        context,
     )
 
     for ii in 1:m

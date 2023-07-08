@@ -139,7 +139,10 @@ function vexity(constraint::GeomMeanHypoConeConstraint)
     return vex
 end
 
-function _add_constraints_to_context(constraint::GeomMeanHypoConeConstraint, context::Context)
+function _add_constraints_to_context(
+    constraint::GeomMeanHypoConeConstraint,
+    context::Context,
+)
     A = constraint.cone.A
     B = constraint.cone.B
     t = constraint.cone.t
@@ -158,7 +161,10 @@ function _add_constraints_to_context(constraint::GeomMeanHypoConeConstraint, con
 
     if fullhyp && t != 0 && t != 1
         W = make_temporary()
-        add_constraints_to_context(W in GeomMeanHypoCone(A, B, t, false), context)
+        add_constraints_to_context(
+            W in GeomMeanHypoCone(A, B, t, false),
+            context,
+        )
         add_constraints_to_context(W ⪰ T, context)
         # cache_conic_form!(
         #     unique_conic_forms,
@@ -226,7 +232,6 @@ function _add_constraints_to_context(constraint::GeomMeanHypoConeConstraint, con
                 context,
             )
         end
-
 
         #add_constraints_to_context(context, constraint, ConicConstr([A,B,T], :geom_mean_hypocone, [size(A), size(B), size(T)]))
         #add_constraints_to_context(context, add_constraints_to_context(T, context))

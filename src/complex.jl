@@ -185,7 +185,6 @@ function operate(
     return ComplexTape(re, im)
 end
 
-
 function operate(
     ::typeof(vcat),
     ::Type{T},
