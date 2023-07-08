@@ -41,29 +41,29 @@ end
 function template(x::HcatAtom, context::Context{T}) where {T}
     objectives = template.(children(x), Ref(context))
     # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
-        #  e1: x => 1 2 3
-        #           4 5 6
-        #      y => 2 4
-        #           7 8
-        #  e2: x => 1 1 1
-        #           2 2 2
-        #           3 3 3
-        #           4 4 4
-        # The objective of [e1 e2] will look like
-        #            x => 1 2 3
-        #                 4 5 6
-        #                 1 1 1
-        #                 2 2 2
-        #                 3 3 3
-        #                 4 4 4
-        #            y => 2 4
-        #                 7 8
-        #                 0 0
-        #                 0 0
-        #                 0 0
-        #                 0 0
-        # builds the objective by aggregating a list of coefficients for each variable
-        # from each child objective, and then vertically concatenating them
+    #  e1: x => 1 2 3
+    #           4 5 6
+    #      y => 2 4
+    #           7 8
+    #  e2: x => 1 1 1
+    #           2 2 2
+    #           3 3 3
+    #           4 4 4
+    # The objective of [e1 e2] will look like
+    #            x => 1 2 3
+    #                 4 5 6
+    #                 1 1 1
+    #                 2 2 2
+    #                 3 3 3
+    #                 4 4 4
+    #            y => 2 4
+    #                 7 8
+    #                 0 0
+    #                 0 0
+    #                 0 0
+    #                 0 0
+    # builds the objective by aggregating a list of coefficients for each variable
+    # from each child objective, and then vertically concatenating them
     return operate(vcat, T, objectives...)
 end
 # TODO: fix piracy!
@@ -77,7 +77,9 @@ end
 hcat(args::Value...) = Base.cat(args..., dims = Val(2))
 
 # TODO: implement vertical concatenation in a more efficient way
-vcat(args::AbstractExprOrValue...) = transpose(HcatAtom(map(transpose, args)...))
+function vcat(args::AbstractExprOrValue...)
+    return transpose(HcatAtom(map(transpose, args)...))
+end
 
 vcat(args::Value...) = Base.cat(args..., dims = Val(1)) # Note: this makes general vcat slower for anyone using Convex...
 
