@@ -144,3 +144,56 @@ function MOI_add_constraint(model, f::ComplexTape, set::MOI.NormOneCone)
     im_inds = MOI_add_constraint(model, to_vaf(imag(f)), set)
     return (re_inds, im_inds)
 end
+
+# vcat
+
+# 1-arg does nothing
+function operate(::typeof(vcat), ::Type{T}, tape::ComplexTape) where {T<:Real}
+    return tape
+end
+
+function operate(
+    ::typeof(vcat),
+    ::Type{T},
+    tape1::ComplexTape,
+    tape2::ComplexTape,
+) where {T<:Real}
+    re = operate(vcat, T, real(tape1), real(tape2))
+    im = operate(vcat, T, imag(tape1), imag(tape2))
+    return ComplexTape(re, im)
+end
+
+function operate(
+    ::typeof(vcat),
+    ::Type{T},
+    tape::ComplexTape,
+    v::AbstractVector,
+) where {T<:Real}
+    re = operate(vcat, T, real(tape), real(v))
+    im = operate(vcat, T, imag(tape), imag(v))
+    return ComplexTape(re, im)
+end
+
+function operate(
+    ::typeof(vcat),
+    ::Type{T},
+    v::AbstractVector,
+    tape::ComplexTape,
+) where {T<:Real}
+    re = operate(vcat, T, real(v), real(tape))
+    im = operate(vcat, T, imag(v), imag(tape))
+    return ComplexTape(re, im)
+end
+
+
+function operate(
+    ::typeof(vcat),
+    ::Type{T},
+    arg1::ComplexTapeOrVec,
+    arg2::ComplexTapeOrVec,
+    arg3::ComplexTapeOrVec,
+    args::Vararg{<:ComplexTapeOrVec},
+) where {T<:Real}
+    all_args = (arg1, arg2, arg3, args...)
+    return foldl((a, b) -> operate(vcat, T, a, b), all_args)::ComplexTape{T}
+end
