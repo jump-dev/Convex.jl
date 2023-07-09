@@ -367,21 +367,6 @@ end
         @test_throws ErrorException Semidefinite(2, 3)
     end
 
-    @testset "ConicObj" for T in [UInt32, UInt64]
-        c = ConicObj()
-        z = zero(T)
-        @test !haskey(c, z)
-        c[z] = (1, 1)
-        @test c[z] == (1, 1)
-        x = T[]
-        for (k, v) in c
-            push!(x, k)
-        end
-        @test x == collect(keys(c))
-        d = copy(c)
-        @test d !== c
-    end
-
     @testset "length and size" begin
         x = Variable(2, 3)
         @test length(x) == 6
