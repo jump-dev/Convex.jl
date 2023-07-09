@@ -40,7 +40,7 @@ nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 
 function conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
     A = only(children(x))
-    if sign(A) == ComplexSign()
+    if iscomplex(sign(A))
         # I'm not sure how to use MOI's `NormNuclearCone` in this case, so we'll just do the extended formulation as an SDP ourselves:
         #   minimize (tr(U) + tr(V))/2
         #   subject to
@@ -48,9 +48,9 @@ function conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
         # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
         # http://arxiv.org/pdf/0706.4138v1.pdf
         m, n = size(A)
-        U = Variable(m, m)
-        V = Variable(n, n)
-        p = minimize((tr(U) + tr(V)) / 2, [U A; A' V] ⪰ 0)
+        U = ComplexVariable(m, m)
+        V = ComplexVariable(n, n)
+        p = minimize(real(tr(U) + tr(V)) / 2, [U A; A' V] ⪰ 0)
         return conic_form!(context, p)
     else
         t = conic_form!(context, Variable())
