@@ -64,14 +64,13 @@ function solve!(
         p.status = MOI.INFEASIBLE
     else
         MOI.optimize!(model)
-        status = MOI.get(model, MOI.TerminationStatus())
-        p.status = status
+        p.status = MOI.get(model, MOI.TerminationStatus())
     end
 
     p.model = model
 
     if p.status != MOI.OPTIMAL
-        @warn "Problem wasn't solved optimally" status
+        @warn "Problem wasn't solved optimally" status = p.status
     end
 
     dual_status = MOI.get(model, MOI.DualStatus())
@@ -107,7 +106,10 @@ function solve!(
             populate_dual!(model, constr, MOI_constr_indices)
         end
     else
-        populate_dual!(model, constr, nothing)
+        # Empty duals
+        for constr in keys(context.constr_to_moi_inds)
+            constr.dual = nothing
+        end
     end
 
     return nothing

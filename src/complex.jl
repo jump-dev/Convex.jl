@@ -14,13 +14,9 @@ Base.real(c::ComplexTape) = c.real_tape
 Base.real(tape::VAFTapes) = tape
 Base.imag(c::ComplexTape) = c.imag_tape
 
-const ComplexTapeOrVec = Union{
-    <:ComplexTape,
-    <:ComplexStructOfVec,
-    <:VAFTapes,
-    <:AbstractVector{<:Real},
-}
-const TapeOrVec = Union{<:VAFTapes,<:AbstractVector{<:Real}}
+const ComplexTapeOrVec =
+    Union{<:ComplexTape,<:ComplexStructOfVec,<:VAFTapes,<:AbstractVector}
+const TapeOrVec = Union{<:VAFTapes,<:AbstractVector}
 
 # this is pretty ugly...
 function complex_operate(
