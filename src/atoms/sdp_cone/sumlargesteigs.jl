@@ -66,8 +66,9 @@ function template(x::SumLargestEigs, context::Context{T}) where {T}
     s = Variable()
     # The two inequality constraints have the side effect of constraining A to be symmetric,
     # since only symmetric matrices can be positive semidefinite.
+    # Note: we know the trace is real, since Z is PSD, but we need to tell Convex.jl that.
     p = minimize(
-        s * k + tr(Z),
+        s * k + real(tr(Z)),
         Z + s * Matrix(1.0I, n, n) - A ⪰ 0,
         A ⪰ 0,
         Z ⪰ 0,

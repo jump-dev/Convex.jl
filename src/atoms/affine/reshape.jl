@@ -27,7 +27,11 @@ function curvature(x::ReshapeAtom)
 end
 
 function evaluate(x::ReshapeAtom)
-    return reshape(evaluate(x.children[1]), x.size[1], x.size[2])
+    val = evaluate(x.children[1])
+    if val isa Number
+        return val
+    end
+    return reshape(val, x.size[1], x.size[2])
 end
 
 function template(A::ReshapeAtom, context::Context)
