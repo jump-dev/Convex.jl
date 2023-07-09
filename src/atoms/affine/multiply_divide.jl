@@ -73,6 +73,7 @@ function template(x::MultiplyAtom, context::Context{T}) where {T}
                 "multiplication of two non-constant expressions is not DCP compliant",
             )
         end
+
         objective = template(expr_child, context)
 
         # make sure all 1x1 sized objects are interpreted as scalars, since

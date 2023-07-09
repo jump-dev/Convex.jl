@@ -3,6 +3,22 @@ struct SparseAffineOperation{T}
     vector::Vector{T}
 end
 
+function Base.convert(
+    ::Type{SparseAffineOperation{T}},
+    obj::SparseAffineOperation,
+) where {T}
+    mat = convert(SparseMatrixCSC{T}, obj.matrix)
+    vec = convert(Vector{T}, obj.vector)
+    return SparseAffineOperation{T}(mat, vec)
+end
+
+function SparseAffineOperation(
+    A::SparseMatrixCSC{T},
+    b::AbstractVector,
+) where {T}
+    return SparseAffineOperation(A, collect(T, b))
+end
+
 function SparseAffineOperation(A::AbstractSparseMatrix, b)
     return SparseAffineOperation(SparseMatrixCSC(A), b)
 end

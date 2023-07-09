@@ -207,54 +207,45 @@ function quantum_relative_entropy(
     return real(tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function conic_form!(atom::QuantumRelativeEntropy1, unique_conic_forms)
-    #println("conic_form QuantumRelativeEntropy1")
-    if !has_conic_form(unique_conic_forms, atom)
-        A = atom.children[1]
-        B = atom.children[2]
-        m = atom.m
-        k = atom.k
-        n = size(A)[1]
-        eye = Matrix(1.0 * I, n, n)
-        e = vec(eye)
+function template(atom::QuantumRelativeEntropy1, context::Context)
+    A = atom.children[1]
+    B = atom.children[2]
+    m = atom.m
+    k = atom.k
+    n = size(A)[1]
+    eye = Matrix(1.0 * I, n, n)
+    e = vec(eye)
 
-        conic_form!(A ⪰ 0, unique_conic_forms)
-        conic_form!(B ⪰ 0, unique_conic_forms)
+    add_constraints_to_context(A ⪰ 0, context)
+    add_constraints_to_context(B ⪰ 0, context)
 
-        τ = Variable()
-        conic_form!(
-            τ in
-            RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
-            unique_conic_forms,
-        )
+    τ = Variable()
+    add_constraints_to_context(
+        τ in RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
+        context,
+    )
 
-        cache_conic_form!(unique_conic_forms, atom, minimize(τ))
-    end
-    return get_conic_form(unique_conic_forms, atom)
+    return template(minimize(τ), context)
 end
 
-function conic_form!(atom::QuantumRelativeEntropy2, unique_conic_forms)
-    #println("conic_form QuantumRelativeEntropy2")
-    if !has_conic_form(unique_conic_forms, atom)
-        A = atom.children[1]
-        B = atom.B
-        J = atom.J
-        K = atom.K
-        m = atom.m
-        k = atom.k
+function template(atom::QuantumRelativeEntropy2, context::Context)
+    A = atom.children[1]
+    B = atom.B
+    J = atom.J
+    K = atom.K
+    m = atom.m
+    k = atom.k
 
-        conic_form!(A ⪰ 0, unique_conic_forms)
+    add_constraints_to_context(A ⪰ 0, context)
 
-        if length(K) > 0
-            conic_form!(K * A * K' == 0, unique_conic_forms)
-            Ap = J * A * J'
-            Bp = Hermitian(J * B * J')
-            τ = -quantum_entropy(Ap, m, k) - real(tr(Ap * log(Bp)))
-        else
-            τ = -quantum_entropy(A, m, k) - real(tr(A * log(B)))
-        end
-
-        cache_conic_form!(unique_conic_forms, atom, minimize(τ))
+    if length(K) > 0
+        add_constraints_to_context(K * A * K' == 0, context)
+        Ap = J * A * J'
+        Bp = Hermitian(J * B * J')
+        τ = -quantum_entropy(Ap, m, k) - real(tr(Ap * log(Bp)))
+    else
+        τ = -quantum_entropy(A, m, k) - real(tr(A * log(B)))
     end
-    return get_conic_form(unique_conic_forms, atom)
+
+    return template(minimize(τ), context)
 end

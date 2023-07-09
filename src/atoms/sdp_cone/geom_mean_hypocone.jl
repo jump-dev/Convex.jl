@@ -87,7 +87,7 @@ struct GeomMeanHypoCone
     end
 end
 
-struct GeomMeanHypoConeConstraint <: Constraint
+mutable struct GeomMeanHypoConeConstraint <: Constraint
     head::Symbol
     id_hash::UInt64
     T::AbstractExpr
@@ -166,11 +166,6 @@ function _add_constraints_to_context(
             context,
         )
         add_constraints_to_context(W ⪰ T, context)
-        # cache_conic_form!(
-        #     unique_conic_forms,
-        #     constraint,
-        #     Array{Convex.ConicConstr,1}(),
-        # )
     else
         p = t.num
         q = t.den

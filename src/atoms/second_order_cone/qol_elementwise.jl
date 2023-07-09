@@ -38,7 +38,13 @@ function template(q::QolElemAtom, context::Context{T}) where {T}
     t = Variable(sz[1], sz[2])
     t_obj = template(t, context)
     x, y = q.children
-    add_constraints_to_context(SOCElemConstraint(y + t, y - t, 2 * x), context)
+
+    for i in 1:length(q.children[1])
+        add_constraints_to_context(
+            SOCConstraint(y[i] + t[i], y[i] - t[i], 2 * x[i]),
+            context,
+        )
+    end
     add_constraints_to_context(y >= 0, context)
     return t_obj
 end

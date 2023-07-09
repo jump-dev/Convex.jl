@@ -24,7 +24,6 @@
 ##      h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 ##      curvature refers to the curvature of the first term.
 ##      We then use this curvature to find vexity of h (see vexity function below)
-## conic_form!: TODO: Fill this in after conic_form! is stable
 #
 #############################################################################
 
@@ -75,6 +74,8 @@ end
 function evaluate(x::AbstractExpr)
     return error("evaluate not implemented for $(x.head).")
 end
+
+evaluate(x) = output(x) # fallback
 
 # This function should never be reached
 function sign(x::AbstractExpr)
