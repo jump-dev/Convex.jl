@@ -1,7 +1,7 @@
 using Convex
 using Convex.ProblemDepot: run_tests
 using Test
-using SCS, ECOS, GLPK
+using SCS, ECOS, GLPK, Clarabel
 
 using MathOptInterface
 const MOI = MathOptInterface
@@ -55,37 +55,18 @@ Random.seed!(2)
     #     end
     # end
 
-    run_tests(["sdp_socp_sumsquares_atom"]) do p
-        return solve!(
-            p,
-            MOI.OptimizerWithAttributes(
-                SCS.Optimizer,
-                "verbose" => 0,
-                "eps_rel" => 1e-6,
-                "eps_abs" => 1e-6,
-            ),
-        )
-    end
-    @testset "SCS" begin
+    @testset "Clarabel" begin
         # TODO(odow): investigate sdp_lieb_ando
         run_tests(; exclude = [r"mip", r"sdp_lieb_ando"]) do p
-            return solve!(
-                p,
-                MOI.OptimizerWithAttributes(
-                    SCS.Optimizer,
-                    "verbose" => 0,
-                    "eps_rel" => 1e-6,
-                    "eps_abs" => 1e-6,
-                ),
-            )
+            return solve!(p, Clarabel.Optimizer; silent_solver = true)
         end
     end
 
-    # @testset "ECOS" begin
-    #     run_tests(; exclude = [r"mip", r"sdp"]) do p
-    #         return solve!(p, ECOS.Optimizer; silent_solver = true)
-    #     end
-    # end
+    @testset "ECOS" begin
+        run_tests(; exclude = [r"mip", r"sdp"]) do p
+            return solve!(p, ECOS.Optimizer; silent_solver = true)
+        end
+    end
 
     @testset "GLPK" begin
         # Note this is an inclusion, not exclusion;
