@@ -150,5 +150,9 @@ function complex_operate(::typeof(*), ::Type{T}, A, c) where {T}
         real_operate(*, T, real(A), imag(c)),
         real_operate(*, T, imag(A), real(c)),
     )
-    return ComplexTape(re, im)
+    if re isa Vector{T} && im isa Vector{T}
+        return ComplexStructOfVec(re, im)
+    else
+        return ComplexTape(re, im)
+    end
 end
