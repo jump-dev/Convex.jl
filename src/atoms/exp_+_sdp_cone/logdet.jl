@@ -28,7 +28,7 @@ function evaluate(x::LogDetAtom)
     return log(det(evaluate(x.children[1])))
 end
 
-function template(x::LogDetAtom, context::Context{T}) where {T}
+function conic_form!(x::LogDetAtom, context::Context{T}) where {T}
     # the object we want the logdet of. Should be a PSD matrix, but may not be a `AbstractVariable` itself.
     A = only(children(x))
 
@@ -39,9 +39,9 @@ function template(x::LogDetAtom, context::Context{T}) where {T}
     add_constraints_to_context(v == vec_tril(A), context)
 
     # We pass to MOI
-    X = template(v, context)
+    X = conic_form!(v, context)
 
-    t = template(Variable(), context)
+    t = conic_form!(Variable(), context)
     f = operate(vcat, T, t, [1], X)
     side_dimension = size(only(children(x)), 1)
 

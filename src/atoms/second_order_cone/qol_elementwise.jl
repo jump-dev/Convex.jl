@@ -33,10 +33,10 @@ function evaluate(q::QolElemAtom)
     return (evaluate(q.children[1]) .^ 2) ./ evaluate(q.children[2])
 end
 
-function template(q::QolElemAtom, context::Context{T}) where {T}
+function conic_form!(q::QolElemAtom, context::Context{T}) where {T}
     sz = q.children[1].size
     t = Variable(sz[1], sz[2])
-    t_obj = template(t, context)
+    t_obj = conic_form!(t, context)
     x, y = q.children
 
     for i in 1:length(q.children[1])

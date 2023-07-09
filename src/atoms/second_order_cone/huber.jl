@@ -40,13 +40,13 @@ function evaluate(x::HuberAtom)
     return c
 end
 
-function template(x::HuberAtom, context::Context)
+function conic_form!(x::HuberAtom, context::Context)
     c = x.children[1]
     s = Variable(c.size)
     n = Variable(c.size)
 
     # objective given by s.^2 + 2 * M * |n|
-    objective = template(square(s) + 2 * x.M * abs(n), context)
+    objective = conic_form!(square(s) + 2 * x.M * abs(n), context)
     add_constraints_to_context(c == s + n, context)
     return objective
 end

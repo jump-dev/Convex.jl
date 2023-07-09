@@ -34,13 +34,13 @@ function evaluate(x::EucNormAtom)
     return norm(vec(evaluate(x.children[1])))
 end
 
-function template(A::EucNormAtom, context::Context{T}) where {T}
-    obj = template(only(children(A)), context)
+function conic_form!(A::EucNormAtom, context::Context{T}) where {T}
+    obj = conic_form!(only(children(A)), context)
 
     x = only(children(A))
     d = length(x)
 
-    t_obj = template(Variable(), context)
+    t_obj = conic_form!(Variable(), context)
 
     f = operate(vcat, T, t_obj, obj)
     set = MOI.SecondOrderCone(d + 1)

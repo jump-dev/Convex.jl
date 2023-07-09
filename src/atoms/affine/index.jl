@@ -68,8 +68,8 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function template(x::IndexAtom, context::Context{T}) where {T}
-    obj = template(only(children(x)), context)
+function conic_form!(x::IndexAtom, context::Context{T}) where {T}
+    obj = conic_form!(only(children(x)), context)
 
     m = length(x)
     n = length(x.children[1])

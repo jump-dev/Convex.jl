@@ -60,7 +60,7 @@ end
 LinearAlgebra.diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
 ## API ends
 
-function template(x::DiagAtom, context::Context{T}) where {T}
+function conic_form!(x::DiagAtom, context::Context{T}) where {T}
     (num_rows, num_cols) = x.children[1].size
     k = x.k
 
@@ -78,7 +78,7 @@ function template(x::DiagAtom, context::Context{T}) where {T}
         start_index += num_rows + 1
     end
 
-    child_obj = template(only(children(x)), context)
+    child_obj = conic_form!(only(children(x)), context)
     obj = operate(*, T, select_diag, child_obj)
     return obj
 end

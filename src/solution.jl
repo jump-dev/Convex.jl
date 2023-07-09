@@ -39,7 +39,7 @@ end
 
 function formulate_model(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
     context = Context{T}(optimizer)
-    cfp = template(p, context)
+    cfp = conic_form!(p, context)
 
     model = context.model
 

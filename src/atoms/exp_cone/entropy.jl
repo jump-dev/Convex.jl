@@ -46,11 +46,11 @@ end
 
 entropy(x::AbstractExpr) = sum(EntropyAtom(x))
 
-function template(e::EntropyAtom, context::Context)
+function conic_form!(e::EntropyAtom, context::Context)
     # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
     t = Variable(e.size)
     x = e.children[1]
     add_constraints_to_context(ExpConstraint(t, x, ones(e.size...)), context)
 
-    return template(t, context)
+    return conic_form!(t, context)
 end

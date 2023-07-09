@@ -42,10 +42,10 @@ function evaluate(x::MinimumAtom)
     return Base.minimum(evaluate(x.children[1]))
 end
 
-function template(x::MinimumAtom, context::Context)
+function conic_form!(x::MinimumAtom, context::Context)
     t = Variable()
     add_constraints_to_context(t <= x.children[1], context)
-    return template(t, context)
+    return conic_form!(t, context)
 end
 
 minimum(x::AbstractExpr) = MinimumAtom(x)

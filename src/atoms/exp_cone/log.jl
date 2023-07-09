@@ -42,12 +42,12 @@ end
 
 log(x::AbstractExpr) = LogAtom(x)
 
-function template(e::LogAtom, context::Context)
+function conic_form!(e::LogAtom, context::Context)
     # log(z) \geq x  <=>    (x,ones(),z) \in ExpCone
     z = e.children[1]
     y = Constant(ones(size(z)))
     x = Variable(size(z))
-    objective = template(x, context)
+    objective = conic_form!(x, context)
     add_constraints_to_context(ExpConstraint(x, y, z), context)
     return objective
 end
