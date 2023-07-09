@@ -58,8 +58,8 @@ function diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
 end
 Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 
-function conic_form!(x::DiagMatrixAtom, context::Context{T}) where {T}
-    obj = conic_form!(only(children(x)), context)
+function conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
 
     sz = x.size[1]
     coeff = sparse(1:sz+1:sz*sz, 1:sz, one(T), sz * sz, sz)

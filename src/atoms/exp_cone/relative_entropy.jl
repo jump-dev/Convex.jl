@@ -51,11 +51,11 @@ function evaluate(e::RelativeEntropyAtom)
     return sum(out)
 end
 
-function conic_form!(e::RelativeEntropyAtom, context::Context{T}) where {T}
+function conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
     # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
-    w = conic_form!(e.children[1], context)
-    v = conic_form!(e.children[2], context)
-    u = conic_form!(Variable(), context)
+    w = conic_form!(context, e.children[1])
+    v = conic_form!(context, e.children[2])
+    u = conic_form!(context, Variable())
     f = operate(vcat, T, u, v, w)
     d = MOI.output_dimension(w)
     @assert d == MOI.output_dimension(v)

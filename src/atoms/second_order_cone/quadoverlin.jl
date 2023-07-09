@@ -30,12 +30,12 @@ function evaluate(q::QuadOverLinAtom)
     return x' * x / evaluate(q.children[2])
 end
 
-function conic_form!(q::QuadOverLinAtom, context::Context)
+function conic_form!(context::Context, q::QuadOverLinAtom)
     t = Variable()
     x, y = q.children
     add_constraints_to_context(SOCConstraint(y + t, y - t, 2 * x), context)
     add_constraints_to_context(y >= 0, context)
-    return conic_form!(t, context)
+    return conic_form!(context, t)
 end
 
 quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)

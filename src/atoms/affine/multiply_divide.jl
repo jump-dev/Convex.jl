@@ -59,7 +59,7 @@ function evaluate(x::MultiplyAtom)
     return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function conic_form!(x::MultiplyAtom, context::Context{T}) where {T}
+function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
         if vexity(x.children[1]) == ConstVexity()
@@ -74,7 +74,7 @@ function conic_form!(x::MultiplyAtom, context::Context{T}) where {T}
             )
         end
 
-        objective = conic_form!(expr_child, context)
+        objective = conic_form!(context, expr_child)
 
         # make sure all 1x1 sized objects are interpreted as scalars, since
         # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
@@ -89,7 +89,7 @@ function conic_form!(x::MultiplyAtom, context::Context{T}) where {T}
 
         # left matrix multiplication
     elseif vexity(x.children[1]) == ConstVexity()
-        objective = conic_form!(x.children[2], context)
+        objective = conic_form!(context, x.children[2])
         return operate(
             *,
             T,
@@ -102,7 +102,7 @@ function conic_form!(x::MultiplyAtom, context::Context{T}) where {T}
 
         # right matrix multiplication
     else
-        objective = conic_form!(x.children[1], context)
+        objective = conic_form!(context, x.children[1])
         return operate(
             *,
             T,

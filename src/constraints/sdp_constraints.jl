@@ -41,7 +41,7 @@ function _add_constraints_to_context(c::SDPConstraint, context::Context)
         return nothing
     end
 
-    f = conic_form!(c.child, context)
+    f = conic_form!(context, c.child)
     d = c.size[1]
     context.constr_to_moi_inds[c] = MOI_add_constraint(
         context.model,

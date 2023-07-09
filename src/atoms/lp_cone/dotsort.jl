@@ -57,7 +57,7 @@ function evaluate(x::DotSortAtom)
     )
 end
 
-function conic_form!(x::DotSortAtom, context::Context{T}) where {T}
+function conic_form!(context::Context{T}, x::DotSortAtom) where {T}
     y = only(x.children)
     w = x.w
     sy = size(y)
@@ -71,7 +71,7 @@ function conic_form!(x::DotSortAtom, context::Context{T}) where {T}
     # minimize sum(mu) + sum(nu)
     # subject to y*w' <= onesvec*nu' + mu*onesvec'
     add_constraints_to_context(y * w' <= onesvec * nu' + mu * onesvec', context)
-    objective = conic_form!(sum(mu) + sum(nu), context)
+    objective = conic_form!(context, sum(mu) + sum(nu))
     return objective
 end
 

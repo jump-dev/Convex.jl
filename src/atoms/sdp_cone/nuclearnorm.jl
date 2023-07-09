@@ -38,7 +38,7 @@ end
 
 nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 
-function conic_form!(x::NuclearNormAtom, context::Context{T}) where {T}
+function conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
     A = only(children(x))
     if sign(A) == ComplexSign()
         # I'm not sure how to use MOI's `NormNuclearCone` in this case, so we'll just do the extended formulation as an SDP ourselves:
@@ -51,10 +51,10 @@ function conic_form!(x::NuclearNormAtom, context::Context{T}) where {T}
         U = Variable(m, m)
         V = Variable(n, n)
         p = minimize((tr(U) + tr(V)) / 2, [U A; A' V] ⪰ 0)
-        return conic_form!(p, context)
+        return conic_form!(context, p)
     else
-        t = conic_form!(Variable(), context)
-        f = operate(vcat, T, t, conic_form!(A, context))
+        t = conic_form!(context, Variable())
+        f = operate(vcat, T, t, conic_form!(context, A))
         m, n = size(A)
         MOI_add_constraint(context.model, f, MOI.NormNuclearCone(m, n))
         return t

@@ -53,7 +53,7 @@ function _add_constraints_to_context(
     eq::EqConstraint,
     context::Context{T},
 ) where {T}
-    f = conic_form!(eq.lhs - eq.rhs, context)
+    f = conic_form!(context, eq.lhs - eq.rhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 == 0`
         if all(abs.(f) .<= CONSTANT_CONSTRAINT_TOL[])
@@ -119,7 +119,7 @@ function _add_constraints_to_context(
     lt::LtConstraint,
     context::Context{T},
 ) where {T}
-    f = conic_form!(lt.rhs - lt.lhs, context)
+    f = conic_form!(context, lt.rhs - lt.lhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
         if all(f .<= CONSTANT_CONSTRAINT_TOL[])
@@ -190,7 +190,7 @@ function _add_constraints_to_context(
     gt::GtConstraint,
     context::Context{T},
 ) where {T}
-    f = conic_form!(gt.lhs - gt.rhs, context)
+    f = conic_form!(context, gt.lhs - gt.rhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
         if all(f .>= -CONSTANT_CONSTRAINT_TOL[])
