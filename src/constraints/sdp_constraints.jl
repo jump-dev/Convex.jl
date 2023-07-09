@@ -33,10 +33,12 @@ function _add_constraint!(context::Context, c::SDPConstraint)
     if vexity(c.child) == ConstVexity()
         x = evaluate(c.child)
         if !(x ≈ transpose(x))
-            error("constant SDP constraint is violated")
+            @warn "constant SDP constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
         if !(evaluate(eigmin(c.child)) ≥ -CONSTANT_CONSTRAINT_TOL[])
-            error("constant SDP constraint is violated")
+            @warn "constant SDP constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
         return nothing
     end
