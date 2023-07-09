@@ -59,8 +59,12 @@ struct AdditionAtom <: AbstractExpr
         # find the size of the expression = max of size of x and size of y
         if x.size == y.size || y.size == (1, 1)
             sz = x.size
+            if y.size == (1, 1)
+                y = y * ones(sz)
+            end
         elseif x.size == (1, 1)
             sz = y.size
+            x = x * ones(sz)
         else
             error("Cannot add expressions of sizes $(x.size) and $(y.size)")
         end
