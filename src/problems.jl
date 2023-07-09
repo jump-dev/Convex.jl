@@ -50,10 +50,16 @@ Problem(args...) = Problem{Float64}(args...)
 function vexity(p::Problem)
     bad_vex = [ConcaveVexity, NotDcp]
 
-    obj_vex = vexity(p.objective)
-    if p.head == :maximize
-        obj_vex = -obj_vex
+    if p.head == :satisfy
+        obj_vex = ConstVexity()
+    elseif p.head == :minimize
+        obj_vex = vexity(p.objective)
+    elseif p.head == :maximize
+        obj_vex = -vexity(p.objective)
+    else
+        error("Unknown type of problem $(p.head)")
     end
+
     typeof(obj_vex) in bad_vex &&
         @warn "Problem not DCP compliant: objective is not DCP"
 

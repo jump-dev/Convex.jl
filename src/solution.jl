@@ -25,7 +25,7 @@ end
 
 scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
 scalar_fn(x) = only(MOIU.scalarize(x))
-scalar_fn(x::VAFTapes) = scalar_fn(to_vaf(x))
+scalar_fn(x::SparseVAFTape) = scalar_fn(to_vaf(x))
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
 """
@@ -86,11 +86,7 @@ function solve!(
             vectorized_value = MOI.get(model, MOI.VariablePrimal(), var_indices)
             set_value!(
                 var,
-                unpackvec(
-                    vectorized_value,
-                    size(var),
-                    sign(var) == ComplexSign(),
-                ),
+                unpackvec(vectorized_value, size(var), iscomplex(sign(var))),
             )
         end
     else

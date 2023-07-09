@@ -29,18 +29,11 @@ struct SparseVAFTape{T}
     variables::Vector{MOI.VariableIndex}
 end
 
-function AffineOperation(op::SparseAffineOperation)
-    return AffineOperation(op.matrix, op.vector)
-end
-function AffineOperation(op::SparseVAFTape)
-    return AffineOperation(SparseAffineOperation(op))
-end
-
 const SparseVAFTapeOrVec = Union{SparseVAFTape,AbstractVector}
 
 MOI.output_dimension(v::SparseVAFTape) = size(v.operations[1].matrix, 1)
 
-function SparseAffineOperation(tape::SparseVAFTape)# -> AffineOperation
+function SparseAffineOperation(tape::SparseVAFTape)# -> SparseAffineOperation
     return foldl(compose, tape.operations)
 end
 
@@ -107,7 +100,7 @@ function real_operate(
     vec_args = (a for a in args if a isa AbstractVector)
     tape_args = (a for a in args if a isa SparseVAFTape)
     if isempty(tape_args)
-        error()
+        return sum(vec_args)
     else
         tape = foldl((a, b) -> real_operate(+, T, a, b), tape_args)
     end
@@ -170,7 +163,7 @@ function real_operate(
     ::Type{T},
     tapes::SparseVAFTape...,
 ) where {T<:Real}
-    ops = AffineOperation.(tapes)
+    ops = SparseAffineOperation.(tapes)
     A = hcat((op.matrix for op in ops)...)
     b = +((op.vector for op in ops)...)
     x = vcat((tape.variables for tape in tapes)...)
@@ -197,8 +190,8 @@ function real_operate(
     tape1::SparseVAFTape,
     tape2::SparseVAFTape,
 ) where {T<:Real}
-    op1 = AffineOperation(tape1)
-    op2 = AffineOperation(tape2)
+    op1 = SparseAffineOperation(tape1)
+    op2 = SparseAffineOperation(tape2)
     A = blockdiag(op1.matrix, op2.matrix)
     b = vcat(op1.vector, op2.vector)
     x = vcat(tape1.variables, tape2.variables)
@@ -220,7 +213,7 @@ function real_operate(
     tape::SparseVAFTape,
     v::AbstractVector,
 ) where {T<:Real}
-    op = AffineOperation(tape)
+    op = SparseAffineOperation(tape)
     n = length(v)
     m = size(op.matrix, 2) # bad for uniformscaling
     Z = spzeros(T, n, m)
@@ -235,7 +228,7 @@ function real_operate(
     v::AbstractVector,
     tape::SparseVAFTape,
 ) where {T<:Real}
-    op = AffineOperation(tape)
+    op = SparseAffineOperation(tape)
     n = length(v)
     m = size(op.matrix, 2) # bad for uniformscaling
     Z = spzeros(T, n, m)
@@ -266,8 +259,8 @@ function real_operate(
     tape2::SparseVAFTape,
 ) where {T<:Real}
     @assert MOI.output_dimension(tape1) == MOI.output_dimension(tape2)
-    op1 = AffineOperation(tape1)
-    op2 = AffineOperation(tape2)
+    op1 = SparseAffineOperation(tape1)
+    op2 = SparseAffineOperation(tape2)
 
     if tape1.variables == tape2.variables
         op = SparseAffineOperation(
