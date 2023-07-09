@@ -9,7 +9,7 @@
     p = minimize(x, x >= 4.3; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -20,7 +20,7 @@
     p = minimize(norm(x, 1), x[1] >= 4.3; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -39,7 +39,7 @@ end
     p = minimize(x, x >= 4.3; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -50,7 +50,7 @@ end
     p = minimize(sum(x), x >= 4.3; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -62,7 +62,7 @@ end
     p = minimize(sum(x + y), x >= 4.3, y >= 7; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -73,7 +73,7 @@ end
     p = minimize(norm(x, 1), x[1] >= 4.3; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -84,7 +84,7 @@ end
     p = minimize(sum(x), x[1] >= 4.3, x >= 0; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -95,7 +95,7 @@ end
     p = minimize(sum(x), x >= 0.5; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -114,7 +114,7 @@ end
     p = minimize(sum(x), x >= 0.5; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -125,7 +125,7 @@ end
     p = minimize(sum(x), x[1] >= 0.5, x >= 0; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test

@@ -9,7 +9,7 @@
     p = minimize(-x, [x <= 0]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -44,7 +44,7 @@ end
     p = minimize(2.0 * x, [x >= 2, x <= 4]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -57,7 +57,7 @@ end
     p = minimize([2 2] * x, [A * x >= [1.1; 1.1]]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -74,7 +74,7 @@ end
     o = 3 * y
     p = Problem{T}(:minimize, o, c)
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -83,7 +83,7 @@ end
 
     p = Problem{T}(:minimize, o, c...)
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -115,7 +115,7 @@ end
     p = minimize(dot([2.0; 2.0], x), x >= [1.1; 1.1]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -135,7 +135,7 @@ end
     p = minimize(dot(fill(2.0, (2, 2)), x), x >= 1.1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -157,7 +157,7 @@ end
     p = minimize(x + y, [x >= 3, y >= 2]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -169,7 +169,7 @@ end
     p = minimize(x, [eye(2) + x * ones(2, 2) >= eye(2)]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -181,7 +181,7 @@ end
     p = minimize(y - 5, y >= -1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -202,7 +202,7 @@ end
     p = minimize(x' * c, x >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -215,7 +215,7 @@ end
     p = minimize(c' * X' * c, [X >= ones(2, 2)]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -236,7 +236,7 @@ end
         numeric_type = T,
     )
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     s = sum(max.(r, r_2')) * 3
@@ -259,7 +259,7 @@ end
     p = minimize(x[1] + x[2], [x >= 1]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -272,7 +272,7 @@ end
     p = minimize(sum(x[I]), [x >= 1]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -289,7 +289,7 @@ end
     p = minimize(c * X[1:n, 5:5+n-1]' * c', X >= A; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     s = c * A[1:n, 5:5+n-1]' * c'
@@ -311,7 +311,7 @@ end
     p = minimize(sum(x), x >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -323,7 +323,7 @@ end
     p = minimize(sum(x) - 2 * x[1, 1], x >= 1, x[1, 1] <= 2; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -336,7 +336,7 @@ end
     p = maximize(sum(x[2:6]), x <= a; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -356,7 +356,7 @@ end
     p = minimize(sum(diag(x, 1)), x >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -368,7 +368,7 @@ end
     p = minimize(sum(diag(x)), x >= 2; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -388,7 +388,7 @@ end
     p = minimize(tr(x), x >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -408,7 +408,7 @@ end
     p = maximize(sum(dot(*)(x, [1, 2, 3])), x <= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -420,7 +420,7 @@ end
     p = maximize(sum(dot(*)(x, eye(3))), x <= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -432,7 +432,7 @@ end
     p = minimize(x[1, 1], dot(*)(3, x) >= 3; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -444,7 +444,7 @@ end
     p = minimize(sum(dot(*)(ones(3, 3), x)), x >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -456,7 +456,7 @@ end
     p = minimize(sum(dot(*)(ones(3, 3), x)), x >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -468,7 +468,7 @@ end
     p = maximize(sum(dot(/)(x, [1 2 3])), x <= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -498,7 +498,7 @@ end
     p = minimize(sum(reshape(X, 2, 3) + A), X >= c; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -511,7 +511,7 @@ end
     p = minimize(sum(vec(X) + b), X >= c; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -526,7 +526,7 @@ end
     p = minimize(c' * reshaped, reshaped >= a; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     # TODO: why is accuracy lower here?
@@ -553,7 +553,7 @@ end
     )
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -583,7 +583,7 @@ end
     )
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     # TODO: why is accuracy lower here?
@@ -643,7 +643,7 @@ end
     p = minimize(sum(Diagonal(x)), x == [1, 2, 3, 4]; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -656,7 +656,7 @@ end
     p = minimize(c' * Diagonal(x) * c, x >= 1, sum(x) == 10; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -684,7 +684,7 @@ end
     p = minimize(sum(conv(h, x)) + sum(x), x >= 1, x <= 2; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -697,7 +697,7 @@ end
     p = minimize(sum(conv(x, h)) + sum(x), x >= 1, x <= 2; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
