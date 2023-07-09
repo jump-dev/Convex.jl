@@ -58,7 +58,7 @@ struct GeomMeanHypoCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(Constant(A), B, t, fullhyp)
+        return GeomMeanHypoCone(constant(A), B, t, fullhyp)
     end
     function GeomMeanHypoCone(
         A::AbstractExpr,
@@ -66,7 +66,7 @@ struct GeomMeanHypoCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(A, Constant(B), t, fullhyp)
+        return GeomMeanHypoCone(A, constant(B), t, fullhyp)
     end
     function GeomMeanHypoCone(
         A::Value,
@@ -74,7 +74,7 @@ struct GeomMeanHypoCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(Constant(A), Constant(B), t, fullhyp)
+        return GeomMeanHypoCone(constant(A), constant(B), t, fullhyp)
     end
 
     function GeomMeanHypoCone(
@@ -102,7 +102,7 @@ mutable struct GeomMeanHypoConeConstraint <: Constraint
     end
 
     function GeomMeanHypoConeConstraint(T::Value, cone::GeomMeanHypoCone)
-        return GeomMeanHypoConeConstraint(Constant(T), cone)
+        return GeomMeanHypoConeConstraint(constant(T), cone)
     end
 end
 

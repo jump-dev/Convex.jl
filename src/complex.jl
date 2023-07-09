@@ -90,7 +90,12 @@ function operate(::typeof(sum), ::Type{T}, c::ComplexTape) where {T}
     return ComplexTape(re, im)
 end
 
-const ComplexValue = Union{<:Complex,AbstractArray{<:Complex}}
+const ComplexValue = Union{
+    <:Complex,
+    AbstractArray{<:Complex},
+    <:ComplexConstant,
+    <:ComplexStructOfVec,
+}
 
 function operate(
     ::typeof(*),
@@ -167,7 +172,7 @@ function operate(
     ::typeof(vcat),
     ::Type{T},
     tape::ComplexTape,
-    v::AbstractVector,
+    v::Union{<:AbstractVector,<:ComplexStructOfVec},
 ) where {T<:Real}
     re = operate(vcat, T, real(tape), real(v))
     im = operate(vcat, T, imag(tape), imag(v))
@@ -177,7 +182,7 @@ end
 function operate(
     ::typeof(vcat),
     ::Type{T},
-    v::AbstractVector,
+    v::Union{<:AbstractVector,<:ComplexStructOfVec},
     tape::ComplexTape,
 ) where {T<:Real}
     re = operate(vcat, T, real(v), real(tape))

@@ -53,4 +53,4 @@ function template(q::GeoMeanAtom, context::Context{T}) where {T}
 end
 
 geomean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
-sqrt(x::AbstractExpr) = GeoMeanAtom(x, Constant(ones(x.size[1], x.size[2])))
+sqrt(x::AbstractExpr) = GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))

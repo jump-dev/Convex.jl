@@ -7,6 +7,7 @@
 
 # fallback
 operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
+# operate(op::F, ::Type{T}, args...) where {F,T} = (@show(args); op(args...))
 
 struct AffineOperation{M,V}
     matrix::M
