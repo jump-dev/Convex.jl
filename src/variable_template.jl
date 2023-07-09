@@ -40,7 +40,7 @@ function _template(a::AbstractVariable, context::Context{T}) where {T}
     return MOI.VectorOfVariables(var_inds)
 end
 
-function to_tape(v::MOI.VectorOfVariables, context::Context{T}) where {T}
+function to_tape(v::MOI.VectorOfVariables, ::Context{T}) where {T}
     var_inds = v.variables
     d = length(var_inds)
     return SparseVAFTape(
