@@ -569,7 +569,7 @@ end
     if test
         @test p.status == MOI.OPTIMAL
         @test evaluate(ρ) ≈ [1.0 0.0; 0.0 1.0] atol = atol rtol = rtol
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test p.optval === nothing
     end
 end
 
@@ -1486,8 +1486,8 @@ function sdp_quantum_relative_entropy_impl(
         if mode != 5
             @test real.(evaluate(B)) ≈ real.(X) atol = atol rtol = rtol
             @test imag.(evaluate(B)) ≈ imag.(X) atol = atol rtol = rtol
+            @test p.optval ≈ 0 atol = atol rtol = rtol
         end
-        @test p.optval ≈ 0 atol = atol rtol = rtol
         if mode == 1
             @test p.optval ≈ evaluate(quantum_relative_entropy(A, B)) atol =
                 atol rtol = rtol
@@ -1501,8 +1501,8 @@ function sdp_quantum_relative_entropy_impl(
             @test p.optval ≈ evaluate(quantum_relative_entropy(B, X)) atol =
                 atol rtol = rtol
         elseif mode == 5
-            @test p.optval ≈ evaluate(quantum_relative_entropy(X, X)) atol =
-                atol rtol = rtol
+            # Satisfiability problem
+            @test p.optval === nothing
         end
     end
 end
