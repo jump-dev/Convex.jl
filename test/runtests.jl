@@ -32,11 +32,6 @@ Random.seed!(2)
 # end
 
 @testset "Convex" begin
-    include("definitions.jl")
-    include("VAFTapes.jl")
-    include("test_utilities.jl")
-    include("test_abstract_variable.jl")
-
     # @testset "SCS with warmstarts" begin
     #     run_tests(
     #         exclude = [
@@ -99,4 +94,9 @@ Random.seed!(2)
             return solve!(p, GLPK.Optimizer; silent_solver = true)
         end
     end
+
+    include("definitions.jl")
+    include("VAFTapes.jl")
+    include("test_utilities.jl")
+    include("test_abstract_variable.jl")
 end
