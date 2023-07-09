@@ -49,7 +49,7 @@ function _add_constraint!(context::Context{T}, c::ExpConstraint) where {T}
     inds = [
         begin
             terms = (t(x[i, j]), t(y[i, j]), t(z[i, j]))
-            obj = operate(vcat, T, terms...)
+            obj = operate(vcat, T, sum(map(sign, c.children)), terms...)
             MOI_add_constraint(context.model, obj, MOI.ExponentialCone())
         end for i in 1:size(x, 1), j in 1:size(x, 2)
     ]

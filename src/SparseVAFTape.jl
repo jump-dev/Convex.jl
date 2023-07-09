@@ -65,7 +65,11 @@ function add_operation(
     return tape2::SparseVAFTape{T}
 end
 
-function operate(::typeof(-), ::Type{T}, tape::SparseVAFTape) where {T<:Real}
+function real_operate(
+    ::typeof(-),
+    ::Type{T},
+    tape::SparseVAFTape,
+) where {T<:Real}
     d = MOI.output_dimension(tape)
     return add_operation(
         tape,
@@ -105,17 +109,17 @@ function real_operate(
     if isempty(tape_args)
         error()
     else
-        tape = foldl((a, b) -> operate(+, T, a, b), tape_args)
+        tape = foldl((a, b) -> real_operate(+, T, a, b), tape_args)
     end
     if isempty(vec_args)
         return tape
     else
         v = sum(vec_args)
-        return operate(+, T, tape, v)
+        return real_operate(+, T, tape, v)
     end
 end
 
-function operate(
+function real_operate(
     ::typeof(-),
     ::Type{T},
     tape::SparseVAFTape,
@@ -128,7 +132,7 @@ function operate(
     )
 end
 
-function operate(
+function real_operate(
     ::typeof(-),
     ::Type{T},
     v::AbstractVector{<:Real},
@@ -141,7 +145,7 @@ function operate(
     )
 end
 
-function operate(
+function real_operate(
     ::typeof(*),
     ::Type{T},
     A::AbstractMatrix{<:Real},
@@ -150,14 +154,18 @@ function operate(
     return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
 end
 
-function operate(::typeof(sum), ::Type{T}, tape::SparseVAFTape) where {T<:Real}
+function real_operate(
+    ::typeof(sum),
+    ::Type{T},
+    tape::SparseVAFTape,
+) where {T<:Real}
     d = MOI.output_dimension(tape)
     # doesn't seem ideal for a sparse representation...
     A = ones(T, 1, d)
     return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
 end
 
-function operate(
+function real_operate(
     ::typeof(+),
     ::Type{T},
     tapes::SparseVAFTape...,
@@ -169,7 +177,7 @@ function operate(
     return SparseVAFTape([SparseAffineOperation(A, b)], x)
 end
 
-function operate(
+function real_operate(
     ::typeof(*),
     ::Type{T},
     x::Real,
@@ -183,7 +191,7 @@ function operate(
 end
 
 # we do all pairs of `SparseVAFTape` and `AbstractVector{<:Real}`, and then do 3+ arguments by iterating
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape1::SparseVAFTape,
@@ -198,11 +206,15 @@ function operate(
 end
 
 # 1-arg does nothing
-function operate(::typeof(vcat), ::Type{T}, tape::SparseVAFTape) where {T<:Real}
+function real_operate(
+    ::typeof(vcat),
+    ::Type{T},
+    tape::SparseVAFTape,
+) where {T<:Real}
     return tape
 end
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape::SparseVAFTape,
@@ -217,7 +229,7 @@ function operate(
     return SparseVAFTape([SparseAffineOperation(A, b)], tape.variables)
 end
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     v::AbstractVector{<:Real},
@@ -232,7 +244,7 @@ function operate(
     return SparseVAFTape([SparseAffineOperation(A, b)], tape.variables)
 end
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     arg1::SparseVAFTapeOrVec,
@@ -241,10 +253,13 @@ function operate(
     args::Vararg{<:SparseVAFTapeOrVec},
 ) where {T<:Real}
     all_args = (arg1, arg2, arg3, args...)
-    return foldl((a, b) -> operate(vcat, T, a, b), all_args)::SparseVAFTape{T}
+    return foldl(
+        (a, b) -> real_operate(vcat, T, a, b),
+        all_args,
+    )::SparseVAFTape{T}
 end
 
-function operate(
+function real_operate(
     ::typeof(+),
     ::Type{T},
     tape1::SparseVAFTape,

@@ -92,7 +92,7 @@ function conic_form!(context::Context{T}, x::IndexAtom) where {T}
         index_matrix = sparse(1:length(x.inds), x.inds, one(T), m, n)
     end
 
-    return operate(*, T, index_matrix, obj)
+    return operate(*, T, sign(x), index_matrix, obj)
 end
 
 ## API Definition begins

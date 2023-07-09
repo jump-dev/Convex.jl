@@ -44,6 +44,7 @@ function conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
         f = operate(
             vcat,
             T,
+            sign(q),
             conic_form!(context, t[i, j]),
             (conic_form!(context, y[i, j]) for y in q.children)...,
         )

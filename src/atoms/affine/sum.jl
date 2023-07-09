@@ -40,7 +40,7 @@ end
 
 function conic_form!(context::Context{T}, A::SumAtom) where {T}
     subobj = conic_form!(context, only(children(A)))
-    obj = operate(sum, T, subobj)
+    obj = operate(sum, T, sign(A), subobj)
     return obj
 end
 

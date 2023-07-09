@@ -79,6 +79,6 @@ function conic_form!(context::Context{T}, x::DiagAtom) where {T}
     end
 
     child_obj = conic_form!(context, only(children(x)))
-    obj = operate(*, T, select_diag, child_obj)
+    obj = operate(*, T, sign(x), select_diag, child_obj)
     return obj
 end

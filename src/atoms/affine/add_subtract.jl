@@ -44,7 +44,7 @@ function conic_form!(context::Context{T}, A::NegateAtom) where {T}
     if subobj isa Value
         return -subobj
     else
-        return operate(-, T, subobj)
+        return operate(-, T, sign(A), subobj)
     end
 end
 
@@ -110,7 +110,12 @@ function evaluate(x::AdditionAtom)
 end
 
 function conic_form!(context::Context{T}, x::AdditionAtom) where {T}
-    obj = operate(+, T, (conic_form!(context, c) for c in children(x))...)
+    obj = operate(
+        +,
+        T,
+        sign(x),
+        (conic_form!(context, c) for c in children(x))...,
+    )
     return obj
 end
 

@@ -28,7 +28,7 @@ end
 
 function conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
     objective = conic_form!(context, only(children(x)))
-    return operate(conj, T, objective)
+    return operate(conj, T, sign(x), objective)
 end
 
 function Base.conj(x::AbstractExpr)

@@ -49,7 +49,7 @@ function conic_form!(context::Context{T}, x::RationalNormAtom) where {T}
     d = length(only(x.children)) + 1
     t = Variable()
     t_obj = conic_form!(context, t)
-    f = operate(vcat, T, t_obj, v)
+    f = operate(vcat, T, sign(x), t_obj, v)
     MOI_add_constraint(context.model, f, MOI.NormCone(Float64(x.k), d))
     return t_obj
 end

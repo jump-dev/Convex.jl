@@ -85,7 +85,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
                 reshape(evaluate(const_child), length(const_child), 1)
         end
 
-        return operate(*, T, const_multiplier, objective)
+        return operate(*, T, sign(x), const_multiplier, objective)
 
         # left matrix multiplication
     elseif vexity(x.children[1]) == ConstVexity()
@@ -93,6 +93,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         return operate(
             *,
             T,
+            sign(x),
             kron(
                 sparse(one(T) * I, x.size[2], x.size[2]),
                 evaluate(x.children[1]),
@@ -106,6 +107,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         return operate(
             *,
             T,
+            sign(x),
             kron(
                 transpose(evaluate(x.children[2])),
                 sparse(one(T) * I, x.size[1], x.size[1]),
