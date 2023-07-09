@@ -52,11 +52,11 @@ end
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 
 function broadcasted(::typeof(^), x::AbstractExpr, k::Int)
-    return k == 2 ? QolElemAtom(x, Constant(ones(x.size[1], x.size[2]))) :
+    return k == 2 ? QolElemAtom(x, constant(ones(x.size[1], x.size[2]))) :
            error("raising variables to powers other than 2 is not implemented")
 end
 
-invpos(x::AbstractExpr) = QolElemAtom(Constant(ones(x.size[1], x.size[2])), x)
+invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size[1], x.size[2])), x)
 function broadcasted(::typeof(/), x::Value, y::AbstractExpr)
     return dotmultiply(constant(x), invpos(y))
 end
@@ -72,6 +72,6 @@ function square(x::AbstractExpr)
             "Square of complex number is not DCP. Did you mean square_modulus?",
         )
     else
-        QolElemAtom(x, Constant(ones(x.size[1], x.size[2])))
+        QolElemAtom(x, constant(ones(x.size[1], x.size[2])))
     end
 end

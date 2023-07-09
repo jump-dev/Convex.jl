@@ -77,7 +77,7 @@ function lieb_ando(
     is_complex =
         sign(A) == ComplexSign() ||
         sign(B) == ComplexSign() ||
-        sign(Constant(K)) == ComplexSign()
+        sign(constant(K)) == ComplexSign()
     if is_complex
         T = HermitianSemidefinite(n * m)
     else

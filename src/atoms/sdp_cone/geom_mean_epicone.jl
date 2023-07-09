@@ -51,7 +51,7 @@ struct GeomMeanEpiCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanEpiCone(Constant(A), B, t, fullhyp)
+        return GeomMeanEpiCone(constant(A), B, t, fullhyp)
     end
     function GeomMeanEpiCone(
         A::AbstractExpr,
@@ -59,7 +59,7 @@ struct GeomMeanEpiCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanEpiCone(A, Constant(B), t, fullhyp)
+        return GeomMeanEpiCone(A, constant(B), t, fullhyp)
     end
     function GeomMeanEpiCone(
         A::Value,
@@ -67,7 +67,7 @@ struct GeomMeanEpiCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanEpiCone(Constant(A), Constant(B), t, fullhyp)
+        return GeomMeanEpiCone(constant(A), constant(B), t, fullhyp)
     end
 
     function GeomMeanEpiCone(
@@ -95,7 +95,7 @@ mutable struct GeomMeanEpiConeConstraint <: Constraint
     end
 
     function GeomMeanEpiConeConstraint(T::Value, cone::GeomMeanEpiCone)
-        return GeomMeanEpiConeConstraint(Constant(T), cone)
+        return GeomMeanEpiConeConstraint(constant(T), cone)
     end
 end
 

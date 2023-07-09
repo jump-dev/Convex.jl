@@ -56,7 +56,7 @@ struct RelativeEntropyEpiCone
         k::Integer = 3,
         e::AbstractArray = Matrix(1.0 * I, size(X)),
     )
-        return RelativeEntropyEpiCone(Constant(X), Y, m, k, e)
+        return RelativeEntropyEpiCone(constant(X), Y, m, k, e)
     end
     function RelativeEntropyEpiCone(
         X::AbstractExpr,
@@ -65,7 +65,7 @@ struct RelativeEntropyEpiCone
         k::Integer = 3,
         e::AbstractArray = Matrix(1.0 * I, size(X)),
     )
-        return RelativeEntropyEpiCone(X, Constant(Y), m, k, e)
+        return RelativeEntropyEpiCone(X, constant(Y), m, k, e)
     end
     function RelativeEntropyEpiCone(
         X::Value,
@@ -74,7 +74,7 @@ struct RelativeEntropyEpiCone
         k::Integer = 3,
         e::AbstractArray = Matrix(1.0 * I, size(X)),
     )
-        return RelativeEntropyEpiCone(Constant(X), Constant(Y), m, k, e)
+        return RelativeEntropyEpiCone(constant(X), constant(Y), m, k, e)
     end
 end
 
@@ -106,7 +106,7 @@ mutable struct RelativeEntropyEpiConeConstraint <: Constraint
         τ::Value,
         cone::RelativeEntropyEpiCone,
     )
-        return RelativeEntropyEpiConeConstraint(Constant(τ), cone)
+        return RelativeEntropyEpiConeConstraint(constant(τ), cone)
     end
 end
 
@@ -171,7 +171,7 @@ function _add_constraints_to_context(
     is_complex =
         sign(X) == ComplexSign() ||
         sign(Y) == ComplexSign() ||
-        sign(Constant(e)) == ComplexSign()
+        sign(constant(e)) == ComplexSign()
     if is_complex
         Z = ComplexVariable(n, n)
         T = [ComplexVariable(r, r) for i in 1:m]

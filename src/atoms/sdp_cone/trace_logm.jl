@@ -103,7 +103,7 @@ function template(atom::TraceLogm, context::Context)
     k = atom.k
     eye = Matrix(1.0 * I, size(X))
 
-    is_complex = sign(X) == ComplexSign() || sign(Constant(C)) == ComplexSign()
+    is_complex = sign(X) == ComplexSign() || sign(constant(C)) == ComplexSign()
     if is_complex
         τ = ComplexVariable(size(X))
     else

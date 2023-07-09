@@ -33,7 +33,7 @@ struct Constant{T<:Value} <: AbstractExpr
     function Constant(x::Value, sign::Sign)
         x isa Complex && error("Real values expected")
         x isa AbstractArray &&
-            eltype(x) isa Complex &&
+            eltype(x) <: Complex &&
             error("Real values expected")
         return new{typeof(x)}(:constant, objectid(x), x, _size(x), sign)
     end
