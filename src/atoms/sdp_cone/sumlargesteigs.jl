@@ -58,7 +58,7 @@ function conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
     A = x.children[1]
     k = x.children[2]
     m, n = size(A)
-    if sign(A) == ComplexSign()
+    if iscomplex(sign(A))
         Z = ComplexVariable(n, n)
     else
         Z = Variable(n, n)

@@ -8,6 +8,12 @@ Breaking changes:
 * The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
 * SDP and exponential constraints now have dual values populated (and SOC?)
 
+Dev notes to move elsewhere:
+
+* `conic_form!` can mutate the context, should never mutate the problem
+* we construct a fresh context on every solve, no support for in-place changes right now (same as release Convex)
+* we can detect infeasibility at problem-creation time if the constraints are constant. We could try to communicate more about that.
+* in the atoms/constraints we call `operate` with the sign. This dispatches to either `real_operate` or `complex_operate` and should have no other methods. `complex_operate` generally forwards real/imag parts to `real_operate` as necessary. Methods for `real_operate`/`complex_operate` should not try to use signatures to limit to real/complex inputs, just assume arguments are appropriate.
 
 ## v0.15.3 (February 11, 2023)
 

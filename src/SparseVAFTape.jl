@@ -36,7 +36,7 @@ function AffineOperation(op::SparseVAFTape)
     return AffineOperation(SparseAffineOperation(op))
 end
 
-const SparseVAFTapeOrVec = Union{SparseVAFTape,AbstractVector{<:Real}}
+const SparseVAFTapeOrVec = Union{SparseVAFTape,AbstractVector}
 
 MOI.output_dimension(v::SparseVAFTape) = size(v.operations[1].matrix, 1)
 
@@ -81,7 +81,7 @@ function real_operate(
     ::typeof(+),
     ::Type{T},
     tape::SparseVAFTape,
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
 ) where {T<:Real}
     d = length(v)
     return add_operation(
@@ -93,7 +93,7 @@ end
 function real_operate(
     ::typeof(+),
     ::Type{T},
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
     tape::SparseVAFTape,
 ) where {T<:Real}
     return real_operate(+, T, tape, v)
@@ -123,7 +123,7 @@ function real_operate(
     ::typeof(-),
     ::Type{T},
     tape::SparseVAFTape,
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
 ) where {T<:Real}
     d = length(v)
     return add_operation(
@@ -135,7 +135,7 @@ end
 function real_operate(
     ::typeof(-),
     ::Type{T},
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
     tape::SparseVAFTape,
 ) where {T<:Real}
     d = length(v)
@@ -148,7 +148,7 @@ end
 function real_operate(
     ::typeof(*),
     ::Type{T},
-    A::AbstractMatrix{<:Real},
+    A::AbstractMatrix,
     tape::SparseVAFTape,
 ) where {T<:Real}
     return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
@@ -190,7 +190,7 @@ function real_operate(
     )
 end
 
-# we do all pairs of `SparseVAFTape` and `AbstractVector{<:Real}`, and then do 3+ arguments by iterating
+# we do all pairs of `SparseVAFTape` and `AbstractVector`, and then do 3+ arguments by iterating
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
@@ -218,7 +218,7 @@ function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape::SparseVAFTape,
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
 ) where {T<:Real}
     op = AffineOperation(tape)
     n = length(v)
@@ -232,7 +232,7 @@ end
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
     tape::SparseVAFTape,
 ) where {T<:Real}
     op = AffineOperation(tape)

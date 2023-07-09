@@ -22,13 +22,13 @@ function _template(a::AbstractVariable, context::Context{T}) where {T}
         if vartype(a) == BinVar
             MOI.add_constraints(
                 context.model,
-                [MOI.SingleVariable(i) for i in var_inds],
+                var_inds,
                 [MOI.ZeroOne() for i in var_inds],
             )
         elseif vartype(a) == IntVar
             MOI.add_constraints(
                 context.model,
-                [MOI.SingleVariable(i) for i in var_inds],
+                var_inds,
                 [MOI.Integer() for i in var_inds],
             )
         end

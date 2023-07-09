@@ -51,7 +51,7 @@ struct VAFTape{T<:Tuple}
         return tape
     end
 end
-const VAFTapeOrVec = Union{VAFTape,AbstractVector{<:Real}}
+const VAFTapeOrVec = Union{VAFTape,AbstractVector}
 
 function Base.isequal(a::VAFTape, b::VAFTape)
     return isequal(a.variables, b.variables) &&
@@ -159,7 +159,7 @@ end
 function real_operate(
     ::typeof(+),
     ::Type{T},
-    args::AbstractVector{<:Real}...,
+    args::AbstractVector...,
 ) where {T<:Real}
     return sum(args)
 end
@@ -215,13 +215,13 @@ function real_operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T<:Real}
     return add_operation(tape, AffineOperation(A, zeros(T, size(A, 1))))
 end
 
-# we do all pairs of `SparseVAFTape` and `AbstractVector{<:Real}`, and then do 3+ arguments by iterating
+# we do all pairs of `SparseVAFTape` and `AbstractVector`, and then do 3+ arguments by iterating
 
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape::VAFTape,
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
 ) where {T<:Real}
     op = AffineOperation(tape)
     n = length(v)
@@ -239,7 +239,7 @@ end
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
-    v::AbstractVector{<:Real},
+    v::AbstractVector,
     tape::VAFTape,
 ) where {T<:Real}
     op = AffineOperation(tape)
