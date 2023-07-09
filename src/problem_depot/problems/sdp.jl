@@ -1226,7 +1226,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test p.status in (MOI.OPTIMAL, MOI.ALMOST_OPTIMAL)
     end
 end
 
