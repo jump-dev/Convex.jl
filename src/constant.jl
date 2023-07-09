@@ -23,10 +23,10 @@ function _sign(x::Value)
     end
 end
 
-struct Constant{T<:Value} <: AbstractExpr
+struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    value::T
+    value::Matrix{T}
     size::Tuple{Int,Int}
     sign::Sign
 
@@ -35,7 +35,10 @@ struct Constant{T<:Value} <: AbstractExpr
         x isa AbstractArray &&
             eltype(x) <: Complex &&
             error("Real values expected")
-        return new{typeof(x)}(:constant, objectid(x), x, _size(x), sign)
+
+        # Convert to matrix
+        mat = [x;;]
+        return new{eltype(x)}(:constant, objectid(x), mat, _size(x), sign)
     end
     function Constant(x::Value, check_sign::Bool = true)
         return Constant(x, check_sign ? _sign(x) : NoSign())
@@ -43,7 +46,7 @@ struct Constant{T<:Value} <: AbstractExpr
 end
 # Constant(x::Constant) = x
 
-struct ComplexConstant{T<:Value} <: AbstractExpr
+struct ComplexConstant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int,Int}
@@ -71,13 +74,14 @@ function evaluate(c::ComplexConstant)
     return evaluate(c.real_constant) + im * evaluate(c.imag_constant)
 end
 
-struct ComplexStructOfVec{T<:AbstractVector{<:Real}}
-    real_vec::T
-    imag_vec::T
+struct ComplexStructOfVec{T<:Real}
+    real_vec::Vector{T}
+    imag_vec::Vector{T}
 end
 
 Base.real(c::ComplexStructOfVec) = c.real_vec
 Base.imag(c::ComplexStructOfVec) = c.imag_vec
+Base.conj(c::ComplexStructOfVec) = ComplexStructOfVec(real(c), -imag(c))
 
 function conic_form!(context::Context, C::ComplexConstant)
     return ComplexStructOfVec(
@@ -86,11 +90,16 @@ function conic_form!(context::Context, C::ComplexConstant)
     )
 end
 
-constant(x::Value) = Constant(x)
-function constant(x::AbstractArray{<:Complex})
-    return ComplexConstant(Constant(real(x)), Constant(imag(x)))
+function constant(x)
+    # Convert to matrix
+    x = [x;;]
+    if eltype(x) <: Real
+        return Constant(x)
+    else
+        return ComplexConstant(Constant(real(x)), Constant(imag(x)))
+    end
 end
-constant(x::Complex) = ComplexConstant(Constant(real(x)), Constant(imag(x)))
+# constant(x::Complex) = ComplexConstant(Constant(real(x)), Constant(imag(x)))
 
 #### Constant Definition end     #####
 
@@ -121,7 +130,7 @@ function conic_form!(::Context{T}, C::Constant) where {T}
     # this should happen at `Constant` creation?
     # No, we don't have access to `T` yet; that's problem-specific
     if eltype(C.value) != T
-        C = Constant(T.(C.value))
+        C = Constant(convert(Matrix{T}, C.value))
     end
-    return vectorize(C.value)
+    return vec(C.value)
 end
