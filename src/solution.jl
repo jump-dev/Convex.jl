@@ -28,24 +28,20 @@ scalar_fn(x) = only(MOIU.scalarize(x))
 scalar_fn(x::VAFTapes) = scalar_fn(to_vaf(x))
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
-function solve!(problem::Problem{T}, optimizer_factory; kwargs...) where {T}
+function formulate_model(
+    problem::Problem{T},
+    optimizer_factory;
+    kwargs...,
+) where {T}
     optimizer = MOI.instantiate(optimizer_factory)
-    return solve!(problem, optimizer; kwargs...)
+    return formulate_model(problem, optimizer; kwargs...)
 end
 
-function solve!(
-    p::Problem{T},
-    optimizer::MOI.ModelLike;
-    silent_solver = false,
-) where {T}
+function formulate_model(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
     context = Context{T}(optimizer)
     cfp = template(p, context)
 
     model = context.model
-
-    if silent_solver
-        MOI.set(model, MOI.Silent(), true)
-    end
 
     if p.head == :satisfy
         MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
@@ -57,6 +53,34 @@ function solve!(
             MOI.ObjectiveSense(),
             p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE,
         )
+    end
+    return model
+end
+
+"""
+    latex_formulation(problem::Problem, optimizer=MOIU.Model{Float64}())
+
+Prints a LaTeX formulation of the problem. Optionally, pass an `optimizer`
+(like `SCS.Optimizer`) as the second argument, to see the formulation provided
+for that specific optimizer (since MathOptInterface will reformulate
+the problem based on what the optimizer can support).
+
+Uses `MathOptInterface.Utilities.latex_formulation`.
+"""
+function latex_formulation(problem::Problem, optimizer = MOIU.Model{Float64}())
+    model = formulate_model(problem, optimizer)
+    return MOIU.latex_formulation(model)
+end
+
+function solve!(
+    p::Problem{T},
+    optimizer::MOI.ModelLike;
+    silent_solver = false,
+) where {T}
+    model = formulate_model(p, optimizer)
+
+    if silent_solver
+        MOI.set(model, MOI.Silent(), true)
     end
 
     MOI.optimize!(model)
