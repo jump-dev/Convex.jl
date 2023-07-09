@@ -17,7 +17,7 @@ function promote_size(values)
             v in values if v isa MOI.AbstractFunction ||
             v isa VectorAffineFunctionAsMatrix ||
             v isa VAFTape ||
-            v isa SparseVAFTape
+            v isa SparseTape
         ),
     )
     return (v isa Number ? fill(v, d) : v for v in values)
@@ -25,7 +25,7 @@ end
 
 scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
 scalar_fn(x) = only(MOIU.scalarize(x))
-scalar_fn(x::SparseVAFTape) = scalar_fn(to_vaf(x))
+scalar_fn(x::SparseTape) = scalar_fn(to_vaf(x))
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
 """
