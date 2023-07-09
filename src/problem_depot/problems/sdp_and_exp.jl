@@ -9,7 +9,7 @@
     p = maximize(logdet(x), [x[1, 1] == 1, x[2, 2] == 1]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test

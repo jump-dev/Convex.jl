@@ -9,7 +9,7 @@
     y = Variable((2, 2), :Semidefinite)
     p = minimize(y[1, 1]; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol = atol rtol = rtol
@@ -18,7 +18,7 @@
     y = Variable((3, 3), :Semidefinite)
     p = minimize(y[1, 1], y[2, 2] == 1; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol = atol rtol = rtol
@@ -30,14 +30,14 @@
     # y = Variable((2, 2), :Semidefinite)
     # p = minimize(y[1, 1], y[1, 2] == 1; numeric_type = T)
 
-    # # @fact vexity(p) --> ConvexVexity()
+    # # @fact problem_vexity(p) --> ConvexVexity()
     # handle_problem!(p)
     # @fact p.optval --> roughly(0, atol)
 
     y = Semidefinite(3)
     p = minimize(sum(diag(y)), y[1, 1] == 1; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
@@ -46,7 +46,7 @@
     y = Variable((3, 3), :Semidefinite)
     p = minimize(tr(y), y[2, 1] <= 4, y[2, 2] >= 3; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 3 atol = atol rtol = rtol
@@ -56,7 +56,7 @@
     y = Semidefinite(3)
     p = minimize(y[1, 2], y[2, 1] == 1; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
@@ -80,7 +80,7 @@ end
         numeric_type = T,
     )
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
@@ -104,7 +104,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -125,7 +125,7 @@ end
     p = minimize(nuclearnorm(y), y == A; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -151,7 +151,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -172,7 +172,7 @@ end
     p = minimize(opnorm(y), y == A; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -198,7 +198,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -218,7 +218,7 @@ end
     p = minimize(eigmax(y), y[1, 1] >= 4; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -252,7 +252,7 @@ end
     p = maximize(eigmin(y), tr(y) <= 6; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -278,7 +278,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -299,7 +299,7 @@ end
     p = minimize(matrixfrac(x, P), eigmax(P) <= 2, x[1] >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -400,7 +400,7 @@ end
     p = maximize(tr(W), tr(X) ≤ 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test

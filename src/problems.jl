@@ -53,9 +53,24 @@ end
 
 Problem(args...) = Problem{Float64}(args...)
 
-function vexity(p::Problem)
-    bad_vex = [ConcaveVexity, NotDcp]
+function problem_vexity(p::Problem)
+    bad_vex = (ConcaveVexity, NotDcp)
+    obj_vex = objective_vexity(p)
+    constr_vex = ConstVexity()
+    for i in 1:length(p.constraints)
+        vex = vexity(p.constraints[i])
+        typeof(vex) in bad_vex &&
+            @warn "Problem not DCP compliant: constraint $i is not DCP"
+        constr_vex += vex
+    end
+    problem_vex = obj_vex + constr_vex
+    # this check is redundant
+    typeof(problem_vex) in bad_vex && @warn("Problem not DCP compliant")
+    return problem_vex
+end
 
+function objective_vexity(p::Problem)
+    bad_vex = (ConcaveVexity, NotDcp)
     if p.head == :satisfy
         obj_vex = ConstVexity()
     elseif p.head == :minimize
@@ -69,19 +84,10 @@ function vexity(p::Problem)
     typeof(obj_vex) in bad_vex &&
         @warn "Problem not DCP compliant: objective is not DCP"
 
-    constr_vex = ConstVexity()
-    for i in 1:length(p.constraints)
-        vex = vexity(p.constraints[i])
-        typeof(vex) in bad_vex &&
-            @warn "Problem not DCP compliant: constraint $i is not DCP"
-        constr_vex += vex
-    end
-    # problem_vex = problem_vexity(p.head, obj_vex, constr_vex)
-    problem_vex = obj_vex + constr_vex
-    # this check is redundant
-    # typeof(problem_vex) in bad_vex && warn("Problem not DCP compliant")
-    return problem_vex
+    return obj_vex
 end
+
+vexity(p::Problem) = objective_vexity(p)
 
 # is this right?
 # function problem_vexity(sense, obj_vexity, constr_vexity)
