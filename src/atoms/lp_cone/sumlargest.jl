@@ -59,5 +59,9 @@ function template(x::SumLargestAtom, context::Context)
     return objective
 end
 
-sumlargest(x::AbstractExpr, k::Int) = SumLargestAtom(x, k)
-sumsmallest(x::AbstractExpr, k::Int) = -SumLargestAtom(-x, k)
+function sumlargest(x::AbstractExpr, k::Int)
+    return k == 0 ? Constant(0) : SumLargestAtom(x, k)
+end
+function sumsmallest(x::AbstractExpr, k::Int)
+    return k == 0 ? Constant(0) : -SumLargestAtom(-x, k)
+end

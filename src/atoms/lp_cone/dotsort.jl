@@ -70,7 +70,7 @@ function template(x::DotSortAtom, context::Context{T}) where {T}
     # given by the solution to
     # minimize sum(mu) + sum(nu)
     # subject to y*w' <= onesvec*nu' + mu*onesvec'
-    add_constraint_to_context(y * w' <= onesvec * nu' + mu * onesvec', context)
+    add_constraints_to_context(y * w' <= onesvec * nu' + mu * onesvec', context)
     objective = template(sum(mu) + sum(nu), context)
     return objective
 end
