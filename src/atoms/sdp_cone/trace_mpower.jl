@@ -104,7 +104,7 @@ function template(atom::TraceMpower, context::Context)
         )
         # It's already a real mathematically, but need to make it a real type.
         u = real(tr(C * T))
-        return template(maximize(u), template)
+        return template(maximize(u), context)
     else
         add_constraints_to_context(
             T in GeomMeanEpiCone(eye, A, t, false),
@@ -112,6 +112,6 @@ function template(atom::TraceMpower, context::Context)
         )
         # It's already a real mathematically, but need to make it a real type.
         u = real(tr(C * T))
-        return template(minimize(u), template)
+        return template(minimize(u), context)
     end
 end

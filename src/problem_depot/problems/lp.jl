@@ -94,7 +94,7 @@ end
     c = ones(4, 1)
     d = fill(2.0, (6, 1))
     constraints = [[x y] <= 2, z <= 0, z <= x, 2z >= -1]
-    objective = sum(x + z) + minimum(y) + c' * y * d
+    objective = sum(x + z * ones(4, 4)) + minimum(y) + c' * y * d
     p = maximize(objective, constraints; numeric_type = T)
 
     if test
