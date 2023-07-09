@@ -67,10 +67,8 @@ end
 
 function conic_form!(context::Context, x::MinAtom)
     t = Variable(x.size[1], x.size[2])
-    for child in x.children
-        add_constraint!(context, t <= child)
-    end
-    return conic_form!(context, t)
+    p = maximize(t, (t <= child for child in x.children)...)
+    return conic_form!(context, p)
 end
 
 min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
