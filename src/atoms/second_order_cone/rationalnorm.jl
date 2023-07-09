@@ -46,7 +46,7 @@ end
 
 function template(x::RationalNormAtom, context::Context{T}) where {T}
     v = template(only(x.children), context)
-    d = length(only(x.children))
+    d = length(only(x.children)) + 1
     t = Variable()
     t_obj = template(t, context)
     f = operate(vcat, T, t_obj, v)
