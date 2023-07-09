@@ -47,6 +47,6 @@ function conic_form!(context::Context{T}, e::ExpAtom) where {T}
     x = e.children[1]
     y = Constant(ones(size(x)))
     z = Variable(size(x))
-    add_constraints_to_context(ExpConstraint(x, y, z), context)
+    add_constraint!(context, ExpConstraint(x, y, z))
     return conic_form!(context, z)
 end

@@ -50,7 +50,7 @@ function conic_form!(context::Context, e::EntropyAtom)
     # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
     t = Variable(e.size)
     x = e.children[1]
-    add_constraints_to_context(ExpConstraint(t, x, ones(e.size...)), context)
+    add_constraint!(context, ExpConstraint(t, x, ones(e.size...)))
 
     return conic_form!(context, t)
 end

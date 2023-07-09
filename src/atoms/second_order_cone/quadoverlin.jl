@@ -33,8 +33,8 @@ end
 function conic_form!(context::Context, q::QuadOverLinAtom)
     t = Variable()
     x, y = q.children
-    add_constraints_to_context(SOCConstraint(y + t, y - t, 2 * x), context)
-    add_constraints_to_context(y >= 0, context)
+    add_constraint!(context, SOCConstraint(y + t, y - t, 2 * x))
+    add_constraint!(context, y >= 0)
     return conic_form!(context, t)
 end
 

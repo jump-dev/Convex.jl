@@ -5,9 +5,9 @@ function iscomplex(constr::Constraint)
     return iscomplex(constr.lhs) || iscomplex(constr.rhs)
 end
 
-function add_constraints_to_context(c::Constraint, context::Context)
+function add_constraint!(context::Context, c::Constraint)
     c ∈ keys(context.constr_to_moi_inds) && return
-    return _add_constraints_to_context(c, context)
+    return _add_constraint!(context, c)
 end
 
 ### Linear equality constraint
@@ -49,10 +49,7 @@ function vexity(c::EqConstraint)
     return vex
 end
 
-function _add_constraints_to_context(
-    eq::EqConstraint,
-    context::Context{T},
-) where {T}
+function _add_constraint!(context::Context{T}, eq::EqConstraint) where {T}
     f = conic_form!(context, eq.lhs - eq.rhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 == 0`
@@ -115,10 +112,7 @@ function vexity(c::LtConstraint)
     return vex
 end
 
-function _add_constraints_to_context(
-    lt::LtConstraint,
-    context::Context{T},
-) where {T}
+function _add_constraint!(context::Context{T}, lt::LtConstraint) where {T}
     f = conic_form!(context, lt.rhs - lt.lhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
@@ -186,10 +180,7 @@ function vexity(c::GtConstraint)
     return vex
 end
 
-function _add_constraints_to_context(
-    gt::GtConstraint,
-    context::Context{T},
-) where {T}
+function _add_constraint!(context::Context{T}, gt::GtConstraint) where {T}
     f = conic_form!(context, gt.lhs - gt.rhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`

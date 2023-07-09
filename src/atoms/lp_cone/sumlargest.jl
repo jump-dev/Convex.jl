@@ -54,8 +54,8 @@ function conic_form!(context::Context, x::SumLargestAtom)
     # minimize sum(t) + k*q
     # subject to c <= t + q, t >= 0
     objective = conic_form!(context, sum(t) + x.k * q)
-    add_constraints_to_context(c <= t + q, context)
-    add_constraints_to_context(t >= 0, context)
+    add_constraint!(context, c <= t + q)
+    add_constraint!(context, t >= 0)
     return objective
 end
 

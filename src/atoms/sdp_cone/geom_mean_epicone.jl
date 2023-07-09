@@ -132,9 +132,9 @@ function vexity(constraint::GeomMeanEpiConeConstraint)
     return vex
 end
 
-function _add_constraints_to_context(
-    constraint::GeomMeanEpiConeConstraint,
+function _add_constraint!(
     context::Context,
+    constraint::GeomMeanEpiConeConstraint,
 )
     A = constraint.cone.A
     B = constraint.cone.B
@@ -153,18 +153,12 @@ function _add_constraints_to_context(
     Z = make_temporary()
 
     if t <= 0
-        add_constraints_to_context([T A; A Z] ⪰ 0, context)
-        add_constraints_to_context(
-            Z in GeomMeanHypoCone(A, B, -t, false),
-            context,
-        )
+        add_constraint!(context, [T A; A Z] ⪰ 0)
+        add_constraint!(context, Z in GeomMeanHypoCone(A, B, -t, false))
     else
         @assert t >= 1 # range of t checked in GeomMeanEpiCone constructor
-        add_constraints_to_context([T B; B Z] ⪰ 0, context)
-        add_constraints_to_context(
-            Z in GeomMeanHypoCone(A, B, 2 - t, false),
-            context,
-        )
+        add_constraint!(context, [T B; B Z] ⪰ 0)
+        add_constraint!(context, Z in GeomMeanHypoCone(A, B, 2 - t, false))
     end
     return nothing
 end

@@ -36,7 +36,7 @@ function conic_form!(context::Context{T}, x::LogDetAtom) where {T}
     v = vec_triu(A)
 
     # ensure symmetry
-    add_constraints_to_context(v == vec_tril(A), context)
+    add_constraint!(context, v == vec_tril(A))
 
     # We pass to MOI
     X = conic_form!(context, v)

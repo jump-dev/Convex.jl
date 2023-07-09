@@ -98,18 +98,12 @@ function conic_form!(context::Context, atom::TraceMpower)
     T = make_temporary()
 
     if t >= 0 && t <= 1
-        add_constraints_to_context(
-            T in GeomMeanHypoCone(eye, A, t, false),
-            context,
-        )
+        add_constraint!(context, T in GeomMeanHypoCone(eye, A, t, false))
         # It's already a real mathematically, but need to make it a real type.
         u = real(tr(C * T))
         return conic_form!(context, maximize(u))
     else
-        add_constraints_to_context(
-            T in GeomMeanEpiCone(eye, A, t, false),
-            context,
-        )
+        add_constraint!(context, T in GeomMeanEpiCone(eye, A, t, false))
         # It's already a real mathematically, but need to make it a real type.
         u = real(tr(C * T))
         return conic_form!(context, minimize(u))

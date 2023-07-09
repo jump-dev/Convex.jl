@@ -44,14 +44,11 @@ function conic_form!(context::Context, A::AbsAtom)
 
     if sign(x) == ComplexSign()
         for i in 1:length(vec(t))
-            add_constraints_to_context(
-                t[i] >= norm2([real(x[i]); imag(x[i])]),
-                context,
-            )
+            add_constraint!(context, t[i] >= norm2([real(x[i]); imag(x[i])]))
         end
     else
-        add_constraints_to_context(t >= x, context)
-        add_constraints_to_context(t >= -x, context)
+        add_constraint!(context, t >= x)
+        add_constraint!(context, t >= -x)
     end
     return t_obj
 end

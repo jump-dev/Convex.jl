@@ -50,7 +50,7 @@ function conic_form!(context::Context, e::LogSumExpAtom)
     t = Variable()
     z = sum(exp(e.children[1] - t * ones(size(e.children[1]))))
     objective = conic_form!(context, t)
-    add_constraints_to_context(z <= 1, context)
+    add_constraint!(context, z <= 1)
     return objective
 end
 

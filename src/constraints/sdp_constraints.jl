@@ -29,7 +29,7 @@ function vexity(c::SDPConstraint)
     end
 end
 
-function _add_constraints_to_context(c::SDPConstraint, context::Context)
+function _add_constraint!(context::Context, c::SDPConstraint)
     if vexity(c.child) == ConstVexity()
         x = evaluate(c.child)
         if !(x ≈ transpose(x))
