@@ -462,7 +462,7 @@ end
 
     # Test 281
     A = rand(6, 6)
-    expr = partialtrace(Constant(A), 1, [2, 3])
+    expr = partialtrace(onstant(A), 1, [2, 3])
     if test
         @test size(expr) == size(evaluate(expr))
 
