@@ -2245,7 +2245,7 @@ end
 
     if test
         @test evaluate(λ) ≈ 2.400000051025101 atol = atol rtol = rtol
-        @test evaluate(X) ≈ [3.0000000535867315, -0.4000000018585541] atol =
+        @test evaluate(x) ≈ [3.0000000535867315, -0.4000000018585541] atol =
             atol rtol = rtol
         @test evaluate(A) ≈ [
             2.400000046152515 -9.292770553059881e-9

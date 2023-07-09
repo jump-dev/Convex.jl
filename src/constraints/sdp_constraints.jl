@@ -30,9 +30,19 @@ function vexity(c::SDPConstraint)
 end
 
 function _add_constraints_to_context(c::SDPConstraint, context::Context)
+    if vexity(c.child) == ConstVexity()
+        x = evaluate(c.child)
+        if !(x ≈ transpose(x))
+            error("constant SDP constraint is violated")
+        end
+        if !(evaluate(eigmin(c.child)) ≥ -CONSTANT_CONSTRAINT_TOL[])
+            error("constant SDP constraint is violated")
+        end
+        return nothing
+    end
+
     f = template(c.child, context)
     d = c.size[1]
-    @assert d == sqrt(MOI.output_dimension(f))
     context.constr_to_moi_inds[c] = MOI_add_constraint(
         context.model,
         f,

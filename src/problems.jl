@@ -126,22 +126,14 @@ function minimize(
     constraints::Constraint...;
     numeric_type = Float64,
 )
-    return minimize(
-        convert(AbstractExpr, objective),
-        collect(constraints);
-        numeric_type = numeric_type,
-    )
+    return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function minimize(
     objective::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return minimize(
-        convert(AbstractExpr, objective),
-        constraints;
-        numeric_type = numeric_type,
-    )
+    return satisfy(constraints; numeric_type = numeric_type)
 end
 
 # Allow users to simply type maximize
@@ -164,22 +156,14 @@ function maximize(
     constraints::Constraint...;
     numeric_type = Float64,
 )
-    return maximize(
-        convert(AbstractExpr, objective),
-        collect(constraints);
-        numeric_type = numeric_type,
-    )
+    return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function maximize(
     objective::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return maximize(
-        convert(AbstractExpr, objective),
-        constraints;
-        numeric_type = numeric_type,
-    )
+    return satisfy(constraints; numeric_type = numeric_type)
 end
 
 # Allow users to simply type satisfy (if there is no objective)

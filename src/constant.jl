@@ -41,6 +41,7 @@ struct Constant{T<:Value} <: AbstractExpr
         return Constant(x, check_sign ? _sign(x) : NoSign())
     end
 end
+# Constant(x::Constant) = x
 
 struct ComplexConstant{T<:Value} <: AbstractExpr
     head::Symbol
@@ -52,6 +53,14 @@ struct ComplexConstant{T<:Value} <: AbstractExpr
         size(re) == size(im) || error("size mismatch")
         return new{T}(:complex_constant, rand(UInt64), size(re), re, im)
     end
+
+    # function ComplexConstant(re::Constant{S1}, im::Constant{S2}) where {S1,S2}
+    #     size(re) == size(im) || error("size mismatch")
+    #     re, im = promote(re.value, im.value)
+    #     re = Constant(re)
+    #     im = Constant(im)
+    #     return new{T}(:complex_constant, rand(UInt64), size(re), re, im)
+    # end
 end
 
 AbstractTrees.children(c::ComplexConstant) = tuple()

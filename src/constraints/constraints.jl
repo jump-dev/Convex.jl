@@ -22,8 +22,14 @@ mutable struct EqConstraint <: Constraint
     function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
         if lhs.size == rhs.size || lhs.size == (1, 1)
             sz = rhs.size
+            if lhs.size == (1, 1)
+                lhs = lhs * ones(rhs.size)
+            end
         elseif rhs.size == (1, 1)
             sz = lhs.size
+            if rhs.size == (1, 1)
+                rhs = rhs * ones(lhs.size)
+            end
         else
             error(
                 "Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)",
@@ -82,8 +88,14 @@ mutable struct LtConstraint <: Constraint
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
+                if lhs.size == (1, 1)
+                    lhs = lhs * ones(rhs.size)
+                end
             elseif rhs.size == (1, 1)
                 sz = lhs.size
+                if rhs.size == (1, 1)
+                    rhs = rhs * ones(lhs.size)
+                end
             else
                 error(
                     "Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)",
@@ -147,8 +159,14 @@ mutable struct GtConstraint <: Constraint
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
+                if lhs.size == (1, 1)
+                    lhs = lhs * ones(rhs.size)
+                end
             elseif rhs.size == (1, 1)
                 sz = lhs.size
+                if rhs.size == (1, 1)
+                    rhs = rhs * ones(lhs.size)
+                end
             else
                 error(
                     "Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)",
