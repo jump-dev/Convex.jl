@@ -54,7 +54,7 @@ function conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
         return conic_form!(context, p)
     else
         t = conic_form!(context, Variable())
-        f = operate(vcat, T, t, conic_form!(context, A))
+        f = operate(vcat, T, sign(x), t, conic_form!(context, A))
         m, n = size(A)
         MOI_add_constraint(context.model, f, MOI.NormNuclearCone(m, n))
         return t

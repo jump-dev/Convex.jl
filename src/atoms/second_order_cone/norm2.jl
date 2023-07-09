@@ -42,7 +42,7 @@ function conic_form!(context::Context{T}, A::EucNormAtom) where {T}
 
     t_obj = conic_form!(context, Variable())
 
-    f = operate(vcat, T, t_obj, obj)
+    f = operate(vcat, T, sign(A), t_obj, obj)
     set = MOI.SecondOrderCone(d + 1)
     MOI_add_constraint(context.model, f, set)
 

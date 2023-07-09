@@ -64,7 +64,7 @@ function conic_form!(context::Context{T}, x::HcatAtom) where {T}
     #                 0 0
     # builds the objective by aggregating a list of coefficients for each variable
     # from each child objective, and then vertically concatenating them
-    return operate(vcat, T, objectives...)
+    return operate(vcat, T, sign(x), objectives...)
 end
 # TODO: fix piracy!
 

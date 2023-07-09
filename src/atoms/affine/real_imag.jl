@@ -41,7 +41,7 @@ end
 
 function conic_form!(context::Context{T}, x::RealAtom) where {T}
     obj = conic_form!(context, only(children(x)))
-    return operate(real, T, obj)
+    return operate(real, T, sign(x), obj)
 end
 
 real(x::AbstractExpr) = RealAtom(x)
@@ -82,7 +82,7 @@ end
 
 function conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
     obj = conic_form!(context, only(children(x)))
-    return operate(imag, T, obj)
+    return operate(imag, T, sign(x), obj)
 end
 
 imag(x::AbstractExpr) = ImaginaryAtom(x)

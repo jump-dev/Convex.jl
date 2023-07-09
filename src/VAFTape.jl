@@ -5,8 +5,18 @@
 # but can be more cumbersome / error prone to ensure optimized dispatches are all hit,
 # and because type stability can be an issue.
 
-# fallback
-operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
+function operate(op, ::Type{T}, sign::Sign, args...) where {T}
+    if iscomplex(sign)
+        return complex_operate(op, T, args...)
+    else
+        return real_operate(op, T, args...)
+    end
+end
+
+# fallbacks
+real_operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
+complex_operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
+
 # operate(op::F, ::Type{T}, args...) where {F,T} = (@show(args); op(args...))
 
 struct AffineOperation{M,V}
@@ -95,7 +105,7 @@ function add_operation(tape::VAFTape, op::AffineOperation)
     return VAFTape((op, tape.operations...), tape.variables)
 end
 
-function operate(::typeof(-), ::Type{T}, tape::VAFTape) where {T<:Real}
+function real_operate(::typeof(-), ::Type{T}, tape::VAFTape) where {T<:Real}
     d = MOI.output_dimension(tape)
     return add_operation(tape, AffineOperation(-one(T) * I, zeros(T, d)))
 end
@@ -172,7 +182,7 @@ end
 
 ####
 
-function operate(
+function real_operate(
     ::typeof(-),
     ::Type{T},
     tape::VAFTape,
@@ -181,7 +191,7 @@ function operate(
     return add_operation(tape, AffineOperation(one(T) * I, -v))
 end
 
-function operate(
+function real_operate(
     ::typeof(-),
     ::Type{T},
     v::AbstractVector,
@@ -190,7 +200,7 @@ function operate(
     return add_operation(tape, AffineOperation(-one(T) * I, v))
 end
 
-function operate(
+function real_operate(
     ::typeof(*),
     ::Type{T},
     A::AbstractMatrix,
@@ -199,7 +209,7 @@ function operate(
     return add_operation(tape, AffineOperation(A, zeros(T, size(A, 1))))
 end
 
-function operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T<:Real}
+function real_operate(::typeof(sum), ::Type{T}, tape::VAFTape) where {T<:Real}
     d = MOI.output_dimension(tape)
     A = ones(T, 1, d)
     return add_operation(tape, AffineOperation(A, zeros(T, size(A, 1))))
@@ -207,7 +217,7 @@ end
 
 # we do all pairs of `SparseVAFTape` and `AbstractVector{<:Real}`, and then do 3+ arguments by iterating
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape::VAFTape,
@@ -226,7 +236,7 @@ function operate(
     return VAFTape(tuple(AffineOperation(A, b)), tape.variables)
 end
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     v::AbstractVector{<:Real},
@@ -245,7 +255,7 @@ function operate(
     return VAFTape(tuple(AffineOperation(A, b)), tape.variables)
 end
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     arg1::VAFTapeOrVec,
@@ -254,10 +264,10 @@ function operate(
     args::Vararg{<:VAFTapeOrVec},
 ) where {T<:Real}
     all_args = (arg1, arg2, arg3, args...)
-    return foldl((a, b) -> operate(vcat, T, a, b), all_args)
+    return foldl((a, b) -> real_operate(vcat, T, a, b), all_args)
 end
 
-function operate(
+function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape1::VAFTape,
@@ -285,7 +295,12 @@ function operate(
     return VAFTape(tuple(AffineOperation(A, b)), x)
 end
 
-function operate(::typeof(*), ::Type{T}, x::Real, tape::VAFTape) where {T<:Real}
+function real_operate(
+    ::typeof(*),
+    ::Type{T},
+    x::Real,
+    tape::VAFTape,
+) where {T<:Real}
     d = MOI.output_dimension(tape)
     return add_operation(tape, AffineOperation(T(x) * I, zeros(T, d)))
 end

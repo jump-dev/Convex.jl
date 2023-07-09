@@ -16,6 +16,7 @@ function _add_constraint!(context::Context{T}, c::SOCConstraint) where {T}
     f = operate(
         vcat,
         T,
+        sum(map(sign, c.children)),
         map(child -> conic_form!(context, child), c.children)...,
     )
 
