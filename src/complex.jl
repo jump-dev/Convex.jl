@@ -1,22 +1,22 @@
-struct ComplexTape{T1<:VAFTapes,T2<:VAFTapes}
-    real_tape::T1
-    imag_tape::T2
+struct ComplexTape{T}
+    real_tape::SparseVAFTape{T}
+    imag_tape::SparseVAFTape{T}
 
-    function ComplexTape(re::T1, im::T2) where {T1,T2}
+    function ComplexTape(re::SparseVAFTape{T}, im::SparseVAFTape{T}) where {T}
         MOI.output_dimension(re) == MOI.output_dimension(im) ||
             DimensionMismatch()
-        return new{T1,T2}(re, im)
+        return new{T}(re, im)
     end
 end
 
 MOI.output_dimension(c::ComplexTape) = MOI.output_dimension(c.real_tape) # same value as for imag
 Base.real(c::ComplexTape) = c.real_tape
-Base.real(tape::VAFTapes) = tape
+Base.real(tape::SparseVAFTape) = tape
 Base.imag(c::ComplexTape) = c.imag_tape
 
 const ComplexTapeOrVec =
-    Union{<:ComplexTape,<:ComplexStructOfVec,<:VAFTapes,<:AbstractVector}
-const TapeOrVec = Union{<:VAFTapes,<:AbstractVector}
+    Union{<:ComplexTape,<:ComplexStructOfVec,<:SparseVAFTape,<:AbstractVector}
+const TapeOrVec = Union{<:SparseVAFTape,<:AbstractVector}
 
 # this is pretty ugly...
 function complex_operate(
@@ -25,7 +25,7 @@ function complex_operate(
     args::ComplexTapeOrVec...,
 ) where {T}
     re = real_operate(+, T, (real(a) for a in args)...)
-    # `imag` not defined for VAFTapes
+    # `imag` not defined for SparseVAFTape
     imag_parts =
         (imag(a) for a in args if a isa ComplexTape || a isa ComplexStructOfVec)
     if isempty(imag_parts)
@@ -45,7 +45,11 @@ function complex_operate(::typeof(conj), ::Type{T}, c::ComplexTape) where {T}
     return ComplexTape(real(c), im)
 end
 
-function complex_operate(::typeof(conj), ::Type{T}, tape::VAFTapes) where {T}
+function complex_operate(
+    ::typeof(conj),
+    ::Type{T},
+    tape::SparseVAFTape,
+) where {T}
     return tape
 end
 
@@ -53,7 +57,11 @@ function complex_operate(::typeof(real), ::Type{T}, c::ComplexTape) where {T}
     return real(c)
 end
 
-function complex_operate(::typeof(real), ::Type{T}, tape::VAFTapes) where {T}
+function complex_operate(
+    ::typeof(real),
+    ::Type{T},
+    tape::SparseVAFTape,
+) where {T}
     return tape
 end
 
@@ -106,7 +114,7 @@ function complex_operate(
     ::typeof(*),
     ::Type{T},
     z::ComplexValue,
-    tape::VAFTapes,
+    tape::SparseVAFTape,
 ) where {T}
     tape = collapse(tape)
     re = real_operate(*, T, real(z), tape)
