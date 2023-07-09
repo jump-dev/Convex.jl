@@ -47,7 +47,7 @@ function conic_form!(context::Context, x::HuberAtom)
 
     # objective given by s.^2 + 2 * M * |n|
     objective = conic_form!(context, square(s) + 2 * x.M * abs(n))
-    add_constraints_to_context(c == s + n, context)
+    add_constraint!(context, c == s + n)
     return objective
 end
 

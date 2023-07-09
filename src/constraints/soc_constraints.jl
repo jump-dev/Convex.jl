@@ -12,10 +12,7 @@ mutable struct SOCConstraint <: Constraint
     end
 end
 
-function _add_constraints_to_context(
-    c::SOCConstraint,
-    context::Context{T},
-) where {T}
+function _add_constraint!(context::Context{T}, c::SOCConstraint) where {T}
     f = operate(
         vcat,
         T,

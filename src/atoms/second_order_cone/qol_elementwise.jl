@@ -40,12 +40,12 @@ function conic_form!(context::Context{T}, q::QolElemAtom) where {T}
     x, y = q.children
 
     for i in 1:length(q.children[1])
-        add_constraints_to_context(
-            SOCConstraint(y[i] + t[i], y[i] - t[i], 2 * x[i]),
+        add_constraint!(
             context,
+            SOCConstraint(y[i] + t[i], y[i] - t[i], 2 * x[i]),
         )
     end
-    add_constraints_to_context(y >= 0, context)
+    add_constraint!(context, y >= 0)
     return t_obj
 end
 

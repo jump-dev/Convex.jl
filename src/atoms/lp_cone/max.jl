@@ -68,7 +68,7 @@ end
 function conic_form!(context::Context, x::MaxAtom)
     t = Variable(x.size)
     for child in children(x)
-        add_constraints_to_context(t >= child, context)
+        add_constraint!(context, t >= child)
     end
     return conic_form!(context, t)
 end

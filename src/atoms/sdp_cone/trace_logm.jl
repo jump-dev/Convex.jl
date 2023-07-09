@@ -109,10 +109,7 @@ function conic_form!(context::Context, atom::TraceLogm)
     else
         τ = Variable(size(X))
     end
-    add_constraints_to_context(
-        τ in RelativeEntropyEpiCone(eye, X, m, k),
-        context,
-    )
+    add_constraint!(context, τ in RelativeEntropyEpiCone(eye, X, m, k))
 
     # It's already a real mathematically, but need to make it a real type.
     t = real(-tr(C * τ))

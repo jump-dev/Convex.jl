@@ -216,13 +216,13 @@ function conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     eye = Matrix(1.0 * I, n, n)
     e = vec(eye)
 
-    add_constraints_to_context(A ⪰ 0, context)
-    add_constraints_to_context(B ⪰ 0, context)
+    add_constraint!(context, A ⪰ 0)
+    add_constraint!(context, B ⪰ 0)
 
     τ = Variable()
-    add_constraints_to_context(
-        τ in RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
+    add_constraint!(
         context,
+        τ in RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
     )
 
     return conic_form!(context, minimize(τ))
@@ -236,10 +236,10 @@ function conic_form!(context::Context, atom::QuantumRelativeEntropy2)
     m = atom.m
     k = atom.k
 
-    add_constraints_to_context(A ⪰ 0, context)
+    add_constraint!(context, A ⪰ 0)
 
     if length(K) > 0
-        add_constraints_to_context(K * A * K' == 0, context)
+        add_constraint!(context, K * A * K' == 0)
         Ap = J * A * J'
         Bp = Hermitian(J * B * J')
         τ = -quantum_entropy(Ap, m, k) - real(tr(Ap * log(Bp)))

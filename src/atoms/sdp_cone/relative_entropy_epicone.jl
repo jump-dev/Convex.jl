@@ -153,9 +153,9 @@ function glquad(m)
     return s, w
 end
 
-function _add_constraints_to_context(
-    constraint::RelativeEntropyEpiConeConstraint,
+function _add_constraint!(
     context::Context,
+    constraint::RelativeEntropyEpiConeConstraint,
 )
     X = constraint.cone.X
     Y = constraint.cone.Y
@@ -180,26 +180,23 @@ function _add_constraints_to_context(
         T = [Variable(r, r) for i in 1:m]
     end
 
-    add_constraints_to_context(
-        Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false),
-        context,
-    )
+    add_constraint!(context, Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false))
 
     for ii in 1:m
         # Note that we are dividing by w here because it is easier
         # to do this than to do sum w_i T(:,...,:,ii) later (cf. line that
         # involves τ)
 
-        add_constraints_to_context(
+        add_constraint!(
+            context,
             [
                 e'*X*e-s[ii]*T[ii]/w[ii] e'*X
                 X*e (1-s[ii])*X+s[ii]*Z
             ] ⪰ 0,
-            context,
         )
     end
 
-    add_constraints_to_context((2^k) * sum(T) + τ ⪰ 0, context)
+    add_constraint!(context, (2^k) * sum(T) + τ ⪰ 0)
 
     return nothing
 end

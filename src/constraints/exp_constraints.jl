@@ -43,10 +43,7 @@ function vexity(c::ExpConstraint)
     return ConvexVexity()
 end
 
-function _add_constraints_to_context(
-    c::ExpConstraint,
-    context::Context{T},
-) where {T}
+function _add_constraint!(context::Context{T}, c::ExpConstraint) where {T}
     x, y, z = c.children
     t = a -> conic_form!(context, a)
     inds = [

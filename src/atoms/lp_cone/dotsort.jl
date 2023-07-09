@@ -70,7 +70,7 @@ function conic_form!(context::Context{T}, x::DotSortAtom) where {T}
     # given by the solution to
     # minimize sum(mu) + sum(nu)
     # subject to y*w' <= onesvec*nu' + mu*onesvec'
-    add_constraints_to_context(y * w' <= onesvec * nu' + mu * onesvec', context)
+    add_constraint!(context, y * w' <= onesvec * nu' + mu * onesvec')
     objective = conic_form!(context, sum(mu) + sum(nu))
     return objective
 end

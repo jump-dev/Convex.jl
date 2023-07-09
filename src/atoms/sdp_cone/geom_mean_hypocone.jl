@@ -139,9 +139,9 @@ function vexity(constraint::GeomMeanHypoConeConstraint)
     return vex
 end
 
-function _add_constraints_to_context(
-    constraint::GeomMeanHypoConeConstraint,
+function _add_constraint!(
     context::Context,
+    constraint::GeomMeanHypoConeConstraint,
 )
     A = constraint.cone.A
     B = constraint.cone.B
@@ -161,74 +161,65 @@ function _add_constraints_to_context(
 
     if fullhyp && t != 0 && t != 1
         W = make_temporary()
-        add_constraints_to_context(
-            W in GeomMeanHypoCone(A, B, t, false),
-            context,
-        )
-        add_constraints_to_context(W ⪰ T, context)
+        add_constraint!(context, W in GeomMeanHypoCone(A, B, t, false))
+        add_constraint!(context, W ⪰ T)
     else
         p = t.num
         q = t.den
 
         if t == 0
             #println("geom_mean_hypocone p=$p q=$q t==0")
-            add_constraints_to_context(A ⪰ 0, context)
-            add_constraints_to_context(B ⪰ 0, context)
-            add_constraints_to_context(A ⪰ T, context)
+            add_constraint!(context, A ⪰ 0)
+            add_constraint!(context, B ⪰ 0)
+            add_constraint!(context, A ⪰ T)
         elseif t == 1
             #println("geom_mean_hypocone p=$p q=$q t==1")
-            add_constraints_to_context(A ⪰ 0, context)
-            add_constraints_to_context(B ⪰ 0, context)
-            add_constraints_to_context(B ⪰ T, context)
+            add_constraint!(context, A ⪰ 0)
+            add_constraint!(context, B ⪰ 0)
+            add_constraint!(context, B ⪰ T)
         elseif t == 1 // 2
             #println("geom_mean_hypocone p=$p q=$q t==1/2")
-            add_constraints_to_context([A T; T' B] ⪰ 0, context)
+            add_constraint!(context, [A T; T' B] ⪰ 0)
         elseif ispow2(q)
             #println("geom_mean_hypocone p=$p q=$q ispow2(q)")
             Z = make_temporary()
             if t < 1 / 2
-                add_constraints_to_context(
+                add_constraint!(
+                    context,
                     Z in GeomMeanHypoCone(A, B, 2 * t, false),
-                    context,
                 )
-                add_constraints_to_context([A T; T' Z] ⪰ 0, context)
+                add_constraint!(context, [A T; T' Z] ⪰ 0)
             else
-                add_constraints_to_context(
-                    Z in GeomMeanHypoCone(A, B, 2 * t - 1, false),
+                add_constraint!(
                     context,
+                    Z in GeomMeanHypoCone(A, B, 2 * t - 1, false),
                 )
-                add_constraints_to_context([B T; T' Z] ⪰ 0, context)
+                add_constraint!(context, [B T; T' Z] ⪰ 0)
             end
         elseif ispow2(p) && t > 1 // 2
             #println("geom_mean_hypocone p=$p q=$q ispow2(p) && t>1/2")
             Z = make_temporary()
-            add_constraints_to_context(
-                Z in GeomMeanHypoCone(A, T, (2 * p - q) // p, false),
+            add_constraint!(
                 context,
+                Z in GeomMeanHypoCone(A, T, (2 * p - q) // p, false),
             )
-            add_constraints_to_context([Z T; T B] ⪰ 0, context)
+            add_constraint!(context, [Z T; T B] ⪰ 0)
         elseif t < 1 / 2
             #println("geom_mean_hypocone p=$p q=$q t<1/2")
             X = make_temporary()
             # Decompose t = (p/2^l) * (2^l/q) where l=floor(log2(q))
             l = floor(Int, log2(q))
-            add_constraints_to_context(
+            add_constraint!(
+                context,
                 X in GeomMeanHypoCone(A, B, p // (2^l), false),
-                context,
             )
-            add_constraints_to_context(
-                T in GeomMeanHypoCone(A, X, (2^l) // q, false),
+            add_constraint!(
                 context,
+                T in GeomMeanHypoCone(A, X, (2^l) // q, false),
             )
         else
             #println("geom_mean_hypocone p=$p q=$q else")
-            add_constraints_to_context(
-                T in GeomMeanHypoCone(B, A, 1 - t, false),
-                context,
-            )
+            add_constraint!(context, T in GeomMeanHypoCone(B, A, 1 - t, false))
         end
-
-        #add_constraints_to_context(context, constraint, ConicConstr([A,B,T], :geom_mean_hypocone, [size(A), size(B), size(T)]))
-        #add_constraints_to_context(context, add_constraints_to_context(T, context))
     end
 end

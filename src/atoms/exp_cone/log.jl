@@ -48,6 +48,6 @@ function conic_form!(context::Context, e::LogAtom)
     y = Constant(ones(size(z)))
     x = Variable(size(z))
     objective = conic_form!(context, x)
-    add_constraints_to_context(ExpConstraint(x, y, z), context)
+    add_constraint!(context, ExpConstraint(x, y, z))
     return objective
 end

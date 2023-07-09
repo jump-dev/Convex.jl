@@ -89,7 +89,7 @@ monotonicity(p::Problem) = monotonicity(p.objective)
 
 function conic_form!(context::Context, p::Problem)
     for c in p.constraints
-        add_constraints_to_context(c, context)
+        add_constraint!(context, c)
     end
     if p.head !== :satisfy
         return conic_form!(context, p.objective)

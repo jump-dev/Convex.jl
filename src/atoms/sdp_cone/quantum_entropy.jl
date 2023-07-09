@@ -77,7 +77,7 @@ function conic_form!(context::Context, atom::QuantumEntropy)
     n = size(X)[1]
     eye = Matrix(1.0 * I, n, n)
 
-    add_constraints_to_context(X ⪰ 0, context)
+    add_constraint!(context, X ⪰ 0)
 
     is_complex = sign(X) == ComplexSign()
     if is_complex
@@ -85,10 +85,7 @@ function conic_form!(context::Context, atom::QuantumEntropy)
     else
         τ = Variable(n, n)
     end
-    add_constraints_to_context(
-        τ in RelativeEntropyEpiCone(X, eye, m, k),
-        context,
-    )
+    add_constraint!(context, τ in RelativeEntropyEpiCone(X, eye, m, k))
 
     # It's already a real mathematically, but need to make it a real type.
     τ = real(-tr(τ))

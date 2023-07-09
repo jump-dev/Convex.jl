@@ -14,9 +14,9 @@ function _template(a::AbstractVariable, context::Context{T}) where {T}
     # and after `var_id_to_moi_indices` is populated
     if first_cache
         if sign(a) == Positive()
-            add_constraints_to_context(a >= 0, context)
+            add_constraint!(context, a >= 0)
         elseif sign(a) == Negative()
-            add_constraints_to_context(a <= 0, context)
+            add_constraint!(context, a <= 0)
         end
 
         if vartype(a) == BinVar
@@ -34,7 +34,7 @@ function _template(a::AbstractVariable, context::Context{T}) where {T}
         end
 
         for constraint in constraints(a)
-            add_constraints_to_context(constraint, context)
+            add_constraint!(context, constraint)
         end
     end
     return MOI.VectorOfVariables(var_inds)
@@ -71,7 +71,7 @@ function conic_form!(context::Context, c::ComplexVariable)
     re = conic_form!(context, c.real_var)
     im = conic_form!(context, c.imag_var)
     for constraint in constraints(c)
-        add_constraints_to_context(constraint, context)
+        add_constraint!(context, constraint)
     end
     return ComplexTape(re, im)
 end
