@@ -195,7 +195,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test p.optval === nothing
         @test evaluate(sum(neg(x))) ≈ 6 atol = atol rtol = rtol
     end
 end

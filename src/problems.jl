@@ -43,7 +43,13 @@ end
 dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
 primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
 termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
-objective_value(p::Problem) = MOI.get(p.model, MOI.ObjectiveValue())
+function objective_value(p::Problem)
+    # These don't have an objective value, and it would be confusing to return one
+    if p.head === :satisfy
+        return nothing
+    end
+    return MOI.get(p.model, MOI.ObjectiveValue())
+end
 
 Problem(args...) = Problem{Float64}(args...)
 
