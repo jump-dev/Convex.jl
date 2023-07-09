@@ -57,7 +57,7 @@ function evaluate(x::DotSortAtom)
     )
 end
 
-function template(x::DotSortAtom, context::Context{T}) where {T}
+function conic_form!(x::DotSortAtom, context::Context{T}) where {T}
     y = only(x.children)
     w = x.w
     sy = size(y)
@@ -71,7 +71,7 @@ function template(x::DotSortAtom, context::Context{T}) where {T}
     # minimize sum(mu) + sum(nu)
     # subject to y*w' <= onesvec*nu' + mu*onesvec'
     add_constraints_to_context(y * w' <= onesvec * nu' + mu * onesvec', context)
-    objective = template(sum(mu) + sum(nu), context)
+    objective = conic_form!(sum(mu) + sum(nu), context)
     return objective
 end
 

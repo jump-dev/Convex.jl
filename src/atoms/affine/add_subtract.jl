@@ -39,8 +39,8 @@ end
 -(x::AbstractExpr) = NegateAtom(x)
 -(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
-function template(A::NegateAtom, context::Context{T}) where {T}
-    subobj = template(only(children(A)), context)
+function conic_form!(A::NegateAtom, context::Context{T}) where {T}
+    subobj = conic_form!(only(children(A)), context)
     if subobj isa Value
         return -subobj
     else
@@ -109,8 +109,8 @@ function evaluate(x::AdditionAtom)
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
-function template(x::AdditionAtom, context::Context{T}) where {T}
-    obj = operate(+, T, (template(c, context) for c in children(x))...)
+function conic_form!(x::AdditionAtom, context::Context{T}) where {T}
+    obj = operate(+, T, (conic_form!(c, context) for c in children(x))...)
     return obj
 end
 

@@ -79,10 +79,10 @@ end
 Base.real(c::ComplexStructOfVec) = c.real_vec
 Base.imag(c::ComplexStructOfVec) = c.imag_vec
 
-function template(C::ComplexConstant, context::Context)
+function conic_form!(C::ComplexConstant, context::Context)
     return ComplexStructOfVec(
-        template(C.real_constant, context),
-        template(C.imag_constant, context),
+        conic_form!(C.real_constant, context),
+        conic_form!(C.imag_constant, context),
     )
 end
 
@@ -117,7 +117,7 @@ sign(x::Constant) = x.sign
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
 length(x::Constant) = length(x.value)
 
-function template(C::Constant, ::Context{T}) where {T}
+function conic_form!(C::Constant, ::Context{T}) where {T}
     # this should happen at `Constant` creation?
     # No, we don't have access to `T` yet; that's problem-specific
     if eltype(C.value) != T

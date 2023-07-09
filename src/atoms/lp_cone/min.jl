@@ -65,12 +65,12 @@ function evaluate(x::MinAtom)
     return min.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-function template(x::MinAtom, context::Context)
+function conic_form!(x::MinAtom, context::Context)
     t = Variable(x.size[1], x.size[2])
     for child in x.children
         add_constraints_to_context(t <= child, context)
     end
-    return template(t, context)
+    return conic_form!(t, context)
 end
 
 min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)

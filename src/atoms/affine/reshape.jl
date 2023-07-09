@@ -34,8 +34,8 @@ function evaluate(x::ReshapeAtom)
     return reshape(val, x.size[1], x.size[2])
 end
 
-function template(A::ReshapeAtom, context::Context)
-    return template(only(children(A)), context)
+function conic_form!(A::ReshapeAtom, context::Context)
+    return conic_form!(only(children(A)), context)
 end
 
 Base.reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)

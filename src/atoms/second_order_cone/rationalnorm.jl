@@ -44,11 +44,11 @@ function evaluate(x::RationalNormAtom)
     return sum(abs.(evaluate(x.children[1])) .^ x.k)^(1 / x.k)
 end
 
-function template(x::RationalNormAtom, context::Context{T}) where {T}
-    v = template(only(x.children), context)
+function conic_form!(x::RationalNormAtom, context::Context{T}) where {T}
+    v = conic_form!(only(x.children), context)
     d = length(only(x.children)) + 1
     t = Variable()
-    t_obj = template(t, context)
+    t_obj = conic_form!(t, context)
     f = operate(vcat, T, t_obj, v)
     MOI_add_constraint(context.model, f, MOI.NormCone(Float64(x.k), d))
     return t_obj

@@ -207,7 +207,7 @@ function quantum_relative_entropy(
     return real(tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function template(atom::QuantumRelativeEntropy1, context::Context)
+function conic_form!(atom::QuantumRelativeEntropy1, context::Context)
     A = atom.children[1]
     B = atom.children[2]
     m = atom.m
@@ -225,10 +225,10 @@ function template(atom::QuantumRelativeEntropy1, context::Context)
         context,
     )
 
-    return template(minimize(τ), context)
+    return conic_form!(minimize(τ), context)
 end
 
-function template(atom::QuantumRelativeEntropy2, context::Context)
+function conic_form!(atom::QuantumRelativeEntropy2, context::Context)
     A = atom.children[1]
     B = atom.B
     J = atom.J
@@ -247,5 +247,5 @@ function template(atom::QuantumRelativeEntropy2, context::Context)
         τ = -quantum_entropy(A, m, k) - real(tr(A * log(B)))
     end
 
-    return template(minimize(τ), context)
+    return conic_form!(minimize(τ), context)
 end

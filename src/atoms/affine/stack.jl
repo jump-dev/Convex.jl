@@ -38,8 +38,8 @@ function evaluate(x::HcatAtom)
     return hcat(map(evaluate, x.children)...)
 end
 
-function template(x::HcatAtom, context::Context{T}) where {T}
-    objectives = template.(children(x), Ref(context))
+function conic_form!(x::HcatAtom, context::Context{T}) where {T}
+    objectives = conic_form!.(children(x), Ref(context))
     # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
     #  e1: x => 1 2 3
     #           4 5 6

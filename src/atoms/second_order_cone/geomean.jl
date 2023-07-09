@@ -36,7 +36,7 @@ function evaluate(q::GeoMeanAtom)
     return prod.(evaluate.(q.children)) .^ Ref(1 / n)
 end
 
-function template(q::GeoMeanAtom, context::Context{T}) where {T}
+function conic_form!(q::GeoMeanAtom, context::Context{T}) where {T}
     n = length(q.children)
     x = first(q.children)
     t = Variable(size(x))
@@ -44,12 +44,12 @@ function template(q::GeoMeanAtom, context::Context{T}) where {T}
         f = operate(
             vcat,
             T,
-            template(t[i, j], context),
-            (template(y[i, j], context) for y in q.children)...,
+            conic_form!(t[i, j], context),
+            (conic_form!(y[i, j], context) for y in q.children)...,
         )
         MOI_add_constraint(context.model, f, MOI.GeometricMeanCone(n + 1))
     end
-    return template(t, context)
+    return conic_form!(t, context)
 end
 
 geomean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)

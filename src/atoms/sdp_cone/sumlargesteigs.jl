@@ -54,7 +54,7 @@ end
 #            Z + sI ⪰ A
 # See Ben-Tal and Nemirovski, "Lectures on Modern Convex Optimization"
 # Example 18.c
-function template(x::SumLargestEigs, context::Context{T}) where {T}
+function conic_form!(x::SumLargestEigs, context::Context{T}) where {T}
     A = x.children[1]
     k = x.children[2]
     m, n = size(A)
@@ -73,5 +73,5 @@ function template(x::SumLargestEigs, context::Context{T}) where {T}
         A ⪰ 0,
         Z ⪰ 0,
     )
-    return template(p, context)
+    return conic_form!(p, context)
 end

@@ -70,7 +70,7 @@ function quantum_entropy(X::MatrixOrConstant, m::Integer = 0, k::Integer = 0)
     return -quantum_relative_entropy(X, Matrix(1.0 * I, size(X)))
 end
 
-function template(atom::QuantumEntropy, context::Context)
+function conic_form!(atom::QuantumEntropy, context::Context)
     X = atom.children[1]
     m = atom.m
     k = atom.k
@@ -92,5 +92,5 @@ function template(atom::QuantumEntropy, context::Context)
 
     # It's already a real mathematically, but need to make it a real type.
     τ = real(-tr(τ))
-    return template(minimize(τ), context)
+    return conic_form!(minimize(τ), context)
 end

@@ -38,8 +38,8 @@ function evaluate(x::SumAtom)
     return sum(evaluate(x.children[1]))
 end
 
-function template(A::SumAtom, context::Context{T}) where {T}
-    subobj = template(only(children(A)), context)
+function conic_form!(A::SumAtom, context::Context{T}) where {T}
+    subobj = conic_form!(only(children(A)), context)
     obj = operate(sum, T, subobj)
     return obj
 end

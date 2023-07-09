@@ -42,11 +42,11 @@ end
 
 exp(x::AbstractExpr) = ExpAtom(x)
 
-function template(e::ExpAtom, context::Context{T}) where {T}
+function conic_form!(e::ExpAtom, context::Context{T}) where {T}
     # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
     x = e.children[1]
     y = Constant(ones(size(x)))
     z = Variable(size(x))
     add_constraints_to_context(ExpConstraint(x, y, z), context)
-    return template(z, context)
+    return conic_form!(z, context)
 end

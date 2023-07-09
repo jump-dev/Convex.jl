@@ -57,19 +57,19 @@ function to_tape(v::MOI.VectorOfVariables, context::Context{T}) where {T}
 end
 
 # get the usual tape
-function template(a::AbstractVariable, context::Context)
+function conic_form!(a::AbstractVariable, context::Context)
     if vexity(a) == ConstVexity()
-        return template(constant(evaluate(a)), context)
+        return conic_form!(constant(evaluate(a)), context)
     end
     return to_tape(_template(a, context), context)
 end
 
-function template(c::ComplexVariable, context::Context)
+function conic_form!(c::ComplexVariable, context::Context)
     if vexity(c) == ConstVexity()
-        return template(constant(evaluate(c)), context)
+        return conic_form!(constant(evaluate(c)), context)
     end
-    re = template(c.real_var, context)
-    im = template(c.imag_var, context)
+    re = conic_form!(c.real_var, context)
+    im = conic_form!(c.imag_var, context)
     for constraint in constraints(c)
         add_constraints_to_context(constraint, context)
     end

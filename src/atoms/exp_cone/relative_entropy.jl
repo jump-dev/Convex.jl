@@ -51,11 +51,11 @@ function evaluate(e::RelativeEntropyAtom)
     return sum(out)
 end
 
-function template(e::RelativeEntropyAtom, context::Context{T}) where {T}
+function conic_form!(e::RelativeEntropyAtom, context::Context{T}) where {T}
     # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
-    w = template(e.children[1], context)
-    v = template(e.children[2], context)
-    u = template(Variable(), context)
+    w = conic_form!(e.children[1], context)
+    v = conic_form!(e.children[2], context)
+    u = conic_form!(Variable(), context)
     f = operate(vcat, T, u, v, w)
     d = MOI.output_dimension(w)
     @assert d == MOI.output_dimension(v)

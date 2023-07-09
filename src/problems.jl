@@ -87,12 +87,12 @@ end
 sign(p::Problem) = sign(p.objective)
 monotonicity(p::Problem) = monotonicity(p.objective)
 
-function template(p::Problem, context::Context)
+function conic_form!(p::Problem, context::Context)
     for c in p.constraints
         add_constraints_to_context(c, context)
     end
     if p.head !== :satisfy
-        return template(p.objective, context)
+        return conic_form!(p.objective, context)
     else
         return nothing
     end
