@@ -1,4 +1,6 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
+
+# TODO- tighten this
 const CONSTANT_CONSTRAINT_TOL = Ref(1e-2)
 
 function iscomplex(constr::Constraint)
@@ -53,11 +55,11 @@ function _add_constraint!(context::Context{T}, eq::EqConstraint) where {T}
     f = conic_form!(context, eq.lhs - eq.rhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 == 0`
-        if all(abs.(f) .<= CONSTANT_CONSTRAINT_TOL[])
-            return nothing
-        else
-            error("Constant constraint is violated")
+        if !all(abs.(f) .<= CONSTANT_CONSTRAINT_TOL[])
+            @warn "Constant constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
+        return nothing
     end
     context.constr_to_moi_inds[eq] =
         MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
@@ -116,11 +118,11 @@ function _add_constraint!(context::Context{T}, lt::LtConstraint) where {T}
     f = conic_form!(context, lt.rhs - lt.lhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
-        if all(f .<= CONSTANT_CONSTRAINT_TOL[])
-            return nothing
-        else
-            error("Constant constraint is violated")
+        if !all(f .<= CONSTANT_CONSTRAINT_TOL[])
+            @warn "Constant constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
+        return nothing
     end
     context.constr_to_moi_inds[lt] = MOI_add_constraint(
         context.model,
@@ -184,11 +186,11 @@ function _add_constraint!(context::Context{T}, gt::GtConstraint) where {T}
     f = conic_form!(context, gt.lhs - gt.rhs)
     if f isa AbstractVector
         # a trivial constraint without variables like `5 >= 0`
-        if all(f .>= -CONSTANT_CONSTRAINT_TOL[])
-            return nothing
-        else
-            error("Constant constraint is violated")
+        if !all(f .>= -CONSTANT_CONSTRAINT_TOL[])
+            @warn "Constant constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
+        return nothing
     end
     context.constr_to_moi_inds[gt] = MOI_add_constraint(
         context.model,

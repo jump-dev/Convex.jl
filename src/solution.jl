@@ -60,10 +60,15 @@ function solve!(
         MOI.set(model, MOI.Silent(), true)
     end
 
-    MOI.optimize!(model)
+    if context.detected_infeasible_during_formulation[]
+        p.status = MOI.INFEASIBLE
+    else
+        MOI.optimize!(model)
+        status = MOI.get(model, MOI.TerminationStatus())
+        p.status = status
+    end
+
     p.model = model
-    status = MOI.get(model, MOI.TerminationStatus())
-    p.status = status
 
     if p.status != MOI.OPTIMAL
         @warn "Problem wasn't solved optimally" status
