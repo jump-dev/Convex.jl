@@ -145,6 +145,14 @@ function real_operate(
     end
 end
 
+function real_operate(
+    ::typeof(+),
+    ::Type{T},
+    args::AbstractVector{<:Real}...,
+) where {T<:Real}
+    return sum(args)
+end
+
 function real_operate(::typeof(+), ::Type{T}, tapes::VAFTape...) where {T<:Real}
     ops = AffineOperation.(tapes)
     if all(op -> op.matrix isa UniformScaling, ops)

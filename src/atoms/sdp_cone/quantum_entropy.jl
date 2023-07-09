@@ -70,30 +70,27 @@ function quantum_entropy(X::MatrixOrConstant, m::Integer = 0, k::Integer = 0)
     return -quantum_relative_entropy(X, Matrix(1.0 * I, size(X)))
 end
 
-function conic_form!(atom::QuantumEntropy, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, atom)
-        X = atom.children[1]
-        m = atom.m
-        k = atom.k
-        n = size(X)[1]
-        eye = Matrix(1.0 * I, n, n)
+function template(atom::QuantumEntropy, context::Context)
+    X = atom.children[1]
+    m = atom.m
+    k = atom.k
+    n = size(X)[1]
+    eye = Matrix(1.0 * I, n, n)
 
-        conic_form!(X ⪰ 0, unique_conic_forms)
+    add_constraints_to_context(X ⪰ 0, context)
 
-        is_complex = sign(X) == ComplexSign()
-        if is_complex
-            τ = ComplexVariable(n, n)
-        else
-            τ = Variable(n, n)
-        end
-        conic_form!(
-            τ in RelativeEntropyEpiCone(X, eye, m, k),
-            unique_conic_forms,
-        )
-
-        # It's already a real mathematically, but need to make it a real type.
-        τ = real(-tr(τ))
-        cache_conic_form!(unique_conic_forms, atom, minimize(τ))
+    is_complex = sign(X) == ComplexSign()
+    if is_complex
+        τ = ComplexVariable(n, n)
+    else
+        τ = Variable(n, n)
     end
-    return get_conic_form(unique_conic_forms, atom)
+    add_constraints_to_context(
+        τ in RelativeEntropyEpiCone(X, eye, m, k),
+        context,
+    )
+
+    # It's already a real mathematically, but need to make it a real type.
+    τ = real(-tr(τ))
+    return template(minimize(τ), context)
 end

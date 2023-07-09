@@ -65,7 +65,7 @@ function evaluate(x::MinAtom)
     return min.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-function conic_form!(x::MinAtom, context::UniqueConicForms)
+function template(x::MinAtom, context::Context)
     t = Variable(x.size[1], x.size[2])
     for child in x.children
         add_constraints_to_context(t <= child, context)

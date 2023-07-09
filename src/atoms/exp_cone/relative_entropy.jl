@@ -51,36 +51,16 @@ function evaluate(e::RelativeEntropyAtom)
     return sum(out)
 end
 
-function conic_form!(
-    e::RelativeEntropyAtom,
-    unique_conic_forms::UniqueConicForms,
-)
-    if !has_conic_form(unique_conic_forms, e)
-        # transform to conic form:
-        # x log x/y <= z
-        # x log y/x >= -z
-        # log y/x >= -z/x
-        # y/x >= exp(-z/x)
-        # y >= x exp(-z/x)
-        # and cf the standard form for the exponential cone {(x,y,z): y*exp(x/y) <= z}
-        z = Variable(e.size)
-        x = e.children[1]
-        y = e.children[2]
-        objective = conic_form!(z, unique_conic_forms)
-        for i in 1:size(x, 1)
-            for j in 1:size(x, 2)
-                conic_form!(
-                    ExpConstraint(-z[i, j], x[i, j], y[i, j]),
-                    unique_conic_forms,
-                )
-            end
-        end
-        # need to constrain x>=0 and y>0.
-        # x>=0 we get for free from the form of the exponential cone, so just add
-        conic_form!(y >= 0, unique_conic_forms) # nb we don't know how to ask for strict inequality
-        cache_conic_form!(unique_conic_forms, e, objective)
-    end
-    return get_conic_form(unique_conic_forms, e)
+function template(e::RelativeEntropyAtom, context::Context{T}) where {T}
+    # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
+    w = template(e.children[1], context)
+    v = template(e.children[2], context)
+    u = template(Variable(), context)
+    f = operate(vcat, T, u, v, w)
+    d = MOI.output_dimension(w)
+    @assert d == MOI.output_dimension(v)
+    MOI_add_constraint(context.model, f, MOI.RelativeEntropyCone(2d + 1))
+    return u
 end
 
 function test(optimizer)
@@ -142,18 +122,6 @@ function test(optimizer)
     obj_val = MOI.get(model, MOI.ObjectiveValue())
     u_val = MOI.get(model, MOI.VariablePrimal(), u)
     return obj_val, u_val
-end
-
-function template(e::RelativeEntropyAtom, context::Context{T}) where {T}
-    # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
-    w = template(e.children[1], context)
-    v = template(e.children[2], context)
-    u = template(Variable(), context)
-    f = operate(vcat, T, u, v, w)
-    d = MOI.output_dimension(w)
-    @assert d == MOI.output_dimension(v)
-    MOI_add_constraint(context.model, f, MOI.RelativeEntropyCone(2d + 1))
-    return u
 end
 
 relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)

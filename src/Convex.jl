@@ -27,13 +27,7 @@ export log_perspective,
 export partialtrace,
     partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
 export relative_entropy,
-    scaledgeomean,
-    sigmamax,
-    square,
-    sumlargest,
-    sumlargesteigs,
-    sumsmallest,
-    sumsquares
+    sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
 export GeomMeanHypoCone,
     GeomMeanEpiCone,
     RelativeEntropyEpiCone,
@@ -137,9 +131,7 @@ include("Context.jl")
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
-# need to define `Variable` before `UniqueConicForms`
 include("variable.jl")
-include("conic_form.jl")
 include("variable_template.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
@@ -191,7 +183,6 @@ include("atoms/second_order_cone/quadoverlin.jl")
 include("atoms/second_order_cone/qol_elementwise.jl")
 include("atoms/second_order_cone/geomean.jl")
 include("atoms/second_order_cone/quadform.jl")
-include("atoms/second_order_cone/power_to_socp.jl")
 include("atoms/second_order_cone/rationalnorm.jl")
 include("atoms/second_order_cone/huber.jl")
 

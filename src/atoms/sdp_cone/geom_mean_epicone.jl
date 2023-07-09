@@ -80,7 +80,7 @@ struct GeomMeanEpiCone
     end
 end
 
-struct GeomMeanEpiConeConstraint <: Constraint
+mutable struct GeomMeanEpiConeConstraint <: Constraint
     head::Symbol
     id_hash::UInt64
     T::AbstractExpr
@@ -132,47 +132,39 @@ function vexity(constraint::GeomMeanEpiConeConstraint)
     return vex
 end
 
-function conic_form!(
+function _add_constraints_to_context(
     constraint::GeomMeanEpiConeConstraint,
-    unique_conic_forms::UniqueConicForms,
+    context::Context,
 )
-    if !has_conic_form(unique_conic_forms, constraint)
-        A = constraint.cone.A
-        B = constraint.cone.B
-        t = constraint.cone.t
-        T = constraint.T
-        is_complex =
-            sign(A) == ComplexSign() ||
-            sign(B) == ComplexSign() ||
-            sign(T) == ComplexSign()
-        if is_complex
-            make_temporary = () -> HermitianSemidefinite(size(A)[1])
-        else
-            make_temporary = () -> Semidefinite(size(A)[1])
-        end
+    A = constraint.cone.A
+    B = constraint.cone.B
+    t = constraint.cone.t
+    T = constraint.T
+    is_complex =
+        sign(A) == ComplexSign() ||
+        sign(B) == ComplexSign() ||
+        sign(T) == ComplexSign()
+    if is_complex
+        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+    else
+        make_temporary = () -> Semidefinite(size(A)[1])
+    end
 
-        Z = make_temporary()
+    Z = make_temporary()
 
-        if t <= 0
-            conic_form!([T A; A Z] ⪰ 0, unique_conic_forms)
-            conic_form!(
-                Z in GeomMeanHypoCone(A, B, -t, false),
-                unique_conic_forms,
-            )
-        else
-            @assert t >= 1 # range of t checked in GeomMeanEpiCone constructor
-            conic_form!([T B; B Z] ⪰ 0, unique_conic_forms)
-            conic_form!(
-                Z in GeomMeanHypoCone(A, B, 2 - t, false),
-                unique_conic_forms,
-            )
-        end
-
-        cache_conic_form!(
-            unique_conic_forms,
-            constraint,
-            Array{Convex.ConicConstr,1}(),
+    if t <= 0
+        add_constraints_to_context([T A; A Z] ⪰ 0, context)
+        add_constraints_to_context(
+            Z in GeomMeanHypoCone(A, B, -t, false),
+            context,
+        )
+    else
+        @assert t >= 1 # range of t checked in GeomMeanEpiCone constructor
+        add_constraints_to_context([T B; B Z] ⪰ 0, context)
+        add_constraints_to_context(
+            Z in GeomMeanHypoCone(A, B, 2 - t, false),
+            context,
         )
     end
-    return get_conic_form(unique_conic_forms, constraint)
+    return nothing
 end

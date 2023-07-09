@@ -82,39 +82,36 @@ function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
     return trace_mpower(A, t // 1, C)
 end
 
-function conic_form!(atom::TraceMpower, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, atom)
-        A = atom.children[1]
-        C = atom.C
-        t = atom.t
-        eye = Matrix(1.0 * I, size(A))
+function template(atom::TraceMpower, context::Context)
+    A = atom.children[1]
+    C = atom.C
+    t = atom.t
+    eye = Matrix(1.0 * I, size(A))
 
-        is_complex = sign(A) == ComplexSign()
-        if is_complex
-            make_temporary = () -> HermitianSemidefinite(size(A)[1])
-        else
-            make_temporary = () -> Semidefinite(size(A)[1])
-        end
-
-        T = make_temporary()
-
-        if t >= 0 && t <= 1
-            conic_form!(
-                T in GeomMeanHypoCone(eye, A, t, false),
-                unique_conic_forms,
-            )
-            # It's already a real mathematically, but need to make it a real type.
-            u = real(tr(C * T))
-            cache_conic_form!(unique_conic_forms, atom, maximize(u))
-        else
-            conic_form!(
-                T in GeomMeanEpiCone(eye, A, t, false),
-                unique_conic_forms,
-            )
-            # It's already a real mathematically, but need to make it a real type.
-            u = real(tr(C * T))
-            cache_conic_form!(unique_conic_forms, atom, minimize(u))
-        end
+    is_complex = sign(A) == ComplexSign()
+    if is_complex
+        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+    else
+        make_temporary = () -> Semidefinite(size(A)[1])
     end
-    return get_conic_form(unique_conic_forms, atom)
+
+    T = make_temporary()
+
+    if t >= 0 && t <= 1
+        add_constraints_to_context(
+            T in GeomMeanHypoCone(eye, A, t, false),
+            context,
+        )
+        # It's already a real mathematically, but need to make it a real type.
+        u = real(tr(C * T))
+        return template(maximize(u), template)
+    else
+        add_constraints_to_context(
+            T in GeomMeanEpiCone(eye, A, t, false),
+            context,
+        )
+        # It's already a real mathematically, but need to make it a real type.
+        u = real(tr(C * T))
+        return template(minimize(u), template)
+    end
 end

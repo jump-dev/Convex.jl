@@ -78,7 +78,7 @@ struct RelativeEntropyEpiCone
     end
 end
 
-struct RelativeEntropyEpiConeConstraint <: Constraint
+mutable struct RelativeEntropyEpiConeConstraint <: Constraint
     head::Symbol
     id_hash::UInt64
     τ::AbstractExpr

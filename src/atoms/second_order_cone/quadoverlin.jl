@@ -30,16 +30,12 @@ function evaluate(q::QuadOverLinAtom)
     return x' * x / evaluate(q.children[2])
 end
 
-function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, q)
-        t = Variable()
-        qol_objective = conic_form!(t, unique_conic_forms)
-        x, y = q.children
-        conic_form!(SOCConstraint(y + t, y - t, 2 * x), unique_conic_forms)
-        conic_form!(y >= 0, unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, q, qol_objective)
-    end
-    return get_conic_form(unique_conic_forms, q)
+function template(q::QuadOverLinAtom, context::Context)
+    t = Variable()
+    x, y = q.children
+    add_constraints_to_context(SOCConstraint(y + t, y - t, 2 * x), context)
+    add_constraints_to_context(y >= 0, context)
+    return template(t, context)
 end
 
 quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)

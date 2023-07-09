@@ -96,29 +96,25 @@ function trace_logm(
     return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
-function conic_form!(atom::TraceLogm, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, atom)
-        X = atom.children[1]
-        C = atom.C
-        m = atom.m
-        k = atom.k
-        eye = Matrix(1.0 * I, size(X))
+function template(atom::TraceLogm, context::Context)
+    X = atom.children[1]
+    C = atom.C
+    m = atom.m
+    k = atom.k
+    eye = Matrix(1.0 * I, size(X))
 
-        is_complex =
-            sign(X) == ComplexSign() || sign(Constant(C)) == ComplexSign()
-        if is_complex
-            τ = ComplexVariable(size(X))
-        else
-            τ = Variable(size(X))
-        end
-        conic_form!(
-            τ in RelativeEntropyEpiCone(eye, X, m, k),
-            unique_conic_forms,
-        )
-
-        # It's already a real mathematically, but need to make it a real type.
-        t = real(-tr(C * τ))
-        cache_conic_form!(unique_conic_forms, atom, maximize(t))
+    is_complex = sign(X) == ComplexSign() || sign(Constant(C)) == ComplexSign()
+    if is_complex
+        τ = ComplexVariable(size(X))
+    else
+        τ = Variable(size(X))
     end
-    return get_conic_form(unique_conic_forms, atom)
+    add_constraints_to_context(
+        τ in RelativeEntropyEpiCone(eye, X, m, k),
+        context,
+    )
+
+    # It's already a real mathematically, but need to make it a real type.
+    t = real(-tr(C * τ))
+    return template(maximize(t), context)
 end
