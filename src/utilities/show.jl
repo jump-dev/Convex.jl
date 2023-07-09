@@ -171,7 +171,7 @@ show(io::IO, e::AbstractExpr) = print_tree_rstrip(io, e)
 
 struct ProblemObjectiveRoot
     head::Symbol
-    objective::AbstractExpr
+    objective::Union{AbstractExpr, Nothing}
 end
 
 AbstractTrees.children(p::ProblemObjectiveRoot) = (p.objective,)
