@@ -60,7 +60,7 @@ end
 
 Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
 
-function conic_form!(x::OperatorNormAtom, context::Context{T}) where {T}
+function conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
     A = x.children[1]
     if sign(A) == ComplexSign()
         # Create the equivalent conic problem:
@@ -72,10 +72,10 @@ function conic_form!(x::OperatorNormAtom, context::Context{T}) where {T}
         m, n = size(A)
         t = Variable()
         p = minimize(t, [t*sparse(1.0I, m, m) A; A' t*sparse(1.0I, n, n)] ⪰ 0)
-        return conic_form!(p, context)
+        return conic_form!(context, p)
     else
-        t = conic_form!(Variable(), context)
-        f = operate(vcat, T, t, conic_form!(A, context))
+        t = conic_form!(context, Variable())
+        f = operate(vcat, T, t, conic_form!(context, A))
         m, n = size(A)
         MOI_add_constraint(context.model, f, MOI.NormSpectralCone(m, n))
         return t

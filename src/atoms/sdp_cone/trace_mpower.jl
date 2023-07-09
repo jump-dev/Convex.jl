@@ -82,7 +82,7 @@ function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
     return trace_mpower(A, t // 1, C)
 end
 
-function conic_form!(atom::TraceMpower, context::Context)
+function conic_form!(context::Context, atom::TraceMpower)
     A = atom.children[1]
     C = atom.C
     t = atom.t
@@ -104,7 +104,7 @@ function conic_form!(atom::TraceMpower, context::Context)
         )
         # It's already a real mathematically, but need to make it a real type.
         u = real(tr(C * T))
-        return conic_form!(maximize(u), context)
+        return conic_form!(context, maximize(u))
     else
         add_constraints_to_context(
             T in GeomMeanEpiCone(eye, A, t, false),
@@ -112,6 +112,6 @@ function conic_form!(atom::TraceMpower, context::Context)
         )
         # It's already a real mathematically, but need to make it a real type.
         u = real(tr(C * T))
-        return conic_form!(minimize(u), context)
+        return conic_form!(context, minimize(u))
     end
 end

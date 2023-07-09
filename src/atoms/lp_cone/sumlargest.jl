@@ -46,14 +46,14 @@ function evaluate(x::SumLargestAtom)
     return sum(sort(vec(evaluate(x.children[1])), rev = true)[1:x.k])
 end
 
-function conic_form!(x::SumLargestAtom, context::Context)
+function conic_form!(context::Context, x::SumLargestAtom)
     c = x.children[1]
     t = Variable(size(c))
     q = Variable()
     # sum k largest given by the solution to
     # minimize sum(t) + k*q
     # subject to c <= t + q, t >= 0
-    objective = conic_form!(sum(t) + x.k * q, context)
+    objective = conic_form!(context, sum(t) + x.k * q)
     add_constraints_to_context(c <= t + q, context)
     add_constraints_to_context(t >= 0, context)
     return objective

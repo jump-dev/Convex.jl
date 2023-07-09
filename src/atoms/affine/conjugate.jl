@@ -26,8 +26,8 @@ function evaluate(x::ConjugateAtom)
     return conj(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ConjugateAtom, context::Context{T}) where {T}
-    objective = conic_form!(only(children(x)), context)
+function conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
+    objective = conic_form!(context, only(children(x)))
     return operate(conj, T, objective)
 end
 

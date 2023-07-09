@@ -36,11 +36,11 @@ function evaluate(x::AbsAtom)
     return abs.(evaluate(x.children[1]))
 end
 
-function conic_form!(A::AbsAtom, context::Context)
+function conic_form!(context::Context, A::AbsAtom)
     x = only(A.children)
 
     t = Variable(size(x))
-    t_obj = conic_form!(t, context)
+    t_obj = conic_form!(context, t)
 
     if sign(x) == ComplexSign()
         for i in 1:length(vec(t))
@@ -88,7 +88,7 @@ abs2(x::AbstractExpr) = square(abs(x))
 # Base.size(d::DCPPromiseWrapper) = size(d.x)
 # evaluate(d::DCPPromiseWrapper) = d.evaluate()
 
-# conic_form!(D::DCPPromiseWrapper, context::Context) = conic_form!(D.x, context)
+# conic_form!(context::Context, D::DCPPromiseWrapper) = conic_form!(context, D.x)
 
 # function abs(x::AbstractExpr)
 #     t = Variable(size(x), Positive())

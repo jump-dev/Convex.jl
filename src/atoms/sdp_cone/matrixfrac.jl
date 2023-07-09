@@ -46,12 +46,12 @@ matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
 matrixfrac(x::Value, P::AbstractExpr) = MatrixFracAtom(constant(x), P)
 matrixfrac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, constant(P))
 
-function conic_form!(m::MatrixFracAtom, context::Context)
+function conic_form!(context::Context, m::MatrixFracAtom)
     x = m.children[1]
     P = m.children[2]
     t = Variable()
     # the matrix [t x'; x P] has Schur complement t - x'*P^{-1}*x
     # this matrix is PSD <=> t >= x'*P^{-1}*x
     p = minimize(t, [t x'; x P] ⪰ 0)
-    return conic_form!(p, context)
+    return conic_form!(context, p)
 end

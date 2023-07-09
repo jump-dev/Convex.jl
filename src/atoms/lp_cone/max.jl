@@ -65,12 +65,12 @@ function evaluate(x::MaxAtom)
     return max.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-function conic_form!(x::MaxAtom, context::Context)
+function conic_form!(context::Context, x::MaxAtom)
     t = Variable(x.size)
     for child in children(x)
         add_constraints_to_context(t >= child, context)
     end
-    return conic_form!(t, context)
+    return conic_form!(context, t)
 end
 
 max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)

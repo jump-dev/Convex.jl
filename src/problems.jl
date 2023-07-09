@@ -87,15 +87,40 @@ end
 sign(p::Problem) = sign(p.objective)
 monotonicity(p::Problem) = monotonicity(p.objective)
 
-function conic_form!(p::Problem, context::Context)
+function conic_form!(context::Context, p::Problem)
     for c in p.constraints
         add_constraints_to_context(c, context)
     end
     if p.head !== :satisfy
-        return conic_form!(p.objective, context)
+        return conic_form!(context, p.objective)
     else
         return nothing
     end
+end
+
+function Context(problem::Problem{T}, optimizer_factory; kwargs...) where {T}
+    optimizer = MOI.instantiate(optimizer_factory)
+    return Context(problem, optimizer; kwargs...)
+end
+
+function Context(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
+    context = Context{T}(optimizer)
+    cfp = conic_form!(context, p)
+
+    model = context.model
+
+    if p.head == :satisfy
+        MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
+    else
+        obj = scalar_fn(cfp)
+        MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+        MOI.set(
+            model,
+            MOI.ObjectiveSense(),
+            p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE,
+        )
+    end
+    return context
 end
 
 function Problem{T}(

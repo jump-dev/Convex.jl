@@ -48,7 +48,7 @@ function _add_constraints_to_context(
     context::Context{T},
 ) where {T}
     x, y, z = c.children
-    t = a -> conic_form!(a, context)
+    t = a -> conic_form!(context, a)
     inds = [
         begin
             terms = (t(x[i, j]), t(y[i, j]), t(z[i, j]))

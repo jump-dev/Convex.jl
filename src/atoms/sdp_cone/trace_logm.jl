@@ -96,7 +96,7 @@ function trace_logm(
     return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
-function conic_form!(atom::TraceLogm, context::Context)
+function conic_form!(context::Context, atom::TraceLogm)
     X = atom.children[1]
     C = atom.C
     m = atom.m
@@ -116,5 +116,5 @@ function conic_form!(atom::TraceLogm, context::Context)
 
     # It's already a real mathematically, but need to make it a real type.
     t = real(-tr(C * τ))
-    return conic_form!(maximize(t), context)
+    return conic_form!(context, maximize(t))
 end

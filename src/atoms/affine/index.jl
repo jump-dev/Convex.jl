@@ -68,8 +68,8 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function conic_form!(x::IndexAtom, context::Context{T}) where {T}
-    obj = conic_form!(only(children(x)), context)
+function conic_form!(context::Context{T}, x::IndexAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
 
     m = length(x)
     n = length(x.children[1])

@@ -42,10 +42,10 @@ function evaluate(x::MaximumAtom)
     return Base.maximum(evaluate(x.children[1]))
 end
 
-function conic_form!(x::MaximumAtom, context::Context)
+function conic_form!(context::Context, x::MaximumAtom)
     t = Variable()
     add_constraints_to_context(t >= x.children[1], context)
-    return conic_form!(t, context)
+    return conic_form!(context, t)
 end
 
 maximum(x::AbstractExpr) = MaximumAtom(x)

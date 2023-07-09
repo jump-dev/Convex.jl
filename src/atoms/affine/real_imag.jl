@@ -39,8 +39,8 @@ function evaluate(x::RealAtom)
     return real.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::RealAtom, context::Context{T}) where {T}
-    obj = conic_form!(only(children(x)), context)
+function conic_form!(context::Context{T}, x::RealAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
     return operate(real, T, obj)
 end
 
@@ -80,8 +80,8 @@ function evaluate(x::ImaginaryAtom)
     return imag.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ImaginaryAtom, context::Context{T}) where {T}
-    obj = conic_form!(only(children(x)), context)
+function conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
     return operate(imag, T, obj)
 end
 
