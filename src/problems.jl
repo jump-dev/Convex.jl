@@ -102,8 +102,19 @@ vexity(p::Problem) = objective_vexity(p)
 #     return obj_vexity + constr_vexity
 # end
 
-sign(p::Problem) = sign(p.objective)
-monotonicity(p::Problem) = monotonicity(p.objective)
+for f in (:sign, :monotonicity, :curvature)
+    @eval function $f(p::Problem)
+        if p.head === :satisfy
+            error("Satisfiability problem cannot be used as subproblem")
+        end
+        m = $f(p.objective)
+        if p.head === :maximize
+            return -m
+        else
+            return m
+        end
+    end
+end
 
 function conic_form!(context::Context, p::Problem)
     for c in p.constraints
