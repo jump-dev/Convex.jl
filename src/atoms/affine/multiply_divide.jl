@@ -79,23 +79,27 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         # make sure all 1x1 sized objects are interpreted as scalars, since
         # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
         if const_child.size == (1, 1)
-            const_multiplier = evaluate(const_child)[1]
+            const_multiplier = convert(T, evaluate(const_child)[1])
         else
             const_multiplier =
                 reshape(evaluate(const_child), length(const_child), 1)
         end
 
-        return operate(*, T, sign(x), const_multiplier, objective)
+        # TODO- here user input gets into our `operate` system
+        # without conversion or validation
+        return operate(add_operation, T, sign(x), const_multiplier, objective)
 
         # left matrix multiplication
     elseif vexity(x.children[1]) == ConstVexity()
         objective = conic_form!(context, x.children[2])
         return operate(
-            *,
+            add_operation,
             T,
             sign(x),
             kron(
                 sparse(one(T) * I, x.size[2], x.size[2]),
+                # TODO- here user input gets into our `operate` system
+                # without conversion or validation
                 evaluate(x.children[1]),
             ),
             objective,
@@ -105,10 +109,12 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     else
         objective = conic_form!(context, x.children[1])
         return operate(
-            *,
+            add_operation,
             T,
             sign(x),
             kron(
+                # TODO- here user input gets into our `operate` system
+                # without conversion or validation
                 transpose(evaluate(x.children[2])),
                 sparse(one(T) * I, x.size[1], x.size[1]),
             ),

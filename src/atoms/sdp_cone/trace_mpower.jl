@@ -81,11 +81,11 @@ function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
     return trace_mpower(A, t // 1, C)
 end
 
-function conic_form!(context::Context, atom::TraceMpower)
+function conic_form!(context::Context{T}, atom::TraceMpower) where {T}
     A = atom.children[1]
     C = atom.C
     t = atom.t
-    eye = Matrix(1.0 * I, size(A))
+    eye = Matrix(one(T) * I, size(A))
 
     is_complex = sign(A) == ComplexSign()
     if is_complex
