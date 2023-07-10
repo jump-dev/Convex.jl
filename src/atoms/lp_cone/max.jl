@@ -9,8 +9,6 @@ import Base.max
 # TODO: This can easily be extended to work
 ### Max Atom
 struct MaxAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -34,9 +32,11 @@ struct MaxAtom <: AbstractExpr
         end
 
         children = (x, y)
-        return new(:max, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::MaxAtom) = print(io, "max")
 
 function sign(x::MaxAtom)
     sign_one = sign(x.children[1])

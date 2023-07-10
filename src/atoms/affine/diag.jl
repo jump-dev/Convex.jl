@@ -11,8 +11,6 @@
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 
 struct DiagAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
@@ -25,15 +23,11 @@ struct DiagAtom <: AbstractExpr
         end
 
         children = (x,)
-        return new(
-            :diag,
-            hash((children, k)),
-            children,
-            (min(num_rows, num_cols) - k, 1),
-            k,
-        )
+        return new(children, (min(num_rows, num_cols) - k, 1), k)
     end
 end
+
+head(io::IO, ::DiagAtom) = print(io, "diag")
 
 ## Type Definition Ends
 

@@ -1,7 +1,5 @@
 import Base.vcat, Base.hcat, Base.hvcat
 struct HcatAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple
     size::Tuple{Int,Int}
 
@@ -18,9 +16,11 @@ struct HcatAtom <: AbstractExpr
             num_cols += arg.size[2]
         end
         children = tuple(args...)
-        return new(:hcat, hash(children), children, (num_rows, num_cols))
+        return new(children, (num_rows, num_cols))
     end
 end
+
+head(io::IO, ::HcatAtom) = print(io, "hcat")
 
 function sign(x::HcatAtom)
     return sum(map(sign, x.children))

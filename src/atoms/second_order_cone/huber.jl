@@ -1,6 +1,4 @@
 struct HuberAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     M::Real
@@ -12,9 +10,11 @@ struct HuberAtom <: AbstractExpr
             error("Huber parameter must by a positive scalar")
         end
         children = (x,)
-        return new(:huber, hash((children, M)), children, x.size, M)
+        return new(children, x.size, M)
     end
 end
+
+head(io::IO, ::HuberAtom) = print(io, "huber")
 
 function sign(x::HuberAtom)
     return Positive()

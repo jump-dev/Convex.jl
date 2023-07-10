@@ -1,14 +1,13 @@
 struct ConjugateAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function ConjugateAtom(x::AbstractExpr)
         children = (x,)
-        return new(:conj, hash(children), children, (x.size[1], x.size[2]))
+        return new(children, (x.size[1], x.size[2]))
     end
 end
+head(io::IO, ::ConjugateAtom) = print(io, "conj")
 
 function sign(x::ConjugateAtom)
     return sign(x.children[1])

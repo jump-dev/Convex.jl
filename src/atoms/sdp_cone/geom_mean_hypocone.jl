@@ -88,8 +88,6 @@ struct GeomMeanHypoCone
 end
 
 mutable struct GeomMeanHypoConeConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     T::AbstractExpr
     cone::GeomMeanHypoCone
 
@@ -97,14 +95,15 @@ mutable struct GeomMeanHypoConeConstraint <: Constraint
         if size(T) != cone.size
             throw(DimensionMismatch("T must be size $(cone.size)"))
         end
-        id_hash = hash((cone.A, cone.B, cone.t, :GeomMeanHypoCone))
-        return new(:GeomMeanHypoCone, id_hash, T, cone)
+        return new(T, cone)
     end
 
     function GeomMeanHypoConeConstraint(T::Value, cone::GeomMeanHypoCone)
         return GeomMeanHypoConeConstraint(constant(T), cone)
     end
 end
+
+head(io::IO, ::GeomMeanHypoConeConstraint) = print(io, "∈(GeomMeanHypoCone)")
 
 in(T, cone::GeomMeanHypoCone) = GeomMeanHypoConeConstraint(T, cone)
 

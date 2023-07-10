@@ -14,8 +14,6 @@ end
 
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     lhs::AbstractExpr
     rhs::AbstractExpr
     size::Tuple{Int,Int}
@@ -37,11 +35,11 @@ mutable struct EqConstraint <: Constraint
                 "Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)",
             )
         end
-        id_hash = hash((lhs, rhs, :(==)))
-        return new(:(==), id_hash, lhs, rhs, sz, nothing)
+        return new(lhs, rhs, sz, nothing)
     end
 end
 
+head(io::IO, ::EqConstraint) = print(io, "==")
 function vexity(c::EqConstraint)
     vex = vexity(c.lhs) + (-vexity(c.rhs))
     # You can't have equality constraints with concave/convex expressions
@@ -72,8 +70,6 @@ end
 
 ### Linear inequality constraints
 mutable struct LtConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     lhs::AbstractExpr
     rhs::AbstractExpr
     size::Tuple{Int,Int}
@@ -101,10 +97,10 @@ mutable struct LtConstraint <: Constraint
                 )
             end
         end
-        id_hash = hash((lhs, rhs, :(<=)))
-        return new(:(<=), id_hash, lhs, rhs, sz, nothing)
+        return new(lhs, rhs, sz, nothing)
     end
 end
+head(io::IO, ::LtConstraint) = print(io, "≤")
 
 function vexity(c::LtConstraint)
     vex = vexity(c.lhs) + (-vexity(c.rhs))
@@ -140,8 +136,6 @@ end
 <(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 
 mutable struct GtConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     lhs::AbstractExpr
     rhs::AbstractExpr
     size::Tuple{Int,Int}
@@ -169,10 +163,10 @@ mutable struct GtConstraint <: Constraint
                 )
             end
         end
-        id_hash = hash((lhs, rhs, :(>=)))
-        return new(:(>=), id_hash, lhs, rhs, sz, nothing)
+        return new(lhs, rhs, sz, nothing)
     end
 end
+head(io::IO, ::GtConstraint) = print(io, "≥")
 
 function vexity(c::GtConstraint)
     vex = -vexity(c.lhs) + (vexity(c.rhs))

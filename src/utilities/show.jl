@@ -79,14 +79,19 @@ Base.summary(io::IO, ::Negative) = print(io, "negative")
 Base.summary(io::IO, ::NoSign) = print(io, "real")
 Base.summary(io::IO, ::ComplexSign) = print(io, "complex")
 
+# Fallback
+head(io::IO, x::AbstractExpr) = print(io, typeof(x))
+
 function Base.summary(io::IO, c::Constraint)
-    print(io, "$(c.head) constraint (")
+    head(io, c)
+    print(io, " constraint (")
     summary(io, vexity(c))
     return print(io, ")")
 end
 
 function Base.summary(io::IO, e::AbstractExpr)
-    print(io, "$(e.head) (")
+    head(io, e)
+    print(io, " (")
     summary(io, vexity(e))
     print(io, "; ")
     summary(io, sign(e))

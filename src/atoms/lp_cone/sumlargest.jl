@@ -6,8 +6,6 @@
 #############################################################################
 
 struct SumLargestAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
@@ -25,10 +23,12 @@ struct SumLargestAtom <: AbstractExpr
                 error("k cannot be larger than the number of entries in x")
             end
             children = (x,)
-            return new(:sumlargest, hash((children, k)), children, (1, 1), k)
+            return new(children, (1, 1), k)
         end
     end
 end
+
+head(io::IO, ::SumLargestAtom) = print(io, "sumlargest")
 
 function sign(x::SumLargestAtom)
     return sign(x.children[1])

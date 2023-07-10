@@ -8,16 +8,16 @@ import Base.real, Base.imag
 
 ### Real
 struct RealAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function RealAtom(x::AbstractExpr)
         children = (x,)
-        return new(:real, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+
+head(io::IO, ::RealAtom) = print(io, "real")
 
 function sign(x::RealAtom)
     if sign(x.children[1]) == ComplexSign()
@@ -52,16 +52,16 @@ real(x::ComplexVariable) = x.real_var
 
 ### Imaginary
 struct ImaginaryAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function ImaginaryAtom(x::AbstractExpr)
         children = (x,)
-        return new(:imag, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+
+head(io::IO, ::ImaginaryAtom) = print(io, "imag")
 
 function sign(x::ImaginaryAtom)
     sign(x.children[1]) == ComplexSign()

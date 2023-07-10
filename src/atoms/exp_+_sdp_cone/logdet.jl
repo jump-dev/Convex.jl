@@ -1,16 +1,16 @@
 import LinearAlgebra.logdet
 
 struct LogDetAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function LogDetAtom(x::AbstractExpr)
         children = (x,)
-        return new(:logdet, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::LogDetAtom) = print(io, "logdet")
 
 function sign(x::LogDetAtom)
     return NoSign()

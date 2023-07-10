@@ -79,8 +79,6 @@ struct RelativeEntropyEpiCone
 end
 
 mutable struct RelativeEntropyEpiConeConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     τ::AbstractExpr
     cone::RelativeEntropyEpiCone
 
@@ -91,15 +89,8 @@ mutable struct RelativeEntropyEpiConeConstraint <: Constraint
         if size(τ) != cone.size
             throw(DimensionMismatch("τ must be size $(cone.size)"))
         end
-        id_hash = hash((
-            cone.X,
-            cone.Y,
-            cone.m,
-            cone.k,
-            cone.e,
-            :RelativeEntropyEpiCone,
-        ))
-        return new(:RelativeEntropyEpiCone, id_hash, τ, cone)
+
+        return new(τ, cone)
     end
 
     function RelativeEntropyEpiConeConstraint(
@@ -108,6 +99,10 @@ mutable struct RelativeEntropyEpiConeConstraint <: Constraint
     )
         return RelativeEntropyEpiConeConstraint(constant(τ), cone)
     end
+end
+
+function head(io::IO, ::RelativeEntropyEpiConeConstraint)
+    return print(io, "∈(RelativeEntropyEpiCone)")
 end
 
 in(τ, cone::RelativeEntropyEpiCone) = RelativeEntropyEpiConeConstraint(τ, cone)

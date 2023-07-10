@@ -15,8 +15,6 @@
 #############################################################################
 
 struct TraceMpower <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     C::AbstractMatrix
@@ -40,9 +38,10 @@ struct TraceMpower <: AbstractExpr
         if t < -1 || t > 2
             throw(DomainError(t, "t must be in the range [-1, 2]"))
         end
-        return new(:trace_mpower, hash(children), children, (1, 1), C, t)
+        return new(children, (1, 1), C, t)
     end
 end
+head(io::IO, ::TraceMpower) = print(io, "trace_mpower")
 
 function sign(atom::TraceMpower)
     return NoSign()

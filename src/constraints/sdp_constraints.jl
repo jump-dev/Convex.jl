@@ -4,8 +4,6 @@ import Base.in
 
 # TODO: Terrible documentation. Please fix.
 mutable struct SDPConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     child::AbstractExpr
     size::Tuple{Int,Int}
     dual::ValueOrNothing
@@ -15,10 +13,11 @@ mutable struct SDPConstraint <: Constraint
         if sz[1] != sz[2]
             error("Positive semidefinite expressions must be square")
         end
-        id_hash = hash((child, :sdp))
-        return new(:sdp, id_hash, child, sz, nothing)
+        return new(child, sz, nothing)
     end
 end
+
+head(io::IO, ::SDPConstraint) = print(io, "sdp")
 
 function vexity(c::SDPConstraint)
     vex = vexity(c.child)

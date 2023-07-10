@@ -8,8 +8,6 @@
 # This atom computes dot(sort(x), sort(w)), where w is constant
 # for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
 struct DotSortAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     w::Value
@@ -23,10 +21,12 @@ struct DotSortAtom <: AbstractExpr
             end
             children = (x,)
             vecw = reshape(w, length(x))
-            return new(:dotsort, hash((children, vecw)), children, (1, 1), vecw)
+            return new(children, (1, 1), vecw)
         end
     end
 end
+
+head(io::IO, ::DotSortAtom) = print(io, "dotsort")
 
 function sign(x::DotSortAtom)
     if all(x.w .>= 0)

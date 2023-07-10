@@ -8,8 +8,6 @@
 # TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs
 
 struct RelativeEntropyAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -20,10 +18,12 @@ struct RelativeEntropyAtom <: AbstractExpr
             )
         else
             children = (x, y)
-            return new(:relative_entropy, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::RelativeEntropyAtom) = print(io, "relative_entropy")
 
 function sign(x::RelativeEntropyAtom)
     return NoSign()

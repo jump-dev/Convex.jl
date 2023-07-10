@@ -81,8 +81,6 @@ struct GeomMeanEpiCone
 end
 
 mutable struct GeomMeanEpiConeConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     T::AbstractExpr
     cone::GeomMeanEpiCone
 
@@ -90,14 +88,15 @@ mutable struct GeomMeanEpiConeConstraint <: Constraint
         if size(T) != cone.size
             throw(DimensionMismatch("T must be size $(cone.size)"))
         end
-        id_hash = hash((cone.A, cone.B, cone.t, :GeomMeanEpiCone))
-        return new(:GeomMeanEpiCone, id_hash, T, cone)
+        return new(T, cone)
     end
 
     function GeomMeanEpiConeConstraint(T::Value, cone::GeomMeanEpiCone)
         return GeomMeanEpiConeConstraint(constant(T), cone)
     end
 end
+
+head(io::IO, ::GeomMeanEpiConeConstraint) = print(io, "∈(GeomMeanEpiCone)")
 
 in(T, cone::GeomMeanEpiCone) = GeomMeanEpiConeConstraint(T, cone)
 

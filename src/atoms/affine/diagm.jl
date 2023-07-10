@@ -8,8 +8,6 @@
 import LinearAlgebra.diagm, LinearAlgebra.Diagonal
 
 struct DiagMatrixAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -29,9 +27,11 @@ struct DiagMatrixAtom <: AbstractExpr
         end
 
         children = (x,)
-        return new(:diagm, hash(children), children, (sz, sz))
+        return new(children, (sz, sz))
     end
 end
+
+head(io::IO, ::DiagMatrixAtom) = print(io, "diagm")
 
 function sign(x::DiagMatrixAtom)
     return sign(x.children[1])

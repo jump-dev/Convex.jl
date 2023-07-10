@@ -1,16 +1,15 @@
 # TODO: Document this
 mutable struct SOCConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     children::Tuple
     dual::ValueOrNothing
 
     function SOCConstraint(args::AbstractExpr...)
         children = tuple(args...)
-        id_hash = hash((children, :soc))
-        return new(:soc, id_hash, children, nothing)
+        return new(children, nothing)
     end
 end
+
+head(io::IO, ::SOCConstraint) = print(io, "soc")
 
 function _add_constraint!(context::Context{T}, c::SOCConstraint) where {T}
     f = operate(

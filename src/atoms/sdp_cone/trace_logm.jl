@@ -24,8 +24,6 @@
 #############################################################################
 
 struct TraceLogm <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     C::AbstractMatrix
@@ -52,9 +50,11 @@ struct TraceLogm <: AbstractExpr
         if any(eigvals(Hermitian(C)) .< -1e-6)
             throw(DomainError(C, "C must be positive semidefinite"))
         end
-        return new(:trace_logm, hash(children), children, (1, 1), C, m, k)
+        return new(children, (1, 1), C, m, k)
     end
 end
+
+head(io::IO, ::TraceLogm) = print(io, "trace_logm")
 
 function sign(atom::TraceLogm)
     return NoSign()

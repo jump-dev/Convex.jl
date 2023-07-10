@@ -1,8 +1,6 @@
 # We process all objects on a vectorized level. The `ReshapeAtom` therefore
 # is simply in charge of remembering the new size.
 struct ReshapeAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -10,9 +8,10 @@ struct ReshapeAtom <: AbstractExpr
         if m * n != length(x)
             error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
         end
-        return new(:reshape, objectid(x), (x,), (m, n))
+        return new((x,), (m, n))
     end
 end
+head(io::IO, ::ReshapeAtom) = print(io, "reshape")
 
 function sign(x::ReshapeAtom)
     return sign(x.children[1])

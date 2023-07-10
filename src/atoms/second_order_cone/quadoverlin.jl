@@ -1,6 +1,4 @@
 struct QuadOverLinAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -9,9 +7,11 @@ struct QuadOverLinAtom <: AbstractExpr
             error("quad over lin arguments must be a vector and a scalar")
         end
         children = (x, y)
-        return new(:qol, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::QuadOverLinAtom) = print(io, "qol")
 
 function sign(q::QuadOverLinAtom)
     return Positive()

@@ -11,8 +11,6 @@ import LinearAlgebra: eigmin, eigmax
 ### Eig max
 
 struct EigMaxAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -20,12 +18,14 @@ struct EigMaxAtom <: AbstractExpr
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:eigmax, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         else
             error("eigmax can only be applied to a square matrix.")
         end
     end
 end
+
+head(io::IO, ::EigMaxAtom) = print(io, "eigmax")
 
 function sign(x::EigMaxAtom)
     return NoSign()
@@ -61,8 +61,6 @@ end
 ### Eig min
 
 struct EigMinAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -70,12 +68,14 @@ struct EigMinAtom <: AbstractExpr
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:eigmin, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         else
             error("eigmin can only be applied to a square matrix.")
         end
     end
 end
+
+head(io::IO, ::EigMinAtom) = print(io, "eigmin")
 
 function sign(x::EigMinAtom)
     return NoSign()
