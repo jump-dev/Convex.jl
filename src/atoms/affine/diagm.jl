@@ -65,5 +65,5 @@ function conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     sz = x.size[1]
     coeff = sparse(1:sz+1:sz*sz, 1:sz, one(T), sz * sz, sz)
 
-    return operate(*, T, sign(x), coeff, obj)
+    return operate(add_operation, T, sign(x), coeff, obj)
 end

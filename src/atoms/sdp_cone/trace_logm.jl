@@ -96,12 +96,12 @@ function trace_logm(
     return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
-function conic_form!(context::Context, atom::TraceLogm)
+function conic_form!(context::Context{T}, atom::TraceLogm) where {T}
     X = atom.children[1]
     C = atom.C
     m = atom.m
     k = atom.k
-    eye = Matrix(1.0 * I, size(X))
+    eye = Matrix(one(T) * I, size(X))
 
     is_complex = sign(X) == ComplexSign() || sign(constant(C)) == ComplexSign()
     if is_complex

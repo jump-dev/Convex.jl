@@ -12,7 +12,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
     push!(v, map(typeof, args))
 
     if iscomplex(sign)
-        if op === *
+        if op === add_operation
 
         else
             # Everything should be either be
@@ -30,7 +30,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
         end
         return complex_operate(op, T, args...)
     else
-        if op === *
+        if op in (real, imag, add_operation)
             # TODO- add some kind of checks
             # @assert length(args) == 2
             # x, y = args
@@ -45,27 +45,13 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
         else
             # Everything should be either a
             # SparseTape{T} or Vector{T}
-            # Except for `real` and `imag` and `*`...
-            # for arg in args
-            #     if !(typeof(arg) == SparseTape{T} || typeof(arg) == Vector{T})
-            #         error("Internal error: unexpected type $(typeof(arg))")
-            #     end
-            # end
+            # Except for `real` and `imag` and `add_operation`...
+            for arg in args
+                if !(typeof(arg) == SparseTape{T} || typeof(arg) == Vector{T})
+                    error("Internal error: unexpected type $(typeof(arg))")
+                end
+            end
         end
         return real_operate(op, T, args...)
     end
-end
-
-# fallbacks
-real_operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
-complex_operate(op::F, ::Type{T}, args...) where {F,T} = op(args...)
-
-function real_operate(::typeof(vcat), ::Type{T}, args...) where {T}
-    @warn "real vcat fallback hit" typeof.(args) args
-    return vcat(args...)
-end
-
-function complex_operate(::typeof(vcat), ::Type{T}, args...) where {T}
-    @warn "complex vcat fallback hit" typeof.(args) args
-    return vcat(args...)
 end
