@@ -231,6 +231,11 @@ mutable struct Variable <: AbstractVariable
     end
 end
 
+function Base.isequal(x::AbstractVariable, y::AbstractVariable)
+    return x.id_hash == y.id_hash
+end
+Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
+
 struct ComplexVariable{T1,T2} <: AbstractVariable
     head::Symbol
     id_hash::UInt64

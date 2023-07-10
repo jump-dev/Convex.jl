@@ -46,11 +46,6 @@ function Base.isequal(x::AbstractExpr, y::AbstractExpr)
     return true
 end
 
-function Base.isequal(x::AbstractVariable, y::AbstractVariable)
-    return x.id_hash == y.id_hash
-end
-Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
-
 # Define hash consistently with `isequal`
 function Base.hash(x::AbstractExpr, h::UInt)
     h = hash(typeof(x), h)
