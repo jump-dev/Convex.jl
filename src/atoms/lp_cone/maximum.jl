@@ -8,8 +8,6 @@ import Base.maximum
 
 ### Maximum Atom
 struct MaximumAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -18,10 +16,12 @@ struct MaximumAtom <: AbstractExpr
             error("Argument should be real instead it is $(sign(x))")
         else
             children = (x,)
-            return new(:maximum, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::MaximumAtom) = print(io, "maximum")
 
 function sign(x::MaximumAtom)
     return sign(x.children[1])

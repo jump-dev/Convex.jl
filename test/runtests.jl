@@ -12,24 +12,28 @@ const MOIB = MOI.Bridges
 using Random
 Random.seed!(2)
 
-# @testset "ProblemDepot" begin
-#     @testset "Problems can run without `solve!`ing if `test==false`; T=$T" for T in
-#                                                                                (
-#         Float64,
-#         BigFloat,
-#     )
-#         Convex.ProblemDepot.foreach_problem() do name, func
-#             @testset "$name" begin
-#                 # We want to check to make sure this does not throw
-#                 func(Val(false), 0.0, 0.0, T) do problem
-#                     @test problem isa Convex.Problem{T} # check numeric type
-#                     model = MOIU.MockOptimizer(MOIU.Model{T}())
-#                     return Convex.load_MOI_model!(model, problem) # make sure it loads without throwing
-#                 end
-#             end
-#         end
-#     end
-# end
+@testset "ProblemDepot" begin
+    @testset "Problems can run without `solve!`ing if `test==false`; T=$T" for T in
+                                                                               (
+        Float64,
+        BigFloat,
+    )
+        Convex.ProblemDepot.foreach_problem() do name, func
+            @testset "$name" begin
+                # We want to check to make sure this does not throw
+                func(Val(false), 0.0, 0.0, T) do problem
+                    @test problem isa Convex.Problem{T} # check numeric type
+                    model = MOIU.MockOptimizer(MOIU.Model{T}())
+
+                    # make sure it loads without throwing
+                    context = Convex.Context(problem, model)
+
+                    return nothing
+                end
+            end
+        end
+    end
+end
 
 @testset "Convex" begin
     # @testset "SCS with warmstarts" begin

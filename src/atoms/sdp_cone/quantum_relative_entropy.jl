@@ -25,8 +25,6 @@
 const MatrixOrConstant = Union{AbstractMatrix,Constant}
 
 struct QuantumRelativeEntropy1 <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -46,20 +44,13 @@ struct QuantumRelativeEntropy1 <: AbstractExpr
         if size(A) != (n, n)
             throw(DimensionMismatch("A and B must be square"))
         end
-        return new(
-            :quantum_relative_entropy,
-            hash(children),
-            children,
-            (1, 1),
-            m,
-            k,
-        )
+        return new(children, (1, 1), m, k)
     end
 end
 
+head(io::IO, ::QuantumRelativeEntropy1) = print(io, "quantum_relative_entropy")
+
 struct QuantumRelativeEntropy2 <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -96,19 +87,11 @@ struct QuantumRelativeEntropy2 <: AbstractExpr
         J = U'[v.>nullspace_tol, :]
         K = U'[v.<nullspace_tol, :]
 
-        return new(
-            :quantum_relative_entropy,
-            hash(children),
-            children,
-            (1, 1),
-            m,
-            k,
-            B,
-            J,
-            K,
-        )
+        return new(children, (1, 1), m, k, B, J, K)
     end
 end
+
+head(io::IO, ::QuantumRelativeEntropy2) = print(io, "quantum_relative_entropy")
 
 sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2}) = Positive()
 

@@ -7,8 +7,6 @@
 #############################################################################
 
 struct MatrixFracAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -21,9 +19,11 @@ struct MatrixFracAtom <: AbstractExpr
             error("sizes must agree for arguments of matrix frac")
         end
         children = (x, P)
-        return new(:matrixfrac, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::MatrixFracAtom) = print(io, "matrixfrac")
 
 function sign(m::MatrixFracAtom)
     return Positive()

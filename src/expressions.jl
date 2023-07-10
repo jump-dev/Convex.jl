@@ -4,11 +4,8 @@
 # Each type which subtypes AbstractExpr (Variable and Constant being exceptions)
 # must have:
 #
-## head::Symbol                  -- a symbol such as :norm, :+ etc
 ## children::(AbstractExpr,)     -- The expressions on which the current expression
 ##                               -- is operated
-## id_hash::UInt64               -- identifier hash, can be a hash of children
-##                                  or a unique identifier of the object
 ## size::(Int, Int)          -- size of the resulting expression
 #
 # Constants and variables do not have children.
@@ -24,6 +21,8 @@
 ##      h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 ##      curvature refers to the curvature of the first term.
 ##      We then use this curvature to find vexity of h (see vexity function below)
+##
+## Optional: `head` to define custom printing
 #
 #############################################################################
 
@@ -33,20 +32,6 @@ import Base.sign,
 ### Abstract types
 abstract type AbstractExpr end
 abstract type Constraint end
-
-# Override hash function because of
-# https://github.com/JuliaLang/julia/issues/10267
-import Base.hash
-
-const hashaa_seed = UInt === UInt64 ? 0x7f53e68ceb575e76 : 0xeb575e7
-function hash(a::Array{AbstractExpr}, h::UInt)
-    h += hashaa_seed
-    h += hash(size(a))
-    for x in a
-        h = hash(x, h)
-    end
-    return h
-end
 
 # If h(x)=f∘g(x), then (for single variable calculus)
 # h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)

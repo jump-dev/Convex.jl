@@ -8,8 +8,6 @@ import Base.minimum
 
 ### Minimum Atom
 struct MinimumAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -18,10 +16,12 @@ struct MinimumAtom <: AbstractExpr
             error("Argument should be real instead it is $(sign(x))")
         else
             children = (x,)
-            return new(:minimum, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::MinimumAtom) = print(io, "minimum")
 
 function sign(x::MinimumAtom)
     return sign(x.children[1])

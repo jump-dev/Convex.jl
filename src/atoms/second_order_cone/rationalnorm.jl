@@ -14,8 +14,6 @@
 ### k-norm for rational k
 
 struct RationalNormAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     k::Rational{Int64}
@@ -23,9 +21,11 @@ struct RationalNormAtom <: AbstractExpr
     function RationalNormAtom(x::AbstractExpr, k::Rational{Int})
         children = (x,)
         k >= 1 || error("p-norms not defined for p < 1")
-        return new(:rationalnorm, hash(children), children, (1, 1), k)
+        return new(children, (1, 1), k)
     end
 end
+
+head(io::IO, ::RationalNormAtom) = print(io, "rationalnorm")
 
 function sign(x::RationalNormAtom)
     return Positive()

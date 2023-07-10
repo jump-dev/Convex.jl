@@ -24,8 +24,6 @@
 #############################################################################
 
 struct QuantumEntropy <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -37,9 +35,11 @@ struct QuantumEntropy <: AbstractExpr
         if size(X) != (n, n)
             throw(DimensionMismatch("X must be square"))
         end
-        return new(:quantum_entropy, hash(children), children, (1, 1), m, k)
+        return new(children, (1, 1), m, k)
     end
 end
+
+head(io::IO, ::QuantumEntropy) = print(io, "quantum_entropy")
 
 function sign(atom::QuantumEntropy)
     return Positive()

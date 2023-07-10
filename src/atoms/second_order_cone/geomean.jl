@@ -1,8 +1,6 @@
 import Base.sqrt
 
 struct GeoMeanAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::NTuple{N,AbstractExpr} where {N}
     size::Tuple{Int,Int}
 
@@ -14,10 +12,12 @@ struct GeoMeanAtom <: AbstractExpr
             error("The arguments should be real, not complex")
         else
             children = args
-            return new(:geomean, hash(children), children, sz)
+            return new(children, sz)
         end
     end
 end
+
+head(io::IO, ::GeoMeanAtom) = print(io, "geomean")
 
 function sign(q::GeoMeanAtom)
     return Positive()

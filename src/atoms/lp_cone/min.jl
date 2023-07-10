@@ -9,8 +9,6 @@ import Base.min
 # TODO: This can easily be extended to work
 ### Min Atom
 struct MinAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -34,9 +32,11 @@ struct MinAtom <: AbstractExpr
         end
 
         children = (x, y)
-        return new(:min, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::MinAtom) = print(io, "min")
 
 function sign(x::MinAtom)
     sign_one = sign(x.children[1])

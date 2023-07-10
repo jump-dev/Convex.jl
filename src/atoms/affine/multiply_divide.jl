@@ -11,8 +11,6 @@ import Base.Broadcast.broadcasted
 ### Scalar and matrix multiplication
 
 struct MultiplyAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -29,9 +27,11 @@ struct MultiplyAtom <: AbstractExpr
             )
         end
         children = (x, y)
-        return new(:*, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::MultiplyAtom) = print(io, "*")
 
 function sign(x::MultiplyAtom)
     return sign(x.children[1]) * sign(x.children[2])
@@ -118,7 +118,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
 end
 
 function *(x::AbstractExpr, y::AbstractExpr)
-    if hash(x) == hash(y) && x.size == (1, 1)
+    if x == y && x.size == (1, 1)
         return square(x)
     end
     return MultiplyAtom(x, y)
@@ -186,7 +186,7 @@ function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
         return x * y
     elseif vexity(x) == ConstVexity()
         return dotmultiply(x, y)
-    elseif hash(x) == hash(y)
+    elseif x == y
         return square(x)
     else
         return dotmultiply(y, x)

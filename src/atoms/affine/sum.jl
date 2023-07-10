@@ -8,16 +8,16 @@ import Base.sum
 
 ### Sum Atom
 struct SumAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function SumAtom(x::AbstractExpr)
         children = (x,)
-        return new(:sum, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::SumAtom) = print(io, "sum")
 
 function sign(x::SumAtom)
     return sign(x.children[1])

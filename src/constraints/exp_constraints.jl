@@ -1,7 +1,5 @@
 ### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
 mutable struct ExpConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr,AbstractExpr} # (x, y, z)
     size::Tuple{Int,Int}
     dual::ValueOrNothing
@@ -14,10 +12,10 @@ mutable struct ExpConstraint <: Constraint
         # @assert(x.size == (1,1),
         #         "Exponential constraint requires x, y, and z to be scalar for now")
         sz = x.size
-        id_hash = hash((x, y, z, :exp))
-        return new(:exp, id_hash, (x, y, z), sz, nothing)
+        return new((x, y, z), sz, nothing)
     end
 end
+head(io::IO, ::ExpConstraint) = print(io, "exp")
 
 function ExpConstraint(x::AbstractExpr, y, z::AbstractExpr)
     return ExpConstraint(x, constant(y), z)

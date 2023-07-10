@@ -9,8 +9,6 @@ import Base.exp
 ### Exponential
 
 struct ExpAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -19,10 +17,12 @@ struct ExpAtom <: AbstractExpr
             error("The argument should be real but it's instead complex")
         else
             children = (x,)
-            return new(:exp, hash(children), children, x.size)
+            return new(children, x.size)
         end
     end
 end
+
+head(io::IO, ::ExpAtom) = print(io, "exp")
 
 function sign(x::ExpAtom)
     return Positive()

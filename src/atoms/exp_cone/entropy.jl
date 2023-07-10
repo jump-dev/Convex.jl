@@ -11,8 +11,6 @@
 
 # Entropy atom: -xlogx entrywise
 mutable struct EntropyAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -22,10 +20,12 @@ mutable struct EntropyAtom <: AbstractExpr
         else
             children = (x,)
             # TODO check positivity or enforce it
-            return new(:entropy, hash(children), children, size(x))
+            return new(children, size(x))
         end
     end
 end
+
+head(io::IO, ::EntropyAtom) = print(io, "entropy")
 
 function sign(x::EntropyAtom)
     return NoSign()

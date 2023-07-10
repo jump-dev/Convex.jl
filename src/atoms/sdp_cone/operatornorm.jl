@@ -10,16 +10,16 @@ import LinearAlgebra: opnorm
 ### Operator norm
 
 struct OperatorNormAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function OperatorNormAtom(x::AbstractExpr)
         children = (x,)
-        return new(:opnorm, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::OperatorNormAtom) = print(io, "opnorm")
 
 function sign(x::OperatorNormAtom)
     return Positive()

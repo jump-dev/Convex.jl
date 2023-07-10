@@ -10,8 +10,6 @@
 # TODO: make this work for a *list* of inputs, rather than just for vector/matrix inputs
 
 struct LogSumExpAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -20,10 +18,12 @@ struct LogSumExpAtom <: AbstractExpr
             error("The argument should be real but it's instead complex")
         else
             children = (x,)
-            return new(:logsumexp, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::LogSumExpAtom) = print(io, "logsumexp")
 
 function sign(x::LogSumExpAtom)
     return NoSign()

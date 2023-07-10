@@ -8,16 +8,16 @@
 ### Nuclear norm
 
 struct NuclearNormAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function NuclearNormAtom(x::AbstractExpr)
         children = (x,)
-        return new(:nuclearnorm, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::NuclearNormAtom) = print(io, "nuclearnorm")
 
 function sign(x::NuclearNormAtom)
     return Positive()

@@ -1,8 +1,6 @@
 import Base.Broadcast.broadcasted
 
 struct QolElemAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -13,9 +11,11 @@ struct QolElemAtom <: AbstractExpr
             )
         end
         children = (x, y)
-        return new(:qol_elem, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+
+head(io::IO, ::QolElemAtom) = print(io, "qol_elem")
 
 function sign(q::QolElemAtom)
     return Positive()

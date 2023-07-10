@@ -3,8 +3,6 @@ import Base.getindex
 const ArrayOrNothing = Union{AbstractArray,Nothing}
 
 struct IndexAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     rows::ArrayOrNothing
@@ -18,31 +16,17 @@ struct IndexAtom <: AbstractExpr
     )
         sz = (length(rows), length(cols))
         children = (x,)
-        return new(
-            :index,
-            hash((children, rows, cols, nothing)),
-            children,
-            sz,
-            rows,
-            cols,
-            nothing,
-        )
+        return new(children, sz, rows, cols, nothing)
     end
 
     function IndexAtom(x::AbstractExpr, inds::AbstractArray)
         sz = (length(inds), 1)
         children = (x,)
-        return new(
-            :index,
-            hash((children, nothing, nothing, inds)),
-            children,
-            sz,
-            nothing,
-            nothing,
-            inds,
-        )
+        return new(children, sz, nothing, nothing, inds)
     end
 end
+
+head(io::IO, ::IndexAtom) = print(io, "index")
 
 ## Type definition ends here
 

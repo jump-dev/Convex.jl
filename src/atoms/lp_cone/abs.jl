@@ -9,16 +9,15 @@ import Base.abs, Base.abs2
 ### Absolute Value
 
 struct AbsAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function AbsAtom(x::AbstractExpr)
         children = (x,)
-        return new(:abs, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+head(io::IO, ::AbsAtom) = print(io, "abs")
 
 function sign(x::AbsAtom)
     return Positive()

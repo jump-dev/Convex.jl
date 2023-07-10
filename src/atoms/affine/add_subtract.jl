@@ -9,16 +9,15 @@
 ### Unary Negation
 
 struct NegateAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function NegateAtom(x::AbstractExpr)
         children = (x,)
-        return new(:-, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+head(io::IO, ::NegateAtom) = print(io, "-")
 
 function sign(x::NegateAtom)
     return -sign(x.children[1])
@@ -50,8 +49,6 @@ end
 
 ### Addition
 struct AdditionAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Array{AbstractExpr,1}
     size::Tuple{Int,Int}
 
@@ -90,9 +87,11 @@ struct AdditionAtom <: AbstractExpr
         else
             push!(children, y)
         end
-        return new(:+, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::AdditionAtom) = print(io, "+")
 
 function sign(x::AdditionAtom)
     return sum(Sign[sign(child) for child in x.children])

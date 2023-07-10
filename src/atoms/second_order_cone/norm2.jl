@@ -7,16 +7,16 @@
 import LinearAlgebra.norm2
 
 struct EucNormAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function EucNormAtom(x::AbstractExpr)
         children = (x,)
-        return new(:norm2, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::EucNormAtom) = print(io, "norm2")
 
 function sign(x::EucNormAtom)
     return Positive()

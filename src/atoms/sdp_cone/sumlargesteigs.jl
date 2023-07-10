@@ -10,8 +10,6 @@ import LinearAlgebra.eigvals
 ### sumlargesteigs
 
 struct SumLargestEigs <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -19,12 +17,14 @@ struct SumLargestEigs <: AbstractExpr
         children = (x, k)
         m, n = size(x)
         if m == n
-            return new(:sumlargesteigs, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         else
             error("sumlargesteigs can only be applied to a square matrix.")
         end
     end
 end
+
+head(io::IO, ::SumLargestEigs) = print(io, "sumlargesteigs")
 
 function sign(x::SumLargestEigs)
     return NoSign()

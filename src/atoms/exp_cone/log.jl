@@ -9,8 +9,6 @@ import Base.log
 ### Logarithm
 
 mutable struct LogAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -19,10 +17,11 @@ mutable struct LogAtom <: AbstractExpr
             error("The argument should be real but it's instead complex")
         else
             children = (x,)
-            return new(:log, hash(children), children, x.size)
+            return new(children, x.size)
         end
     end
 end
+head(io::IO, ::LogAtom) = print(io, "log")
 
 function sign(x::LogAtom)
     return NoSign()
