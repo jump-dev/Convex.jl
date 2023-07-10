@@ -39,7 +39,7 @@ function evaluate(x::HcatAtom)
 end
 
 function conic_form!(context::Context{T}, x::HcatAtom) where {T}
-    objectives = conic_form!.(Ref(context), children(x))
+    objectives = map(c -> conic_form!(context, c), children(x))
     # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
     #  e1: x => 1 2 3
     #           4 5 6

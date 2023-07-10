@@ -33,6 +33,33 @@ import Base.sign,
 abstract type AbstractExpr end
 abstract type Constraint end
 
+# We commandeer `==` to create a constraint.
+# Therefore we define `isequal` to still have a notion of equality
+# (Normally `isequal` falls back to `==`, so we need to provide a method).
+# All `AbstractExpr` (Constraints are not AbstractExpr's!) are compared by value, except for AbstractVariables,
+# which use their `id_hash` field.
+function Base.isequal(x::AbstractExpr, y::AbstractExpr)
+    typeof(x) == typeof(y) || return false
+    for i in 1:fieldcount(typeof(x))
+        isequal(getfield(x, i), getfield(y, i)) || return false
+    end
+    return true
+end
+
+function Base.isequal(x::AbstractVariable, y::AbstractVariable)
+    return x.id_hash == y.id_hash
+end
+Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
+
+# Define hash consistently with `isequal`
+function Base.hash(x::AbstractExpr, h::UInt)
+    h = hash(typeof(x), h)
+    for i in 1:fieldcount(typeof(x))
+        h = hash(getfield(x, i), h)
+    end
+    return h
+end
+
 # If h(x)=f∘g(x), then (for single variable calculus)
 # h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 # We calculate the vexity according to this
