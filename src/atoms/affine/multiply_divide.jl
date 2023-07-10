@@ -118,7 +118,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
 end
 
 function *(x::AbstractExpr, y::AbstractExpr)
-    if x == y && x.size == (1, 1)
+    if isequal(x, y) && x.size == (1, 1)
         return square(x)
     end
     return MultiplyAtom(x, y)
@@ -186,7 +186,7 @@ function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
         return x * y
     elseif vexity(x) == ConstVexity()
         return dotmultiply(x, y)
-    elseif x == y
+    elseif isequal(x, y)
         return square(x)
     else
         return dotmultiply(y, x)
