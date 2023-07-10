@@ -34,6 +34,8 @@ function evaluate(x::EucNormAtom)
     return norm(vec(evaluate(x.children[1])))
 end
 
+## Create a new variable euc_norm to represent the norm
+## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function conic_form!(context::Context{T}, A::EucNormAtom) where {T}
     obj = conic_form!(context, only(children(A)))
 
