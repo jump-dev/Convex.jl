@@ -57,6 +57,7 @@ function diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
     return DiagMatrixAtom(x)
 end
 Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+diagm(x::AbstractExpr) = DiagMatrixAtom(x)
 
 function conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     obj = conic_form!(context, only(children(x)))

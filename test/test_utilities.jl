@@ -1,4 +1,4 @@
-using Convex: AbstractExpr, ConicObj
+using Convex: AbstractExpr, ComplexConstant
 using LinearAlgebra
 using SparseArrays
 
@@ -119,7 +119,7 @@ end
 
         @test sprint(show, 2 * x) == """
           * (constant; real)
-          ├─ 2
+          ├─ [2;;]
           └─ real variable (fixed) ($(Convex.show_id(x)))"""
 
         free!(x)
@@ -130,12 +130,12 @@ end
         └─ log (concave; real)
            └─ real variable ($(Convex.show_id(x)))
         subject to
-        ├─ >= constraint (affine)
+        ├─ ≥ constraint (affine)
         │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ 1
-        └─ <= constraint (affine)
+        │  └─ [1;;]
+        └─ ≤ constraint (affine)
            ├─ real variable ($(Convex.show_id(x)))
-           └─ 3
+           └─ [3;;]
 
         status: `solve!` not called yet"""
 
@@ -185,15 +185,15 @@ end
         old_maxwidth = Convex.MAXWIDTH[]
         Convex.MAXWIDTH[] = 2
         @test sprint(show, p) == """
-            minimize
-            └─ 0
+            satisfy
+            └─ nothing
             subject to
             ├─ == constraint (affine)
             │  ├─ real variable ($(Convex.show_id(x)))
-            │  └─ 1
+            │  └─ [1;;]
             ├─ == constraint (affine)
             │  ├─ real variable ($(Convex.show_id(x)))
-            │  └─ 2
+            │  └─ [2;;]
             ⋮
 
             status: `solve!` not called yet"""
@@ -211,12 +211,12 @@ end
             ),
         )
         @test sprint(show, p) == """
-                minimize
-                └─ 0
+                satisfy
+                └─ nothing
                 subject to
-                └─ >= constraint (affine)
+                └─ ≥ constraint (affine)
                    ├─ real variable ($(Convex.show_id(x)))
-                   └─ 0
+                   └─ [0;;]
 
                 termination status: OPTIMAL
                 primal status: FEASIBLE_POINT
@@ -239,7 +239,7 @@ end
     end
 
     @testset "vartype and set_vartype" begin
-        for x in (Variable(), Variable(1), ComplexVariable(2, 2))
+        for x in (Variable(), Variable(1))
             @test vartype(x) == ContVar
 
             vartype!(x, BinVar)
@@ -328,10 +328,9 @@ end
             ComplexVariable(),
             Variable(ComplexSign()),
         ]
-            @test x isa Variable
+            @test x isa ComplexVariable
             @test x isa Convex.AbstractVariable
             @test sign(x) == ComplexSign()
-            @test x.sign == ComplexSign()
         end
 
         for vt in (BinVar, IntVar),
@@ -406,8 +405,8 @@ end
     end
 
     @testset "Parametric constants" begin
-        z = Constant([1.0 0.0im; 0.0 1.0])
-        @test z isa Constant{Matrix{Complex{Float64}}}
+        z = constant([1.0 0.0im; 0.0 1.0])
+        @test z isa ComplexConstant{Float64}
 
         # Helper functions
         @test Convex.ispos(1)
@@ -429,21 +428,18 @@ end
         @test Convex._sign([0 0; 0 0]) == Positive()
         @test Convex._size(0 + 1im) == (1, 1)
         @test Convex._sign(0 + 1im) == ComplexSign()
-
-        @test Convex.imag_conic_form(Constant(1.0)) == [0.0]
-        @test Convex.imag_conic_form(Constant([1.0, 2.0])) == [0.0, 0.0]
     end
 
     @testset "#341: Evaluate for constants" begin
         A = rand(4, 4)
-        @test evaluate(Constant(A)) ≈ copy(A)
-        @test Constant(A).size == (4, 4)
+        @test evaluate(constant(A)) ≈ copy(A)
+        @test constant(A).size == (4, 4)
         b = rand(4)
-        @test evaluate(Constant(b)) ≈ copy(b)
-        @test Constant(b).size == (4, 1)
+        @test evaluate(constant(b)) ≈ copy(b)
+        @test constant(b).size == (4, 1)
         c = 1.0
-        @test evaluate(Constant(c)) ≈ c
-        @test Constant(c).size == (1, 1)
+        @test evaluate(constant(c)) ≈ c
+        @test constant(c).size == (1, 1)
 
         @test evaluate(sumlargesteigs(Variable(4, 4), 0)) == 0
         @test evaluate(sumlargest(Variable(4), 0)) == 0
@@ -583,7 +579,7 @@ end
     end
 
     @testset "`logsumexp` stability" begin
-        v = Convex.Constant([1000, 1000, 1000])
+        v = Convex.constant([1000, 1000, 1000])
         @test Convex.evaluate(Convex.logsumexp(v)) ≈ 1001.098612
     end
 end

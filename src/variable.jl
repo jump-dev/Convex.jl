@@ -209,12 +209,16 @@ mutable struct Variable <: AbstractVariable
     """
     vartype::VarType
     function Variable(size::Tuple{Int,Int}, sign::Sign, vartype::VarType)
-        if iscomplex(sign) && vartype != ContVar
-            throw(
-                ArgumentError(
-                    "vartype must be `ContVar` for complex variables; got vartype = $vartype",
-                ),
-            )
+        if iscomplex(sign)
+            if vartype == ContVar
+                return ComplexVariable(size)
+            else
+                throw(
+                    ArgumentError(
+                        "vartype must be `ContVar` for complex variables; got vartype = $vartype",
+                    ),
+                )
+            end
         end
         this = new(
             :variable,
@@ -390,10 +394,40 @@ function Variable(first_set::Symbol, more_sets::Symbol...)
 end
 
 # Case 3: ComplexVariable
-# ComplexVariable(size::Tuple{Int, Int}, first_set::Symbol, more_sets::Symbol...) = Variable(size, ComplexSign(), first_set, more_sets...)
-# ComplexVariable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,n), ComplexSign(), first_set, more_sets...)
-# ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...) = Variable((m,1), ComplexSign(), first_set, more_sets...)
-# ComplexVariable(first_set::Symbol, more_sets::Symbol...) = Variable((1,1), ComplexSign(), first_set, more_sets...)
+function ComplexVariable(
+    size::Tuple{Int,Int},
+    first_set::Symbol,
+    more_sets::Symbol...,
+)
+    sets = [first_set]
+    append!(sets, more_sets)
+    if :Bin in sets
+        throw(ArgumentError("Complex variables cannot be restricted to binary"))
+    elseif :Int in sets
+        throw(
+            ArgumentError("Complex variables cannot be restricted to integer"),
+        )
+    end
+    x = ComplexVariable(size)
+    if :Semidefinite in sets
+        add_constraint!(x, x ⪰ 0)
+    end
+    return x
+end
+function ComplexVariable(
+    m::Int,
+    n::Int,
+    first_set::Symbol,
+    more_sets::Symbol...,
+)
+    return ComplexVariable((m, n), first_set, more_sets...)
+end
+function ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...)
+    return ComplexVariable((m, 1), first_set, more_sets...)
+end
+function ComplexVariable(first_set::Symbol, more_sets::Symbol...)
+    return ComplexVariable((1, 1), first_set, more_sets...)
+end
 
 Semidefinite(m::Integer) = Semidefinite(m, m)
 

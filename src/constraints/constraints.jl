@@ -22,12 +22,12 @@ mutable struct EqConstraint <: Constraint
     function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
         if lhs.size == rhs.size || lhs.size == (1, 1)
             sz = rhs.size
-            if lhs.size == (1, 1)
+            if lhs.size == (1, 1) && rhs.size != (1, 1)
                 lhs = lhs * ones(rhs.size)
             end
         elseif rhs.size == (1, 1)
             sz = lhs.size
-            if rhs.size == (1, 1)
+            if rhs.size == (1, 1) && lhs.size != (1, 1)
                 rhs = rhs * ones(lhs.size)
             end
         else
@@ -83,12 +83,12 @@ mutable struct LtConstraint <: Constraint
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
-                if lhs.size == (1, 1)
+                if lhs.size == (1, 1) && rhs.size != (1, 1)
                     lhs = lhs * ones(rhs.size)
                 end
             elseif rhs.size == (1, 1)
                 sz = lhs.size
-                if rhs.size == (1, 1)
+                if rhs.size == (1, 1) && lhs.size != (1, 1)
                     rhs = rhs * ones(lhs.size)
                 end
             else
@@ -149,12 +149,12 @@ mutable struct GtConstraint <: Constraint
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
-                if lhs.size == (1, 1)
+                if lhs.size == (1, 1) && rhs.size != (1, 1)
                     lhs = lhs * ones(rhs.size)
                 end
             elseif rhs.size == (1, 1)
                 sz = lhs.size
-                if rhs.size == (1, 1)
+                if rhs.size == (1, 1) && lhs.size != (1, 1)
                     rhs = rhs * ones(lhs.size)
                 end
             else
