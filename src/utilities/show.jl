@@ -2,7 +2,7 @@ import Base.show, Base.summary
 using .TreePrint
 
 """
-    show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3)
+    show_id(io::IO, x::Union{AbstractVariable}; digits = 3)
 
 Print a truncated version of the objects `id_hash` field.
 
@@ -15,15 +15,11 @@ julia> Convex.show_id(stdout, x)
 id: 163…906
 ```
 """
-function show_id(
-    io::IO,
-    x::Union{AbstractExpr,Constraint};
-    digits = MAXDIGITS[],
-)
+function show_id(io::IO, x::Union{AbstractVariable}; digits = MAXDIGITS[])
     return print(io, show_id(x; digits = digits))
 end
 
-function show_id(x::Union{AbstractExpr,Constraint}; digits = MAXDIGITS[])
+function show_id(x::Union{AbstractVariable}; digits = MAXDIGITS[])
     hash_str = string(x.id_hash)
     if length(hash_str) > (2 * digits + 1)
         return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
