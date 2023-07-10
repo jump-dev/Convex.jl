@@ -1,5 +1,3 @@
-USE_SPARSE2() = true
-
 # It might be useful to get a direct VOV sometimes...
 function _template(a::AbstractVariable, context::Context{T}) where {T}
     first_cache = false
@@ -37,7 +35,18 @@ function _template(a::AbstractVariable, context::Context{T}) where {T}
             add_constraint!(context, constraint)
         end
     end
-    return MOI.VectorOfVariables(var_inds)
+
+    return to_vov(var_inds)
+end
+
+# Real case
+to_vov(var_inds::Vector{MOI.VariableIndex}) = MOI.VectorOfVariables(var_inds)
+
+# Complex case
+function to_vov(
+    (v1, v2)::Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
+)
+    return (to_vov(v1), to_vov(v2))
 end
 
 function to_tape(v::MOI.VectorOfVariables, ::Context{T}) where {T}
@@ -47,6 +56,14 @@ function to_tape(v::MOI.VectorOfVariables, ::Context{T}) where {T}
         [SparseAffineOperation(sparse(one(T) * I, d, d), zeros(T, d))],
         var_inds,
     )
+end
+
+# Complex case
+function to_tape(
+    (v1, v2)::Tuple{MOI.VectorOfVariables,MOI.VectorOfVariables},
+    ::Context{T},
+) where {T}
+    return ComplexTape(to_tape(v1, context), to_tape(v2, context))
 end
 
 # get the usual tape

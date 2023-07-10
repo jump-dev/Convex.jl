@@ -103,7 +103,6 @@ end
 Convex.constraints(ρ::DensityMatrix) = [ρ ⪰ 0, tr(ρ) == 1]
 Convex.sign(::DensityMatrix) = Convex.ComplexSign()
 Convex.vartype(::DensityMatrix) = Convex.ContVar
-
 end
 
 import .DensityMatricies

@@ -2,7 +2,9 @@ function add_variables!(model, var::AbstractVariable)
     var.id_hash == objectid(:constant) &&
         error("Internal error: constant used as variable")
     return if sign(var) == ComplexSign()
-        error("complex not implemented")
+        L = MOI.add_variables(model, length(var))
+        R = MOI.add_variables(model, length(var))
+        return (L, R)
     else
         return MOI.add_variables(model, length(var))
     end
