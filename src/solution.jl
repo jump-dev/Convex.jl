@@ -85,11 +85,28 @@ function solve!(
         for (id, var_indices) in var_to_indices
             var = id_to_variables[id]
             vexity(var) == ConstVexity() && continue
-            vectorized_value = MOI.get(model, MOI.VariablePrimal(), var_indices)
-            set_value!(
-                var,
-                unpackvec(vectorized_value, size(var), iscomplex(sign(var))),
-            )
+            if var_indices isa Tuple
+                vectorized_value_re =
+                    MOI.get(model, MOI.VariablePrimal(), var_indices[1])
+                vectorized_value_im =
+                    MOI.get(model, MOI.VariablePrimal(), var_indices[2])
+                set_value!(
+                    var,
+                    unpackvec(vectorized_value_re, size(var), false) +
+                    im * unpackvec(vectorized_value_im, size(var), false),
+                )
+            else
+                vectorized_value =
+                    MOI.get(model, MOI.VariablePrimal(), var_indices)
+                set_value!(
+                    var,
+                    unpackvec(
+                        vectorized_value,
+                        size(var),
+                        iscomplex(sign(var)),
+                    ),
+                )
+            end
         end
     else
         for (id, var_indices) in var_to_indices

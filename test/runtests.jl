@@ -70,14 +70,16 @@ Random.seed!(2)
         end
     end
 
-    @testset "ECOS" begin
-        # For `rational_norm` problems:
-        # >   MathOptInterface.UnsupportedConstraint{MathOptInterface.VectorAffineFunction{Float64}, MathOptInterface.NormCone}: `MathOptInterface.VectorAffineFunction{Float64}`-in-`MathOptInterface.NormCone` constraint is not supported by the model.
-        # Missing a bridge?
-        run_tests(; exclude = [r"mip", r"sdp", r"rational_norm"]) do p
-            return solve!(p, ECOS.Optimizer; silent_solver = true)
-        end
-    end
+    # Disabling ECOS due to this segfault:
+    # https://github.com/jump-dev/ECOS.jl/issues/144
+    # @testset "ECOS" begin
+    #     # For `rational_norm` problems:
+    #     # >   MathOptInterface.UnsupportedConstraint{MathOptInterface.VectorAffineFunction{Float64}, MathOptInterface.NormCone}: `MathOptInterface.VectorAffineFunction{Float64}`-in-`MathOptInterface.NormCone` constraint is not supported by the model.
+    #     # Missing a bridge?
+    #     run_tests(; exclude = [r"mip", r"sdp", r"rational_norm"]) do p
+    #         return solve!(p, ECOS.Optimizer; silent_solver = true)
+    #     end
+    # end
 
     @testset "GLPK" begin
         # Note this is an inclusion, not exclusion;

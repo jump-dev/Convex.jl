@@ -61,7 +61,7 @@ end
 # Complex case
 function to_tape(
     (v1, v2)::Tuple{MOI.VectorOfVariables,MOI.VectorOfVariables},
-    ::Context{T},
+    context::Context{T},
 ) where {T}
     return ComplexTape(to_tape(v1, context), to_tape(v2, context))
 end
@@ -72,16 +72,4 @@ function conic_form!(context::Context, a::AbstractVariable)
         return conic_form!(context, constant(evaluate(a)))
     end
     return to_tape(_template(a, context), context)
-end
-
-function conic_form!(context::Context, c::ComplexVariable)
-    if vexity(c) == ConstVexity()
-        return conic_form!(context, constant(evaluate(c)))
-    end
-    re = conic_form!(context, c.real_var)
-    im = conic_form!(context, c.imag_var)
-    for constraint in constraints(c)
-        add_constraint!(context, constraint)
-    end
-    return ComplexTape(re, im)
 end
