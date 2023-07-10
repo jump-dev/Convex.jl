@@ -8,6 +8,23 @@ norm_fro(x::AbstractExpr) = norm2(vec(x))
 # behavior of norm should be consistent with julia:
 # * vector norms for vectors
 # * operator norms for matrices
+"""
+    norm(x::AbstractExpr, p::Real=2)
+
+Computes the `p`-norm `‖x‖ₚ = (∑ᵢ |xᵢ|^p)^(1/p)` of a vector expression `x`.
+This function uses specialized methods for `p=1, 2, Inf`. For `p > 1` otherwise,
+this function uses the procedure documented at
+[`rational_to_socp.pdf`](https://github.com/jump-dev/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf),
+based on the paper "Second-order cone programming" by F. Alizadeh and D. Goldfarb,
+Mathematical Programming, Series B, 95:3-51, 2001.
+
+!!! warning
+    For versions of Convex.jl prior to v0.14.0, `norm` on a matrix expression returned
+    the operator norm ([`opnorm`](@ref)), which matches Julia v0.6 behavior. This functionality
+    was deprecated since Convex.jl v0.8.0, and has been removed. In the future,
+    `norm(x, p)` will return `‖vec(x)‖ₚ`, matching the behavior of [`norm`](@ref)
+    for numeric matrices.
+"""
 function norm(x::AbstractExpr, p::Real = 2)
     if length(size(x)) <= 1 || minimum(size(x)) == 1
         # x is a vector
