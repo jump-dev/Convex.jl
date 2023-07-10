@@ -4,7 +4,6 @@ mutable struct Problem{T<:Real} <: AbstractExpr
     constraints::Array{Constraint}
     status::MOI.TerminationStatusCode
     model::Union{MOI.ModelLike,Nothing}
-    id_hash::UInt64
     function Problem{T}(
         head::Symbol,
         objective::Union{AbstractExpr,Nothing},
@@ -13,15 +12,13 @@ mutable struct Problem{T<:Real} <: AbstractExpr
         if objective !== nothing && sign(objective) == Convex.ComplexSign()
             error("Objective cannot be a complex expression")
         else
-            p = new(
+            return new(
                 head,
                 objective,
                 constraints,
                 MOI.OPTIMIZE_NOT_CALLED,
                 nothing,
             )
-            p.id_hash = objectid(p) # is this right?
-            return p
         end
     end
 end
