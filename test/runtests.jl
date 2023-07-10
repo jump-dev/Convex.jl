@@ -35,7 +35,7 @@ Random.seed!(2)
             end
         end
     end
-    
+
     # @testset "SCS with warmstarts" begin
     #     run_tests(
     #         exclude = [
