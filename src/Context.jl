@@ -1,6 +1,12 @@
 struct Context{T,M}
     model::M
-    var_id_to_moi_indices::OrderedDict{UInt64,Vector{MOI.VariableIndex}}
+    var_id_to_moi_indices::OrderedDict{
+        UInt64,
+        Union{
+            Vector{MOI.VariableIndex},
+            Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
+        },
+    }
     id_to_variables::OrderedDict{UInt64,Any}
 
     # Used for populating constraint duals

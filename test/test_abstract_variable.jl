@@ -126,6 +126,13 @@ import LinearAlgebra
 
     @test prob.optval ≈ e_val atol = TOL
     @test evaluate(ρ) ≈ proj atol = TOL
+
+    ρ2 = real(ρ) + im * imag(ρ)
+    prob = maximize(real(tr(ρ2 * X)))
+    solve!(prob, solver)
+    @test prob.optval ≈ e_val atol = TOL
+    @test evaluate(ρ) ≈ proj atol = TOL
+    @test evaluate(ρ) ≈ evaluate(ρ2) atol = TOL
 end
 
 module ProbabilityVectors
