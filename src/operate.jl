@@ -6,14 +6,41 @@ function complex_promote(v::Vector)
     return ComplexStructOfVec(v, zero(v))
 end
 
-mapping = Dict()
+# Here we run `complex_promote` and dispatch to either `real_operate`
+# or `complex_operate` depending on `sign`. We also check the types
+# at this stage, instead of letting them fall to MethodErrors later.
+# At this stage, it should be impossible for any user input to lead to an
+# error here, since we have converted the arguments earlier in the pipeline.
+# However new atoms and new invocations of `operate` could lead to issues.
 function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
-    v = get!(mapping, (op, iscomplex(sign)), Any[])
-    push!(v, map(typeof, args))
-
     if iscomplex(sign)
         if op === add_operation
-            # TODO: add checks
+            @assert length(args) == 2
+            x, y = args
+            if !(
+                typeof(x) in (
+                    T,
+                    Complex{T},
+                    SparseMatrixCSC{T,Int},
+                    SparseMatrixCSC{Complex{T},Int},
+                )
+            )
+                error(
+                    "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
+                )
+            end
+            if !(
+                typeof(y) in (
+                    SparseTape{T},
+                    Vector{T},
+                    ComplexTape{T},
+                    ComplexStructOfVec{T},
+                )
+            )
+                error(
+                    "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
+                )
+            end
         else
             # Everything should be either be
             # ComplexTape{T}, SparseTape{T}, or ComplexStructOfVec{T}
@@ -24,24 +51,45 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
                     typeof(arg) == ComplexStructOfVec{T} ||
                     typeof(arg) == SparseTape{T}
                 )
-                    error("Internal error: unexpected type $(typeof(arg))")
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(arg))",
+                    )
                 end
             end
         end
         return complex_operate(op, T, args...)
     else
         if op in (real, imag, add_operation)
-            # TODO- add some kind of checks
-            # @assert length(args) == 2
-            # x, y = args
-            # if !(
-            #     x isa Union{T,SparseMatrixCSC{T}} && y isa SparseTape{T} ||
-            #     y isa Union{T,SparseMatrixCSC{T}} && x isa SparseTape{T}
-            # )
-            #     error(
-            #         "Internal error: unexpected type pair $(typeof(x)) and $(typeof(y))",
-            #     )
-            # end
+            if op in (real, imag)
+                x = only(args)
+                x = complex_promote(x)
+
+                if !(
+                    typeof(x) == ComplexTape{T} ||
+                    typeof(x) == ComplexStructOfVec{T} ||
+                    typeof(x) == SparseTape{T}
+                )
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(x))",
+                    )
+                end
+            end
+
+            if op === add_operation
+                @assert length(args) == 2
+
+                x, y = args
+                if !(typeof(x) in (T, SparseMatrixCSC{T,Int}))
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
+                    )
+                end
+                if !(typeof(y) in (SparseTape{T}, Vector{T}))
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
+                    )
+                end
+            end
         else
             # Everything should be either a
             # SparseTape{T} or Vector{T}

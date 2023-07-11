@@ -220,11 +220,13 @@ end
 ## Binary
 
 # `add_operation`
+# Here the left-side argument may be a `SparseMatrixCSC{T}` or a `T`
+# and the right-argument is either a `SparseTape{T}` or `Vector{T}`
 
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    A::AbstractMatrix,
+    A::SparseMatrixCSC{T},
     tape::SparseTape{T},
 ) where {T<:Real}
     return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
@@ -233,7 +235,7 @@ end
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    A,
+    A::SparseMatrixCSC{T},
     v::Vector{T},
 ) where {T<:Real}
     return A * v
@@ -242,54 +244,44 @@ end
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    x::Real,
-    tape::SparseTape,
+    x::T,
+    tape::SparseTape{T},
 ) where {T<:Real}
     d = MOI.output_dimension(tape)
     return add_operation(
         tape,
-        SparseAffineOperation(sparse(T(x) * I, d, d), zeros(T, d)),
+        SparseAffineOperation(sparse(x * I, d, d), zeros(T, d)),
     )
 end
 
+function real_operate(
+    ::typeof(add_operation),
+    ::Type{T},
+    x::T,
+    v::Vector{T},
+) where {T<:Real}
+    return x * v
+end
+
 # Here we have our two complex -> real functions
+# These are allowed these inputs:
+const ComplexToRealInputs{T} =
+    Union{ComplexTape{T},SparseTape{T},ComplexStructOfVec{T}}
 
 # `real`
-#1. ComplexTape
-function real_operate(::typeof(real), ::Type{T}, c::ComplexTape{T}) where {T}
-    return real(c)
-end
-
-#2. SparseTape
-function real_operate(::typeof(real), ::Type{T}, tape::SparseTape{T}) where {T}
-    return tape
-end
-
-#3. ComplexStructOfVec
 function real_operate(
     ::typeof(real),
     ::Type{T},
-    v::ComplexStructOfVec{T},
+    c::ComplexToRealInputs{T},
 ) where {T}
-    return real(v)
+    return real(c)
 end
 
 # `imag`
-#1. ComplexTape
-function real_operate(::typeof(imag), ::Type{T}, c::ComplexTape{T}) where {T}
-    return imag(c)
-end
-
-#2. SparseTape
-function real_operate(::typeof(imag), ::Type{T}, c::SparseTape{T}) where {T}
-    return imag(c)
-end
-
-#3. ComplexStructOfVec
 function real_operate(
     ::typeof(imag),
     ::Type{T},
-    c::ComplexStructOfVec{T},
+    c::ComplexToRealInputs{T},
 ) where {T}
     return imag(c)
 end

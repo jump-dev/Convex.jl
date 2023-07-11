@@ -59,6 +59,37 @@ function evaluate(x::MultiplyAtom)
     return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
+function complex_convert(::Type{T}, x::Number) where {T}
+    return Complex{T}(x)
+end
+function complex_convert(::Type{T}, x::AbstractSparseMatrix) where {T}
+    return SparseMatrixCSC{Complex{T}}(x)
+end
+function complex_convert(::Type{T}, x::AbstractMatrix{Complex{T}}) where {T}
+    return sparse(x)
+end
+function complex_convert(::Type{T}, x::AbstractMatrix) where {T}
+    return sparse(convert(Matrix{Complex{T}}, x))
+end
+function complex_convert(::Type{T}, x::AbstractVector) where {T}
+    return sparse(convert(Vector{Complex{T}}, x))
+end
+function real_convert(::Type{T}, x::Number) where {T}
+    return T(x)
+end
+function real_convert(::Type{T}, x::AbstractSparseMatrix) where {T}
+    return SparseMatrixCSC{T}(x)
+end
+function real_convert(::Type{T}, x::AbstractMatrix{T}) where {T}
+    return SparseMatrixCSC{T}(x)
+end
+function real_convert(::Type{T}, x::AbstractMatrix) where {T}
+    return sparse(convert(Matrix{T}, x))
+end
+function real_convert(::Type{T}, x::AbstractVector) where {T}
+    return sparse(convert(Vector{T}, x))
+end
+
 function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
@@ -79,48 +110,57 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         # make sure all 1x1 sized objects are interpreted as scalars, since
         # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
         if const_child.size == (1, 1)
+            # Scalar
             const_multiplier = evaluate(const_child)[1]
-            if iscomplex(const_multiplier)
-                const_multiplier = convert(Complex{T}, const_multiplier)
-            else
-                const_multiplier = convert(T, const_multiplier)
-            end
         else
+            # Matrix
             const_multiplier =
                 reshape(evaluate(const_child), length(const_child), 1)
         end
 
-        # TODO- here user input gets into our `operate` system
-        # without conversion or validation
+        if iscomplex(const_multiplier)
+            const_multiplier = complex_convert(T, const_multiplier)
+        else
+            const_multiplier = real_convert(T, const_multiplier)
+        end
+
         return operate(add_operation, T, sign(x), const_multiplier, objective)
 
         # left matrix multiplication
     elseif vexity(x.children[1]) == ConstVexity()
         objective = conic_form!(context, x.children[2])
+
+        const_multiplier = evaluate(x.children[1])
+        if iscomplex(const_multiplier)
+            const_multiplier = complex_convert(T, const_multiplier)
+        else
+            const_multiplier = real_convert(T, const_multiplier)
+        end
+
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(
-                sparse(one(T) * I, x.size[2], x.size[2]),
-                # TODO- here user input gets into our `operate` system
-                # without conversion or validation
-                evaluate(x.children[1]),
-            ),
+            kron(sparse(one(T) * I, x.size[2], x.size[2]), const_multiplier),
             objective,
         )
 
         # right matrix multiplication
     else
         objective = conic_form!(context, x.children[1])
+        const_multiplier = evaluate(x.children[2])
+        if iscomplex(const_multiplier)
+            const_multiplier = complex_convert(T, const_multiplier)
+        else
+            const_multiplier = real_convert(T, const_multiplier)
+        end
+
         return operate(
             add_operation,
             T,
             sign(x),
             kron(
-                # TODO- here user input gets into our `operate` system
-                # without conversion or validation
-                transpose(evaluate(x.children[2])),
+                sparse(transpose(const_multiplier)),
                 sparse(one(T) * I, x.size[1], x.size[1]),
             ),
             objective,
