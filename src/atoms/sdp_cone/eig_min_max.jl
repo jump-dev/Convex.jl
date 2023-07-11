@@ -50,11 +50,11 @@ eigmax(x::AbstractExpr) = EigMaxAtom(x)
 #   subject to
 #            tI - A is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(context::Context, x::EigMaxAtom)
+function conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = minimize(t, t * Matrix(1.0I, n, n) - A ⪰ 0)
+    p = minimize(t, t * Matrix(one(T) * I, n, n) - A ⪰ 0)
     return conic_form!(context, p)
 end
 

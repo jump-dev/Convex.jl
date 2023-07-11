@@ -1,5 +1,8 @@
 struct Context{T,M}
+    # MOI model
     model::M
+
+    # Used for populating variable values after solving
     var_id_to_moi_indices::OrderedDict{
         UInt64,
         Union{
@@ -13,10 +16,6 @@ struct Context{T,M}
     constr_to_moi_inds::IdDict{Any,Any}
 
     detected_infeasible_during_formulation::Ref{Bool}
-
-    # Unused
-    # constraint_id_to_moi_index::OrderedDict{UInt64, Any}
-    # constraint_id_to_constraint::OrderedDict{UInt64, Any}
 end
 
 function Context{T}(optimizer) where {T}
@@ -34,5 +33,4 @@ function Context{T}(optimizer) where {T}
         IdDict{Any,Any}(),
         false,
     )
-    # OrderedDict{UInt64,Any}(), OrderedDict{UInt64,Any}())
 end

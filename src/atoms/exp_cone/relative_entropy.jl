@@ -63,67 +63,6 @@ function conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
     return u
 end
 
-function test(optimizer)
-    model = Convex.Context{Float64}(optimizer).model
-    u = MOI.add_variable(model)
-    v = MOI.add_variable(model)
-    w = MOI.add_variable(model)
-    # f = MOI.VectorOfVariables([u, v, w])
-    f = MOI.VectorAffineFunction{Float64}(
-        [
-            MOI.VectorAffineTerm{Float64}(
-                1,
-                MOI.ScalarAffineTerm{Float64}(1.0, u),
-            ),
-            MOI.VectorAffineTerm{Float64}(
-                2,
-                MOI.ScalarAffineTerm{Float64}(1.0, v),
-            ),
-            MOI.VectorAffineTerm{Float64}(
-                3,
-                MOI.ScalarAffineTerm{Float64}(1.0, w),
-            ),
-        ],
-        [0.0, 0.0, 0.0],
-    )
-    MOI.add_constraint(model, f, MOI.RelativeEntropyCone(1))
-
-    g2 = MOI.VectorAffineFunction{Float64}(
-        [
-            MOI.VectorAffineTerm{Float64}(
-                1,
-                MOI.ScalarAffineTerm{Float64}(1.0, v),
-            ),
-        ],
-        [-5.0],
-    )
-    MOI.add_constraint(model, g2, MOI.Zeros(1))
-
-    g1 = MOI.VectorAffineFunction{Float64}(
-        [
-            MOI.VectorAffineTerm{Float64}(
-                1,
-                MOI.ScalarAffineTerm{Float64}(1.0, w),
-            ),
-        ],
-        [-10.0],
-    )
-    MOI.add_constraint(model, g1, MOI.Nonpositives(1))
-    # MOI.add_constraint(model, MOI.SingleVariable(v), MOI.EqualTo(5.0))
-    # MOI.add_constraint(model, MOI.SingleVariable(w), MOI.LessThan(10.0))
-    # o=MOI.SingleVariable(u)
-    o = MOI.ScalarAffineFunction{Float64}(
-        MOI.ScalarAffineTerm{Float64}[MOI.ScalarAffineTerm{Float64}(-1.0, u)],
-        0.0,
-    )
-    MOI.set(model, MOI.ObjectiveFunction{typeof(o)}(), o)
-    MOI.set(model, MOI.ObjectiveSense(), MOI.MAX_SENSE)
-    MOI.optimize!(model)
-    obj_val = MOI.get(model, MOI.ObjectiveValue())
-    u_val = MOI.get(model, MOI.VariablePrimal(), u)
-    return obj_val, u_val
-end
-
 relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)
 # y*log(x/y)
 log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy(y, x)

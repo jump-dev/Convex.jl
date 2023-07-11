@@ -71,7 +71,10 @@ function conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
         # http://arxiv.org/pdf/0706.4138v1.pdf
         m, n = size(A)
         t = Variable()
-        p = minimize(t, [t*sparse(1.0I, m, m) A; A' t*sparse(1.0I, n, n)] ⪰ 0)
+        p = minimize(
+            t,
+            [t*sparse(one(T) * I, m, m) A; A' t*sparse(one(T) * I, n, n)] ⪰ 0,
+        )
         return conic_form!(context, p)
     else
         t = conic_form!(context, Variable())
