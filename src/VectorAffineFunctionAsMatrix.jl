@@ -1,21 +1,3 @@
-# # A simple type representing a vector of zeros. Maybe should include the size or use FillArrays or similar.
-# struct Zero
-#     len::Int
-# end
-
-# Base.:(+)(a, ::Zero) = a
-# Base.:(+)(::Zero, a) = a
-# Base.:(+)(z1::Zero, z2::Zero) = (@assert z1.len == z2.len; z1)
-# Base.:(-)(::Zero, a) = -a
-# Base.:(-)(a, ::Zero) = a
-# Base.:(-)(z::Zero) = z
-# Base.:(*)(A, z::Zero) = Zero(size(A, 1))
-# Base.:(*)(::LinearAlgebra.UniformScaling, z::Zero) = z
-# Base.size(z::Zero) = (z.len,)
-# Base.length(z::Zero) = z.len
-# SparseArrays.sparse(z::Zero) = spzeros(z.len)
-# Base.convert(::Type{Vector{T}}, z::Zero) where {T} = zeros(T, z.len)
-
 # This is a variant of MOI.VectorAffineFunction which represents
 # the transformation `matrix * variables + vector` lazily.
 struct VectorAffineFunctionAsMatrix{T,V}

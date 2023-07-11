@@ -6,7 +6,15 @@ Breaking changes:
 
 * `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`.
 * The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
-* SDP and exponential constraints now have dual values populated (and SOC?)
+* The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
+
+
+Other changes:
+
+* SDP, SOC, and exponential cone constraints now have dual values populated.
+* `geomean` supports more than 2 arguments
+* [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) of `imag` and `real` has been removed. This should not affect use of Convex. Unfortunately, piracy of `hcat`, `vcat`, and `hvcat` still remains.
+* `sumlargesteigs` now enforces that it's argument is hermitian.
 
 Dev notes to move elsewhere:
 
