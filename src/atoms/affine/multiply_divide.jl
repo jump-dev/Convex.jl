@@ -79,7 +79,12 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         # make sure all 1x1 sized objects are interpreted as scalars, since
         # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
         if const_child.size == (1, 1)
-            const_multiplier = convert(T, evaluate(const_child)[1])
+            const_multiplier = evaluate(const_child)[1]
+            if iscomplex(const_multiplier)
+                const_multiplier = convert(Complex{T}, const_multiplier)
+            else
+                const_multiplier = convert(T, const_multiplier)
+            end
         else
             const_multiplier =
                 reshape(evaluate(const_child), length(const_child), 1)

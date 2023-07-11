@@ -94,17 +94,17 @@ function conic_form!(context::Context{T}, atom::TraceMpower) where {T}
         make_temporary = () -> Semidefinite(size(A)[1])
     end
 
-    T = make_temporary()
+    tmp = make_temporary()
 
     if t >= 0 && t <= 1
-        add_constraint!(context, T in GeomMeanHypoCone(eye, A, t, false))
-        # It's already a real mathematically, but need to make it a real type.
-        u = real(tr(C * T))
+        add_constraint!(context, tmp in GeomMeanHypoCone(eye, A, t, false))
+        # It's already a real mathematically, but Convex doesn't know it
+        u = real(tr(C * tmp))
         return conic_form!(context, maximize(u))
     else
-        add_constraint!(context, T in GeomMeanEpiCone(eye, A, t, false))
-        # It's already a real mathematically, but need to make it a real type.
-        u = real(tr(C * T))
+        add_constraint!(context, tmp in GeomMeanEpiCone(eye, A, t, false))
+        # It's already a real mathematically, but Convex doesn't know it
+        u = real(tr(C * tmp))
         return conic_form!(context, minimize(u))
     end
 end
