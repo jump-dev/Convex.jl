@@ -4,7 +4,8 @@ struct GeoMeanAtom <: AbstractExpr
     children::NTuple{N,AbstractExpr} where {N}
     size::Tuple{Int,Int}
 
-    function GeoMeanAtom(args::AbstractExpr...)
+    function GeoMeanAtom(args::AbstractExprOrValue...)
+        args = Tuple(arg isa Value ? constant(arg) : arg for arg in args)
         sz = size(first(args))
         if any(!=(sz), size.(args))
             error("geo mean must take arguments of the same size")
@@ -24,16 +25,19 @@ function sign(q::GeoMeanAtom)
 end
 
 function monotonicity(q::GeoMeanAtom)
-    return (Nondecreasing(), Nondecreasing())
+    return fill(Nondecreasing(), length(q.children))
 end
 
 function curvature(q::GeoMeanAtom)
     return ConcaveVexity()
 end
 
+_geomean(scalar_args...) = prod(scalar_args)^(1 / length(scalar_args))
 function evaluate(q::GeoMeanAtom)
     n = length(q.children)
-    return prod.(evaluate.(q.children)) .^ Ref(1 / n)
+    children = evaluate.(q.children)
+    c1 = first(children)
+    return [_geomean((children[i][I] for i in 1:n)...) for I in eachindex(c1)]
 end
 
 function conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
@@ -53,5 +57,5 @@ function conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
     return conic_form!(context, t)
 end
 
-geomean(x::AbstractExpr, y::AbstractExpr) = GeoMeanAtom(x, y)
+geomean(args::AbstractExprOrValue...) = GeoMeanAtom(args...)
 sqrt(x::AbstractExpr) = GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
