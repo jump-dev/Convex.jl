@@ -19,11 +19,7 @@ Random.seed!(2)
             Float64,
             BigFloat,
         )
-            # `sdp_lieb_ando` causes stackoverflow, not sure why.
-            # Needs investigation
-            Convex.ProblemDepot.foreach_problem(;
-                exclude = [r"sdp_lieb_ando"],
-            ) do name, func
+            Convex.ProblemDepot.foreach_problem() do name, func
                 @testset "$name" begin
                     # We want to check to make sure this does not throw
                     func(Val(false), 0.0, 0.0, T) do problem
