@@ -213,11 +213,7 @@ function real_operate(
     return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
 end
 
-function real_operate(
-    ::typeof(sum),
-    ::Type{T},
-    v::Vector{T},
-) where {T<:Real}
+function real_operate(::typeof(sum), ::Type{T}, v::Vector{T}) where {T<:Real}
     return [sum(v)]
 end
 

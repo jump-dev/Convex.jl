@@ -1,7 +1,6 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
 
-# TODO- tighten this
-const CONSTANT_CONSTRAINT_TOL = Ref(1e-2)
+const CONSTANT_CONSTRAINT_TOL = Ref(1e-6)
 
 function iscomplex(constr::Constraint)
     return iscomplex(constr.lhs) || iscomplex(constr.rhs)

@@ -13,7 +13,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
 
     if iscomplex(sign)
         if op === add_operation
-
+            # TODO: add checks
         else
             # Everything should be either be
             # ComplexTape{T}, SparseTape{T}, or ComplexStructOfVec{T}
@@ -45,7 +45,6 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
         else
             # Everything should be either a
             # SparseTape{T} or Vector{T}
-            # Except for `real` and `imag` and `add_operation`...
             for arg in args
                 if !(typeof(arg) == SparseTape{T} || typeof(arg) == Vector{T})
                     error("Internal error: unexpected type $(typeof(arg))")
