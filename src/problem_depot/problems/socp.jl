@@ -276,6 +276,36 @@ end
         @test p.optval ≈ 4 atol = atol rtol = rtol
         @test evaluate(sum(geomean(x, y))) ≈ 4 atol = atol rtol = rtol
     end
+
+    # 3 arg
+    z = Variable(2)
+    p = maximize(
+        sum(geomean(x, y, z)),
+        1 < x,
+        x < 2,
+        y < 2,
+        z < 2;
+        numeric_type = T,
+    )
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test evaluate(sum(geomean(x, y, z))) ≈ 4 atol = atol rtol = rtol
+    end
+
+    p = maximize(
+        sum(geomean(x, y, 4 * ones(2))),
+        1 < x,
+        x < 2,
+        y < 2;
+        numeric_type = T,
+    )
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 2 * 4^(2 / 3) atol = atol rtol = rtol
+        @test evaluate(sum(geomean(x, y, 4 * ones(2)))) ≈ 2 * 4^(2 / 3) atol =
+            atol rtol = rtol
+    end
 end
 
 @add_problem socp function socp_sqrt_atom(
