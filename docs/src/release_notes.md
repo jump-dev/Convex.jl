@@ -16,14 +16,6 @@ Other changes:
 * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) of `imag` and `real` has been removed. This should not affect use of Convex. Unfortunately, piracy of `hcat`, `vcat`, and `hvcat` still remains.
 * `sumlargesteigs` now enforces that it's argument is hermitian.
 
-Dev notes to move elsewhere:
-
-* `conic_form!` can mutate the context, should never mutate the problem
-* we construct a fresh context on every solve, no support for in-place changes right now (same as release Convex)
-* we can detect infeasibility at problem-creation time if the constraints are constant. We could try to communicate more about that.
-* in the atoms/constraints we call `operate` with the sign. This dispatches to either `real_operate` or `complex_operate` and should have no other methods. `complex_operate` generally forwards real/imag parts to `real_operate` as necessary. Methods for `real_operate`/`complex_operate` should not try to use signatures to limit to real/complex inputs, just assume arguments are appropriate.
-* data flow: everything we store is an `AbstractExpr`. Values become `Constant` and `ComplexConstant`. At this time we don't know the solve type `T <: Real` and parts of problems (and variables) can be reused in multiple problems. Then at `conic_form!` time we have a `Context{T}` which has a MOI model and specified type `T`. The leaves of the tree are variables and constants. For variables outputs of `conic_form!` are of types: `SparseTape{T}` or `ComplexTape{T}`, depending on the sign variable. Likewise for constant, the outputs of `conic_form!` are either `Vector{T}` or `ComplexStructOfVec{T}`. For atoms, the outputs generally depend on the children, and are the result of `operate`ing them.
-
 ## v0.15.3 (February 11, 2023)
 
  * Add support for LDLFactorizations v0.10 [#496](https://github.com/jump-dev/Convex.jl/pull/496).
