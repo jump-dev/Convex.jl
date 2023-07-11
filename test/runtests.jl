@@ -94,7 +94,7 @@ Random.seed!(2)
     end
 
     include("definitions.jl")
-    # include("VAFTapes.jl")
+    include("SparseTape.jl")
     include("test_utilities.jl")
     include("test_abstract_variable.jl")
 end
