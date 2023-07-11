@@ -70,6 +70,14 @@ Random.seed!(2)
         end
     end
 
+    # Slow, and also hits linear algebra issues with BigFloat matrices
+    # @testset "Clarabel with BigFloat" begin
+    #     # TODO(odow): investigate sdp_lieb_ando
+    #     run_tests(; exclude = [r"mip", r"sdp_lieb_ando"], T = BigFloat) do p
+    #         return solve!(p, Clarabel.Optimizer{BigFloat}; silent_solver = true)
+    #     end
+    # end
+
     # Disabling ECOS due to this segfault:
     # https://github.com/jump-dev/ECOS.jl/issues/144
     # @testset "ECOS" begin
