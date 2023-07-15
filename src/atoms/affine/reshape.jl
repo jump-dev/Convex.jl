@@ -1,6 +1,6 @@
 # We process all objects on a vectorized level. The `ReshapeAtom` therefore
 # is simply in charge of remembering the new size.
-struct ReshapeAtom <: AbstractExpr
+mutable struct ReshapeAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -33,7 +33,7 @@ function evaluate(x::ReshapeAtom)
     return reshape(val, x.size[1], x.size[2])
 end
 
-function conic_form!(context::Context, A::ReshapeAtom)
+function _conic_form!(context::Context, A::ReshapeAtom)
     return conic_form!(context, only(children(A)))
 end
 

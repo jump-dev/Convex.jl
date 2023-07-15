@@ -1,6 +1,6 @@
 import Base.sqrt
 
-struct GeoMeanAtom <: AbstractExpr
+mutable struct GeoMeanAtom <: AbstractExpr
     children::NTuple{N,AbstractExpr} where {N}
     size::Tuple{Int,Int}
 
@@ -40,7 +40,7 @@ function evaluate(q::GeoMeanAtom)
     return [_geomean((children[i][I] for i in 1:n)...) for I in eachindex(c1)]
 end
 
-function conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
+function _conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
     n = length(q.children)
     x = first(q.children)
     t = Variable(size(x))

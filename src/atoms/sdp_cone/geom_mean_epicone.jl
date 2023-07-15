@@ -20,7 +20,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct GeomMeanEpiCone
+mutable struct GeomMeanEpiCone
     A::AbstractExpr
     B::AbstractExpr
     t::Rational

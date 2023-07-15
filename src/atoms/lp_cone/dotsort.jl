@@ -7,7 +7,7 @@
 
 # This atom computes dot(sort(x), sort(w)), where w is constant
 # for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
-struct DotSortAtom <: AbstractExpr
+mutable struct DotSortAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     w::Value
@@ -57,7 +57,7 @@ function evaluate(x::DotSortAtom)
     )
 end
 
-function conic_form!(context::Context{T}, x::DotSortAtom) where {T}
+function _conic_form!(context::Context{T}, x::DotSortAtom) where {T}
     y = only(x.children)
     w = x.w
     sy = size(y)

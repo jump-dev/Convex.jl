@@ -10,7 +10,7 @@
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 
-struct DiagAtom <: AbstractExpr
+mutable struct DiagAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
@@ -66,7 +66,7 @@ LinearAlgebra.diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(context::Context{T}, x::DiagAtom) where {T}
+function _conic_form!(context::Context{T}, x::DiagAtom) where {T}
     (num_rows, num_cols) = x.children[1].size
     k = x.k
 

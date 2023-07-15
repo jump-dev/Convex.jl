@@ -8,7 +8,7 @@
 
 ### Unary Negation
 
-struct NegateAtom <: AbstractExpr
+mutable struct NegateAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -38,7 +38,7 @@ end
 -(x::AbstractExpr) = NegateAtom(x)
 -(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
-function conic_form!(context::Context{T}, A::NegateAtom) where {T}
+function _conic_form!(context::Context{T}, A::NegateAtom) where {T}
     subobj = conic_form!(context, only(children(A)))
     if subobj isa Value
         return -subobj
@@ -48,7 +48,7 @@ function conic_form!(context::Context{T}, A::NegateAtom) where {T}
 end
 
 ### Addition
-struct AdditionAtom <: AbstractExpr
+mutable struct AdditionAtom <: AbstractExpr
     children::Array{AbstractExpr,1}
     size::Tuple{Int,Int}
 
@@ -112,7 +112,7 @@ function evaluate(x::AdditionAtom)
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
-function conic_form!(context::Context{T}, x::AdditionAtom) where {T}
+function _conic_form!(context::Context{T}, x::AdditionAtom) where {T}
     obj = operate(
         +,
         T,

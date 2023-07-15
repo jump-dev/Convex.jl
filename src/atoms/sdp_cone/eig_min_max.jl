@@ -10,7 +10,7 @@ import LinearAlgebra: eigmin, eigmax
 
 ### Eig max
 
-struct EigMaxAtom <: AbstractExpr
+mutable struct EigMaxAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -50,7 +50,7 @@ eigmax(x::AbstractExpr) = EigMaxAtom(x)
 #   subject to
 #            tI - A is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
+function _conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
     A = x.children[1]
     m, n = size(A)
     t = Variable()
@@ -60,7 +60,7 @@ end
 
 ### Eig min
 
-struct EigMinAtom <: AbstractExpr
+mutable struct EigMinAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -100,7 +100,7 @@ eigmin(x::AbstractExpr) = EigMinAtom(x)
 #   subject to
 #            A - tI is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(context::Context, x::EigMinAtom)
+function _conic_form!(context::Context, x::EigMinAtom)
     A = x.children[1]
     m, n = size(A)
     t = Variable()

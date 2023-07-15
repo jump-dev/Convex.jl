@@ -1,4 +1,4 @@
-struct HuberAtom <: AbstractExpr
+mutable struct HuberAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     M::Real
@@ -40,7 +40,7 @@ function evaluate(x::HuberAtom)
     return c
 end
 
-function conic_form!(context::Context, x::HuberAtom)
+function _conic_form!(context::Context, x::HuberAtom)
     c = x.children[1]
     s = Variable(c.size)
     n = Variable(c.size)

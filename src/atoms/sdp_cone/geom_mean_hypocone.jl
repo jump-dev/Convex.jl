@@ -26,7 +26,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct GeomMeanHypoCone
+mutable struct GeomMeanHypoCone
     A::AbstractExpr
     B::AbstractExpr
     t::Rational

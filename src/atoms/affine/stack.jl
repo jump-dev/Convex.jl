@@ -1,5 +1,5 @@
 import Base.vcat, Base.hcat, Base.hvcat
-struct HcatAtom <: AbstractExpr
+mutable struct HcatAtom <: AbstractExpr
     children::Tuple
     size::Tuple{Int,Int}
 
@@ -38,7 +38,7 @@ function evaluate(x::HcatAtom)
     return hcat(map(evaluate, x.children)...)
 end
 
-function conic_form!(context::Context{T}, x::HcatAtom) where {T}
+function _conic_form!(context::Context{T}, x::HcatAtom) where {T}
     objectives = map(c -> conic_form!(context, c), children(x))
     # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
     #  e1: x => 1 2 3

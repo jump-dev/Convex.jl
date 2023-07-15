@@ -17,7 +17,7 @@
 #   Pablo A. Parrilo (arXiv:1705.00812)
 #############################################################################
 
-struct RelativeEntropyEpiCone
+mutable struct RelativeEntropyEpiCone
     X::AbstractExpr
     Y::AbstractExpr
     m::Integer

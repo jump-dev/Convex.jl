@@ -6,7 +6,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-struct MatrixFracAtom <: AbstractExpr
+mutable struct MatrixFracAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -46,7 +46,7 @@ matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
 matrixfrac(x::Value, P::AbstractExpr) = MatrixFracAtom(constant(x), P)
 matrixfrac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, constant(P))
 
-function conic_form!(context::Context, m::MatrixFracAtom)
+function _conic_form!(context::Context, m::MatrixFracAtom)
     x = m.children[1]
     P = m.children[2]
     t = Variable()

@@ -8,7 +8,7 @@ import Base.abs, Base.abs2
 
 ### Absolute Value
 
-struct AbsAtom <: AbstractExpr
+mutable struct AbsAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -35,7 +35,7 @@ function evaluate(x::AbsAtom)
     return abs.(evaluate(x.children[1]))
 end
 
-function conic_form!(context::Context, A::AbsAtom)
+function _conic_form!(context::Context, A::AbsAtom)
     x = only(A.children)
 
     t = Variable(size(x))
@@ -58,7 +58,7 @@ abs2(x::AbstractExpr) = square(abs(x))
 ## Alternate version: no atom, just a DCPPromise:
 
 # # A lightweight atom
-# struct DCPPromiseWrapper <: AbstractExpr
+# mutable struct DCPPromiseWrapper <: AbstractExpr
 #     x::AbstractVariable
 #     sign::Sign
 #     monotonicity::Monotonicity

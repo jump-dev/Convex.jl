@@ -16,6 +16,9 @@ struct Context{T,M}
     constr_to_moi_inds::IdDict{Any,Any}
 
     detected_infeasible_during_formulation::Ref{Bool}
+
+    # Cache
+    conic_form_cache::IdDict{Any, Any}
 end
 
 function Context{T}(optimizer) where {T}
@@ -32,5 +35,6 @@ function Context{T}(optimizer) where {T}
         OrderedDict{UInt64,Any}(),
         IdDict{Any,Any}(),
         false,
+        IdDict{Any,Any}()
     )
 end
