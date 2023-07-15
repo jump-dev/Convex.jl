@@ -17,30 +17,30 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
         if op === add_operation
             @assert length(args) == 2
             x, y = args
-            # if !(
-            #     typeof(x) in (
-            #         T,
-            #         Complex{T},
-            #         SparseMatrixCSC{T,Int},
-            #         SparseMatrixCSC{Complex{T},Int},
-            #     )
-            # )
-            #     error(
-            #         "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
-            #     )
-            # end
-            # if !(
-            #     typeof(y) in (
-            #         SparseTape{T},
-            #         Vector{T},
-            #         ComplexTape{T},
-            #         ComplexStructOfVec{T},
-            #     )
-            # )
-            #     error(
-            #         "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
-            #     )
-            # end
+            if !(
+                typeof(x) in (
+                    T,
+                    Complex{T},
+                    SparseMatrixCSC{T,Int},
+                    SparseMatrixCSC{Complex{T},Int},
+                )
+            )
+                error(
+                    "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
+                )
+            end
+            if !(
+                typeof(y) in (
+                    SparseTape{T},
+                    Vector{T},
+                    ComplexTape{T},
+                    ComplexStructOfVec{T},
+                )
+            )
+                error(
+                    "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
+                )
+            end
         else
             # Everything should be either be
             # ComplexTape{T}, SparseTape{T}, or ComplexStructOfVec{T}
@@ -79,16 +79,16 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
                 @assert length(args) == 2
 
                 x, y = args
-                # if !(typeof(x) in (T, SparseMatrixCSC{T,Int}))
-                #     error(
-                #         "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
-                #     )
-                # end
-                # if !(typeof(y) in (SparseTape{T}, Vector{T}))
-                #     error(
-                #         "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
-                #     )
-                # end
+                if !(typeof(x) in (T, SparseMatrixCSC{T,Int}))
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
+                    )
+                end
+                if !(typeof(y) in (SparseTape{T}, Vector{T}))
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
+                    )
+                end
             end
         else
             # Everything should be either a

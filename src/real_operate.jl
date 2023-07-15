@@ -226,47 +226,41 @@ end
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    A::AbstractMatrix,
+    A::SparseMatrixCSC{T},
     tape::SparseTape{T},
 ) where {T<:Real}
-    return add_operation(
-        tape,
-        SparseAffineOperation{T}(real_convert(T, A), zeros(T, size(A, 1))),
-    )
+    return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
 end
 
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    A::AbstractMatrix,
+    A::SparseMatrixCSC{T},
     v::Vector{T},
 ) where {T<:Real}
-    return Vector{T}(A * v)
+    return A * v
 end
 
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    x::Real,
+    x::T,
     tape::SparseTape{T},
 ) where {T<:Real}
     d = MOI.output_dimension(tape)
     return add_operation(
         tape,
-        SparseAffineOperation{T}(
-            sparse(real_convert(T, x) * I, d, d),
-            zeros(T, d),
-        ),
+        SparseAffineOperation(sparse(x * I, d, d), zeros(T, d)),
     )
 end
 
 function real_operate(
     ::typeof(add_operation),
     ::Type{T},
-    x::Real,
+    x::T,
     v::Vector{T},
 ) where {T<:Real}
-    return Vector{T}(real_convert(T, x) * v)
+    return x * v
 end
 
 # Here we have our two complex -> real functions
