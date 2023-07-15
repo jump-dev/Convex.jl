@@ -118,11 +118,11 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
                 reshape(evaluate(const_child), length(const_child), 1)
         end
 
-        if iscomplex(const_multiplier)
-            const_multiplier = complex_convert(T, const_multiplier)
-        else
-            const_multiplier = real_convert(T, const_multiplier)
-        end
+        # if iscomplex(const_multiplier)
+        #     const_multiplier = complex_convert(T, const_multiplier)
+        # else
+        #     const_multiplier = real_convert(T, const_multiplier)
+        # end
 
         return operate(add_operation, T, sign(x), const_multiplier, objective)
 
@@ -131,17 +131,17 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         objective = conic_form!(context, x.children[2])
 
         const_multiplier = evaluate(x.children[1])
-        if iscomplex(const_multiplier)
-            const_multiplier = complex_convert(T, const_multiplier)
-        else
-            const_multiplier = real_convert(T, const_multiplier)
-        end
+        # if iscomplex(const_multiplier)
+        #     const_multiplier = complex_convert(T, const_multiplier)
+        # else
+        #     const_multiplier = real_convert(T, const_multiplier)
+        # end
 
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(sparse(one(T) * I, x.size[2], x.size[2]), const_multiplier),
+            kron(Diagonal(ones(T, x.size[2])), const_multiplier),
             objective,
         )
 
@@ -149,20 +149,17 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     else
         objective = conic_form!(context, x.children[1])
         const_multiplier = evaluate(x.children[2])
-        if iscomplex(const_multiplier)
-            const_multiplier = complex_convert(T, const_multiplier)
-        else
-            const_multiplier = real_convert(T, const_multiplier)
-        end
+        # if iscomplex(const_multiplier)
+        #     const_multiplier = complex_convert(T, const_multiplier)
+        # else
+        #     const_multiplier = real_convert(T, const_multiplier)
+        # end
 
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(
-                sparse(transpose(const_multiplier)),
-                sparse(one(T) * I, x.size[1], x.size[1]),
-            ),
+            kron(transpose(const_multiplier), Diagonal(ones(T, x.size[1]))),
             objective,
         )
     end
