@@ -1,5 +1,5 @@
 ### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
-mutable mutable struct ExpConstraint <: Constraint
+mutable struct ExpConstraint <: Constraint
     children::Tuple{AbstractExpr,AbstractExpr,AbstractExpr} # (x, y, z)
     size::Tuple{Int,Int}
     dual::ValueOrNothing
