@@ -7,7 +7,7 @@
 import Base.real, Base.imag
 
 ### Real
-struct RealAtom <: AbstractExpr
+mutable struct RealAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -39,7 +39,7 @@ function evaluate(x::RealAtom)
     return real.(evaluate(x.children[1]))
 end
 
-function conic_form!(context::Context{T}, x::RealAtom) where {T}
+function _conic_form!(context::Context{T}, x::RealAtom) where {T}
     obj = conic_form!(context, only(children(x)))
     return operate(real, T, sign(x), obj)
 end
@@ -49,7 +49,7 @@ real(x::ComplexConstant) = x.real_constant
 real(x::Constant) = x
 
 ### Imaginary
-struct ImaginaryAtom <: AbstractExpr
+mutable struct ImaginaryAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -78,7 +78,7 @@ function evaluate(x::ImaginaryAtom)
     return imag.(evaluate(x.children[1]))
 end
 
-function conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
+function _conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
     obj = conic_form!(context, only(children(x)))
     return operate(imag, T, sign(x), obj)
 end

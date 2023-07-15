@@ -1,6 +1,6 @@
 import LinearAlgebra.logdet
 
-struct LogDetAtom <: AbstractExpr
+mutable struct LogDetAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -28,7 +28,7 @@ function evaluate(x::LogDetAtom)
     return log(det(evaluate(x.children[1])))
 end
 
-function conic_form!(context::Context{T}, x::LogDetAtom) where {T}
+function _conic_form!(context::Context{T}, x::LogDetAtom) where {T}
     # the object we want the logdet of. Should be a PSD matrix, but may not be a `AbstractVariable` itself.
     A = only(children(x))
 

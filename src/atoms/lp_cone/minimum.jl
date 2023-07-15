@@ -7,7 +7,7 @@
 import Base.minimum
 
 ### Minimum Atom
-struct MinimumAtom <: AbstractExpr
+mutable struct MinimumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -42,7 +42,7 @@ function evaluate(x::MinimumAtom)
     return Base.minimum(evaluate(x.children[1]))
 end
 
-function conic_form!(context::Context, x::MinimumAtom)
+function _conic_form!(context::Context, x::MinimumAtom)
     t = Variable()
     add_constraint!(context, t <= x.children[1])
     return conic_form!(context, t)

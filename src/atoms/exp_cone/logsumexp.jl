@@ -9,7 +9,7 @@
 
 # TODO: make this work for a *list* of inputs, rather than just for vector/matrix inputs
 
-struct LogSumExpAtom <: AbstractExpr
+mutable struct LogSumExpAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -45,7 +45,7 @@ end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
-function conic_form!(context::Context, e::LogSumExpAtom)
+function _conic_form!(context::Context, e::LogSumExpAtom)
     # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
     t = Variable()
     z = sum(exp(e.children[1] - t * ones(size(e.children[1]))))

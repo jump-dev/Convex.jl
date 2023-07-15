@@ -8,7 +8,7 @@ import Base.max
 
 # TODO: This can easily be extended to work
 ### Max Atom
-struct MaxAtom <: AbstractExpr
+mutable struct MaxAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -65,7 +65,7 @@ function evaluate(x::MaxAtom)
     return max.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-function conic_form!(context::Context, x::MaxAtom)
+function _conic_form!(context::Context, x::MaxAtom)
     t = Variable(x.size)
     p = minimize(t, (t >= child for child in x.children)...)
     return conic_form!(context, p)

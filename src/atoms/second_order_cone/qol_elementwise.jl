@@ -1,6 +1,6 @@
 import Base.Broadcast.broadcasted
 
-struct QolElemAtom <: AbstractExpr
+mutable struct QolElemAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -33,7 +33,7 @@ function evaluate(q::QolElemAtom)
     return (evaluate(q.children[1]) .^ 2) ./ evaluate(q.children[2])
 end
 
-function conic_form!(context::Context{T}, q::QolElemAtom) where {T}
+function _conic_form!(context::Context{T}, q::QolElemAtom) where {T}
     sz = q.children[1].size
     t = Variable(sz[1], sz[2])
     t_obj = conic_form!(context, t)

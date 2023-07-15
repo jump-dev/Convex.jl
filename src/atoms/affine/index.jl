@@ -2,7 +2,7 @@ import Base.getindex
 
 const ArrayOrNothing = Union{AbstractArray,Nothing}
 
-struct IndexAtom <: AbstractExpr
+mutable struct IndexAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     rows::ArrayOrNothing
@@ -52,7 +52,7 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function conic_form!(context::Context{T}, x::IndexAtom) where {T}
+function _conic_form!(context::Context{T}, x::IndexAtom) where {T}
     obj = conic_form!(context, only(children(x)))
 
     m = length(x)

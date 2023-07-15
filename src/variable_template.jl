@@ -67,9 +67,14 @@ function to_tape(
 end
 
 # get the usual tape
-function conic_form!(context::Context, a::AbstractVariable)
+function _conic_form!(context::Context, a::AbstractVariable)
     if vexity(a) == ConstVexity()
         return conic_form!(context, constant(evaluate(a)))
     end
     return to_tape(_template(a, context), context)
+end
+
+function conic_form!(context::Context, a::AbstractExpr)
+    d = context.conic_form_cache
+    return get!(() -> _conic_form!(context, a), d, a)
 end

@@ -6,7 +6,7 @@
 #############################################################################
 import LinearAlgebra.norm2
 
-struct EucNormAtom <: AbstractExpr
+mutable struct EucNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -36,7 +36,7 @@ end
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
-function conic_form!(context::Context{T}, A::EucNormAtom) where {T}
+function _conic_form!(context::Context{T}, A::EucNormAtom) where {T}
     obj = conic_form!(context, only(children(A)))
 
     x = only(children(A))

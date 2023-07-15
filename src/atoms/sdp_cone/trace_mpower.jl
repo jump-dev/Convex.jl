@@ -14,7 +14,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct TraceMpower <: AbstractExpr
+mutable struct TraceMpower <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     C::AbstractMatrix
@@ -81,7 +81,7 @@ function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
     return trace_mpower(A, t // 1, C)
 end
 
-function conic_form!(context::Context{T}, atom::TraceMpower) where {T}
+function _conic_form!(context::Context{T}, atom::TraceMpower) where {T}
     A = atom.children[1]
     C = atom.C
     t = atom.t

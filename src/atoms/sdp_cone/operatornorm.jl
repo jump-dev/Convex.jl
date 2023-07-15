@@ -9,7 +9,7 @@ import LinearAlgebra: opnorm
 
 ### Operator norm
 
-struct OperatorNormAtom <: AbstractExpr
+mutable struct OperatorNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -60,7 +60,7 @@ end
 
 Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
 
-function conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
+function _conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
     A = x.children[1]
     if sign(A) == ComplexSign()
         # Create the equivalent conic problem:

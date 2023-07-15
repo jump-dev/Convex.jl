@@ -7,7 +7,7 @@
 import Base.sum
 
 ### Sum Atom
-struct SumAtom <: AbstractExpr
+mutable struct SumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -38,7 +38,7 @@ function evaluate(x::SumAtom)
     return sum(evaluate(x.children[1]))
 end
 
-function conic_form!(context::Context{T}, A::SumAtom) where {T}
+function _conic_form!(context::Context{T}, A::SumAtom) where {T}
     subobj = conic_form!(context, only(children(A)))
     obj = operate(sum, T, sign(A), subobj)
     return obj

@@ -24,7 +24,7 @@
 
 const MatrixOrConstant = Union{AbstractMatrix,Constant}
 
-struct QuantumRelativeEntropy1 <: AbstractExpr
+mutable struct QuantumRelativeEntropy1 <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -50,7 +50,7 @@ end
 
 head(io::IO, ::QuantumRelativeEntropy1) = print(io, "quantum_relative_entropy")
 
-struct QuantumRelativeEntropy2 <: AbstractExpr
+mutable struct QuantumRelativeEntropy2 <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -190,7 +190,7 @@ function quantum_relative_entropy(
     return real(tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function conic_form!(context::Context, atom::QuantumRelativeEntropy1)
+function _conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     A = atom.children[1]
     B = atom.children[2]
     m = atom.m
@@ -211,7 +211,7 @@ function conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     return conic_form!(context, minimize(τ))
 end
 
-function conic_form!(context::Context, atom::QuantumRelativeEntropy2)
+function _conic_form!(context::Context, atom::QuantumRelativeEntropy2)
     A = atom.children[1]
     B = atom.B
     J = atom.J

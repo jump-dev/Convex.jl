@@ -8,7 +8,7 @@ import Base.exp
 
 ### Exponential
 
-struct ExpAtom <: AbstractExpr
+mutable struct ExpAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -42,7 +42,7 @@ end
 
 exp(x::AbstractExpr) = ExpAtom(x)
 
-function conic_form!(context::Context{T}, e::ExpAtom) where {T}
+function _conic_form!(context::Context{T}, e::ExpAtom) where {T}
     # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
     x = e.children[1]
     y = Constant(ones(size(x)))

@@ -1,4 +1,4 @@
-struct ConjugateAtom <: AbstractExpr
+mutable struct ConjugateAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -25,7 +25,7 @@ function evaluate(x::ConjugateAtom)
     return conj(evaluate(x.children[1]))
 end
 
-function conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
+function _conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
     objective = conic_form!(context, only(children(x)))
     return operate(conj, T, sign(x), objective)
 end

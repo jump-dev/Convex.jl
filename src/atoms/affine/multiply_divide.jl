@@ -10,7 +10,7 @@ import Base.Broadcast.broadcasted
 
 ### Scalar and matrix multiplication
 
-struct MultiplyAtom <: AbstractExpr
+mutable struct MultiplyAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -90,7 +90,7 @@ function real_convert(::Type{T}, x::AbstractVector) where {T}
     return sparse(convert(Vector{T}, x))
 end
 
-function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
+function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
         if vexity(x.children[1]) == ConstVexity()
