@@ -29,13 +29,13 @@ end
 
 function vexity(c::ExpConstraint)
     # TODO: check these...
-    if vexity(c.x) == ConcaveVexity()
+    if vexity(c.children[1]) == ConcaveVexity()
         error("Exponential constraint requires x to be convex")
     end
-    if vexity(c.y) != ConstVexity()
+    if vexity(c.children[2]) != ConstVexity()
         error("Exponential constraint requires y to be constant")
     end
-    if vexity(c.z) == ConvexVexity()
+    if vexity(c.children[3]) == ConvexVexity()
         error("Exponential constraint requires z to be concave")
     end
     return ConvexVexity()
