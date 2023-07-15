@@ -23,7 +23,15 @@ end
 
 # convert to a usual VAF
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
-    I, J, V = findnz(vaf_as_matrix.aff.matrix)
+    if issparse(vaf_as_matrix.aff.matrix)
+        I, J, V = findnz(vaf_as_matrix.aff.matrix)
+    else
+        inds = findall(!iszero, vaf_as_matrix.aff.matrix )
+        V = vaf_as_matrix.aff.matrix[inds]
+        inds = Tuple.(inds)
+        I = first.(inds)
+        J = last.(inds)
+    end
     vats = MOI.VectorAffineTerm{T}[]
     for n in eachindex(I, J, V)
         i = I[n]

@@ -141,7 +141,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
             add_operation,
             T,
             sign(x),
-            kron(Diagonal(ones(T, x.size[2])), const_multiplier),
+            ApplyArray(kron, Diagonal(ones(T, x.size[2])), const_multiplier),
             objective,
         )
 
@@ -159,7 +159,7 @@ function conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
             add_operation,
             T,
             sign(x),
-            kron(transpose(const_multiplier), Diagonal(ones(T, x.size[1]))),
+            ApplyArray(kron, transpose(const_multiplier), Diagonal(ones(T, x.size[1]))),
             objective,
         )
     end

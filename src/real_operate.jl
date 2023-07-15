@@ -229,10 +229,17 @@ function real_operate(
     A::AbstractMatrix,
     tape::SparseTape{T},
 ) where {T<:Real}
-    return add_operation(
-        tape,
-        SparseAffineOperation{T}(real_convert(T, A), zeros(T, size(A, 1))),
-    )
+    tape = Convex.collapse(tape)
+    B = only(tape.operations)
+
+    vec = A * B.vector
+    mat = A * B.matrix
+
+    return SparseTape([SparseAffineOperation(mat, vec)], tape.variables)
+    # return add_operation(
+    #     tape,
+    #     SparseAffineOperation{T}(real_convert(T, A), zeros(T, size(A, 1))),
+    # )
 end
 
 function real_operate(
@@ -250,14 +257,22 @@ function real_operate(
     x::Real,
     tape::SparseTape{T},
 ) where {T<:Real}
-    d = MOI.output_dimension(tape)
-    return add_operation(
-        tape,
-        SparseAffineOperation{T}(
-            sparse(real_convert(T, x) * I, d, d),
-            zeros(T, d),
-        ),
-    )
+    tape = Convex.collapse(tape)
+    B = only(tape.operations)
+
+    vec = x * B.vector
+    mat = x * B.matrix
+
+    return SparseTape([SparseAffineOperation(mat, vec)], tape.variables)
+
+    # d = MOI.output_dimension(tape)
+    # return add_operation(
+    #     tape,
+    #     SparseAffineOperation{T}(
+    #         sparse(real_convert(T, x) * I, d, d),
+    #         zeros(T, d),
+    #     ),
+    # )
 end
 
 function real_operate(
