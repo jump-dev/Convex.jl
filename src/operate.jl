@@ -20,8 +20,14 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
             @assert length(args) == 2
             x, y = args
             if !(
-                typeof(x) in
-                (T, Complex{T}, SPARSE_MATRIX{T},  SPARSE_MATRIX{Complex{T}}, Matrix{T},Matrix{Complex{T}})
+                typeof(x) in (
+                    T,
+                    Complex{T},
+                    SPARSE_MATRIX{T},
+                    SPARSE_MATRIX{Complex{T}},
+                    Matrix{T},
+                    Matrix{Complex{T}},
+                )
             )
                 error(
                     "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",

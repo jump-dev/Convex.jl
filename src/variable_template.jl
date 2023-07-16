@@ -53,7 +53,7 @@ function to_tape(v::MOI.VectorOfVariables, ::Context{T}) where {T}
     var_inds = v.variables
     d = length(var_inds)
     return SparseTape(
-        [SparseAffineOperation(spidentity(T, d), spzeros(T,d))],
+        [SparseAffineOperation(spidentity(T, d), spzeros(T, d))],
         var_inds,
     )
 end

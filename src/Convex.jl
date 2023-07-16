@@ -141,7 +141,7 @@ const SPARSE_VECTOR{T} = Vector{T}
 const SPARSE_MATRIX{T} = SparseMatrixCSC{T,Int}
 spzeros(T, d) = zeros(T, d)
 spzeros(T, n, m) = SparseArrays.spzeros(T, n, m)
-spidentity(T, d) = sparse(one(T)*I, d, d)
+spidentity(T, d) = sparse(one(T) * I, d, d)
 # function create_sparse(::Type{T}, I, J, V, args...) where T
 #     return SparseArrays.sparse(I, J, T.(V), args...)::SPARSE_MATRIX{T}
 # end

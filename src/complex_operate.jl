@@ -120,12 +120,7 @@ end
 function complex_operate(::typeof(add_operation), ::Type{T}, A, c) where {T}
     L = real_operate(add_operation, T, real(A), real(c))
     R = real_operate(add_operation, T, imag(A), imag(c))
-    re = real_operate(
-        -,
-        T,
-        L,
-        R,
-    )
+    re = real_operate(-, T, L, R)
 
     im = real_operate(
         +,

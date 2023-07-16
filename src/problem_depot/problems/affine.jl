@@ -802,8 +802,8 @@ end
 ) where {T,test}
     dims = [2, 3, 4]
     d = prod(dims)
-    A = rand( 2, 2)
-    B = rand( 3, 3)
+    A = rand(2, 2)
+    B = rand(3, 3)
     C = rand(ComplexF64, 4, 4)
     M = kron(A, kron(B, C))
     Mt1 = kron(transpose(A), B, C)

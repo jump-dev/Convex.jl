@@ -157,7 +157,7 @@ function blockdiag(xs::GBMatrix{T,T}...) where {T}
     heights = size.(xs, 1)
     for (i, x) in enumerate(xs)
         entries[i, i] = x
-        m = size(x,2)
+        m = size(x, 2)
         for j in 1:(i-1)
             entries[j, i] = GBMatrix{T,T}(heights[j], m)
         end
@@ -305,7 +305,7 @@ function real_operate(
     d = MOI.output_dimension(tape)
     return add_operation(
         tape,
-        SparseAffineOperation(x*spidentity(T, d), spzeros(T, d)),
+        SparseAffineOperation(x * spidentity(T, d), spzeros(T, d)),
     )
 end
 

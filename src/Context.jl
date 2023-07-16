@@ -19,7 +19,7 @@ mutable struct Context{T,M}
 
     # Cache
     # conic_form_cache::DataStructures.WeakKeyIdDict{Any, Any}
-    conic_form_cache::IdDict{Any, Any}
+    conic_form_cache::IdDict{Any,Any}
 end
 
 function Context{T}(optimizer) where {T}
@@ -36,7 +36,6 @@ function Context{T}(optimizer) where {T}
         OrderedDict{UInt64,Any}(),
         IdDict{Any,Any}(),
         false,
-        IdDict{Any,Any}()
+        IdDict{Any,Any}(),
     )
 end
-
