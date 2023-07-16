@@ -133,6 +133,11 @@ function Context(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
     context = Context{T}(optimizer)
     cfp = conic_form!(context, p)
 
+    # Save some memory before the solve;
+    # we don't need these anymore,
+    # since we don't re-use contexts between solves currently
+    empty!(context.conic_form_cache)
+
     model = context.model
 
     if p.head == :satisfy

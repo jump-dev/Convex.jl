@@ -80,9 +80,13 @@ head(io::IO, x::AbstractExpr) = print(io, typeof(x))
 
 function Base.summary(io::IO, c::Constraint)
     head(io, c)
-    print(io, " constraint (")
-    summary(io, vexity(c))
-    return print(io, ")")
+    print(io, " constraint")
+    if applicable(vexity, c)
+        print(io, " (")
+        summary(io, vexity(c))
+        print(io, ")")
+    end
+    return nothing
 end
 
 function Base.summary(io::IO, e::AbstractExpr)

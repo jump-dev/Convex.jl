@@ -17,7 +17,7 @@ Random.seed!(2)
         @testset "Problems can run without `solve!`ing if `test==false`; T=$T" for T in
                                                                                    (
             Float64,
-            # BigFloat,
+            BigFloat,
         )
             Convex.ProblemDepot.foreach_problem() do name, func
                 @testset "$name" begin
@@ -29,6 +29,10 @@ Random.seed!(2)
                         # make sure it loads without throwing
                         context = Convex.Context(problem, model)
 
+                        # Make sure they can print
+                        @test sprint(show, context) isa AbstractString
+
+                        @test sprint(show, problem) isa AbstractString
                         return nothing
                     end
                 end

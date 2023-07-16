@@ -27,19 +27,19 @@ function ExpConstraint(x, y::AbstractExpr, z::AbstractExpr)
     return ExpConstraint(constant(x), y, z)
 end
 
-function vexity(c::ExpConstraint)
-    # TODO: check these...
-    if vexity(c.children[1]) == ConcaveVexity()
-        error("Exponential constraint requires x to be convex")
-    end
-    if vexity(c.children[2]) != ConstVexity()
-        error("Exponential constraint requires y to be constant")
-    end
-    if vexity(c.children[3]) == ConvexVexity()
-        error("Exponential constraint requires z to be concave")
-    end
-    return ConvexVexity()
-end
+# function vexity(c::ExpConstraint)
+#     # TODO: check these...
+#     if vexity(c.children[1]) == ConcaveVexity()
+#         error("Exponential constraint requires x to be convex")
+#     end
+#     if vexity(c.children[2]) != ConstVexity()
+#         error("Exponential constraint requires y to be constant")
+#     end
+#     if vexity(c.children[3]) == ConvexVexity()
+#         error("Exponential constraint requires z to be concave")
+#     end
+#     return ConvexVexity()
+# end
 
 function _add_constraint!(context::Context{T}, c::ExpConstraint) where {T}
     x, y, z = c.children
