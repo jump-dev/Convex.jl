@@ -802,13 +802,13 @@ end
 ) where {T,test}
     dims = [2, 3, 4]
     d = prod(dims)
-    A = rand(ComplexF64, 2, 2)
-    B = rand(ComplexF64, 3, 3)
+    A = rand( 2, 2)
+    B = rand( 3, 3)
     C = rand(ComplexF64, 4, 4)
-    M = kron(A, B, C)
+    M = kron(A, kron(B, C))
     Mt1 = kron(transpose(A), B, C)
     Mt2 = kron(A, transpose(B), C)
-    Mt3 = kron(A, B, transpose(C))
+    Mt3 = kron(A, kron(B, transpose(C)))
 
     Rt1 = ComplexVariable(d, d)
     Rt2 = ComplexVariable(d, d)

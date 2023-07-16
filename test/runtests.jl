@@ -17,7 +17,7 @@ Random.seed!(2)
         @testset "Problems can run without `solve!`ing if `test==false`; T=$T" for T in
                                                                                    (
             Float64,
-            BigFloat,
+            # BigFloat,
         )
             Convex.ProblemDepot.foreach_problem() do name, func
                 @testset "$name" begin

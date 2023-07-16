@@ -66,18 +66,18 @@ function real_convert(::Type{T}, x::Number) where {T}
     return T(x)
 end
 function real_convert(::Type{T}, x::AbstractMatrix) where {T}
-    return GBMatrix{T, T}(x)
+    return GBMatrix{T,T}(x)
 end
 
-function real_convert(::Type{T}, x::GBMatrix{T,T}) where {T}
+function real_convert(::Type{T}, x::SPARSE_MATRIX{T}) where {T}
     return x
 end
 
-function real_convert(::Type{T}, x::GBVector{T,T}) where {T}
+function real_convert(::Type{T}, x::SPARSE_VECTOR{T}) where {T}
     return x
 end
 function real_convert(::Type{T}, x::AbstractVector) where {T}
-    return GBVector{T,T}(x)
+    return SPARSE_VECTOR{T}(x)
 end
 
 function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
@@ -158,7 +158,7 @@ function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
 end
 
 # _id(T, n) = Diagonal(one(T)*I, n)
-_id(T, n) = gbidentity(T, n)
+_id(T, n) = spidentity(T, n)
 
 function *(x::AbstractExpr, y::AbstractExpr)
     if isequal(x, y) && x.size == (1, 1)
@@ -170,6 +170,32 @@ end
 *(x::Value, y::AbstractExpr) = MultiplyAtom(constant(x), y)
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
 /(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))
+
+# ambiguity
+function Base.:(*)(
+    x::Convex.AbstractExpr,
+    y::Union{
+        LinearAlgebra.Transpose{
+            <:Any,
+            <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+        },
+        SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+    },
+) where {T,F,O}
+    return MultiplyAtom(x, constant(y))
+end
+function Base.:(*)(
+    x::Union{
+        LinearAlgebra.Transpose{
+            <:Any,
+            <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+        },
+        SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+    },
+    y::Convex.AbstractExpr,
+) where {T,F,O}
+    return MultiplyAtom(constant(x), y)
+end
 
 function dotmultiply(x, y)
     if vexity(x) != ConstVexity()

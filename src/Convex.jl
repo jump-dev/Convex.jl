@@ -7,7 +7,7 @@ using SparseArrays
 using LDLFactorizations
 using AbstractTrees: AbstractTrees, children
 using SuiteSparseGraphBLAS
-using DataStructures
+# using DataStructures
 
 using MathOptInterface
 const MOI = MathOptInterface
@@ -129,6 +129,12 @@ function vec_tril(M)
     inds = [L[i, j] for i in 1:n for j in 1:i]
     return M[inds]
 end
+
+const SPARSE_VECTOR{T} = GBVector{T,T}
+const SPARSE_MATRIX{T} = GBMatrix{T,T}
+spzeros(T, d) = GBVector{T,T}(d)
+spzeros(T, n, m) = GBMatrix{T,T}(n, m)
+spidentity(T, d) = GBMatrix{T,T}(Diagonal(ones(T, d)))
 
 include("Context.jl")
 ### modeling framework

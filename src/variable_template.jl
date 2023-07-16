@@ -53,7 +53,7 @@ function to_tape(v::MOI.VectorOfVariables, ::Context{T}) where {T}
     var_inds = v.variables
     d = length(var_inds)
     return SparseTape(
-        [SparseAffineOperation(gbidentity(T, d), GBVector{T,T}(d))],
+        [SparseAffineOperation(spidentity(T, d), SPARSE_VECTOR{T}(d))],
         var_inds,
     )
 end
@@ -77,16 +77,16 @@ end
 function conic_form!(context::Context, a::AbstractExpr)
 
     # Nicer implementation
-    # d = context.conic_form_cache
-    # return get!(() -> _conic_form!(context, a), d, a)
+    d = context.conic_form_cache
+    return get!(() -> _conic_form!(context, a), d, a)
 
     # Avoid closure
-    wkh = context.conic_form_cache
-    default = () -> _conic_form!(context, a)
-    key = a
-    return Base.@lock wkh.lock begin
-        get!(default, wkh.ht, DataStructures.WeakRefForWeakDict(key))
-    end
+    # wkh = context.conic_form_cache
+    # default = () -> _conic_form!(context, a)
+    # key = a
+    # return Base.@lock wkh.lock begin
+    #     get!(default, wkh.ht, DataStructures.WeakRefForWeakDict(key))
+    # end
 
     return
 end

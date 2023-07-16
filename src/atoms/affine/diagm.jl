@@ -63,8 +63,8 @@ function _conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     obj = conic_form!(context, only(children(x)))
 
     sz = x.size[1]
-    I = 1:sz+1:sz*sz
-    J = 1:sz
+    I = collect(1:sz+1:sz*sz)
+    J = collect(1:sz)
     V = one(T)
     coeff = GBMatrix{T, T}(I, J, V, sz * sz, sz)
     # coeff = sparse(, 1:sz, one(T),

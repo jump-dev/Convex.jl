@@ -42,7 +42,7 @@ function _conic_form!(context::Context{T}, x::LogDetAtom) where {T}
     X = conic_form!(context, v)
 
     t = conic_form!(context, Variable())
-    f = operate(vcat, T, sign(x), t, [one(T)], X)
+    f = operate(vcat, T, sign(x), t, SPARSE_VECTOR{T}([one(T)]), X)
     side_dimension = size(only(children(x)), 1)
 
     set = MOI.LogDetConeTriangle(side_dimension)

@@ -2,7 +2,7 @@
 # First we cover real -> real, then complex -> real
 
 # Only two types allowed here for real -> real
-const AllAllowedReal{T} = Union{SparseTape{T},Vector{T}}
+const AllAllowedReal{T} = Union{SparseTape{T},SPARSE_VECTOR{T}}
 
 ## Vararg
 
@@ -12,8 +12,8 @@ const AllAllowedReal{T} = Union{SparseTape{T},Vector{T}}
 function real_operate(
     ::typeof(+),
     ::Type{T},
-    v1::Vector{T},
-    v2::Vector{T},
+    v1::SPARSE_VECTOR{T},
+    v2::SPARSE_VECTOR{T},
 ) where {T<:Real}
     return v1 + v2
 end
@@ -22,7 +22,7 @@ end
 function real_operate(
     ::typeof(+),
     ::Type{T},
-    v::Vector{T},
+    v::SPARSE_VECTOR{T},
     tape::SparseTape{T},
 ) where {T<:Real}
     return real_operate(+, T, tape, v)
@@ -33,10 +33,10 @@ function real_operate(
     ::typeof(+),
     ::Type{T},
     tape::SparseTape{T},
-    v::Vector{T},
+    v::SPARSE_VECTOR{T},
 ) where {T<:Real}
     d = length(v)
-    return add_operation(tape, SparseAffineOperation(gbidentity(T, d), v))
+    return add_operation(tape, SparseAffineOperation(spidentity(T, d), v))
 end
 
 # (SparseTape, SparseTape)
@@ -101,11 +101,15 @@ function real_operate(
 
     return add_operation(
         tape,
-        SparseAffineOperation(-gbidentity(T, d), GBVector{T,T}(d)),
+        SparseAffineOperation(-spidentity(T, d), spzeros(T, d)),
     )
 end
 
-function real_operate(::typeof(-), ::Type{T}, v::Vector{T}) where {T<:Real}
+function real_operate(
+    ::typeof(-),
+    ::Type{T},
+    v::SPARSE_VECTOR{T},
+) where {T<:Real}
     return -v
 end
 
@@ -131,73 +135,6 @@ function real_operate(
     return v
 end
 
-# https://github.com/JuliaSparse/SuiteSparseGraphBLAS.jl/blob/ce89efca856aa1afe65c5913423eb87ac4239f87/src/operations/concat.jl#L14C1-L35C1
-using SuiteSparseGraphBLAS: AbstractGBVector, AbstractGBMatrix, cat!
-function _vcat(
-    tiles::Union{AbstractGBMatrix{T,F},AbstractGBVector{T,F}}...,
-) where {T,F}
-    return cat(collect(tiles))
-
-    fills = getproperty.(tiles, :fill)
-    if F <: Union{Nothing,Missing}
-        fill = F()
-    elseif all(y -> y == fills[1], fills)
-        fill = fills[1]
-    else
-        fill = zero(F)
-    end
-    ncols = size(tiles[1], 2)
-    nrows = sum(size.(tiles, 1))
-    types = eltype.(tiles)
-    t = types[1]
-    for type in types[2:end]
-        t = promote_type(t, type)
-    end
-    # sz = (tiles isa AbstractArray && ncols == 1) ? (nrows,) : (nrows, ncols)
-
-    if ndims(tiles[1]) == 1
-        @assert ncols == 1
-        @assert all(==(1), ndims.(tiles))
-        sz = (nrows,)
-        vec = true
-    else
-        sz = (nrows, ncols)
-        vec = false
-    end
-    C = similar(tiles[1], t, sz; fill) # TODO: FIXME, we want this to use promotion, but it's complicated.
-
-    # if !vec
-    nr = 1
-    for x in tiles
-        # @show size(x)
-        C[nr:(nr+size(x, 1)-1)] = x
-        nr += size(x, 1)
-    end
-    # else
-    #     nr = 1
-    #     for x in tiles
-    #         @show size(x)
-    #         @show nr:(nr+size(x, 1))
-    #         @show size(C)
-    #         C[nr:(nr+size(x, 1)-1)] = x
-    #         nr += size(x, 1)
-    #     end
-    # end
-    return C
-end
-
-# function Base.setindex!(
-#     u::AbstractGBVector,
-#     x,
-#     I::Union{Vector,UnitRange,StepRange,Colon},
-#     ::Colon;
-#     mask = nothing,
-#     accum = nothing,
-#     desc = nothing,
-# )
-#     return SuiteSparseGraphBLAS.subassign!(u, x, I; mask, accum, desc)
-# end
-
 # we do all pairs of `SparseTape` and `Vector`, and then do 3+ arguments by iterating
 function real_operate(
     ::typeof(vcat),
@@ -215,34 +152,20 @@ end
 
 blockdiag(x, y) = Base.blockdiag(x, y)
 
-function blockdiag(xs::GBMatrix{T}...) where {T}
-    # nrows = sum(size.(xs, 1))
-    # ncols = sum(size.(xs, 2))
-    # z = GBMatrix{T}(nrows, ncols)
-    # n = m = 1
-    # for x in xs
-    #     z[n:(n+size(x, 1)-1), m:(m+size(x,2)-1)] = x
-    # end
-    # return z
-
+function blockdiag(xs::GBMatrix{T,T}...) where {T}
     N = length(xs)
-
     entries = Matrix{GBMatrix{T,T}}(undef, N, N)
-
     heights = size.(xs, 1)
     for (i, x) in enumerate(xs)
         entries[i, i] = x
-        n, m = size(x)
-        # @assert n == m
+        m = size(x,2)
         for j in 1:(i-1)
             entries[j, i] = GBMatrix{T,T}(heights[j], m)
         end
         for j in (i+1):lastindex(entries, 1)
             entries[j, i] = GBMatrix{T,T}(heights[j], m)
         end
-
     end
-
     return cat(entries)
 end
 
@@ -250,37 +173,52 @@ function real_operate(
     ::typeof(vcat),
     ::Type{T},
     tape::SparseTape{T},
-    v::Vector{T},
+    v::SPARSE_VECTOR{T},
 ) where {T<:Real}
     op = SparseAffineOperation(tape)
     n = length(v)
     m = size(op.matrix, 2) # bad for uniformscaling
-    Z = GBMatrix{T,T}(n, m)
-    A = vcat(op.matrix, Z)
-    b = vcat(op.vector, GBVector{T,T}(v))
+    b = vcat(op.vector, v)
+    # Workaround SparseSuiteGraphBLAS bug with vcat
+    # where vcatting two (1,1) GBMatrix yields GBVector
+    if op.matrix isa GBMatrix
+        A = GBMatrix{T,T}(size(op.matrix, 1) + n, m)
+        A[1:size(op.matrix, 1), :] = op.matrix
+    else
+        Z = spzeros(T, n, m)
+        A = vcat(op.matrix, Z)
+    end
     return SparseTape([SparseAffineOperation(A, b)], tape.variables)
 end
 
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
-    v::Vector{T},
+    v::SPARSE_VECTOR{T},
     tape::SparseTape{T},
 ) where {T<:Real}
     op = SparseAffineOperation(tape)
     n = length(v)
     m = size(op.matrix, 2) # bad for uniformscaling
-    Z = GBMatrix{T,T}(n, m)
-    A = vcat(Z, op.matrix)
-    b = _vcat(GBVector{T,T}(v), op.vector)
+    b = vcat(v, op.vector)
+
+    # Workaround SparseSuiteGraphBLAS bug with vcat
+    # where vcatting two (1,1) GBMatrix yields GBVector
+    if op.matrix isa GBMatrix
+        A = GBMatrix{T,T}(n + size(op.matrix, 1), m)
+        A[(n+1):end, :] = op.matrix
+    else
+        Z = spzeros(T, n, m)
+        A = vcat(Z, op.matrix)
+    end
     return SparseTape([SparseAffineOperation(A, b)], tape.variables)
 end
 
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
-    v1::Vector{T},
-    v2::Vector{T},
+    v1::SPARSE_VECTOR{T},
+    v2::SPARSE_VECTOR{T},
 ) where {T<:Real}
     return vcat(v1, v2)
 end
@@ -327,7 +265,11 @@ function real_operate(
     return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
 end
 
-function real_operate(::typeof(sum), ::Type{T}, v::Vector{T}) where {T<:Real}
+function real_operate(
+    ::typeof(sum),
+    ::Type{T},
+    v::SPARSE_VECTOR{T},
+) where {T<:Real}
     return [sum(v)]
 end
 
@@ -335,7 +277,7 @@ end
 
 # `add_operation`
 # Here the left-side argument may be a `SparseMatrixCSC{T}` or a `T`
-# and the right-argument is either a `SparseTape{T}` or `Vector{T}`
+# and the right-argument is either a `SparseTape{T}` or `SPARSE_VECTOR{T}`
 
 function real_operate(
     ::typeof(add_operation),
@@ -350,12 +292,10 @@ function real_operate(
     ::typeof(add_operation),
     ::Type{T},
     A::AbstractMatrix,
-    v::Vector{T},
+    v::SPARSE_VECTOR{T},
 ) where {T<:Real}
-    return Vector{T}(A * v)
+    return SPARSE_VECTOR{T}(A * v)
 end
-
-gbidentity(T, d) = GBMatrix{T,T}(Diagonal(ones(T, d)))
 
 function real_operate(
     ::typeof(add_operation),
@@ -366,7 +306,7 @@ function real_operate(
     d = MOI.output_dimension(tape)
     return add_operation(
         tape,
-        SparseAffineOperation(gbidentity(T, d), GBVector{T,T}(d)),
+        SparseAffineOperation(spidentity(T, d), spzeros(T, d)),
     )
 end
 
@@ -374,9 +314,9 @@ function real_operate(
     ::typeof(add_operation),
     ::Type{T},
     x::Real,
-    v::Vector{T},
+    v::SPARSE_VECTOR{T},
 ) where {T<:Real}
-    return Vector{T}(real_convert(T, x) * v)
+    return SPARSE_VECTOR{T}(real_convert(T, x) * v)
 end
 
 # Here we have our two complex -> real functions

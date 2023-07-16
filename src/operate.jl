@@ -2,8 +2,8 @@ complex_promote(tape::ComplexTape) = tape
 complex_promote(tape::SparseTape) = tape
 complex_promote(v::ComplexStructOfVec) = v
 
-function complex_promote(v::Vector)
-    return ComplexStructOfVec(v, zero(v))
+function complex_promote(v::AbstractVector{T}) where {T}
+    return ComplexStructOfVec(v, SPARSE_VECTOR{T}(length(v)))
 end
 
 # Here we run `complex_promote` and dispatch to either `real_operate`
@@ -17,30 +17,26 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
         if op === add_operation
             @assert length(args) == 2
             x, y = args
-            # if !(
-            #     typeof(x) in (
-            #         T,
-            #         Complex{T},
-            #         SparseMatrixCSC{T,Int},
-            #         SparseMatrixCSC{Complex{T},Int},
-            #     )
-            # )
-            #     error(
-            #         "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
-            #     )
-            # end
-            # if !(
-            #     typeof(y) in (
-            #         SparseTape{T},
-            #         Vector{T},
-            #         ComplexTape{T},
-            #         ComplexStructOfVec{T},
-            #     )
-            # )
-            #     error(
-            #         "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
-            #     )
-            # end
+            if !(
+                typeof(x) in
+                (T, Complex{T}, SPARSE_MATRIX{T}, GBMatrix{Complex{T},Complex{T}})
+            )
+                error(
+                    "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
+                )
+            end
+            if !(
+                typeof(y) in (
+                    SparseTape{T},
+                    SPARSE_VECTOR{T},
+                    ComplexTape{T},
+                    ComplexStructOfVec{T},
+                )
+            )
+                error(
+                    "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
+                )
+            end
         else
             # Everything should be either be
             # ComplexTape{T}, SparseTape{T}, or ComplexStructOfVec{T}
@@ -79,22 +75,25 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
                 @assert length(args) == 2
 
                 x, y = args
-                # if !(typeof(x) in (T, SparseMatrixCSC{T,Int}))
-                #     error(
-                #         "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
-                #     )
-                # end
-                # if !(typeof(y) in (SparseTape{T}, Vector{T}))
-                #     error(
-                #         "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
-                #     )
-                # end
+                if !(typeof(x) in (T, SPARSE_MATRIX{T}))
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
+                    )
+                end
+                if !(typeof(y) in (SparseTape{T}, SPARSE_VECTOR{T}))
+                    error(
+                        "Convex.jl internal error: unexpected type $(typeof(y)) for second argument of operation $op of with sign=$sign",
+                    )
+                end
             end
         else
             # Everything should be either a
-            # SparseTape{T} or Vector{T}
+            # SparseTape{T} or GBVector{T, T}
             for arg in args
-                if !(typeof(arg) == SparseTape{T} || typeof(arg) == Vector{T} || typeof(arg) == GBVector{T, T})
+                if !(
+                    typeof(arg) == SparseTape{T} ||
+                    typeof(arg) == SPARSE_VECTOR{T}
+                )
                     error("Internal error: unexpected type $(typeof(arg))")
                 end
             end

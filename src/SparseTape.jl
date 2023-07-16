@@ -1,6 +1,6 @@
 struct SparseAffineOperation{T}
-    matrix::Union{GBMatrix{T,T}}
-    vector::Union{GBVector{T,T}}
+    matrix::SPARSE_MATRIX{T}
+    vector::SPARSE_VECTOR{T}
 end
 
 # function Base.convert(
@@ -16,7 +16,7 @@ function SparseAffineOperation(
     A::AbstractMatrix{T},
     b::AbstractVector{T},
 ) where {T}
-    return SparseAffineOperation{T}(GBMatrix{T,T}(A), GBVector{T, T}(b))
+    return SparseAffineOperation{T}(SPARSE_MATRIX{T}(A), GBVector{T, T}(b))
 end
 
 
