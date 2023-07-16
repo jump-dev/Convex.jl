@@ -130,11 +130,26 @@ function vec_tril(M)
     return M[inds]
 end
 
-const SPARSE_VECTOR{T} = GBVector{T,T}
-const SPARSE_MATRIX{T} = GBMatrix{T,T}
-spzeros(T, d) = GBVector{T,T}(d)
-spzeros(T, n, m) = GBMatrix{T,T}(n, m)
-spidentity(T, d) = GBMatrix{T,T}(Diagonal(ones(T, d)))
+# const SPARSE_VECTOR{T} = GBVector{T,T}
+# const SPARSE_MATRIX{T} = GBMatrix{T,T}
+# spzeros(T, d) = GBVector{T,T}(d)
+# spzeros(T, n, m) = GBMatrix{T,T}(n, m)
+# spidentity(T, d) = GBMatrix{T,T}(Diagonal(ones(T, d)))
+# create_sparse(T, args...) = GBMatrix{T,T}(args...)
+
+const SPARSE_VECTOR{T} = Vector{T}
+const SPARSE_MATRIX{T} = SparseMatrixCSC{T,Int}
+spzeros(T, d) = zeros(T, d)
+spzeros(T, n, m) = SparseArrays.spzeros(T, n, m)
+spidentity(T, d) = sparse(one(T)*I, d, d)
+# function create_sparse(::Type{T}, I, J, V, args...) where T
+#     return SparseArrays.sparse(I, J, T.(V), args...)::SPARSE_MATRIX{T}
+# end
+function create_sparse(::Type{T}, args...) where {T}
+    local result::SPARSE_MATRIX{T}
+    result = SparseArrays.sparse(args...)
+    return result
+end
 
 include("Context.jl")
 ### modeling framework

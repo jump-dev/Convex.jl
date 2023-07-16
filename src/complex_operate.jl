@@ -118,11 +118,13 @@ end
 ## Binary
 
 function complex_operate(::typeof(add_operation), ::Type{T}, A, c) where {T}
+    L = real_operate(add_operation, T, real(A), real(c))
+    R = real_operate(add_operation, T, imag(A), imag(c))
     re = real_operate(
         -,
         T,
-        real_operate(add_operation, T, real(A), real(c)),
-        real_operate(add_operation, T, imag(A), imag(c)),
+        L,
+        R,
     )
 
     im = real_operate(
@@ -131,7 +133,7 @@ function complex_operate(::typeof(add_operation), ::Type{T}, A, c) where {T}
         real_operate(add_operation, T, real(A), imag(c)),
         real_operate(add_operation, T, imag(A), real(c)),
     )
-    if re isa Vector && im isa Vector
+    if re isa AbstractVector && im isa AbstractVector
         return ComplexStructOfVec(re, im)
     else
         return ComplexTape(re, im)

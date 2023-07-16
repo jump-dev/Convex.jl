@@ -90,6 +90,8 @@ function _conic_form!(context::Context, C::ComplexConstant)
     )
 end
 
+constant(x::Constant) = x
+constant(x::ComplexConstant) = x
 function constant(x)
     # Convert to matrix
     x = [x;;]

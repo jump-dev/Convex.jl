@@ -1,9 +1,11 @@
 complex_promote(tape::ComplexTape) = tape
 complex_promote(tape::SparseTape) = tape
 complex_promote(v::ComplexStructOfVec) = v
+complex_promote(x::Real) = complex(x)
+complex_promote(x::Complex) = x
 
 function complex_promote(v::AbstractVector{T}) where {T}
-    return ComplexStructOfVec(v, SPARSE_VECTOR{T}(length(v)))
+    return ComplexStructOfVec(v, spzeros(T, length(v)))
 end
 
 # Here we run `complex_promote` and dispatch to either `real_operate`
@@ -19,7 +21,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
             x, y = args
             if !(
                 typeof(x) in
-                (T, Complex{T}, SPARSE_MATRIX{T}, GBMatrix{Complex{T},Complex{T}})
+                (T, Complex{T}, SPARSE_MATRIX{T},  SPARSE_MATRIX{Complex{T}}, Matrix{T},Matrix{Complex{T}})
             )
                 error(
                     "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
@@ -75,7 +77,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
                 @assert length(args) == 2
 
                 x, y = args
-                if !(typeof(x) in (T, SPARSE_MATRIX{T}))
+                if !(typeof(x) in (T, SPARSE_MATRIX{T}, Matrix{T}))
                     error(
                         "Convex.jl internal error: unexpected type $(typeof(x)) for first argument of operation $op of with sign=$sign",
                     )

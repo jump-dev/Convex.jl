@@ -16,7 +16,7 @@ function SparseAffineOperation(
     A::AbstractMatrix{T},
     b::AbstractVector{T},
 ) where {T}
-    return SparseAffineOperation{T}(SPARSE_MATRIX{T}(A), GBVector{T, T}(b))
+    return SparseAffineOperation{T}(create_sparse(T,A), SPARSE_VECTOR{T}(b))
 end
 
 
@@ -30,11 +30,25 @@ end
 # function SparseAffineOperation(A::AbstractSparseMatrix, b)
 #     return SparseAffineOperation(SparseMatrixCSC(A), b)
 # end
-# SparseAffineOperation(A, b) = SparseAffineOperation(sparse(A), b)
+# SparseAffineOperation(A, b) = SparseAffineOperation(create_sparse(A), b)
 
 mutable struct SparseTape{T}
     operations::Vector{SparseAffineOperation{T}}
     variables::Vector{MOI.VariableIndex}
+    function SparseTape{T}(operations::Vector{SparseAffineOperation{T}}, variables::Vector{MOI.VariableIndex}) where {T}
+        # Is this necessary?
+        # if !issorted(variables; by = x->x.value)
+        #     p = sortperm(variables; by = x->x.value)
+        #     op = foldl(compose, operations)
+        #     matrix = op.matrix[:, p]
+        #     vector = op.vector
+        #     operations = [SparseAffineOperation(matrix, vector)]
+        #     variables = variables[p]
+        # end
+        new(operations, variables)
+    end
+
+    SparseTape(operations::Vector{SparseAffineOperation{T}}, variables::Vector{MOI.VariableIndex}) where {T} = SparseTape{T}(operations, variables)
 end
 
 MOI.output_dimension(v::SparseTape) = size(v.operations[1].matrix, 1)
@@ -66,8 +80,8 @@ Base.real(tape::SparseTape) = tape
 function Base.imag(c::SparseTape{T}) where {T}
     n = MOI.output_dimension(c)
     m = length(c.variables)
-    mat = GBMatrix{T, T}(n,m)
-    v = zeros(T, n)
+    mat = spzeros(T, n, m)
+    v = spzeros(T, n)
     op = SparseAffineOperation(mat, v)
 
     # Hack re-use variables from input

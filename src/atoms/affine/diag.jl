@@ -78,7 +78,7 @@ function _conic_form!(context::Context{T}, x::DiagAtom) where {T}
         sz_diag = Base.min(num_rows + k, num_cols)
     end
 
-    select_diag = SPARSE_MATRIX{T}(sz_diag, length(x.children[1]))
+    select_diag = spzeros(T, sz_diag, length(x.children[1]))
     for i in 1:sz_diag
         select_diag[i, start_index] = 1
         start_index += num_rows + 1

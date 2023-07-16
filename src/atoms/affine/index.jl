@@ -60,9 +60,8 @@ function _conic_form!(context::Context{T}, x::IndexAtom) where {T}
 
     if x.inds === nothing
         sz = length(x.cols) * length(x.rows)
-        J = Array{Int}(undef, sz)
+        J = Vector{Int}(undef, sz)
         k = 1
-
         num_rows = x.children[1].size[1]
         for c in x.cols
             for r in x.rows
@@ -71,9 +70,9 @@ function _conic_form!(context::Context{T}, x::IndexAtom) where {T}
             end
         end
 
-        index_matrix = SPARSE_MATRIX{T}(collect(1:sz), J, one(T), m, n)
+        index_matrix = create_sparse(T, collect(1:sz), J, one(T), m, n)
     else
-        index_matrix = SPARSE_MATRIX{T}(collect(1:length(x.inds)), collect(x.inds), one(T), m, n)
+        index_matrix = create_sparse(T, collect(1:length(x.inds)), collect(x.inds), one(T), m, n)
     end
 
     return operate(add_operation, T, sign(x), index_matrix, obj)

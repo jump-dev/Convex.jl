@@ -98,7 +98,6 @@ function real_operate(
     tape::SparseTape{T},
 ) where {T<:Real}
     d = MOI.output_dimension(tape)
-
     return add_operation(
         tape,
         SparseAffineOperation(-spidentity(T, d), spzeros(T, d)),
@@ -150,7 +149,7 @@ function real_operate(
     return SparseTape([SparseAffineOperation(A, b)], x)
 end
 
-blockdiag(x, y) = Base.blockdiag(x, y)
+blockdiag(xs...) = SparseArrays.blockdiag(xs...)::SPARSE_MATRIX
 
 function blockdiag(xs::GBMatrix{T,T}...) where {T}
     N = length(xs)
@@ -285,7 +284,7 @@ function real_operate(
     A::AbstractMatrix,
     tape::SparseTape{T},
 ) where {T<:Real}
-    return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
+    return add_operation(tape, SparseAffineOperation(A, spzeros(T, size(A, 1))))
 end
 
 function real_operate(
@@ -306,7 +305,7 @@ function real_operate(
     d = MOI.output_dimension(tape)
     return add_operation(
         tape,
-        SparseAffineOperation(spidentity(T, d), spzeros(T, d)),
+        SparseAffineOperation(x*spidentity(T, d), spzeros(T, d)),
     )
 end
 

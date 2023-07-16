@@ -66,7 +66,7 @@ function real_convert(::Type{T}, x::Number) where {T}
     return T(x)
 end
 function real_convert(::Type{T}, x::AbstractMatrix) where {T}
-    return GBMatrix{T,T}(x)
+    return create_sparse(T, x)
 end
 
 function real_convert(::Type{T}, x::SPARSE_MATRIX{T}) where {T}
@@ -132,7 +132,7 @@ function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
             add_operation,
             T,
             sign(x),
-            kron(_id(T, x.size[2]), const_multiplier),
+            kron(spidentity(T, x.size[2]), const_multiplier),
             objective,
         )
 
@@ -151,14 +151,11 @@ function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
             add_operation,
             T,
             sign(x),
-            kron(transpose(const_multiplier), _id(T, x.size[1])),
+            kron(transpose(const_multiplier), spidentity(T, x.size[1])),
             objective,
         )
     end
 end
-
-# _id(T, n) = Diagonal(one(T)*I, n)
-_id(T, n) = spidentity(T, n)
 
 function *(x::AbstractExpr, y::AbstractExpr)
     if isequal(x, y) && x.size == (1, 1)

@@ -66,8 +66,8 @@ function _conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     I = collect(1:sz+1:sz*sz)
     J = collect(1:sz)
     V = one(T)
-    coeff = GBMatrix{T, T}(I, J, V, sz * sz, sz)
-    # coeff = sparse(, 1:sz, one(T),
+    coeff = create_sparse(T, I, J, V, sz * sz, sz)
+    # coeff = create_sparse(, 1:sz, one(T),
 
     return operate(add_operation, T, sign(x), coeff, obj)
 end

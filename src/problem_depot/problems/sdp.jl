@@ -582,7 +582,7 @@ end
 ) where {T,test}
     a = 2 + 4im
     x = ComplexVariable()
-    objective = norm2(a - x)
+    objective = norm2(a + (-x))
     c1 = real(x) >= 0
     p = minimize(objective, c1; numeric_type = T)
 
