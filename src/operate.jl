@@ -94,7 +94,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
             # Everything should be either a
             # SparseTape{T} or Vector{T}
             for arg in args
-                if !(typeof(arg) == SparseTape{T} || typeof(arg) == Vector{T})
+                if !(typeof(arg) == SparseTape{T} || typeof(arg) == Vector{T} || typeof(arg) == GBVector{T, T})
                     error("Internal error: unexpected type $(typeof(arg))")
                 end
             end

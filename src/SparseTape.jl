@@ -1,28 +1,36 @@
 struct SparseAffineOperation{T}
-    matrix::SparseMatrixCSC{T}
-    vector::Vector{T}
+    matrix::Union{GBMatrix{T,T}}
+    vector::Union{GBVector{T,T}}
 end
 
-function Base.convert(
-    ::Type{SparseAffineOperation{T}},
-    obj::SparseAffineOperation,
-) where {T}
-    mat = convert(SparseMatrixCSC{T}, obj.matrix)
-    vec = convert(Vector{T}, obj.vector)
-    return SparseAffineOperation{T}(mat, vec)
-end
+# function Base.convert(
+#     ::Type{SparseAffineOperation{T}},
+#     obj::SparseAffineOperation,
+# ) where {T}
+#     mat = convert(SparseMatrixCSC{T}, obj.matrix)
+#     vec = convert(Vector{T}, obj.vector)
+#     return SparseAffineOperation{T}(mat, vec)
+# end
 
 function SparseAffineOperation(
-    A::SparseMatrixCSC{T},
-    b::AbstractVector,
+    A::AbstractMatrix{T},
+    b::AbstractVector{T},
 ) where {T}
-    return SparseAffineOperation(A, collect(T, b))
+    return SparseAffineOperation{T}(GBMatrix{T,T}(A), GBVector{T, T}(b))
 end
 
-function SparseAffineOperation(A::AbstractSparseMatrix, b)
-    return SparseAffineOperation(SparseMatrixCSC(A), b)
-end
-SparseAffineOperation(A, b) = SparseAffineOperation(sparse(A), b)
+
+# function SparseAffineOperation(
+#     A::GBMatrix{T, T},
+#     b::GBVector{T, T},
+# ) where {T}
+#     return SparseAffineOperation{T}(A, b)
+# end
+
+# function SparseAffineOperation(A::AbstractSparseMatrix, b)
+#     return SparseAffineOperation(SparseMatrixCSC(A), b)
+# end
+# SparseAffineOperation(A, b) = SparseAffineOperation(sparse(A), b)
 
 struct SparseTape{T}
     operations::Vector{SparseAffineOperation{T}}
@@ -58,7 +66,7 @@ Base.real(tape::SparseTape) = tape
 function Base.imag(c::SparseTape{T}) where {T}
     n = MOI.output_dimension(c)
     m = length(c.variables)
-    mat = spzeros(T, n, m)
+    mat = GBMatrix{T, T}(n,m)
     v = zeros(T, n)
     op = SparseAffineOperation(mat, v)
 

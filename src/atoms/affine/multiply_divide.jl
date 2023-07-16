@@ -59,35 +59,25 @@ function evaluate(x::MultiplyAtom)
     return evaluate(x.children[1]) * evaluate(x.children[2])
 end
 
-function complex_convert(::Type{T}, x::Number) where {T}
-    return Complex{T}(x)
-end
-function complex_convert(::Type{T}, x::AbstractSparseMatrix) where {T}
-    return SparseMatrixCSC{Complex{T}}(x)
-end
-function complex_convert(::Type{T}, x::AbstractMatrix{Complex{T}}) where {T}
-    return sparse(x)
-end
-function complex_convert(::Type{T}, x::AbstractMatrix) where {T}
-    return sparse(convert(Matrix{Complex{T}}, x))
-end
-function complex_convert(::Type{T}, x::AbstractVector) where {T}
-    return sparse(convert(Vector{Complex{T}}, x))
+function complex_convert(::Type{T}, x) where {T}
+    return real_convert(Complex{T}, x)
 end
 function real_convert(::Type{T}, x::Number) where {T}
     return T(x)
 end
-function real_convert(::Type{T}, x::AbstractSparseMatrix) where {T}
-    return SparseMatrixCSC{T}(x)
-end
-function real_convert(::Type{T}, x::AbstractMatrix{T}) where {T}
-    return SparseMatrixCSC{T}(x)
-end
 function real_convert(::Type{T}, x::AbstractMatrix) where {T}
-    return sparse(convert(Matrix{T}, x))
+    return GBMatrix{T, T}(x)
+end
+
+function real_convert(::Type{T}, x::GBMatrix{T,T}) where {T}
+    return x
+end
+
+function real_convert(::Type{T}, x::GBVector{T,T}) where {T}
+    return x
 end
 function real_convert(::Type{T}, x::AbstractVector) where {T}
-    return sparse(convert(Vector{T}, x))
+    return GBVector{T,T}(x)
 end
 
 function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
@@ -118,11 +108,11 @@ function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
                 reshape(evaluate(const_child), length(const_child), 1)
         end
 
-        # if iscomplex(const_multiplier)
-        #     const_multiplier = complex_convert(T, const_multiplier)
-        # else
-        #     const_multiplier = real_convert(T, const_multiplier)
-        # end
+        if iscomplex(const_multiplier)
+            const_multiplier = complex_convert(T, const_multiplier)
+        else
+            const_multiplier = real_convert(T, const_multiplier)
+        end
 
         return operate(add_operation, T, sign(x), const_multiplier, objective)
 
@@ -131,17 +121,18 @@ function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         objective = conic_form!(context, x.children[2])
 
         const_multiplier = evaluate(x.children[1])
-        # if iscomplex(const_multiplier)
-        #     const_multiplier = complex_convert(T, const_multiplier)
-        # else
-        #     const_multiplier = real_convert(T, const_multiplier)
-        # end
+
+        if iscomplex(const_multiplier)
+            const_multiplier = complex_convert(T, const_multiplier)
+        else
+            const_multiplier = real_convert(T, const_multiplier)
+        end
 
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(Diagonal(ones(T, x.size[2])), const_multiplier),
+            kron(_id(T, x.size[2]), const_multiplier),
             objective,
         )
 
@@ -149,21 +140,25 @@ function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     else
         objective = conic_form!(context, x.children[1])
         const_multiplier = evaluate(x.children[2])
-        # if iscomplex(const_multiplier)
-        #     const_multiplier = complex_convert(T, const_multiplier)
-        # else
-        #     const_multiplier = real_convert(T, const_multiplier)
-        # end
+
+        if iscomplex(const_multiplier)
+            const_multiplier = complex_convert(T, const_multiplier)
+        else
+            const_multiplier = real_convert(T, const_multiplier)
+        end
 
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(transpose(const_multiplier), Diagonal(ones(T, x.size[1]))),
+            kron(transpose(const_multiplier), _id(T, x.size[1])),
             objective,
         )
     end
 end
+
+# _id(T, n) = Diagonal(one(T)*I, n)
+_id(T, n) = gbidentity(T, n)
 
 function *(x::AbstractExpr, y::AbstractExpr)
     if isequal(x, y) && x.size == (1, 1)

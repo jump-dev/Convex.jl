@@ -53,7 +53,7 @@ function to_tape(v::MOI.VectorOfVariables, ::Context{T}) where {T}
     var_inds = v.variables
     d = length(var_inds)
     return SparseTape(
-        [SparseAffineOperation(sparse(one(T) * I, d, d), zeros(T, d))],
+        [SparseAffineOperation(gbidentity(T, d), GBVector{T,T}(d))],
         var_inds,
     )
 end

@@ -73,7 +73,7 @@ function _conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
         t = Variable()
         p = minimize(
             t,
-            [t*sparse(one(T) * I, m, m) A; A' t*sparse(one(T) * I, n, n)] ⪰ 0,
+            [t*gbidentity(T, m) A; A' t*gbidentity(T, n)] ⪰ 0,
         )
         return conic_form!(context, p)
     else
