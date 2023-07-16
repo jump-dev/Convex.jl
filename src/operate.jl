@@ -96,7 +96,7 @@ function operate(op::F, ::Type{T}, sign::Sign, args...) where {F,T}
             end
         else
             # Everything should be either a
-            # SparseTape{T} or GBVector{T, T}
+            # SparseTape{T} or SPARSE_VECTOR{T}
             for arg in args
                 if !(
                     typeof(arg) == SparseTape{T} ||

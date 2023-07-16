@@ -120,13 +120,6 @@ function output(x::Value)
     end
 end
 
-vec(x) = Base.vec(x)
-function vec(x::GBMatrix)
-    # Hacks to try to get `vec` to work
-    x = reshape(x, length(x), 1)
-    return x[:, 1]
-end
-
 evaluate(x::Constant) = output(x.value)
 
 sign(x::Constant) = x.sign
@@ -138,10 +131,6 @@ length(x::Constant) = length(x.value)
 function _conic_form!(::Context{T}, C::Constant) where {T}
     # this should happen at `Constant` creation?
     # No, we don't have access to `T` yet; that's problem-specific
-    # if eltype(C.value) != T
-    #     C = Constant{T}(convert(GBMatrix{T}, C.value))
-    # end
-
     x = SPARSE_VECTOR{T}(vec(C.value))
 
     return x

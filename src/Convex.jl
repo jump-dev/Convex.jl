@@ -6,7 +6,6 @@ using LinearAlgebra
 using SparseArrays
 using LDLFactorizations
 using AbstractTrees: AbstractTrees, children
-using SuiteSparseGraphBLAS
 # using DataStructures
 
 using MathOptInterface
@@ -130,6 +129,35 @@ function vec_tril(M)
     return M[inds]
 end
 
+# using SuiteSparseGraphBLAS
+#
+
+# vec(x) = Base.vec(x)
+# function vec(x::GBMatrix)
+#     # Hacks to try to get `vec` to work
+#     x = reshape(x, length(x), 1)
+#     return x[:, 1]
+# end
+
+# blockdiag(xs...) = SparseArrays.blockdiag(xs...)::SPARSE_MATRIX
+
+# function blockdiag(xs::GBMatrix{T,T}...) where {T}
+#     N = length(xs)
+#     entries = Matrix{GBMatrix{T,T}}(undef, N, N)
+#     heights = size.(xs, 1)
+#     for (i, x) in enumerate(xs)
+#         entries[i, i] = x
+#         m = size(x, 2)
+#         for j in 1:(i-1)
+#             entries[j, i] = GBMatrix{T,T}(heights[j], m)
+#         end
+#         for j in (i+1):lastindex(entries, 1)
+#             entries[j, i] = GBMatrix{T,T}(heights[j], m)
+#         end
+#     end
+#     return cat(entries)
+# end
+#
 # const SPARSE_VECTOR{T} = GBVector{T,T}
 # const SPARSE_MATRIX{T} = GBMatrix{T,T}
 # spzeros(T, d) = GBVector{T,T}(d)
@@ -142,9 +170,6 @@ const SPARSE_MATRIX{T} = SparseMatrixCSC{T,Int}
 spzeros(T, d) = zeros(T, d)
 spzeros(T, n, m) = SparseArrays.spzeros(T, n, m)
 spidentity(T, d) = sparse(one(T) * I, d, d)
-# function create_sparse(::Type{T}, I, J, V, args...) where T
-#     return SparseArrays.sparse(I, J, T.(V), args...)::SPARSE_MATRIX{T}
-# end
 function create_sparse(::Type{T}, args...) where {T}
     local result::SPARSE_MATRIX{T}
     result = SparseArrays.sparse(args...)

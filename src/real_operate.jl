@@ -149,25 +149,6 @@ function real_operate(
     return SparseTape([SparseAffineOperation(A, b)], x)
 end
 
-blockdiag(xs...) = SparseArrays.blockdiag(xs...)::SPARSE_MATRIX
-
-function blockdiag(xs::GBMatrix{T,T}...) where {T}
-    N = length(xs)
-    entries = Matrix{GBMatrix{T,T}}(undef, N, N)
-    heights = size.(xs, 1)
-    for (i, x) in enumerate(xs)
-        entries[i, i] = x
-        m = size(x, 2)
-        for j in 1:(i-1)
-            entries[j, i] = GBMatrix{T,T}(heights[j], m)
-        end
-        for j in (i+1):lastindex(entries, 1)
-            entries[j, i] = GBMatrix{T,T}(heights[j], m)
-        end
-    end
-    return cat(entries)
-end
-
 function real_operate(
     ::typeof(vcat),
     ::Type{T},
@@ -180,13 +161,13 @@ function real_operate(
     b = vcat(op.vector, v)
     # Workaround SparseSuiteGraphBLAS bug with vcat
     # where vcatting two (1,1) GBMatrix yields GBVector
-    if op.matrix isa GBMatrix
-        A = GBMatrix{T,T}(size(op.matrix, 1) + n, m)
-        A[1:size(op.matrix, 1), :] = op.matrix
-    else
-        Z = spzeros(T, n, m)
-        A = vcat(op.matrix, Z)
-    end
+    # if op.matrix isa GBMatrix
+    # A = GBMatrix{T,T}(size(op.matrix, 1) + n, m)
+    # A[1:size(op.matrix, 1), :] = op.matrix
+    # else
+    Z = spzeros(T, n, m)
+    A = vcat(op.matrix, Z)
+    # end
     return SparseTape([SparseAffineOperation(A, b)], tape.variables)
 end
 
@@ -203,13 +184,13 @@ function real_operate(
 
     # Workaround SparseSuiteGraphBLAS bug with vcat
     # where vcatting two (1,1) GBMatrix yields GBVector
-    if op.matrix isa GBMatrix
-        A = GBMatrix{T,T}(n + size(op.matrix, 1), m)
-        A[(n+1):end, :] = op.matrix
-    else
-        Z = spzeros(T, n, m)
-        A = vcat(Z, op.matrix)
-    end
+    # if op.matrix isa GBMatrix
+    # A = GBMatrix{T,T}(n + size(op.matrix, 1), m)
+    # A[(n+1):end, :] = op.matrix
+    # else
+    Z = spzeros(T, n, m)
+    A = vcat(Z, op.matrix)
+    # end
     return SparseTape([SparseAffineOperation(A, b)], tape.variables)
 end
 

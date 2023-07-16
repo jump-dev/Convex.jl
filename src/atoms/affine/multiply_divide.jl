@@ -168,31 +168,31 @@ end
 *(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
 /(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))
 
-# ambiguity
-function Base.:(*)(
-    x::Convex.AbstractExpr,
-    y::Union{
-        LinearAlgebra.Transpose{
-            <:Any,
-            <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-        },
-        SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-    },
-) where {T,F,O}
-    return MultiplyAtom(x, constant(y))
-end
-function Base.:(*)(
-    x::Union{
-        LinearAlgebra.Transpose{
-            <:Any,
-            <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-        },
-        SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-    },
-    y::Convex.AbstractExpr,
-) where {T,F,O}
-    return MultiplyAtom(constant(x), y)
-end
+# # ambiguity
+# function Base.:(*)(
+#     x::Convex.AbstractExpr,
+#     y::Union{
+#         LinearAlgebra.Transpose{
+#             <:Any,
+#             <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+#         },
+#         SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+#     },
+# ) where {T,F,O}
+#     return MultiplyAtom(x, constant(y))
+# end
+# function Base.:(*)(
+#     x::Union{
+#         LinearAlgebra.Transpose{
+#             <:Any,
+#             <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+#         },
+#         SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
+#     },
+#     y::Convex.AbstractExpr,
+# ) where {T,F,O}
+#     return MultiplyAtom(constant(x), y)
+# end
 
 function dotmultiply(x, y)
     if vexity(x) != ConstVexity()

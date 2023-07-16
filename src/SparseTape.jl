@@ -19,18 +19,6 @@ function SparseAffineOperation(
     return SparseAffineOperation{T}(create_sparse(T, A), SPARSE_VECTOR{T}(b))
 end
 
-# function SparseAffineOperation(
-#     A::GBMatrix{T, T},
-#     b::GBVector{T, T},
-# ) where {T}
-#     return SparseAffineOperation{T}(A, b)
-# end
-
-# function SparseAffineOperation(A::AbstractSparseMatrix, b)
-#     return SparseAffineOperation(SparseMatrixCSC(A), b)
-# end
-# SparseAffineOperation(A, b) = SparseAffineOperation(create_sparse(A), b)
-
 mutable struct SparseTape{T}
     operations::Vector{SparseAffineOperation{T}}
     variables::Vector{MOI.VariableIndex}
