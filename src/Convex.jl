@@ -7,6 +7,7 @@ using SparseArrays
 using LDLFactorizations
 using AbstractTrees: AbstractTrees, children
 using SuiteSparseGraphBLAS
+using DataStructures
 
 using MathOptInterface
 const MOI = MathOptInterface

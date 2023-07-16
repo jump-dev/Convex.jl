@@ -71,9 +71,9 @@ function _conic_form!(context::Context{T}, x::IndexAtom) where {T}
             end
         end
 
-        index_matrix = sparse(1:sz, J, one(T), m, n)
+        index_matrix = GBMatrix{T,T}(collect(1:sz), J, one(T), m, n)
     else
-        index_matrix = sparse(1:length(x.inds), x.inds, one(T), m, n)
+        index_matrix = GBMatrix{T,T}(collect(1:length(x.inds)), collect(x.inds), one(T), m, n)
     end
 
     return operate(add_operation, T, sign(x), index_matrix, obj)

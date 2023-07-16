@@ -23,7 +23,7 @@ function _sign(x::Value)
     end
 end
 
-struct Constant{T<:Real} <: AbstractExpr
+mutable struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     value::Matrix{T}
@@ -46,7 +46,7 @@ struct Constant{T<:Real} <: AbstractExpr
 end
 # Constant(x::Constant) = x
 
-struct ComplexConstant{T<:Real} <: AbstractExpr
+mutable struct ComplexConstant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int,Int}
@@ -74,7 +74,7 @@ function evaluate(c::ComplexConstant)
     return evaluate(c.real_constant) + im * evaluate(c.imag_constant)
 end
 
-struct ComplexStructOfVec{T<:Real}
+mutable struct ComplexStructOfVec{T<:Real}
     real_vec::Vector{T}
     imag_vec::Vector{T}
 end

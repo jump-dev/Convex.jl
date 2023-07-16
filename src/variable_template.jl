@@ -75,6 +75,18 @@ function _conic_form!(context::Context, a::AbstractVariable)
 end
 
 function conic_form!(context::Context, a::AbstractExpr)
-    d = context.conic_form_cache
-    return get!(() -> _conic_form!(context, a), d, a)
+
+    # Nicer implementation
+    # d = context.conic_form_cache
+    # return get!(() -> _conic_form!(context, a), d, a)
+
+    # Avoid closure
+    wkh = context.conic_form_cache
+    default = () -> _conic_form!(context, a)
+    key = a
+    return Base.@lock wkh.lock begin
+        get!(default, wkh.ht, DataStructures.WeakRefForWeakDict(key))
+    end
+
+    return
 end

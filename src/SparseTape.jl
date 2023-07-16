@@ -32,7 +32,7 @@ end
 # end
 # SparseAffineOperation(A, b) = SparseAffineOperation(sparse(A), b)
 
-struct SparseTape{T}
+mutable struct SparseTape{T}
     operations::Vector{SparseAffineOperation{T}}
     variables::Vector{MOI.VariableIndex}
 end

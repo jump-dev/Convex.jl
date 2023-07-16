@@ -1,4 +1,4 @@
-struct ComplexTape{T}
+mutable struct ComplexTape{T}
     real_tape::SparseTape{T}
     imag_tape::SparseTape{T}
 

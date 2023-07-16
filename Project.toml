@@ -5,6 +5,7 @@ version = "0.16.0"
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 LDLFactorizations = "40e66cde-538c-5869-a4ad-c39174c6795b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"

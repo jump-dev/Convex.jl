@@ -24,17 +24,15 @@ end
 # convert to a usual VAF
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
     I, J, V = findnz(vaf_as_matrix.aff.matrix)
-    vats = MOI.VectorAffineTerm{T}[]
-    for n in eachindex(I, J, V)
+    vats = Vector{MOI.VectorAffineTerm{T}}(undef, length(I))
+    for (idx, n) in enumerate(eachindex(I, J, V))
         i = I[n]
         j = J[n]
         v = V[n]
-        push!(
-            vats,
-            MOI.VectorAffineTerm{T}(
-                i,
-                MOI.ScalarAffineTerm{T}(v, vaf_as_matrix.variables[j]),
-            ),
+
+        vats[idx] = MOI.VectorAffineTerm{T}(
+            i,
+            MOI.ScalarAffineTerm{T}(v, vaf_as_matrix.variables[j]),
         )
     end
 

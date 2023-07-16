@@ -1,4 +1,4 @@
-struct Context{T,M}
+mutable struct Context{T,M}
     # MOI model
     model::M
 
@@ -18,7 +18,7 @@ struct Context{T,M}
     detected_infeasible_during_formulation::Ref{Bool}
 
     # Cache
-    conic_form_cache::IdDict{Any, Any}
+    conic_form_cache::DataStructures.WeakKeyIdDict{Any, Any}
 end
 
 function Context{T}(optimizer) where {T}
