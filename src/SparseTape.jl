@@ -46,6 +46,16 @@ mutable struct SparseTape{T}
     end
 end
 
+function Base.:(==)(tape1::SparseAffineOperation, tape2::SparseAffineOperation)
+    tape1.matrix == tape1.matrix && tape1.vector == tape2.vector
+end
+Base.hash(tape::SparseAffineOperation, h::UInt) = hash(typeof(tape), hash(tape.matrix, hash(tape.vector, h)))
+
+function Base.:(==)(tape1::SparseTape, tape2::SparseTape)
+    tape1.operations == tape1.operations && tape1.variables == tape2.variables
+end
+Base.hash(tape::SparseTape, h::UInt) = hash(typeof(tape), hash(tape.operations, hash(tape.variables, h)))
+
 MOI.output_dimension(v::SparseTape) = size(v.operations[1].matrix, 1)
 
 function SparseAffineOperation(tape::SparseTape)# -> SparseAffineOperation

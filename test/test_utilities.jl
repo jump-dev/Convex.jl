@@ -395,12 +395,21 @@ end
 
     @testset "Cartesian index" begin
         x = Variable(3, 2)
+        set_value!(x, rand(3, 2))
+        context = Convex.Context{Float64}(MOI.Utilities.Model{Float64}())
+
         for ind in CartesianIndices(zeros(3, 2))
-            @test x[ind] === x[ind[1], ind[2]]
+            L = Convex.conic_form!(context, x[ind])
+            R = Convex.conic_form!(context, x[ind[1], ind[2]])
+            @test L == R
+            @test evaluate(x[ind]) == evaluate(x[ind[1], ind[2]])
         end
         y = [1.0 2 3; 4 5 6] * x
         for ind in CartesianIndices(zeros(2, 2))
-            @test y[ind] === y[ind[1], ind[2]]
+            L = Convex.conic_form!(context, y[ind])
+            R = Convex.conic_form!(context, y[ind[1], ind[2]])
+            @test L == R
+            @test evaluate(y[ind]) == evaluate(y[ind[1], ind[2]])
         end
     end
 
