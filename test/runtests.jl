@@ -90,3 +90,7 @@ end
         end
     end
 end
+
+@testset "Write to file" begin
+    include("write_to_file.jl")
+end
