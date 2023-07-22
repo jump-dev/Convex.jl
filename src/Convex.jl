@@ -60,7 +60,7 @@ export constraints, add_constraint!, set_value!, evaluate
 export Positive, Negative, ComplexSign, NoSign
 
 # Problems
-export add_constraints!, maximize, minimize, Problem, satisfy, solve!
+export add_constraints!, maximize, minimize, Problem, satisfy, solve!, write_to_file
 
 # Module level globals
 

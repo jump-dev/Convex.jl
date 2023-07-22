@@ -201,3 +201,27 @@ function cache_conic_form!(
     end
     return cache_conic_form!(conic_forms, x, objective)
 end
+
+"""
+    write_to_file(problem::Problem, filename::String)
+
+Write the current problem to the file at `filename`. Requires solving
+the problem at least once using [`solve!`](@ref) to ensure that the
+problem is loaded into a MathOptInterface model.
+
+Supported file types depend on the model type.
+"""
+function write_to_file(problem::Problem, filename::String)
+    isnothing(problem.model) && throw(
+        ArgumentError(
+            """
+            Problem has not been loaded into a MathOptInterface model; call 
+            `solve!(problem, optimizer)` before writing problem to file.
+            """
+        )   
+    )
+    dest = MOI.FileFormats.Model(format = MOI.FileFormats.FORMAT_SDPA)
+    src = problem.model
+    MOI.copy_to(MOI.Bridges.full_bridge_optimizer(dest, Float64), src)
+    return MOI.write_to_file(dest, filename) # nothing
+end
