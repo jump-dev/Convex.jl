@@ -6,8 +6,8 @@
 
     m, n = 5, 10
     x = Variable(n)
-    A = randn(m, n)
-    b = randn(m)
+    A = randn(Float32, m, n)
+    b = randn(Float32, m)
     problem = minimize(sumsquares(A * x - b), [0 <= x, x <= 1])
 
     # Haven't solved the problem yet, should get an ArgumentError
