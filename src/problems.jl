@@ -212,7 +212,7 @@ problem is loaded into a MathOptInterface model.
 The file format is inferred from the filename extension. Supported file
 types depend on the model type.
 """
-function write_to_file(problem::Problem, filename::String)
+function write_to_file(problem::Problem{T}, filename::String) where T
     isnothing(problem.model) && throw(
         ArgumentError(
             """
@@ -223,6 +223,6 @@ function write_to_file(problem::Problem, filename::String)
     )
     dest = MOI.FileFormats.Model(filename=filename)
     src = problem.model
-    MOI.copy_to(MOI.Bridges.full_bridge_optimizer(dest, Float64), src)
+    MOI.copy_to(MOI.Bridges.full_bridge_optimizer(dest, T), src)
     return MOI.write_to_file(dest, filename) # nothing
 end
