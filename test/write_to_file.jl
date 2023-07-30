@@ -6,8 +6,8 @@
 
     m, n = 5, 10
     x = Variable(n)
-    A = randn(m, n)
-    b = randn(m)
+    A = rand(m, n)
+    b = rand(m)
     problem::Problem{Float64} =
         minimize(sumsquares(A * x - b), [0 <= x, x <= 1])
 
@@ -36,8 +36,8 @@ end
 
     m, n = 5, 10
     x = Variable(n)
-    A = randn(Float32, m, n)
-    b = randn(Float32, m)
+    A = rand(Float32, m, n)
+    b = rand(Float32, m)
     problem::Problem{Float32} = minimize(
         sumsquares(A * x - b),
         [0 <= x, x <= 1],
@@ -72,8 +72,8 @@ end
 
     m, n = 5, 10
     x = Variable(n)
-    A = randn(BigFloat, m, n)
-    b = randn(BigFloat, m)
+    A = rand(BigFloat, m, n)
+    b = rand(BigFloat, m)
     problem::Problem{BigFloat} = minimize(
         sumsquares(A * x - b),
         [0 <= x, x <= 1],
