@@ -83,5 +83,5 @@ function Base.imag(c::SparseTape{T}) where {T}
 
     # Hack re-use variables from input
     # I think this is OK bc the operation is all zeros
-    return SparseTape([op], c.variables)
+    return SparseTape(op, c.variables)
 end

@@ -55,12 +55,12 @@ function real_operate(
             op1.matrix + op2.matrix,
             op1.vector + op2.vector,
         )
-        return SparseTape([op], tape1.variables)
+        return SparseTape(op, tape1.variables)
     else
         mat = hcat(op1.matrix, op2.matrix)
         vec = op1.vector + op2.vector
         op = SparseAffineOperation(mat, vec)
-        return SparseTape([op], vcat(tape1.variables, tape2.variables))
+        return SparseTape(op, vcat(tape1.variables, tape2.variables))
     end
 end
 
@@ -146,7 +146,7 @@ function real_operate(
     A = blockdiag(op1.matrix, op2.matrix)
     b = vcat(op1.vector, op2.vector)
     x = vcat(tape1.variables, tape2.variables)
-    return SparseTape([SparseAffineOperation(A, b)], x)
+    return SparseTape(SparseAffineOperation(A, b), x)
 end
 
 function real_operate(
@@ -168,7 +168,7 @@ function real_operate(
     Z = spzeros(T, n, m)
     A = vcat(op.matrix, Z)
     # end
-    return SparseTape([SparseAffineOperation(A, b)], tape.variables)
+    return SparseTape(SparseAffineOperation(A, b), tape.variables)
 end
 
 function real_operate(
@@ -191,7 +191,7 @@ function real_operate(
     Z = spzeros(T, n, m)
     A = vcat(Z, op.matrix)
     # end
-    return SparseTape([SparseAffineOperation(A, b)], tape.variables)
+    return SparseTape(SparseAffineOperation(A, b), tape.variables)
 end
 
 function real_operate(
@@ -228,7 +228,7 @@ function real_operate(
     A = blockdiag((op.matrix for op in ops)...)
     b = vcat((op.vector for op in ops)...)
     x = vcat((arg.variables for arg in all_args)...)
-    return SparseTape([SparseAffineOperation(A, b)], x)
+    return SparseTape(SparseAffineOperation(A, b), x)
 end
 
 ## Unary
