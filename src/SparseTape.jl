@@ -20,29 +20,20 @@ function SparseAffineOperation(
 end
 
 mutable struct SparseTape{T}
-    operations::Vector{SparseAffineOperation{T}}
+    operation::SparseAffineOperation{T}
     variables::Vector{MOI.VariableIndex}
     function SparseTape{T}(
-        operations::Vector{SparseAffineOperation{T}},
+        operation::SparseAffineOperation{T},
         variables::Vector{MOI.VariableIndex},
     ) where {T}
-        # Is this necessary?
-        # if !issorted(variables; by = x->x.value)
-        #     p = sortperm(variables; by = x->x.value)
-        #     op = foldl(compose, operations)
-        #     matrix = op.matrix[:, p]
-        #     vector = op.vector
-        #     operations = [SparseAffineOperation(matrix, vector)]
-        #     variables = variables[p]
-        # end
-        return new(operations, variables)
+        return new(operation, variables)
     end
 
     function SparseTape(
-        operations::Vector{SparseAffineOperation{T}},
+        operation::SparseAffineOperation{T},
         variables::Vector{MOI.VariableIndex},
     ) where {T}
-        return SparseTape{T}(operations, variables)
+        return SparseTape{T}(operation, variables)
     end
 end
 
@@ -54,17 +45,17 @@ function Base.hash(tape::SparseAffineOperation, h::UInt)
 end
 
 function Base.:(==)(tape1::SparseTape, tape2::SparseTape)
-    return tape1.operations == tape1.operations &&
+    return tape1.operation == tape1.operation &&
            tape1.variables == tape2.variables
 end
 function Base.hash(tape::SparseTape, h::UInt)
-    return hash(typeof(tape), hash(tape.operations, hash(tape.variables, h)))
+    return hash(typeof(tape), hash(tape.operation, hash(tape.variables, h)))
 end
 
-MOI.output_dimension(v::SparseTape) = size(v.operations[1].matrix, 1)
+MOI.output_dimension(v::SparseTape) = size(v.operation.matrix, 1)
 
 function SparseAffineOperation(tape::SparseTape)# -> SparseAffineOperation
-    return foldl(compose, tape.operations)
+    return tape.operation
 end
 
 function compose(A::SparseAffineOperation, B::SparseAffineOperation)
@@ -73,15 +64,11 @@ function compose(A::SparseAffineOperation, B::SparseAffineOperation)
     return SparseAffineOperation(mat, vec)
 end
 
-function collapse(sparse_tape::SparseTape) # -> SparseTape
-    op = SparseAffineOperation(sparse_tape)
-    return SparseTape([op], sparse_tape.variables)
-end
 #### SparseTape
 
 function add_operation(tape::SparseTape{T}, op::SparseAffineOperation) where {T}
-    tape2 = SparseTape(copy(tape.operations), tape.variables)
-    pushfirst!(tape2.operations, op)
+    operation = compose(op, tape.operation)
+    tape2 = SparseTape(operation, tape.variables)
     return tape2::SparseTape{T}
 end
 

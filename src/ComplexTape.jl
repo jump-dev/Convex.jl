@@ -13,12 +13,6 @@ MOI.output_dimension(c::ComplexTape) = MOI.output_dimension(c.real_tape) # same 
 Base.real(c::ComplexTape) = c.real_tape
 Base.imag(c::ComplexTape) = c.imag_tape
 
-function collapse(tape::ComplexTape)
-    re = collapse(real(tape))
-    im = collapse(imag(tape))
-    return ComplexTape(re, im)
-end
-
 function MOI_add_constraint(
     model,
     f::ComplexTape,
