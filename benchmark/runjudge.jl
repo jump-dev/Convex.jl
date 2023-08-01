@@ -14,7 +14,7 @@ group_target = benchmarkpkg(
 
 group_baseline = benchmarkpkg(
     dirname(@__DIR__),
-    mkconfig(id = "main"),
+    mkconfig(id = "master"),
     resultfile = joinpath(@__DIR__, "result-baseline.json"),
 )
 
