@@ -55,7 +55,7 @@ end
 
 function Base.:(==)(tape1::SparseTape, tape2::SparseTape)
     return tape1.operations == tape1.operations &&
-        tape1.variables == tape2.variables
+           tape1.variables == tape2.variables
 end
 function Base.hash(tape::SparseTape, h::UInt)
     return hash(typeof(tape), hash(tape.operations, hash(tape.variables, h)))

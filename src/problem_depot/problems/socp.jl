@@ -378,9 +378,9 @@ end
     x = Variable(3)
     a, b, c, d, e, f = rand(6)
     M = [
-        2 a-b*im c-d*im
-        a+b*im 2 e-f*im
-        c+d*im e+f*im 2
+        3 a-b*im c-d*im
+        a+b*im 3 e-f*im
+        c+d*im e+f*im 3
     ]
     y = rand(3)
     p = minimize(quadform(x - y, M); numeric_type = T)

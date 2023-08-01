@@ -33,6 +33,6 @@ problems = [
 ]
 
 SUITE["formulation"] = ProblemDepot.benchmark_suite(problems) do problem
-    model = MOIU.MockOptimizer(MOIU.Model{Float64}())
-    return Convex.load_MOI_model!(model, problem)
+    opt = MOIU.MockOptimizer(MOIU.Model{Float64}())
+    return Convex.Context(problem, opt)
 end
