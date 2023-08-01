@@ -67,9 +67,7 @@ end
 #### SparseTape
 
 function add_operation(tape::SparseTape{T}, op::SparseAffineOperation) where {T}
-    operation = compose(op, tape.operation)
-    tape2 = SparseTape(operation, tape.variables)
-    return tape2::SparseTape{T}
+    return SparseTape(compose(op, tape.operation), tape.variables)
 end
 
 Base.real(tape::SparseTape) = tape

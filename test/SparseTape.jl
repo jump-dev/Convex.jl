@@ -17,7 +17,7 @@ using Convex: SparseTape, SparseAffineOperation, add_operation
     A_init = copy(A)
     b_init = copy(b)
     op = SparseAffineOperation(A, b)
-    tape = SparseTape([op], variables)
+    tape = SparseTape(op, variables)
     collapsed_tape = SparseAffineOperation(tape)
     @test collapsed_tape.matrix * input + collapsed_tape.vector ≈ A * input + b
 

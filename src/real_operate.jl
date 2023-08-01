@@ -35,8 +35,11 @@ function real_operate(
     tape::SparseTape{T},
     v::SPARSE_VECTOR{T},
 ) where {T<:Real}
-    d = length(v)
-    return add_operation(tape, SparseAffineOperation(spidentity(T, d), v))
+    op = SparseAffineOperation(tape)
+    return SparseTape(
+        SparseAffineOperation(op.matrix, op.vector + v),
+        tape.variables,
+    )
 end
 
 # (SparseTape, SparseTape)
@@ -97,10 +100,10 @@ function real_operate(
     ::Type{T},
     tape::SparseTape{T},
 ) where {T<:Real}
-    d = MOI.output_dimension(tape)
-    return add_operation(
-        tape,
-        SparseAffineOperation(-spidentity(T, d), spzeros(T, d)),
+    op = SparseAffineOperation(tape)
+    return SparseTape(
+        SparseAffineOperation(-op.matrix, -op.vector),
+        tape.variables,
     )
 end
 
@@ -239,10 +242,10 @@ function real_operate(
     ::Type{T},
     tape::SparseTape{T},
 ) where {T<:Real}
-    d = MOI.output_dimension(tape)
-    # doesn't seem ideal for a sparse representation...
-    A = ones(T, 1, d)
-    return add_operation(tape, SparseAffineOperation(A, zeros(T, size(A, 1))))
+    op = SparseAffineOperation(tape)
+    mat = sum(op.matrix; dims = 1)
+    vec = [sum(op.vector)]
+    return SparseTape{T}(SparseAffineOperation(mat, vec), tape.variables)
 end
 
 function real_operate(
@@ -265,7 +268,12 @@ function real_operate(
     A::AbstractMatrix,
     tape::SparseTape{T},
 ) where {T<:Real}
-    return add_operation(tape, SparseAffineOperation(A, spzeros(T, size(A, 1))))
+    op = SparseAffineOperation(tape)
+    return SparseTape(
+        SparseAffineOperation(A * op.matrix, A * op.vector),
+        tape.variables,
+    )
+    # return add_operation(tape, SparseAffineOperation(A, spzeros(T, size(A, 1))))
 end
 
 function real_operate(
@@ -283,10 +291,10 @@ function real_operate(
     x::Real,
     tape::SparseTape{T},
 ) where {T<:Real}
-    d = MOI.output_dimension(tape)
-    return add_operation(
-        tape,
-        SparseAffineOperation(x * spidentity(T, d), spzeros(T, d)),
+    op = SparseAffineOperation(tape)
+    return SparseTape(
+        SparseAffineOperation(x * op.matrix, x * op.vector),
+        tape.variables,
     )
 end
 
