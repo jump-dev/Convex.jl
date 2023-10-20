@@ -128,6 +128,7 @@ include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
 include("solution.jl")
+include("MOI_wrapper.jl")
 
 ### affine atoms
 include("atoms/affine/add_subtract.jl")
