@@ -2,7 +2,7 @@
 
 ## v0.16.0 (October 23, 2023)
 
-* `hcat`, `vcat`, and `hvcat` with Convex.jl objects (variables, expressions, and so forth) only support up to 5 arguments.
+* `hcat`, `vcat`, and `hvcat` with Convex.jl objects (variables, expressions, and so forth) only support up to 5 arguments by default. This can be modified by running `set_preferences!(Convex, "num_cat_methods" => 10)`. If you are writing package code that depends on these additional methods existing, set `set_preferences!(Convex, "num_cat_methods" => 10; export_prefs=true)` to "export" this preference setting.
 * Relatedly, type piracy for these functions has been removed, making Convex.jl loadable on Julia v.10.
 
 ## v0.15.3 (February 11, 2023)

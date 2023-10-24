@@ -6,6 +6,7 @@ using LinearAlgebra
 using SparseArrays
 using LDLFactorizations
 using AbstractTrees: AbstractTrees
+using Preferences
 
 using MathOptInterface
 const MOI = MathOptInterface

@@ -122,7 +122,7 @@ end
 # - Up to 5 arguments means 57 new methods for each function
 # - Up to 6 arguments means 120 new methods for each function
 # - Up to 7 arguments means 247 new methods for each function
-const N_METHODS = 5
+const N_METHODS = @load_preference("num_cat_methods", 5)
 
 # Let us stick to 5 unless we really need more.
 for (outer, inner) in [(:hcat, :HcatAtom), (:vcat, :_vcat)]
