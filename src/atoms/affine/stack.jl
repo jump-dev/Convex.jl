@@ -26,7 +26,6 @@ end
 # Allow splatting
 HcatAtom(args...) = HcatAtom(args)
 
-
 function sign(x::HcatAtom)
     return sum(map(sign, x.children))
 end
@@ -127,14 +126,14 @@ const N_METHODS = 5
 # Let us stick to 5 unless we really need more.
 for (outer, inner) in [(:hcat, :HcatAtom), (:vcat, :_vcat)]
     for len in 1:N_METHODS  # generate all combinations up to length 5
-        for mask in Iterators.product(ntuple(_->(true, false), len)...)
+        for mask in Iterators.product(ntuple(_ -> (true, false), len)...)
             any(mask) || continue  # Don't do this if no argument would be a Foo
             arg_names = Symbol[]
             sig = Expr[]
             for (ii, is_foo) in enumerate(mask)
                 arg_name = Symbol(:x, ii)
                 push!(arg_names, arg_name)
-                push!(sig, :($arg_name :: $(is_foo ? :AbstractExpr : :Value)))
+                push!(sig, :($arg_name::$(is_foo ? :AbstractExpr : :Value)))
             end
             body = quote
                 $inner($(arg_names...))
@@ -146,18 +145,18 @@ end
 
 # `hvcat` is special since the first argument is different
 for len in 1:N_METHODS  # generate all combinations up to length 5
-    for mask in Iterators.product(ntuple(_->(true, false), len)...)
+    for mask in Iterators.product(ntuple(_ -> (true, false), len)...)
         any(mask) || continue  # Don't do this if no argument would be a Foo
-            arg_names = Symbol[:rows]
-            sig = Expr[:(rows::Tuple{Vararg{Int}})]
-            for (ii, is_foo) in enumerate(mask)
-                arg_name = Symbol(:x, ii)
-                push!(arg_names, arg_name)
-                push!(sig, :($arg_name :: $(is_foo ? :AbstractExpr : :Value)))
-            end
-            body = quote
-                _hvcat($(arg_names...))
-            end
+        arg_names = Symbol[:rows]
+        sig = Expr[:(rows::Tuple{Vararg{Int}})]
+        for (ii, is_foo) in enumerate(mask)
+            arg_name = Symbol(:x, ii)
+            push!(arg_names, arg_name)
+            push!(sig, :($arg_name::$(is_foo ? :AbstractExpr : :Value)))
+        end
+        body = quote
+            _hvcat($(arg_names...))
+        end
         eval(Expr(:function, Expr(:call, :hvcat, sig...), body))
     end
 end
