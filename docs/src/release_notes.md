@@ -1,5 +1,10 @@
 # Release notes
 
+## v0.16.0 (October 23, 2023)
+
+* `hcat`, `vcat`, and `hvcat` with Convex.jl objects (variables, expressions, and so forth) only support up to 5 arguments.
+* Relatedly, type piracy for these functions has been removed, making Convex.jl loadable on Julia v.10.
+
 ## v0.15.3 (February 11, 2023)
 
  * Add support for LDLFactorizations v0.10 [#496](https://github.com/jump-dev/Convex.jl/pull/496).

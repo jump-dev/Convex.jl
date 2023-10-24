@@ -5,7 +5,10 @@ struct HcatAtom <: AbstractExpr
     children::Tuple
     size::Tuple{Int,Int}
 
-    function HcatAtom(args::AbstractExpr...)
+    function HcatAtom(args)
+        if !all(x -> x isa AbstractExpr, args)
+            args = map(arg -> convert(AbstractExpr, arg), args)
+        end
         num_rows = args[1].size[1]
         num_cols = 0
         for arg in args
@@ -20,6 +23,9 @@ struct HcatAtom <: AbstractExpr
         return new(:hcat, hash(children), children, (num_rows, num_cols))
     end
 end
+# Allow splatting
+HcatAtom(args...) = HcatAtom(args)
+
 
 function sign(x::HcatAtom)
     return sum(map(sign, x.children))
@@ -108,32 +114,70 @@ function conic_form!(x::HcatAtom, unique_conic_forms::UniqueConicForms)
     return get_conic_form(unique_conic_forms, x)
 end
 
-# TODO: fix piracy!
+# Avoid piracy: if any 1 argument is an AbstractExpr, out of up to 5 total arguments
+# then dispatch to our private method (e.g. `HcatAtom` for `hcat`).
+# Uses the `eval` strategy "At least one argument of this type" from
+# from https://www.oxinabox.net/2023/06/17/resident-eval.html
+# How to choose how many arguments to support?
+# - Up to 5 arguments means 57 new methods for each function
+# - Up to 6 arguments means 120 new methods for each function
+# - Up to 7 arguments means 247 new methods for each function
+const N_METHODS = 5
 
-# * `Value` is not owned by Convex.jl
-# * splatting creates zero-argument functions, which again are not owned by Convex.jl
-
-hcat(args::AbstractExpr...) = HcatAtom(args...)
-function hcat(args::AbstractExprOrValue...)
-    return HcatAtom(map(arg -> convert(AbstractExpr, arg), args)...)
+# Let us stick to 5 unless we really need more.
+for (outer, inner) in [(:hcat, :HcatAtom), (:vcat, :_vcat)]
+    for len in 1:N_METHODS  # generate all combinations up to length 5
+        for mask in Iterators.product(ntuple(_->(true, false), len)...)
+            any(mask) || continue  # Don't do this if no argument would be a Foo
+            arg_names = Symbol[]
+            sig = Expr[]
+            for (ii, is_foo) in enumerate(mask)
+                arg_name = Symbol(:x, ii)
+                push!(arg_names, arg_name)
+                push!(sig, :($arg_name :: $(is_foo ? :AbstractExpr : :Value)))
+            end
+            body = quote
+                $inner($(arg_names...))
+            end
+            eval(Expr(:function, Expr(:call, outer, sig...), body))
+        end
+    end
 end
-hcat(args::Value...) = Base.cat(args..., dims = Val(2))
+
+# `hvcat` is special since the first argument is different
+for len in 1:N_METHODS  # generate all combinations up to length 5
+    for mask in Iterators.product(ntuple(_->(true, false), len)...)
+        any(mask) || continue  # Don't do this if no argument would be a Foo
+            arg_names = Symbol[:rows]
+            sig = Expr[:(rows::Tuple{Vararg{Int}})]
+            for (ii, is_foo) in enumerate(mask)
+                arg_name = Symbol(:x, ii)
+                push!(arg_names, arg_name)
+                push!(sig, :($arg_name :: $(is_foo ? :AbstractExpr : :Value)))
+            end
+            body = quote
+                _hvcat($(arg_names...))
+            end
+        eval(Expr(:function, Expr(:call, :hvcat, sig...), body))
+    end
+end
 
 # TODO: implement vertical concatenation in a more efficient way
-vcat(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)...))
-function vcat(args::AbstractExprOrValue...)
+_vcat(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)))
+
+function _vcat(args::AbstractExprOrValue...)
     return transpose(
-        HcatAtom(map(arg -> transpose(convert(AbstractExpr, arg)), args)...),
+        HcatAtom(map(arg -> transpose(convert(AbstractExpr, arg)), args)),
     )
 end
-vcat(args::Value...) = Base.cat(args..., dims = Val(1)) # Note: this makes general vcat slower for anyone using Convex...
 
-function hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
+function _hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
     nbr = length(rows)
     rs = Vector{Any}(undef, nbr)
     a = 1
     for i in 1:nbr
-        rs[i] = hcat(args[a:a-1+rows[i]]...)
+        # Avoid splatting to not hit method limits
+        rs[i] = HcatAtom(args[a:a-1+rows[i]])
         a += rows[i]
     end
     return vcat(rs...)
