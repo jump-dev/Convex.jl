@@ -1,5 +1,9 @@
 # Release notes
 
+## v0.15.4 (October 24, 2023)
+
+* Convex's piracy of `hcat` and `vcat` was made less severe, allowing precompilation of Convex.jl on Julia 1.10.
+
 ## v0.15.3 (February 11, 2023)
 
  * Add support for LDLFactorizations v0.10 [#496](https://github.com/jump-dev/Convex.jl/pull/496).
