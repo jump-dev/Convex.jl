@@ -137,10 +137,7 @@ function _expr(func::MOI.ScalarNonlinearFunction, model)
             "Power with exponent different from 2 is not supported by Convex.jl",
         )
     end
-    @show func.head
-    @show func
     expr = Expr(:call, func.head, _expr.(func.args, model)...)
-    @show expr
     return eval(expr)
 end
 
