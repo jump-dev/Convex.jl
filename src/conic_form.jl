@@ -133,6 +133,7 @@ function Base.empty!(conic_forms::UniqueConicForms)
     empty!(conic_forms.constr_list)
     empty!(conic_forms.id_to_variables)
     empty!(conic_forms.conic_constr_to_constr)
+    return
 end
 
 function has_conic_form(conic_forms::UniqueConicForms, exp::AbstractExpr)

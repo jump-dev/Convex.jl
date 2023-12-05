@@ -47,15 +47,24 @@ function _add_variable(model::Optimizer, vi::MOI.VariableIndex)
     return
 end
 
-function MOI.supports_add_constrained_variables(model::Optimizer, S::Type{MOI.Reals})
+function MOI.supports_add_constrained_variables(
+    model::Optimizer,
+    S::Type{MOI.Reals},
+)
     return MOI.supports_add_constrained_variables(model.model, S)
 end
 
-function MOI.supports_add_constrained_variables(model::Optimizer, S::Type{<:MOI.AbstractVectorSet})
+function MOI.supports_add_constrained_variables(
+    model::Optimizer,
+    S::Type{<:MOI.AbstractVectorSet},
+)
     return MOI.supports_add_constrained_variables(model.model, S)
 end
 
-function MOI.add_constrained_variables(model::Optimizer, set::MOI.AbstractVectorSet)
+function MOI.add_constrained_variables(
+    model::Optimizer,
+    set::MOI.AbstractVectorSet,
+)
     vis, ci = MOI.add_constrained_variables(model.model, set)
     for vi in vis
         _add_variable(model, vi)
@@ -63,11 +72,17 @@ function MOI.add_constrained_variables(model::Optimizer, set::MOI.AbstractVector
     return vis, ci
 end
 
-function MOI.supports_add_constrained_variable(model::Optimizer, S::Type{<:MOI.AbstractScalarSet})
+function MOI.supports_add_constrained_variable(
+    model::Optimizer,
+    S::Type{<:MOI.AbstractScalarSet},
+)
     return MOI.supports_add_constrained_variable(model.model, S)
 end
 
-function MOI.add_constrained_variable(model::Optimizer, set::MOI.AbstractScalarSet)
+function MOI.add_constrained_variable(
+    model::Optimizer,
+    set::MOI.AbstractScalarSet,
+)
     vi, ci = MOI.add_constrained_variable(model.model, set)
     _add_variable(model, vi)
     return vi, ci
@@ -118,7 +133,9 @@ function _expr(func::MOI.ScalarNonlinearFunction, model)
         if length(func.args) == 2 && func.args[2] == 2
             return square(_expr(func.args[1], model))
         end
-        error("Power with exponent different from 2 is not supported by Convex.jl")
+        error(
+            "Power with exponent different from 2 is not supported by Convex.jl",
+        )
     end
     @show func.head
     @show func
@@ -154,7 +171,8 @@ function MOI.add_constraint(
             model.convex_to_moi[id] = [vi]
         end
     end
-    for conic_constr in model.unique_conic_forms.constr_list[(last(model.constraint_offset) + 1):end]
+    for conic_constr in
+        model.unique_conic_forms.constr_list[(last(model.constraint_offset)+1):end]
         conic_set, conic_func = make_MOI_constr(
             conic_constr,
             model.convex_to_moi,
@@ -176,20 +194,14 @@ MOI.optimize!(model::Optimizer) = MOI.optimize!(model.model)
 
 function MOI.supports(
     model::Optimizer,
-    attr::Union{
-        MOI.AbstractModelAttribute,
-        MOI.AbstractOptimizerAttribute,
-    },
+    attr::Union{MOI.AbstractModelAttribute,MOI.AbstractOptimizerAttribute},
 )
     return MOI.supports(model.model, attr)
 end
 
 function MOI.set(
     model::Optimizer,
-    attr::Union{
-        MOI.AbstractModelAttribute,
-        MOI.AbstractOptimizerAttribute,
-    },
+    attr::Union{MOI.AbstractModelAttribute,MOI.AbstractOptimizerAttribute},
     value,
 )
     return MOI.set(model.model, attr, value)
@@ -197,10 +209,7 @@ end
 
 function MOI.get(
     model::Optimizer,
-    attr::Union{
-        MOI.AbstractModelAttribute,
-        MOI.AbstractOptimizerAttribute,
-    },
+    attr::Union{MOI.AbstractModelAttribute,MOI.AbstractOptimizerAttribute},
 )
     return MOI.get(model.model, attr)
 end
