@@ -127,6 +127,15 @@ function UniqueConicForms()
     )
 end
 
+function Base.empty!(conic_forms::UniqueConicForms)
+    empty!(conic_forms.exp_map)
+    empty!(conic_forms.constr_map)
+    empty!(conic_forms.constr_list)
+    empty!(conic_forms.id_to_variables)
+    empty!(conic_forms.conic_constr_to_constr)
+    return
+end
+
 function has_conic_form(conic_forms::UniqueConicForms, exp::AbstractExpr)
     return haskey(conic_forms.exp_map, (exp.head, exp.id_hash))
 end
