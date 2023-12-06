@@ -1,13 +1,12 @@
 struct Optimizer{T,M} <: MOI.AbstractOptimizer
-    model::M
-    unique_conic_forms::UniqueConicForms
+    context::Context{T,M}
     moi_to_convex::OrderedDict{MOI.VariableIndex,UInt64}
     convex_to_moi::Dict{UInt64,Vector{MOI.VariableIndex}}
     constraint_offset::Vector{UInt64}
     function Optimizer{T}(model::MOI.ModelLike) where {T}
         return new{T,typeof(model)}(
             model,
-            UniqueConicForms(),
+            Context{T,typeof(model)}(model),
             OrderedDict{MOI.VariableIndex,UInt64}(),
             Dict{UInt64,MOI.VariableIndex}(),
             UInt64[],
@@ -21,7 +20,7 @@ MOI.is_empty(model::Optimizer) = MOI.is_empty(model.model)
 
 function MOI.empty!(model::Optimizer)
     MOI.empty!(model.model)
-    empty!(model.unique_conic_forms)
+    empty!(model.context)
     empty!(model.moi_to_convex)
     empty!(model.convex_to_moi)
     empty!(model.constraint_offset)
@@ -160,7 +159,7 @@ function MOI.add_constraint(
 ) where {T}
     constraint = _constraint(_expr(func, model), set)
     push!(model.constraint_offset, length(model.unique_conic_forms.constr_list))
-    conic_form!(constraint, model.unique_conic_forms)
+    add_constraint!(model.context, constraint)
     for id in keys(model.unique_conic_forms.id_to_variables)
         vi = MOI.add_variable(model.model)
         if !haskey(model.convex_to_moi, id)

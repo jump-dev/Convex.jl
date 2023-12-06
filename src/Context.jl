@@ -10,6 +10,7 @@ mutable struct Context{T,M}
             Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
         },
     }
+    # `id_hash` -> `AbstractVariable`
     id_to_variables::OrderedDict{UInt64,Any}
 
     # Used for populating constraint duals
