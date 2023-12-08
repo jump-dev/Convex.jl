@@ -40,3 +40,13 @@ function Context{T}(optimizer) where {T}
         IdDict{Any,Any}(),
     )
 end
+
+function Base.empty!(context::Context)
+    MOI.empty!(context.model)
+    empty!(context.var_id_to_moi_indices)
+    empty!(context.id_to_variables)
+    empty!(context.constr_to_moi_inds)
+    context.detected_infeasible_during_formulation[] = false
+    empty!(context.conic_form_cache)
+    return
+end
