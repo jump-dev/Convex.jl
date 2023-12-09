@@ -183,7 +183,7 @@ problem = minimize(
 )
 @time solve!(problem, SCS.Optimizer; silent_solver = true)
 λ = 1.5
-@time solve!(problem, SCS.Optimizer; silent_solver = true, warmstart = true)
+@time solve!(problem, SCS.Optimizer; silent_solver = true)#, warmstart = true) # FIXME
 
 # # DCP examples
 
