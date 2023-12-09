@@ -10,21 +10,6 @@ function add_variables!(model, var::AbstractVariable)
     end
 end
 
-# this is kind of awful; currently needed since sometimes Convex treats numbers as vectors or matrices
-# need to think of a better way, possibly via breaking changes to Convex's syntax
-function promote_size(values)
-    d = only(
-        unique(
-            MOI.output_dimension(v) for
-            v in values if v isa MOI.AbstractFunction ||
-            v isa VectorAffineFunctionAsMatrix ||
-            v isa VAFTape ||
-            v isa SparseTape
-        ),
-    )
-    return (v isa Number ? fill(v, d) : v for v in values)
-end
-
 scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
 scalar_fn(x) = only(MOIU.scalarize(x))
 scalar_fn(x::SparseTape) = scalar_fn(to_vaf(x))
@@ -157,23 +142,5 @@ function unpackvec(v::AbstractVector, size::Tuple{Int,Int}, iscomplex::Bool)
         return v[]
     else
         return reshape(v, size)
-    end
-end
-
-# In `packvec`, we use `real` even in the `iscomplex == false` branch
-# for type stability. Note here `iscomplex` refers to the `Sign` of the variable
-# associated to the values here, not whether or not the variable actually holds
-# a complex number at this point. Hence, one could have `iscomplex==true` and
-# `isreal(value)==true` or even `value isa Real` could hold.
-function packvec(value::Number, iscomplex::Bool)
-    return iscomplex ? [real(value), imag(value)] : [real(value)]
-end
-
-function packvec(value::AbstractArray, iscomplex::Bool)
-    value = reshape(value, length(value))
-    if iscomplex
-        return [real(value); imag(value)]
-    else
-        return real(value)
     end
 end
