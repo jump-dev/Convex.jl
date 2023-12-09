@@ -216,7 +216,7 @@ end
                 subject to
                 └─ ≥ constraint (affine)
                    ├─ real variable ($(Convex.show_id(x)))
-                   └─ [0;;]
+                   └─ $(reshape([0], 1, 1))
 
                 termination status: OPTIMAL
                 primal status: FEASIBLE_POINT
