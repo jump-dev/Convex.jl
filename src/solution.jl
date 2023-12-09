@@ -45,7 +45,17 @@ function latex_formulation(problem::Problem, optimizer = MOIU.Model{Float64}())
     return MOIU.latex_formulation(context.model)
 end
 
-function solve!(problem::Problem{T}, optimizer_factory; kwargs...) where {T}
+"""
+    solve!(problem::Problem, optimizer_factory;
+        silent_solver = false)
+
+Solves the problem, populating `problem.optval` with the optimal value,
+as well as the values of the variables (accessed by [`evaluate`](@ref))
+and constraint duals (accessed by `cons.dual`), where applicable.
+Optional keyword arguments:
+* `silent_solver`: whether the solver should be silent (and not emit output or logs) during the solution process.
+"""
+function solve!(problem::Problem, optimizer_factory; kwargs...)
     optimizer = MOI.instantiate(optimizer_factory)
     return solve!(problem, optimizer; kwargs...)
 end
