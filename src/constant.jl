@@ -41,7 +41,13 @@ mutable struct Constant{T<:Real} <: AbstractExpr
             error("Real values expected")
 
         # Convert to matrix
-        return new{eltype(x)}(:constant, objectid(x), _matrix(x), _size(x), sign)
+        return new{eltype(x)}(
+            :constant,
+            objectid(x),
+            _matrix(x),
+            _size(x),
+            sign,
+        )
     end
     function Constant(x::Value, check_sign::Bool = true)
         return Constant(x, check_sign ? _sign(x) : NoSign())

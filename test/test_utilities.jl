@@ -119,7 +119,7 @@ end
 
         @test sprint(show, 2 * x) == """
           * (constant; real)
-          ├─ [2;;]
+          ├─ $(reshape([2], 1, 1))
           └─ real variable (fixed) ($(Convex.show_id(x)))"""
 
         free!(x)
@@ -132,10 +132,10 @@ end
         subject to
         ├─ ≥ constraint (affine)
         │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ [1;;]
+        │  └─ $(reshape([1], 1, 1))
         └─ ≤ constraint (affine)
            ├─ real variable ($(Convex.show_id(x)))
-           └─ [3;;]
+           └─ $(reshape([3], 1, 1))
 
         status: `solve!` not called yet"""
 
@@ -190,10 +190,10 @@ end
             subject to
             ├─ == constraint (affine)
             │  ├─ real variable ($(Convex.show_id(x)))
-            │  └─ [1;;]
+            │  └─ $(reshape([1], 1, 1))
             ├─ == constraint (affine)
             │  ├─ real variable ($(Convex.show_id(x)))
-            │  └─ [2;;]
+            │  └─ $(reshape([2], 1, 1))
             ⋮
 
             status: `solve!` not called yet"""
