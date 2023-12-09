@@ -23,6 +23,10 @@ function _sign(x::Value)
     end
 end
 
+_matrix(x::AbstractArray) = [x;;]
+_matrix(x::AbstractVector) = reshape(Vector(x), length(x), 1)
+_matrix(x::Number) = _matrix([x])
+
 mutable struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
@@ -37,8 +41,7 @@ mutable struct Constant{T<:Real} <: AbstractExpr
             error("Real values expected")
 
         # Convert to matrix
-        mat = [x;;]
-        return new{eltype(x)}(:constant, objectid(x), mat, _size(x), sign)
+        return new{eltype(x)}(:constant, objectid(x), _matrix(x), _size(x), sign)
     end
     function Constant(x::Value, check_sign::Bool = true)
         return Constant(x, check_sign ? _sign(x) : NoSign())
