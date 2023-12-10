@@ -10,10 +10,7 @@
 #############################################################################
 import Convex.sign,
     Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-using Convex:
-    AbstractExpr,
-    ConstVexity,
-    Nondecreasing
+using Convex: AbstractExpr, ConstVexity, Nondecreasing
 export antidiag
 
 ### Diagonal
@@ -98,5 +95,11 @@ function Convex.new_conic_form!(
     end
 
     objective = conic_form!(context, Convex.only(Convex.children(x)))
-    return Convex.operate(Convex.add_operation, T, Convex.sign(x), select_diag, objective)
+    return Convex.operate(
+        Convex.add_operation,
+        T,
+        Convex.sign(x),
+        select_diag,
+        objective,
+    )
 end
