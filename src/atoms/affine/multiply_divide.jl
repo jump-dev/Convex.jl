@@ -80,7 +80,7 @@ function real_convert(::Type{T}, x::AbstractVector) where {T}
     return SPARSE_VECTOR{T}(x)
 end
 
-function _conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
+function new_conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     # scalar multiplication
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
         if vexity(x.children[1]) == ConstVexity()

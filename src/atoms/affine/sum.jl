@@ -38,7 +38,7 @@ function evaluate(x::SumAtom)
     return sum(evaluate(x.children[1]))
 end
 
-function _conic_form!(context::Context{T}, A::SumAtom) where {T}
+function new_conic_form!(context::Context{T}, A::SumAtom) where {T}
     subobj = conic_form!(context, only(children(A)))
     obj = operate(sum, T, sign(A), subobj)
     return obj

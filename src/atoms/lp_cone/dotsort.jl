@@ -57,7 +57,7 @@ function evaluate(x::DotSortAtom)
     )
 end
 
-function _conic_form!(context::Context{T}, x::DotSortAtom) where {T}
+function new_conic_form!(context::Context{T}, x::DotSortAtom) where {T}
     y = only(x.children)
     w = x.w
     sy = size(y)

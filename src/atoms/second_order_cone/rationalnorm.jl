@@ -44,7 +44,7 @@ function evaluate(x::RationalNormAtom)
     return sum(abs.(evaluate(x.children[1])) .^ x.k)^(1 / x.k)
 end
 
-function _conic_form!(context::Context{T}, x::RationalNormAtom) where {T}
+function new_conic_form!(context::Context{T}, x::RationalNormAtom) where {T}
     v = conic_form!(context, only(x.children))
     d = length(only(x.children)) + 1
     t = Variable()

@@ -113,7 +113,7 @@ for f in (:sign, :monotonicity, :curvature)
     end
 end
 
-function _conic_form!(context::Context, p::Problem)
+function new_conic_form!(context::Context, p::Problem)
     for c in p.constraints
         add_constraint!(context, c)
     end

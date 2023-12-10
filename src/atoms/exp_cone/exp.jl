@@ -42,7 +42,7 @@ end
 
 exp(x::AbstractExpr) = ExpAtom(x)
 
-function _conic_form!(context::Context{T}, e::ExpAtom) where {T}
+function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
     x = e.children[1]
     y = Constant(ones(size(x)))

@@ -40,7 +40,7 @@ function evaluate(x::HuberAtom)
     return c
 end
 
-function _conic_form!(context::Context, x::HuberAtom)
+function new_conic_form!(context::Context, x::HuberAtom)
     c = x.children[1]
     s = Variable(c.size)
     n = Variable(c.size)

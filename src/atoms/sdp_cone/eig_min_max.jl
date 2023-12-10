@@ -50,7 +50,7 @@ eigmax(x::AbstractExpr) = EigMaxAtom(x)
 #   subject to
 #            tI - A is positive semidefinite
 #            A      is positive semidefinite
-function _conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
+function new_conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
     A = x.children[1]
     m, n = size(A)
     t = Variable()
@@ -100,7 +100,7 @@ eigmin(x::AbstractExpr) = EigMinAtom(x)
 #   subject to
 #            A - tI is positive semidefinite
 #            A      is positive semidefinite
-function _conic_form!(context::Context, x::EigMinAtom)
+function new_conic_form!(context::Context, x::EigMinAtom)
     A = x.children[1]
     m, n = size(A)
     t = Variable()

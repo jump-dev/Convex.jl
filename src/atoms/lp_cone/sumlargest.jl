@@ -46,7 +46,7 @@ function evaluate(x::SumLargestAtom)
     return sum(sort(vec(evaluate(x.children[1])), rev = true)[1:x.k])
 end
 
-function _conic_form!(context::Context, x::SumLargestAtom)
+function new_conic_form!(context::Context, x::SumLargestAtom)
     c = x.children[1]
     t = Variable(size(c))
     q = Variable()

@@ -92,7 +92,7 @@ Base.real(c::ComplexStructOfVec) = c.real_vec
 Base.imag(c::ComplexStructOfVec) = c.imag_vec
 Base.conj(c::ComplexStructOfVec) = ComplexStructOfVec(real(c), -imag(c))
 
-function _conic_form!(context::Context, C::ComplexConstant)
+function new_conic_form!(context::Context, C::ComplexConstant)
     return ComplexStructOfVec(
         conic_form!(context, C.real_constant),
         conic_form!(context, C.imag_constant),
@@ -137,7 +137,7 @@ sign(x::Constant) = x.sign
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
 length(x::Constant) = length(x.value)
 
-function _conic_form!(::Context{T}, C::Constant) where {T}
+function new_conic_form!(::Context{T}, C::Constant) where {T}
     # this should happen at `Constant` creation?
     # No, we don't have access to `T` yet; that's problem-specific
     x = SPARSE_VECTOR{T}(vec(C.value))

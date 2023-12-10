@@ -38,7 +38,7 @@ end
 -(x::AbstractExpr) = NegateAtom(x)
 -(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
-function _conic_form!(context::Context{T}, A::NegateAtom) where {T}
+function new_conic_form!(context::Context{T}, A::NegateAtom) where {T}
     subobj = conic_form!(context, only(children(A)))
     if subobj isa Value
         return -subobj
@@ -112,7 +112,7 @@ function evaluate(x::AdditionAtom)
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
-function _conic_form!(context::Context{T}, x::AdditionAtom) where {T}
+function new_conic_form!(context::Context{T}, x::AdditionAtom) where {T}
     obj = operate(
         +,
         T,

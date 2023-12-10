@@ -46,7 +46,7 @@ end
 
 entropy(x::AbstractExpr) = sum(EntropyAtom(x))
 
-function _conic_form!(context::Context, e::EntropyAtom)
+function new_conic_form!(context::Context, e::EntropyAtom)
     # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
     t = Variable(e.size)
     x = e.children[1]

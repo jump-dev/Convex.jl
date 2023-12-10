@@ -81,7 +81,7 @@ function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
     return trace_mpower(A, t // 1, C)
 end
 
-function _conic_form!(context::Context{T}, atom::TraceMpower) where {T}
+function new_conic_form!(context::Context{T}, atom::TraceMpower) where {T}
     A = atom.children[1]
     C = atom.C
     t = atom.t

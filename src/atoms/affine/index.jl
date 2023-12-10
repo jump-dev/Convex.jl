@@ -52,7 +52,7 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function _conic_form!(context::Context{T}, x::IndexAtom) where {T}
+function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
     obj = conic_form!(context, only(children(x)))
 
     m = length(x)

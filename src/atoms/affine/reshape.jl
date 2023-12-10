@@ -33,7 +33,7 @@ function evaluate(x::ReshapeAtom)
     return reshape(val, x.size[1], x.size[2])
 end
 
-function _conic_form!(context::Context, A::ReshapeAtom)
+function new_conic_form!(context::Context, A::ReshapeAtom)
     return conic_form!(context, only(children(A)))
 end
 

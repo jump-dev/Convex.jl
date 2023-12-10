@@ -96,7 +96,7 @@ function trace_logm(
     return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
-function _conic_form!(context::Context{T}, atom::TraceLogm) where {T}
+function new_conic_form!(context::Context{T}, atom::TraceLogm) where {T}
     X = atom.children[1]
     C = atom.C
     m = atom.m

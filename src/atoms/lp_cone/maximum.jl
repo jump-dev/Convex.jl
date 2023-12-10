@@ -42,7 +42,7 @@ function evaluate(x::MaximumAtom)
     return Base.maximum(evaluate(x.children[1]))
 end
 
-function _conic_form!(context::Context, x::MaximumAtom)
+function new_conic_form!(context::Context, x::MaximumAtom)
     t = Variable()
     add_constraint!(context, t >= x.children[1])
     return conic_form!(context, t)

@@ -76,7 +76,7 @@ antidiag(x::AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function Convex._conic_form!(
+function Convex.new_conic_form!(
     context::Context,
     x::AntidiagAtom,
 )

@@ -36,7 +36,7 @@ end
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
-function _conic_form!(context::Context{T}, A::EucNormAtom) where {T}
+function new_conic_form!(context::Context{T}, A::EucNormAtom) where {T}
     obj = conic_form!(context, only(children(A)))
 
     x = only(children(A))

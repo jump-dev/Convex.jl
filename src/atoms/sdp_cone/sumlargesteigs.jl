@@ -54,7 +54,7 @@ end
 #            Z + sI ⪰ A
 # See Ben-Tal and Nemirovski, "Lectures on Modern Convex Optimization"
 # Example 18.c
-function _conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
+function new_conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
     X = x.children[1]
     k = x.children[2]
     m, n = size(X)

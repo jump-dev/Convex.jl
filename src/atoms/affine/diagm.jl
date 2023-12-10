@@ -59,7 +59,7 @@ end
 Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
 diagm(x::AbstractExpr) = DiagMatrixAtom(x)
 
-function _conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
+function new_conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     obj = conic_form!(context, only(children(x)))
 
     sz = x.size[1]

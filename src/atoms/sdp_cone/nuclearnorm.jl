@@ -41,7 +41,7 @@ nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 # The complex case is example 1.20 of Watrous' "The Theory of Quantum Information"
 # (the operator A is negated but this doesn't affect the norm)
 # https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf
-function _conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
+function new_conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
     A = only(children(x))
     if iscomplex(sign(A))
         # I'm not sure how to use MOI's `NormNuclearCone` in this case, so we'll just do the extended formulation as an SDP ourselves:

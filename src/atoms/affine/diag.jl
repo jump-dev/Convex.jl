@@ -66,7 +66,7 @@ LinearAlgebra.diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function _conic_form!(context::Context{T}, x::DiagAtom) where {T}
+function new_conic_form!(context::Context{T}, x::DiagAtom) where {T}
     (num_rows, num_cols) = x.children[1].size
     k = x.k
 

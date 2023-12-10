@@ -51,7 +51,7 @@ function evaluate(e::RelativeEntropyAtom)
     return sum(out)
 end
 
-function _conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
+function new_conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
     # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
     w = conic_form!(context, e.children[1])
     v = conic_form!(context, e.children[2])

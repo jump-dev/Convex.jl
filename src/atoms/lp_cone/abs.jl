@@ -35,7 +35,7 @@ function evaluate(x::AbsAtom)
     return abs.(evaluate(x.children[1]))
 end
 
-function _conic_form!(context::Context, A::AbsAtom)
+function new_conic_form!(context::Context, A::AbsAtom)
     x = only(A.children)
 
     t = Variable(size(x))

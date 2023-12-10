@@ -39,7 +39,7 @@ function evaluate(x::RealAtom)
     return real.(evaluate(x.children[1]))
 end
 
-function _conic_form!(context::Context{T}, x::RealAtom) where {T}
+function new_conic_form!(context::Context{T}, x::RealAtom) where {T}
     obj = conic_form!(context, only(children(x)))
     return operate(real, T, sign(x), obj)
 end
@@ -78,7 +78,7 @@ function evaluate(x::ImaginaryAtom)
     return imag.(evaluate(x.children[1]))
 end
 
-function _conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
+function new_conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
     obj = conic_form!(context, only(children(x)))
     return operate(imag, T, sign(x), obj)
 end

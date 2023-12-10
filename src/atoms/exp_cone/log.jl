@@ -41,7 +41,7 @@ end
 
 log(x::AbstractExpr) = LogAtom(x)
 
-function _conic_form!(context::Context, e::LogAtom)
+function new_conic_form!(context::Context, e::LogAtom)
     # log(z) \geq x  <=>    (x,ones(),z) \in ExpCone
     z = e.children[1]
     y = Constant(ones(size(z)))

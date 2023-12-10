@@ -66,23 +66,40 @@ function to_tape(
     return ComplexTape(to_tape(v1, context), to_tape(v2, context))
 end
 
+"""
+    new_conic_form!(context::Context, a::AbstractExpr)
+
+Create a new conic form for `a` and return it, assuming that no conic form
+for `a` has already been created, that is `!haskey(context, a)` as this is
+already checked in [`conic_form!`](@ref) which calls this function.
+"""
+function new_conic_form! end
+
 # get the usual tape
-function _conic_form!(context::Context, a::AbstractVariable)
+function new_conic_form!(context::Context, a::AbstractVariable)
     if vexity(a) == ConstVexity()
         return conic_form!(context, constant(evaluate(a)))
     end
     return to_tape(_template(a, context), context)
 end
 
+"""
+    conic_form!(context::Context, a::AbstractExpr)
+
+Return the conic form for `a`. If it as already been created, it is directly
+accessed in `context[a]`, otherwise, it is created by calling
+[`new_conic_form`](@ref) and then cached in `context` so that the next call
+with the same expression does not create a duplicate one.
+"""
 function conic_form!(context::Context, a::AbstractExpr)
 
     # Nicer implementation
     d = context.conic_form_cache
-    return get!(() -> _conic_form!(context, a), d, a)
+    return get!(() -> new_conic_form!(context, a), d, a)
 
     # Avoid closure
     # wkh = context.conic_form_cache
-    # default = () -> _conic_form!(context, a)
+    # default = () -> new_conic_form!(context, a)
     # key = a
     # return Base.@lock wkh.lock begin
     #     get!(default, wkh.ht, DataStructures.WeakRefForWeakDict(key))

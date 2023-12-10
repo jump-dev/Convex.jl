@@ -60,7 +60,7 @@ end
 
 Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
 
-function _conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
+function new_conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
     A = x.children[1]
     if sign(A) == ComplexSign()
         # Create the equivalent conic problem:

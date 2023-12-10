@@ -70,7 +70,7 @@ function quantum_entropy(X::MatrixOrConstant, m::Integer = 0, k::Integer = 0)
     return -quantum_relative_entropy(X, Matrix(1.0 * I, size(X)))
 end
 
-function _conic_form!(context::Context, atom::QuantumEntropy)
+function new_conic_form!(context::Context, atom::QuantumEntropy)
     X = atom.children[1]
     m = atom.m
     k = atom.k

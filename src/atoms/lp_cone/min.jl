@@ -65,7 +65,7 @@ function evaluate(x::MinAtom)
     return min.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-function _conic_form!(context::Context, x::MinAtom)
+function new_conic_form!(context::Context, x::MinAtom)
     t = Variable(x.size[1], x.size[2])
     p = maximize(t, (t <= child for child in x.children)...)
     return conic_form!(context, p)

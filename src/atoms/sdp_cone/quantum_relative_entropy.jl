@@ -190,7 +190,7 @@ function quantum_relative_entropy(
     return real(tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function _conic_form!(context::Context, atom::QuantumRelativeEntropy1)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     A = atom.children[1]
     B = atom.children[2]
     m = atom.m
@@ -211,7 +211,7 @@ function _conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     return conic_form!(context, minimize(τ))
 end
 
-function _conic_form!(context::Context, atom::QuantumRelativeEntropy2)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2)
     A = atom.children[1]
     B = atom.B
     J = atom.J
