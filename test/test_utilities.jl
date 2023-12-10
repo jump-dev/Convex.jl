@@ -206,7 +206,9 @@ end
         # test `MAXWIDTH`
         x = Variable()
         p = satisfy([x == i for i in 1:100])
-        err = ErrorException("Satisfiability problem cannot be used as subproblem")
+        err = ErrorException(
+            "Satisfiability problem cannot be used as subproblem",
+        )
         @test_throws err sign(p)
         old_maxwidth = Convex.MAXWIDTH[]
         Convex.MAXWIDTH[] = 2

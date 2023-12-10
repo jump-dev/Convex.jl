@@ -177,11 +177,7 @@ function minimize(
 )
     return Problem{numeric_type}(:minimize, objective, constraints)
 end
-function minimize(
-    ::Value,
-    constraints::Constraint...;
-    numeric_type = Float64,
-)
+function minimize(::Value, constraints::Constraint...; numeric_type = Float64)
     return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function minimize(
@@ -207,11 +203,7 @@ function maximize(
 )
     return Problem{numeric_type}(:maximize, objective, constraints)
 end
-function maximize(
-    ::Value,
-    constraints::Constraint...;
-    numeric_type = Float64,
-)
+function maximize(::Value, constraints::Constraint...; numeric_type = Float64)
     return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function maximize(
