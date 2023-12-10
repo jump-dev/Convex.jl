@@ -46,11 +46,7 @@ function solve!(problem::Problem, optimizer_factory; kwargs...)
     return solve!(problem, optimizer; kwargs...)
 end
 
-function solve!(
-    p::Problem,
-    optimizer::MOI.ModelLike;
-    silent_solver = false,
-)
+function solve!(p::Problem, optimizer::MOI.ModelLike; silent_solver = false)
     context = Context(p, optimizer)
     model = context.model
 
