@@ -59,8 +59,8 @@ Convex.jl. Let's say you're adding the new function $f$.
      it!
 
 ```@docs
-conic_form!
-new_conic_form!
+Convex.conic_form!
+Convex.new_conic_form!
 ```
 
 Fixing the guts
@@ -116,4 +116,3 @@ PRs that comment the code more thoroughly will also be welcomed.
     * At the level of problem formulation (when we construct atoms), we convert everything to an `AbstractExpr` (or `Constraint`); in particular, constants become `Constant` or `ComplexConstant`. At this time we don't know the numeric type that will be used to solve the problem.
     * Once we begin to `solve!` the problem, we recursively call `conic_form!`. The output is of type `SparseTape{T}`, `ComplexTape{T}`, `Vector{T}`, or `ComplexStructOfVec{T}`. We can call `operate` to manipulate these outputs.
     * We convert these to `MOI.VectorAffineFunction` before passing them to MOI.
-
