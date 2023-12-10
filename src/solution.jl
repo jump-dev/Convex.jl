@@ -32,7 +32,8 @@ end
 
 """
     solve!(problem::Problem, optimizer_factory;
-        silent_solver = false)
+        silent_solver = false,
+    )
 
 Solves the problem, populating `problem.optval` with the optimal value,
 as well as the values of the variables (accessed by [`evaluate`](@ref))
@@ -46,10 +47,10 @@ function solve!(problem::Problem, optimizer_factory; kwargs...)
 end
 
 function solve!(
-    p::Problem{T},
+    p::Problem,
     optimizer::MOI.ModelLike;
     silent_solver = false,
-) where {T}
+)
     context = Context(p, optimizer)
     model = context.model
 
