@@ -13,10 +13,7 @@ import Convex.sign,
 using Convex:
     AbstractExpr,
     ConstVexity,
-    Nondecreasing,
-    has_conic_form,
-    cache_conic_form!,
-    get_conic_form
+    Nondecreasing
 export antidiag
 
 ### Diagonal
