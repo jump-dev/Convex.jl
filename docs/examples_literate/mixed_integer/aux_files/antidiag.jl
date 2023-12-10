@@ -77,9 +77,9 @@ antidiag(x::AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
 # The canonical form will then be:
 # coeff * x - d = 0
 function Convex.new_conic_form!(
-    context::Convex.Context,
+    context::Convex.Context{T},
     x::AntidiagAtom,
-)
+) where {T}
     (num_rows, num_cols) = x.children[1].size
     k = x.k
 
@@ -91,12 +91,12 @@ function Convex.new_conic_form!(
         sz_diag = Base.min(num_rows + k, num_cols)
     end
 
-    select_diag = spzeros(sz_diag, length(x.children[1]))
+    select_diag = spzeros(T, sz_diag, length(x.children[1]))
     for i in 1:sz_diag
         select_diag[i, start_index] = 1
         start_index += num_rows - 1
     end
 
-    objective = conic_form!(context, x.children[1])
-    return select_diag * objective
+    objective = conic_form!(context, Convex.only(Convex.children(x)))
+    return Convex.operate(Convex.add_operation, T, Convex.sign(x), select_diag, objective)
 end
