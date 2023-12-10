@@ -70,6 +70,26 @@ end
         @test_throws ErrorException minimize(x + im * x)
     end
 
+    @testset "Constant objective" begin
+        x = Variable()
+        for p in [
+            satisfy(x == 0, x == 1),
+            satisfy(Constraint[]),
+            minimize(0, x == 0),
+            minimize(0, Constraint[]),
+            maximize(0, x == 0),
+            maximize(0, Constraint[]),
+        ]
+            @test isnothing(p.objective)
+        end
+    end
+
+    @testset "Invalid head" begin
+        p = Problem(:invalid, nothing, Constraint[])
+        err = ErrorException("Unknown type of problem $(p.head)")
+        @test_throws err Convex.objective_vexity(p)
+    end
+
     @testset "`optval` is nothing before `solve!`" begin
         x = Variable()
         p = minimize(x, x >= 0)
@@ -124,6 +144,9 @@ end
 
         free!(x)
         p = maximize(log(x), x >= 1, x <= 3)
+        @test monotonicity(p) == (Convex.Nonincreasing(),)
+        @test sign(p) == NoSign()
+        @test curvature(p) == Convex.ConvexVexity()
 
         @test sprint(show, p) == """
         maximize
@@ -156,6 +179,7 @@ end
         level2 = hcat(level3, level3)
         root = hcat(level2, level2)
         p = minimize(sum(x), root == root)
+        @test curvature(p) == Convex.ConstVexity()
         @test sprint(show, p) == """
         minimize
         └─ sum (affine; real)
@@ -182,6 +206,8 @@ end
         # test `MAXWIDTH`
         x = Variable()
         p = satisfy([x == i for i in 1:100])
+        err = ErrorException("Satisfiability problem cannot be used as subproblem")
+        @test_throws err sign(p)
         old_maxwidth = Convex.MAXWIDTH[]
         Convex.MAXWIDTH[] = 2
         @test sprint(show, p) == """
@@ -499,11 +525,15 @@ end
         p = minimize(norm_1(x))
         y = randn(3, 3)
         c = (norm2(x - y) < 1)
+        @test p.size == (1, 1)
         @test length(p.constraints) == 0
         add_constraint!(p, c)
         @test length(p.constraints) == 1
         empty!(p.constraints)
         add_constraints!(p, c)
+        @test length(p.constraints) == 1
+        empty!(p.constraints)
+        add_constraint!(p, [c])
         @test length(p.constraints) == 1
         empty!(p.constraints)
         c2 = (norm2(x - rand(3, 3)) < 3)

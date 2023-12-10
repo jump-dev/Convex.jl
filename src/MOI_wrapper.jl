@@ -11,12 +11,12 @@ struct Optimizer{T,M} <: MOI.AbstractOptimizer
             MOI.ConstraintIndex[],
         )
     end
-    function Optimizer{T}(model::MOI.ModelLike) where {T}
-        return Optimizer(Context{T}(model))
+    function Optimizer{T}(optimizer_constructor) where {T}
+        return Optimizer(Context{T}(optimizer_constructor))
     end
 end
 
-Optimizer(model::MOI.ModelLike) = Optimizer{Float64}(model)
+Optimizer(optimizer_constructor) = Optimizer{Float64}(optimizer_constructor)
 
 MOI.is_empty(model::Optimizer) = MOI.is_empty(model.context.model)
 

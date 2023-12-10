@@ -3,8 +3,7 @@ using Convex.ProblemDepot: run_tests
 using Test
 using SCS, ECOS, GLPK, Clarabel
 
-using MathOptInterface
-const MOI = MathOptInterface
+import MathOptInterface as MOI
 const MOIU = MOI.Utilities
 const MOIB = MOI.Bridges
 

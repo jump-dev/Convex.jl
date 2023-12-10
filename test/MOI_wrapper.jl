@@ -8,7 +8,7 @@ function test_runtests()
     optimizer = MOI.Utilities.CachingOptimizer(
         MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
         MOI.instantiate(
-            () -> Convex.Optimizer(ECOS.Optimizer()),
+            () -> Convex.Optimizer(ECOS.Optimizer),
             with_bridge_type = Float64,
         ),
     )

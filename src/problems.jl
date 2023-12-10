@@ -106,7 +106,7 @@ for f in (:sign, :monotonicity, :curvature)
         end
         m = $f(p.objective)
         if p.head === :maximize
-            return -m
+            return (-).(m)
         else
             return m
         end
@@ -178,14 +178,14 @@ function minimize(
     return Problem{numeric_type}(:minimize, objective, constraints)
 end
 function minimize(
-    objective::Value,
+    ::Value,
     constraints::Constraint...;
     numeric_type = Float64,
 )
     return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function minimize(
-    objective::Value,
+    ::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
@@ -208,14 +208,14 @@ function maximize(
     return Problem{numeric_type}(:maximize, objective, constraints)
 end
 function maximize(
-    objective::Value,
+    ::Value,
     constraints::Constraint...;
     numeric_type = Float64,
 )
     return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function maximize(
-    objective::Value,
+    ::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
