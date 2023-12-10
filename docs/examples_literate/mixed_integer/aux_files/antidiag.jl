@@ -77,7 +77,7 @@ antidiag(x::AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
 # The canonical form will then be:
 # coeff * x - d = 0
 function Convex.new_conic_form!(
-    context::Context,
+    context::Convex.Context,
     x::AntidiagAtom,
 )
     (num_rows, num_cols) = x.children[1].size
