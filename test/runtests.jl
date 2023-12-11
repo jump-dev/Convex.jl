@@ -100,4 +100,5 @@ Random.seed!(2)
     include("SparseTape.jl")
     include("test_utilities.jl")
     include("test_abstract_variable.jl")
+    include("MOI_wrapper.jl")
 end
