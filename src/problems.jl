@@ -124,13 +124,8 @@ function new_conic_form!(context::Context, p::Problem)
     end
 end
 
-function Context(problem::Problem{T}, optimizer_factory; kwargs...) where {T}
-    optimizer = MOI.instantiate(optimizer_factory)
-    return Context(problem, optimizer; kwargs...)
-end
-
-function Context(p::Problem{T}, optimizer::MOI.ModelLike) where {T}
-    context = Context{T}(optimizer)
+function Context(p::Problem{T}, optimizer_factory) where {T}
+    context = Context{T}(optimizer_factory)
     cfp = conic_form!(context, p)
 
     # Save some memory before the solve;

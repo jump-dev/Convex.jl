@@ -41,13 +41,8 @@ and constraint duals (accessed by `cons.dual`), where applicable.
 Optional keyword arguments:
 * `silent_solver`: whether the solver should be silent (and not emit output or logs) during the solution process.
 """
-function solve!(problem::Problem, optimizer_factory; kwargs...)
-    optimizer = MOI.instantiate(optimizer_factory)
-    return solve!(problem, optimizer; kwargs...)
-end
-
-function solve!(p::Problem, optimizer::MOI.ModelLike; silent_solver = false)
-    context = Context(p, optimizer)
+function solve!(p::Problem, optimizer_factory; silent_solver = false)
+    context = Context(p, optimizer_factory)
     model = context.model
 
     if silent_solver

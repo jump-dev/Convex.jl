@@ -23,14 +23,7 @@ mutable struct Context{T,M}
     conic_form_cache::IdDict{Any,Any}
 end
 
-function Context{T}(optimizer) where {T}
-    model = MOIB.full_bridge_optimizer(
-        MOIU.CachingOptimizer(
-            MOIU.UniversalFallback(MOIU.Model{T}()),
-            optimizer,
-        ),
-        T,
-    )
+function Context{T}(model::MOI.ModelLike) where {T}
     return Context{T,typeof(model)}(
         model,
         OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
@@ -39,6 +32,10 @@ function Context{T}(optimizer) where {T}
         false,
         IdDict{Any,Any}(),
     )
+end
+
+function Context{T}(optimizer_factory) where {T}
+    return Context{T}(MOI.instantiate(optimizer_factory, with_bridge_type = T))
 end
 
 function Base.empty!(context::Context)
