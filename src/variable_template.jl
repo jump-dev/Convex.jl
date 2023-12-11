@@ -88,7 +88,7 @@ end
 
 Return the conic form for `a`. If it as already been created, it is directly
 accessed in `context[a]`, otherwise, it is created by calling
-[`new_conic_form`](@ref) and then cached in `context` so that the next call
+[`Convex.new_conic_form`](@ref) and then cached in `context` so that the next call
 with the same expression does not create a duplicate one.
 """
 function conic_form!(context::Context, a::AbstractExpr)
