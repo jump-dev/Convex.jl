@@ -21,11 +21,7 @@ function test_runtests()
             MOI.ObjectiveBound,
         ],
     )
-    return MOI.Test.runtests(
-        optimizer,
-        config;
-        exclude = String[],
-    )
+    return MOI.Test.runtests(optimizer, config; exclude = String[])
 end
 
 function runtests()
