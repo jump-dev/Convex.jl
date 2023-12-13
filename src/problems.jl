@@ -30,8 +30,6 @@ function Base.getproperty(p::Problem, s::Symbol)
         else
             return objective_value(p)
         end
-    elseif s === :size
-        return (1, 1)
     else
         return getfield(p, s)
     end

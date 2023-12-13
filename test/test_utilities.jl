@@ -527,7 +527,6 @@ end
         p = minimize(norm_1(x))
         y = randn(3, 3)
         c = (norm2(x - y) < 1)
-        @test p.size == (1, 1)
         @test length(p.constraints) == 0
         add_constraint!(p, c)
         @test length(p.constraints) == 1
