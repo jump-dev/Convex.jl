@@ -23,7 +23,8 @@ mutable struct Context{T,M}
     conic_form_cache::IdDict{Any,Any}
 end
 
-function Context{T}(model::MOI.ModelLike) where {T}
+function Context{T}(optimizer_factory) where {T}
+    model = MOI.instantiate(optimizer_factory, with_bridge_type = T)
     return Context{T,typeof(model)}(
         model,
         OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
@@ -32,10 +33,6 @@ function Context{T}(model::MOI.ModelLike) where {T}
         false,
         IdDict{Any,Any}(),
     )
-end
-
-function Context{T}(optimizer_factory) where {T}
-    return Context{T}(MOI.instantiate(optimizer_factory, with_bridge_type = T))
 end
 
 function Base.empty!(context::Context)
