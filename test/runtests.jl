@@ -21,7 +21,10 @@ Random.seed!(2)
                     # We want to check to make sure this does not throw
                     func(Val(false), 0.0, 0.0, T) do problem
                         @test problem isa Convex.Problem{T} # check numeric type
-                        model = () -> MOI.Utilities.MockOptimizer(MOI.Utilities.Model{T}())
+                        model =
+                            () -> MOI.Utilities.MockOptimizer(
+                                MOI.Utilities.Model{T}(),
+                            )
 
                         # make sure it loads without throwing
                         context = Convex.Context(problem, model)

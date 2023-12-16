@@ -25,7 +25,10 @@ the problem based on what the optimizer can support).
 
 Uses `MathOptInterface.Utilities.latex_formulation`.
 """
-function latex_formulation(problem::Problem, optimizer = MOI.Utilities.Model{Float64}())
+function latex_formulation(
+    problem::Problem,
+    optimizer = MOI.Utilities.Model{Float64}(),
+)
     context = Context(problem, optimizer)
     return MOI.Utilities.latex_formulation(context.model)
 end

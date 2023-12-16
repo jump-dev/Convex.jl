@@ -11,7 +11,10 @@ function test_runtests()
         Convex.Optimizer(ECOS.Optimizer),
     )
     MOI.set(optimizer, MOI.Silent(), true)
-    MOI.Bridges.remove_bridge(optimizer.optimizer.context.model, MOI.Bridges.Variable.ZerosBridge{T})
+    MOI.Bridges.remove_bridge(
+        optimizer.optimizer.context.model,
+        MOI.Bridges.Variable.ZerosBridge{T},
+    )
     config = MOI.Test.Config(;
         atol = 1e-3,
         rtol = 1e-3,
