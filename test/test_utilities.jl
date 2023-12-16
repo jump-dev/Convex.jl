@@ -424,7 +424,7 @@ end
     @testset "Cartesian index" begin
         x = Variable(3, 2)
         set_value!(x, rand(3, 2))
-        context = Convex.Context{Float64}(MOI.Utilities.Model{Float64}())
+        context = Convex.Context{Float64}(() -> MOI.Utilities.Model{Float64}())
 
         for ind in CartesianIndices(zeros(3, 2))
             L = Convex.conic_form!(context, x[ind])
