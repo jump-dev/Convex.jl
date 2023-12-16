@@ -8,10 +8,7 @@ using LDLFactorizations
 using AbstractTrees: AbstractTrees, children
 # using DataStructures
 
-using MathOptInterface
-const MOI = MathOptInterface
-const MOIU = MOI.Utilities
-const MOIB = MOI.Bridges
+import MathOptInterface as MOI
 
 # Functions
 export conv,

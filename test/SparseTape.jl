@@ -2,9 +2,9 @@ using SparseArrays, LinearAlgebra
 using Convex: SparseTape, SparseAffineOperation, add_operation
 @testset "SparseTape with type $T" for T in (Float64, Float32, BigFloat)
     optimizer = SCS.Optimizer()
-    model = MOIB.full_bridge_optimizer(
-        MOIU.CachingOptimizer(
-            MOIU.UniversalFallback(MOIU.Model{T}()),
+    model = MOI.Bridges.full_bridge_optimizer(
+        MOI.Utilities.CachingOptimizer(
+            MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
             optimizer,
         ),
         T,

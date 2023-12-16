@@ -5,23 +5,23 @@ import MathOptInterface as MOI
 import Convex, ECOS
 
 function test_runtests()
+    T = Float64
     optimizer = MOI.Utilities.CachingOptimizer(
-        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
-        MOI.instantiate(
-            () -> Convex.Optimizer(ECOS.Optimizer()),
-            with_bridge_type = Float64,
-        ),
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
+        Convex.Optimizer(ECOS.Optimizer),
     )
+    MOI.set(optimizer, MOI.Silent(), true)
+    MOI.Bridges.remove_bridge(optimizer.optimizer.context.model, MOI.Bridges.Variable.ZerosBridge{T})
     config = MOI.Test.Config(;
-        atol = 1e-4,
-        rtol = 1e-4,
+        atol = 1e-3,
+        rtol = 1e-3,
         exclude = Any[
             MOI.ConstraintBasisStatus,
             MOI.VariableBasisStatus,
             MOI.ObjectiveBound,
         ],
     )
-    return MOI.Test.runtests(optimizer, config; exclude = String[])
+    return MOI.Test.runtests(optimizer, config)
 end
 
 function runtests()

@@ -11,12 +11,12 @@ function add_variables!(model, var::AbstractVariable)
 end
 
 scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
-scalar_fn(x) = only(MOIU.scalarize(x))
+scalar_fn(x) = only(MOI.Utilities.scalarize(x))
 scalar_fn(x::SparseTape) = scalar_fn(to_vaf(x))
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
 """
-    latex_formulation(problem::Problem, optimizer=MOIU.Model{Float64}())
+    latex_formulation(problem::Problem, optimizer=MOI.Utilities.Model{Float64}())
 
 Prints a LaTeX formulation of the problem. Optionally, pass an `optimizer`
 (like `SCS.Optimizer`) as the second argument, to see the formulation provided
@@ -25,9 +25,9 @@ the problem based on what the optimizer can support).
 
 Uses `MathOptInterface.Utilities.latex_formulation`.
 """
-function latex_formulation(problem::Problem, optimizer = MOIU.Model{Float64}())
+function latex_formulation(problem::Problem, optimizer = MOI.Utilities.Model{Float64}())
     context = Context(problem, optimizer)
-    return MOIU.latex_formulation(context.model)
+    return MOI.Utilities.latex_formulation(context.model)
 end
 
 """
