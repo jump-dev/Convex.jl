@@ -2,19 +2,12 @@ import LinearAlgebra.isposdef
 import Base.in
 ### Positive semidefinite cone constraint
 
-# TODO: Terrible documentation. Please fix.
-mutable struct SDPConstraint <: Constraint
-    child::AbstractExpr
-    size::Tuple{Int,Int}
-    dual::ValueOrNothing
-
-    function SDPConstraint(child::AbstractExpr)
-        sz = child.size
-        if sz[1] != sz[2]
-            error("Positive semidefinite expressions must be square")
-        end
-        return new(child, sz, nothing)
+const SDPConstraint = Constraint{MOI.PositiveSemidefiniteConeTriangle}
+function set_with_size(::Type{MOI.PositiveSemidefiniteConeTriangle}, sz::Tuple{Int,Int})
+    if sz[1] != sz[2]
+        error("Positive semidefinite expressions must be square")
     end
+    return MOI.PositiveSemidefiniteConeTriangle(sz[1])
 end
 
 head(io::IO, ::SDPConstraint) = print(io, "sdp")

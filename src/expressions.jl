@@ -31,7 +31,18 @@ import Base.sign,
 
 ### Abstract types
 abstract type AbstractExpr end
-abstract type Constraint end
+abstract type Constraint{S<:MOI.AbstractSet} end
+struct Constraint
+    child::AbstractExpr
+    set::S
+    dual::ValueOrNothing
+    function Constraint(child, set::MOI.AbstractSet)
+        return new{typeof(set)}(child, set)
+    end
+    function Constraint{S}(child) where {S<:MOI.AbstractSet}
+        return Constraint(child, set_with_size(S, size(child)))
+    end
+end
 
 # We commandeer `==` to create a constraint.
 # Therefore we define `isequal` to still have a notion of equality

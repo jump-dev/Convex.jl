@@ -1,12 +1,6 @@
-# TODO: Document this
-mutable struct SOCConstraint <: Constraint
-    children::Tuple
-    dual::ValueOrNothing
-
-    function SOCConstraint(args::AbstractExpr...)
-        children = tuple(args...)
-        return new(children, nothing)
-    end
+const SOCConstraint = Constraint{MOI.SecondOrderCone}
+function set_with_size(::Type{MOI.SecondOrderCone}, sz::Tuple{Int})
+    return MOI.SecondOrderCone(sz[1])
 end
 
 head(io::IO, ::SOCConstraint) = print(io, "soc")
