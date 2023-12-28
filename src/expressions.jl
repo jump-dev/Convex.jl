@@ -28,7 +28,17 @@
 
 abstract type AbstractExpr end
 
-abstract type Constraint end
+struct Constraint{S<:MOI.AbstractSet}
+    child::AbstractExpr
+    set::S
+    dual::ValueOrNothing
+    function Constraint(child, set::MOI.AbstractSet)
+        return new{typeof(set)}(child, set)
+    end
+    function Constraint{S}(child) where {S<:MOI.AbstractSet}
+        return Constraint(child, set_with_size(S, size(child)))
+    end
+end
 
 const Value = Union{Number,AbstractArray}
 

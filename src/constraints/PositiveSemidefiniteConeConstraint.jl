@@ -1,14 +1,9 @@
-mutable struct PositiveSemidefiniteConeConstraint <: Constraint
-    child::AbstractExpr
-    size::Tuple{Int,Int}
-    dual::Union{Value,Nothing}
-
-    function PositiveSemidefiniteConeConstraint(child::AbstractExpr)
-        if child.size[1] != child.size[2]
-            error("Positive semidefinite expressions must be square")
-        end
-        return new(child, child.size, nothing)
+const PositiveSemidefiniteConeConstraint = Constraint{MOI.PositiveSemidefiniteConeTriangle}
+function set_with_size(::Type{MOI.PositiveSemidefiniteConeTriangle}, sz::Tuple{Int,Int})
+    if sz[1] != sz[2]
+        error("Positive semidefinite expressions must be square")
     end
+    return MOI.PositiveSemidefiniteConeTriangle(sz[1])
 end
 
 head(io::IO, ::PositiveSemidefiniteConeConstraint) = print(io, "sdp")

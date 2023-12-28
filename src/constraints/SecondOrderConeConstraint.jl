@@ -1,8 +1,7 @@
-mutable struct SecondOrderConeConstraint <: Constraint
-    children::Tuple
-    dual::Union{Value,Nothing}
+const SecondOrderConeConstraint = Constraint{MOI.SecondOrderCone}
 
-    SecondOrderConeConstraint(args::AbstractExpr...) = new(args, nothing)
+function set_with_size(::Type{MOI.SecondOrderCone}, sz::Tuple{Int})
+    return MOI.SecondOrderCone(sz[1])
 end
 
 head(io::IO, ::SecondOrderConeConstraint) = print(io, "soc")
