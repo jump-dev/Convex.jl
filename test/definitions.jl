@@ -38,3 +38,9 @@ end
     set_value!(x, 1.5)
     @test evaluate(expr) ≈ log(1 + exp(1.5))
 end
+
+@testset "`dot` (issue #508)" begin
+    x = [1.0 + 1.0im]
+    y = [-1.0im]
+    @test dot(x, y) ≈ evaluate(dot(constant(x), y))
+end
