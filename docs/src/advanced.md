@@ -5,7 +5,7 @@ DCP warnings
 ------------
 
 When an expression is created which is not of [DCP
-form](https://dcp.stanford.edu/), a warning is emitted. For example,
+form](https://dcp.stanford.edu/), an error is emitted. For example,
 
 ```repl
 x = Variable()
@@ -16,9 +16,9 @@ x*y
 To disable this, run
 
 ```julia
-Convex.emit_dcp_warnings(false)
+Convex.allow_dcp_violations(true)
 ```
-See [`Convex.emit_dcp_warnings`](@ref) for more details.
+See [`Convex.allow_dcp_violations`](@ref) for more details.
 
 
 Dual Variables

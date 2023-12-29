@@ -7,7 +7,7 @@ Breaking changes:
 * `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`.
 * The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
 * The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
-
+* DCP violations now throw a `DCPViolationError` exception by default, rather than a warning. Relatedly, `Convex.emit_dcp_warnings` has been removed, and [`Convex.allow_dcp_violations`](@ref) added.
 
 Other changes:
 

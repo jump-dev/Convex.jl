@@ -20,10 +20,19 @@ struct AffineVexity <: Vexity end
 struct ConvexVexity <: Vexity end
 struct ConcaveVexity <: Vexity end
 
+struct DCPViolationError <: Exception end
+
+function Base.showerror(io::IO, ::DCPViolationError)
+    return print(
+        io,
+        "DCPViolationError: Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior.",
+    )
+end
+
 struct NotDcp <: Vexity
     function NotDcp()
-        if emit_dcp_warnings()
-            @warn "Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior."
+        if !allow_dcp_violations()
+            throw(DCPViolationError())
         end
         return new()
     end

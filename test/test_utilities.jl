@@ -513,17 +513,20 @@ end
     # end
 
     @testset "DCP warnings" begin
-        # default is to log
-        @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
+        # default is to error
+        @test_throws DCPViolationError Convex.NotDcp()
 
-        Convex.emit_dcp_warnings(false)
+        Convex.allow_dcp_violations(true)
         try
             @test_logs Convex.NotDcp()
         finally
             # Reset unconditionally
-            Convex.emit_dcp_warnings(true)
+            Convex.allow_dcp_violations(false)
         end
-        @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
+        @test_throws DCPViolationError Convex.NotDcp()
+
+        str = sprint(Base.showerror, DCPViolationError)
+        @test contains(str, "Expression not DCP compliant")
     end
 
     @testset "`add_constraints!` (#380)" begin

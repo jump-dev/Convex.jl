@@ -33,6 +33,8 @@ export GeomMeanHypoCone,
     quantum_entropy
 export trace_logm, trace_mpower, lieb_ando
 
+export DCPViolationError
+
 # rexports from LinearAlgebra
 export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
 
@@ -57,25 +59,24 @@ export add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
 # Module level globals
 
-const EMIT_DCP_WARNINGS = Ref{Bool}(true)
+const ALLOW_DCP_VIOLATIONS = Ref{Bool}(false)
 
 """
-    emit_dcp_warnings()
-    emit_dcp_warnings(emit)
+    allow_dcp_violations()
+    allow_dcp_violations(emit)
 
-Controls whether or not warnings are emitted for when an expression fails to be
+Controls whether or not errors are emitted for when an expression fails to be
 of disciplined convex form. When called without an argument, returns the current setting
-for whether or not DCP warnings are emitted. To turn warnings off, call
+for whether or not DCP errors are emitted. To turn errors off, call
 
-    Convex.emit_dcp_warnings(false)
+    Convex.allow_dcp_violations(true)
 
-to (globally) turn off DCP warnings. Note that if a problem is not DCP, the solution
-obtained by Convex.jl can be wildly incorrect (even if the solution status is `OPTIMAL`!).
+to (globally) allow non-DCP problems to be solved. Note that if a problem is not DCP, the solution obtained by Convex.jl can be wildly incorrect (even if the solution status is `OPTIMAL`!).
 
-To re-enable warnings, call, `Convex.emit_dcp_warnings(true)`.
+To re-enable errors, call, `Convex.allow_dcp_violations(false)`.
 """
-emit_dcp_warnings(emit) = EMIT_DCP_WARNINGS[] = emit
-emit_dcp_warnings() = EMIT_DCP_WARNINGS[]
+allow_dcp_violations(emit) = ALLOW_DCP_VIOLATIONS[] = emit
+allow_dcp_violations() = ALLOW_DCP_VIOLATIONS[]
 
 """
     MAXDEPTH
