@@ -21,7 +21,7 @@
 #-
 
 ## Make the Convex.jl module available
-using Convex, SparseArrays, LinearAlgebra
+using Convex, SparseArrays, LinearAlgebra, Test
 using SCS # first order splitting conic solver [O'Donoghue et al., 2014]
 
 ## Generate random problem data
@@ -199,7 +199,7 @@ sum(x) + y[2]
 #-
 
 ## not dcp compliant
-log(x) + square(x)
+@test_throws DCPViolationError log(x) + square(x)
 
 #-
 
