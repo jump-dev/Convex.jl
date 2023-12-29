@@ -405,7 +405,7 @@ end
     ::Type{T},
 ) where {T,test}
     x = Variable(3)
-    p = maximize(sum(dot(*)(x, [1, 2, 3])), x <= 1; numeric_type = T)
+    p = maximize(sum(x .* [1, 2, 3]), x <= 1; numeric_type = T)
 
     if test
         @test problem_vexity(p) == AffineVexity()
@@ -413,11 +413,11 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 6 atol = atol rtol = rtol
-        @test evaluate(sum((dot(*))(x, [1, 2, 3]))) ≈ 6 atol = atol rtol = rtol
+        @test evaluate(sum(x .* [1, 2, 3])) ≈ 6 atol = atol rtol = rtol
     end
 
     x = Variable(3, 3)
-    p = maximize(sum(dot(*)(x, eye(3))), x <= 1; numeric_type = T)
+    p = maximize(sum(x .* eye(3)), x <= 1; numeric_type = T)
 
     if test
         @test problem_vexity(p) == AffineVexity()
@@ -425,11 +425,11 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 3 atol = atol rtol = rtol
-        @test evaluate(sum((dot(*))(x, eye(3)))) ≈ 3 atol = atol rtol = rtol
+        @test evaluate(sum(x .* eye(3))) ≈ 3 atol = atol rtol = rtol
     end
 
     x = Variable(5, 5)
-    p = minimize(x[1, 1], dot(*)(3, x) >= 3; numeric_type = T)
+    p = minimize(x[1, 1], 3 .* x >= 3; numeric_type = T)
 
     if test
         @test problem_vexity(p) == AffineVexity()
@@ -441,7 +441,7 @@ end
     end
 
     x = Variable(3, 1)
-    p = minimize(sum(dot(*)(ones(3, 3), x)), x >= 1; numeric_type = T)
+    p = minimize(sum(ones(3, 3) .* x), x >= 1; numeric_type = T)
 
     if test
         @test problem_vexity(p) == AffineVexity()
@@ -453,7 +453,7 @@ end
     end
 
     x = Variable(1, 3)
-    p = minimize(sum(dot(*)(ones(3, 3), x)), x >= 1; numeric_type = T)
+    p = minimize(sum(ones(3, 3) .* x), x >= 1; numeric_type = T)
 
     if test
         @test problem_vexity(p) == AffineVexity()
@@ -465,7 +465,7 @@ end
     end
 
     x = Variable(1, 3, Positive())
-    p = maximize(sum(dot(/)(x, [1 2 3])), x <= 1; numeric_type = T)
+    p = maximize(sum(x ./ [1 2 3]), x <= 1; numeric_type = T)
 
     if test
         @test problem_vexity(p) == AffineVexity()
@@ -473,8 +473,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 11 / 6 atol = atol rtol = rtol
-        @test evaluate(sum((dot(/))(x, [1 2 3]))) ≈ 11 / 6 atol = atol rtol =
-            rtol
+        @test evaluate(sum(x ./ [1 2 3])) ≈ 11 / 6 atol = atol rtol = rtol
     end
 
     # Broadcast fusion works

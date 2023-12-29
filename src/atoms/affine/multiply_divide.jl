@@ -195,6 +195,10 @@ end
 # end
 
 function dotmultiply(x, y)
+    if size(x) == (1, 1) || size(y) == (1, 1)
+        return x * y
+    end
+
     if vexity(x) != ConstVexity()
         if vexity(y) != ConstVexity()
             error(
@@ -223,39 +227,12 @@ function dotmultiply(x, y)
     return reshape(const_multiplier * vec(var), size(var)...)
 end
 
-function broadcasted(
-    ::typeof(*),
-    x::Union{Constant,ComplexConstant},
-    y::AbstractExpr,
-)
-    if x.size == (1, 1) || y.size == (1, 1)
-        return x * y
-    elseif size(y, 1) < size(x, 1) && size(y, 1) == 1
-        return dotmultiply(x, ones(size(x, 1)) * y)
-    elseif size(y, 2) < size(x, 2) && size(y, 2) == 1
-        return dotmultiply(x, y * ones(1, size(x, 1)))
-    else
-        return dotmultiply(x, y)
-    end
-end
-function broadcasted(
-    ::typeof(*),
-    y::AbstractExpr,
-    x::Union{Constant,ComplexConstant},
-)
-    return dotmultiply(x, y)
-end
-
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
 function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
-    if x.size == (1, 1) || y.size == (1, 1)
-        return x * y
-    elseif vexity(x) == ConstVexity()
-        return dotmultiply(x, y)
-    elseif isequal(x, y)
+    if isequal(x, y)
         return square(x)
     else
-        return dotmultiply(y, x)
+        return dotmultiply(x, y)
     end
 end
 function broadcasted(::typeof(*), x::Value, y::AbstractExpr)
