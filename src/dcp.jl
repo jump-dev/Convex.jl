@@ -14,6 +14,7 @@ import Base.-, Base.+, Base.*, Base./
 
 # Vexity subtypes
 abstract type Vexity end
+Base.broadcastable(v::Vexity) = Ref(v)
 struct ConstVexity <: Vexity end
 struct AffineVexity <: Vexity end
 struct ConvexVexity <: Vexity end
@@ -37,6 +38,7 @@ struct NoMonotonicity <: Monotonicity end
 
 # Sign subtypes
 abstract type Sign end
+Base.broadcastable(s::Sign) = Ref(s)
 struct Positive <: Sign end
 struct Negative <: Sign end
 struct NoSign <: Sign end

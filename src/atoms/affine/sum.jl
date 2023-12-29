@@ -7,17 +7,17 @@
 import Base.sum
 
 ### Sum Atom
-struct SumAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct SumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function SumAtom(x::AbstractExpr)
         children = (x,)
-        return new(:sum, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::SumAtom) = print(io, "sum")
 
 function sign(x::SumAtom)
     return sign(x.children[1])
@@ -38,21 +38,10 @@ function evaluate(x::SumAtom)
     return sum(evaluate(x.children[1]))
 end
 
-# Suppose x was of the form
-# x = Ay where A was a coefficient. Then sum(x) can also be considered
-# sum(A, 1) * y
-function conic_form!(x::SumAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = copy(objective)
-        for var in keys(new_obj)
-            re = sum(new_obj[var][1], dims = 1)
-            im = sum(new_obj[var][2], dims = 1)
-            new_obj[var] = (re, im)
-        end
-        cache_conic_form!(unique_conic_forms, x, new_obj)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context{T}, A::SumAtom) where {T}
+    subobj = conic_form!(context, only(children(A)))
+    obj = operate(sum, T, sign(A), subobj)
+    return obj
 end
 
 # Dispatch to an internal helper function that handles the dimension argument in
@@ -70,3 +59,5 @@ function _sum(x::AbstractExpr, dimension::Integer)
         error("Sum not implemented for dimension $dimension")
     end
 end
+
+Base.@deprecate sum(x::AbstractExpr, dim::Int) sum(x, dims = dim)

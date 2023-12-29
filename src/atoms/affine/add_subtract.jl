@@ -8,17 +8,16 @@
 
 ### Unary Negation
 
-struct NegateAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct NegateAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function NegateAtom(x::AbstractExpr)
         children = (x,)
-        return new(:-, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+head(io::IO, ::NegateAtom) = print(io, "-")
 
 function sign(x::NegateAtom)
     return -sign(x.children[1])
@@ -37,20 +36,19 @@ function evaluate(x::NegateAtom)
 end
 
 -(x::AbstractExpr) = NegateAtom(x)
+-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
-function conic_form!(x::NegateAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        objective = -objective
-        cache_conic_form!(unique_conic_forms, x, objective)
+function new_conic_form!(context::Context{T}, A::NegateAtom) where {T}
+    subobj = conic_form!(context, only(children(A)))
+    if subobj isa Value
+        return -subobj
+    else
+        return operate(-, T, sign(A), subobj)
     end
-    return get_conic_form(unique_conic_forms, x)
 end
 
 ### Addition
-struct AdditionAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct AdditionAtom <: AbstractExpr
     children::Array{AbstractExpr,1}
     size::Tuple{Int,Int}
 
@@ -58,11 +56,25 @@ struct AdditionAtom <: AbstractExpr
         # find the size of the expression = max of size of x and size of y
         if x.size == y.size || y.size == (1, 1)
             sz = x.size
+            if y.size == (1, 1)
+                y = y * ones(sz)
+            end
         elseif x.size == (1, 1)
             sz = y.size
+            x = x * ones(sz)
         else
             error("Cannot add expressions of sizes $(x.size) and $(y.size)")
         end
+
+        if x.size != y.size
+            if (x isa Constant || x isa ComplexConstant) && (x.size == (1, 1))
+                x = constant(fill(evaluate(x), y.size))
+            elseif (y isa Constant || y isa ComplexConstant) &&
+                   (y.size == (1, 1))
+                y = constant(fill(evaluate(y), x.size))
+            end
+        end
+
         # see if we're forming a sum of more than two terms and condense them
         children = AbstractExpr[]
         if isa(x, AdditionAtom)
@@ -75,9 +87,11 @@ struct AdditionAtom <: AbstractExpr
         else
             push!(children, y)
         end
-        return new(:+, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::AdditionAtom) = print(io, "+")
 
 function sign(x::AdditionAtom)
     return sum(Sign[sign(child) for child in x.children])
@@ -98,24 +112,19 @@ function evaluate(x::AdditionAtom)
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
-function conic_form!(x::AdditionAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        objective = ConicObj()
-        for child in x.children
-            child_objective = conic_form!(child, unique_conic_forms)
-            if x.size != child.size
-                child_objective = promote_size(child_objective, length(x))
-            end
-            objective += child_objective
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context{T}, x::AdditionAtom) where {T}
+    obj = operate(
+        +,
+        T,
+        sign(x),
+        (conic_form!(context, c) for c in children(x))...,
+    )
+    return obj
 end
 
 +(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
-+(x::Value, y::AbstractExpr) = AdditionAtom(Constant(x), y)
-+(x::AbstractExpr, y::Value) = AdditionAtom(x, Constant(y))
++(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
++(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
 -(x::AbstractExpr, y::AbstractExpr) = x + (-y)
--(x::Value, y::AbstractExpr) = Constant(x) + (-y)
--(x::AbstractExpr, y::Value) = x + Constant(-y)
+-(x::Value, y::AbstractExpr) = constant(x) + (-y)
+-(x::AbstractExpr, y::Value) = x + constant(-y)

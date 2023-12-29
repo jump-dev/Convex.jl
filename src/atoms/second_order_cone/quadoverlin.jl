@@ -1,6 +1,4 @@
-struct QuadOverLinAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct QuadOverLinAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -9,9 +7,11 @@ struct QuadOverLinAtom <: AbstractExpr
             error("quad over lin arguments must be a vector and a scalar")
         end
         children = (x, y)
-        return new(:qol, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::QuadOverLinAtom) = print(io, "qol")
 
 function sign(q::QuadOverLinAtom)
     return Positive()
@@ -30,16 +30,12 @@ function evaluate(q::QuadOverLinAtom)
     return x' * x / evaluate(q.children[2])
 end
 
-function conic_form!(q::QuadOverLinAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, q)
-        t = Variable()
-        qol_objective = conic_form!(t, unique_conic_forms)
-        x, y = q.children
-        conic_form!(SOCConstraint(y + t, y - t, 2 * x), unique_conic_forms)
-        conic_form!(y >= 0, unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, q, qol_objective)
-    end
-    return get_conic_form(unique_conic_forms, q)
+function new_conic_form!(context::Context, q::QuadOverLinAtom)
+    t = Variable()
+    x, y = q.children
+    add_constraint!(context, SOCConstraint(y + t, y - t, 2 * x))
+    add_constraint!(context, y >= 0)
+    return conic_form!(context, t)
 end
 
 quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)

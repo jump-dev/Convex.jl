@@ -5,9 +5,9 @@
 # Please read expressions.jl first.
 #############################################################################
 
-struct DiagMatrixAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+import LinearAlgebra.diagm, LinearAlgebra.Diagonal
+
+mutable struct DiagMatrixAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -27,9 +27,11 @@ struct DiagMatrixAtom <: AbstractExpr
         end
 
         children = (x,)
-        return new(:diagm, hash(children), children, (sz, sz))
+        return new(children, (sz, sz))
     end
 end
+
+head(io::IO, ::DiagMatrixAtom) = print(io, "diagm")
 
 function sign(x::DiagMatrixAtom)
     return sign(x.children[1])
@@ -50,23 +52,22 @@ function evaluate(x::DiagMatrixAtom)
     return Diagonal(vec(evaluate(x.children[1])))
 end
 
-function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
+function diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
     d == 0 || throw(ArgumentError("only the main diagonal is supported"))
     return DiagMatrixAtom(x)
 end
-LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
-LinearAlgebra.Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+diagm(x::AbstractExpr) = DiagMatrixAtom(x)
 
-function conic_form!(x::DiagMatrixAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        sz = x.size[1]
+function new_conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
 
-        I = 1:sz+1:sz*sz
-        J = 1:sz
-        coeff = sparse(I, J, 1.0, sz * sz, sz)
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = coeff * objective
-        cache_conic_form!(unique_conic_forms, x, new_obj)
-    end
-    return get_conic_form(unique_conic_forms, x)
+    sz = x.size[1]
+    I = collect(1:sz+1:sz*sz)
+    J = collect(1:sz)
+    V = one(T)
+    coeff = create_sparse(T, I, J, V, sz * sz, sz)
+    # coeff = create_sparse(, 1:sz, one(T),
+
+    return operate(add_operation, T, sign(x), coeff, obj)
 end

@@ -1,9 +1,18 @@
 import Base.==, Base.<=, Base.>=, Base.<, Base.>
 
+const CONSTANT_CONSTRAINT_TOL = Ref(1e-6)
+
+function iscomplex(constr::Constraint)
+    return iscomplex(constr.lhs) || iscomplex(constr.rhs)
+end
+
+function add_constraint!(context::Context, c::Constraint)
+    c ∈ keys(context.constr_to_moi_inds) && return
+    return _add_constraint!(context, c)
+end
+
 ### Linear equality constraint
 mutable struct EqConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     lhs::AbstractExpr
     rhs::AbstractExpr
     size::Tuple{Int,Int}
@@ -12,18 +21,24 @@ mutable struct EqConstraint <: Constraint
     function EqConstraint(lhs::AbstractExpr, rhs::AbstractExpr)
         if lhs.size == rhs.size || lhs.size == (1, 1)
             sz = rhs.size
+            if lhs.size == (1, 1) && rhs.size != (1, 1)
+                lhs = lhs * ones(rhs.size)
+            end
         elseif rhs.size == (1, 1)
             sz = lhs.size
+            if rhs.size == (1, 1) && lhs.size != (1, 1)
+                rhs = rhs * ones(lhs.size)
+            end
         else
             error(
                 "Cannot create equality constraint between expressions of size $(lhs.size) and $(rhs.size)",
             )
         end
-        id_hash = hash((lhs, rhs, :(==)))
-        return new(:(==), id_hash, lhs, rhs, sz, nothing)
+        return new(lhs, rhs, sz, nothing)
     end
 end
 
+head(io::IO, ::EqConstraint) = print(io, "==")
 function vexity(c::EqConstraint)
     vex = vexity(c.lhs) + (-vexity(c.rhs))
     # You can't have equality constraints with concave/convex expressions
@@ -33,39 +48,27 @@ function vexity(c::EqConstraint)
     return vex
 end
 
-function conic_form!(c::EqConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        if !(sign(c.lhs) == ComplexSign() || sign(c.rhs) == ComplexSign())
-            expr = c.lhs - c.rhs
-            objective = conic_form!(expr, unique_conic_forms)
-            new_constraint =
-                ConicConstr([objective], :Zero, [c.size[1] * c.size[2]])
-            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        else
-            real_expr = real(c.lhs - c.rhs)
-            imag_expr = imag(c.lhs - c.rhs)
-            real_objective = conic_form!(real_expr, unique_conic_forms)
-            imag_objective = conic_form!(imag_expr, unique_conic_forms)
-            new_constraint = ConicConstr(
-                [real_objective, imag_objective],
-                :Zero,
-                [c.size[1] * c.size[2], c.size[1] * c.size[2]],
-            )
-            unique_conic_forms.conic_constr_to_constr[new_constraint] = c
+function _add_constraint!(context::Context{T}, eq::EqConstraint) where {T}
+    f = conic_form!(context, eq.lhs - eq.rhs)
+    if f isa AbstractVector
+        # a trivial constraint without variables like `5 == 0`
+        if !all(abs.(f) .<= CONSTANT_CONSTRAINT_TOL[])
+            @warn "Constant constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
+        return nothing
     end
-    return get_conic_form(unique_conic_forms, c)
+    context.constr_to_moi_inds[eq] =
+        MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
+    return nothing
 end
 
 ==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
-==(lhs::AbstractExpr, rhs::Value) = ==(lhs, Constant(rhs))
-==(lhs::Value, rhs::AbstractExpr) = ==(Constant(lhs), rhs)
+==(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
+==(lhs::Value, rhs::AbstractExpr) = ==(constant(lhs), rhs)
 
 ### Linear inequality constraints
 mutable struct LtConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     lhs::AbstractExpr
     rhs::AbstractExpr
     size::Tuple{Int,Int}
@@ -79,18 +82,24 @@ mutable struct LtConstraint <: Constraint
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
+                if lhs.size == (1, 1) && rhs.size != (1, 1)
+                    lhs = lhs * ones(rhs.size)
+                end
             elseif rhs.size == (1, 1)
                 sz = lhs.size
+                if rhs.size == (1, 1) && lhs.size != (1, 1)
+                    rhs = rhs * ones(lhs.size)
+                end
             else
                 error(
                     "Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)",
                 )
             end
         end
-        id_hash = hash((lhs, rhs, :(<=)))
-        return new(:(<=), id_hash, lhs, rhs, sz, nothing)
+        return new(lhs, rhs, sz, nothing)
     end
 end
+head(io::IO, ::LtConstraint) = print(io, "≤")
 
 function vexity(c::LtConstraint)
     vex = vexity(c.lhs) + (-vexity(c.rhs))
@@ -100,28 +109,32 @@ function vexity(c::LtConstraint)
     return vex
 end
 
-function conic_form!(c::LtConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        expr = c.rhs - c.lhs
-        objective = conic_form!(expr, unique_conic_forms)
-        new_constraint =
-            ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
+function _add_constraint!(context::Context{T}, lt::LtConstraint) where {T}
+    f = conic_form!(context, lt.rhs - lt.lhs)
+    if f isa AbstractVector
+        # a trivial constraint without variables like `5 >= 0`
+        if !all(f .<= CONSTANT_CONSTRAINT_TOL[])
+            @warn "Constant constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
+        end
+        return nothing
     end
-    return get_conic_form(unique_conic_forms, c)
+    context.constr_to_moi_inds[lt] = MOI_add_constraint(
+        context.model,
+        f,
+        MOI.Nonnegatives(MOI.output_dimension(f)),
+    )
+    return nothing
 end
 
 <=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
-<=(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 <(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<(lhs::AbstractExpr, rhs::Value) = <=(lhs, Constant(rhs))
-<(lhs::Value, rhs::AbstractExpr) = <=(Constant(lhs), rhs)
+<(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+<(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 
 mutable struct GtConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
     lhs::AbstractExpr
     rhs::AbstractExpr
     size::Tuple{Int,Int}
@@ -135,18 +148,24 @@ mutable struct GtConstraint <: Constraint
         else
             if lhs.size == rhs.size || lhs.size == (1, 1)
                 sz = rhs.size
+                if lhs.size == (1, 1) && rhs.size != (1, 1)
+                    lhs = lhs * ones(rhs.size)
+                end
             elseif rhs.size == (1, 1)
                 sz = lhs.size
+                if rhs.size == (1, 1) && lhs.size != (1, 1)
+                    rhs = rhs * ones(lhs.size)
+                end
             else
                 error(
                     "Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)",
                 )
             end
         end
-        id_hash = hash((lhs, rhs, :(>=)))
-        return new(:(>=), id_hash, lhs, rhs, sz, nothing)
+        return new(lhs, rhs, sz, nothing)
     end
 end
+head(io::IO, ::GtConstraint) = print(io, "≥")
 
 function vexity(c::GtConstraint)
     vex = -vexity(c.lhs) + (vexity(c.rhs))
@@ -156,24 +175,30 @@ function vexity(c::GtConstraint)
     return vex
 end
 
-function conic_form!(c::GtConstraint, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, c)
-        expr = c.lhs - c.rhs
-        objective = conic_form!(expr, unique_conic_forms)
-        new_constraint =
-            ConicConstr([objective], :NonNeg, [c.size[1] * c.size[2]])
-        unique_conic_forms.conic_constr_to_constr[new_constraint] = c
-        cache_conic_form!(unique_conic_forms, c, new_constraint)
+function _add_constraint!(context::Context{T}, gt::GtConstraint) where {T}
+    f = conic_form!(context, gt.lhs - gt.rhs)
+    if f isa AbstractVector
+        # a trivial constraint without variables like `5 >= 0`
+        if !all(f .>= -CONSTANT_CONSTRAINT_TOL[])
+            @warn "Constant constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
+        end
+        return nothing
     end
-    return get_conic_form(unique_conic_forms, c)
+    context.constr_to_moi_inds[gt] = MOI_add_constraint(
+        context.model,
+        f,
+        MOI.Nonnegatives(MOI.output_dimension(f)),
+    )
+    return nothing
 end
 
 >=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->=(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
->=(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
+>=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+>=(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 >(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->(lhs::AbstractExpr, rhs::Value) = >=(lhs, Constant(rhs))
->(lhs::Value, rhs::AbstractExpr) = >=(Constant(lhs), rhs)
+>(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+>(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 
 function +(
     constraints_one::Array{<:Constraint},
@@ -190,4 +215,23 @@ function +(constraint_one::Constraint, constraints_two::Array{<:Constraint})
 end
 function +(constraints_one::Array{<:Constraint}, constraint_two::Constraint)
     return constraints_one + [constraint_two]
+end
+
+function populate_dual!(
+    model::MOI.ModelLike,
+    constr::Union{EqConstraint,GtConstraint,LtConstraint},
+    MOI_constr_indices,
+)
+    if iscomplex(constr)
+        re = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[1])
+        imag = MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[2])
+        constr.dual = output(reshape(re + im * imag, constr.size))
+    else
+        constr.dual = output(
+            reshape(
+                MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices),
+                constr.size,
+            ),
+        )
+    end
 end

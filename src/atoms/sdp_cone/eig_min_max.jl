@@ -10,9 +10,7 @@ import LinearAlgebra: eigmin, eigmax
 
 ### Eig max
 
-struct EigMaxAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct EigMaxAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -20,12 +18,14 @@ struct EigMaxAtom <: AbstractExpr
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:eigmax, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         else
             error("eigmax can only be applied to a square matrix.")
         end
     end
 end
+
+head(io::IO, ::EigMaxAtom) = print(io, "eigmax")
 
 function sign(x::EigMaxAtom)
     return NoSign()
@@ -50,22 +50,17 @@ eigmax(x::AbstractExpr) = EigMaxAtom(x)
 #   subject to
 #            tI - A is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(x::EigMaxAtom, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        m, n = size(A)
-        t = Variable()
-        p = minimize(t, t * Matrix(1.0I, n, n) - A ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
+    A = x.children[1]
+    m, n = size(A)
+    t = Variable()
+    p = minimize(t, t * Matrix(one(T) * I, n, n) - A ⪰ 0)
+    return conic_form!(context, p)
 end
 
 ### Eig min
 
-struct EigMinAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct EigMinAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -73,12 +68,14 @@ struct EigMinAtom <: AbstractExpr
         children = (x,)
         m, n = size(x)
         if m == n
-            return new(:eigmin, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         else
             error("eigmin can only be applied to a square matrix.")
         end
     end
 end
+
+head(io::IO, ::EigMinAtom) = print(io, "eigmin")
 
 function sign(x::EigMinAtom)
     return NoSign()
@@ -103,13 +100,10 @@ eigmin(x::AbstractExpr) = EigMinAtom(x)
 #   subject to
 #            A - tI is positive semidefinite
 #            A      is positive semidefinite
-function conic_form!(x::EigMinAtom, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        m, n = size(A)
-        t = Variable()
-        p = maximize(t, A - t * Matrix(1.0I, n, n) ⪰ 0)
-        cache_conic_form!(unique_conic_forms, x, p)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context, x::EigMinAtom)
+    A = x.children[1]
+    m, n = size(A)
+    t = Variable()
+    p = maximize(t, A - t * Matrix(1.0I, n, n) ⪰ 0)
+    return conic_form!(context, p)
 end

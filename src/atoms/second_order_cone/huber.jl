@@ -1,6 +1,4 @@
-struct HuberAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct HuberAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     M::Real
@@ -12,9 +10,11 @@ struct HuberAtom <: AbstractExpr
             error("Huber parameter must by a positive scalar")
         end
         children = (x,)
-        return new(:huber, hash((children, M)), children, x.size, M)
+        return new(children, x.size, M)
     end
 end
+
+head(io::IO, ::HuberAtom) = print(io, "huber")
 
 function sign(x::HuberAtom)
     return Positive()
@@ -40,20 +40,15 @@ function evaluate(x::HuberAtom)
     return c
 end
 
-function conic_form!(x::HuberAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        c = x.children[1]
-        s = Variable(c.size)
-        n = Variable(c.size)
+function new_conic_form!(context::Context, x::HuberAtom)
+    c = x.children[1]
+    s = Variable(c.size)
+    n = Variable(c.size)
 
-        # objective given by s.^2 + 2 * M * |n|
-        objective =
-            conic_form!(square(s) + 2 * x.M * abs(n), unique_conic_forms)
-        conic_form!(c == s + n, unique_conic_forms)
-
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+    # objective given by s.^2 + 2 * M * |n|
+    objective = conic_form!(context, square(s) + 2 * x.M * abs(n))
+    add_constraint!(context, c == s + n)
+    return objective
 end
 
 huber(x::AbstractExpr, M::Real = 1.0) = HuberAtom(x, M)

@@ -10,13 +10,7 @@
 #############################################################################
 import Convex.sign,
     Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-using Convex:
-    AbstractExpr,
-    ConstVexity,
-    Nondecreasing,
-    has_conic_form,
-    cache_conic_form!,
-    get_conic_form
+using Convex: AbstractExpr, ConstVexity, Nondecreasing
 export antidiag
 
 ### Diagonal
@@ -79,31 +73,33 @@ antidiag(x::AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(
+function Convex.new_conic_form!(
+    context::Convex.Context{T},
     x::AntidiagAtom,
-    unique_conic_forms::Convex.UniqueConicForms,
-)
-    if !has_conic_form(unique_conic_forms, x)
-        (num_rows, num_cols) = x.children[1].size
-        k = x.k
+) where {T}
+    (num_rows, num_cols) = x.children[1].size
+    k = x.k
 
-        if k >= 0
-            start_index = k * num_rows + num_rows
-            sz_diag = Base.min(num_rows, num_cols - k)
-        else
-            start_index = num_rows + k
-            sz_diag = Base.min(num_rows + k, num_cols)
-        end
-
-        select_diag = spzeros(sz_diag, length(x.children[1]))
-        for i in 1:sz_diag
-            select_diag[i, start_index] = 1
-            start_index += num_rows - 1
-        end
-
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = select_diag * objective
-        cache_conic_form!(unique_conic_forms, x, new_obj)
+    if k >= 0
+        start_index = k * num_rows + num_rows
+        sz_diag = Base.min(num_rows, num_cols - k)
+    else
+        start_index = num_rows + k
+        sz_diag = Base.min(num_rows + k, num_cols)
     end
-    return get_conic_form(unique_conic_forms, x)
+
+    select_diag = spzeros(T, sz_diag, length(x.children[1]))
+    for i in 1:sz_diag
+        select_diag[i, start_index] = 1
+        start_index += num_rows - 1
+    end
+
+    objective = conic_form!(context, Convex.only(Convex.children(x)))
+    return Convex.operate(
+        Convex.add_operation,
+        T,
+        Convex.sign(x),
+        select_diag,
+        objective,
+    )
 end

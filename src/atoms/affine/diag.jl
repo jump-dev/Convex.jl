@@ -6,14 +6,11 @@
 #############################################################################
 
 # k >= min(num_cols, num_rows) || k <= -min(num_rows, num_cols)
-import LinearAlgebra.diag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
 
-struct DiagAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct DiagAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
@@ -26,15 +23,11 @@ struct DiagAtom <: AbstractExpr
         end
 
         children = (x,)
-        return new(
-            :diag,
-            hash((children, k)),
-            children,
-            (min(num_rows, num_cols) - k, 1),
-            k,
-        )
+        return new(children, (min(num_rows, num_cols) - k, 1), k)
     end
 end
+
+head(io::IO, ::DiagAtom) = print(io, "diag")
 
 ## Type Definition Ends
 
@@ -58,7 +51,7 @@ function evaluate(x::DiagAtom)
 end
 
 ## API begins
-diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
+LinearAlgebra.diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
 ## API ends
 
 # Finds the "k"-th diagonal of x as a column vector
@@ -73,28 +66,25 @@ diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
 # 3. We populate coeff with 1s at the correct indices
 # The canonical form will then be:
 # coeff * x - d = 0
-function conic_form!(x::DiagAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        (num_rows, num_cols) = x.children[1].size
-        k = x.k
+function new_conic_form!(context::Context{T}, x::DiagAtom) where {T}
+    (num_rows, num_cols) = x.children[1].size
+    k = x.k
 
-        if k >= 0
-            start_index = k * num_rows + 1
-            sz_diag = Base.min(num_rows, num_cols - k)
-        else
-            start_index = -k + 1
-            sz_diag = Base.min(num_rows + k, num_cols)
-        end
-
-        select_diag = spzeros(sz_diag, length(x.children[1]))
-        for i in 1:sz_diag
-            select_diag[i, start_index] = 1
-            start_index += num_rows + 1
-        end
-
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        new_obj = select_diag * objective
-        cache_conic_form!(unique_conic_forms, x, new_obj)
+    if k >= 0
+        start_index = k * num_rows + 1
+        sz_diag = Base.min(num_rows, num_cols - k)
+    else
+        start_index = -k + 1
+        sz_diag = Base.min(num_rows + k, num_cols)
     end
-    return get_conic_form(unique_conic_forms, x)
+
+    select_diag = spzeros(T, sz_diag, length(x.children[1]))
+    for i in 1:sz_diag
+        select_diag[i, start_index] = 1
+        start_index += num_rows + 1
+    end
+
+    child_obj = conic_form!(context, only(children(x)))
+    obj = operate(add_operation, T, sign(x), select_diag, child_obj)
+    return obj
 end

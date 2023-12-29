@@ -1,4 +1,4 @@
-using Convex: AbstractExpr, ConicObj
+using Convex: AbstractExpr, ComplexConstant
 using LinearAlgebra
 using SparseArrays
 
@@ -70,6 +70,26 @@ end
         @test_throws ErrorException minimize(x + im * x)
     end
 
+    @testset "Constant objective" begin
+        x = Variable()
+        for p in [
+            satisfy(x == 0, x == 1),
+            satisfy(Constraint[]),
+            minimize(0, x == 0),
+            minimize(0, Constraint[]),
+            maximize(0, x == 0),
+            maximize(0, Constraint[]),
+        ]
+            @test isnothing(p.objective)
+        end
+    end
+
+    @testset "Invalid head" begin
+        p = Problem(:invalid, nothing, Constraint[])
+        err = ErrorException("Unknown type of problem $(p.head)")
+        @test_throws err Convex.objective_vexity(p)
+    end
+
     @testset "`optval` is nothing before `solve!`" begin
         x = Variable()
         p = minimize(x, x >= 0)
@@ -119,23 +139,26 @@ end
 
         @test sprint(show, 2 * x) == """
           * (constant; real)
-          ├─ 2
+          ├─ $(reshape([2], 1, 1))
           └─ real variable (fixed) ($(Convex.show_id(x)))"""
 
         free!(x)
         p = maximize(log(x), x >= 1, x <= 3)
+        @test monotonicity(p) == (Convex.Nonincreasing(),)
+        @test sign(p) == NoSign()
+        @test curvature(p) == Convex.ConvexVexity()
 
         @test sprint(show, p) == """
         maximize
         └─ log (concave; real)
            └─ real variable ($(Convex.show_id(x)))
         subject to
-        ├─ >= constraint (affine)
+        ├─ ≥ constraint (affine)
         │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ 1
-        └─ <= constraint (affine)
+        │  └─ $(reshape([1], 1, 1))
+        └─ ≤ constraint (affine)
            ├─ real variable ($(Convex.show_id(x)))
-           └─ 3
+           └─ $(reshape([3], 1, 1))
 
         status: `solve!` not called yet"""
 
@@ -156,6 +179,7 @@ end
         level2 = hcat(level3, level3)
         root = hcat(level2, level2)
         p = minimize(sum(x), root == root)
+        @test curvature(p) == Convex.ConstVexity()
         @test sprint(show, p) == """
         minimize
         └─ sum (affine; real)
@@ -182,18 +206,22 @@ end
         # test `MAXWIDTH`
         x = Variable()
         p = satisfy([x == i for i in 1:100])
+        err = ErrorException(
+            "Satisfiability problem cannot be used as subproblem",
+        )
+        @test_throws err sign(p)
         old_maxwidth = Convex.MAXWIDTH[]
         Convex.MAXWIDTH[] = 2
         @test sprint(show, p) == """
-            minimize
-            └─ 0
+            satisfy
+            └─ nothing
             subject to
             ├─ == constraint (affine)
             │  ├─ real variable ($(Convex.show_id(x)))
-            │  └─ 1
+            │  └─ $(reshape([1], 1, 1))
             ├─ == constraint (affine)
             │  ├─ real variable ($(Convex.show_id(x)))
-            │  └─ 2
+            │  └─ $(reshape([2], 1, 1))
             ⋮
 
             status: `solve!` not called yet"""
@@ -211,12 +239,12 @@ end
             ),
         )
         @test sprint(show, p) == """
-                minimize
-                └─ 0
+                satisfy
+                └─ nothing
                 subject to
-                └─ >= constraint (affine)
+                └─ ≥ constraint (affine)
                    ├─ real variable ($(Convex.show_id(x)))
-                   └─ 0
+                   └─ $(reshape([0], 1, 1))
 
                 termination status: OPTIMAL
                 primal status: FEASIBLE_POINT
@@ -239,7 +267,7 @@ end
     end
 
     @testset "vartype and set_vartype" begin
-        for x in (Variable(), Variable(1), ComplexVariable(2, 2))
+        for x in (Variable(), Variable(1))
             @test vartype(x) == ContVar
 
             vartype!(x, BinVar)
@@ -328,10 +356,9 @@ end
             ComplexVariable(),
             Variable(ComplexSign()),
         ]
-            @test x isa Variable
+            @test x isa ComplexVariable
             @test x isa Convex.AbstractVariable
             @test sign(x) == ComplexSign()
-            @test x.sign == ComplexSign()
         end
 
         for vt in (BinVar, IntVar),
@@ -367,21 +394,6 @@ end
         @test_throws ErrorException Semidefinite(2, 3)
     end
 
-    @testset "ConicObj" for T in [UInt32, UInt64]
-        c = ConicObj()
-        z = zero(T)
-        @test !haskey(c, z)
-        c[z] = (1, 1)
-        @test c[z] == (1, 1)
-        x = T[]
-        for (k, v) in c
-            push!(x, k)
-        end
-        @test x == collect(keys(c))
-        d = copy(c)
-        @test d !== c
-    end
-
     @testset "length and size" begin
         x = Variable(2, 3)
         @test length(x) == 6
@@ -411,18 +423,27 @@ end
 
     @testset "Cartesian index" begin
         x = Variable(3, 2)
+        set_value!(x, rand(3, 2))
+        context = Convex.Context{Float64}(() -> MOI.Utilities.Model{Float64}())
+
         for ind in CartesianIndices(zeros(3, 2))
-            @test x[ind] === x[ind[1], ind[2]]
+            L = Convex.conic_form!(context, x[ind])
+            R = Convex.conic_form!(context, x[ind[1], ind[2]])
+            @test L == R
+            @test evaluate(x[ind]) == evaluate(x[ind[1], ind[2]])
         end
         y = [1.0 2 3; 4 5 6] * x
         for ind in CartesianIndices(zeros(2, 2))
-            @test y[ind] === y[ind[1], ind[2]]
+            L = Convex.conic_form!(context, y[ind])
+            R = Convex.conic_form!(context, y[ind[1], ind[2]])
+            @test L == R
+            @test evaluate(y[ind]) == evaluate(y[ind[1], ind[2]])
         end
     end
 
     @testset "Parametric constants" begin
-        z = Constant([1.0 0.0im; 0.0 1.0])
-        @test z isa Constant{Matrix{Complex{Float64}}}
+        z = constant([1.0 0.0im; 0.0 1.0])
+        @test z isa ComplexConstant{Float64}
 
         # Helper functions
         @test Convex.ispos(1)
@@ -444,21 +465,18 @@ end
         @test Convex._sign([0 0; 0 0]) == Positive()
         @test Convex._size(0 + 1im) == (1, 1)
         @test Convex._sign(0 + 1im) == ComplexSign()
-
-        @test Convex.imag_conic_form(Constant(1.0)) == [0.0]
-        @test Convex.imag_conic_form(Constant([1.0, 2.0])) == [0.0, 0.0]
     end
 
     @testset "#341: Evaluate for constants" begin
         A = rand(4, 4)
-        @test evaluate(Constant(A)) ≈ copy(A)
-        @test Constant(A).size == (4, 4)
+        @test evaluate(constant(A)) ≈ copy(A)
+        @test constant(A).size == (4, 4)
         b = rand(4)
-        @test evaluate(Constant(b)) ≈ copy(b)
-        @test Constant(b).size == (4, 1)
+        @test evaluate(constant(b)) ≈ copy(b)
+        @test constant(b).size == (4, 1)
         c = 1.0
-        @test evaluate(Constant(c)) ≈ c
-        @test Constant(c).size == (1, 1)
+        @test evaluate(constant(c)) ≈ c
+        @test constant(c).size == (1, 1)
 
         @test evaluate(sumlargesteigs(Variable(4, 4), 0)) == 0
         @test evaluate(sumlargest(Variable(4), 0)) == 0
@@ -514,6 +532,9 @@ end
         @test length(p.constraints) == 1
         empty!(p.constraints)
         add_constraints!(p, c)
+        @test length(p.constraints) == 1
+        empty!(p.constraints)
+        add_constraint!(p, [c])
         @test length(p.constraints) == 1
         empty!(p.constraints)
         c2 = (norm2(x - rand(3, 3)) < 3)
@@ -598,7 +619,7 @@ end
     end
 
     @testset "`logsumexp` stability" begin
-        v = Convex.Constant([1000, 1000, 1000])
+        v = Convex.constant([1000, 1000, 1000])
         @test Convex.evaluate(Convex.logsumexp(v)) ≈ 1001.098612
     end
 end

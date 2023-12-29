@@ -8,9 +8,7 @@ import Base.max
 
 # TODO: This can easily be extended to work
 ### Max Atom
-struct MaxAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct MaxAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -34,9 +32,11 @@ struct MaxAtom <: AbstractExpr
         end
 
         children = (x, y)
-        return new(:max, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::MaxAtom) = print(io, "max")
 
 function sign(x::MaxAtom)
     sign_one = sign(x.children[1])
@@ -65,21 +65,14 @@ function evaluate(x::MaxAtom)
     return max.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-# x <= this and y <= this if max(x, y) = this
-function conic_form!(x::MaxAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        this = Variable(x.size[1], x.size[2])
-        objective = conic_form!(this, unique_conic_forms)
-        for child in x.children
-            conic_form!(this >= child, unique_conic_forms)
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context, x::MaxAtom)
+    t = Variable(x.size)
+    p = minimize(t, (t >= child for child in x.children)...)
+    return conic_form!(context, p)
 end
 
 max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
-max(x::AbstractExpr, y::Value) = max(x, Constant(y))
-max(x::Value, y::AbstractExpr) = max(Constant(x), y)
+max(x::AbstractExpr, y::Value) = max(x, constant(y))
+max(x::Value, y::AbstractExpr) = max(constant(x), y)
 pos(x::AbstractExpr) = max(x, Constant(0, Positive()))
 hinge_loss(x::AbstractExpr) = pos(1 - x)

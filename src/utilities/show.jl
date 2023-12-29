@@ -2,7 +2,7 @@ import Base.show, Base.summary
 using .TreePrint
 
 """
-    show_id(io::IO, x::Union{AbstractExpr, Constraint}; digits = 3)
+    show_id(io::IO, x::Union{AbstractVariable}; digits = 3)
 
 Print a truncated version of the objects `id_hash` field.
 
@@ -15,15 +15,11 @@ julia> Convex.show_id(stdout, x)
 id: 163…906
 ```
 """
-function show_id(
-    io::IO,
-    x::Union{AbstractExpr,Constraint};
-    digits = MAXDIGITS[],
-)
+function show_id(io::IO, x::Union{AbstractVariable}; digits = MAXDIGITS[])
     return print(io, show_id(x; digits = digits))
 end
 
-function show_id(x::Union{AbstractExpr,Constraint}; digits = MAXDIGITS[])
+function show_id(x::Union{AbstractVariable}; digits = MAXDIGITS[])
     hash_str = string(x.id_hash)
     if length(hash_str) > (2 * digits + 1)
         return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
@@ -58,6 +54,17 @@ function Base.summary(io::IO, x::AbstractVariable)
     end
 end
 
+function Base.summary(io::IO, x::Union{Constant,ComplexConstant})
+    sgn = summary(sign(x))
+    if size(x) == (1, 1)
+        print(io, "$(sgn) constant")
+    elseif size(x, 2) == 1
+        print(io, "$(size(x,1))-element $(sgn) constant")
+    else
+        print(io, "$(size(x,1))×$(size(x,2)) $(sgn) constant")
+    end
+end
+
 Base.summary(io::IO, ::AffineVexity) = print(io, "affine")
 Base.summary(io::IO, ::ConvexVexity) = print(io, "convex")
 Base.summary(io::IO, ::ConcaveVexity) = print(io, "concave")
@@ -68,14 +75,23 @@ Base.summary(io::IO, ::Negative) = print(io, "negative")
 Base.summary(io::IO, ::NoSign) = print(io, "real")
 Base.summary(io::IO, ::ComplexSign) = print(io, "complex")
 
+# Fallback
+head(io::IO, x::AbstractExpr) = print(io, typeof(x))
+
 function Base.summary(io::IO, c::Constraint)
-    print(io, "$(c.head) constraint (")
-    summary(io, vexity(c))
-    return print(io, ")")
+    head(io, c)
+    print(io, " constraint")
+    if applicable(vexity, c)
+        print(io, " (")
+        summary(io, vexity(c))
+        print(io, ")")
+    end
+    return nothing
 end
 
 function Base.summary(io::IO, e::AbstractExpr)
-    print(io, "$(e.head) (")
+    head(io, e)
+    print(io, " (")
     summary(io, vexity(e))
     print(io, "; ")
     summary(io, sign(e))
@@ -84,7 +100,7 @@ end
 
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
-show(io::IO, x::Constant) = print(io, evaluate(x))
+show(io::IO, x::Union{Constant,ComplexConstant}) = print(io, evaluate(x))
 
 # A variable, for example, Variable(3, 4), will be displayed as:
 # julia> Variable(3,4)
@@ -160,7 +176,7 @@ show(io::IO, e::AbstractExpr) = print_tree_rstrip(io, e)
 
 struct ProblemObjectiveRoot
     head::Symbol
-    objective::AbstractExpr
+    objective::Union{AbstractExpr,Nothing}
 end
 
 AbstractTrees.children(p::ProblemObjectiveRoot) = (p.objective,)

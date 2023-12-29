@@ -6,17 +6,17 @@
 #############################################################################
 import LinearAlgebra.norm2
 
-struct EucNormAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct EucNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function EucNormAtom(x::AbstractExpr)
         children = (x,)
-        return new(:norm2, hash(children), children, (1, 1))
+        return new(children, (1, 1))
     end
 end
+
+head(io::IO, ::EucNormAtom) = print(io, "norm2")
 
 function sign(x::EucNormAtom)
     return Positive()
@@ -36,14 +36,19 @@ end
 
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
-function conic_form!(x::EucNormAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        euc_norm = Variable()
-        objective = conic_form!(euc_norm, unique_conic_forms)
-        conic_form!(SOCConstraint(euc_norm, x.children[1]), unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context{T}, A::EucNormAtom) where {T}
+    obj = conic_form!(context, only(children(A)))
+
+    x = only(children(A))
+    d = length(x)
+
+    t_obj = conic_form!(context, Variable())
+
+    f = operate(vcat, T, sign(A), t_obj, obj)
+    set = MOI.SecondOrderCone(d + 1)
+    MOI_add_constraint(context.model, f, set)
+
+    return t_obj
 end
 
 function norm2(x::AbstractExpr)

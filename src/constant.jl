@@ -23,20 +23,94 @@ function _sign(x::Value)
     end
 end
 
-struct Constant{T<:Value} <: AbstractExpr
+_matrix(x::AbstractArray) = [x;;]
+_matrix(x::AbstractVector) = reshape(Vector(x), length(x), 1)
+_matrix(x::Number) = _matrix([x])
+
+mutable struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    value::T
+    value::Matrix{T}
     size::Tuple{Int,Int}
     sign::Sign
 
     function Constant(x::Value, sign::Sign)
-        return new{typeof(x)}(:constant, objectid(x), x, _size(x), sign)
+        x isa Complex && error("Real values expected")
+        x isa AbstractArray &&
+            eltype(x) <: Complex &&
+            error("Real values expected")
+
+        # Convert to matrix
+        return new{eltype(x)}(
+            :constant,
+            objectid(x),
+            _matrix(x),
+            _size(x),
+            sign,
+        )
     end
     function Constant(x::Value, check_sign::Bool = true)
         return Constant(x, check_sign ? _sign(x) : NoSign())
     end
 end
+# Constant(x::Constant) = x
+
+mutable struct ComplexConstant{T<:Real} <: AbstractExpr
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int,Int}
+    real_constant::Constant{T}
+    imag_constant::Constant{T}
+    function ComplexConstant(re::Constant{T}, im::Constant{T}) where {T}
+        size(re) == size(im) || error("size mismatch")
+        return new{T}(:complex_constant, rand(UInt64), size(re), re, im)
+    end
+
+    # function ComplexConstant(re::Constant{S1}, im::Constant{S2}) where {S1,S2}
+    #     size(re) == size(im) || error("size mismatch")
+    #     re, im = promote(re.value, im.value)
+    #     re = Constant(re)
+    #     im = Constant(im)
+    #     return new{T}(:complex_constant, rand(UInt64), size(re), re, im)
+    # end
+end
+
+AbstractTrees.children(c::ComplexConstant) = tuple()
+vexity(::ComplexConstant) = ConstVexity()
+sign(::ComplexConstant) = ComplexSign()
+
+function evaluate(c::ComplexConstant)
+    return evaluate(c.real_constant) + im * evaluate(c.imag_constant)
+end
+
+mutable struct ComplexStructOfVec{T<:Real}
+    real_vec::SPARSE_VECTOR{T}
+    imag_vec::SPARSE_VECTOR{T}
+end
+
+Base.real(c::ComplexStructOfVec) = c.real_vec
+Base.imag(c::ComplexStructOfVec) = c.imag_vec
+Base.conj(c::ComplexStructOfVec) = ComplexStructOfVec(real(c), -imag(c))
+
+function new_conic_form!(context::Context, C::ComplexConstant)
+    return ComplexStructOfVec(
+        conic_form!(context, C.real_constant),
+        conic_form!(context, C.imag_constant),
+    )
+end
+
+constant(x::Constant) = x
+constant(x::ComplexConstant) = x
+function constant(x)
+    # Convert to matrix
+    x = [x;;]
+    if eltype(x) <: Real
+        return Constant(x)
+    else
+        return ComplexConstant(Constant(real(x)), Constant(imag(x)))
+    end
+end
+# constant(x::Complex) = ComplexConstant(Constant(real(x)), Constant(imag(x)))
 
 #### Constant Definition end     #####
 
@@ -57,38 +131,16 @@ end
 
 evaluate(x::Constant) = output(x.value)
 
-evaluate(x::Value) = output(x)
-
 sign(x::Constant) = x.sign
-
-# `real(::Real)` is a no-op and should be optimized out for `Constant{<:Real}`
-real_conic_form(x::Constant{<:Number}) = [real(x.value)]
-real_conic_form(x::Constant{<:AbstractVecOrMat}) = vec(real(x.value))
-
-# `imag(::Real)` always returns 0, so we can avoid the implicit conversion to `Complex`
-# by multiplication with `im` and just use an explicit call to `zeros` with the appropriate
-# length
-imag_conic_form(x::Constant{T}) where {T<:Real} = zeros(Complex{T}, 1)
-function imag_conic_form(x::Constant{<:AbstractVecOrMat{T}}) where {T<:Real}
-    return zeros(Complex{T}, length(x))
-end
-imag_conic_form(x::Constant{<:Complex}) = [im * imag(x.value)]
-function imag_conic_form(x::Constant{<:AbstractVecOrMat{<:Complex}})
-    return im * vec(imag(x.value))
-end
 
 # We can more efficiently get the length of a constant by asking for the length of its
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
 length(x::Constant) = length(x.value)
 
-function conic_form!(x::Constant, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        #real_Value = real_conic_form(x)
-        #imag_Value = imag_conic_form(x)
-        objective = ConicObj()
-        objective[objectid(:constant)] =
-            (real_conic_form(x), imag_conic_form(x))
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(::Context{T}, C::Constant) where {T}
+    # this should happen at `Constant` creation?
+    # No, we don't have access to `T` yet; that's problem-specific
+    x = SPARSE_VECTOR{T}(vec(C.value))
+
+    return x
 end

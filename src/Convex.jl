@@ -5,12 +5,10 @@ using OrderedCollections: OrderedDict
 using LinearAlgebra
 using SparseArrays
 using LDLFactorizations
-using AbstractTrees: AbstractTrees
+using AbstractTrees: AbstractTrees, children
+# using DataStructures
 
-using MathOptInterface
-const MOI = MathOptInterface
-const MOIU = MOI.Utilities
-const MOIB = MOI.Bridges
+import MathOptInterface as MOI
 
 # Functions
 export conv,
@@ -27,13 +25,7 @@ export log_perspective,
 export partialtrace,
     partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
 export relative_entropy,
-    scaledgeomean,
-    sigmamax,
-    square,
-    sumlargest,
-    sumlargesteigs,
-    sumsmallest,
-    sumsquares
+    sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
 export GeomMeanHypoCone,
     GeomMeanEpiCone,
     RelativeEntropyEpiCone,
@@ -51,8 +43,9 @@ export socp
 export Constraint # useful for making abstractly-typed vectors via `Constraint[]`
 
 # Variables
-export Constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
-export curvature, evaluate, fix!, free!, monotonicity, sign, vexity
+export constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
+export curvature,
+    evaluate, fix!, free!, monotonicity, sign, vexity, problem_vexity
 export BinVar, IntVar, ContVar, vartype, vartype!
 export constraints, add_constraint!, set_value!, evaluate
 
@@ -112,21 +105,92 @@ Set via:
 """
 const MAXDIGITS = Ref(3)
 
+# where do these go?
+# used so far only in `Constant`
+vectorize(v::AbstractVector) = v
+vectorize(v::Number) = [v]
+vectorize(v::AbstractMatrix) = vec(v)
+
+# where should these go?
+function vec_triu(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [L[i, j] for i in 1:n for j in i:m]
+    return M[inds]
+end
+
+function vec_tril(M)
+    L = LinearIndices(size(M))
+    n, m = size(M)
+    inds = [L[i, j] for i in 1:n for j in 1:i]
+    return M[inds]
+end
+
+# using SuiteSparseGraphBLAS
+#
+
+# vec(x) = Base.vec(x)
+# function vec(x::GBMatrix)
+#     # Hacks to try to get `vec` to work
+#     x = reshape(x, length(x), 1)
+#     return x[:, 1]
+# end
+
+# blockdiag(xs...) = SparseArrays.blockdiag(xs...)::SPARSE_MATRIX
+
+# function blockdiag(xs::GBMatrix{T,T}...) where {T}
+#     N = length(xs)
+#     entries = Matrix{GBMatrix{T,T}}(undef, N, N)
+#     heights = size.(xs, 1)
+#     for (i, x) in enumerate(xs)
+#         entries[i, i] = x
+#         m = size(x, 2)
+#         for j in 1:(i-1)
+#             entries[j, i] = GBMatrix{T,T}(heights[j], m)
+#         end
+#         for j in (i+1):lastindex(entries, 1)
+#             entries[j, i] = GBMatrix{T,T}(heights[j], m)
+#         end
+#     end
+#     return cat(entries)
+# end
+#
+# const SPARSE_VECTOR{T} = GBVector{T,T}
+# const SPARSE_MATRIX{T} = GBMatrix{T,T}
+# spzeros(T, d) = GBVector{T,T}(d)
+# spzeros(T, n, m) = GBMatrix{T,T}(n, m)
+# spidentity(T, d) = GBMatrix{T,T}(Diagonal(ones(T, d)))
+# create_sparse(T, args...) = GBMatrix{T,T}(args...)
+
+const SPARSE_VECTOR{T} = Vector{T}
+const SPARSE_MATRIX{T} = SparseMatrixCSC{T,Int}
+spzeros(T, d) = zeros(T, d)
+spzeros(T, n, m) = SparseArrays.spzeros(T, n, m)
+spidentity(T, d) = sparse(one(T) * I, d, d)
+function create_sparse(::Type{T}, args...) where {T}
+    local result::SPARSE_MATRIX{T}
+    result = SparseArrays.sparse(args...)
+    return result
+end
+
+include("Context.jl")
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
-# need to define `Variable` before `UniqueConicForms`
 include("variable.jl")
-include("conic_form.jl")
-# need to define `conic_form!` for `Variable`s after `UniqueConicForms`
-include("variable_conic_form.jl")
+include("variable_template.jl")
 include("constant.jl")
 include("constraints/constraints.jl")
-include("constraints/signs_and_sets.jl")
 include("constraints/soc_constraints.jl")
 include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("problems.jl")
+include("SparseTape.jl")
+include("VectorAffineFunctionAsMatrix.jl")
+include("ComplexTape.jl")
+include("operate.jl")
+include("complex_operate.jl")
+include("real_operate.jl")
 include("solution.jl")
 include("MOI_wrapper.jl")
 
@@ -166,7 +230,6 @@ include("atoms/second_order_cone/quadoverlin.jl")
 include("atoms/second_order_cone/qol_elementwise.jl")
 include("atoms/second_order_cone/geomean.jl")
 include("atoms/second_order_cone/quadform.jl")
-include("atoms/second_order_cone/power_to_socp.jl")
 include("atoms/second_order_cone/rationalnorm.jl")
 include("atoms/second_order_cone/huber.jl")
 

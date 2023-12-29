@@ -5,9 +5,16 @@ on:
       - master
       - release-*
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   build:
+    # Run on push's or non-draft PRs
+    if: (github.event_name == 'push') || (github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: julia-actions/setup-julia@latest
@@ -18,7 +25,7 @@ jobs:
         shell: julia --color=yes {0}
         run: |
           using Pkg
-          Pkg.add(PackageSpec(name="JuliaFormatter", version="0.22.4"))
+          Pkg.add(PackageSpec(name="JuliaFormatter", version="1"))
           using JuliaFormatter
           format(".", verbose=true)
           out = String(read(Cmd(`git diff`)))

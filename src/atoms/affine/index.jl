@@ -2,9 +2,7 @@ import Base.getindex
 
 const ArrayOrNothing = Union{AbstractArray,Nothing}
 
-struct IndexAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct IndexAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     rows::ArrayOrNothing
@@ -18,31 +16,17 @@ struct IndexAtom <: AbstractExpr
     )
         sz = (length(rows), length(cols))
         children = (x,)
-        return new(
-            :index,
-            hash((children, rows, cols, nothing)),
-            children,
-            sz,
-            rows,
-            cols,
-            nothing,
-        )
+        return new(children, sz, rows, cols, nothing)
     end
 
     function IndexAtom(x::AbstractExpr, inds::AbstractArray)
         sz = (length(inds), 1)
         children = (x,)
-        return new(
-            :index,
-            hash((children, nothing, nothing, inds)),
-            children,
-            sz,
-            nothing,
-            nothing,
-            inds,
-        )
+        return new(children, sz, nothing, nothing, inds)
     end
 end
+
+head(io::IO, ::IndexAtom) = print(io, "index")
 
 ## Type definition ends here
 
@@ -68,33 +52,37 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function conic_form!(x::IndexAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        m = length(x)
-        n = length(x.children[1])
+function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
 
-        if x.inds === nothing
-            sz = length(x.cols) * length(x.rows)
-            J = Array{Int}(undef, sz)
-            k = 1
+    m = length(x)
+    n = length(x.children[1])
 
-            num_rows = x.children[1].size[1]
-            for c in x.cols
-                for r in x.rows
-                    J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
-                    k += 1
-                end
+    if x.inds === nothing
+        sz = length(x.cols) * length(x.rows)
+        J = Vector{Int}(undef, sz)
+        k = 1
+        num_rows = x.children[1].size[1]
+        for c in x.cols
+            for r in x.rows
+                J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
+                k += 1
             end
-
-            index_matrix = sparse(1:sz, J, 1.0, m, n)
-        else
-            index_matrix = sparse(1:length(x.inds), x.inds, 1.0, m, n)
         end
-        objective = conic_form!(x.children[1], unique_conic_forms)
-        objective = index_matrix * objective
-        cache_conic_form!(unique_conic_forms, x, objective)
+
+        index_matrix = create_sparse(T, collect(1:sz), J, one(T), m, n)
+    else
+        index_matrix = create_sparse(
+            T,
+            collect(1:length(x.inds)),
+            collect(x.inds),
+            one(T),
+            m,
+            n,
+        )
     end
-    return get_conic_form(unique_conic_forms, x)
+
+    return operate(add_operation, T, sign(x), index_matrix, obj)
 end
 
 ## API Definition begins

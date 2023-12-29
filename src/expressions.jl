@@ -4,11 +4,8 @@
 # Each type which subtypes AbstractExpr (Variable and Constant being exceptions)
 # must have:
 #
-## head::Symbol                  -- a symbol such as :norm, :+ etc
 ## children::(AbstractExpr,)     -- The expressions on which the current expression
 ##                               -- is operated
-## id_hash::UInt64               -- identifier hash, can be a hash of children
-##                                  or a unique identifier of the object
 ## size::(Int, Int)          -- size of the resulting expression
 #
 # Constants and variables do not have children.
@@ -24,7 +21,8 @@
 ##      h''(x) = g'(x)^T f''(g(x)) g'(x) + f'(g(x))g''(x)
 ##      curvature refers to the curvature of the first term.
 ##      We then use this curvature to find vexity of h (see vexity function below)
-## conic_form!: TODO: Fill this in after conic_form! is stable
+##
+## Optional: `head` to define custom printing
 #
 #############################################################################
 
@@ -35,16 +33,24 @@ import Base.sign,
 abstract type AbstractExpr end
 abstract type Constraint end
 
-# Override hash function because of
-# https://github.com/JuliaLang/julia/issues/10267
-import Base.hash
+# We commandeer `==` to create a constraint.
+# Therefore we define `isequal` to still have a notion of equality
+# (Normally `isequal` falls back to `==`, so we need to provide a method).
+# All `AbstractExpr` (Constraints are not AbstractExpr's!) are compared by value, except for AbstractVariables,
+# which use their `id_hash` field.
+function Base.isequal(x::AbstractExpr, y::AbstractExpr)
+    typeof(x) == typeof(y) || return false
+    for i in 1:fieldcount(typeof(x))
+        isequal(getfield(x, i), getfield(y, i)) || return false
+    end
+    return true
+end
 
-const hashaa_seed = UInt === UInt64 ? 0x7f53e68ceb575e76 : 0xeb575e7
-function hash(a::Array{AbstractExpr}, h::UInt)
-    h += hashaa_seed
-    h += hash(size(a))
-    for x in a
-        h = hash(x, h)
+# Define hash consistently with `isequal`
+function Base.hash(x::AbstractExpr, h::UInt)
+    h = hash(typeof(x), h)
+    for i in 1:fieldcount(typeof(x))
+        h = hash(getfield(x, i), h)
     end
     return h
 end
@@ -76,6 +82,8 @@ function evaluate(x::AbstractExpr)
     return error("evaluate not implemented for $(x.head).")
 end
 
+evaluate(x) = output(x) # fallback
+
 # This function should never be reached
 function sign(x::AbstractExpr)
     return error("sign not implemented for $(x.head).")
@@ -94,7 +102,7 @@ const Value = Union{Number,AbstractArray}
 const ValueOrNothing = Union{Value,Nothing}
 const AbstractExprOrValue = Union{AbstractExpr,Value}
 
-convert(::Type{AbstractExpr}, x::Value) = Constant(x)
+convert(::Type{AbstractExpr}, x::Value) = constant(x)
 convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
 function size(x::AbstractExpr, dim::Integer)
@@ -113,3 +121,5 @@ lastindex(x::AbstractExpr) = length(x)
 axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
 axes(x::AbstractExpr, n::Integer) = axes(x)[n]
 lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))
+
+@deprecate get_vectorized_size(x::AbstractExpr) length(x)

@@ -7,17 +7,17 @@
 import Base.real, Base.imag
 
 ### Real
-struct RealAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct RealAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function RealAtom(x::AbstractExpr)
         children = (x,)
-        return new(:real, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+
+head(io::IO, ::RealAtom) = print(io, "real")
 
 function sign(x::RealAtom)
     if sign(x.children[1]) == ComplexSign()
@@ -39,37 +39,27 @@ function evaluate(x::RealAtom)
     return real.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::RealAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        new_objective = ConicObj()
-        objective = conic_form!(x.children[1], unique_conic_forms)
-
-        for var in keys(objective)
-            re = real.(objective[var][1])
-            im = real.(objective[var][2])
-            new_objective[var] = (re, im)
-        end
-
-        cache_conic_form!(unique_conic_forms, x, new_objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context{T}, x::RealAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
+    return operate(real, T, sign(x), obj)
 end
 
 real(x::AbstractExpr) = RealAtom(x)
-real(x::Value) = RealAtom(Constant(x))
+real(x::ComplexConstant) = x.real_constant
+real(x::Constant) = x
 
 ### Imaginary
-struct ImaginaryAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct ImaginaryAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function ImaginaryAtom(x::AbstractExpr)
         children = (x,)
-        return new(:imag, hash(children), children, x.size)
+        return new(children, x.size)
     end
 end
+
+head(io::IO, ::ImaginaryAtom) = print(io, "imag")
 
 function sign(x::ImaginaryAtom)
     sign(x.children[1]) == ComplexSign()
@@ -88,20 +78,11 @@ function evaluate(x::ImaginaryAtom)
     return imag.(evaluate(x.children[1]))
 end
 
-function conic_form!(x::ImaginaryAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        new_objective = ConicObj()
-        objective = conic_form!(x.children[1], unique_conic_forms)
-
-        for var in keys(objective)
-            re = imag.(objective[var][1])
-            im = imag.(objective[var][2])
-            new_objective[var] = (re, im)
-        end
-        cache_conic_form!(unique_conic_forms, x, new_objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
+    obj = conic_form!(context, only(children(x)))
+    return operate(imag, T, sign(x), obj)
 end
 
 imag(x::AbstractExpr) = ImaginaryAtom(x)
-imag(x::Value) = ImaginaryAtom(Constant(x))
+imag(x::ComplexConstant) = x.imag_constant
+imag(x::Constant) = Constant(zero(x.value))

@@ -23,9 +23,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct QuantumEntropy <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct QuantumEntropy <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -37,9 +35,11 @@ struct QuantumEntropy <: AbstractExpr
         if size(X) != (n, n)
             throw(DimensionMismatch("X must be square"))
         end
-        return new(:quantum_entropy, hash(children), children, (1, 1), m, k)
+        return new(children, (1, 1), m, k)
     end
 end
+
+head(io::IO, ::QuantumEntropy) = print(io, "quantum_entropy")
 
 function sign(atom::QuantumEntropy)
     return Positive()
@@ -70,30 +70,24 @@ function quantum_entropy(X::MatrixOrConstant, m::Integer = 0, k::Integer = 0)
     return -quantum_relative_entropy(X, Matrix(1.0 * I, size(X)))
 end
 
-function conic_form!(atom::QuantumEntropy, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, atom)
-        X = atom.children[1]
-        m = atom.m
-        k = atom.k
-        n = size(X)[1]
-        eye = Matrix(1.0 * I, n, n)
+function new_conic_form!(context::Context, atom::QuantumEntropy)
+    X = atom.children[1]
+    m = atom.m
+    k = atom.k
+    n = size(X)[1]
+    eye = Matrix(1.0 * I, n, n)
 
-        conic_form!(X ⪰ 0, unique_conic_forms)
+    add_constraint!(context, X ⪰ 0)
 
-        is_complex = sign(X) == ComplexSign()
-        if is_complex
-            τ = ComplexVariable(n, n)
-        else
-            τ = Variable(n, n)
-        end
-        conic_form!(
-            τ in RelativeEntropyEpiCone(X, eye, m, k),
-            unique_conic_forms,
-        )
-
-        # It's already a real mathematically, but need to make it a real type.
-        τ = real(-tr(τ))
-        cache_conic_form!(unique_conic_forms, atom, minimize(τ))
+    is_complex = sign(X) == ComplexSign()
+    if is_complex
+        τ = ComplexVariable(n, n)
+    else
+        τ = Variable(n, n)
     end
-    return get_conic_form(unique_conic_forms, atom)
+    add_constraint!(context, τ in RelativeEntropyEpiCone(X, eye, m, k))
+
+    # It's already a real mathematically, but need to make it a real type.
+    τ = real(-tr(τ))
+    return conic_form!(context, minimize(τ))
 end

@@ -8,9 +8,7 @@ import Base.min
 
 # TODO: This can easily be extended to work
 ### Min Atom
-struct MinAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct MinAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -34,9 +32,11 @@ struct MinAtom <: AbstractExpr
         end
 
         children = (x, y)
-        return new(:min, hash(children), children, sz)
+        return new(children, sz)
     end
 end
+
+head(io::IO, ::MinAtom) = print(io, "min")
 
 function sign(x::MinAtom)
     sign_one = sign(x.children[1])
@@ -65,20 +65,13 @@ function evaluate(x::MinAtom)
     return min.(evaluate(x.children[1]), evaluate(x.children[2]))
 end
 
-# x >= this and y >= this if min(x, y) = this
-function conic_form!(x::MinAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        this = Variable(x.size[1], x.size[2])
-        objective = conic_form!(this, unique_conic_forms)
-        for child in x.children
-            conic_form!(this <= child, unique_conic_forms)
-        end
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context, x::MinAtom)
+    t = Variable(x.size[1], x.size[2])
+    p = maximize(t, (t <= child for child in x.children)...)
+    return conic_form!(context, p)
 end
 
 min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
-min(x::AbstractExpr, y::Value) = min(x, Constant(y))
-min(x::Value, y::AbstractExpr) = min(Constant(x), y)
+min(x::AbstractExpr, y::Value) = min(x, constant(y))
+min(x::Value, y::AbstractExpr) = min(constant(x), y)
 neg(x::AbstractExpr) = max(-x, Constant(0, Positive()))

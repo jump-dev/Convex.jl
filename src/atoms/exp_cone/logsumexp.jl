@@ -9,9 +9,7 @@
 
 # TODO: make this work for a *list* of inputs, rather than just for vector/matrix inputs
 
-struct LogSumExpAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct LogSumExpAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -20,10 +18,12 @@ struct LogSumExpAtom <: AbstractExpr
             error("The argument should be real but it's instead complex")
         else
             children = (x,)
-            return new(:logsumexp, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::LogSumExpAtom) = print(io, "logsumexp")
 
 function sign(x::LogSumExpAtom)
     return NoSign()
@@ -45,18 +45,13 @@ end
 
 logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
 
-function conic_form!(e::LogSumExpAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, e)
-        # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
-        t = Variable(e.size)
-        z = sum(exp(e.children[1] - t))
-        objective = conic_form!(t, unique_conic_forms)
-        conic_form!(z, unique_conic_forms)
-        conic_form!(z <= 1, unique_conic_forms)
-
-        cache_conic_form!(unique_conic_forms, e, objective)
-    end
-    return get_conic_form(unique_conic_forms, e)
+function new_conic_form!(context::Context, e::LogSumExpAtom)
+    # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
+    t = Variable()
+    z = sum(exp(e.children[1] - t * ones(size(e.children[1]))))
+    objective = conic_form!(context, t)
+    add_constraint!(context, z <= 1)
+    return objective
 end
 
 function logisticloss(e::AbstractExpr)

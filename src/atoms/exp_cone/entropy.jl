@@ -11,8 +11,6 @@
 
 # Entropy atom: -xlogx entrywise
 mutable struct EntropyAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -22,10 +20,12 @@ mutable struct EntropyAtom <: AbstractExpr
         else
             children = (x,)
             # TODO check positivity or enforce it
-            return new(:entropy, hash(children), children, size(x))
+            return new(children, size(x))
         end
     end
 end
+
+head(io::IO, ::EntropyAtom) = print(io, "entropy")
 
 function sign(x::EntropyAtom)
     return NoSign()
@@ -44,23 +44,13 @@ function evaluate(x::EntropyAtom)
     return -c .* log.(c)
 end
 
-function conic_form!(e::EntropyAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, e)
-        # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
-        t = Variable(e.size)
-        x = e.children[1]
-        objective = conic_form!(t, unique_conic_forms)
-        for i in 1:size(x, 1)
-            for j in 1:size(x, 2)
-                conic_form!(
-                    ExpConstraint(t[i, j], x[i, j], 1),
-                    unique_conic_forms,
-                )
-            end
-        end
-        cache_conic_form!(unique_conic_forms, e, objective)
-    end
-    return get_conic_form(unique_conic_forms, e)
-end
-
 entropy(x::AbstractExpr) = sum(EntropyAtom(x))
+
+function new_conic_form!(context::Context, e::EntropyAtom)
+    # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
+    t = Variable(e.size)
+    x = e.children[1]
+    add_constraint!(context, ExpConstraint(t, x, ones(e.size...)))
+
+    return conic_form!(context, t)
+end

@@ -9,7 +9,7 @@
     p = minimize(abs(x), x <= -1; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -28,7 +28,7 @@
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -38,6 +38,8 @@
         @test p.constraints[2].dual ≈ 1 atol = atol rtol = rtol
         @test p.constraints[3].dual[1, 1] ≈ 0 atol = atol rtol = rtol
         @test p.constraints[3].dual[2, 2] ≈ 0 atol = atol rtol = rtol
+        @test p.constraints[3].dual[1, 2] ≈ p.constraints[3].dual[2, 1] atol =
+            atol rtol = rtol
         @test p.constraints[3].dual[1, 2] <= 1 + atol
         @test p.constraints[3].dual[2, 1] <= 1 + atol
         @test p.constraints[3].dual[1, 2] >= -atol
@@ -57,7 +59,7 @@ end
     p = minimize(maximum(x), x >= a; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -78,7 +80,7 @@ end
     p = maximize(minimum(x), x <= a; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -92,11 +94,11 @@ end
     c = ones(4, 1)
     d = fill(2.0, (6, 1))
     constraints = [[x y] <= 2, z <= 0, z <= x, 2z >= -1]
-    objective = sum(x + z) + minimum(y) + c' * y * d
+    objective = sum(x + z * ones(4, 4)) + minimum(y) + c' * y * d
     p = maximize(objective, constraints; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -119,7 +121,7 @@ end
     p = minimize(maximum(max(x, y)), [x >= a, y >= b]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     max_a = maximum(a)
@@ -145,7 +147,7 @@ end
     p = maximize(minimum(min(x, y)), [x <= a, y <= b]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     min_a = minimum(a)
@@ -169,7 +171,7 @@ end
     p = minimize(sum(pos(x)), [x >= a, x <= 2]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -189,11 +191,11 @@ end
     p = minimize(1, [x >= -2, x <= -2, neg(x) <= 3]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test p.optval === nothing
         @test evaluate(sum(neg(x))) ≈ 6 atol = atol rtol = rtol
     end
 end
@@ -213,7 +215,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -231,7 +233,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -255,7 +257,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -273,7 +275,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -300,7 +302,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -320,7 +322,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -350,7 +352,7 @@ end
     p = minimize(norm_inf(x), [-2 <= x, x <= 1]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -372,7 +374,7 @@ end
     p = minimize(norm_1(x), [-2 <= x, x <= 1]; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test

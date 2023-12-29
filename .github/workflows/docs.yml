@@ -8,13 +8,20 @@ on:
       - 'src/**'
       - 'docs/**'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/docs.yml'
       - 'src/**'
       - 'docs/**'
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   build:
+    # Run on push's or non-draft PRs
+    if: (github.event_name == 'push') || (github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     env:
       GKSwstype: nul

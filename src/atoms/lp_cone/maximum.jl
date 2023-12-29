@@ -7,9 +7,7 @@
 import Base.maximum
 
 ### Maximum Atom
-struct MaximumAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct MaximumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -18,10 +16,12 @@ struct MaximumAtom <: AbstractExpr
             error("Argument should be real instead it is $(sign(x))")
         else
             children = (x,)
-            return new(:maximum, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::MaximumAtom) = print(io, "maximum")
 
 function sign(x::MaximumAtom)
     return sign(x.children[1])
@@ -42,16 +42,10 @@ function evaluate(x::MaximumAtom)
     return Base.maximum(evaluate(x.children[1]))
 end
 
-# x <= this if maximum(x) = this
-# so, this - x will be in the :NonNeg cone
-function conic_form!(x::MaximumAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        this = Variable()
-        objective = conic_form!(this, unique_conic_forms)
-        conic_form!(this >= x.children[1], unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context, x::MaximumAtom)
+    t = Variable()
+    add_constraint!(context, t >= x.children[1])
+    return conic_form!(context, t)
 end
 
 maximum(x::AbstractExpr) = MaximumAtom(x)

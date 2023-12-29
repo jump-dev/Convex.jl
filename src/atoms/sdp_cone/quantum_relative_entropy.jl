@@ -24,9 +24,7 @@
 
 const MatrixOrConstant = Union{AbstractMatrix,Constant}
 
-struct QuantumRelativeEntropy1 <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct QuantumRelativeEntropy1 <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -46,20 +44,13 @@ struct QuantumRelativeEntropy1 <: AbstractExpr
         if size(A) != (n, n)
             throw(DimensionMismatch("A and B must be square"))
         end
-        return new(
-            :quantum_relative_entropy,
-            hash(children),
-            children,
-            (1, 1),
-            m,
-            k,
-        )
+        return new(children, (1, 1), m, k)
     end
 end
 
-struct QuantumRelativeEntropy2 <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+head(io::IO, ::QuantumRelativeEntropy1) = print(io, "quantum_relative_entropy")
+
+mutable struct QuantumRelativeEntropy2 <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -96,19 +87,11 @@ struct QuantumRelativeEntropy2 <: AbstractExpr
         J = U'[v.>nullspace_tol, :]
         K = U'[v.<nullspace_tol, :]
 
-        return new(
-            :quantum_relative_entropy,
-            hash(children),
-            children,
-            (1, 1),
-            m,
-            k,
-            B,
-            J,
-            K,
-        )
+        return new(children, (1, 1), m, k, B, J, K)
     end
 end
+
+head(io::IO, ::QuantumRelativeEntropy2) = print(io, "quantum_relative_entropy")
 
 sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2}) = Positive()
 
@@ -207,54 +190,45 @@ function quantum_relative_entropy(
     return real(tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function conic_form!(atom::QuantumRelativeEntropy1, unique_conic_forms)
-    #println("conic_form QuantumRelativeEntropy1")
-    if !has_conic_form(unique_conic_forms, atom)
-        A = atom.children[1]
-        B = atom.children[2]
-        m = atom.m
-        k = atom.k
-        n = size(A)[1]
-        eye = Matrix(1.0 * I, n, n)
-        e = vec(eye)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
+    A = atom.children[1]
+    B = atom.children[2]
+    m = atom.m
+    k = atom.k
+    n = size(A)[1]
+    eye = Matrix(1.0 * I, n, n)
+    e = vec(eye)
 
-        conic_form!(A ⪰ 0, unique_conic_forms)
-        conic_form!(B ⪰ 0, unique_conic_forms)
+    add_constraint!(context, A ⪰ 0)
+    add_constraint!(context, B ⪰ 0)
 
-        τ = Variable()
-        conic_form!(
-            τ in
-            RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
-            unique_conic_forms,
-        )
+    τ = Variable()
+    add_constraint!(
+        context,
+        τ in RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
+    )
 
-        cache_conic_form!(unique_conic_forms, atom, minimize(τ))
-    end
-    return get_conic_form(unique_conic_forms, atom)
+    return conic_form!(context, minimize(τ))
 end
 
-function conic_form!(atom::QuantumRelativeEntropy2, unique_conic_forms)
-    #println("conic_form QuantumRelativeEntropy2")
-    if !has_conic_form(unique_conic_forms, atom)
-        A = atom.children[1]
-        B = atom.B
-        J = atom.J
-        K = atom.K
-        m = atom.m
-        k = atom.k
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2)
+    A = atom.children[1]
+    B = atom.B
+    J = atom.J
+    K = atom.K
+    m = atom.m
+    k = atom.k
 
-        conic_form!(A ⪰ 0, unique_conic_forms)
+    add_constraint!(context, A ⪰ 0)
 
-        if length(K) > 0
-            conic_form!(K * A * K' == 0, unique_conic_forms)
-            Ap = J * A * J'
-            Bp = Hermitian(J * B * J')
-            τ = -quantum_entropy(Ap, m, k) - real(tr(Ap * log(Bp)))
-        else
-            τ = -quantum_entropy(A, m, k) - real(tr(A * log(B)))
-        end
-
-        cache_conic_form!(unique_conic_forms, atom, minimize(τ))
+    if length(K) > 0
+        add_constraint!(context, K * A * K' == 0)
+        Ap = J * A * J'
+        Bp = Hermitian(J * B * J')
+        τ = -quantum_entropy(Ap, m, k) - real(tr(Ap * log(Bp)))
+    else
+        τ = -quantum_entropy(A, m, k) - real(tr(A * log(B)))
     end
-    return get_conic_form(unique_conic_forms, atom)
+
+    return conic_form!(context, minimize(τ))
 end

@@ -1,16 +1,15 @@
-mutable struct Problem{T<:Real}
+mutable struct Problem{T<:Real} <: AbstractExpr
     head::Symbol
-    objective::AbstractExpr
+    objective::Union{AbstractExpr,Nothing}
     constraints::Array{Constraint}
     status::MOI.TerminationStatusCode
     model::Union{MOI.ModelLike,Nothing}
-
     function Problem{T}(
         head::Symbol,
-        objective::AbstractExpr,
+        objective::Union{AbstractExpr,Nothing},
         constraints::Array = Constraint[],
     ) where {T<:Real}
-        if sign(objective) == Convex.ComplexSign()
+        if objective !== nothing && sign(objective) == Convex.ComplexSign()
             error("Objective cannot be a complex expression")
         else
             return new(
@@ -39,20 +38,19 @@ end
 dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
 primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
 termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
-objective_value(p::Problem) = MOI.get(p.model, MOI.ObjectiveValue())
+function objective_value(p::Problem)
+    # These don't have an objective value, and it would be confusing to return one
+    if p.head === :satisfy
+        return nothing
+    end
+    return MOI.get(p.model, MOI.ObjectiveValue())
+end
 
 Problem(args...) = Problem{Float64}(args...)
 
-function vexity(p::Problem)
-    bad_vex = [ConcaveVexity, NotDcp]
-
-    obj_vex = vexity(p.objective)
-    if p.head == :maximize
-        obj_vex = -obj_vex
-    end
-    typeof(obj_vex) in bad_vex &&
-        @warn "Problem not DCP compliant: objective is not DCP"
-
+function problem_vexity(p::Problem)
+    bad_vex = (ConcaveVexity, NotDcp)
+    obj_vex = objective_vexity(p)
     constr_vex = ConstVexity()
     for i in 1:length(p.constraints)
         vex = vexity(p.constraints[i])
@@ -62,18 +60,91 @@ function vexity(p::Problem)
     end
     problem_vex = obj_vex + constr_vex
     # this check is redundant
-    # typeof(problem_vex) in bad_vex && warn("Problem not DCP compliant")
+    typeof(problem_vex) in bad_vex && @warn("Problem not DCP compliant")
     return problem_vex
 end
 
-function conic_form!(p::Problem, unique_conic_forms::UniqueConicForms)
-    objective_var = Variable()
-    objective = conic_form!(objective_var, unique_conic_forms)
-    conic_form!(p.objective - objective_var == 0, unique_conic_forms)
-    for constraint in p.constraints
-        conic_form!(constraint, unique_conic_forms)
+function objective_vexity(p::Problem)
+    bad_vex = (ConcaveVexity, NotDcp)
+    if p.head == :satisfy
+        obj_vex = ConstVexity()
+    elseif p.head == :minimize
+        obj_vex = vexity(p.objective)
+    elseif p.head == :maximize
+        obj_vex = -vexity(p.objective)
+    else
+        error("Unknown type of problem $(p.head)")
     end
-    return objective, objective_var.id_hash
+
+    typeof(obj_vex) in bad_vex &&
+        @warn "Problem not DCP compliant: objective is not DCP"
+
+    return obj_vex
+end
+
+vexity(p::Problem) = objective_vexity(p)
+
+# is this right?
+# function problem_vexity(sense, obj_vexity, constr_vexity)
+#     if constr_vexity == ConstVexity()
+#         return obj_vexity
+#     end
+
+#     if constr_vexity == AffineVexity() && obj_vexity == AffineVexity()
+#         return sense === :maximize ? ConcaveVexity() : ConvexVexity()
+#     end
+
+#     return obj_vexity + constr_vexity
+# end
+
+for f in (:sign, :monotonicity, :curvature)
+    @eval function $f(p::Problem)
+        if p.head === :satisfy
+            error("Satisfiability problem cannot be used as subproblem")
+        end
+        m = $f(p.objective)
+        if p.head === :maximize
+            return (-).(m)
+        else
+            return m
+        end
+    end
+end
+
+function new_conic_form!(context::Context, p::Problem)
+    for c in p.constraints
+        add_constraint!(context, c)
+    end
+    if p.head !== :satisfy
+        return conic_form!(context, p.objective)
+    else
+        return nothing
+    end
+end
+
+function Context(p::Problem{T}, optimizer_factory) where {T}
+    context = Context{T}(optimizer_factory)
+    cfp = conic_form!(context, p)
+
+    # Save some memory before the solve;
+    # we don't need these anymore,
+    # since we don't re-use contexts between solves currently
+    empty!(context.conic_form_cache)
+
+    model = context.model
+
+    if p.head == :satisfy
+        MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
+    else
+        obj = scalar_fn(cfp)
+        MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+        MOI.set(
+            model,
+            MOI.ObjectiveSense(),
+            p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE,
+        )
+    end
+    return context
 end
 
 function Problem{T}(
@@ -99,27 +170,15 @@ function minimize(
 )
     return Problem{numeric_type}(:minimize, objective, constraints)
 end
-function minimize(
-    objective::Value,
-    constraints::Constraint...;
-    numeric_type = Float64,
-)
-    return minimize(
-        convert(AbstractExpr, objective),
-        collect(constraints);
-        numeric_type = numeric_type,
-    )
+function minimize(::Value, constraints::Constraint...; numeric_type = Float64)
+    return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function minimize(
-    objective::Value,
+    ::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return minimize(
-        convert(AbstractExpr, objective),
-        constraints;
-        numeric_type = numeric_type,
-    )
+    return satisfy(constraints; numeric_type = numeric_type)
 end
 
 # Allow users to simply type maximize
@@ -137,38 +196,26 @@ function maximize(
 )
     return Problem{numeric_type}(:maximize, objective, constraints)
 end
-function maximize(
-    objective::Value,
-    constraints::Constraint...;
-    numeric_type = Float64,
-)
-    return maximize(
-        convert(AbstractExpr, objective),
-        collect(constraints);
-        numeric_type = numeric_type,
-    )
+function maximize(::Value, constraints::Constraint...; numeric_type = Float64)
+    return satisfy(collect(constraints); numeric_type = numeric_type)
 end
 function maximize(
-    objective::Value,
+    ::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return maximize(
-        convert(AbstractExpr, objective),
-        constraints;
-        numeric_type = numeric_type,
-    )
+    return satisfy(constraints; numeric_type = numeric_type)
 end
 
 # Allow users to simply type satisfy (if there is no objective)
 function satisfy(constraints::Constraint...; numeric_type = Float64)
-    return Problem{numeric_type}(:minimize, Constant(0), [constraints...])
+    return Problem{numeric_type}(:satisfy, nothing, [constraints...])
 end
 function satisfy(
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return Problem{numeric_type}(:minimize, Constant(0), constraints)
+    return Problem{numeric_type}(:satisfy, nothing, constraints)
 end
 function satisfy(constraint::Constraint; numeric_type = Float64)
     return satisfy([constraint]; numeric_type = numeric_type)
@@ -187,17 +234,4 @@ function add_constraint!(p::Problem, constraints::Array{<:Constraint})
 end
 function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
-end
-
-# caches conic form of x when x is the solution to the optimization problem p
-function cache_conic_form!(
-    conic_forms::UniqueConicForms,
-    x::AbstractExpr,
-    p::Problem,
-)
-    objective = conic_form!(p.objective, conic_forms)
-    for c in p.constraints
-        conic_form!(c, conic_forms)
-    end
-    return cache_conic_form!(conic_forms, x, objective)
 end

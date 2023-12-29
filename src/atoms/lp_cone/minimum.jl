@@ -7,9 +7,7 @@
 import Base.minimum
 
 ### Minimum Atom
-struct MinimumAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct MinimumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -18,10 +16,12 @@ struct MinimumAtom <: AbstractExpr
             error("Argument should be real instead it is $(sign(x))")
         else
             children = (x,)
-            return new(:minimum, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         end
     end
 end
+
+head(io::IO, ::MinimumAtom) = print(io, "minimum")
 
 function sign(x::MinimumAtom)
     return sign(x.children[1])
@@ -42,16 +42,10 @@ function evaluate(x::MinimumAtom)
     return Base.minimum(evaluate(x.children[1]))
 end
 
-# x >= this if minimum(x) = this
-# so, x - this will be in the :NonNeg cone
-function conic_form!(x::MinimumAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        this = Variable()
-        objective = conic_form!(this, unique_conic_forms)
-        conic_form!(this <= x.children[1], unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context, x::MinimumAtom)
+    t = Variable()
+    add_constraint!(context, t <= x.children[1])
+    return conic_form!(context, t)
 end
 
 minimum(x::AbstractExpr) = MinimumAtom(x)

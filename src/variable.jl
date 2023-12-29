@@ -97,12 +97,10 @@ Sets the current sign of `x` to `s`.
 sign!(x::AbstractVariable, s::Sign) = x.sign = s
 
 """
-    evaluate(x::AbstractExpr)
+    evaluate(x::AbstractVariable)
 
 Returns the current value of `x` if assigned; errors otherwise.
 """
-evaluate
-
 function evaluate(x::AbstractVariable)
     return _value(x) === nothing ?
            error("Value of the variable is yet to be calculated") :
@@ -161,6 +159,11 @@ end
 # Some helpers for the constructors for `Variable`
 iscomplex(sign::Sign) = sign == ComplexSign()
 iscomplex(x::AbstractVariable) = iscomplex(sign(x))
+iscomplex(x::AbstractExpr) = iscomplex(sign(x))
+iscomplex(x::Complex) = true
+iscomplex(x::Real) = false
+iscomplex(x::AbstractArray{<:Complex}) = true
+iscomplex(x::AbstractArray{<:Real}) = false
 
 # A concrete implementation of the `AbstractVariable` interface
 mutable struct Variable <: AbstractVariable
@@ -193,7 +196,7 @@ mutable struct Variable <: AbstractVariable
     vexity::Vexity
     """
     The sign of the variable. Can be  `Positive()`, `Negative()`, `NoSign()`
-    (i.e. real), or `ComplexSign()`. Accessed by `sign(v::Variable)`. 
+    (i.e. real), or `ComplexSign()`. Accessed by `sign(v::Variable)`.
     """
     sign::Sign
     """
@@ -206,12 +209,16 @@ mutable struct Variable <: AbstractVariable
     """
     vartype::VarType
     function Variable(size::Tuple{Int,Int}, sign::Sign, vartype::VarType)
-        if iscomplex(sign) && vartype != ContVar
-            throw(
-                ArgumentError(
-                    "vartype must be `ContVar` for complex variables; got vartype = $vartype",
-                ),
-            )
+        if iscomplex(sign)
+            if vartype == ContVar
+                return ComplexVariable(size)
+            else
+                throw(
+                    ArgumentError(
+                        "vartype must be `ContVar` for complex variables; got vartype = $vartype",
+                    ),
+                )
+            end
         end
         this = new(
             :variable,
@@ -227,12 +234,39 @@ mutable struct Variable <: AbstractVariable
         return this
     end
 end
+
+function Base.isequal(x::AbstractVariable, y::AbstractVariable)
+    return x.id_hash == y.id_hash
+end
+Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
+
+mutable struct ComplexVariable <: AbstractVariable
+    head::Symbol
+    id_hash::UInt64
+    size::Tuple{Int,Int}
+    value::ValueOrNothing
+    vexity::Vexity
+    constraints::Vector{Constraint}
+    function ComplexVariable(sz::Tuple{Int,Int})
+        return new(
+            :ComplexVariable,
+            rand(UInt64),
+            sz,
+            nothing,
+            AffineVexity(),
+            Constraint[],
+        )
+    end
+end
+
+vartype(::ComplexVariable) = ContVar
+sign(::ComplexVariable) = ComplexSign()
+
 Variable(size::Tuple{Int,Int}, sign::Sign) = Variable(size, sign, ContVar)
 function Variable(size::Tuple{Int,Int}, vartype::VarType)
     return Variable(size, NoSign(), vartype)
 end
 Variable(size::Tuple{Int,Int}) = Variable(size, NoSign(), ContVar)
-ComplexVariable(size::Tuple{Int,Int}) = Variable(size, ComplexSign(), ContVar)
 
 function Variable(m::Int, n::Int, sign::Sign, vartype::VarType)
     return Variable((m, n), sign, vartype)
@@ -240,19 +274,19 @@ end
 Variable(m::Int, n::Int, sign::Sign) = Variable((m, n), sign, ContVar)
 Variable(m::Int, n::Int, vartype::VarType) = Variable((m, n), NoSign(), vartype)
 Variable(m::Int, n::Int) = Variable((m, n), NoSign(), ContVar)
-ComplexVariable(m::Int, n::Int) = Variable((m, n), ComplexSign(), ContVar)
+ComplexVariable(m::Int, n::Int) = ComplexVariable((m, n))
 
 Variable(m::Int, sign::Sign, vartype::VarType) = Variable((m, 1), sign, vartype)
 Variable(m::Int, sign::Sign) = Variable((m, 1), sign, ContVar)
 Variable(m::Int, vartype::VarType) = Variable((m, 1), NoSign(), vartype)
 Variable(m::Int) = Variable((m, 1), NoSign(), ContVar)
-ComplexVariable(m::Int) = Variable((m, 1), ComplexSign(), ContVar)
+ComplexVariable(m::Int) = ComplexVariable((m, 1))
 
 Variable(sign::Sign, vartype::VarType) = Variable((1, 1), sign, vartype)
 Variable(sign::Sign) = Variable((1, 1), sign, ContVar)
 Variable(vartype::VarType) = Variable((1, 1), NoSign(), vartype)
 Variable() = Variable((1, 1), NoSign(), ContVar)
-ComplexVariable() = Variable((1, 1), ComplexSign(), ContVar)
+ComplexVariable() = ComplexVariable((1, 1))
 
 ###
 # Compatability with old `sets` model
@@ -318,7 +352,20 @@ function ComplexVariable(
     first_set::Symbol,
     more_sets::Symbol...,
 )
-    return Variable(size, ComplexSign(), first_set, more_sets...)
+    sets = [first_set]
+    append!(sets, more_sets)
+    if :Bin in sets
+        throw(ArgumentError("Complex variables cannot be restricted to binary"))
+    elseif :Int in sets
+        throw(
+            ArgumentError("Complex variables cannot be restricted to integer"),
+        )
+    end
+    x = ComplexVariable(size)
+    if :Semidefinite in sets
+        add_constraint!(x, x ⪰ 0)
+    end
+    return x
 end
 function ComplexVariable(
     m::Int,
@@ -326,13 +373,13 @@ function ComplexVariable(
     first_set::Symbol,
     more_sets::Symbol...,
 )
-    return Variable((m, n), ComplexSign(), first_set, more_sets...)
+    return ComplexVariable((m, n), first_set, more_sets...)
 end
 function ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...)
-    return Variable((m, 1), ComplexSign(), first_set, more_sets...)
+    return ComplexVariable((m, 1), first_set, more_sets...)
 end
 function ComplexVariable(first_set::Symbol, more_sets::Symbol...)
-    return Variable((1, 1), ComplexSign(), first_set, more_sets...)
+    return ComplexVariable((1, 1), first_set, more_sets...)
 end
 
 Semidefinite(m::Integer) = Semidefinite(m, m)
@@ -351,7 +398,7 @@ Semidefinite((m, n)::Tuple{Integer,Integer}) = Semidefinite(m, n)
 
 function HermitianSemidefinite(m::Integer, n::Integer = m)
     if m == n
-        x = Variable((m, n), ComplexSign(), ContVar)
+        x = ComplexVariable((m, n))
         add_constraint!(x, x ⪰ 0)
         return x
     else
@@ -361,20 +408,6 @@ end
 
 function HermitianSemidefinite((m, n)::Tuple{Integer,Integer})
     return HermitianSemidefinite(m, n)
-end
-
-function real_conic_form(x::AbstractVariable)
-    vec_size = length(x)
-    return sparse(1.0I, vec_size, vec_size)
-end
-
-function imag_conic_form(x::AbstractVariable)
-    vec_size = length(x)
-    if sign(x) == ComplexSign()
-        return im * sparse(1.0I, vec_size, vec_size)
-    else
-        return spzeros(vec_size, vec_size)
-    end
 end
 
 """

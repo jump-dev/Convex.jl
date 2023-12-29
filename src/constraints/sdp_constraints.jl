@@ -3,9 +3,7 @@ import Base.in
 ### Positive semidefinite cone constraint
 
 # TODO: Terrible documentation. Please fix.
-struct SDPConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
+mutable struct SDPConstraint <: Constraint
     child::AbstractExpr
     size::Tuple{Int,Int}
     dual::ValueOrNothing
@@ -15,10 +13,11 @@ struct SDPConstraint <: Constraint
         if sz[1] != sz[2]
             error("Positive semidefinite expressions must be square")
         end
-        id_hash = hash((child, :sdp))
-        return new(:sdp, id_hash, child, sz, nothing)
+        return new(child, sz, nothing)
     end
 end
+
+head(io::IO, ::SDPConstraint) = print(io, "sdp")
 
 function vexity(c::SDPConstraint)
     vex = vexity(c.child)
@@ -29,81 +28,66 @@ function vexity(c::SDPConstraint)
     end
 end
 
-# users specify SDPs as `A in :SDP` where A is an n x n square matrix
-# solvers (Mosek and SCS) specify the *lower triangular part of A* is in the SDP cone
-# so we need the lower triangular part (n*(n+1)/2 entries) of c.child to be in the SDP cone
-# and we need the corresponding upper elements to match the lower elements,
-# which we enforce via equality constraints
-function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
-    # TODO:
-    # 1) propagate dual values
-    # 2) presolve to eliminate (many) variables --- variables on upper triangular part often don't matter at all
-    if !has_conic_form(unique_conic_forms, c)
-        n = c.size[1]
-        # construct linear indices to pick out the lower triangular part (including diagonal),
-        # the upper triangular part (not including diagonal)
-        # and the corresponding entries in the lower triangular part, so
-        # symmetry => c.child[upperpart]
-        rescale = triu(ones(n, n))
-        rescale[diagind(n, n)] .= 1.0
-        diagandupperpart = findall(!iszero, vec(rescale))
-        lowerpart = Vector{Int}(undef, div(n * (n - 1), 2))
-        upperpart = Vector{Int}(undef, div(n * (n - 1), 2))
-        kupper = 0
-        # diagandupperpart in column-major order:
-        # consider using find(triu(ones(3,3)))
-        @inbounds for j in 1:n
-            for i in j+1:n
-                kupper += 1
-                upperpart[kupper] = n * (i - 1) + j # (j,i)th element
-                lowerpart[kupper] = n * (j - 1) + i # (i,j)th element
-            end
+function _add_constraint!(context::Context, c::SDPConstraint)
+    if vexity(c.child) == ConstVexity()
+        x = evaluate(c.child)
+        if !(x ≈ transpose(x))
+            @warn "constant SDP constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
         end
-        objective = conic_form!(
-            (broadcast(*, rescale, c.child))[diagandupperpart],
-            unique_conic_forms,
-        )
-        sdp_constraint = ConicConstr([objective], :SDP, [div(n * (n + 1), 2)])
-        cache_conic_form!(unique_conic_forms, c, sdp_constraint)
-        # make sure upper and lower triangular part match in the solution
-        # note that this introduces all-zero rows into the constraint matrix
-        # if the matrix we require to be PSD has already been constructed to be symmetric
-        equality_constraint = conic_form!(
-            c.child[lowerpart] == c.child[upperpart],
-            unique_conic_forms,
-        )
-
-        # for computing duals --- won't work b/c
-        # 1) sizes are wrong (will be n(n+1)/2, expects n^2), and
-        # 2) the "correct" dual is the sum of the sdp dual and the equality constraint dual (so yes, dual of sdp constraint is *not* symmetric)
-        # conic_constr_to_constr[sdp_constraint] = c
-
+        if !(evaluate(eigmin(c.child)) ≥ -CONSTANT_CONSTRAINT_TOL[])
+            @warn "constant SDP constraint is violated"
+            context.detected_infeasible_during_formulation[] = true
+        end
+        return nothing
     end
-    return get_conic_form(unique_conic_forms, c)
+
+    f = conic_form!(context, c.child)
+    d = c.size[1]
+    context.constr_to_moi_inds[c] = MOI_add_constraint(
+        context.model,
+        f,
+        MOI.PositiveSemidefiniteConeSquare(d),
+    )
+    return nothing
+end
+
+function populate_dual!(
+    model::MOI.ModelLike,
+    constr::SDPConstraint,
+    MOI_constr_indices,
+)
+    return constr.dual = output(
+        reshape(
+            MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices),
+            constr.size,
+        ),
+    )
 end
 
 # TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
 function isposdef(x::AbstractExpr)
-    if sign(x) == ComplexSign()
+    if iscomplex(x)
         SDPConstraint([real(x) -imag(x); imag(x) real(x)])
     else
         SDPConstraint(x)
     end
 end
 
-# TODO: Throw error if symbol is invalid.
 function in(x::AbstractExpr, y::Symbol)
     if y == :semidefinite || y == :SDP
-        if sign(x) == ComplexSign()
+        if iscomplex(x)
             SDPConstraint([real(x) -imag(x); imag(x) real(x)])
         else
             SDPConstraint(x)
         end
+    else
+        error("Set $y not understood")
     end
 end
 
 function ⪰(x::AbstractExpr, y::AbstractExpr)
-    if sign(x) == ComplexSign() || sign(y) == ComplexSign()
+    if iscomplex(x) || iscomplex(y)
         SDPConstraint([real(x - y) -imag(x - y); imag(x - y) real(x - y)])
     else
         SDPConstraint(x - y)
@@ -111,7 +95,7 @@ function ⪰(x::AbstractExpr, y::AbstractExpr)
 end
 
 function ⪯(x::AbstractExpr, y::AbstractExpr)
-    if sign(x) == ComplexSign() || sign(y) == ComplexSign()
+    if iscomplex(x) || iscomplex(y)
         SDPConstraint([real(y - x) -imag(y - x); imag(y - x) real(y - x)])
     else
         SDPConstraint(y - x)
@@ -119,57 +103,57 @@ function ⪯(x::AbstractExpr, y::AbstractExpr)
 end
 
 function ⪰(x::AbstractExpr, y::Value)
-    if sign(x) == ComplexSign() || !isreal(y)
+    if iscomplex(x) || iscomplex(y)
         all(y .== 0) ? SDPConstraint([real(x) -imag(x); imag(x) real(x)]) :
         SDPConstraint(
             [
-                real(x - Constant(y)) -imag(x - Constant(y))
-                imag(x - Constant(y)) real(x - Constant(y))
+                real(x - constant(y)) -imag(x - constant(y))
+                imag(x - constant(y)) real(x - constant(y))
             ],
         )
     else
-        all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - Constant(y))
+        all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - constant(y))
     end
 end
 
 function ⪰(x::Value, y::AbstractExpr)
-    if sign(y) == ComplexSign() || !isreal(x)
+    if iscomplex(y) || iscomplex(x)
         all(x .== 0) ? SDPConstraint([real(-y) -imag(-y); imag(-y) real(-y)]) :
         SDPConstraint(
             [
-                real(Constant(x) - y) -imag(Constant(x) - y)
-                imag(Constant(x) - y) real(Constant(x) - y)
+                real(constant(x) - y) -imag(constant(x) - y)
+                imag(constant(x) - y) real(constant(x) - y)
             ],
         )
     else
-        all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(Constant(x) - y)
+        all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(constant(x) - y)
     end
 end
 
 function ⪯(x::Value, y::AbstractExpr)
-    if sign(y) == ComplexSign() || !isreal(x)
+    if iscomplex(y) || iscomplex(x)
         all(x .== 0) ? SDPConstraint([real(y) -imag(y); imag(y) real(y)]) :
         SDPConstraint(
             [
-                real(y - Constant(x)) -imag(y - Constant(x))
-                imag(y - Constant(x)) real(y - Constant(x))
+                real(y - constant(x)) -imag(y - constant(x))
+                imag(y - constant(x)) real(y - constant(x))
             ],
         )
     else
-        all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - Constant(x))
+        all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - constant(x))
     end
 end
 
 function ⪯(x::AbstractExpr, y::Value)
-    if sign(x) == ComplexSign() || !isreal(y)
+    if iscomplex(x) || iscomplex(y)
         all(y .== 0) ? SDPConstraint([real(-x) -imag(-x); imag(-x) real(-x)]) :
         SDPConstraint(
             [
-                real(Constant(y) - x) -imag(Constant(y) - x)
-                imag(Constant(y) - x) real(Constant(y) - x)
+                real(constant(y) - x) -imag(constant(y) - x)
+                imag(constant(y) - x) real(constant(y) - x)
             ],
         )
     else
-        all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(Constant(y) - x)
+        all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(constant(y) - x)
     end
 end

@@ -10,14 +10,21 @@ on:
       - 'src/**'
       - 'Project.toml'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/ci.yml'
       - 'test/**'
       - 'src/**'
       - 'Project.toml'
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   test:
+    # Run on push's or non-draft PRs
+    if: (github.event_name == 'push') || (github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch')
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:

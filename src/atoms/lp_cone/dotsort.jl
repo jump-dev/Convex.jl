@@ -7,9 +7,7 @@
 
 # This atom computes dot(sort(x), sort(w)), where w is constant
 # for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
-struct DotSortAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct DotSortAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     w::Value
@@ -23,10 +21,12 @@ struct DotSortAtom <: AbstractExpr
             end
             children = (x,)
             vecw = reshape(w, length(x))
-            return new(:dotsort, hash((children, vecw)), children, (1, 1), vecw)
+            return new(children, (1, 1), vecw)
         end
     end
 end
+
+head(io::IO, ::DotSortAtom) = print(io, "dotsort")
 
 function sign(x::DotSortAtom)
     if all(x.w .>= 0)
@@ -57,25 +57,22 @@ function evaluate(x::DotSortAtom)
     )
 end
 
-function conic_form!(x::DotSortAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        y = x.children[1]
-        w = x.w
-        sy = size(y)
-        if sy[1] > 1 && sy[2] > 1
-            y = vec(y)
-        end
-        mu = Variable(size(y))
-        nu = Variable(size(y))
-        onesvec = ones(size(y))
-        # given by the solution to
-        # minimize sum(mu) + sum(nu)
-        # subject to y*w' <= onesvec*nu' + mu*onesvec'
-        objective = conic_form!(sum(mu) + sum(nu), unique_conic_forms)
-        conic_form!(y * w' <= onesvec * nu' + mu * onesvec', unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
+function new_conic_form!(context::Context{T}, x::DotSortAtom) where {T}
+    y = only(x.children)
+    w = x.w
+    sy = size(y)
+    if sy[1] > 1 && sy[2] > 1
+        y = vec(y)
     end
-    return get_conic_form(unique_conic_forms, x)
+    mu = Variable(size(y))
+    nu = Variable(size(y))
+    onesvec = ones(size(y))
+    # given by the solution to
+    # minimize sum(mu) + sum(nu)
+    # subject to y*w' <= onesvec*nu' + mu*onesvec'
+    add_constraint!(context, y * w' <= onesvec * nu' + mu * onesvec')
+    objective = conic_form!(context, sum(mu) + sum(nu))
+    return objective
 end
 
 dotsort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)

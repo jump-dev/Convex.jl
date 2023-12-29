@@ -9,7 +9,7 @@
     y = Variable((2, 2), :Semidefinite)
     p = minimize(y[1, 1]; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol = atol rtol = rtol
@@ -18,7 +18,7 @@
     y = Variable((3, 3), :Semidefinite)
     p = minimize(y[1, 1], y[2, 2] == 1; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol = atol rtol = rtol
@@ -30,14 +30,14 @@
     # y = Variable((2, 2), :Semidefinite)
     # p = minimize(y[1, 1], y[1, 2] == 1; numeric_type = T)
 
-    # # @fact vexity(p) --> ConvexVexity()
+    # # @fact problem_vexity(p) --> ConvexVexity()
     # handle_problem!(p)
     # @fact p.optval --> roughly(0, atol)
 
     y = Semidefinite(3)
     p = minimize(sum(diag(y)), y[1, 1] == 1; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
@@ -46,7 +46,7 @@
     y = Variable((3, 3), :Semidefinite)
     p = minimize(tr(y), y[2, 1] <= 4, y[2, 2] >= 3; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 3 atol = atol rtol = rtol
@@ -56,7 +56,7 @@
     y = Semidefinite(3)
     p = minimize(y[1, 2], y[2, 1] == 1; numeric_type = T)
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
@@ -80,7 +80,7 @@ end
         numeric_type = T,
     )
 
-    # @fact vexity(p) --> ConvexVexity()
+    # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
@@ -104,7 +104,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -125,7 +125,7 @@ end
     p = minimize(nuclearnorm(y), y == A; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -151,7 +151,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -172,7 +172,7 @@ end
     p = minimize(opnorm(y), y == A; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -198,7 +198,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -218,7 +218,7 @@ end
     p = minimize(eigmax(y), y[1, 1] >= 4; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -252,7 +252,7 @@ end
     p = maximize(eigmin(y), tr(y) <= 6; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -278,7 +278,7 @@ end
     )
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -299,7 +299,7 @@ end
     p = minimize(matrixfrac(x, P), eigmax(P) <= 2, x[1] >= 1; numeric_type = T)
 
     if test
-        @test vexity(p) == ConvexVexity()
+        @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
@@ -400,7 +400,7 @@ end
     p = maximize(tr(W), tr(X) ≤ 1; numeric_type = T)
 
     if test
-        @test vexity(p) == AffineVexity()
+        @test problem_vexity(p) == AffineVexity()
     end
     handle_problem!(p)
     if test
@@ -462,7 +462,7 @@ end
 
     # Test 281
     A = rand(6, 6)
-    expr = partialtrace(Constant(A), 1, [2, 3])
+    expr = partialtrace(constant(A), 1, [2, 3])
     if test
         @test size(expr) == size(evaluate(expr))
 
@@ -549,11 +549,8 @@ end
     handle_problem!(p2)
 
     if test
-        real_diff = real(x1) - evaluate(xr)
-        @test real_diff ≈ zeros(10, 1) atol = atol rtol = rtol
-
-        imag_diff = imag(x1) - evaluate(xi)
-        @test imag_diff ≈ zeros(10, 1) atol = atol rtol = rtol
+        @test real(x1) ≈ evaluate(xr) atol = atol rtol = rtol
+        @test imag(x1) ≈ evaluate(xi) atol = atol rtol = rtol
     end
 end
 
@@ -572,7 +569,7 @@ end
     if test
         @test p.status == MOI.OPTIMAL
         @test evaluate(ρ) ≈ [1.0 0.0; 0.0 1.0] atol = atol rtol = rtol
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test p.optval === nothing
     end
 end
 
@@ -585,7 +582,7 @@ end
 ) where {T,test}
     a = 2 + 4im
     x = ComplexVariable()
-    objective = norm2(a - x)
+    objective = norm2(a + (-x))
     c1 = real(x) >= 0
     p = minimize(objective, c1; numeric_type = T)
 
@@ -594,10 +591,8 @@ end
         @test p.optval ≈ 0 atol = atol rtol = rtol
         @test evaluate(objective) ≈ 0 atol = atol rtol = rtol
 
-        real_diff = real(evaluate(x)) - real(a)
-        imag_diff = imag(evaluate(x)) - imag(a)
-        @test real_diff ≈ 0 atol = atol rtol = rtol
-        @test imag_diff ≈ 0 atol = atol rtol = rtol
+        @test real(evaluate(x)) ≈ real(a) atol = atol rtol = rtol
+        @test imag(evaluate(x)) ≈ imag(a) atol = atol rtol = rtol
     end
 end
 
@@ -619,10 +614,8 @@ end
         @test p.optval ≈ 0 atol = atol rtol = rtol
         @test evaluate(objective) ≈ 0.0 atol = atol rtol = rtol
 
-        real_diff = real.(evaluate(x)) - real.(a)
-        imag_diff = imag.(evaluate(x)) - imag.(a)
-        @test real_diff ≈ zeros(2, 1) atol = atol rtol = rtol
-        @test imag_diff ≈ zeros(2, 1) atol = atol rtol = rtol
+        @test real.(evaluate(x)) ≈ real.(a) atol = atol rtol = rtol
+        @test imag.(evaluate(x)) ≈ imag.(a) atol = atol rtol = rtol
     end
 end
 
@@ -644,10 +637,8 @@ end
         @test p.optval ≈ 0 atol = atol rtol = rtol
         @test evaluate(objective) ≈ 0.0 atol = atol rtol = rtol
 
-        real_diff = real(evaluate(x)) .- real(a)
-        imag_diff = imag(evaluate(x)) .- imag(a)
-        @test real_diff ≈ 0.0 atol = atol rtol = rtol
-        @test imag_diff ≈ 0.0 atol = atol rtol = rtol
+        @test real(evaluate(x)) ≈ real(a) atol = atol rtol = rtol
+        @test imag(evaluate(x)) ≈ imag(a) atol = atol rtol = rtol
     end
 end
 
@@ -672,10 +663,8 @@ end
     posA = v * Diagonal(max.(l, 0)) * v'
 
     if test
-        real_diff = real.(evaluate(x)) - real.(posA)
-        imag_diff = imag.(evaluate(x)) - imag.(posA)
-        @test real_diff ≈ zeros(n, n) atol = atol rtol = rtol
-        @test imag_diff ≈ zeros(n, n) atol = atol rtol = rtol
+        @test real.(evaluate(x)) ≈ real.(posA) atol = atol rtol = rtol
+        @test imag.(evaluate(x)) ≈ imag.(posA) atol = atol rtol = rtol
     end
 end
 
@@ -1002,7 +991,7 @@ end
         handle_problem!(p)
 
         if test
-            @test Y.value ≈ eye(n) * exp(-1) atol = atol rtol = rtol
+            @test evaluate(Y) ≈ eye(n) * exp(-1) atol = atol rtol = rtol
         end
     end
 end
@@ -1027,7 +1016,7 @@ end
     handle_problem!(p)
 
     if test
-        @test A.value ≈ eye(n) atol = atol rtol = rtol
+        @test evaluate(A) ≈ eye(n) atol = atol rtol = rtol
     end
 end
 
@@ -1051,7 +1040,7 @@ end
     handle_problem!(p)
 
     if test
-        @test A.value ≈ eye(n) atol = atol rtol = rtol
+        @test evaluate(A) ≈ eye(n) atol = atol rtol = rtol
     end
 end
 
@@ -1075,7 +1064,7 @@ end
     handle_problem!(p)
 
     if test
-        @test B.value ≈ A^-1 atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^-1 atol = atol rtol = rtol
     end
 end
 
@@ -1100,7 +1089,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(-5 // 3) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(-5 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1125,7 +1114,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(-2 // 3) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(-2 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1149,8 +1138,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A^-1) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A^-1) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A^-1) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A^-1) atol = atol rtol = rtol
     end
 end
 
@@ -1175,8 +1164,8 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test real.(B.value) ≈ real.(A^(-5 // 3)) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A^(-5 // 3)) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A^(-5 // 3)) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A^(-5 // 3)) atol = atol rtol = rtol
     end
 end
 
@@ -1201,8 +1190,8 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test real.(B.value) ≈ real.(A^(-2 // 3)) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A^(-2 // 3)) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A^(-2 // 3)) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A^(-2 // 3)) atol = atol rtol = rtol
     end
 end
 
@@ -1237,7 +1226,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test p.status in (MOI.OPTIMAL, MOI.ALMOST_OPTIMAL)
     end
 end
 
@@ -1262,7 +1251,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B ≈ A.value^2 atol = atol rtol = rtol
+        @test B ≈ evaluate(A)^2 atol = atol rtol = rtol
     end
 end
 
@@ -1288,7 +1277,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^2 atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^2 atol = atol rtol = rtol
     end
 end
 
@@ -1313,7 +1302,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B ≈ A.value^(8 // 3) atol = atol rtol = rtol
+        @test B ≈ evaluate(A)^(8 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1339,7 +1328,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(8 // 3) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(8 // 3) atol = atol rtol = rtol
     end
 end
 
@@ -1365,7 +1354,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B ≈ A.value^(3 // 8) atol = atol rtol = rtol
+        @test B ≈ evaluate(A)^(3 // 8) atol = atol rtol = rtol
     end
 end
 
@@ -1390,7 +1379,7 @@ end
 
     # A #_t B = I  =>  B = A^(1-1/t)
     if test
-        @test B.value ≈ A^(3 // 8) atol = atol rtol = rtol
+        @test evaluate(B) ≈ A^(3 // 8) atol = atol rtol = rtol
     end
 end
 
@@ -1497,8 +1486,8 @@ function sdp_quantum_relative_entropy_impl(
         if mode != 5
             @test real.(evaluate(B)) ≈ real.(X) atol = atol rtol = rtol
             @test imag.(evaluate(B)) ≈ imag.(X) atol = atol rtol = rtol
+            @test p.optval ≈ 0 atol = atol rtol = rtol
         end
-        @test p.optval ≈ 0 atol = atol rtol = rtol
         if mode == 1
             @test p.optval ≈ evaluate(quantum_relative_entropy(A, B)) atol =
                 atol rtol = rtol
@@ -1512,8 +1501,8 @@ function sdp_quantum_relative_entropy_impl(
             @test p.optval ≈ evaluate(quantum_relative_entropy(B, X)) atol =
                 atol rtol = rtol
         elseif mode == 5
-            @test p.optval ≈ evaluate(quantum_relative_entropy(X, X)) atol =
-                atol rtol = rtol
+            # Satisfiability problem
+            @test p.optval === nothing
         end
     end
 end
@@ -1844,8 +1833,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1876,8 +1865,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1912,8 +1901,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1948,8 +1937,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -1984,8 +1973,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -2020,8 +2009,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(B.value) ≈ real.(A) atol = atol rtol = rtol
-        @test imag.(B.value) ≈ imag.(A) atol = atol rtol = rtol
+        @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
+        @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
         @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
@@ -2069,8 +2058,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(X.value) ≈ real.(eye(n)) atol = atol rtol = rtol
-        @test imag.(X.value) ≈ imag.(eye(n)) atol = atol rtol = rtol
+        @test real.(evaluate(X)) ≈ real.(eye(n)) atol = atol rtol = rtol
+        @test imag.(evaluate(X)) ≈ imag.(eye(n)) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * log(evaluate(X))) atol = atol rtol = rtol
         @test p.optval ≈ trace_logm(evaluate(X), C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_logm(X, C)) atol = atol rtol = rtol
@@ -2097,8 +2086,8 @@ end
     handle_problem!(p)
 
     if test
-        @test real.(X.value) ≈ real.(eye(n)) atol = atol rtol = rtol
-        @test imag.(X.value) ≈ imag.(eye(n)) atol = atol rtol = rtol
+        @test real.(evaluate(X)) ≈ real.(eye(n)) atol = atol rtol = rtol
+        @test imag.(evaluate(X)) ≈ imag.(eye(n)) atol = atol rtol = rtol
         @test p.optval ≈ tr(C * log(evaluate(X))) atol = atol rtol = rtol
         @test p.optval ≈ trace_logm(evaluate(X), C) atol = atol rtol = rtol
         @test p.optval ≈ evaluate(trace_logm(X, C)) atol = atol rtol = rtol
@@ -2166,7 +2155,7 @@ end
     for n in [2, 3]
         for t in [1 // 2, 1 // 4, 3 // 4, 1 // 8, 3 // 2, 5 // 4]
             for cplx in [false, true]
-                #@show n,t,cplx
+                # @show n, t, cplx
 
                 if cplx
                     A = randn(ComplexF64, n, n)
@@ -2255,9 +2244,9 @@ end
     handle_problem!(p)
 
     if test
-        @test λ.value ≈ 2.400000051025101 atol = atol rtol = rtol
-        @test x.value ≈ [3.0000000535867315, -0.4000000018585541] atol = atol rtol =
-            rtol
+        @test evaluate(λ) ≈ 2.400000051025101 atol = atol rtol = rtol
+        @test evaluate(x) ≈ [3.0000000535867315, -0.4000000018585541] atol =
+            atol rtol = rtol
         @test evaluate(A) ≈ [
             2.400000046152515 -9.292770553059881e-9
             -9.292770553059881e-9 2.399999957564593

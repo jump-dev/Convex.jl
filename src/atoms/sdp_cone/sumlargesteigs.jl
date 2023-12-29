@@ -9,9 +9,7 @@ import LinearAlgebra.eigvals
 
 ### sumlargesteigs
 
-struct SumLargestEigs <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct SumLargestEigs <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
@@ -19,12 +17,14 @@ struct SumLargestEigs <: AbstractExpr
         children = (x, k)
         m, n = size(x)
         if m == n
-            return new(:sumlargesteigs, hash(children), children, (1, 1))
+            return new(children, (1, 1))
         else
             error("sumlargesteigs can only be applied to a square matrix.")
         end
     end
 end
+
+head(io::IO, ::SumLargestEigs) = print(io, "sumlargesteigs")
 
 function sign(x::SumLargestEigs)
     return NoSign()
@@ -54,26 +54,20 @@ end
 #            Z + sI ⪰ A
 # See Ben-Tal and Nemirovski, "Lectures on Modern Convex Optimization"
 # Example 18.c
-
-function conic_form!(x::SumLargestEigs, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, x)
-        A = x.children[1]
-        k = x.children[2]
-        m, n = size(A)
-        if sign(A) == ComplexSign()
-            Z = ComplexVariable(n, n)
-        else
-            Z = Variable(n, n)
-        end
-        s = Variable()
-        # The two inequality constraints have the side effect of constraining A to be symmetric,
-        # since only symmetric matrices can be positive semidefinite.
-        p = minimize(
-            s * k + real(tr(Z)),
-            Z + s * Matrix(1.0I, n, n) - A ⪰ 0,
-            Z ⪰ 0,
-        )
-        cache_conic_form!(unique_conic_forms, x, p)
+function new_conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
+    X = x.children[1]
+    k = x.children[2]
+    m, n = size(X)
+    if iscomplex(sign(X))
+        Z = ComplexVariable(n, n)
+    else
+        Z = Variable(n, n)
     end
-    return get_conic_form(unique_conic_forms, x)
+    s = Variable()
+    # Note: we know the trace is real, since Z is PSD, but we need to tell Convex.jl that.
+    p = minimize(
+        s * k + real(tr(Z)),
+        [Z - X + s * Matrix(1.0I, n, n) ⪰ 0, Z ⪰ 0, X == X'],
+    )
+    return conic_form!(context, p)
 end

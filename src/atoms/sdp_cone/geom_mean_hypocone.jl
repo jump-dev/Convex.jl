@@ -26,7 +26,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct GeomMeanHypoCone
+mutable struct GeomMeanHypoCone
     A::AbstractExpr
     B::AbstractExpr
     t::Rational
@@ -58,7 +58,7 @@ struct GeomMeanHypoCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(Constant(A), B, t, fullhyp)
+        return GeomMeanHypoCone(constant(A), B, t, fullhyp)
     end
     function GeomMeanHypoCone(
         A::AbstractExpr,
@@ -66,7 +66,7 @@ struct GeomMeanHypoCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(A, Constant(B), t, fullhyp)
+        return GeomMeanHypoCone(A, constant(B), t, fullhyp)
     end
     function GeomMeanHypoCone(
         A::Value,
@@ -74,7 +74,7 @@ struct GeomMeanHypoCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(Constant(A), Constant(B), t, fullhyp)
+        return GeomMeanHypoCone(constant(A), constant(B), t, fullhyp)
     end
 
     function GeomMeanHypoCone(
@@ -87,9 +87,7 @@ struct GeomMeanHypoCone
     end
 end
 
-struct GeomMeanHypoConeConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
+mutable struct GeomMeanHypoConeConstraint <: Constraint
     T::AbstractExpr
     cone::GeomMeanHypoCone
 
@@ -97,14 +95,15 @@ struct GeomMeanHypoConeConstraint <: Constraint
         if size(T) != cone.size
             throw(DimensionMismatch("T must be size $(cone.size)"))
         end
-        id_hash = hash((cone.A, cone.B, cone.t, :GeomMeanHypoCone))
-        return new(:GeomMeanHypoCone, id_hash, T, cone)
+        return new(T, cone)
     end
 
     function GeomMeanHypoConeConstraint(T::Value, cone::GeomMeanHypoCone)
-        return GeomMeanHypoConeConstraint(Constant(T), cone)
+        return GeomMeanHypoConeConstraint(constant(T), cone)
     end
 end
+
+head(io::IO, ::GeomMeanHypoConeConstraint) = print(io, "∈(GeomMeanHypoCone)")
 
 in(T, cone::GeomMeanHypoCone) = GeomMeanHypoConeConstraint(T, cone)
 
@@ -139,109 +138,87 @@ function vexity(constraint::GeomMeanHypoConeConstraint)
     return vex
 end
 
-function conic_form!(
+function _add_constraint!(
+    context::Context,
     constraint::GeomMeanHypoConeConstraint,
-    unique_conic_forms::UniqueConicForms,
 )
-    if !has_conic_form(unique_conic_forms, constraint)
-        A = constraint.cone.A
-        B = constraint.cone.B
-        t = constraint.cone.t
-        T = constraint.T
-        fullhyp = constraint.cone.fullhyp
+    A = constraint.cone.A
+    B = constraint.cone.B
+    t = constraint.cone.t
+    T = constraint.T
+    fullhyp = constraint.cone.fullhyp
 
-        is_complex =
-            sign(A) == ComplexSign() ||
-            sign(B) == ComplexSign() ||
-            sign(T) == ComplexSign()
-        if is_complex
-            make_temporary = () -> HermitianSemidefinite(size(A)[1])
-        else
-            make_temporary = () -> Semidefinite(size(A)[1])
-        end
+    is_complex =
+        sign(A) == ComplexSign() ||
+        sign(B) == ComplexSign() ||
+        sign(T) == ComplexSign()
+    if is_complex
+        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+    else
+        make_temporary = () -> Semidefinite(size(A)[1])
+    end
 
-        if fullhyp && t != 0 && t != 1
-            W = make_temporary()
-            conic_form!(
-                W in GeomMeanHypoCone(A, B, t, false),
-                unique_conic_forms,
-            )
-            conic_form!(W ⪰ T, unique_conic_forms)
-            cache_conic_form!(
-                unique_conic_forms,
-                constraint,
-                Array{Convex.ConicConstr,1}(),
-            )
-        else
-            p = t.num
-            q = t.den
+    if fullhyp && t != 0 && t != 1
+        W = make_temporary()
+        add_constraint!(context, W in GeomMeanHypoCone(A, B, t, false))
+        add_constraint!(context, W ⪰ T)
+    else
+        p = t.num
+        q = t.den
 
-            if t == 0
-                #println("geom_mean_hypocone p=$p q=$q t==0")
-                conic_form!(A ⪰ 0, unique_conic_forms)
-                conic_form!(B ⪰ 0, unique_conic_forms)
-                conic_form!(A ⪰ T, unique_conic_forms)
-            elseif t == 1
-                #println("geom_mean_hypocone p=$p q=$q t==1")
-                conic_form!(A ⪰ 0, unique_conic_forms)
-                conic_form!(B ⪰ 0, unique_conic_forms)
-                conic_form!(B ⪰ T, unique_conic_forms)
-            elseif t == 1 // 2
-                #println("geom_mean_hypocone p=$p q=$q t==1/2")
-                conic_form!([A T; T' B] ⪰ 0, unique_conic_forms)
-            elseif ispow2(q)
-                #println("geom_mean_hypocone p=$p q=$q ispow2(q)")
-                Z = make_temporary()
-                if t < 1 / 2
-                    conic_form!(
-                        Z in GeomMeanHypoCone(A, B, 2 * t, false),
-                        unique_conic_forms,
-                    )
-                    conic_form!([A T; T' Z] ⪰ 0, unique_conic_forms)
-                else
-                    conic_form!(
-                        Z in GeomMeanHypoCone(A, B, 2 * t - 1, false),
-                        unique_conic_forms,
-                    )
-                    conic_form!([B T; T' Z] ⪰ 0, unique_conic_forms)
-                end
-            elseif ispow2(p) && t > 1 // 2
-                #println("geom_mean_hypocone p=$p q=$q ispow2(p) && t>1/2")
-                Z = make_temporary()
-                conic_form!(
-                    Z in GeomMeanHypoCone(A, T, (2 * p - q) // p, false),
-                    unique_conic_forms,
+        if t == 0
+            #println("geom_mean_hypocone p=$p q=$q t==0")
+            add_constraint!(context, A ⪰ 0)
+            add_constraint!(context, B ⪰ 0)
+            add_constraint!(context, A ⪰ T)
+        elseif t == 1
+            #println("geom_mean_hypocone p=$p q=$q t==1")
+            add_constraint!(context, A ⪰ 0)
+            add_constraint!(context, B ⪰ 0)
+            add_constraint!(context, B ⪰ T)
+        elseif t == 1 // 2
+            #println("geom_mean_hypocone p=$p q=$q t==1/2")
+            add_constraint!(context, [A T; T' B] ⪰ 0)
+        elseif ispow2(q)
+            #println("geom_mean_hypocone p=$p q=$q ispow2(q)")
+            Z = make_temporary()
+            if t < 1 / 2
+                add_constraint!(
+                    context,
+                    Z in GeomMeanHypoCone(A, B, 2 * t, false),
                 )
-                conic_form!([Z T; T B] ⪰ 0, unique_conic_forms)
-            elseif t < 1 / 2
-                #println("geom_mean_hypocone p=$p q=$q t<1/2")
-                X = make_temporary()
-                # Decompose t = (p/2^l) * (2^l/q) where l=floor(log2(q))
-                l = floor(Int, log2(q))
-                conic_form!(
-                    X in GeomMeanHypoCone(A, B, p // (2^l), false),
-                    unique_conic_forms,
-                )
-                conic_form!(
-                    T in GeomMeanHypoCone(A, X, (2^l) // q, false),
-                    unique_conic_forms,
-                )
+                add_constraint!(context, [A T; T' Z] ⪰ 0)
             else
-                #println("geom_mean_hypocone p=$p q=$q else")
-                conic_form!(
-                    T in GeomMeanHypoCone(B, A, 1 - t, false),
-                    unique_conic_forms,
+                add_constraint!(
+                    context,
+                    Z in GeomMeanHypoCone(A, B, 2 * t - 1, false),
                 )
+                add_constraint!(context, [B T; T' Z] ⪰ 0)
             end
-
-            cache_conic_form!(
-                unique_conic_forms,
-                constraint,
-                Array{Convex.ConicConstr,1}(),
+        elseif ispow2(p) && t > 1 // 2
+            #println("geom_mean_hypocone p=$p q=$q ispow2(p) && t>1/2")
+            Z = make_temporary()
+            add_constraint!(
+                context,
+                Z in GeomMeanHypoCone(A, T, (2 * p - q) // p, false),
             )
-            #cache_conic_form!(unique_conic_forms, constraint, ConicConstr([A,B,T], :geom_mean_hypocone, [size(A), size(B), size(T)]))
-            #cache_conic_form!(unique_conic_forms, conic_form!(T, unique_conic_forms))
+            add_constraint!(context, [Z T; T B] ⪰ 0)
+        elseif t < 1 / 2
+            #println("geom_mean_hypocone p=$p q=$q t<1/2")
+            X = make_temporary()
+            # Decompose t = (p/2^l) * (2^l/q) where l=floor(log2(q))
+            l = floor(Int, log2(q))
+            add_constraint!(
+                context,
+                X in GeomMeanHypoCone(A, B, p // (2^l), false),
+            )
+            add_constraint!(
+                context,
+                T in GeomMeanHypoCone(A, X, (2^l) // q, false),
+            )
+        else
+            #println("geom_mean_hypocone p=$p q=$q else")
+            add_constraint!(context, T in GeomMeanHypoCone(B, A, 1 - t, false))
         end
     end
-    return get_conic_form(unique_conic_forms, constraint)
 end

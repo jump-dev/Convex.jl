@@ -20,7 +20,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct GeomMeanEpiCone
+mutable struct GeomMeanEpiCone
     A::AbstractExpr
     B::AbstractExpr
     t::Rational
@@ -51,7 +51,7 @@ struct GeomMeanEpiCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanEpiCone(Constant(A), B, t, fullhyp)
+        return GeomMeanEpiCone(constant(A), B, t, fullhyp)
     end
     function GeomMeanEpiCone(
         A::AbstractExpr,
@@ -59,7 +59,7 @@ struct GeomMeanEpiCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanEpiCone(A, Constant(B), t, fullhyp)
+        return GeomMeanEpiCone(A, constant(B), t, fullhyp)
     end
     function GeomMeanEpiCone(
         A::Value,
@@ -67,7 +67,7 @@ struct GeomMeanEpiCone
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanEpiCone(Constant(A), Constant(B), t, fullhyp)
+        return GeomMeanEpiCone(constant(A), constant(B), t, fullhyp)
     end
 
     function GeomMeanEpiCone(
@@ -80,9 +80,7 @@ struct GeomMeanEpiCone
     end
 end
 
-struct GeomMeanEpiConeConstraint <: Constraint
-    head::Symbol
-    id_hash::UInt64
+mutable struct GeomMeanEpiConeConstraint <: Constraint
     T::AbstractExpr
     cone::GeomMeanEpiCone
 
@@ -90,14 +88,15 @@ struct GeomMeanEpiConeConstraint <: Constraint
         if size(T) != cone.size
             throw(DimensionMismatch("T must be size $(cone.size)"))
         end
-        id_hash = hash((cone.A, cone.B, cone.t, :GeomMeanEpiCone))
-        return new(:GeomMeanEpiCone, id_hash, T, cone)
+        return new(T, cone)
     end
 
     function GeomMeanEpiConeConstraint(T::Value, cone::GeomMeanEpiCone)
-        return GeomMeanEpiConeConstraint(Constant(T), cone)
+        return GeomMeanEpiConeConstraint(constant(T), cone)
     end
 end
+
+head(io::IO, ::GeomMeanEpiConeConstraint) = print(io, "∈(GeomMeanEpiCone)")
 
 in(T, cone::GeomMeanEpiCone) = GeomMeanEpiConeConstraint(T, cone)
 
@@ -132,47 +131,33 @@ function vexity(constraint::GeomMeanEpiConeConstraint)
     return vex
 end
 
-function conic_form!(
+function _add_constraint!(
+    context::Context,
     constraint::GeomMeanEpiConeConstraint,
-    unique_conic_forms::UniqueConicForms,
 )
-    if !has_conic_form(unique_conic_forms, constraint)
-        A = constraint.cone.A
-        B = constraint.cone.B
-        t = constraint.cone.t
-        T = constraint.T
-        is_complex =
-            sign(A) == ComplexSign() ||
-            sign(B) == ComplexSign() ||
-            sign(T) == ComplexSign()
-        if is_complex
-            make_temporary = () -> HermitianSemidefinite(size(A)[1])
-        else
-            make_temporary = () -> Semidefinite(size(A)[1])
-        end
-
-        Z = make_temporary()
-
-        if t <= 0
-            conic_form!([T A; A Z] ⪰ 0, unique_conic_forms)
-            conic_form!(
-                Z in GeomMeanHypoCone(A, B, -t, false),
-                unique_conic_forms,
-            )
-        else
-            @assert t >= 1 # range of t checked in GeomMeanEpiCone constructor
-            conic_form!([T B; B Z] ⪰ 0, unique_conic_forms)
-            conic_form!(
-                Z in GeomMeanHypoCone(A, B, 2 - t, false),
-                unique_conic_forms,
-            )
-        end
-
-        cache_conic_form!(
-            unique_conic_forms,
-            constraint,
-            Array{Convex.ConicConstr,1}(),
-        )
+    A = constraint.cone.A
+    B = constraint.cone.B
+    t = constraint.cone.t
+    T = constraint.T
+    is_complex =
+        sign(A) == ComplexSign() ||
+        sign(B) == ComplexSign() ||
+        sign(T) == ComplexSign()
+    if is_complex
+        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+    else
+        make_temporary = () -> Semidefinite(size(A)[1])
     end
-    return get_conic_form(unique_conic_forms, constraint)
+
+    Z = make_temporary()
+
+    if t <= 0
+        add_constraint!(context, [T A; A Z] ⪰ 0)
+        add_constraint!(context, Z in GeomMeanHypoCone(A, B, -t, false))
+    else
+        @assert t >= 1 # range of t checked in GeomMeanEpiCone constructor
+        add_constraint!(context, [T B; B Z] ⪰ 0)
+        add_constraint!(context, Z in GeomMeanHypoCone(A, B, 2 - t, false))
+    end
+    return nothing
 end

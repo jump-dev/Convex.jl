@@ -5,9 +5,7 @@
 # Please read expressions.jl first.
 #############################################################################
 
-struct SumLargestAtom <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct SumLargestAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
@@ -25,10 +23,12 @@ struct SumLargestAtom <: AbstractExpr
                 error("k cannot be larger than the number of entries in x")
             end
             children = (x,)
-            return new(:sumlargest, hash((children, k)), children, (1, 1), k)
+            return new(children, (1, 1), k)
         end
     end
 end
+
+head(io::IO, ::SumLargestAtom) = print(io, "sumlargest")
 
 function sign(x::SumLargestAtom)
     return sign(x.children[1])
@@ -46,20 +46,17 @@ function evaluate(x::SumLargestAtom)
     return sum(sort(vec(evaluate(x.children[1])), rev = true)[1:x.k])
 end
 
-function conic_form!(x::SumLargestAtom, unique_conic_forms::UniqueConicForms)
-    if !has_conic_form(unique_conic_forms, x)
-        c = x.children[1]
-        t = Variable(size(c))
-        q = Variable()
-        # sum k largest given by the solution to
-        # minimize sum(t) + k*q
-        # subject to c <= t + q, t >= 0
-        objective = conic_form!(sum(t) + x.k * q, unique_conic_forms)
-        conic_form!(c <= t + q, unique_conic_forms)
-        conic_form!(t >= 0, unique_conic_forms)
-        cache_conic_form!(unique_conic_forms, x, objective)
-    end
-    return get_conic_form(unique_conic_forms, x)
+function new_conic_form!(context::Context, x::SumLargestAtom)
+    c = x.children[1]
+    t = Variable(size(c))
+    q = Variable()
+    # sum k largest given by the solution to
+    # minimize sum(t) + k*q
+    # subject to c <= t + q, t >= 0
+    objective = conic_form!(context, sum(t) + x.k * q)
+    add_constraint!(context, c <= t + q)
+    add_constraint!(context, t >= 0)
+    return objective
 end
 
 function sumlargest(x::AbstractExpr, k::Int)

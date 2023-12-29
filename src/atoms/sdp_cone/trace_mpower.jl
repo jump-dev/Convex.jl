@@ -14,9 +14,7 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-struct TraceMpower <: AbstractExpr
-    head::Symbol
-    id_hash::UInt64
+mutable struct TraceMpower <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     C::AbstractMatrix
@@ -40,9 +38,10 @@ struct TraceMpower <: AbstractExpr
         if t < -1 || t > 2
             throw(DomainError(t, "t must be in the range [-1, 2]"))
         end
-        return new(:trace_mpower, hash(children), children, (1, 1), C, t)
+        return new(children, (1, 1), C, t)
     end
 end
+head(io::IO, ::TraceMpower) = print(io, "trace_mpower")
 
 function sign(atom::TraceMpower)
     return NoSign()
@@ -82,39 +81,30 @@ function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
     return trace_mpower(A, t // 1, C)
 end
 
-function conic_form!(atom::TraceMpower, unique_conic_forms)
-    if !has_conic_form(unique_conic_forms, atom)
-        A = atom.children[1]
-        C = atom.C
-        t = atom.t
-        eye = Matrix(1.0 * I, size(A))
+function new_conic_form!(context::Context{T}, atom::TraceMpower) where {T}
+    A = atom.children[1]
+    C = atom.C
+    t = atom.t
+    eye = Matrix(one(T) * I, size(A))
 
-        is_complex = sign(A) == ComplexSign()
-        if is_complex
-            make_temporary = () -> HermitianSemidefinite(size(A)[1])
-        else
-            make_temporary = () -> Semidefinite(size(A)[1])
-        end
-
-        T = make_temporary()
-
-        if t >= 0 && t <= 1
-            conic_form!(
-                T in GeomMeanHypoCone(eye, A, t, false),
-                unique_conic_forms,
-            )
-            # It's already a real mathematically, but need to make it a real type.
-            u = real(tr(C * T))
-            cache_conic_form!(unique_conic_forms, atom, maximize(u))
-        else
-            conic_form!(
-                T in GeomMeanEpiCone(eye, A, t, false),
-                unique_conic_forms,
-            )
-            # It's already a real mathematically, but need to make it a real type.
-            u = real(tr(C * T))
-            cache_conic_form!(unique_conic_forms, atom, minimize(u))
-        end
+    is_complex = sign(A) == ComplexSign()
+    if is_complex
+        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+    else
+        make_temporary = () -> Semidefinite(size(A)[1])
     end
-    return get_conic_form(unique_conic_forms, atom)
+
+    tmp = make_temporary()
+
+    if t >= 0 && t <= 1
+        add_constraint!(context, tmp in GeomMeanHypoCone(eye, A, t, false))
+        # It's already a real mathematically, but Convex doesn't know it
+        u = real(tr(C * tmp))
+        return conic_form!(context, maximize(u))
+    else
+        add_constraint!(context, tmp in GeomMeanEpiCone(eye, A, t, false))
+        # It's already a real mathematically, but Convex doesn't know it
+        u = real(tr(C * tmp))
+        return conic_form!(context, minimize(u))
+    end
 end

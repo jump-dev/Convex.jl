@@ -5,18 +5,18 @@
 # This function returns the jth term in the sum, namely
 # (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I).
 function _term(x, j::Int, sys, dims)
-    a = sparse(1.0I, 1, 1)
-    b = sparse(1.0I, 1, 1)
+    a = spidentity(Float64, 1)
+    b = spidentity(Float64, 1)
     for (i_sys, dim) in enumerate(dims)
         if i_sys == sys
             # create a vector that is only 1 at its jth component
-            v = spzeros(dim, 1)
+            v = spzeros(Float64, dim, 1)
             v[j] = 1
             a = kron(a, v')
             b = kron(b, v)
         else
-            a = kron(a, sparse(1.0I, dim, dim))
-            b = kron(b, sparse(1.0I, dim, dim))
+            a = kron(a, spidentity(Float64, dim))
+            b = kron(b, spidentity(Float64, dim))
         end
     end
     return a * x * b
