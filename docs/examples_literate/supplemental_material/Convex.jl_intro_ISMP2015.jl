@@ -199,7 +199,7 @@ sum(x) + y[2]
 #-
 
 ## not dcp compliant
-@test_throws DCPViolationError log(x) + square(x)
+@test_throws DCPViolationError vexity(log(x) + square(x))
 
 #-
 
