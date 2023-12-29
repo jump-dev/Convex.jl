@@ -1,8 +1,8 @@
 Advanced Features
 =================
 
-DCP warnings
-------------
+DCP Errors
+----------
 
 When an expression is created which is not of [DCP
 form](https://dcp.stanford.edu/), an error is emitted. For example,

@@ -83,5 +83,5 @@ whose solution is infinity. In other words, we got the wrong answer by using the
 reformulation, since the extended formulation was only valid for a minimization
 problem. Convex.jl always performs these reformulations, but they are only
 guaranteed to be valid when the DCP ruleset is followed. Therefore, Convex.jl
-programatically checks the whether or not these rules were satisfied and warns
-if they were not. One should not take these DCP warnings lightly!
+programmatically checks the whether or not these rules were satisfied and errors
+if they were not.
