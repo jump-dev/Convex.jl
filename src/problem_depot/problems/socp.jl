@@ -177,7 +177,8 @@ end
     A = [1 2; 2 1; 3 4]
     b = [2; 3; 4]
     expr = A * x + b
-    p = minimize(sum(dot(^)(expr, 2)); numeric_type = T) # elementwise ^
+    # `literal_pow` case:
+    p = minimize(sum(expr .^ 2); numeric_type = T) # elementwise ^
     if test
         @test problem_vexity(p) == ConvexVexity()
     end
@@ -188,15 +189,27 @@ end
             rtol
     end
 
-    p = minimize(sum(dot(*)(expr, expr)); numeric_type = T) # elementwise *
+    # Test non-literal case:
+    k = 2
+    p = minimize(sum(expr .^ k); numeric_type = T) # elementwise ^
     if test
         @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
         @test p.optval ≈ 0.42105 atol = atol rtol = rtol
-        @test evaluate(sum((dot(*))(expr, expr))) ≈ 0.42105 atol = atol rtol =
+        @test evaluate(sum(broadcast(^, expr, 2))) ≈ 0.42105 atol = atol rtol =
             rtol
+    end
+
+    p = minimize(sum(expr .* expr); numeric_type = T) # elementwise *
+    if test
+        @test problem_vexity(p) == ConvexVexity()
+    end
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 0.42105 atol = atol rtol = rtol
+        @test evaluate(sum(expr .* expr)) ≈ 0.42105 atol = atol rtol = rtol
     end
 end
 
@@ -227,13 +240,13 @@ end
     end
 
     x = Variable(3)
-    p = minimize(sum(dot(/)([3, 6, 9], x)), x <= 3; numeric_type = T)
+    p = minimize(sum([3, 6, 9] ./ x), x <= 3; numeric_type = T)
 
     handle_problem!(p)
     if test
         @test evaluate(x) ≈ fill(3.0, (3, 1)) atol = atol rtol = rtol
         @test p.optval ≈ 6 atol = atol rtol = rtol
-        @test evaluate(sum((dot(/))([3, 6, 9], x))) ≈ 6 atol = atol rtol = rtol
+        @test evaluate(sum([3, 6, 9] ./ x)) ≈ 6 atol = atol rtol = rtol
     end
 
     x = Variable()

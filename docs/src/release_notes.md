@@ -7,6 +7,8 @@ Breaking changes:
 * `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`.
 * The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
 * The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
+* The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild) type piracy.
+* `vecdot(x,y)` has been removed. Call `dot(vec(x), vec(y))` instead.
 
 
 Other changes:
@@ -15,6 +17,7 @@ Other changes:
 * `geomean` supports more than 2 arguments
 * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) of `imag` and `real` has been removed. This should not affect use of Convex. Unfortunately, piracy of `hcat`, `vcat`, and `hvcat` still remains.
 * `sumlargesteigs` now enforces that it's argument is hermitian.
+* Bugfix: `dot` now correctly complex-conjugates its first argument
 
 ## v0.15.4 (October 24, 2023)
 
