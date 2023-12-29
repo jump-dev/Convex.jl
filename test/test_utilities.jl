@@ -525,7 +525,7 @@ end
         end
         @test_throws DCPViolationError Convex.NotDcp()
 
-        str = sprint(Base.showerror, DCPViolationError)
+        str = sprint(Base.showerror, DCPViolationError())
         @test contains(str, "Expression not DCP compliant")
     end
 
