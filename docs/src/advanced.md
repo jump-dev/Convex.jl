@@ -16,9 +16,9 @@ x*y
 To disable this, run
 
 ```julia
-Convex.emit_dcp_warnings() = false
+Convex.emit_dcp_warnings(false)
 ```
-to redefine the method. See [`Convex.emit_dcp_warnings`](@ref) for more details.
+See [`Convex.emit_dcp_warnings`](@ref) for more details.
 
 
 Dual Variables

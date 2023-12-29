@@ -516,9 +516,13 @@ end
         # default is to log
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
 
-        @eval Convex.emit_dcp_warnings() = false
-        @test_logs Convex.NotDcp()
-        @eval Convex.emit_dcp_warnings() = true
+        Convex.emit_dcp_warnings(false)
+        try
+            @test_logs Convex.NotDcp()
+        finally
+            # Reset unconditionally
+            Convex.emit_dcp_warnings(true)
+        end
         @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
     end
 
