@@ -64,12 +64,15 @@ const EMIT_DCP_WARNINGS = Ref{Bool}(true)
     emit_dcp_warnings(emit)
 
 Controls whether or not warnings are emitted for when an expression fails to be
-of disciplined convex form. To turn warnings off, call
+of disciplined convex form. When called without an argument, returns the current setting
+for whether or not DCP warnings are emitted. To turn warnings off, call
 
     Convex.emit_dcp_warnings(false)
 
 to (globally) turn off DCP warnings. Note that if a problem is not DCP, the solution
 obtained by Convex.jl can be wildly incorrect (even if the solution status is `OPTIMAL`!).
+
+To re-enable warnings, call, `Convex.emit_dcp_warnings(true)`.
 """
 emit_dcp_warnings(emit) = EMIT_DCP_WARNINGS[] = emit
 emit_dcp_warnings() = EMIT_DCP_WARNINGS[]
