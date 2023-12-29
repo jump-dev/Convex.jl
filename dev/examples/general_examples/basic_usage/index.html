@@ -21,7 +21,7 @@ println(round(p.optval, digits = 2))
 println(round.(evaluate(x), digits = 2))
 println(evaluate(x[1] + x[4] - x[2]))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10.0
 [1.0, 1.0, 1.0, 1.0]
-0.9999998768818892</code></pre><h3 id="Matrix-Variables-and-promotions"><a class="docs-heading-anchor" href="#Matrix-Variables-and-promotions">Matrix Variables and promotions</a><a id="Matrix-Variables-and-promotions-1"></a><a class="docs-heading-anchor-permalink" href="#Matrix-Variables-and-promotions" title="Permalink"></a></h3><p class="math-container">\[\begin{array}{ll}
+0.9992362732533817</code></pre><h3 id="Matrix-Variables-and-promotions"><a class="docs-heading-anchor" href="#Matrix-Variables-and-promotions">Matrix Variables and promotions</a><a id="Matrix-Variables-and-promotions-1"></a><a class="docs-heading-anchor-permalink" href="#Matrix-Variables-and-promotions" title="Permalink"></a></h3><p class="math-container">\[\begin{array}{ll}
   \text{minimize} &amp; \| X \|_F + y \\
   \text{subject to} &amp; 2 X \leq 1\\
   &amp; X&#39; + y \geq 1 \\
@@ -34,7 +34,7 @@ p = minimize(norm(vec(X)) + y, 2 * X &lt;= 1, X&#39; + y &gt;= 1, X &gt;= 0, y &
 solve!(p, SCS.Optimizer; silent_solver = true)
 println(round.(evaluate(X), digits = 2))
 println(evaluate(y))
-p.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.000218246497784</code></pre><h3 id="Norm,-exponential-and-geometric-mean"><a class="docs-heading-anchor" href="#Norm,-exponential-and-geometric-mean">Norm, exponential and geometric mean</a><a id="Norm,-exponential-and-geometric-mean-1"></a><a class="docs-heading-anchor-permalink" href="#Norm,-exponential-and-geometric-mean" title="Permalink"></a></h3><p class="math-container">\[\begin{array}{ll}
+p.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.0002185951700004</code></pre><h3 id="Norm,-exponential-and-geometric-mean"><a class="docs-heading-anchor" href="#Norm,-exponential-and-geometric-mean">Norm, exponential and geometric mean</a><a id="Norm,-exponential-and-geometric-mean-1"></a><a class="docs-heading-anchor-permalink" href="#Norm,-exponential-and-geometric-mean" title="Permalink"></a></h3><p class="math-container">\[\begin{array}{ll}
   \text{satisfy} &amp; \| x \|_2 \leq 100 \\
   &amp; e^{x_1} \leq 5 \\
   &amp; x_2 \geq 7 \\
@@ -50,19 +50,19 @@ solve!(p, SCS.Optimizer; silent_solver = true)
 println(p.status)
 evaluate(x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4-element Vector{Float64}:
   0.0
-  9.067076004734945
- 13.459326256169538
- 13.459326256169538</code></pre><h3 id="SDP-cone-and-Eigenvalues"><a class="docs-heading-anchor" href="#SDP-cone-and-Eigenvalues">SDP cone and Eigenvalues</a><a id="SDP-cone-and-Eigenvalues-1"></a><a class="docs-heading-anchor-permalink" href="#SDP-cone-and-Eigenvalues" title="Permalink"></a></h3><pre><code class="language-julia hljs">y = Semidefinite(2)
+  8.56778632771492
+ 13.436339396945778
+ 13.436339396945778</code></pre><h3 id="SDP-cone-and-Eigenvalues"><a class="docs-heading-anchor" href="#SDP-cone-and-Eigenvalues">SDP cone and Eigenvalues</a><a id="SDP-cone-and-Eigenvalues-1"></a><a class="docs-heading-anchor-permalink" href="#SDP-cone-and-Eigenvalues" title="Permalink"></a></h3><pre><code class="language-julia hljs">y = Semidefinite(2)
 p = maximize(eigmin(y), tr(y) &lt;= 6)
 solve!(p, SCS.Optimizer; silent_solver = true)
-p.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0000002857354535</code></pre><pre><code class="language-julia hljs">x = Variable()
+p.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.000000285744781</code></pre><pre><code class="language-julia hljs">x = Variable()
 y = Variable((2, 2))
 # SDP constraints
 p = minimize(x + y[1, 1], isposdef(y), x &gt;= 1, y[2, 1] == 1)
 solve!(p, SCS.Optimizer; silent_solver = true)
 evaluate(y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×2 Matrix{Float64}:
- 0.000939533     1.0
- 1.0          1489.11</code></pre><h3 id="Mixed-integer-program"><a class="docs-heading-anchor" href="#Mixed-integer-program">Mixed integer program</a><a id="Mixed-integer-program-1"></a><a class="docs-heading-anchor-permalink" href="#Mixed-integer-program" title="Permalink"></a></h3><p class="math-container">\[\begin{array}{ll}
+ 0.00074354     1.0
+ 1.0         1839.9</code></pre><h3 id="Mixed-integer-program"><a class="docs-heading-anchor" href="#Mixed-integer-program">Mixed integer program</a><a id="Mixed-integer-program-1"></a><a class="docs-heading-anchor-permalink" href="#Mixed-integer-program" title="Permalink"></a></h3><p class="math-container">\[\begin{array}{ll}
   \text{minimize} &amp; \sum_{i=1}^n x_i \\
     \text{subject to} &amp; x \in \mathbb{Z}^n \\
   &amp; x \geq 0.5 \\
@@ -74,4 +74,4 @@ evaluate(x)</code></pre><pre class="documenter-example-output"><code class="nohi
  1.0
  1.0
  1.0
- 1.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../DCP_analysis/">« DCP analysis</a><a class="docs-footer-nextpage" href="../chebyshev_center/">Chebyshev center »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Wednesday 6 December 2023 21:40">Wednesday 6 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 1.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../DCP_analysis/">« DCP analysis</a><a class="docs-footer-nextpage" href="../chebyshev_center/">Chebyshev center »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 29 December 2023 08:13">Friday 29 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

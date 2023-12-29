@@ -22,48 +22,48 @@ c2 = U in :SDP
 p = minimize(objective, c1, c2)
 solve!(p, SCS.Optimizer; silent_solver = true)
 evaluate(U)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20×20 Matrix{ComplexF64}:
-        1.0+1.17772e-18im  …  -0.504648-0.863327im
-   0.162026+0.986788im         0.770152-0.63786im
-  -0.882302+0.470687im         0.851607+0.524182im
-   0.501735+0.865023im         0.493597-0.869691im
-   0.915661+0.401953im        -0.115069-0.993357im
-   0.140736+0.990048im     …   0.783711-0.621126im
- -0.0639068+0.997957im         0.893811-0.448444im
-  -0.834062+0.551672im         0.897179+0.441667im
-   0.975719-0.219034im        -0.681491-0.731827im
-   -0.80756+0.589788im         0.916711+0.399552im
-   0.944061+0.329774im     …  -0.191715-0.981451im
-  -0.745915+0.666042im         0.951434+0.307851im
- -0.0858896+0.996306im          0.90348-0.428632im
-   0.767064+0.641572im         0.166788-0.985992im
-  -0.614321+0.789057im         0.991228+0.132164im
-  -0.336963+0.941519im     …   0.982884-0.184226im
-   0.725339+0.688394im         0.228267-0.973599im
-  -0.269198+0.963086im         0.967306-0.253613im
-   0.988531+0.151026im        -0.368474-0.929638im
-  -0.504648+0.863327im              1.0-1.28089e-17im</code></pre><p>Verify if the rank of <span>$U$</span> is 1:</p><pre><code class="language-julia hljs">B, C = eigen(evaluate(U));
+        1.0+4.28674e-19im  …  -0.504673-0.863311im
+   0.161996+0.986792im         0.770152-0.63786im
+  -0.882315+0.47066im          0.851606+0.524182im
+   0.501709+0.865037im         0.493596-0.869691im
+   0.915649+0.40198im         -0.115069-0.993357im
+   0.140706+0.990052im     …   0.783711-0.621125im
+ -0.0639361+0.997954im         0.893811-0.448444im
+  -0.834078+0.551647im         0.897179+0.441667im
+   0.975724-0.219005im        -0.681491-0.731827im
+  -0.807576+0.589764im         0.916711+0.399551im
+   0.944051+0.329802im     …  -0.191715-0.981451im
+  -0.745935+0.66602im          0.951435+0.307851im
+  -0.085919+0.996303im         0.903479-0.428632im
+   0.767044+0.641596im          0.16679-0.985993im
+  -0.614344+0.789038im         0.991228+0.132164im
+   -0.33699+0.941509im     …   0.982884-0.184227im
+   0.725317+0.688415im         0.228268-0.973598im
+  -0.269226+0.963077im         0.967306-0.253613im
+   0.988525+0.151055im        -0.368474-0.929638im
+  -0.504673+0.863311im              1.0-8.35041e-18im</code></pre><p>Verify if the rank of <span>$U$</span> is 1:</p><pre><code class="language-julia hljs">B, C = eigen(evaluate(U));
 length([e for e in B if (abs(real(e)) &gt; 1e-4)])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1</code></pre><p>Decompose <span>$U = uu^*$</span> where <span>$u$</span> is the phase of <span>$Ax$</span></p><pre><code class="language-julia hljs">u = C[:, 1];
 for i in 1:n
     u[i] = u[i] / abs(u[i])
 end
 u</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20-element Vector{ComplexF64}:
                   1.0 + 0.0im
- -0.09321751711582545 - 0.9956457675814028im
-   0.8914006935215294 - 0.45321606722327956im
- -0.40944623481712145 - 0.9123342483947879im
-   -0.912617502490476 - 0.4088144984562632im
-  -0.3281693267280607 - 0.9446189141631939im
- -0.06195667104760572 - 0.9980788400285314im
-   0.8346404781698487 - 0.5507951272482412im
-  -0.9757316730960294 + 0.21896963743227818im
-   0.8440476661488214 - 0.5362681579850959im
-   -0.933226412715302 - 0.3592888289531539im
-     0.78794248072546 - 0.6157488506430265im
-  0.14870221819473498 - 0.9888820204169784im
-   0.6972905025777185 + 0.716788640405882im
-   0.5173854676178119 - 0.8557524629809126im
- -0.23573643437927766 + 0.9718170267628287im
-   -0.888067446002504 - 0.45971318379027337im
-  0.26481592948305865 - 0.9642989803437644im
-  -0.9838104234262074 - 0.17921230637974223im
-   0.5374892984782067 - 0.8432705698774298im</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Fidelity in Quantum Information Theory/">« Fidelity in quantum information theory</a><a class="docs-footer-nextpage" href="../povm_simulation/">POVM simulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Wednesday 6 December 2023 21:40">Wednesday 6 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ -0.16279413346314903 - 0.9866600580290976im
+   0.9061078518145439 - 0.4230467596850642im
+   -0.523459970488254 - 0.8520502680572528im
+  -0.8967280409963284 - 0.4425819929582395im
+  -0.1799894772011611 - 0.9836685356850918im
+    0.065058608286222 - 0.9978814446054501im
+   0.8580610124781907 - 0.5135477571413416im
+  -0.9737398404683185 + 0.22766361827207635im
+   0.8315307200328751 - 0.5554787679485224im
+  -0.9295253705758827 - 0.36875816662925315im
+   0.7919511265894237 - 0.6105844848124972im
+   0.1326046202510303 - 0.9911690141888416im
+  -0.8506598094853204 - 0.5257165477007534im
+   0.5549714851531254 - 0.8318693711556726im
+  0.19334104118838571 - 0.9811316128798373im
+  -0.7553072333265941 - 0.6553708746080541im
+   0.2395500220692762 - 0.9708840234171171im
+  -0.9971268057082702 - 0.07575046757625697im
+   0.5587615660812553 - 0.8293283500944745im</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Fidelity in Quantum Information Theory/">« Fidelity in quantum information theory</a><a class="docs-footer-nextpage" href="../povm_simulation/">POVM simulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 29 December 2023 08:13">Friday 29 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

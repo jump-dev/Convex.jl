@@ -13,24 +13,24 @@ b = rand(m, 1);
 x = Variable(n);
 problem = maximize(entropy(x), sum(x) == 1, A * x &lt;= b)
 solve!(problem, SCS.Optimizer; silent_solver = true)
-problem.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.1480332350684095</code></pre><pre><code class="language-julia hljs">evaluate(x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">25-element Vector{Float64}:
- 0.02090112150925664
- 0.026662221322873127
- 0.03088782116314491
- 0.05861220536048732
- 0.05449215264938552
- 0.02645247054167646
- 0.03366533267317568
- 0.06379294998140604
- 0.0732298484881859
- 0.02313412240924475
+problem.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.148013973937255</code></pre><pre><code class="language-julia hljs">evaluate(x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">25-element Vector{Float64}:
+ 0.020900739472579435
+ 0.026660763141844682
+ 0.030886704518753604
+ 0.058613968815721194
+ 0.054493987542873275
+ 0.026451292291790482
+ 0.03366416553553802
+ 0.06379587116392287
+ 0.07323720993183912
+ 0.023133648549778
  ⋮
- 0.027717200127803588
- 0.049568617076695645
- 0.04157917069184767
- 0.04260298097492467
- 0.032397618155268273
- 0.05250042455119695
- 0.05960820012403955
- 0.04838519200843289
- 0.06074430288075965</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../logistic_regression/">« Logistic regression</a><a class="docs-footer-nextpage" href="../optimal_advertising/">Optimal advertising »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Wednesday 6 December 2023 21:40">Wednesday 6 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0.027715784985962697
+ 0.049566686769494855
+ 0.0415792975217902
+ 0.04260261086285848
+ 0.03239612206391842
+ 0.05250074653095457
+ 0.05960717670930832
+ 0.04838609955452682
+ 0.06074606505961268</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../logistic_regression/">« Logistic regression</a><a class="docs-footer-nextpage" href="../optimal_advertising/">Optimal advertising »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 29 December 2023 08:13">Friday 29 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

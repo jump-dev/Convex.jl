@@ -6,23 +6,29 @@ X = Variable(size(P), :Bin)</code></pre><pre class="documenter-example-output"><
 size: (50, 7)
 sign: real
 vexity: affine
-id: 998…603</code></pre><p>We want every student to be assigned to exactly one section. So, every row must have exactly one non-zero entry. In other words, the sum of all the columns for every row is 1. We also want each section to have between 6 and 10 students, so the sum of all the rows for every column should be between these.</p><pre><code class="language-julia hljs">constraints =
+id: 111…564</code></pre><p>We want every student to be assigned to exactly one section. So, every row must have exactly one non-zero entry. In other words, the sum of all the columns for every row is 1. We also want each section to have between 6 and 10 students, so the sum of all the rows for every column should be between these.</p><pre><code class="language-julia hljs">constraints =
     [sum(X, dims = 2) == 1, sum(X, dims = 1) &lt;= 10, sum(X, dims = 1) &gt;= 6]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element Vector{Constraint}:
  == constraint (affine)
 ├─ * (affine; real)
-│  ├─ 50×7 real variable (id: 998…603)
+│  ├─ 50×7 real variable (id: 111…564)
 │  └─ 7×1 Matrix{Float64}
-└─ 1
- &lt;= constraint (affine)
+└─ * (constant; positive)
+   ├─ [1]
+   └─ 50×1 Matrix{Float64}
+ ≤ constraint (affine)
 ├─ * (affine; real)
 │  ├─ 1×50 Matrix{Float64}
-│  └─ 50×7 real variable (id: 998…603)
-└─ 10
- &gt;= constraint (affine)
+│  └─ 50×7 real variable (id: 111…564)
+└─ * (constant; positive)
+   ├─ [10]
+   └─ 1×7 Matrix{Float64}
+ ≥ constraint (affine)
 ├─ * (affine; real)
 │  ├─ 1×50 Matrix{Float64}
-│  └─ 50×7 real variable (id: 998…603)
-└─ 6</code></pre><p>Our objective is simple <code>sum(X .* P)</code>, which can be more efficiently represented as <code>vec(X)&#39; * vec(P)</code>. Since each entry of <code>X</code> is either 0 or 1, this is basically summing up the rankings of students that were assigned to them. If all students got their first choice, this value will be the number of students since the ranking of the first choice is 1.</p><pre><code class="language-julia hljs">p = minimize(vec(X)&#39; * vec(P), constraints)
+│  └─ 50×7 real variable (id: 111…564)
+└─ * (constant; positive)
+   ├─ [6]
+   └─ 1×7 Matrix{Float64}</code></pre><p>Our objective is simple <code>sum(X .* P)</code>, which can be more efficiently represented as <code>vec(X)&#39; * vec(P)</code>. Since each entry of <code>X</code> is either 0 or 1, this is basically summing up the rankings of students that were assigned to them. If all students got their first choice, this value will be the number of students since the ranking of the first choice is 1.</p><pre><code class="language-julia hljs">p = minimize(vec(X)&#39; * vec(P), constraints)
 
 solve!(p, GLPK.Optimizer)
-p.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">65.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../n_queens/">« N queens</a><a class="docs-footer-nextpage" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Wednesday 6 December 2023 21:40">Wednesday 6 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+p.optval</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">65.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../n_queens/">« N queens</a><a class="docs-footer-nextpage" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 29 December 2023 08:13">Friday 29 December 2023</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
