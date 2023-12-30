@@ -2253,3 +2253,43 @@ end
         ] atol = atol rtol = rtol
     end
 end
+
+# Using the formulation from:
+# https://discourse.julialang.org/t/minimisation-of-operator-norm-solution-does-not-match-evaluated-value-convex-jl/102319/2
+@add_problem sdp function sdp_issue_510(
+    handle_problem!,
+    ::Val{test},
+    atol,
+    rtol,
+    ::Type{T},
+) where {T,test}
+    d₁ = 2
+    d₂ = 2
+    H = rand(ComplexF64, d₁ * d₂, d₁ * d₂)
+    U = exp(im * π * (H + H'))
+    K = rand(ComplexF64, d₁ * d₂, d₁ * d₂)
+    K *= d₁ / LinearAlgebra.tr(K' * K)
+    ρ = Semidefinite(d₂)
+    J = sum(
+        kron(
+            ((1:d₁) .== j) * ((1:d₁) .== k)',
+            partialtrace(
+                U' *
+                (
+                    K * kron(((1:d₁) .== j) * ((1:d₁) .== k)', I(d₂)) * K' -
+                    kron(((1:d₁) .== j) * ((1:d₁) .== k)', ρ)
+                ) *
+                U,
+                2,
+                [d₁, d₂],
+            ),
+        ) for j in 1:d₁, k in 1:d₁
+    )
+    constraints = [tr(ρ) == 1]
+    p = minimize(opnorm(J, Inf), constraints; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ opnorm(evaluate(J), Inf) atol = atol rtol = rtol
+        @test tr(evaluate(ρ)) ≈ 1 atol = atol rtol = rtol
+    end
+end

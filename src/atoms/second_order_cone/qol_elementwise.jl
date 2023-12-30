@@ -56,6 +56,16 @@ function broadcasted(::typeof(^), x::AbstractExpr, k::Int)
            error("raising variables to powers other than 2 is not implemented")
 end
 
+# handle literal case
+function broadcasted(
+    ::typeof(Base.literal_pow),
+    ::typeof(^),
+    x::AbstractExpr,
+    ::Val{k},
+) where {k}
+    return broadcasted(^, x, k)
+end
+
 invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size[1], x.size[2])), x)
 function broadcasted(::typeof(/), x::Value, y::AbstractExpr)
     return dotmultiply(constant(x), invpos(y))
