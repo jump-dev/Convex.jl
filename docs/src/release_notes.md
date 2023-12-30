@@ -9,7 +9,7 @@ Breaking changes:
 * The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
 * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild) type piracy.
 * `vecdot(x,y)` has been removed. Call `dot(vec(x), vec(y))` instead.
-* DCP violations now throw a `DCPViolationError` exception by default, rather than a warning. Relatedly, `Convex.emit_dcp_warnings` has been removed, and [`Convex.allow_dcp_violations`](@ref) added.
+* DCP violations now throw a `DCPViolationError` exception, rather than a warning. Relatedly, `Convex.emit_dcp_warnings` has been removed.
 
 Other changes:
 

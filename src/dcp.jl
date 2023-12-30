@@ -34,14 +34,7 @@ function Base.showerror(io::IO, ::DCPViolationError)
     )
 end
 
-struct NotDcp <: Vexity
-    function NotDcp()
-        if !allow_dcp_violations()
-            throw(DCPViolationError())
-        end
-        return new()
-    end
-end
+struct NotDcp <: Vexity end
 
 # Monotonocity subtypes
 abstract type Monotonicity end

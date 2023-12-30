@@ -513,18 +513,10 @@ end
     # end
 
     @testset "DCP warnings" begin
-        # default is to error
-        @test_throws DCPViolationError Convex.NotDcp()
-
-        Convex.allow_dcp_violations(true)
-        try
-            @test_logs Convex.NotDcp()
-        finally
-            # Reset unconditionally
-            Convex.allow_dcp_violations(false)
-        end
-        @test_throws DCPViolationError Convex.NotDcp()
-
+        x = Variable()
+        y = Variable()
+        p = minimize(log(x) + square(y), x >= 0, y >= 0)
+        @test_throws DCPViolationError solve!(p, SCS.Optimizer)
         str = sprint(Base.showerror, DCPViolationError())
         @test contains(str, "Expression not DCP compliant")
     end

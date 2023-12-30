@@ -59,25 +59,6 @@ export add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
 # Module level globals
 
-const ALLOW_DCP_VIOLATIONS = Ref{Bool}(false)
-
-"""
-    allow_dcp_violations()
-    allow_dcp_violations(emit)
-
-Controls whether or not errors are emitted for when an expression fails to be
-of disciplined convex form. When called without an argument, returns the current setting
-for whether or not DCP errors are emitted. To turn errors off, call
-
-    Convex.allow_dcp_violations(true)
-
-to (globally) allow non-DCP problems to be solved. Note that if a problem is not DCP, the solution obtained by Convex.jl can be wildly incorrect (even if the solution status is `OPTIMAL`!).
-
-To re-enable errors, call, `Convex.allow_dcp_violations(false)`.
-"""
-allow_dcp_violations(emit) = ALLOW_DCP_VIOLATIONS[] = emit
-allow_dcp_violations() = ALLOW_DCP_VIOLATIONS[]
-
 """
     MAXDEPTH
 

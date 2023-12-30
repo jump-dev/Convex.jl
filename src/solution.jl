@@ -52,6 +52,10 @@ function solve!(p::Problem, optimizer_factory; silent_solver = false)
         MOI.set(model, MOI.Silent(), true)
     end
 
+    if vexity(p) == NotDcp()
+        throw(DCPViolationError())
+    end
+
     if context.detected_infeasible_during_formulation[]
         p.status = MOI.INFEASIBLE
     else
