@@ -96,7 +96,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ sqrt(35) atol = atol rtol = rtol
-        @test evaluate(norm(m), 2) ≈ sqrt(35) atol = atol rtol = rtol
+        @test evaluate(norm(m, 2)) ≈ sqrt(35) atol = atol rtol = rtol
         @test p.constraints[1].dual ≈ 0.6761 atol = atol rtol = rtol
         dual = 0.1690 .* ones(4, 5)
         dual[3, 3] = 0
