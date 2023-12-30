@@ -129,7 +129,7 @@ mutable struct ProbabilityVector <: Convex.AbstractVariable
     end
 end
 
-Convex.constraints(p::ProbabilityVector) = [ sum(p) == 1 ]
+Convex.get_constraints(p::ProbabilityVector) = [ sum(p) == 1 ]
 Convex.sign(::ProbabilityVector) = Convex.Positive()
 Convex.vartype(::ProbabilityVector) = Convex.ContVar
 

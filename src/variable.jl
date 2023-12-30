@@ -40,11 +40,11 @@ abstract type AbstractVariable <: AbstractExpr end
 
 # Default implementation of `AbstractVariable` interface
 """
-    constraints(x::AbstractVariable)
+    get_constraints(x::AbstractVariable)
 
 Returns the current constraints carried by `x`.
 """
-constraints(x::AbstractVariable) = x.constraints
+get_constraints(x::AbstractVariable) = x.constraints
 
 """
     add_constraint!(x::AbstractVariable, C::Constraint)
