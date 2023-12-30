@@ -28,7 +28,7 @@ implement methods (or use the field-access fallbacks) for
 * [`vexity`](@ref), [`vexity!`](@ref): get or set the `vexity` of the variable. The
     `vexity` should be `AffineVexity()` unless the variable has been
     [`fix!`](@ref)'d, in which case it is `ConstVexity()`.
-* [`sign`](@ref), [`vartype`](@ref), and [`constraints`](@ref): get the `Sign`, `VarType`,
+* [`sign`](@ref), [`vartype`](@ref), and [`get_constraints`](@ref): get the `Sign`, `VarType`,
     numeric type, and a (possibly empty) vector of constraints which are
     to be applied to any problem in which the variable is used.
 
@@ -40,11 +40,11 @@ abstract type AbstractVariable <: AbstractExpr end
 
 # Default implementation of `AbstractVariable` interface
 """
-    constraints(x::AbstractVariable)
+    get_constraints(x::AbstractVariable)
 
 Returns the current constraints carried by `x`.
 """
-constraints(x::AbstractVariable) = x.constraints
+get_constraints(x::AbstractVariable) = x.constraints
 
 """
     add_constraint!(x::AbstractVariable, C::Constraint)

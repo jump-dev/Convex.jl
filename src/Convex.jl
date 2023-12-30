@@ -49,7 +49,7 @@ export constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
 export curvature,
     evaluate, fix!, free!, monotonicity, sign, vexity, problem_vexity
 export BinVar, IntVar, ContVar, vartype, vartype!
-export constraints, add_constraint!, set_value!, evaluate
+export get_constraints, add_constraint!, set_value!, evaluate
 
 # Signs
 export Positive, Negative, ComplexSign, NoSign

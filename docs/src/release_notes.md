@@ -9,6 +9,7 @@ Breaking changes:
 * The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
 * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild) type piracy.
 * `vecdot(x,y)` has been removed. Call `dot(vec(x), vec(y))` instead.
+* The function `constraints`, used to get constraints associated to an individual variable, has been renamed `get_constraints`.
 * DCP violations now throw a `DCPViolationError` exception, rather than a warning. Relatedly, `Convex.emit_dcp_warnings` has been removed.
 
 Other changes:
@@ -18,6 +19,7 @@ Other changes:
 * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) of `imag` and `real` has been removed. This should not affect use of Convex. Unfortunately, piracy of `hcat`, `vcat`, and `hvcat` still remains.
 * `sumlargesteigs` now enforces that it's argument is hermitian.
 * Bugfix: `dot` now correctly complex-conjugates its first argument
+* `norm` on `AbstractExpr` objects now supports matrices (treating them like vectors), matching Base's behavior.
 
 ## v0.15.4 (October 24, 2023)
 

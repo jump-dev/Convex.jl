@@ -31,7 +31,7 @@ function _template(a::AbstractVariable, context::Context{T}) where {T}
             )
         end
 
-        for constraint in constraints(a)
+        for constraint in get_constraints(a)
             add_constraint!(context, constraint)
         end
     end
