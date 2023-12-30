@@ -158,7 +158,7 @@ Subtypes of `AbstractVariable` must have the fields `head`, `id_hash`, and
 * either have a field `vexity`, or implement [`Convex.vexity`](@ref) and
   [`Convex.vexity!`](@ref) (though the latter is only necessary if you wish to
   support [`Convex.fix!`](@ref) and [`Convex.free!`](@ref)
-* have a field `constraints` or implement [`Convex.constraints`](@ref) (optionally,
+* have a field `constraints` or implement [`Convex.get_constraints`](@ref) (optionally,
   implement [`Convex.add_constraint!`](@ref) to be able to add constraints to your
   variable after its creation),
 * either have a field `sign` or implement [`Convex.sign`](@ref), and
