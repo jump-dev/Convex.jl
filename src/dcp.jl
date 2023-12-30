@@ -26,7 +26,7 @@ function Base.showerror(io::IO, ::DCPViolationError)
     return print(
         io,
         "DCPViolationError: Expression not DCP compliant. This either means " *
-        "that your expression is not convex, or that we could not prove it " *
+        "that your problem is not convex, or that we could not prove it " *
         "was convex using the rules of disciplined convex programming. For a " *
         "list of supported operations, see https://jump.dev/Convex.jl/stable/operations/. " *
         "For help writing your problem as a disciplined convex program, " *
