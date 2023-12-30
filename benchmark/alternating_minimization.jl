@@ -22,11 +22,8 @@ function alternating_minimization(f, A, M, Y_init, k, MAX_ITERS)
     X = Variable(m, k)
     Y = Variable(k, n)
 
-    objective = (
-        norm(vec(M .* A) - vec(M .* (X * Y)), 2) +
-        γ1 * norm(vec(X), 2) +
-        γ2 * norm(vec(Y), 1)
-    )
+    objective =
+        (norm(M .* A - M .* (X * Y), 2) + γ1 * norm(X, 2) + γ2 * norm(Y, 1))
 
     constraints = [X * Y >= ϵ]
 

@@ -35,7 +35,7 @@ X = Variable(m, n);
 A = randn(p, m);
 b = randn(p, n);
 @time begin
-    p = minimize(norm(vec(X)), A * X == b)
+    p = minimize(norm(X), A * X == b)
 end
 @time solve!(p, ECOS.Optimizer; silent_solver = true)
 
@@ -52,6 +52,6 @@ n = 3
 A = randn(n, n);
 #@time begin
 X = Variable(n, n);
-p = minimize(norm(vec(X' - A)), X[1, 1] == 1);
+p = minimize(norm(X' - A), X[1, 1] == 1);
 solve!(p, ECOS.Optimizer; silent_solver = true)
 #end

@@ -88,7 +88,7 @@ end
 ) where {T,test}
     m = Variable(4, 5)
     c = [m[3, 3] == 4, m >= 1]
-    p = minimize(norm(vec(m), 2), c; numeric_type = T)
+    p = minimize(norm(m, 2), c; numeric_type = T)
 
     if test
         @test problem_vexity(p) == ConvexVexity()
@@ -96,7 +96,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ sqrt(35) atol = atol rtol = rtol
-        @test evaluate(norm(vec(m), 2)) ≈ sqrt(35) atol = atol rtol = rtol
+        @test evaluate(norm(m), 2) ≈ sqrt(35) atol = atol rtol = rtol
         @test p.constraints[1].dual ≈ 0.6761 atol = atol rtol = rtol
         dual = 0.1690 .* ones(4, 5)
         dual[3, 3] = 0
@@ -544,14 +544,10 @@ end
     # Vector norm
     # TODO: Once the deprecation for norm on matrices is removed, remove the `vec` calls
     if test
-        @test evaluate(norm(vec(x), 1)) ≈ norm(vec(A), 1) atol = atol rtol =
-            rtol
-        @test evaluate(norm(vec(x), 2)) ≈ norm(vec(A), 2) atol = atol rtol =
-            rtol
-        @test evaluate(norm(vec(x), 7)) ≈ norm(vec(A), 7) atol = atol rtol =
-            rtol
-        @test evaluate(norm(vec(x), Inf)) ≈ norm(vec(A), Inf) atol = atol rtol =
-            rtol
+        @test evaluate(norm(x, 1)) ≈ norm(vec(A), 1) atol = atol rtol = rtol
+        @test evaluate(norm(x, 2)) ≈ norm(vec(A), 2) atol = atol rtol = rtol
+        @test evaluate(norm(x, 7)) ≈ norm(vec(A), 7) atol = atol rtol = rtol
+        @test evaluate(norm(x, Inf)) ≈ norm(vec(A), Inf) atol = atol rtol = rtol
     end
 end
 
