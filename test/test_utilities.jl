@@ -386,8 +386,8 @@ end
             Semidefinite(2, 2),
             Semidefinite(2),
         ]
-            @test length(constraints(x)) == 1
-            @test constraints(x)[] isa Convex.SDPConstraint
+            @test length(get_constraints(x)) == 1
+            @test get_constraints(x)[] isa Convex.SDPConstraint
         end
 
         @test_throws ErrorException HermitianSemidefinite(2, 3)

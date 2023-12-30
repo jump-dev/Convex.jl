@@ -50,7 +50,7 @@ function Convex.vartype!(x::DictVector, s::Convex.VarType)
     return global_cache[x.id_hash][:vartype] = s
 end
 
-Convex.constraints(x::DictVector) = global_cache[x.id_hash][:constraints]
+Convex.get_constraints(x::DictVector) = global_cache[x.id_hash][:constraints]
 function Convex.add_constraint!(x::DictVector, s::Convex.Constraint)
     return push!(global_cache[x.id_hash][:constraints], s)
 end
@@ -74,7 +74,7 @@ import .DictVectors
     solve!(p, solver)
     @test p.optval ≈ 6 atol = TOL
     @test evaluate(x + y) ≈ 6 atol = TOL
-    @test length(constraints(x)) == 1
+    @test length(get_constraints(x)) == 1
 end
 
 # Let us do another example of custom variable types, but using field access for simplicity
@@ -100,7 +100,7 @@ mutable struct DensityMatrix{T} <: Convex.AbstractVariable
         return this
     end
 end
-Convex.constraints(ρ::DensityMatrix) = [ρ ⪰ 0, tr(ρ) == 1]
+Convex.get_constraints(ρ::DensityMatrix) = [ρ ⪰ 0, tr(ρ) == 1]
 Convex.sign(::DensityMatrix) = Convex.ComplexSign()
 Convex.vartype(::DensityMatrix) = Convex.ContVar
 end
@@ -150,7 +150,7 @@ mutable struct ProbabilityVector <: Convex.AbstractVariable
         return this
     end
 end
-Convex.constraints(p::ProbabilityVector) = [sum(p) == 1]
+Convex.get_constraints(p::ProbabilityVector) = [sum(p) == 1]
 Convex.sign(::ProbabilityVector) = Convex.Positive()
 Convex.vartype(::ProbabilityVector) = Convex.ContVar
 

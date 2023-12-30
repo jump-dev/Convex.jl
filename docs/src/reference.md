@@ -6,7 +6,7 @@ The `AbstractVariable` interface:
 Convex.AbstractVariable
 Convex._value
 Convex.set_value!
-Convex.constraints
+Convex.get_constraints
 Convex.add_constraint!
 Convex.vexity
 Convex.vexity!

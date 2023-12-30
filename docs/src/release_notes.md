@@ -9,7 +9,7 @@ Breaking changes:
 * The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
 * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild) type piracy.
 * `vecdot(x,y)` has been removed. Call `dot(vec(x), vec(y))` instead.
-
+* The function `constraints`, used to get constraints associated to an individual variable, has been renamed `get_constraints`.
 
 Other changes:
 
