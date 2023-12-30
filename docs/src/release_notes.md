@@ -18,6 +18,7 @@ Other changes:
 * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) of `imag` and `real` has been removed. This should not affect use of Convex. Unfortunately, piracy of `hcat`, `vcat`, and `hvcat` still remains.
 * `sumlargesteigs` now enforces that it's argument is hermitian.
 * Bugfix: `dot` now correctly complex-conjugates its first argument
+* `norm` on `AbstractExpr` objects now supports matrices (treating them like vectors), matching Base's behavior.
 
 ## v0.15.4 (October 24, 2023)
 
