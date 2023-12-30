@@ -21,7 +21,7 @@
 #-
 
 ## Make the Convex.jl module available
-using Convex, SparseArrays, LinearAlgebra, Test
+using Convex, SparseArrays, LinearAlgebra
 using SCS # first order splitting conic solver [O'Donoghue et al., 2014]
 
 ## Generate random problem data
