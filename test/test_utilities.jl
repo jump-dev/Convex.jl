@@ -519,6 +519,9 @@ end
         @test_throws DCPViolationError solve!(p, SCS.Optimizer)
         str = sprint(Base.showerror, DCPViolationError())
         @test contains(str, "Expression not DCP compliant")
+
+        p = minimize(sqrt(x), x >= 0, x <= 1)
+        @test_throws DCPViolationError solve!(p, SCS.Optimizer)
     end
 
     @testset "`add_constraints!` (#380)" begin

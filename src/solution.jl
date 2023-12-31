@@ -52,7 +52,8 @@ function solve!(p::Problem, optimizer_factory; silent_solver = false)
         MOI.set(model, MOI.Silent(), true)
     end
 
-    if vexity(p) == NotDcp()
+    # check DCPness
+    if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
 
