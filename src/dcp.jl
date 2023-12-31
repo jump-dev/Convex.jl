@@ -20,14 +20,21 @@ struct AffineVexity <: Vexity end
 struct ConvexVexity <: Vexity end
 struct ConcaveVexity <: Vexity end
 
-struct NotDcp <: Vexity
-    function NotDcp()
-        if emit_dcp_warnings()
-            @warn "Expression not DCP compliant. Trying to solve non-DCP compliant problems can lead to unexpected behavior."
-        end
-        return new()
-    end
+struct DCPViolationError <: Exception end
+
+function Base.showerror(io::IO, ::DCPViolationError)
+    return print(
+        io,
+        "DCPViolationError: Expression not DCP compliant. This either means " *
+        "that your problem is not convex, or that we could not prove it " *
+        "was convex using the rules of disciplined convex programming. For a " *
+        "list of supported operations, see https://jump.dev/Convex.jl/stable/operations/. " *
+        "For help writing your problem as a disciplined convex program, " *
+        "please post a reproducible example on https://jump.dev/forum.",
+    )
 end
+
+struct NotDcp <: Vexity end
 
 # Monotonocity subtypes
 abstract type Monotonicity end

@@ -24,5 +24,4 @@ Convex.fix!
 Convex.free!
 Convex.evaluate
 Convex.solve!
-Convex.emit_dcp_warnings
 ```

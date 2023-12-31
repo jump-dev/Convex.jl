@@ -513,13 +513,15 @@ end
     # end
 
     @testset "DCP warnings" begin
-        # default is to log
-        @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
+        x = Variable()
+        y = Variable()
+        p = minimize(log(x) + square(y), x >= 0, y >= 0)
+        @test_throws DCPViolationError solve!(p, SCS.Optimizer)
+        str = sprint(Base.showerror, DCPViolationError())
+        @test contains(str, "Expression not DCP compliant")
 
-        @eval Convex.emit_dcp_warnings() = false
-        @test_logs Convex.NotDcp()
-        @eval Convex.emit_dcp_warnings() = true
-        @test_logs (:warn, r"not DCP compliant") Convex.NotDcp()
+        p = minimize(sqrt(x), x >= 0, x <= 1)
+        @test_throws DCPViolationError solve!(p, SCS.Optimizer)
     end
 
     @testset "`add_constraints!` (#380)" begin

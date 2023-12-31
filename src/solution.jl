@@ -52,6 +52,11 @@ function solve!(p::Problem, optimizer_factory; silent_solver = false)
         MOI.set(model, MOI.Silent(), true)
     end
 
+    # check DCPness
+    if problem_vexity(p) in (ConcaveVexity(), NotDcp())
+        throw(DCPViolationError())
+    end
+
     if context.detected_infeasible_during_formulation[]
         p.status = MOI.INFEASIBLE
     else

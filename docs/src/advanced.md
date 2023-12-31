@@ -1,25 +1,21 @@
 Advanced Features
 =================
 
-DCP warnings
-------------
+DCP Errors
+----------
 
-When an expression is created which is not of [DCP
-form](https://dcp.stanford.edu/), a warning is emitted. For example,
+When a problem is solved that involves an expression which is not of [DCP
+form](https://dcp.stanford.edu/), an error is emitted. For example,
 
 ```repl
+using SCS
 x = Variable()
 y = Variable()
-x*y
+p = minimize(log(x) + square(y), x >= 0, y >= 0)
+solve!(p, SCS.Optimizer)
 ```
 
-To disable this, run
-
-```julia
-Convex.emit_dcp_warnings() = false
-```
-to redefine the method. See [`Convex.emit_dcp_warnings`](@ref) for more details.
-
+See [Extended formulations and the DCP ruleset](@ref) for more discussion on why these errors occur.
 
 Dual Variables
 --------------

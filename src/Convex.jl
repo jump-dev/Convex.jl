@@ -33,6 +33,8 @@ export GeomMeanHypoCone,
     quantum_entropy
 export trace_logm, trace_mpower, lieb_ando
 
+export DCPViolationError
+
 # rexports from LinearAlgebra
 export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
 
@@ -56,19 +58,6 @@ export Positive, Negative, ComplexSign, NoSign
 export add_constraints!, maximize, minimize, Problem, satisfy, solve!
 
 # Module level globals
-
-"""
-    emit_dcp_warnings
-
-Controls whether or not warnings are emitted for when an expression fails to be
-of disciplined convex form. To turn warnings off, override the method via
-
-    Convex.emit_dcp_warnings() = false
-
-This will cause Julia's method invalidation to recompile any functions emitting
-DCP warnings and remove them. This should be run from top-level (not within a function).
-"""
-emit_dcp_warnings() = true
 
 """
     MAXDEPTH

@@ -10,6 +10,7 @@ Breaking changes:
 * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild) type piracy.
 * `vecdot(x,y)` has been removed. Call `dot(vec(x), vec(y))` instead.
 * The function `constraints`, used to get constraints associated to an individual variable, has been renamed `get_constraints`.
+* DCP violations now throw a `DCPViolationError` exception, rather than a warning. Relatedly, `Convex.emit_dcp_warnings` has been removed.
 
 Other changes:
 
