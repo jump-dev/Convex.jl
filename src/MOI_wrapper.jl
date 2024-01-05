@@ -217,11 +217,18 @@ function MOI.is_valid(model::Optimizer, i::MOI.Index)
     return MOI.is_valid(model.context.model, i)
 end
 
-function MOI.supports(::Optimizer, ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction})
+function MOI.supports(
+    ::Optimizer,
+    ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
+)
     return true
 end
 
-function MOI.set(model::Optimizer, ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}, func::MOI.ScalarNonlinearFunction)
+function MOI.set(
+    model::Optimizer,
+    ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
+    func::MOI.ScalarNonlinearFunction,
+)
     cfp = conic_form!(model.context, _expr(func, model))
     obj = scalar_fn(cfp)
     MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
