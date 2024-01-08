@@ -56,6 +56,7 @@ export Positive, Negative, ComplexSign, NoSign
 
 # Problems
 export add_constraints!, maximize, minimize, Problem, satisfy, solve!
+export write_to_file
 
 # Module level globals
 

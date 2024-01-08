@@ -235,3 +235,32 @@ end
 function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
 end
+
+"""
+    write_to_file(problem::Problem{Float64}, filename::String)
+
+Write the current problem to the file at `filename`.
+
+Requires solving the problem at least once using [`solve!`](@ref) to ensure that
+the problem is loaded into a MathOptInterface model.
+
+The file format is inferred from the filename extension. Supported file
+types depend on the model type.
+
+Currently, `Float64` is the only supported coefficient type. This may be
+relaxed in future if file formats support other types.
+"""
+function write_to_file(p::Problem{T}, filename::String) where {T<:Float64}
+    if isnothing(p.model)
+        msg = """
+        Problem has not been loaded into a MathOptInterface model;
+        call `solve!(problem, optimizer)` before writing problem to file.
+        """
+        throw(ArgumentError(msg))
+    end
+    dest = MOI.FileFormats.Model(; filename)
+    model = MOI.Bridges.full_bridge_optimizer(dest, T)
+    MOI.copy_to(model, p.model)
+    MOI.write_to_file(dest, filename)
+    return
+end
