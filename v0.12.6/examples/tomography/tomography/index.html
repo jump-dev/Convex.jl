@@ -1,17 +1,58 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tomography · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../../assets/documenter.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link href="../../../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../../">Home</a></li><li><a class="toctext" href="../../../installation/">Installation</a></li><li><a class="toctext" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../../../types/">Basic Types</a></li><li><a class="toctext" href="../../../operations/">Supported Operations</a></li><li><a class="toctext" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../../../solvers/">Solvers</a></li><li><a class="toctext" href="../../../faq/">FAQ</a></li><li><a class="toctext" href="../../../advanced/">Advanced</a></li><li><a class="toctext" href="../../../problem_depot/">Problem Depot</a></li><li><a class="toctext" href="../../../contributing/">Contributing</a></li><li><a class="toctext" href="../../../credits/">Credits</a></li><li><span class="toctext">Examples</span><ul><li><span class="toctext">General examples</span><ul><li><a class="toctext" href="../../general_examples/DCP_analysis/">DCP analysis</a></li><li><a class="toctext" href="../../general_examples/basic_usage/">Basic Usage</a></li><li><a class="toctext" href="../../general_examples/chebyshev_center/">Chebyshev center</a></li><li><a class="toctext" href="../../general_examples/control/">Control</a></li><li><a class="toctext" href="../../general_examples/huber_regression/">Huber regression</a></li><li><a class="toctext" href="../../general_examples/logistic_regression/">Logistic regression</a></li><li><a class="toctext" href="../../general_examples/max_entropy/">Entropy Maximization</a></li><li><a class="toctext" href="../../general_examples/optimal_advertising/">Optimal advertising</a></li><li><a class="toctext" href="../../general_examples/robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="toctext" href="../../general_examples/svm/">Support vector machine</a></li><li><a class="toctext" href="../../general_examples/svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="toctext" href="../../general_examples/trade_off_curves/">Trade-off curves</a></li><li><a class="toctext" href="../../general_examples/worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><span class="toctext">Mixed integer</span><ul><li><a class="toctext" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="toctext" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="toctext" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><span class="toctext">Optimization with complex variables</span><ul><li><a class="toctext" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><span class="toctext">Portfolio optimization</span><ul><li><a class="toctext" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="toctext" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><span class="toctext">Supplemental material</span><ul><li><a class="toctext" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="toctext" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><span class="toctext">Time series</span><ul><li><a class="toctext" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><span class="toctext">Tomography</span><ul><li class="current"><a class="toctext" href>Tomography</a><ul class="internal"></ul></li></ul></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li>Examples</li><li>Tomography</li><li><a href>Tomography</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/tomography/tomography.jl"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Tomography</span><a class="fa fa-bars" href="#"></a></div></header><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><div></div><h1><a class="nav-anchor" id="Tomography-1" href="#Tomography-1">Tomography</a></h1><p>Tomography is the process of reconstructing a density distribution from given integrals over sections of the distribution. In our example, we will work with tomography on black and white images. Suppose <span>$x$</span> be the vector of <span>$n$</span> pixel densities, with <span>$x_j$</span> denoting how white pixel <span>$j$</span> is. Let <span>$y$</span> be the vector of <span>$m$</span> line integrals over the image, with <span>$y_i$</span> denoting the integral for line <span>$i$</span>. We can define a matrix <span>$A$</span> to describe the geometry of the lines. Entry <span>$A_{ij}$</span> describes how much of pixel <span>$j$</span> is intersected by line <span>$i$</span>. Assuming our measurements of the line integrals are perfect, we have the relationship that</p><div>\[  y = Ax\]</div><p>However, anytime we have measurements, there are usually small errors that occur. Therefore it makes sense to try to minimize</p><div>\[ \|y - Ax\|_2^2.\]</div><p>This is simply an unconstrained least squares problem; something we can readily solve!</p><pre><code class="language-julia">using Convex, ECOS, DelimitedFiles, SparseArrays
-aux(str) = joinpath(@__DIR__, &quot;aux&quot;, str) # path to auxiliary files
-line_mat_x = readdlm(aux(&quot;tux_sparse_x.txt&quot;))
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Tomography · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link href="../../../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../../../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../../../">Home</a></li><li><a class="toctext" href="../../../installation/">Installation</a></li><li><a class="toctext" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../../../types/">Basic Types</a></li><li><a class="toctext" href="../../../operations/">Supported Operations</a></li><li><a class="toctext" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../../../solvers/">Solvers</a></li><li><a class="toctext" href="../../../faq/">FAQ</a></li><li><a class="toctext" href="../../../advanced/">Advanced</a></li><li><a class="toctext" href="../../../problem_depot/">Problem Depot</a></li><li><a class="toctext" href="../../../contributing/">Contributing</a></li><li><a class="toctext" href="../../../credits/">Credits</a></li><li><span class="toctext">Examples</span><ul><li><span class="toctext">General examples</span><ul><li><a class="toctext" href="../../general_examples/DCP_analysis/">DCP analysis</a></li><li><a class="toctext" href="../../general_examples/basic_usage/">Basic Usage</a></li><li><a class="toctext" href="../../general_examples/chebyshev_center/">Chebyshev center</a></li><li><a class="toctext" href="../../general_examples/control/">Control</a></li><li><a class="toctext" href="../../general_examples/huber_regression/">Huber regression</a></li><li><a class="toctext" href="../../general_examples/logistic_regression/">Logistic regression</a></li><li><a class="toctext" href="../../general_examples/max_entropy/">Entropy Maximization</a></li><li><a class="toctext" href="../../general_examples/optimal_advertising/">Optimal advertising</a></li><li><a class="toctext" href="../../general_examples/robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="toctext" href="../../general_examples/svm/">Support vector machine</a></li><li><a class="toctext" href="../../general_examples/svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="toctext" href="../../general_examples/trade_off_curves/">Trade-off curves</a></li><li><a class="toctext" href="../../general_examples/worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><span class="toctext">Mixed integer</span><ul><li><a class="toctext" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="toctext" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="toctext" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><span class="toctext">Optimization with complex variables</span><ul><li><a class="toctext" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><span class="toctext">Portfolio optimization</span><ul><li><a class="toctext" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="toctext" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><span class="toctext">Supplemental material</span><ul><li><a class="toctext" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="toctext" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><span class="toctext">Time series</span><ul><li><a class="toctext" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><span class="toctext">Tomography</span><ul><li class="current"><a class="toctext" href="">Tomography</a><ul class="internal"></ul></li></ul></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li>Examples</li><li>Tomography</li><li><a href="">Tomography</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/tomography/tomography.jl"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Tomography</span><a class="fa fa-bars" href="#"></a></div></header><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><div></div><h1><a class="nav-anchor" href="#Tomography-1" id="Tomography-1">Tomography</a></h1><p>Tomography is the process of reconstructing a density distribution from given integrals over sections of the distribution. In our example, we will work with tomography on black and white images. Suppose <span>$x$</span> be the vector of <span>$n$</span> pixel densities, with <span>$x_j$</span> denoting how white pixel <span>$j$</span> is. Let <span>$y$</span> be the vector of <span>$m$</span> line integrals over the image, with <span>$y_i$</span> denoting the integral for line <span>$i$</span>. We can define a matrix <span>$A$</span> to describe the geometry of the lines. Entry <span>$A_{ij}$</span> describes how much of pixel <span>$j$</span> is intersected by line <span>$i$</span>. Assuming our measurements of the line integrals are perfect, we have the relationship that</p><div>\[  y = Ax\]</div><p>However, anytime we have measurements, there are usually small errors that occur. Therefore it makes sense to try to minimize</p><div>\[ \|y - Ax\|_2^2.\]</div><p>This is simply an unconstrained least squares problem; something we can readily solve!</p><pre><code class="language-julia">using Convex, ECOS, DelimitedFiles, SparseArrays
+aux(str) = joinpath(@__DIR__, "aux", str) # path to auxiliary files
+line_mat_x = readdlm(aux("tux_sparse_x.txt"))
 summary(line_mat_x)
 
-line_mat_y = readdlm(aux(&quot;tux_sparse_y.txt&quot;))
+line_mat_y = readdlm(aux("tux_sparse_y.txt"))
 summary(line_mat_y)
 
-line_mat_val = readdlm(aux(&quot;tux_sparse_val.txt&quot;))
+line_mat_val = readdlm(aux("tux_sparse_val.txt"))
 summary(line_mat_val)
 
-line_vals = readdlm(aux(&quot;tux_sparse_lines.txt&quot;))
-summary(line_vals)</code></pre><pre><code class="language-none">&quot;3300×1 Array{Float64,2}&quot;</code></pre><p>Form the sparse matrix from the data Image is 50 x 50</p><pre><code class="language-julia">img_size = 50</code></pre><pre><code class="language-none">50</code></pre><p>The number of pixels in the image</p><pre><code class="language-julia">num_pixels = img_size * img_size
+line_vals = readdlm(aux("tux_sparse_lines.txt"))
+summary(line_vals)</code></pre><pre><code class="language-none">"3300×1 Array{Float64,2}"</code></pre><p>Form the sparse matrix from the data Image is 50 x 50</p><pre><code class="language-julia">img_size = 50</code></pre><pre><code class="language-none">50</code></pre><p>The number of pixels in the image</p><pre><code class="language-julia">num_pixels = img_size * img_size
 
 line_mat = spzeros(length(line_vals), num_pixels)
 
@@ -39,118 +80,51 @@ for i = 1:img_size
   end
 end</code></pre><p>Plot the image using the pixel values obtained!</p><pre><code class="language-julia">using Plots
 image = reshape(evaluate(pixel_colors), img_size, img_size)
-heatmap(image, yflip=true, aspect_ratio=1, colorbar=nothing, color=:grays)</code></pre><?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
-<defs>
-  <clipPath id="clip2600">
-    <rect x="0" y="0" width="2400" height="1600"/>
-  </clipPath>
-</defs>
-<path clip-path="url(#clip2600)" d="
+heatmap(image, yflip=true, aspect_ratio=1, colorbar=nothing, color=:grays)</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip2600"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip2600)" d="
 M0 1600 L2400 1600 L2400 0 L0 0  Z
-  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
-<defs>
-  <clipPath id="clip2601">
-    <rect x="480" y="0" width="1681" height="1600"/>
-  </clipPath>
-</defs>
-<path clip-path="url(#clip2600)" d="
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip2601"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip2600)" d="
 M140.517 1487.47 L2352.76 1487.47 L2352.76 47.2441 L140.517 47.2441  Z
-  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
-<defs>
-  <clipPath id="clip2602">
-    <rect x="140" y="47" width="2213" height="1441"/>
-  </clipPath>
-</defs>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip2602"><rect height="1441" width="2213" x="140" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip2602)" points="
   512.119,47.2441 512.119,1487.47 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   1088.21,47.2441 1088.21,1487.47 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   1664.3,47.2441 1664.3,1487.47 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   2240.4,47.2441 2240.4,1487.47 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   140.517,320.888 2352.76,320.888 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   140.517,608.934 2352.76,608.934 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   140.517,896.98 2352.76,896.98 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   140.517,1185.03 2352.76,1185.03 
-  "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
   140.517,1473.07 2352.76,1473.07 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,1487.47 2352.76,1487.47 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,47.2441 140.517,1487.47 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   512.119,1487.47 512.119,1465.87 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   1088.21,1487.47 1088.21,1465.87 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   1664.3,1487.47 1664.3,1465.87 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   2240.4,1487.47 2240.4,1465.87 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,320.888 173.7,320.888 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,608.934 173.7,608.934 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,896.98 173.7,896.98 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,1185.03 173.7,1185.03 
-  "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
   140.517,1473.07 173.7,1473.07 
-  "/>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 512.119, 1541.47)" x="512.119" y="1541.47">0</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1088.21, 1541.47)" x="1088.21" y="1541.47">20</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1664.3, 1541.47)" x="1664.3" y="1541.47">40</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2240.4, 1541.47)" x="2240.4" y="1541.47">60</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 338.388)" x="116.517" y="338.388">10</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 626.434)" x="116.517" y="626.434">20</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 914.48)" x="116.517" y="914.48">30</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 1202.53)" x="116.517" y="1202.53">40</text>
-</g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 1490.57)" x="116.517" y="1490.57">50</text>
-</g>
-<g clip-path="url(#clip2602)">
-<image width="1440" height="1440" xlink:href="data:image/png;base64,
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 512.119, 1541.47)" x="512.119" y="1541.47">0</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1088.21, 1541.47)" x="1088.21" y="1541.47">20</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1664.3, 1541.47)" x="1664.3" y="1541.47">40</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2240.4, 1541.47)" x="2240.4" y="1541.47">60</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 338.388)" x="116.517" y="338.388">10</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 626.434)" x="116.517" y="626.434">20</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 914.48)" x="116.517" y="914.48">30</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 1202.53)" x="116.517" y="1202.53">40</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 116.517, 1490.57)" x="116.517" y="1490.57">50</text></g><g clip-path="url(#clip2602)"><image height="1440" href="data:image/png;base64,
 iVBORw0KGgoAAAANSUhEUgAABaAAAAWgCAYAAACooOTIAAAgAElEQVR4nOza3Yucd/nH8euemd3Z
 TbpJzINGIzZtCYJoU1SC4pn0SOtDgxV8QAURMSc9sFVaREWLKIiCPRDUo7S2Ih4YeyBYihSkoLXU
 0BZtKUXQUJtN2ib7kN2dp98f4e+6vrLzev0Dn7nvmbln7vdMt7q6Oos50HVd64dQYjarfTpbnNfq
@@ -536,7 +510,4 @@ DNAAAAAAALQwQAMAAAAA0MIADQAAAABACwM0AAAAAAAtDNAAAAAAALQwQAMAAAAA0MIADQAAAABA
 CwM0AAAAAAAtDNAAAAAAALQwQAMAAAAA0MIADQAAAABACwM0AAAAAAAtDNAAAAAAALQwQAMAAAAA
 0MIADQAAAABACwM0AAAAAAAtDNAAAAAAALQwQAMAAAAA0MIADQAAAABACwM0AAAAAAAt/g94Ox7f
 0qt/IwAAAABJRU5ErkJggg==
-" transform="translate(527, 47)"/>
-</g>
-</svg>
-<p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><div></div><footer><hr/><a class="previous" href="../../time_series/time_series/"><span class="direction">Previous</span><span class="title">Time Series Analysis</span></a></footer></article></body></html>
+" transform="translate(527, 47)" width="1440"/></g></svg><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><div></div><footer><hr/><a class="previous" href="../../time_series/time_series/"><span class="direction">Previous</span><span class="title">Time Series Analysis</span></a></footer></article></body></HTML>
