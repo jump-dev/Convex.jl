@@ -1,8 +1,22 @@
 module TestMOIWrapper
 
 using Test
+
+import Convex
+import ECOS
 import MathOptInterface as MOI
-import Convex, ECOS
+import SparseArrays
+
+function runtests()
+    for name in names(@__MODULE__; all = true)
+        if startswith("$name", "test_")
+            @testset "$(name)" begin
+                getfield(@__MODULE__, name)()
+            end
+        end
+    end
+    return
+end
 
 function test_runtests()
     T = Float64
@@ -24,17 +38,8 @@ function test_runtests()
             MOI.ObjectiveBound,
         ],
     )
-    return MOI.Test.runtests(optimizer, config)
-end
-
-function runtests()
-    for name in names(@__MODULE__; all = true)
-        if startswith("$name", "test_")
-            @testset "$(name)" begin
-                getfield(@__MODULE__, name)()
-            end
-        end
-    end
+    MOI.Test.runtests(optimizer, config)
+    return
 end
 
 end
