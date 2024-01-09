@@ -140,18 +140,22 @@ function _expr(model::Optimizer, f::MOI.ScalarNonlinearFunction)
         else
             return sum(args)
         end
-    elseif f.head == :- && length(args) == 2
+    elseif f.head == :- && 1 <= length(args) <= 2
         return -(args...)
     elseif f.head == :*
         return *(args...)
     elseif f.head == :/ && length(args) == 2
-        return args[1] / args[2]
+        if !(f.args[2] isa Real)
+            msg = "denominator must be a scalar constant. Got $(f.args[2])"
+            throw(MOI.UnsupportedNonlinearOperator(:/, msg))
+        end
+        return args[1] / f.args[2]
     elseif f.head == :^ && length(args) == 2
         if f.args[2] != 2
             msg = "Power with exponent different from 2 is not supported by Convex.jl"
-            throw(MOI.UnsupportedNonlinearoperator(:^, msg))
+            throw(MOI.UnsupportedNonlinearOperator(:^, msg))
         end
-        return square(_expr(model, args[1]))
+        return square(args[1])
     elseif f.head == :min
         if length(f.args) == 1
             return args[1]
