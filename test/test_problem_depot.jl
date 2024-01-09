@@ -72,16 +72,16 @@ function test_Clarabel()
 end
 
 # Slow, and also hits linear algebra issues with BigFloat matrices
-function test_Clarabel_BigFloat()
-    # TODO(odow): investigate sdp_lieb_ando
-    Convex.ProblemDepot.run_tests(;
-        exclude = [r"mip", r"sdp_lieb_ando"],
-        T = BigFloat,
-    ) do p
-        return solve!(p, Clarabel.Optimizer{BigFloat}; silent_solver = true)
-    end
-    return
-end
+# function test_Clarabel_BigFloat()
+#     # TODO(odow): investigate sdp_lieb_ando
+#     Convex.ProblemDepot.run_tests(;
+#         exclude = [r"mip", r"sdp_lieb_ando"],
+#         T = BigFloat,
+#     ) do p
+#         return solve!(p, Clarabel.Optimizer{BigFloat}; silent_solver = true)
+#     end
+#     return
+# end
 
 # Disabling ECOS due to this segfault:
 # https://github.com/jump-dev/ECOS.jl/issues/144
