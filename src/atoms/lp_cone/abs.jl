@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.abs, Base.abs2
 
 ### Absolute Value
 
@@ -19,7 +18,7 @@ mutable struct AbsAtom <: AbstractExpr
 end
 head(io::IO, ::AbsAtom) = print(io, "abs")
 
-function sign(x::AbsAtom)
+function Base.sign(x::AbsAtom)
     return Positive()
 end
 
@@ -43,7 +42,7 @@ function new_conic_form!(context::Context, A::AbsAtom)
 
     if sign(x) == ComplexSign()
         for i in 1:length(vec(t))
-            add_constraint!(context, t[i] >= norm2([real(x[i]); imag(x[i])]))
+            add_constraint!(context, t[i] >= LinearAlgebra.norm2([real(x[i]); imag(x[i])]))
         end
     else
         add_constraint!(context, t >= x)
@@ -52,8 +51,8 @@ function new_conic_form!(context::Context, A::AbsAtom)
     return t_obj
 end
 
-abs(x::AbstractExpr) = AbsAtom(x)
-abs2(x::AbstractExpr) = square(abs(x))
+Base.abs(x::AbstractExpr) = AbsAtom(x)
+Base.abs2(x::AbstractExpr) = square(abs(x))
 
 ## Alternate version: no atom, just a DCPPromise:
 

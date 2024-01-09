@@ -1,42 +1,61 @@
-__precompile__()
-
 module Convex
-using OrderedCollections: OrderedDict
-using LinearAlgebra
-using SparseArrays
-using LDLFactorizations
-using AbstractTrees: AbstractTrees, children
-# using DataStructures
 
+import AbstractTrees
+import LDLFactorizations
+import LinearAlgebra
 import MathOptInterface as MOI
+import OrderedCollections
+import SparseArrays
 
 # Functions
 export conv,
-    dotsort, entropy, exp, geomean, hinge_loss, huber, inner_product, invpos
-export log_perspective,
+    dotsort,
+    entropy,
+    exp,
+    geomean,
+    hinge_loss,
+    huber,
+    inner_product,
+    invpos,
+    log_perspective,
     logisticloss,
     logsumexp,
     matrixfrac,
     neg,
-    norm2,
+    # norm2,
     norm_1,
     norm_inf,
-    nuclearnorm
-export partialtrace,
-    partialtranspose, pos, qol_elementwise, quadform, quadoverlin, rationalnorm
-export relative_entropy,
-    sigmamax, square, sumlargest, sumlargesteigs, sumsmallest, sumsquares
-export GeomMeanHypoCone,
+    nuclearnorm,
+    partialtrace,
+    partialtranspose,
+    pos,
+    qol_elementwise,
+    quadform,
+    quadoverlin,
+    rationalnorm,
+    relative_entropy,
+    sigmamax,
+    square,
+    sumlargest,
+    sumlargesteigs,
+    sumsmallest,
+    sumsquares,
+    GeomMeanHypoCone,
     GeomMeanEpiCone,
     RelativeEntropyEpiCone,
     quantum_relative_entropy,
-    quantum_entropy
-export trace_logm, trace_mpower, lieb_ando
+    quantum_entropy,
+    trace_logm,
+    trace_mpower,
+    lieb_ando
 
 export DCPViolationError
 
 # rexports from LinearAlgebra
-export diag, diagm, Diagonal, dot, eigmax, eigmin, kron, logdet, norm, tr
+for k in (:diag, :diagm, :Diagonal, :dot, :eigmax, :eigmin, :logdet, :norm, :norm2, :tr)
+    @eval $k = LinearAlgebra.$k
+    @eval export $k
+end
 
 # Constraints
 export Constraint
@@ -47,7 +66,7 @@ export Constraint # useful for making abstractly-typed vectors via `Constraint[]
 # Variables
 export constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
 export curvature,
-    evaluate, fix!, free!, monotonicity, sign, vexity, problem_vexity
+    evaluate, fix!, free!, monotonicity, vexity, problem_vexity
 export BinVar, IntVar, ContVar, vartype, vartype!
 export get_constraints, add_constraint!, set_value!, evaluate
 
@@ -149,14 +168,14 @@ end
 # const SPARSE_MATRIX{T} = GBMatrix{T,T}
 # spzeros(T, d) = GBVector{T,T}(d)
 # spzeros(T, n, m) = GBMatrix{T,T}(n, m)
-# spidentity(T, d) = GBMatrix{T,T}(Diagonal(ones(T, d)))
+# spidentity(T, d) = GBMatrix{T,T}(LinearAlgebra.Diagonal(ones(T, d)))
 # create_sparse(T, args...) = GBMatrix{T,T}(args...)
 
 const SPARSE_VECTOR{T} = Vector{T}
-const SPARSE_MATRIX{T} = SparseMatrixCSC{T,Int}
+const SPARSE_MATRIX{T} = SparseArrays.SparseMatrixCSC{T,Int}
 spzeros(T, d) = zeros(T, d)
 spzeros(T, n, m) = SparseArrays.spzeros(T, n, m)
-spidentity(T, d) = sparse(one(T) * I, d, d)
+spidentity(T, d) = SparseArrays.sparse(one(T) * LinearAlgebra.I, d, d)
 function create_sparse(::Type{T}, args...) where {T}
     local result::SPARSE_MATRIX{T}
     result = SparseArrays.sparse(args...)

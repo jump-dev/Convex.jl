@@ -83,11 +83,11 @@ by [`fix!`](@ref) and [`free!`](@ref).
 vexity!(x::AbstractVariable, v::Vexity) = x.vexity = v
 
 """
-    sign(x::AbstractVariable)
+    Base.sign(x::AbstractVariable)
 
 Returns the current sign of `x`.
 """
-sign(x::AbstractVariable) = x.sign
+Base.sign(x::AbstractVariable) = x.sign
 
 """
     sign!(x::AbstractVariable, s::Sign)
@@ -260,7 +260,7 @@ mutable struct ComplexVariable <: AbstractVariable
 end
 
 vartype(::ComplexVariable) = ContVar
-sign(::ComplexVariable) = ComplexSign()
+Base.sign(::ComplexVariable) = ComplexSign()
 
 Variable(size::Tuple{Int,Int}, sign::Sign) = Variable(size, sign, ContVar)
 function Variable(size::Tuple{Int,Int}, vartype::VarType)

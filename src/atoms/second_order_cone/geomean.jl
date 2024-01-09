@@ -1,5 +1,3 @@
-import Base.sqrt
-
 mutable struct GeoMeanAtom <: AbstractExpr
     children::NTuple{N,AbstractExpr} where {N}
     size::Tuple{Int,Int}
@@ -20,7 +18,7 @@ end
 
 head(io::IO, ::GeoMeanAtom) = print(io, "geomean")
 
-function sign(q::GeoMeanAtom)
+function Base.sign(q::GeoMeanAtom)
     return Positive()
 end
 
@@ -58,4 +56,5 @@ function new_conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
 end
 
 geomean(args::AbstractExprOrValue...) = GeoMeanAtom(args...)
-sqrt(x::AbstractExpr) = GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
+
+Base.sqrt(x::AbstractExpr) = GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))

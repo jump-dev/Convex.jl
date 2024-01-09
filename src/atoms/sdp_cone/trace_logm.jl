@@ -1,5 +1,5 @@
 #############################################################################
-# trace_logm(X, C) returns tr(C*logm(X)) where X and C are a positive definite
+# trace_logm(X, C) returns LinearAlgebra.tr(C*logm(X)) where X and C are a positive definite
 # matrices and C is constant.
 #
 # trace_logm is concave in X.
@@ -10,7 +10,7 @@
 # of square-roots to take. See reference for more details.
 #
 # Implementation uses the expression
-#   tr(C*logm(X)) = -tr(C*D_{op}(I||X))
+#   LinearAlgebra.tr(C*logm(X)) = -LinearAlgebra.tr(C*D_{op}(I||X))
 # where D_{op} is the operator relative entropy:
 #   D_{op}(X||Y) = X^{1/2}*logm(X^{1/2} Y^{-1} X^{1/2})*X^{1/2}
 #
@@ -47,7 +47,7 @@ mutable struct TraceLogm <: AbstractExpr
         if norm(C - C') > 1e-6
             throw(DomainError(C, "C must be Hermitian"))
         end
-        if any(eigvals(Hermitian(C)) .< -1e-6)
+        if any(LinearAlgebra.eigvals(LinearAlgebra.Hermitian(C)) .< -1e-6)
             throw(DomainError(C, "C must be positive semidefinite"))
         end
         return new(children, (1, 1), C, m, k)
@@ -56,7 +56,7 @@ end
 
 head(io::IO, ::TraceLogm) = print(io, "trace_logm")
 
-function sign(atom::TraceLogm)
+function Base.sign(atom::TraceLogm)
     return NoSign()
 end
 
@@ -92,7 +92,7 @@ function trace_logm(
     k::Integer = 3,
 )
     #println("trace_logm constant X")
-    eye = Matrix(1.0 * I, size(X))
+    eye = Matrix(1.0 * LinearAlgebra.I, size(X))
     return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
@@ -101,7 +101,7 @@ function new_conic_form!(context::Context{T}, atom::TraceLogm) where {T}
     C = atom.C
     m = atom.m
     k = atom.k
-    eye = Matrix(one(T) * I, size(X))
+    eye = Matrix(one(T) * LinearAlgebra.I, size(X))
 
     is_complex = sign(X) == ComplexSign() || sign(constant(C)) == ComplexSign()
     if is_complex
@@ -112,6 +112,6 @@ function new_conic_form!(context::Context{T}, atom::TraceLogm) where {T}
     add_constraint!(context, τ in RelativeEntropyEpiCone(eye, X, m, k))
 
     # It's already a real mathematically, but need to make it a real type.
-    t = real(-tr(C * τ))
+    t = real(-LinearAlgebra.tr(C * τ))
     return conic_form!(context, maximize(t))
 end

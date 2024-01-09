@@ -2,19 +2,20 @@
 # which is available under an MIT license (see LICENSE).
 
 module ProblemDepot
-using BenchmarkTools, Test
-using MathOptInterface
-const MOI = MathOptInterface
+
+using BenchmarkTools
 using Convex
-using LinearAlgebra
-using LinearAlgebra: eigen, I, opnorm
 using Convex: AffineVexity, ConcaveVexity, ConvexVexity
+using Test
+
+import LinearAlgebra
+import MathOptInterface as MOI
 
 randperm(d) = sortperm(rand(d))
 shuffle(x) = x[randperm(length(x))]
 mean(x) = sum(x) / length(x)
-eye(n, T) = Matrix{T}(I, n, n)
-eye(n) = Matrix{Float64}(I, n, n)
+eye(n, T) = Matrix{T}(LinearAlgebra.I, n, n)
+eye(n) = Matrix{Float64}(LinearAlgebra.I, n, n)
 
 """
     const PROBLEMS = Dict{String, Dict{String, Function}}()

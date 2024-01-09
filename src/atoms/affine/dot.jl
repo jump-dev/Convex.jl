@@ -1,5 +1,3 @@
-import LinearAlgebra.dot
-
 function ismatrix(x::AbstractExpr)
     return (s = size(x); length(s) == 2 && s[1] > 1 && s[2] > 1)
 end
@@ -12,6 +10,6 @@ ismatrix(::Any) = false
 asvec(x) = convert(AbstractExpr, ismatrix(x) ? vec(x) : x)
 _vecdot(x, y) = sum(broadcast(*, conj(asvec(x)), asvec(y)))
 
-dot(x::AbstractExpr, y::AbstractExpr) = _vecdot(x, y)
-dot(x::Value, y::AbstractExpr) = _vecdot(x, y)
-dot(x::AbstractExpr, y::Value) = _vecdot(x, y)
+LinearAlgebra.dot(x::AbstractExpr, y::AbstractExpr) = _vecdot(x, y)
+LinearAlgebra.dot(x::Value, y::AbstractExpr) = _vecdot(x, y)
+LinearAlgebra.dot(x::AbstractExpr, y::Value) = _vecdot(x, y)

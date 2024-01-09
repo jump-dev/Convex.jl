@@ -30,7 +30,7 @@ mutable struct RelativeEntropyEpiCone
         Y::AbstractExpr,
         m::Integer = 3,
         k::Integer = 3,
-        e::AbstractArray = Matrix(1.0 * I, size(X)),
+        e::AbstractArray = Matrix(1.0 * LinearAlgebra.I, size(X)),
     )
         if size(X) != size(Y)
             throw(DimensionMismatch("X and Y must be the same size"))
@@ -54,7 +54,7 @@ mutable struct RelativeEntropyEpiCone
         Y::AbstractExpr,
         m::Integer = 3,
         k::Integer = 3,
-        e::AbstractArray = Matrix(1.0 * I, size(X)),
+        e::AbstractArray = Matrix(1.0 * LinearAlgebra.I, size(X)),
     )
         return RelativeEntropyEpiCone(constant(X), Y, m, k, e)
     end
@@ -63,7 +63,7 @@ mutable struct RelativeEntropyEpiCone
         Y::Value,
         m::Integer = 3,
         k::Integer = 3,
-        e::AbstractArray = Matrix(1.0 * I, size(X)),
+        e::AbstractArray = Matrix(1.0 * LinearAlgebra.I, size(X)),
     )
         return RelativeEntropyEpiCone(X, constant(Y), m, k, e)
     end
@@ -72,7 +72,7 @@ mutable struct RelativeEntropyEpiCone
         Y::Value,
         m::Integer = 3,
         k::Integer = 3,
-        e::AbstractArray = Matrix(1.0 * I, size(X)),
+        e::AbstractArray = Matrix(1.0 * LinearAlgebra.I, size(X)),
     )
         return RelativeEntropyEpiCone(constant(X), constant(Y), m, k, e)
     end
@@ -105,7 +105,7 @@ function head(io::IO, ::RelativeEntropyEpiConeConstraint)
     return print(io, "∈(RelativeEntropyEpiCone)")
 end
 
-in(τ, cone::RelativeEntropyEpiCone) = RelativeEntropyEpiConeConstraint(τ, cone)
+Base.in(τ, cone::RelativeEntropyEpiCone) = RelativeEntropyEpiConeConstraint(τ, cone)
 
 function AbstractTrees.children(constraint::RelativeEntropyEpiConeConstraint)
     return (constraint.τ, constraint.cone.X, constraint.cone.Y)
@@ -139,8 +139,8 @@ function glquad(m)
     # Clenshaw-Curtis?", SIAM Review 2008] and computes the weights and
     # nodes on [-1, 1].
     beta = [0.5 ./ sqrt(1 - (2 * i)^-2) for i in 1:(m-1)] # 3-term recurrence coeffs
-    T = diagm(1 => beta, -1 => beta) # Jacobi matrix
-    s, V = eigen(T)
+    T = LinearAlgebra.diagm(1 => beta, -1 => beta) # Jacobi matrix
+    s, V = LinearAlgebra.eigen(T)
     w = 2 * V[1, :] .^ 2 # weights
     # Translate and scale to [0, 1]
     s = (s .+ 1) / 2

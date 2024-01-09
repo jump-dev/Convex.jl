@@ -1,9 +1,7 @@
-import LinearAlgebra.norm
-
 # deprecate these soon
 norm_inf(x::AbstractExpr) = maximum(abs(x))
 norm_1(x::AbstractExpr) = sum(abs(x))
-norm_fro(x::AbstractExpr) = norm2(vec(x))
+norm_fro(x::AbstractExpr) = LinearAlgebra.norm2(vec(x))
 
 """
     norm(x::AbstractExpr, p::Real=2)
@@ -26,7 +24,7 @@ function LinearAlgebra.norm(x::AbstractExpr, p::Real = 2)
     if p == 1
         return norm_1(x)
     elseif p == 2
-        return norm2(x)
+        return LinearAlgebra.norm2(x)
     elseif p == Inf
         return norm_inf(x)
     elseif p > 1

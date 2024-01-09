@@ -25,7 +25,7 @@ end
 
 head(io::IO, ::MatrixFracAtom) = print(io, "matrixfrac")
 
-function sign(m::MatrixFracAtom)
+function Base.sign(m::MatrixFracAtom)
     return Positive()
 end
 

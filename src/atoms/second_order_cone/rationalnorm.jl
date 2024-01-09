@@ -27,7 +27,7 @@ end
 
 head(io::IO, ::RationalNormAtom) = print(io, "rationalnorm")
 
-function sign(x::RationalNormAtom)
+function Base.sign(x::RationalNormAtom)
     return Positive()
 end
 

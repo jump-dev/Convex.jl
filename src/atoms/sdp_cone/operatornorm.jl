@@ -5,7 +5,6 @@
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import LinearAlgebra: opnorm
 
 ### Operator norm
 
@@ -21,7 +20,7 @@ end
 
 head(io::IO, ::OperatorNormAtom) = print(io, "opnorm")
 
-function sign(x::OperatorNormAtom)
+function Base.sign(x::OperatorNormAtom)
     return Positive()
 end
 
@@ -36,12 +35,12 @@ end
 
 # in julia, `norm` on matrices is the operator norm
 function evaluate(x::OperatorNormAtom)
-    return opnorm(evaluate(x.children[1]), 2)
+    return LinearAlgebra.opnorm(evaluate(x.children[1]), 2)
 end
 
 sigmamax(x::AbstractExpr) = OperatorNormAtom(x)
 
-function opnorm(x::AbstractExpr, p::Real = 2)
+function LinearAlgebra.opnorm(x::AbstractExpr, p::Real = 2)
     if length(size(x)) <= 1 || minimum(size(x)) == 1
         throw(ArgumentError("argument to `opnorm` must be a matrix"))
     end
@@ -58,7 +57,7 @@ function opnorm(x::AbstractExpr, p::Real = 2)
     end
 end
 
-Base.@deprecate operatornorm(x::AbstractExpr) opnorm(x)
+Base.@deprecate operatornorm(x::AbstractExpr) LinearAlgebra.opnorm(x)
 
 function new_conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
     A = x.children[1]

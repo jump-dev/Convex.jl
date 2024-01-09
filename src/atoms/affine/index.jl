@@ -1,5 +1,3 @@
-import Base.getindex
-
 const ArrayOrNothing = Union{AbstractArray,Nothing}
 
 mutable struct IndexAtom <: AbstractExpr
@@ -30,7 +28,7 @@ head(io::IO, ::IndexAtom) = print(io, "index")
 
 ## Type definition ends here
 
-function sign(x::IndexAtom)
+function Base.sign(x::IndexAtom)
     return sign(x.children[1])
 end
 
@@ -53,7 +51,7 @@ function evaluate(x::IndexAtom)
 end
 
 function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
-    obj = conic_form!(context, only(children(x)))
+    obj = conic_form!(context, only(AbstractTrees.children(x)))
 
     m = length(x)
     n = length(x.children[1])
@@ -87,41 +85,41 @@ end
 
 ## API Definition begins
 
-function getindex(
+function Base.getindex(
     x::AbstractExpr,
     rows::AbstractVector{T},
     cols::AbstractVector{T},
 ) where {T<:Real}
     return IndexAtom(x, rows, cols)
 end
-getindex(x::AbstractExpr, inds::AbstractVector{<:Real}) = IndexAtom(x, inds)
-getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
-getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
-function getindex(x::AbstractExpr, row::Real, cols::AbstractVector{<:Real})
+Base.getindex(x::AbstractExpr, inds::AbstractVector{<:Real}) = IndexAtom(x, inds)
+Base.getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
+Base.getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
+function Base.getindex(x::AbstractExpr, row::Real, cols::AbstractVector{<:Real})
     return getindex(x, row:row, cols)
 end
-function getindex(x::AbstractExpr, rows::AbstractVector{<:Real}, col::Real)
+function Base.getindex(x::AbstractExpr, rows::AbstractVector{<:Real}, col::Real)
     return getindex(x, rows, col:col)
 end
 # XXX todo: speed test; there are lots of possible solutions for this
-function getindex(x::AbstractExpr, I::AbstractMatrix{Bool})
+function Base.getindex(x::AbstractExpr, I::AbstractMatrix{Bool})
     return [xi for (xi, ii) in zip(x, I) if ii]
 end
-function getindex(x::AbstractExpr, I::AbstractVector{Bool})
+function Base.getindex(x::AbstractExpr, I::AbstractVector{Bool})
     return [xi for (xi, ii) in zip(x, I) if ii]
 end
 # Colon methods
 # All rows and columns
-function getindex(x::AbstractExpr, cln_r::Colon, cln_c::Colon)
+function Base.getindex(x::AbstractExpr, cln_r::Colon, cln_c::Colon)
     rows, cols = size(x)
     return getindex(x, 1:rows, 1:cols)
 end
 # All rows for this column(s)
-getindex(x::AbstractExpr, cln_r::Colon, col) = getindex(x, 1:size(x)[1], col)
+Base.getindex(x::AbstractExpr, cln_r::Colon, col) = getindex(x, 1:size(x)[1], col)
 # All columns for this row(s)
-getindex(x::AbstractExpr, row, cln_c::Colon) = getindex(x, row, 1:size(x)[2])
+Base.getindex(x::AbstractExpr, row, cln_c::Colon) = getindex(x, row, 1:size(x)[2])
 
 # Cartesian Index
-getindex(x::AbstractExpr, c::CartesianIndex{N}) where {N} = x[Tuple(c)...]
+Base.getindex(x::AbstractExpr, c::CartesianIndex{N}) where {N} = x[Tuple(c)...]
 
 ## API Definition ends

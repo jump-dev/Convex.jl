@@ -1,12 +1,12 @@
 struct Optimizer{T,M} <: MOI.AbstractOptimizer
     context::Context{T,M}
-    moi_to_convex::OrderedDict{MOI.VariableIndex,UInt64}
+    moi_to_convex::OrderedCollections.OrderedDict{MOI.VariableIndex,UInt64}
     convex_to_moi::Dict{UInt64,Vector{MOI.VariableIndex}}
     constraint_map::Vector{MOI.ConstraintIndex}
     function Optimizer(context::Context{T,M}) where {T,M}
         return new{T,M}(
             context,
-            OrderedDict{MOI.VariableIndex,UInt64}(),
+            OrderedCollections.OrderedDict{MOI.VariableIndex,UInt64}(),
             Dict{UInt64,MOI.VariableIndex}(),
             MOI.ConstraintIndex[],
         )

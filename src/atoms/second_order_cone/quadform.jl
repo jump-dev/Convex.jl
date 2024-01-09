@@ -13,25 +13,25 @@ function is_psd(A; tol = sqrt(eps(float(real(eltype(A))))))
     # * sparse fallback if the arithmetic is supported
     # * dense fallack otherwise
     if T <: AbstractFloat || T <: LinearAlgebra.BlasFloat
-        return is_psd(sparse(A); tol = tol)
+        return is_psd(SparseArrays.sparse(A); tol = tol)
     else
         return is_psd(Matrix(A); tol = tol)
     end
 end
 function is_psd(
-    A::SparseMatrixCSC{Complex{T}};
+    A::SparseArrays.SparseMatrixCSC{Complex{T}};
     tol::T = sqrt(eps(T)),
 ) where {T<:LinearAlgebra.BlasReal}
-    return isposdef(A + tol * I)
+    return LinearAlgebra.isposdef(A + tol * LinearAlgebra.I)
 end
 function is_psd(
-    A::SparseMatrixCSC{T};
+    A::SparseArrays.SparseMatrixCSC{T};
     tol::T = sqrt(eps(T)),
 ) where {T<:AbstractFloat}
     # LDLFactorizations requires the input matrix to only have the upper triangle.
-    A_ = Symmetric(sparse(UpperTriangular(A)) + tol * I)
+    A_ = LinearAlgebra.Symmetric(SparseArrays.sparse(LinearAlgebra.UpperTriangular(A)) + tol * LinearAlgebra.I)
     try
-        F = ldl(A_)
+        F = LDLFactorizations.ldl(A_)
         d = F.D.diag
         return minimum(d) >= 0
     catch err
@@ -41,14 +41,14 @@ function is_psd(
     end
 end
 function is_psd(A::Matrix; tol = sqrt(eps(float(real(eltype(A))))))
-    return isposdef(A + tol * I)
+    return LinearAlgebra.isposdef(A + tol * LinearAlgebra.I)
 end
 
 function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     if length(size(A)) != 2 || size(A, 1) != size(A, 2)
         error("Quadratic form only takes square matrices")
     end
-    if !ishermitian(A)
+    if !LinearAlgebra.ishermitian(A)
         error("Quadratic form only defined for Hermitian matrices")
     end
     if assume_psd
@@ -63,7 +63,7 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
         end
     end
 
-    P = sqrt(Hermitian(factor * A))
+    P = sqrt(LinearAlgebra.Hermitian(factor * A))
     return factor * square(norm2(P * x))
 end
 

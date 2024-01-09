@@ -16,7 +16,7 @@ end
 
 head(io::IO, ::HuberAtom) = print(io, "huber")
 
-function sign(x::HuberAtom)
+function Base.sign(x::HuberAtom)
     return Positive()
 end
 

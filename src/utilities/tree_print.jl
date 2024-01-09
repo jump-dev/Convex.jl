@@ -6,7 +6,7 @@
 # See LICENSE for a copy of its MIT license.
 module TreePrint
 
-using AbstractTrees: children, printnode
+import AbstractTrees
 
 # Printing
 struct TreeCharSet
@@ -91,7 +91,7 @@ function _print_tree(
         println(io, line)
     end
     depth > maxdepth && return
-    c = children(tree)
+    c = AbstractTrees.children(tree)
     if !isempty(c)
         width = 0
         s = Iterators.Stateful(
@@ -136,7 +136,7 @@ function print_tree(f::Function, io::IO, tree, args...; kwargs...)
     return _print_tree(f, io, tree, args...; kwargs...)
 end
 function print_tree(io::IO, tree, args...; kwargs...)
-    return print_tree(printnode, io, tree, args...; kwargs...)
+    return print_tree(AbstractTrees.printnode, io, tree, args...; kwargs...)
 end
 function print_tree(tree, args...; kwargs...)
     return print_tree(stdout::IO, tree, args...; kwargs...)

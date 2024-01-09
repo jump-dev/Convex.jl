@@ -1,4 +1,3 @@
-import Base.show, Base.summary
 using .TreePrint
 
 """
@@ -100,7 +99,7 @@ end
 
 # A Constant is simply a wrapper around a native Julia constant
 # Hence, we simply display its value
-show(io::IO, x::Union{Constant,ComplexConstant}) = print(io, evaluate(x))
+Base.show(io::IO, x::Union{Constant,ComplexConstant}) = print(io, evaluate(x))
 
 # A variable, for example, Variable(3, 4), will be displayed as:
 # julia> Variable(3,4)
@@ -110,7 +109,7 @@ show(io::IO, x::Union{Constant,ComplexConstant}) = print(io, evaluate(x))
 # vexity: affine
 # id: 758…633
 # here, the `id` will change from run to run.
-function show(io::IO, x::AbstractVariable)
+function Base.show(io::IO, x::AbstractVariable)
     print(io, "Variable")
     print(io, "\nsize: $(size(x))")
     print(io, "\nsign: ")
@@ -159,7 +158,7 @@ function AbstractTrees.printnode(io::IO, c::ConstraintRoot)
     return AbstractTrees.printnode(io, c.constraint)
 end
 
-show(io::IO, c::Constraint) = print_tree_rstrip(io, c)
+Base.show(io::IO, c::Constraint) = print_tree_rstrip(io, c)
 
 struct ExprRoot
     expr::AbstractExpr
@@ -172,7 +171,7 @@ function AbstractTrees.printnode(io::IO, e::ExprRoot)
     return AbstractTrees.printnode(io, e.expr)
 end
 
-show(io::IO, e::AbstractExpr) = print_tree_rstrip(io, e)
+Base.show(io::IO, e::AbstractExpr) = print_tree_rstrip(io, e)
 
 struct ProblemObjectiveRoot
     head::Symbol
@@ -210,7 +209,7 @@ function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
     end
 end
 
-function show(io::IO, p::Problem)
+function Base.show(io::IO, p::Problem)
     TreePrint.print_tree(io, p, MAXDEPTH[], MAXWIDTH[])
     if p.status == MOI.OPTIMIZE_NOT_CALLED
         print(io, "\nstatus: `solve!` not called yet")

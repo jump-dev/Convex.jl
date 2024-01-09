@@ -1,5 +1,3 @@
-import LinearAlgebra.isposdef
-import Base.in
 ### Positive semidefinite cone constraint
 
 # TODO: Terrible documentation. Please fix.
@@ -35,7 +33,7 @@ function _add_constraint!(context::Context, c::SDPConstraint)
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
-        if !(evaluate(eigmin(c.child)) ≥ -CONSTANT_CONSTRAINT_TOL[])
+        if !(evaluate(LinearAlgebra.eigmin(c.child)) ≥ -CONSTANT_CONSTRAINT_TOL[])
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
@@ -66,7 +64,7 @@ function populate_dual!(
 end
 
 # TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
-function isposdef(x::AbstractExpr)
+function LinearAlgebra.isposdef(x::AbstractExpr)
     if iscomplex(x)
         SDPConstraint([real(x) -imag(x); imag(x) real(x)])
     else
@@ -74,7 +72,7 @@ function isposdef(x::AbstractExpr)
     end
 end
 
-function in(x::AbstractExpr, y::Symbol)
+function Base.in(x::AbstractExpr, y::Symbol)
     if y == :semidefinite || y == :SDP
         if iscomplex(x)
             SDPConstraint([real(x) -imag(x); imag(x) real(x)])

@@ -19,7 +19,7 @@ mutable struct NegateAtom <: AbstractExpr
 end
 head(io::IO, ::NegateAtom) = print(io, "-")
 
-function sign(x::NegateAtom)
+function Base.sign(x::NegateAtom)
     return -sign(x.children[1])
 end
 
@@ -35,11 +35,11 @@ function evaluate(x::NegateAtom)
     return -evaluate(x.children[1])
 end
 
--(x::AbstractExpr) = NegateAtom(x)
--(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
+Base.:-(x::AbstractExpr) = NegateAtom(x)
+Base.:-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
 function new_conic_form!(context::Context{T}, A::NegateAtom) where {T}
-    subobj = conic_form!(context, only(children(A)))
+    subobj = conic_form!(context, only(AbstractTrees.children(A)))
     if subobj isa Value
         return -subobj
     else
@@ -93,7 +93,7 @@ end
 
 head(io::IO, ::AdditionAtom) = print(io, "+")
 
-function sign(x::AdditionAtom)
+function Base.sign(x::AdditionAtom)
     return sum(Sign[sign(child) for child in x.children])
     # Creating an array of type Sign and adding all the sign of xhildren of x so if anyone is complex the resultant sign would be complex.
 end
@@ -117,14 +117,14 @@ function new_conic_form!(context::Context{T}, x::AdditionAtom) where {T}
         +,
         T,
         sign(x),
-        (conic_form!(context, c) for c in children(x))...,
+        (conic_form!(context, c) for c in AbstractTrees.children(x))...,
     )
     return obj
 end
 
-+(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
-+(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
-+(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
--(x::AbstractExpr, y::AbstractExpr) = x + (-y)
--(x::Value, y::AbstractExpr) = constant(x) + (-y)
--(x::AbstractExpr, y::Value) = x + constant(-y)
+Base.:+(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
+Base.:+(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
+Base.:+(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
+Base.:-(x::AbstractExpr, y::AbstractExpr) = x + (-y)
+Base.:-(x::Value, y::AbstractExpr) = constant(x) + (-y)
+Base.:-(x::AbstractExpr, y::Value) = x + constant(-y)

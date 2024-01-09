@@ -1,4 +1,3 @@
-import Base.vcat, Base.hcat, Base.hvcat
 mutable struct HcatAtom <: AbstractExpr
     children::Tuple
     size::Tuple{Int,Int}
@@ -22,7 +21,7 @@ end
 
 head(io::IO, ::HcatAtom) = print(io, "hcat")
 
-function sign(x::HcatAtom)
+function Base.sign(x::HcatAtom)
     return sum(map(sign, x.children))
 end
 
@@ -39,7 +38,7 @@ function evaluate(x::HcatAtom)
 end
 
 function new_conic_form!(context::Context{T}, x::HcatAtom) where {T}
-    objectives = map(c -> conic_form!(context, c), children(x))
+    objectives = map(c -> conic_form!(context, c), AbstractTrees.children(x))
     # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
     #  e1: x => 1 2 3
     #           4 5 6
@@ -80,15 +79,16 @@ function Base.hcat(args::AbstractExprOrValue...)
 end
 
 # TODO: implement vertical concatenation in a more efficient way
-vcat(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)...))
-function vcat(args::AbstractExprOrValue...)
+Base.vcat(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)...))
+
+function Base.vcat(args::AbstractExprOrValue...)
     if all(Base.Fix2(isa, Value), args)
         return Base.cat(args..., dims = Val(1))
     end
     return transpose(HcatAtom(map(transpose, args)...))
 end
 
-function hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
+function Base.hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
     nbr = length(rows)
     rs = Vector{Any}(undef, nbr)
     a = 1

@@ -1,6 +1,6 @@
 #############################################################################
 # lieb_ando.jl
-# Returns tr(K' * A^{1-t} * K * B^t) where A and B are positive semidefinite
+# Returns LinearAlgebra.tr(K' * A^{1-t} * K * B^t) where A and B are positive semidefinite
 # matrices and K is an arbitrary matrix (possibly rectangular).
 #
 # Disciplined convex programming information:
@@ -29,7 +29,7 @@ function lieb_ando(
     if t < -1 || t > 2
         throw(DomainError(t, "t must be between -1 and 2"))
     end
-    return real(tr(K' * A^(1 - t) * K * B^t))
+    return real(LinearAlgebra.tr(K' * A^(1 - t) * K * B^t))
 end
 
 function lieb_ando(
@@ -71,8 +71,8 @@ function lieb_ando(
     Kvec = reshape(K', n * m, 1)
     KvKv = Kvec * Kvec'
     KvKv = (KvKv + KvKv') / 2
-    Im = Matrix(1.0 * I, m, m)
-    In = Matrix(1.0 * I, n, n)
+    Im = Matrix(1.0 * LinearAlgebra.I, m, m)
+    In = Matrix(1.0 * LinearAlgebra.I, n, n)
 
     is_complex =
         sign(A) == ComplexSign() ||
@@ -90,14 +90,14 @@ function lieb_ando(
             T,
             T in GeomMeanHypoCone(kron(A, Im), kron(In, conj(B)), t, false),
         )
-        return real(tr(KvKv * T))
+        return real(LinearAlgebra.tr(KvKv * T))
     elseif (t >= -1 && t <= 0) || (t >= 1 && t <= 2)
         # Convex function
         add_constraint!(
             T,
             T in GeomMeanEpiCone(kron(A, Im), kron(In, conj(B)), t, false),
         )
-        return real(tr(KvKv * T))
+        return real(LinearAlgebra.tr(KvKv * T))
     else
         throw(DomainError(t, "t must be between -1 and 2"))
     end

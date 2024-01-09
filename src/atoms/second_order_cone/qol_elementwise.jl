@@ -1,5 +1,3 @@
-import Base.Broadcast.broadcasted
-
 mutable struct QolElemAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
@@ -17,7 +15,7 @@ end
 
 head(io::IO, ::QolElemAtom) = print(io, "qol_elem")
 
-function sign(q::QolElemAtom)
+function Base.sign(q::QolElemAtom)
     return Positive()
 end
 
@@ -51,29 +49,31 @@ end
 
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 
-function broadcasted(::typeof(^), x::AbstractExpr, k::Int)
+function Base.Broadcast.broadcasted(::typeof(^), x::AbstractExpr, k::Int)
     return k == 2 ? QolElemAtom(x, constant(ones(x.size[1], x.size[2]))) :
            error("raising variables to powers other than 2 is not implemented")
 end
 
 # handle literal case
-function broadcasted(
+function Base.Broadcast.broadcasted(
     ::typeof(Base.literal_pow),
     ::typeof(^),
     x::AbstractExpr,
     ::Val{k},
 ) where {k}
-    return broadcasted(^, x, k)
+    return Base.Broadcast.broadcasted(^, x, k)
 end
 
 invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size[1], x.size[2])), x)
-function broadcasted(::typeof(/), x::Value, y::AbstractExpr)
+function Base.Broadcast.broadcasted(::typeof(/), x::Value, y::AbstractExpr)
     return dotmultiply(constant(x), invpos(y))
 end
-function /(x::Value, y::AbstractExpr)
+
+function Base.:/(x::Value, y::AbstractExpr)
     return size(y) == (1, 1) ? MultiplyAtom(constant(x), invpos(y)) :
            error("cannot divide by a variable of size $(size(y))")
 end
+
 sumsquares(x::AbstractExpr) = square(norm2(x))
 
 function square(x::AbstractExpr)

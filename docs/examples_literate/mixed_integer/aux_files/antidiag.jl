@@ -40,7 +40,7 @@ struct AntidiagAtom <: AbstractExpr
     end
 end
 
-function sign(x::AntidiagAtom)
+function Base.sign(x::AntidiagAtom)
     return sign(x.children[1])
 end
 

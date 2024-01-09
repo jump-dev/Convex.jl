@@ -1,5 +1,5 @@
 #############################################################################
-# quantum_entropy returns -tr(X*log(X)) where X is a positive semidefinite.
+# quantum_entropy returns -LinearAlgebra.tr(X*log(X)) where X is a positive semidefinite.
 # Note this function uses logarithm base e, not base 2, so return value is in
 # units of nats, not bits.
 #
@@ -41,7 +41,7 @@ end
 
 head(io::IO, ::QuantumEntropy) = print(io, "quantum_entropy")
 
-function sign(atom::QuantumEntropy)
+function Base.sign(atom::QuantumEntropy)
     return Positive()
 end
 
@@ -67,7 +67,7 @@ end
 
 function quantum_entropy(X::MatrixOrConstant, m::Integer = 0, k::Integer = 0)
     #println("quantum_entropy constant X")
-    return -quantum_relative_entropy(X, Matrix(1.0 * I, size(X)))
+    return -quantum_relative_entropy(X, Matrix(1.0 * LinearAlgebra.I, size(X)))
 end
 
 function new_conic_form!(context::Context, atom::QuantumEntropy)
@@ -75,7 +75,7 @@ function new_conic_form!(context::Context, atom::QuantumEntropy)
     m = atom.m
     k = atom.k
     n = size(X)[1]
-    eye = Matrix(1.0 * I, n, n)
+    eye = Matrix(1.0 * LinearAlgebra.I, n, n)
 
     add_constraint!(context, X ⪰ 0)
 
@@ -88,6 +88,6 @@ function new_conic_form!(context::Context, atom::QuantumEntropy)
     add_constraint!(context, τ in RelativeEntropyEpiCone(X, eye, m, k))
 
     # It's already a real mathematically, but need to make it a real type.
-    τ = real(-tr(τ))
+    τ = real(-LinearAlgebra.tr(τ))
     return conic_form!(context, minimize(τ))
 end

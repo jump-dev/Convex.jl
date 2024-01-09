@@ -3,7 +3,7 @@ mutable struct Context{T,M}
     model::M
 
     # Used for populating variable values after solving
-    var_id_to_moi_indices::OrderedDict{
+    var_id_to_moi_indices::OrderedCollections.OrderedDict{
         UInt64,
         Union{
             Vector{MOI.VariableIndex},
@@ -11,7 +11,7 @@ mutable struct Context{T,M}
         },
     }
     # `id_hash` -> `AbstractVariable`
-    id_to_variables::OrderedDict{UInt64,Any}
+    id_to_variables::OrderedCollections.OrderedDict{UInt64,Any}
 
     # Used for populating constraint duals
     constr_to_moi_inds::IdDict{Any,Any}
@@ -27,8 +27,8 @@ function Context{T}(optimizer_factory) where {T}
     model = MOI.instantiate(optimizer_factory, with_bridge_type = T)
     return Context{T,typeof(model)}(
         model,
-        OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
-        OrderedDict{UInt64,Any}(),
+        OrderedCollections.OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
+        OrderedCollections.OrderedDict{UInt64,Any}(),
         IdDict{Any,Any}(),
         false,
         IdDict{Any,Any}(),

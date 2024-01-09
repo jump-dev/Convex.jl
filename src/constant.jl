@@ -77,7 +77,7 @@ end
 
 AbstractTrees.children(c::ComplexConstant) = tuple()
 vexity(::ComplexConstant) = ConstVexity()
-sign(::ComplexConstant) = ComplexSign()
+Base.sign(::ComplexConstant) = ComplexSign()
 
 function evaluate(c::ComplexConstant)
     return evaluate(c.real_constant) + im * evaluate(c.imag_constant)
@@ -131,11 +131,11 @@ end
 
 evaluate(x::Constant) = output(x.value)
 
-sign(x::Constant) = x.sign
+Base.sign(x::Constant) = x.sign
 
 # We can more efficiently get the length of a constant by asking for the length of its
 # value, which Julia can get via Core.arraylen for arrays and knows is 1 for scalars
-length(x::Constant) = length(x.value)
+Base.length(x::Constant) = length(x.value)
 
 function new_conic_form!(::Context{T}, C::Constant) where {T}
     # this should happen at `Constant` creation?

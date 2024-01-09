@@ -41,10 +41,10 @@ Returns a matrix `M` so that for any vector `v` of length `prod(dims)`,
 function permutedims_matrix(dims, p)
     d = prod(dims)
     n = length(dims)
-    return sparse(
+    return SparseArrays.sparse(
         reshape(
             PermutedDimsArray(
-                reshape(Matrix(I, d, d), (dims..., dims...)),
+                reshape(Matrix(LinearAlgebra.I, d, d), (dims..., dims...)),
                 (p..., (n+1:2n)...),
             ),
             (d, d),

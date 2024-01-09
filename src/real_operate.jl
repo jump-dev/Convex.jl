@@ -146,7 +146,7 @@ function real_operate(
 ) where {T<:Real}
     op1 = SparseAffineOperation(tape1)
     op2 = SparseAffineOperation(tape2)
-    A = blockdiag(op1.matrix, op2.matrix)
+    A = SparseArrays.blockdiag(op1.matrix, op2.matrix)
     b = vcat(op1.vector, op2.vector)
     x = vcat(tape1.variables, tape2.variables)
     return SparseTape(SparseAffineOperation(A, b), x)
@@ -228,7 +228,7 @@ function real_operate(
 ) where {T<:Real}
     all_args = (arg1, arg2, arg3, args...)
     ops = SparseAffineOperation.(all_args)
-    A = blockdiag((op.matrix for op in ops)...)
+    A = SparseArrays.blockdiag((op.matrix for op in ops)...)
     b = vcat((op.vector for op in ops)...)
     x = vcat((arg.variables for arg in all_args)...)
     return SparseTape(SparseAffineOperation(A, b), x)

@@ -30,7 +30,7 @@ end
 
 head(io::IO, ::SumLargestAtom) = print(io, "sumlargest")
 
-function sign(x::SumLargestAtom)
+function Base.sign(x::SumLargestAtom)
     return sign(x.children[1])
 end
 

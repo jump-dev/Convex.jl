@@ -13,7 +13,7 @@ end
 
 head(io::IO, ::QuadOverLinAtom) = print(io, "qol")
 
-function sign(q::QuadOverLinAtom)
+function Base.sign(q::QuadOverLinAtom)
     return Positive()
 end
 

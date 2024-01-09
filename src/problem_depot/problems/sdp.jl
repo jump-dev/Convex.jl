@@ -74,7 +74,7 @@ end
     y = Variable((3, 3))
     p = minimize(
         x + y[1, 1],
-        isposdef(y),
+        LinearAlgebra.isposdef(y),
         x >= 1,
         y[2, 1] == 1;
         numeric_type = T,
@@ -129,8 +129,8 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ sum(svdvals(A)) atol = atol rtol = rtol
-        @test evaluate(nuclearnorm(y)) ≈ sum(svdvals(A)) atol = atol rtol = rtol
+        @test p.optval ≈ sum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
+        @test evaluate(nuclearnorm(y)) ≈ sum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
     end
 end
 
@@ -143,7 +143,7 @@ end
 ) where {T,test}
     y = Variable((3, 3))
     p = minimize(
-        opnorm(y),
+        LinearAlgebra.opnorm(y),
         y[2, 1] <= 4,
         y[2, 2] >= 3,
         sum(y) >= 12;
@@ -156,7 +156,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 4 atol = atol rtol = rtol
-        @test evaluate(opnorm(y)) ≈ 4 atol = atol rtol = rtol
+        @test evaluate(LinearAlgebra.opnorm(y)) ≈ 4 atol = atol rtol = rtol
     end
 end
 
@@ -169,15 +169,15 @@ end
 ) where {T,test}
     A = [1 2im 3 4; 4im 3im 2 1; 4 5 6 7]
     y = ComplexVariable(3, 4)
-    p = minimize(opnorm(y), y == A; numeric_type = T)
+    p = minimize(LinearAlgebra.opnorm(y), y == A; numeric_type = T)
 
     if test
         @test problem_vexity(p) == ConvexVexity()
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ maximum(svdvals(A)) atol = atol rtol = rtol
-        @test evaluate(opnorm(y)) ≈ maximum(svdvals(A)) atol = atol rtol = rtol
+        @test p.optval ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
+        @test evaluate(LinearAlgebra.opnorm(y)) ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
     end
 end
 
@@ -351,7 +351,7 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ sum(eigvals(A)[2:end]) atol = atol rtol = rtol
+        @test p.optval ≈ sum(LinearAlgebra.eigvals(A)[2:end]) atol = atol rtol = rtol
     end
 
     x1 = Semidefinite(3)
@@ -659,7 +659,7 @@ end
 
     handle_problem!(p)
     # test that X is approximately equal to posA:
-    l, v = eigen(A)
+    l, v = LinearAlgebra.eigen(A)
     posA = v * Diagonal(max.(l, 0)) * v'
 
     if test
@@ -1007,7 +1007,7 @@ end
     A = Variable(n, n)
     B = randn(n, n)
     B = B * B' # now A is positive semidefinite
-    B += 0.2 * I # prevent numerical instability
+    B += 0.2 * LinearAlgebra.I # prevent numerical instability
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 0)
     objective = tr(A)
@@ -1031,7 +1031,7 @@ end
     A = Variable(n, n)
     B = randn(n, n)
     B = B * B' # now A is positive semidefinite
-    B += 0.2 * I # prevent numerical instability
+    B += 0.2 * LinearAlgebra.I # prevent numerical instability
 
     c1 = eye(n) in GeomMeanHypoCone(B, A, 1)
     objective = tr(A)
@@ -1054,7 +1054,7 @@ end
     n = 4
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 1 // 2)
@@ -1078,7 +1078,7 @@ end
     n = 4
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 3 // 8)
@@ -1103,7 +1103,7 @@ end
     n = 4
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 3 // 5)
@@ -1128,7 +1128,7 @@ end
     n = 4
     A = randn(ComplexF64, n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 1 // 2)
@@ -1153,7 +1153,7 @@ end
     n = 4
     A = randn(ComplexF64, n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 3 // 8)
@@ -1179,7 +1179,7 @@ end
     n = 4
     A = randn(ComplexF64, n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
     c1 = eye(n) in GeomMeanHypoCone(A, B, 3 // 5)
@@ -1240,7 +1240,7 @@ end
     n = 3
     B = randn(n, n)
     B = B * B' # now B is positive semidefinite
-    B += 0.2 * I # prevent numerical instability
+    B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
     c1 = eye(n) in GeomMeanEpiCone(A, B, -1)
@@ -1265,7 +1265,7 @@ end
     n = 3
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
@@ -1291,7 +1291,7 @@ end
     n = 3
     B = randn(n, n)
     B = B * B' # now B is positive semidefinite
-    B += 0.2 * I # prevent numerical instability
+    B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
     c1 = eye(n) in GeomMeanEpiCone(A, B, -3 // 5)
@@ -1316,7 +1316,7 @@ end
     n = 3
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
@@ -1342,7 +1342,7 @@ end
     n = 3
     B = randn(n, n)
     B = B * B' # now B is positive semidefinite
-    B += 0.2 * I # prevent numerical instability
+    B += 0.2 * LinearAlgebra.I # prevent numerical instability
     B /= tr(B) # solver has problems if B is large
     A = Variable(n, n)
 
@@ -1368,7 +1368,7 @@ end
     n = 3
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
     c1 = eye(n) in GeomMeanEpiCone(A, B, 8 // 5)
@@ -1731,11 +1731,11 @@ end
 
     for cplx in [false, true]
         if cplx
-            ψ1 = normalize(randn(ComplexF64, n))
-            ψ2 = normalize(randn(ComplexF64, n))
+            ψ1 = LinearAlgebra.normalize(randn(ComplexF64, n))
+            ψ2 = LinearAlgebra.normalize(randn(ComplexF64, n))
         else
-            ψ1 = normalize(randn(Float64, n))
-            ψ2 = normalize(randn(Float64, n))
+            ψ1 = LinearAlgebra.normalize(randn(Float64, n))
+            ψ2 = LinearAlgebra.normalize(randn(Float64, n))
         end
         ρ1 = ψ1 * ψ1'
         ρ2 = ψ2 * ψ2'
@@ -1956,7 +1956,7 @@ end
     n = 3
     A = randn(n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     C = randn(n, n)
     C = C * C' # now C is positive semidefinite
     t = -1 // 4
@@ -1992,7 +1992,7 @@ end
     n = 3
     A = randn(ComplexF64, n, n)
     A = A * A' # now A is positive semidefinite
-    A += 0.2 * I # prevent numerical instability
+    A += 0.2 * LinearAlgebra.I # prevent numerical instability
     C = randn(ComplexF64, n, n)
     C = C * C' # now C is positive semidefinite
     t = -1 // 4
@@ -2268,7 +2268,7 @@ end
     H = rand(ComplexF64, d₁ * d₂, d₁ * d₂)
     U = exp(im * π * (H + H'))
     K = rand(ComplexF64, d₁ * d₂, d₁ * d₂)
-    K *= d₁ / LinearAlgebra.tr(K' * K)
+    K *= d₁ / tr(K' * K)
     ρ = Semidefinite(d₂)
     J = sum(
         kron(
@@ -2276,7 +2276,7 @@ end
             partialtrace(
                 U' *
                 (
-                    K * kron(((1:d₁) .== j) * ((1:d₁) .== k)', I(d₂)) * K' -
+                    K * kron(((1:d₁) .== j) * ((1:d₁) .== k)', LinearAlgebra.I(d₂)) * K' -
                     kron(((1:d₁) .== j) * ((1:d₁) .== k)', ρ)
                 ) *
                 U,
@@ -2286,10 +2286,10 @@ end
         ) for j in 1:d₁, k in 1:d₁
     )
     constraints = [tr(ρ) == 1]
-    p = minimize(opnorm(J, Inf), constraints; numeric_type = T)
+    p = minimize(LinearAlgebra.opnorm(J, Inf), constraints; numeric_type = T)
     handle_problem!(p)
     if test
-        @test p.optval ≈ opnorm(evaluate(J), Inf) atol = atol rtol = rtol
+        @test p.optval ≈ LinearAlgebra.opnorm(evaluate(J), Inf) atol = atol rtol = rtol
         @test tr(evaluate(ρ)) ≈ 1 atol = atol rtol = rtol
     end
 end

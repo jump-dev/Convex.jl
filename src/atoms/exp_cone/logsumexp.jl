@@ -25,7 +25,7 @@ end
 
 head(io::IO, ::LogSumExpAtom) = print(io, "logsumexp")
 
-function sign(x::LogSumExpAtom)
+function Base.sign(x::LogSumExpAtom)
     return NoSign()
 end
 

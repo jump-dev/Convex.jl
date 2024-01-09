@@ -5,8 +5,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import LinearAlgebra.diagm, LinearAlgebra.Diagonal
-
 mutable struct DiagMatrixAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -33,7 +31,7 @@ end
 
 head(io::IO, ::DiagMatrixAtom) = print(io, "diagm")
 
-function sign(x::DiagMatrixAtom)
+function Base.sign(x::DiagMatrixAtom)
     return sign(x.children[1])
 end
 
@@ -49,18 +47,18 @@ function curvature(x::DiagMatrixAtom)
 end
 
 function evaluate(x::DiagMatrixAtom)
-    return Diagonal(vec(evaluate(x.children[1])))
+    return LinearAlgebra.Diagonal(vec(evaluate(x.children[1])))
 end
 
-function diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
+function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
     d == 0 || throw(ArgumentError("only the main diagonal is supported"))
     return DiagMatrixAtom(x)
 end
-Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
-diagm(x::AbstractExpr) = DiagMatrixAtom(x)
+LinearAlgebra.Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
 
 function new_conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
-    obj = conic_form!(context, only(children(x)))
+    obj = conic_form!(context, only(AbstractTrees.children(x)))
 
     sz = x.size[1]
     I = collect(1:sz+1:sz*sz)

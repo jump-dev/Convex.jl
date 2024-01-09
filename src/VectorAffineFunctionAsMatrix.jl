@@ -23,7 +23,7 @@ end
 
 # convert to a usual VAF
 function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
-    I, J, V = findnz(vaf_as_matrix.aff.matrix)
+    I, J, V = SparseArrays.findnz(vaf_as_matrix.aff.matrix)
     vats = Vector{MOI.VectorAffineTerm{T}}(undef, length(I))
     for (idx, n) in enumerate(eachindex(I, J, V))
         i = I[n]
