@@ -118,27 +118,66 @@ function MOI.supports_constraint(
     return true
 end
 
-function _expr(vi::MOI.VariableIndex, model)
-    return model.context.id_to_variables[model.moi_to_convex[vi]]
-end
-
-function _expr(v::Value, _)
+function _expr(::Optimizer, v::Value)
     return Constant(v)
 end
 
-Base.:+(e::AbstractExpr) = e
+function _expr(model::Optimizer, x::MOI.VariableIndex)
+    return model.context.id_to_variables[model.moi_to_convex[x]]
+end
 
-function _expr(func::MOI.ScalarNonlinearFunction, model)
-    if func.head == :^
-        if length(func.args) == 2 && func.args[2] == 2
-            return square(_expr(func.args[1], model))
+function _expr(model::Optimizer, f::MOI.AbstractScalarFunction)
+    return _expr(model, convert(MOI.ScalarNonlinearFunction, f))
+end
+
+function _expr(model::Optimizer, f::MOI.ScalarNonlinearFunction)
+    args = _expr.(model, f.args)
+    if f.head == :+
+        if length(args) == 1
+            return args[1]
+        elseif length(args) == 2
+            return args[1] + args[2]
+        else
+            return sum(args)
         end
-        error(
-            "Power with exponent different from 2 is not supported by Convex.jl",
-        )
+    elseif f.head == :- && length(args) == 2
+        return -(args...)
+    elseif f.head == :*
+        return *(args...)
+    elseif f.head == :/ && length(args) == 2
+        return args[1] / args[2]
+    elseif f.head == :^ && length(args) == 2
+        if f.args[2] != 2
+            msg = "Power with exponent different from 2 is not supported by Convex.jl"
+            throw(MOI.UnsupportedNonlinearoperator(:^, msg))
+        end
+        return square(_expr(model, args[1]))
+    elseif f.head == :min
+        if length(f.args) == 1
+            return args[1]
+        elseif length(args) == 2
+            return min(args[1], args[2])
+        else
+            return minimum(args)
+        end
+    elseif f.head == :max
+        if length(f.args) == 1
+            return args[1]
+        elseif length(args) == 2
+            return max(args[1], args[2])
+        else
+            return maximum(args)
+        end
+    elseif f.head == :abs
+        return abs(args[1])
+    elseif f.head == :sqrt
+        return sqrt(args[1])
+    elseif f.head == :exp
+        return exp(args[1])
+    elseif f.head == :log
+        return log(args[1])
     end
-    expr = Expr(:call, func.head, _expr.(func.args, model)...)
-    return eval(expr)
+    return throw(MOI.UnsupportedNonlinearOperator(f.head))
 end
 
 function _constraint(expr::AbstractExpr, set::MOI.EqualTo)
@@ -158,7 +197,7 @@ function MOI.add_constraint(
     func::MOI.ScalarNonlinearFunction,
     set::MOI.AbstractScalarSet,
 ) where {T}
-    constraint = _constraint(_expr(func, model), set)
+    constraint = _constraint(_expr(model, func), set)
     add_constraint!(model.context, constraint)
     push!(model.constraint_map, model.context.constr_to_moi_inds[constraint])
     return MOI.ConstraintIndex{typeof(func),typeof(set)}(
