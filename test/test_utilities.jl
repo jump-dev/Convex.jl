@@ -922,6 +922,20 @@ function test_ProbabilityVectors()
     return
 end
 
+function test_write_to_file()
+    x = Variable(3)
+    p = minimize(logsumexp(x))
+    dir = mktempdir()
+    filename = joinpath(dir, "test.mof.json")
+    @test_throws ArgumentError write_to_file(p, filename)
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    write_to_file(p, filename)
+    @test occursin("ExponentialCone", read(filename, String))
+    p_int = minimize(logsumexp(x); numeric_type = Int)
+    @test_throws MethodError write_to_file(p_int, filename)
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
