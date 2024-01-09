@@ -6,6 +6,7 @@ using Test
 import Clarabel
 # import ECOS
 import GLPK
+import MathOptInterface as MOI
 # import SCS
 
 function runtests()
