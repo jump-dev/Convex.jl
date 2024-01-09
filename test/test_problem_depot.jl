@@ -73,7 +73,7 @@ function test_Clarabel()
         exclude = [
             r"mip",
             r"sdp_lieb_ando",
-            r"sdp_quantum_relative_entropy4_lowrank",
+            r"sdp_quantum_relative_entropy3_lowrank",
         ],
     ) do p
         return solve!(p, Clarabel.Optimizer; silent_solver = true)
