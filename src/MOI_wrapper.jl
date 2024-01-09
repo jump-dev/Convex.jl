@@ -309,8 +309,11 @@ function MOI.get(
     return MOI.get(model.context.model, attr, ci)
 end
 
+# See `constraints/constraints.jl`
+# `LessThan` constraints are reformulated as `rhs - lhs` unlike MOI while
+# `GreaterThan` constraints are reformulated as `lhs - rhs` like in MOI
 _flip_dual(x, ::Type{<:MOI.LessThan}) = -x
-_flip_dual(x, ::Type{<:MOI.GreaterThan}) = x
+_flip_dual(x, ::Type{<:Union{MOI.GreaterThan,MOI.EqualTo}}) = x
 
 function MOI.get(
     model::Optimizer,
