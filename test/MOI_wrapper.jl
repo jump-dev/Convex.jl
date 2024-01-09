@@ -46,6 +46,7 @@ function test_scalar_nonlinear_function()
     model = Convex.Optimizer(ECOS.Optimizer)
     x = MOI.add_variable(model)
     y = Convex._expr(model, x)
+    tested_operators = Set{Symbol}()
     for (f, g) in Any[
         3.0=>3.0,
         x=>y,
@@ -73,7 +74,13 @@ function test_scalar_nonlinear_function()
         MOI.ScalarNonlinearFunction(:log, Any[x])=>log(y),
     ]
         @test sprint(show, Convex._expr(model, f)) == sprint(show, g)
+        if f isa MOI.ScalarNonlinearFunction
+            push!(tested_operators, f.head)
+        end
     end
+    # Test that we have a test above for every supported operator
+    operators = MOI.get(model, MOI.ListOfSupportedNonlinearOperators())
+    @test sort(collect(tested_operators)) == sort(operators)
     for f in [
         MOI.ScalarNonlinearFunction(:foo, Any[x]),
         MOI.ScalarNonlinearFunction(:^, Any[2, x]),

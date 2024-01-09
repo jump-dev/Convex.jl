@@ -184,6 +184,10 @@ function _expr(model::Optimizer, f::MOI.ScalarNonlinearFunction)
     return throw(MOI.UnsupportedNonlinearOperator(f.head))
 end
 
+function MOI.get(::Optimizer, ::MOI.ListOfSupportedNonlinearOperators)
+    return Symbol[:+, :-, :*, :/, :^, :min, :max, :abs, :sqrt, :exp, :log]
+end
+
 function _constraint(expr::AbstractExpr, set::MOI.EqualTo)
     return expr == MOI.constant(set)
 end
