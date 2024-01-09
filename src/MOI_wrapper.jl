@@ -229,7 +229,7 @@ function MOI.set(
     ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
     func::MOI.ScalarNonlinearFunction,
 )
-    cfp = conic_form!(model.context, _expr(func, model))
+    cfp = conic_form!(model.context, _expr(model, func))
     obj = scalar_fn(cfp)
     MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
     return
@@ -307,6 +307,20 @@ function MOI.get(
     ci::MOI.ConstraintIndex,
 )
     return MOI.get(model.context.model, attr, ci)
+end
+
+_flip_dual(x, ::Type{<:MOI.LessThan}) = -x
+_flip_dual(x, ::Type{<:MOI.GreaterThan}) = x
+
+function MOI.get(
+    model::Optimizer,
+    attr::MOI.AbstractConstraintAttribute,
+    ci::MOI.ConstraintIndex{MOI.ScalarNonlinearFunction,S},
+) where {S<:MOI.AbstractScalarSet}
+    return _flip_dual(
+        MOI.get(model.context.model, attr, model.constraint_map[ci.value])[],
+        S,
+    )
 end
 
 function MOI.get(model::Optimizer, I::Type{<:MOI.Index}, name::String)
