@@ -60,7 +60,7 @@ function test_scalar_nonlinear_function()
         MOI.ScalarNonlinearFunction(:-, Any[x, 2])=>-(y, 2),
         MOI.ScalarNonlinearFunction(:*, Any[x, 2])=>*(y, 2),
         MOI.ScalarNonlinearFunction(:/, Any[x, 2])=>y/2,
-        MOI.ScalarNonlinearFunction(:^, Any[x, 2])=>square(y),
+        MOI.ScalarNonlinearFunction(:^, Any[x, 2])=>Convex.square(y),
         MOI.ScalarNonlinearFunction(:min, Any[x])=>y,
         MOI.ScalarNonlinearFunction(:min, Any[x, x])=>min(y, y),
         MOI.ScalarNonlinearFunction(:min, Any[x, x, x])=>minimum([y, y, y]),
