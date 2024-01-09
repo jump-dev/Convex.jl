@@ -28,7 +28,7 @@ function test_runtests()
 end
 
 function test_scalar_nonlinear_function()
-    model = Convex.Optimizer(SCS.Optimizer)
+    model = Convex.Optimizer(ECOS.Optimizer)
     x = MOI.add_variable(model)
     y = Convex._expr(model, x)
     for (f, g) in Any[
@@ -44,7 +44,7 @@ function test_scalar_nonlinear_function()
         MOI.ScalarNonlinearFunction(:-, Any[x])=>-y,
         MOI.ScalarNonlinearFunction(:-, Any[x, 2])=>-(y, 2),
         MOI.ScalarNonlinearFunction(:*, Any[x, 2])=>*(y, 2),
-        MOI.ScalarNonlinearFunction(:/, Any[x, 2])=>y / 2,
+        MOI.ScalarNonlinearFunction(:/, Any[x, 2])=>y/2,
         MOI.ScalarNonlinearFunction(:^, Any[x, 2])=>square(y),
         MOI.ScalarNonlinearFunction(:min, Any[x])=>y,
         MOI.ScalarNonlinearFunction(:min, Any[x, x])=>min(y, y),
