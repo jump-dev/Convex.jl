@@ -226,7 +226,11 @@ function dotmultiply(x, y)
 end
 
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
-function Base.Broadcast.broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
+function Base.Broadcast.broadcasted(
+    ::typeof(*),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
     if isequal(x, y)
         return square(x)
     else

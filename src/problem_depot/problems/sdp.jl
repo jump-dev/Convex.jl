@@ -130,7 +130,8 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ sum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
-        @test evaluate(nuclearnorm(y)) ≈ sum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
+        @test evaluate(nuclearnorm(y)) ≈ sum(LinearAlgebra.svdvals(A)) atol =
+            atol rtol = rtol
     end
 end
 
@@ -176,8 +177,10 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
-        @test evaluate(LinearAlgebra.opnorm(y)) ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
+        @test p.optval ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol =
+            rtol
+        @test evaluate(LinearAlgebra.opnorm(y)) ≈
+              maximum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
     end
 end
 
@@ -351,7 +354,8 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ sum(LinearAlgebra.eigvals(A)[2:end]) atol = atol rtol = rtol
+        @test p.optval ≈ sum(LinearAlgebra.eigvals(A)[2:end]) atol = atol rtol =
+            rtol
     end
 
     x1 = Semidefinite(3)
@@ -2276,8 +2280,12 @@ end
             partialtrace(
                 U' *
                 (
-                    K * kron(((1:d₁) .== j) * ((1:d₁) .== k)', LinearAlgebra.I(d₂)) * K' -
-                    kron(((1:d₁) .== j) * ((1:d₁) .== k)', ρ)
+                    K *
+                    kron(
+                        ((1:d₁) .== j) * ((1:d₁) .== k)',
+                        LinearAlgebra.I(d₂),
+                    ) *
+                    K' - kron(((1:d₁) .== j) * ((1:d₁) .== k)', ρ)
                 ) *
                 U,
                 2,
@@ -2289,7 +2297,8 @@ end
     p = minimize(LinearAlgebra.opnorm(J, Inf), constraints; numeric_type = T)
     handle_problem!(p)
     if test
-        @test p.optval ≈ LinearAlgebra.opnorm(evaluate(J), Inf) atol = atol rtol = rtol
+        @test p.optval ≈ LinearAlgebra.opnorm(evaluate(J), Inf) atol = atol rtol =
+            rtol
         @test tr(evaluate(ρ)) ≈ 1 atol = atol rtol = rtol
     end
 end

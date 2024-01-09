@@ -208,10 +208,16 @@ end
 function Base.:+(constraint_one::Constraint, constraint_two::Constraint)
     return [constraint_one] + [constraint_two]
 end
-function Base.:+(constraint_one::Constraint, constraints_two::Array{<:Constraint})
+function Base.:+(
+    constraint_one::Constraint,
+    constraints_two::Array{<:Constraint},
+)
     return [constraint_one] + constraints_two
 end
-function Base.:+(constraints_one::Array{<:Constraint}, constraint_two::Constraint)
+function Base.:+(
+    constraints_one::Array{<:Constraint},
+    constraint_two::Constraint,
+)
     return constraints_one + [constraint_two]
 end
 

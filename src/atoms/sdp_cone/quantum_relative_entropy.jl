@@ -93,7 +93,9 @@ end
 
 head(io::IO, ::QuantumRelativeEntropy2) = print(io, "quantum_relative_entropy")
 
-Base.sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2}) = Positive()
+function Base.sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2})
+    return Positive()
+end
 
 function monotonicity(atom::QuantumRelativeEntropy1)
     return (NoMonotonicity(), NoMonotonicity())

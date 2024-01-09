@@ -53,7 +53,10 @@ function new_conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
         m, n = size(A)
         U = ComplexVariable(m, m)
         V = ComplexVariable(n, n)
-        p = minimize(real(LinearAlgebra.tr(U) + LinearAlgebra.tr(V)) / 2, [U A; A' V] ⪰ 0)
+        p = minimize(
+            real(LinearAlgebra.tr(U) + LinearAlgebra.tr(V)) / 2,
+            [U A; A' V] ⪰ 0,
+        )
         return conic_form!(context, p)
     else
         t = conic_form!(context, Variable())

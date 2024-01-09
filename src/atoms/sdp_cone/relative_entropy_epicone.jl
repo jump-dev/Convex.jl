@@ -105,7 +105,9 @@ function head(io::IO, ::RelativeEntropyEpiConeConstraint)
     return print(io, "∈(RelativeEntropyEpiCone)")
 end
 
-Base.in(τ, cone::RelativeEntropyEpiCone) = RelativeEntropyEpiConeConstraint(τ, cone)
+function Base.in(τ, cone::RelativeEntropyEpiCone)
+    return RelativeEntropyEpiConeConstraint(τ, cone)
+end
 
 function AbstractTrees.children(constraint::RelativeEntropyEpiConeConstraint)
     return (constraint.τ, constraint.cone.X, constraint.cone.Y)

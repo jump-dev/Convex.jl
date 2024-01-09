@@ -52,7 +52,18 @@ export conv,
 export DCPViolationError
 
 # rexports from LinearAlgebra
-for k in (:diag, :diagm, :Diagonal, :dot, :eigmax, :eigmin, :logdet, :norm, :norm2, :tr)
+for k in (
+    :diag,
+    :diagm,
+    :Diagonal,
+    :dot,
+    :eigmax,
+    :eigmin,
+    :logdet,
+    :norm,
+    :norm2,
+    :tr,
+)
     @eval $k = LinearAlgebra.$k
     @eval export $k
 end
@@ -65,8 +76,7 @@ export Constraint # useful for making abstractly-typed vectors via `Constraint[]
 
 # Variables
 export constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
-export curvature,
-    evaluate, fix!, free!, monotonicity, vexity, problem_vexity
+export curvature, evaluate, fix!, free!, monotonicity, vexity, problem_vexity
 export BinVar, IntVar, ContVar, vartype, vartype!
 export get_constraints, add_constraint!, set_value!, evaluate
 

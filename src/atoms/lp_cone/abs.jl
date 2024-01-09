@@ -42,7 +42,10 @@ function new_conic_form!(context::Context, A::AbsAtom)
 
     if sign(x) == ComplexSign()
         for i in 1:length(vec(t))
-            add_constraint!(context, t[i] >= LinearAlgebra.norm2([real(x[i]); imag(x[i])]))
+            add_constraint!(
+                context,
+                t[i] >= LinearAlgebra.norm2([real(x[i]); imag(x[i])]),
+            )
         end
     else
         add_constraint!(context, t >= x)

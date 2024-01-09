@@ -57,4 +57,6 @@ end
 
 geomean(args::AbstractExprOrValue...) = GeoMeanAtom(args...)
 
-Base.sqrt(x::AbstractExpr) = GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
+function Base.sqrt(x::AbstractExpr)
+    return GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
+end

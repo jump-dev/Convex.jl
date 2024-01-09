@@ -29,7 +29,10 @@ function is_psd(
     tol::T = sqrt(eps(T)),
 ) where {T<:AbstractFloat}
     # LDLFactorizations requires the input matrix to only have the upper triangle.
-    A_ = LinearAlgebra.Symmetric(SparseArrays.sparse(LinearAlgebra.UpperTriangular(A)) + tol * LinearAlgebra.I)
+    A_ = LinearAlgebra.Symmetric(
+        SparseArrays.sparse(LinearAlgebra.UpperTriangular(A)) +
+        tol * LinearAlgebra.I,
+    )
     try
         F = LDLFactorizations.ldl(A_)
         d = F.D.diag

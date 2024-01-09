@@ -92,9 +92,13 @@ function Base.getindex(
 ) where {T<:Real}
     return IndexAtom(x, rows, cols)
 end
-Base.getindex(x::AbstractExpr, inds::AbstractVector{<:Real}) = IndexAtom(x, inds)
+function Base.getindex(x::AbstractExpr, inds::AbstractVector{<:Real})
+    return IndexAtom(x, inds)
+end
 Base.getindex(x::AbstractExpr, ind::Real) = getindex(x, ind:ind)
-Base.getindex(x::AbstractExpr, row::Real, col::Real) = getindex(x, row:row, col:col)
+function Base.getindex(x::AbstractExpr, row::Real, col::Real)
+    return getindex(x, row:row, col:col)
+end
 function Base.getindex(x::AbstractExpr, row::Real, cols::AbstractVector{<:Real})
     return getindex(x, row:row, cols)
 end
@@ -115,9 +119,13 @@ function Base.getindex(x::AbstractExpr, cln_r::Colon, cln_c::Colon)
     return getindex(x, 1:rows, 1:cols)
 end
 # All rows for this column(s)
-Base.getindex(x::AbstractExpr, cln_r::Colon, col) = getindex(x, 1:size(x)[1], col)
+function Base.getindex(x::AbstractExpr, cln_r::Colon, col)
+    return getindex(x, 1:size(x)[1], col)
+end
 # All columns for this row(s)
-Base.getindex(x::AbstractExpr, row, cln_c::Colon) = getindex(x, row, 1:size(x)[2])
+function Base.getindex(x::AbstractExpr, row, cln_c::Colon)
+    return getindex(x, row, 1:size(x)[2])
+end
 
 # Cartesian Index
 Base.getindex(x::AbstractExpr, c::CartesianIndex{N}) where {N} = x[Tuple(c)...]

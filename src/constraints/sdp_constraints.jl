@@ -33,7 +33,10 @@ function _add_constraint!(context::Context, c::SDPConstraint)
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
-        if !(evaluate(LinearAlgebra.eigmin(c.child)) ≥ -CONSTANT_CONSTRAINT_TOL[])
+        if !(
+            evaluate(LinearAlgebra.eigmin(c.child)) ≥
+            -CONSTANT_CONSTRAINT_TOL[]
+        )
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
