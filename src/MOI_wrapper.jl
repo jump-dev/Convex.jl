@@ -321,7 +321,7 @@ function MOI.get(
     ci::MOI.ConstraintIndex{MOI.ScalarNonlinearFunction,S},
 ) where {S<:MOI.AbstractScalarSet}
     ret = MOI.get(model.context.model, attr, model.constraint_map[ci.value])
-    return _flip_dual(ret, S)
+    return _flip_dual(ret[], S)
 end
 
 function MOI.get(model::Optimizer, I::Type{<:MOI.Index}, name::String)
