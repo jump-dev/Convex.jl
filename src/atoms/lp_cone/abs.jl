@@ -1,45 +1,24 @@
-#############################################################################
-# abs.jl
-# Absolute value of an expression
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Absolute Value
-
 mutable struct AbsAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function AbsAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, x.size)
-    end
+    AbsAtom(x::AbstractExpr) = new((x,), x.size)
 end
+
 head(io::IO, ::AbsAtom) = print(io, "abs")
 
-function Base.sign(x::AbsAtom)
-    return Positive()
-end
+Base.sign(::AbsAtom) = Positive()
 
-function monotonicity(x::AbsAtom)
-    return (Nondecreasing() * sign(x.children[1]),)
-end
+monotonicity(x::AbsAtom) = (Nondecreasing() * sign(x.children[1]),)
 
-function curvature(x::AbsAtom)
-    return ConvexVexity()
-end
+curvature(::AbsAtom) = ConvexVexity()
 
-function evaluate(x::AbsAtom)
-    return abs.(evaluate(x.children[1]))
-end
+evaluate(x::AbsAtom) = abs.(evaluate(x.children[1]))
 
 function new_conic_form!(context::Context, A::AbsAtom)
     x = only(A.children)
-
     t = Variable(size(x))
     t_obj = conic_form!(context, t)
-
     if sign(x) == ComplexSign()
         for i in 1:length(vec(t))
             add_constraint!(
@@ -55,49 +34,5 @@ function new_conic_form!(context::Context, A::AbsAtom)
 end
 
 Base.abs(x::AbstractExpr) = AbsAtom(x)
+
 Base.abs2(x::AbstractExpr) = square(abs(x))
-
-## Alternate version: no atom, just a DCPPromise:
-
-# # A lightweight atom
-# mutable struct DCPPromiseWrapper <: AbstractExpr
-#     x::AbstractVariable
-#     sign::Sign
-#     monotonicity::Monotonicity
-#     curvature::Vexity
-#     evaluate::Any
-# end
-
-# function DCPPromiseWrapper(x::AbstractVariable;
-#         sign::Sign = sign(x),
-#         monotonicity::Monotonicity = monotonicity(x),
-#         curvature::Vexity = curvature(x),
-#         evaluate = () -> evaluate(x))
-#         DCPPromise(tuple(x), sign, monotonicity, curvature, evaluate)
-# end
-
-# sign(d::DCPPromiseWrapper) = d.sign
-# monotonicity(d::DCPPromiseWrapper) = d.monotonicity
-# curvature(d::DCPPromiseWrapper) = d.curvature
-
-# # No children! it is a leaf type
-# AbstractTrees.children(::DCPPromiseWrapper) = ()
-
-# Base.size(d::DCPPromiseWrapper) = size(d.x)
-# evaluate(d::DCPPromiseWrapper) = d.evaluate()
-
-# conic_form!(context::Context, D::DCPPromiseWrapper) = conic_form!(context, D.x)
-
-# function abs(x::AbstractExpr)
-#     t = Variable(size(x), Positive())
-#     add_constraint!(t, t >= x)
-#     add_constraint!(t, t >= -x)
-#     return DCPPromise(
-#         t,
-#         monotonicity = Nondecreasing() * sign(x),
-#         curvature = ConvexVexity(),
-#         evaluate = () -> abs.(evaluate(x)),
-#     )
-# end
-
-# Base.abs2(x::AbstractExpr) = square(abs(x))

@@ -1,12 +1,3 @@
-#############################################################################
-# min.jl
-# Return the minimum of the two arguments. Operates elementwise over arrays.
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-# TODO: This can easily be extended to work
-### Min Atom
 mutable struct MinAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
@@ -16,22 +7,17 @@ mutable struct MinAtom <: AbstractExpr
             error(
                 "Both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
             )
-        else
-            if x.size == y.size
-                sz = x.size
-            elseif x.size == (1, 1)
-                sz = y.size
-            elseif y.size == (1, 1)
-                sz = x.size
-            else
-                error(
-                    "Got different sizes for x as $(x.size) and y as $(y.size)",
-                )
-            end
         end
-
-        children = (x, y)
-        return new(children, sz)
+        sz = if x.size == y.size
+            x.size
+        elseif x.size == (1, 1)
+            y.size
+        elseif y.size == (1, 1)
+            x.size
+        else
+            error("Got different sizes for x as $(x.size) and y as $(y.size)")
+        end
+        return new((x, y), sz)
     end
 end
 
@@ -49,20 +35,11 @@ function Base.sign(x::MinAtom)
     end
 end
 
-# The monotonicity
-function monotonicity(x::MinAtom)
-    return (Nondecreasing(), Nondecreasing())
-end
+monotonicity(::MinAtom) = (Nondecreasing(), Nondecreasing())
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
-# this represents the first term
-function curvature(x::MinAtom)
-    return ConcaveVexity()
-end
+curvature(::MinAtom) = ConcaveVexity()
 
-function evaluate(x::MinAtom)
-    return min.(evaluate(x.children[1]), evaluate(x.children[2]))
-end
+evaluate(x::MinAtom) = min.(evaluate(x.children[1]), evaluate(x.children[2]))
 
 function new_conic_form!(context::Context, x::MinAtom)
     t = Variable(x.size[1], x.size[2])
@@ -71,6 +48,9 @@ function new_conic_form!(context::Context, x::MinAtom)
 end
 
 Base.min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
+
 Base.min(x::AbstractExpr, y::Value) = min(x, constant(y))
+
 Base.min(x::Value, y::AbstractExpr) = min(constant(x), y)
+
 neg(x::AbstractExpr) = max(-x, Constant(0, Positive()))

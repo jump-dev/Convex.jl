@@ -1,12 +1,3 @@
-#############################################################################
-# max.jl
-# Return the maximum of the two arguments. Operates elementwise over arrays.
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-# TODO: This can easily be extended to work
-### Max Atom
 mutable struct MaxAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
@@ -16,22 +7,17 @@ mutable struct MaxAtom <: AbstractExpr
             error(
                 "Both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
             )
-        else
-            if x.size == y.size
-                sz = x.size
-            elseif x.size == (1, 1)
-                sz = y.size
-            elseif y.size == (1, 1)
-                sz = x.size
-            else
-                error(
-                    "Got different sizes for x as $(x.size) and y as $(y.size)",
-                )
-            end
         end
-
-        children = (x, y)
-        return new(children, sz)
+        sz = if x.size == y.size
+            x.size
+        elseif x.size == (1, 1)
+            y.size
+        elseif y.size == (1, 1)
+            x.size
+        else
+            error("Got different sizes for x as $(x.size) and y as $(y.size)")
+        end
+        return new((x, y), sz)
     end
 end
 
@@ -49,20 +35,11 @@ function Base.sign(x::MaxAtom)
     end
 end
 
-# The monotonicity
-function monotonicity(x::MaxAtom)
-    return (Nondecreasing(), Nondecreasing())
-end
+monotonicity(::MaxAtom) = (Nondecreasing(), Nondecreasing())
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
-# this represents the first term
-function curvature(x::MaxAtom)
-    return ConvexVexity()
-end
+curvature(::MaxAtom) = ConvexVexity()
 
-function evaluate(x::MaxAtom)
-    return max.(evaluate(x.children[1]), evaluate(x.children[2]))
-end
+evaluate(x::MaxAtom) = max.(evaluate(x.children[1]), evaluate(x.children[2]))
 
 function new_conic_form!(context::Context, x::MaxAtom)
     t = Variable(x.size)
@@ -71,7 +48,11 @@ function new_conic_form!(context::Context, x::MaxAtom)
 end
 
 Base.max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
+
 Base.max(x::AbstractExpr, y::Value) = max(x, constant(y))
+
 Base.max(x::Value, y::AbstractExpr) = max(constant(x), y)
+
 pos(x::AbstractExpr) = max(x, Constant(0, Positive()))
+
 hinge_loss(x::AbstractExpr) = pos(1 - x)
