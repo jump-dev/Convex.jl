@@ -76,4 +76,5 @@ function new_conic_form!(context::Context{T}, x::DotSortAtom) where {T}
 end
 
 dotsort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)
+
 dotsort(b::Value, a::AbstractExpr) = DotSortAtom(a, b)

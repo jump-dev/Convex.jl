@@ -1,11 +1,3 @@
-#############################################################################
-# maximum.jl
-# Compute the maximum value of an array.
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Maximum Atom
 mutable struct MaximumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -13,33 +5,20 @@ mutable struct MaximumAtom <: AbstractExpr
     function MaximumAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
             error("Argument should be real instead it is $(sign(x))")
-        else
-            children = (x,)
-            return new(children, (1, 1))
         end
+        return new((x,), (1, 1))
     end
 end
 
 head(io::IO, ::MaximumAtom) = print(io, "maximum")
 
-function Base.sign(x::MaximumAtom)
-    return sign(x.children[1])
-end
+Base.sign(x::MaximumAtom) = sign(x.children[1])
 
-# The monotonicity
-function monotonicity(x::MaximumAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::MaximumAtom) = (Nondecreasing(),)
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
-# this represents the first term
-function curvature(x::MaximumAtom)
-    return ConvexVexity()
-end
+curvature(::MaximumAtom) = ConvexVexity()
 
-function evaluate(x::MaximumAtom)
-    return Base.maximum(evaluate(x.children[1]))
-end
+evaluate(x::MaximumAtom) = Base.maximum(evaluate(x.children[1]))
 
 function new_conic_form!(context::Context, x::MaximumAtom)
     t = Variable()
