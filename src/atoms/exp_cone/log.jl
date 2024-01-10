@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.log
 
 ### Logarithm
 
@@ -23,7 +22,7 @@ mutable struct LogAtom <: AbstractExpr
 end
 head(io::IO, ::LogAtom) = print(io, "log")
 
-function sign(x::LogAtom)
+function Base.sign(x::LogAtom)
     return NoSign()
 end
 
@@ -39,7 +38,7 @@ function evaluate(x::LogAtom)
     return log.(evaluate(x.children[1]))
 end
 
-log(x::AbstractExpr) = LogAtom(x)
+Base.log(x::AbstractExpr) = LogAtom(x)
 
 function new_conic_form!(context::Context, e::LogAtom)
     # log(z) \geq x  <=>    (x,ones(),z) \in ExpCone

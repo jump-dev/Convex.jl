@@ -1,5 +1,3 @@
-import Base.==, Base.<=, Base.>=, Base.<, Base.>
-
 const CONSTANT_CONSTRAINT_TOL = Ref(1e-6)
 
 function iscomplex(constr::Constraint)
@@ -63,9 +61,9 @@ function _add_constraint!(context::Context{T}, eq::EqConstraint) where {T}
     return nothing
 end
 
-==(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
-==(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
-==(lhs::Value, rhs::AbstractExpr) = ==(constant(lhs), rhs)
+Base.:(==)(lhs::AbstractExpr, rhs::AbstractExpr) = EqConstraint(lhs, rhs)
+Base.:(==)(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
+Base.:(==)(lhs::Value, rhs::AbstractExpr) = ==(constant(lhs), rhs)
 
 ### Linear inequality constraints
 mutable struct LtConstraint <: Constraint
@@ -127,12 +125,12 @@ function _add_constraint!(context::Context{T}, lt::LtConstraint) where {T}
     return nothing
 end
 
-<=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
-<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
-<(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
-<(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
-<(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
+Base.:<=(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
+Base.:<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+Base.:<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
+Base.:<(lhs::AbstractExpr, rhs::AbstractExpr) = LtConstraint(lhs, rhs)
+Base.:<(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
+Base.:<(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 
 mutable struct GtConstraint <: Constraint
     lhs::AbstractExpr
@@ -193,27 +191,33 @@ function _add_constraint!(context::Context{T}, gt::GtConstraint) where {T}
     return nothing
 end
 
->=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
->=(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
->(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
->(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
->(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
+Base.:>=(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
+Base.:>=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+Base.:>=(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
+Base.:>(lhs::AbstractExpr, rhs::AbstractExpr) = GtConstraint(lhs, rhs)
+Base.:>(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
+Base.:>(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 
-function +(
+function Base.:+(
     constraints_one::Array{<:Constraint},
     constraints_two::Array{<:Constraint},
 )
     constraints = append!(Constraint[], constraints_one)
     return append!(constraints, constraints_two)
 end
-function +(constraint_one::Constraint, constraint_two::Constraint)
+function Base.:+(constraint_one::Constraint, constraint_two::Constraint)
     return [constraint_one] + [constraint_two]
 end
-function +(constraint_one::Constraint, constraints_two::Array{<:Constraint})
+function Base.:+(
+    constraint_one::Constraint,
+    constraints_two::Array{<:Constraint},
+)
     return [constraint_one] + constraints_two
 end
-function +(constraints_one::Array{<:Constraint}, constraint_two::Constraint)
+function Base.:+(
+    constraints_one::Array{<:Constraint},
+    constraint_two::Constraint,
+)
     return constraints_one + [constraint_two]
 end
 

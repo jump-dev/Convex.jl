@@ -9,7 +9,7 @@ mutable struct ConjugateAtom <: AbstractExpr
 end
 head(io::IO, ::ConjugateAtom) = print(io, "conj")
 
-function sign(x::ConjugateAtom)
+function Base.sign(x::ConjugateAtom)
     return sign(x.children[1])
 end
 
@@ -26,7 +26,7 @@ function evaluate(x::ConjugateAtom)
 end
 
 function new_conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
-    objective = conic_form!(context, only(children(x)))
+    objective = conic_form!(context, only(AbstractTrees.children(x)))
     return operate(conj, T, sign(x), objective)
 end
 

@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.sum
 
 ### Sum Atom
 mutable struct SumAtom <: AbstractExpr
@@ -19,7 +18,7 @@ end
 
 head(io::IO, ::SumAtom) = print(io, "sum")
 
-function sign(x::SumAtom)
+function Base.sign(x::SumAtom)
     return sign(x.children[1])
 end
 
@@ -39,14 +38,14 @@ function evaluate(x::SumAtom)
 end
 
 function new_conic_form!(context::Context{T}, A::SumAtom) where {T}
-    subobj = conic_form!(context, only(children(A)))
+    subobj = conic_form!(context, only(AbstractTrees.children(A)))
     obj = operate(sum, T, sign(A), subobj)
     return obj
 end
 
 # Dispatch to an internal helper function that handles the dimension argument in
 # the same manner as Base, with dims=: denoting a regular sum
-sum(x::AbstractExpr; dims = :) = _sum(x, dims)
+Base.sum(x::AbstractExpr; dims = :) = _sum(x, dims)
 
 _sum(x::AbstractExpr, ::Colon) = SumAtom(x)
 
@@ -59,5 +58,3 @@ function _sum(x::AbstractExpr, dimension::Integer)
         error("Sum not implemented for dimension $dimension")
     end
 end
-
-Base.@deprecate sum(x::AbstractExpr, dim::Int) sum(x, dims = dim)

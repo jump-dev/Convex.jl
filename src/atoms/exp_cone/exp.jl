@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.exp
 
 ### Exponential
 
@@ -24,7 +23,7 @@ end
 
 head(io::IO, ::ExpAtom) = print(io, "exp")
 
-function sign(x::ExpAtom)
+function Base.sign(x::ExpAtom)
     return Positive()
 end
 
@@ -40,7 +39,7 @@ function evaluate(x::ExpAtom)
     return exp.(evaluate(x.children[1]))
 end
 
-exp(x::AbstractExpr) = ExpAtom(x)
+Base.exp(x::AbstractExpr) = ExpAtom(x)
 
 function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone

@@ -1,10 +1,9 @@
 #############################################################################
-# norm2.jl
+# LinearAlgebra.norm2.jl
 # Handles the euclidean norm (also called frobenius norm for matrices)
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import LinearAlgebra.norm2
 
 mutable struct EucNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
@@ -18,7 +17,7 @@ end
 
 head(io::IO, ::EucNormAtom) = print(io, "norm2")
 
-function sign(x::EucNormAtom)
+function Base.sign(x::EucNormAtom)
     return Positive()
 end
 
@@ -37,9 +36,9 @@ end
 ## Create a new variable euc_norm to represent the norm
 ## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function new_conic_form!(context::Context{T}, A::EucNormAtom) where {T}
-    obj = conic_form!(context, only(children(A)))
+    obj = conic_form!(context, only(AbstractTrees.children(A)))
 
-    x = only(children(A))
+    x = only(AbstractTrees.children(A))
     d = length(x)
 
     t_obj = conic_form!(context, Variable())
@@ -51,7 +50,7 @@ function new_conic_form!(context::Context{T}, A::EucNormAtom) where {T}
     return t_obj
 end
 
-function norm2(x::AbstractExpr)
+function LinearAlgebra.norm2(x::AbstractExpr)
     if sign(x) == ComplexSign()
         return EucNormAtom([real(x); imag(x)])
     else

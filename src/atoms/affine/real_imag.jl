@@ -4,8 +4,6 @@
 # and expressions.
 #############################################################################
 
-import Base.real, Base.imag
-
 ### Real
 mutable struct RealAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
@@ -19,7 +17,7 @@ end
 
 head(io::IO, ::RealAtom) = print(io, "real")
 
-function sign(x::RealAtom)
+function Base.sign(x::RealAtom)
     if sign(x.children[1]) == ComplexSign()
         return NoSign()
     else
@@ -40,13 +38,13 @@ function evaluate(x::RealAtom)
 end
 
 function new_conic_form!(context::Context{T}, x::RealAtom) where {T}
-    obj = conic_form!(context, only(children(x)))
+    obj = conic_form!(context, only(AbstractTrees.children(x)))
     return operate(real, T, sign(x), obj)
 end
 
-real(x::AbstractExpr) = RealAtom(x)
-real(x::ComplexConstant) = x.real_constant
-real(x::Constant) = x
+Base.real(x::AbstractExpr) = RealAtom(x)
+Base.real(x::ComplexConstant) = x.real_constant
+Base.real(x::Constant) = x
 
 ### Imaginary
 mutable struct ImaginaryAtom <: AbstractExpr
@@ -61,7 +59,7 @@ end
 
 head(io::IO, ::ImaginaryAtom) = print(io, "imag")
 
-function sign(x::ImaginaryAtom)
+function Base.sign(x::ImaginaryAtom)
     sign(x.children[1]) == ComplexSign()
     return NoSign()
 end
@@ -79,10 +77,10 @@ function evaluate(x::ImaginaryAtom)
 end
 
 function new_conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
-    obj = conic_form!(context, only(children(x)))
+    obj = conic_form!(context, only(AbstractTrees.children(x)))
     return operate(imag, T, sign(x), obj)
 end
 
-imag(x::AbstractExpr) = ImaginaryAtom(x)
-imag(x::ComplexConstant) = x.imag_constant
-imag(x::Constant) = Constant(zero(x.value))
+Base.imag(x::AbstractExpr) = ImaginaryAtom(x)
+Base.imag(x::ComplexConstant) = x.imag_constant
+Base.imag(x::Constant) = Constant(zero(x.value))

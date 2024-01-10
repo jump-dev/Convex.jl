@@ -6,8 +6,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import Base.Broadcast.broadcasted
-
 ### Scalar and matrix multiplication
 
 mutable struct MultiplyAtom <: AbstractExpr
@@ -33,7 +31,7 @@ end
 
 head(io::IO, ::MultiplyAtom) = print(io, "*")
 
-function sign(x::MultiplyAtom)
+function Base.sign(x::MultiplyAtom)
     return sign(x.children[1]) * sign(x.children[2])
 end
 
@@ -157,16 +155,16 @@ function new_conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     end
 end
 
-function *(x::AbstractExpr, y::AbstractExpr)
+function Base.:*(x::AbstractExpr, y::AbstractExpr)
     if isequal(x, y) && x.size == (1, 1)
         return square(x)
     end
     return MultiplyAtom(x, y)
 end
 
-*(x::Value, y::AbstractExpr) = MultiplyAtom(constant(x), y)
-*(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
-/(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))
+Base.:*(x::Value, y::AbstractExpr) = MultiplyAtom(constant(x), y)
+Base.:*(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
+Base.:/(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))
 
 # # ambiguity
 # function Base.:(*)(
@@ -223,25 +221,29 @@ function dotmultiply(x, y)
     elseif size(var, 2) < size(coeff, 2)
         var = var * ones(1, size(coeff, 1))
     end
-    const_multiplier = Diagonal(vec(coeff))
+    const_multiplier = LinearAlgebra.Diagonal(vec(coeff))
     return reshape(const_multiplier * vec(var), size(var)...)
 end
 
 # if neither is a constant it's not DCP, but might be nice to support anyway for eg MultiConvex
-function broadcasted(::typeof(*), x::AbstractExpr, y::AbstractExpr)
+function Base.Broadcast.broadcasted(
+    ::typeof(*),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
     if isequal(x, y)
         return square(x)
     else
         return dotmultiply(x, y)
     end
 end
-function broadcasted(::typeof(*), x::Value, y::AbstractExpr)
+function Base.Broadcast.broadcasted(::typeof(*), x::Value, y::AbstractExpr)
     return dotmultiply(constant(x), y)
 end
-function broadcasted(::typeof(*), x::AbstractExpr, y::Value)
+function Base.Broadcast.broadcasted(::typeof(*), x::AbstractExpr, y::Value)
     return dotmultiply(constant(y), x)
 end
-function broadcasted(::typeof(/), x::AbstractExpr, y::Value)
+function Base.Broadcast.broadcasted(::typeof(/), x::AbstractExpr, y::Value)
     return dotmultiply(constant(1 ./ y), x)
 end
 # x ./ y and x / y for x constant, y variable is defined in second_order_cone.qol_elemwise.jl

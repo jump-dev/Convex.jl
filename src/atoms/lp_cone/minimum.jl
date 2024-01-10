@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.minimum
 
 ### Minimum Atom
 mutable struct MinimumAtom <: AbstractExpr
@@ -23,7 +22,7 @@ end
 
 head(io::IO, ::MinimumAtom) = print(io, "minimum")
 
-function sign(x::MinimumAtom)
+function Base.sign(x::MinimumAtom)
     return sign(x.children[1])
 end
 
@@ -39,7 +38,7 @@ function curvature(x::MinimumAtom)
 end
 
 function evaluate(x::MinimumAtom)
-    return Base.minimum(evaluate(x.children[1]))
+    return minimum(evaluate(x.children[1]))
 end
 
 function new_conic_form!(context::Context, x::MinimumAtom)
@@ -48,4 +47,4 @@ function new_conic_form!(context::Context, x::MinimumAtom)
     return conic_form!(context, t)
 end
 
-minimum(x::AbstractExpr) = MinimumAtom(x)
+Base.minimum(x::AbstractExpr) = MinimumAtom(x)

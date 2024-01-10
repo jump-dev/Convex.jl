@@ -98,7 +98,7 @@ end
 
 head(io::IO, ::GeomMeanEpiConeConstraint) = print(io, "∈(GeomMeanEpiCone)")
 
-in(T, cone::GeomMeanEpiCone) = GeomMeanEpiConeConstraint(T, cone)
+Base.in(T, cone::GeomMeanEpiCone) = GeomMeanEpiConeConstraint(T, cone)
 
 function AbstractTrees.children(constraint::GeomMeanEpiConeConstraint)
     return (

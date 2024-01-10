@@ -1,5 +1,5 @@
 #############################################################################
-# quantum_relative_entropy returns tr(A*(log(A)-log(B))) where A and B
+# quantum_relative_entropy returns LinearAlgebra.tr(A*(log(A)-log(B))) where A and B
 # are positive semidefinite matrices.  Note this function uses logarithm
 # base e, not base 2, so return value is in units of nats, not bits.
 #
@@ -80,7 +80,7 @@ mutable struct QuantumRelativeEntropy2 <: AbstractExpr
         end
 
         # nullspace of A must contain nullspace of B
-        v, U = eigen(Hermitian(B))
+        v, U = LinearAlgebra.eigen(LinearAlgebra.Hermitian(B))
         if any(v .< -nullspace_tol)
             throw(DomainError(B, "B must be positive semidefinite"))
         end
@@ -93,7 +93,9 @@ end
 
 head(io::IO, ::QuantumRelativeEntropy2) = print(io, "quantum_relative_entropy")
 
-sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2}) = Positive()
+function Base.sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2})
+    return Positive()
+end
 
 function monotonicity(atom::QuantumRelativeEntropy1)
     return (NoMonotonicity(), NoMonotonicity())
@@ -172,22 +174,22 @@ function quantum_relative_entropy(
     end
 
     # need to project down to support of A
-    v, U = eigen(Hermitian(A))
+    v, U = LinearAlgebra.eigen(LinearAlgebra.Hermitian(A))
     if any(v .< -nullspace_tol)
         throw(DomainError(A, "A must be positive semidefinite"))
     end
-    if any(eigvals(Hermitian(B)) .< -nullspace_tol)
+    if any(LinearAlgebra.eigvals(LinearAlgebra.Hermitian(B)) .< -nullspace_tol)
         throw(DomainError(B, "B must be positive semidefinite"))
     end
     J = U'[v.>nullspace_tol, :]
-    Ap = Hermitian(J * A * J')
-    Bp = Hermitian(J * B * J')
+    Ap = LinearAlgebra.Hermitian(J * A * J')
+    Bp = LinearAlgebra.Hermitian(J * B * J')
 
-    if any(eigvals(Bp) .< nullspace_tol)
+    if any(LinearAlgebra.eigvals(Bp) .< nullspace_tol)
         return Inf
     end
 
-    return real(tr(Ap * (log(Ap) - log(Bp))))
+    return real(LinearAlgebra.tr(Ap * (log(Ap) - log(Bp))))
 end
 
 function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
@@ -196,7 +198,7 @@ function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     m = atom.m
     k = atom.k
     n = size(A)[1]
-    eye = Matrix(1.0 * I, n, n)
+    eye = Matrix(1.0 * LinearAlgebra.I, n, n)
     e = vec(eye)
 
     add_constraint!(context, A ⪰ 0)
@@ -224,10 +226,10 @@ function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2)
     if length(K) > 0
         add_constraint!(context, K * A * K' == 0)
         Ap = J * A * J'
-        Bp = Hermitian(J * B * J')
-        τ = -quantum_entropy(Ap, m, k) - real(tr(Ap * log(Bp)))
+        Bp = LinearAlgebra.Hermitian(J * B * J')
+        τ = -quantum_entropy(Ap, m, k) - real(LinearAlgebra.tr(Ap * log(Bp)))
     else
-        τ = -quantum_entropy(A, m, k) - real(tr(A * log(B)))
+        τ = -quantum_entropy(A, m, k) - real(LinearAlgebra.tr(A * log(B)))
     end
 
     return conic_form!(context, minimize(τ))

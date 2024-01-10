@@ -1,4 +1,4 @@
-function LinearAlgebra.kron(a::Value, b::AbstractExpr)
+function Base.kron(a::Value, b::AbstractExpr)
     rows = AbstractExpr[]
     for i in 1:size(a)[1]
         row = AbstractExpr[]
@@ -14,7 +14,7 @@ function LinearAlgebra.kron(a::Value, b::AbstractExpr)
     return foldl(vcat, rows)
 end
 
-function LinearAlgebra.kron(a::AbstractExpr, b::Value)
+function Base.kron(a::AbstractExpr, b::Value)
     rows = AbstractExpr[]
     for i in 1:size(a)[1]
         row = AbstractExpr[]

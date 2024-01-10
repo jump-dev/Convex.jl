@@ -28,7 +28,7 @@ end
 
 head(io::IO, ::DotSortAtom) = print(io, "dotsort")
 
-function sign(x::DotSortAtom)
+function Base.sign(x::DotSortAtom)
     if all(x.w .>= 0)
         return sign(x.children[1])
     elseif all(x.w .<= 0)

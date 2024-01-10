@@ -5,9 +5,6 @@
 # All expressions and atoms are subtypes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import LinearAlgebra.eigvals
-
-### sumlargesteigs
 
 mutable struct SumLargestEigs <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
@@ -26,7 +23,7 @@ end
 
 head(io::IO, ::SumLargestEigs) = print(io, "sumlargesteigs")
 
-function sign(x::SumLargestEigs)
+function Base.sign(x::SumLargestEigs)
     return NoSign()
 end
 
@@ -39,7 +36,7 @@ function curvature(x::SumLargestEigs)
 end
 
 function evaluate(x::SumLargestEigs)
-    return eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
+    return LinearAlgebra.eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
 end
 
 function sumlargesteigs(x::AbstractExpr, k::Int)
@@ -66,8 +63,8 @@ function new_conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
     s = Variable()
     # Note: we know the trace is real, since Z is PSD, but we need to tell Convex.jl that.
     p = minimize(
-        s * k + real(tr(Z)),
-        [Z - X + s * Matrix(1.0I, n, n) ⪰ 0, Z ⪰ 0, X == X'],
+        s * k + real(LinearAlgebra.tr(Z)),
+        [Z - X + s * Matrix(1.0 * LinearAlgebra.I, n, n) ⪰ 0, Z ⪰ 0, X == X'],
     )
     return conic_form!(context, p)
 end

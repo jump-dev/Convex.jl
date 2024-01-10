@@ -19,7 +19,7 @@ end
 
 head(io::IO, ::NuclearNormAtom) = print(io, "nuclearnorm")
 
-function sign(x::NuclearNormAtom)
+function Base.sign(x::NuclearNormAtom)
     return Positive()
 end
 
@@ -33,7 +33,7 @@ function curvature(x::NuclearNormAtom)
 end
 
 function evaluate(x::NuclearNormAtom)
-    return sum(svdvals(evaluate(x.children[1])))
+    return sum(LinearAlgebra.svdvals(evaluate(x.children[1])))
 end
 
 nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
@@ -42,10 +42,10 @@ nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
 # (the operator A is negated but this doesn't affect the norm)
 # https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf
 function new_conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
-    A = only(children(x))
+    A = only(AbstractTrees.children(x))
     if iscomplex(sign(A))
         # I'm not sure how to use MOI's `NormNuclearCone` in this case, so we'll just do the extended formulation as an SDP ourselves:
-        #   minimize (tr(U) + tr(V))/2
+        #   minimize (LinearAlgebra.tr(U) + LinearAlgebra.tr(V))/2
         #   subject to
         #            [U A; A' V] ⪰ 0
         # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
@@ -53,7 +53,10 @@ function new_conic_form!(context::Context{T}, x::NuclearNormAtom) where {T}
         m, n = size(A)
         U = ComplexVariable(m, m)
         V = ComplexVariable(n, n)
-        p = minimize(real(tr(U) + tr(V)) / 2, [U A; A' V] ⪰ 0)
+        p = minimize(
+            real(LinearAlgebra.tr(U) + LinearAlgebra.tr(V)) / 2,
+            [U A; A' V] ⪰ 0,
+        )
         return conic_form!(context, p)
     else
         t = conic_form!(context, Variable())

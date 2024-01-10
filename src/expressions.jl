@@ -26,9 +26,6 @@
 #
 #############################################################################
 
-import Base.sign,
-    Base.size, Base.length, Base.lastindex, Base.ndims, Base.convert, Base.axes
-
 ### Abstract types
 abstract type AbstractExpr end
 abstract type Constraint end
@@ -85,15 +82,15 @@ end
 evaluate(x) = output(x) # fallback
 
 # This function should never be reached
-function sign(x::AbstractExpr)
+function Base.sign(x::AbstractExpr)
     return error("sign not implemented for $(x.head).")
 end
 
-function size(x::AbstractExpr)
+function Base.size(x::AbstractExpr)
     return x.size
 end
 
-function length(x::AbstractExpr)
+function Base.length(x::AbstractExpr)
     return prod(x.size)
 end
 
@@ -102,10 +99,10 @@ const Value = Union{Number,AbstractArray}
 const ValueOrNothing = Union{Value,Nothing}
 const AbstractExprOrValue = Union{AbstractExpr,Value}
 
-convert(::Type{AbstractExpr}, x::Value) = constant(x)
-convert(::Type{AbstractExpr}, x::AbstractExpr) = x
+Base.convert(::Type{AbstractExpr}, x::Value) = constant(x)
+Base.convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
-function size(x::AbstractExpr, dim::Integer)
+function Base.size(x::AbstractExpr, dim::Integer)
     if dim < 1
         error("dimension out of range")
     elseif dim > 2
@@ -115,11 +112,11 @@ function size(x::AbstractExpr, dim::Integer)
     end
 end
 
-ndims(x::AbstractExpr) = 2
-lastindex(x::AbstractExpr) = length(x)
+Base.ndims(x::AbstractExpr) = 2
+Base.lastindex(x::AbstractExpr) = length(x)
 
-axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
-axes(x::AbstractExpr, n::Integer) = axes(x)[n]
-lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))
+Base.axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
+Base.axes(x::AbstractExpr, n::Integer) = axes(x)[n]
+Base.lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))
 
 @deprecate get_vectorized_size(x::AbstractExpr) length(x)

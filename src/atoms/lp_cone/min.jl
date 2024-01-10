@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.min
 
 # TODO: This can easily be extended to work
 ### Min Atom
@@ -38,7 +37,7 @@ end
 
 head(io::IO, ::MinAtom) = print(io, "min")
 
-function sign(x::MinAtom)
+function Base.sign(x::MinAtom)
     sign_one = sign(x.children[1])
     sign_two = sign(x.children[2])
     if sign_one == Negative() || sign_two == Negative()
@@ -71,7 +70,7 @@ function new_conic_form!(context::Context, x::MinAtom)
     return conic_form!(context, p)
 end
 
-min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
-min(x::AbstractExpr, y::Value) = min(x, constant(y))
-min(x::Value, y::AbstractExpr) = min(constant(x), y)
+Base.min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
+Base.min(x::AbstractExpr, y::Value) = min(x, constant(y))
+Base.min(x::Value, y::AbstractExpr) = min(constant(x), y)
 neg(x::AbstractExpr) = max(-x, Constant(0, Positive()))

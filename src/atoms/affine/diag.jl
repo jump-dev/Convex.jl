@@ -31,7 +31,7 @@ head(io::IO, ::DiagAtom) = print(io, "diag")
 
 ## Type Definition Ends
 
-function sign(x::DiagAtom)
+function Base.sign(x::DiagAtom)
     return sign(x.children[1])
 end
 
@@ -47,7 +47,7 @@ function curvature(x::DiagAtom)
 end
 
 function evaluate(x::DiagAtom)
-    return diag(evaluate(x.children[1]), x.k)
+    return LinearAlgebra.diag(evaluate(x.children[1]), x.k)
 end
 
 ## API begins
@@ -84,7 +84,7 @@ function new_conic_form!(context::Context{T}, x::DiagAtom) where {T}
         start_index += num_rows + 1
     end
 
-    child_obj = conic_form!(context, only(children(x)))
+    child_obj = conic_form!(context, only(AbstractTrees.children(x)))
     obj = operate(add_operation, T, sign(x), select_diag, child_obj)
     return obj
 end

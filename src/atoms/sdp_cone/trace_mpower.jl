@@ -1,5 +1,5 @@
 #############################################################################
-# trace_mpower(A, t, C) returns tr(C*A^t) where A and C are positive definite
+# trace_mpower(A, t, C) returns LinearAlgebra.tr(C*A^t) where A and C are positive definite
 # matrices and C is constant and t ∈ [-1, 2].
 #
 # When t ∈ [0,1], trace_mpower(A, t, C) is concave in A (for fixed
@@ -32,7 +32,7 @@ mutable struct TraceMpower <: AbstractExpr
         if norm(C - C') > 1e-6
             throw(DomainError(C, "C must be Hermitian"))
         end
-        if any(eigvals(Hermitian(C)) .< -1e-6)
+        if any(LinearAlgebra.eigvals(LinearAlgebra.Hermitian(C)) .< -1e-6)
             throw(DomainError(C, "C must be positive semidefinite"))
         end
         if t < -1 || t > 2
@@ -43,7 +43,7 @@ mutable struct TraceMpower <: AbstractExpr
 end
 head(io::IO, ::TraceMpower) = print(io, "trace_mpower")
 
-function sign(atom::TraceMpower)
+function Base.sign(atom::TraceMpower)
     return NoSign()
 end
 
@@ -74,7 +74,7 @@ end
 
 function trace_mpower(A::MatrixOrConstant, t::Rational, C::MatrixOrConstant)
     #println("trace_mpower constant A")
-    return tr(C * A^t)
+    return LinearAlgebra.tr(C * A^t)
 end
 
 function trace_mpower(A::AbstractExprOrValue, t::Integer, C::MatrixOrConstant)
@@ -85,7 +85,7 @@ function new_conic_form!(context::Context{T}, atom::TraceMpower) where {T}
     A = atom.children[1]
     C = atom.C
     t = atom.t
-    eye = Matrix(one(T) * I, size(A))
+    eye = Matrix(one(T) * LinearAlgebra.I, size(A))
 
     is_complex = sign(A) == ComplexSign()
     if is_complex
@@ -99,12 +99,12 @@ function new_conic_form!(context::Context{T}, atom::TraceMpower) where {T}
     if t >= 0 && t <= 1
         add_constraint!(context, tmp in GeomMeanHypoCone(eye, A, t, false))
         # It's already a real mathematically, but Convex doesn't know it
-        u = real(tr(C * tmp))
+        u = real(LinearAlgebra.tr(C * tmp))
         return conic_form!(context, maximize(u))
     else
         add_constraint!(context, tmp in GeomMeanEpiCone(eye, A, t, false))
         # It's already a real mathematically, but Convex doesn't know it
-        u = real(tr(C * tmp))
+        u = real(LinearAlgebra.tr(C * tmp))
         return conic_form!(context, minimize(u))
     end
 end

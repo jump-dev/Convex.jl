@@ -1,5 +1,3 @@
-import LinearAlgebra.logdet
-
 mutable struct LogDetAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -12,7 +10,7 @@ end
 
 head(io::IO, ::LogDetAtom) = print(io, "logdet")
 
-function sign(x::LogDetAtom)
+function Base.sign(x::LogDetAtom)
     return NoSign()
 end
 
@@ -25,12 +23,12 @@ function curvature(x::LogDetAtom)
 end
 
 function evaluate(x::LogDetAtom)
-    return log(det(evaluate(x.children[1])))
+    return log(LinearAlgebra.det(evaluate(x.children[1])))
 end
 
 function new_conic_form!(context::Context{T}, x::LogDetAtom) where {T}
     # the object we want the logdet of. Should be a PSD matrix, but may not be a `AbstractVariable` itself.
-    A = only(children(x))
+    A = only(AbstractTrees.children(x))
 
     # We vectorize and take the upper triangle
     v = vec_triu(A)
@@ -43,7 +41,7 @@ function new_conic_form!(context::Context{T}, x::LogDetAtom) where {T}
 
     t = conic_form!(context, Variable())
     f = operate(vcat, T, sign(x), t, SPARSE_VECTOR{T}([one(T)]), X)
-    side_dimension = size(only(children(x)), 1)
+    side_dimension = size(only(AbstractTrees.children(x)), 1)
 
     set = MOI.LogDetConeTriangle(side_dimension)
 
@@ -51,4 +49,4 @@ function new_conic_form!(context::Context{T}, x::LogDetAtom) where {T}
     return t
 end
 
-logdet(x::AbstractExpr) = LogDetAtom(x)
+LinearAlgebra.logdet(x::AbstractExpr) = LogDetAtom(x)

@@ -105,7 +105,7 @@ end
 
 head(io::IO, ::GeomMeanHypoConeConstraint) = print(io, "∈(GeomMeanHypoCone)")
 
-in(T, cone::GeomMeanHypoCone) = GeomMeanHypoConeConstraint(T, cone)
+Base.in(T, cone::GeomMeanHypoCone) = GeomMeanHypoConeConstraint(T, cone)
 
 function AbstractTrees.children(constraint::GeomMeanHypoConeConstraint)
     return (

@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.max
 
 # TODO: This can easily be extended to work
 ### Max Atom
@@ -38,7 +37,7 @@ end
 
 head(io::IO, ::MaxAtom) = print(io, "max")
 
-function sign(x::MaxAtom)
+function Base.sign(x::MaxAtom)
     sign_one = sign(x.children[1])
     sign_two = sign(x.children[2])
     if sign_one == Positive() || sign_two == Positive()
@@ -71,8 +70,8 @@ function new_conic_form!(context::Context, x::MaxAtom)
     return conic_form!(context, p)
 end
 
-max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
-max(x::AbstractExpr, y::Value) = max(x, constant(y))
-max(x::Value, y::AbstractExpr) = max(constant(x), y)
+Base.max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
+Base.max(x::AbstractExpr, y::Value) = max(x, constant(y))
+Base.max(x::Value, y::AbstractExpr) = max(constant(x), y)
 pos(x::AbstractExpr) = max(x, Constant(0, Positive()))
 hinge_loss(x::AbstractExpr) = pos(1 - x)

@@ -4,7 +4,6 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Base.maximum
 
 ### Maximum Atom
 mutable struct MaximumAtom <: AbstractExpr
@@ -23,7 +22,7 @@ end
 
 head(io::IO, ::MaximumAtom) = print(io, "maximum")
 
-function sign(x::MaximumAtom)
+function Base.sign(x::MaximumAtom)
     return sign(x.children[1])
 end
 
@@ -48,4 +47,4 @@ function new_conic_form!(context::Context, x::MaximumAtom)
     return conic_form!(context, t)
 end
 
-maximum(x::AbstractExpr) = MaximumAtom(x)
+Base.maximum(x::AbstractExpr) = MaximumAtom(x)

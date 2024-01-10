@@ -25,7 +25,7 @@ end
 
 head(io::IO, ::RelativeEntropyAtom) = print(io, "relative_entropy")
 
-function sign(x::RelativeEntropyAtom)
+function Base.sign(x::RelativeEntropyAtom)
     return NoSign()
 end
 

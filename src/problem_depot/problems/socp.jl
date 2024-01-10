@@ -536,10 +536,14 @@ end
     set_value!(x, A)
     # Matrix norm
     if test
-        @test evaluate(opnorm(x)) ≈ opnorm(A) atol = atol rtol = rtol
-        @test evaluate(opnorm(x, 1)) ≈ opnorm(A, 1) atol = atol rtol = rtol
-        @test evaluate(opnorm(x, 2)) ≈ opnorm(A, 2) atol = atol rtol = rtol
-        @test evaluate(opnorm(x, Inf)) ≈ opnorm(A, Inf) atol = atol rtol = rtol
+        @test evaluate(LinearAlgebra.opnorm(x)) ≈ LinearAlgebra.opnorm(A) atol =
+            atol rtol = rtol
+        @test evaluate(LinearAlgebra.opnorm(x, 1)) ≈ LinearAlgebra.opnorm(A, 1) atol =
+            atol rtol = rtol
+        @test evaluate(LinearAlgebra.opnorm(x, 2)) ≈ LinearAlgebra.opnorm(A, 2) atol =
+            atol rtol = rtol
+        @test evaluate(LinearAlgebra.opnorm(x, Inf)) ≈
+              LinearAlgebra.opnorm(A, Inf) atol = atol rtol = rtol
     end
     # Vector norm
     if test

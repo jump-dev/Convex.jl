@@ -27,7 +27,7 @@ end
 
 head(io::IO, ::EntropyAtom) = print(io, "entropy")
 
-function sign(x::EntropyAtom)
+function Base.sign(x::EntropyAtom)
     return NoSign()
 end
 

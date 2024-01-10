@@ -13,7 +13,7 @@ mutable struct ReshapeAtom <: AbstractExpr
 end
 head(io::IO, ::ReshapeAtom) = print(io, "reshape")
 
-function sign(x::ReshapeAtom)
+function Base.sign(x::ReshapeAtom)
     return sign(x.children[1])
 end
 
@@ -34,7 +34,7 @@ function evaluate(x::ReshapeAtom)
 end
 
 function new_conic_form!(context::Context, A::ReshapeAtom)
-    return conic_form!(context, only(children(A)))
+    return conic_form!(context, only(AbstractTrees.children(A)))
 end
 
 Base.reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)

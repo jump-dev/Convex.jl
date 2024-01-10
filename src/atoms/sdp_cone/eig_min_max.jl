@@ -6,8 +6,6 @@
 # Please read expressions.jl first.
 #############################################################################
 
-import LinearAlgebra: eigmin, eigmax
-
 ### Eig max
 
 mutable struct EigMaxAtom <: AbstractExpr
@@ -27,7 +25,7 @@ end
 
 head(io::IO, ::EigMaxAtom) = print(io, "eigmax")
 
-function sign(x::EigMaxAtom)
+function Base.sign(x::EigMaxAtom)
     return NoSign()
 end
 
@@ -40,10 +38,10 @@ function curvature(x::EigMaxAtom)
 end
 
 function evaluate(x::EigMaxAtom)
-    return eigmax(evaluate(x.children[1]))
+    return LinearAlgebra.eigmax(evaluate(x.children[1]))
 end
 
-eigmax(x::AbstractExpr) = EigMaxAtom(x)
+LinearAlgebra.eigmax(x::AbstractExpr) = EigMaxAtom(x)
 
 # Create the equivalent conic problem:
 #   minimize t
@@ -54,7 +52,7 @@ function new_conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = minimize(t, t * Matrix(one(T) * I, n, n) - A ⪰ 0)
+    p = minimize(t, t * Matrix(one(T) * LinearAlgebra.I, n, n) - A ⪰ 0)
     return conic_form!(context, p)
 end
 
@@ -77,7 +75,7 @@ end
 
 head(io::IO, ::EigMinAtom) = print(io, "eigmin")
 
-function sign(x::EigMinAtom)
+function Base.sign(x::EigMinAtom)
     return NoSign()
 end
 
@@ -90,10 +88,10 @@ function curvature(x::EigMinAtom)
 end
 
 function evaluate(x::EigMinAtom)
-    return eigmin(evaluate(x.children[1]))
+    return LinearAlgebra.eigmin(evaluate(x.children[1]))
 end
 
-eigmin(x::AbstractExpr) = EigMinAtom(x)
+LinearAlgebra.eigmin(x::AbstractExpr) = EigMinAtom(x)
 
 # Create the equivalent conic problem:
 #   maximize t
@@ -104,6 +102,6 @@ function new_conic_form!(context::Context, x::EigMinAtom)
     A = x.children[1]
     m, n = size(A)
     t = Variable()
-    p = maximize(t, A - t * Matrix(1.0I, n, n) ⪰ 0)
+    p = maximize(t, A - t * Matrix(1.0 * LinearAlgebra.I, n, n) ⪰ 0)
     return conic_form!(context, p)
 end

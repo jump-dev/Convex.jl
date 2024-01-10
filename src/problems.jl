@@ -97,7 +97,7 @@ vexity(p::Problem) = objective_vexity(p)
 #     return obj_vexity + constr_vexity
 # end
 
-for f in (:sign, :monotonicity, :curvature)
+for f in (:monotonicity, :curvature)
     @eval function $f(p::Problem)
         if p.head === :satisfy
             error("Satisfiability problem cannot be used as subproblem")
@@ -108,6 +108,18 @@ for f in (:sign, :monotonicity, :curvature)
         else
             return m
         end
+    end
+end
+
+function Base.sign(p::Problem)
+    if p.head === :satisfy
+        error("Satisfiability problem cannot be used as subproblem")
+    end
+    m = sign(p.objective)
+    if p.head === :maximize
+        return (-).(m)
+    else
+        return m
     end
 end
 
