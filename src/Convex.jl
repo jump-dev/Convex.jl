@@ -7,7 +7,6 @@ import MathOptInterface as MOI
 import OrderedCollections
 import SparseArrays
 
-# Functions
 export conv,
     dotsort,
     entropy,
@@ -22,7 +21,6 @@ export conv,
     logsumexp,
     matrixfrac,
     neg,
-    # norm2,
     norm_1,
     norm_inf,
     nuclearnorm,
@@ -47,9 +45,50 @@ export conv,
     quantum_entropy,
     trace_logm,
     trace_mpower,
-    lieb_ando
-
-export DCPViolationError
+    lieb_ando,
+    # Constraints
+    Constraint,
+    isposdef,
+    ⪰,
+    ⪯,
+    socp,
+    Constraint, # useful for making abstractly-typed vectors via `Constraint[]`
+    # Variables
+    constant,
+    ComplexVariable,
+    HermitianSemidefinite,
+    Semidefinite,
+    Variable,
+    curvature,
+    evaluate,
+    fix!,
+    free!,
+    monotonicity,
+    vexity,
+    problem_vexity,
+    BinVar,
+    IntVar,
+    ContVar,
+    vartype,
+    vartype!
+    get_constraints,
+    add_constraint!,
+    set_value!,
+    evaluate,
+    # Signs
+    Positive,
+    Negative,
+    ComplexSign,
+    NoSign,
+    # Problems
+    add_constraints!,
+    maximize,
+    minimize,
+    Problem,
+    satisfy,
+    solve!,
+    write_to_file,
+    DCPViolationError
 
 # Imports and exports as needed to maintain backwards compatibility
 for k in (
@@ -71,25 +110,6 @@ for k in (
 end
 using AbstractTrees: children
 using Base: sign
-
-# Constraints
-export Constraint
-export isposdef, ⪰, ⪯ # PSD constraints
-export socp
-export Constraint # useful for making abstractly-typed vectors via `Constraint[]`
-
-# Variables
-export constant, ComplexVariable, HermitianSemidefinite, Semidefinite, Variable
-export curvature, evaluate, fix!, free!, monotonicity, vexity, problem_vexity
-export BinVar, IntVar, ContVar, vartype, vartype!
-export get_constraints, add_constraint!, set_value!, evaluate
-
-# Signs
-export Positive, Negative, ComplexSign, NoSign
-
-# Problems
-export add_constraints!, maximize, minimize, Problem, satisfy, solve!
-export write_to_file
 
 # Module level globals
 
