@@ -64,8 +64,10 @@ for k in (
     :norm2,
     :tr,
 )
-    @eval $k = LinearAlgebra.$k
-    @eval export $k
+    @eval begin
+        using LinearAlgebra: $k
+        export $k
+    end
 end
 
 # Constraints
