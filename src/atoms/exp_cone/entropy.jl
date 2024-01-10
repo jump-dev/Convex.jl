@@ -1,15 +1,3 @@
-#############################################################################
-# entropy.jl
-# entropy (ie, sum_i( -x_i log (x_i) ) of an expression x
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Entropy: sum_i -x_i log (x_i)
-
-# TODO: make this work for a *list* of inputs, rather than just for scalar/vector/matrix inputs
-
-# Entropy atom: -xlogx entrywise
 mutable struct EntropyAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -17,27 +5,19 @@ mutable struct EntropyAtom <: AbstractExpr
     function EntropyAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
-        else
-            children = (x,)
-            # TODO check positivity or enforce it
-            return new(children, size(x))
         end
+        # TODO check positivity or enforce it
+        return new((x,), size(x))
     end
 end
 
 head(io::IO, ::EntropyAtom) = print(io, "entropy")
 
-function Base.sign(x::EntropyAtom)
-    return NoSign()
-end
+Base.sign(::EntropyAtom) = NoSign()
 
-function monotonicity(x::EntropyAtom)
-    return (NoMonotonicity(),)
-end
+monotonicity(::EntropyAtom) = (NoMonotonicity(),)
 
-function curvature(x::EntropyAtom)
-    return ConcaveVexity()
-end
+curvature(::EntropyAtom) = ConcaveVexity()
 
 function evaluate(x::EntropyAtom)
     c = evaluate(x.children[1])
@@ -51,6 +31,5 @@ function new_conic_form!(context::Context, e::EntropyAtom)
     t = Variable(e.size)
     x = e.children[1]
     add_constraint!(context, ExpConstraint(t, x, ones(e.size...)))
-
     return conic_form!(context, t)
 end

@@ -1,12 +1,3 @@
-#############################################################################
-# log.jl
-# natural logarithm of an logression
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Logarithm
-
 mutable struct LogAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -14,38 +5,28 @@ mutable struct LogAtom <: AbstractExpr
     function LogAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
-        else
-            children = (x,)
-            return new(children, x.size)
         end
+        return new((x,), x.size)
     end
 end
+
 head(io::IO, ::LogAtom) = print(io, "log")
 
-function Base.sign(x::LogAtom)
-    return NoSign()
-end
+Base.sign(::LogAtom) = NoSign()
 
-function monotonicity(x::LogAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::LogAtom) = (Nondecreasing(),)
 
-function curvature(x::LogAtom)
-    return ConcaveVexity()
-end
+curvature(::LogAtom) = ConcaveVexity()
 
-function evaluate(x::LogAtom)
-    return log.(evaluate(x.children[1]))
-end
+evaluate(x::LogAtom) = log.(evaluate(x.children[1]))
 
 Base.log(x::AbstractExpr) = LogAtom(x)
 
 function new_conic_form!(context::Context, e::LogAtom)
-    # log(z) \geq x  <=>    (x,ones(),z) \in ExpCone
+    # log(z) \geq x  <=> (x,ones(),z) \in ExpCone
     z = e.children[1]
     y = Constant(ones(size(z)))
     x = Variable(size(z))
-    objective = conic_form!(context, x)
     add_constraint!(context, ExpConstraint(x, y, z))
-    return objective
+    return conic_form!(context, x)
 end

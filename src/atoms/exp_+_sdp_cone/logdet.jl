@@ -2,50 +2,29 @@ mutable struct LogDetAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function LogDetAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, (1, 1))
-    end
+    LogDetAtom(x::AbstractExpr) = new((x,), (1, 1))
 end
 
 head(io::IO, ::LogDetAtom) = print(io, "logdet")
 
-function Base.sign(x::LogDetAtom)
-    return NoSign()
-end
+Base.sign(::LogDetAtom) = NoSign()
 
-function monotonicity(x::LogDetAtom)
-    return (NoMonotonicity(),)
-end
+monotonicity(::LogDetAtom) = (NoMonotonicity(),)
 
-function curvature(x::LogDetAtom)
-    return ConcaveVexity()
-end
+curvature(::LogDetAtom) = ConcaveVexity()
 
-function evaluate(x::LogDetAtom)
-    return log(LinearAlgebra.det(evaluate(x.children[1])))
-end
+evaluate(x::LogDetAtom) = log(LinearAlgebra.det(evaluate(x.children[1])))
 
 function new_conic_form!(context::Context{T}, x::LogDetAtom) where {T}
-    # the object we want the logdet of. Should be a PSD matrix, but may not be a `AbstractVariable` itself.
+    # the object we want the logdet of. Should be a PSD matrix, but may not be a
+    # `AbstractVariable` itself.
     A = only(AbstractTrees.children(x))
-
-    # We vectorize and take the upper triangle
     v = vec_triu(A)
-
-    # ensure symmetry
     add_constraint!(context, v == vec_tril(A))
-
-    # We pass to MOI
-    X = conic_form!(context, v)
-
     t = conic_form!(context, Variable())
+    X = conic_form!(context, v)
     f = operate(vcat, T, sign(x), t, SPARSE_VECTOR{T}([one(T)]), X)
-    side_dimension = size(only(AbstractTrees.children(x)), 1)
-
-    set = MOI.LogDetConeTriangle(side_dimension)
-
-    MOI_add_constraint(context.model, f, set)
+    MOI_add_constraint(context.model, f, MOI.LogDetConeTriangle(size(A, 1)))
     return t
 end
 
