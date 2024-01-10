@@ -1,0 +1,23 @@
+[deps]
+Clarabel = "61c947e1-3e6d-4ee4-985a-eec8c727bd6e"
+Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
+ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
+GLPK = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+Clarabel = "0.5"
+ECOS = "1"
+GLPK = "1"
+LinearAlgebra = "<0.0.1, 1.6"
+MathOptInterface = "1.17"
+Random = "<0.0.1, 1.6"
+SCS = "1"
+SparseArrays = "<0.0.1, 1.6"
+Test = "<0.0.1, 1.6"
+julia = "1.6"
