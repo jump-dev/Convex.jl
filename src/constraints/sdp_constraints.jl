@@ -1,17 +1,13 @@
-### Positive semidefinite cone constraint
-
-# TODO: Terrible documentation. Please fix.
 mutable struct SDPConstraint <: Constraint
     child::AbstractExpr
     size::Tuple{Int,Int}
-    dual::ValueOrNothing
+    dual::Union{Value,Nothing}
 
     function SDPConstraint(child::AbstractExpr)
-        sz = child.size
-        if sz[1] != sz[2]
+        if child.size[1] != child.size[2]
             error("Positive semidefinite expressions must be square")
         end
-        return new(child, sz, nothing)
+        return new(child, child.size, nothing)
     end
 end
 
@@ -21,9 +17,8 @@ function vexity(c::SDPConstraint)
     vex = vexity(c.child)
     if vex == AffineVexity() || vex == ConstVexity()
         return AffineVexity()
-    else
-        return NotDcp()
     end
+    return NotDcp()
 end
 
 function _add_constraint!(context::Context, c::SDPConstraint)
@@ -33,128 +28,56 @@ function _add_constraint!(context::Context, c::SDPConstraint)
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
-        if !(
-            evaluate(LinearAlgebra.eigmin(c.child)) ≥
-            -CONSTANT_CONSTRAINT_TOL[]
-        )
+        if evaluate(LinearAlgebra.eigmin(c.child)) < -CONSTANT_CONSTRAINT_TOL[]
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
-        return nothing
+        return
     end
-
-    f = conic_form!(context, c.child)
-    d = c.size[1]
     context.constr_to_moi_inds[c] = MOI_add_constraint(
         context.model,
-        f,
-        MOI.PositiveSemidefiniteConeSquare(d),
+        conic_form!(context, c.child),
+        MOI.PositiveSemidefiniteConeSquare(c.size[1]),
     )
-    return nothing
+    return
 end
 
-function populate_dual!(
-    model::MOI.ModelLike,
-    constr::SDPConstraint,
-    MOI_constr_indices,
-)
-    return constr.dual = output(
-        reshape(
-            MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices),
-            constr.size,
-        ),
-    )
+function populate_dual!(model::MOI.ModelLike, c::SDPConstraint, indices)
+    dual = MOI.get(model, MOI.ConstraintDual(), indices)
+    c.dual = output(reshape(dual, c.size))
+    return
 end
 
-# TODO: Remove isposdef, change tests to use in. Update documentation and notebooks
-function LinearAlgebra.isposdef(x::AbstractExpr)
-    if iscomplex(x)
-        SDPConstraint([real(x) -imag(x); imag(x) real(x)])
-    else
-        SDPConstraint(x)
-    end
-end
+# TODO: Remove isposdef, change tests to use in. Update documentation and
+# notebooks
+LinearAlgebra.isposdef(x::AbstractExpr) = in(x, :SDP)
 
 function Base.in(x::AbstractExpr, y::Symbol)
-    if y == :semidefinite || y == :SDP
-        if iscomplex(x)
-            SDPConstraint([real(x) -imag(x); imag(x) real(x)])
-        else
-            SDPConstraint(x)
-        end
-    else
+    if !(y in (:semidefinite, :SDP))
         error("Set $y not understood")
     end
+    if iscomplex(x)
+        return SDPConstraint([real(x) -imag(x); imag(x) real(x)])
+    end
+    return SDPConstraint(x)
 end
 
-function ⪰(x::AbstractExpr, y::AbstractExpr)
-    if iscomplex(x) || iscomplex(y)
-        SDPConstraint([real(x - y) -imag(x - y); imag(x - y) real(x - y)])
-    else
-        SDPConstraint(x - y)
-    end
-end
-
-function ⪯(x::AbstractExpr, y::AbstractExpr)
-    if iscomplex(x) || iscomplex(y)
-        SDPConstraint([real(y - x) -imag(y - x); imag(y - x) real(y - x)])
-    else
-        SDPConstraint(y - x)
-    end
-end
+⪰(x::AbstractExpr, y::AbstractExpr) = in(x - y, :SDP)
 
 function ⪰(x::AbstractExpr, y::Value)
-    if iscomplex(x) || iscomplex(y)
-        all(y .== 0) ? SDPConstraint([real(x) -imag(x); imag(x) real(x)]) :
-        SDPConstraint(
-            [
-                real(x - constant(y)) -imag(x - constant(y))
-                imag(x - constant(y)) real(x - constant(y))
-            ],
-        )
-    else
-        all(y .== 0) ? SDPConstraint(x) : SDPConstraint(x - constant(y))
+    if all(y .== 0)
+        return in(x, :SDP)
     end
+    return in(x - constant(y), :SDP)
 end
 
 function ⪰(x::Value, y::AbstractExpr)
-    if iscomplex(y) || iscomplex(x)
-        all(x .== 0) ? SDPConstraint([real(-y) -imag(-y); imag(-y) real(-y)]) :
-        SDPConstraint(
-            [
-                real(constant(x) - y) -imag(constant(x) - y)
-                imag(constant(x) - y) real(constant(x) - y)
-            ],
-        )
-    else
-        all(x .== 0) ? SDPConstraint(-y) : SDPConstraint(constant(x) - y)
+    if all(x .== 0)
+        return in(-y, :SDP)
     end
+    return in(constant(x) - y, :SDP)
 end
 
-function ⪯(x::Value, y::AbstractExpr)
-    if iscomplex(y) || iscomplex(x)
-        all(x .== 0) ? SDPConstraint([real(y) -imag(y); imag(y) real(y)]) :
-        SDPConstraint(
-            [
-                real(y - constant(x)) -imag(y - constant(x))
-                imag(y - constant(x)) real(y - constant(x))
-            ],
-        )
-    else
-        all(x .== 0) ? SDPConstraint(y) : SDPConstraint(y - constant(x))
-    end
-end
-
-function ⪯(x::AbstractExpr, y::Value)
-    if iscomplex(x) || iscomplex(y)
-        all(y .== 0) ? SDPConstraint([real(-x) -imag(-x); imag(-x) real(-x)]) :
-        SDPConstraint(
-            [
-                real(constant(y) - x) -imag(constant(y) - x)
-                imag(constant(y) - x) real(constant(y) - x)
-            ],
-        )
-    else
-        all(y .== 0) ? SDPConstraint(-x) : SDPConstraint(constant(y) - x)
-    end
-end
+⪯(x::AbstractExpr, y::AbstractExpr) = ⪰(y, x)
+⪯(x::Value, y::AbstractExpr) = ⪰(y, x)
+⪯(x::AbstractExpr, y::Value) = ⪰(y, x)
