@@ -1,28 +1,27 @@
-### (Primal) exponential cone constraint ExpConstraint(x,y,z) => y exp(x/y) <= z & y>=0
 mutable struct ExpConstraint <: Constraint
     children::Tuple{AbstractExpr,AbstractExpr,AbstractExpr} # (x, y, z)
     size::Tuple{Int,Int}
-    dual::ValueOrNothing
+    dual::Union{Value,Nothing}
 
     function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z::AbstractExpr)
         @assert(
             x.size == y.size == z.size,
             "Exponential constraint requires x, y, and z to be of same size"
         )
-        # @assert(x.size == (1,1),
-        #         "Exponential constraint requires x, y, and z to be scalar for now")
-        sz = x.size
-        return new((x, y, z), sz, nothing)
+        return new((x, y, z), x.size, nothing)
     end
 end
+
 head(io::IO, ::ExpConstraint) = print(io, "exp")
 
 function ExpConstraint(x::AbstractExpr, y, z::AbstractExpr)
     return ExpConstraint(x, constant(y), z)
 end
+
 function ExpConstraint(x::AbstractExpr, y::AbstractExpr, z)
     return ExpConstraint(x, y, constant(z))
 end
+
 function ExpConstraint(x, y::AbstractExpr, z::AbstractExpr)
     return ExpConstraint(constant(x), y, z)
 end
@@ -42,28 +41,24 @@ end
 # end
 
 function _add_constraint!(context::Context{T}, c::ExpConstraint) where {T}
-    x, y, z = c.children
-    t = a -> conic_form!(context, a)
-    inds = [
-        begin
-            terms = (t(x[i, j]), t(y[i, j]), t(z[i, j]))
-            obj = operate(vcat, T, sum(map(sign, c.children)), terms...)
-            MOI_add_constraint(context.model, obj, MOI.ExponentialCone())
-        end for i in 1:size(x, 1), j in 1:size(x, 2)
+    context.constr_to_moi_inds[c] = [
+        MOI_add_constraint(
+            context.model,
+            operate(
+                vcat,
+                T,
+                sum(map(sign, c.children)),
+                conic_form!(context, c.children[1][i, j]),
+                conic_form!(context, c.children[2][i, j]),
+                conic_form!(context, c.children[3][i, j]),
+            ),
+            MOI.ExponentialCone(),
+        ) for i in 1:size(c.children[1], 1), j in 1:size(c.children[1], 2)
     ]
-    context.constr_to_moi_inds[c] = inds
-    return nothing
+    return
 end
 
-function populate_dual!(
-    model::MOI.ModelLike,
-    constr::ExpConstraint,
-    MOI_constr_indices,
-)
-    x = first(AbstractTrees.children(constr))
-    constr.dual = output([
-        MOI.get(model, MOI.ConstraintDual(), MOI_constr_indices[i, j]) for
-        i in 1:size(x, 1), j in 1:size(x, 2)
-    ])
-    return nothing
+function populate_dual!(model::MOI.ModelLike, c::ExpConstraint, indices)
+    c.dual = output(MOI.get.(model, MOI.ConstraintDual(), indices))
+    return
 end
