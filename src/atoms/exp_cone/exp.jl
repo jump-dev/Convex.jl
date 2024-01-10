@@ -1,12 +1,3 @@
-#############################################################################
-# exp.jl
-# e raised to the power of an expression
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Exponential
-
 mutable struct ExpAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -14,30 +5,20 @@ mutable struct ExpAtom <: AbstractExpr
     function ExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
             error("The argument should be real but it's instead complex")
-        else
-            children = (x,)
-            return new(children, x.size)
         end
+        return new((x,), x.size)
     end
 end
 
 head(io::IO, ::ExpAtom) = print(io, "exp")
 
-function Base.sign(x::ExpAtom)
-    return Positive()
-end
+Base.sign(::ExpAtom) = Positive()
 
-function monotonicity(x::ExpAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::ExpAtom) = (Nondecreasing(),)
 
-function curvature(x::ExpAtom)
-    return ConvexVexity()
-end
+curvature(::ExpAtom) = ConvexVexity()
 
-function evaluate(x::ExpAtom)
-    return exp.(evaluate(x.children[1]))
-end
+evaluate(x::ExpAtom) = exp.(evaluate(x.children[1]))
 
 Base.exp(x::AbstractExpr) = ExpAtom(x)
 
