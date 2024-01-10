@@ -317,7 +317,7 @@ _flip_dual(x, ::Type{S}) where {S<:MOI.AbstractScalarSet} = x
 
 function MOI.get(
     model::Optimizer,
-    attr::MOI.AbstractConstraintAttribute,
+    attr::Union{MOI.ConstraintDual,MOI.ConstraintPrimal},
     ci::MOI.ConstraintIndex{MOI.ScalarNonlinearFunction,S},
 ) where {S<:MOI.AbstractScalarSet}
     ret = MOI.get(model.context.model, attr, model.constraint_map[ci.value])
