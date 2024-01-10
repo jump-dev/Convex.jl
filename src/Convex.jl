@@ -51,7 +51,7 @@ export conv,
 
 export DCPViolationError
 
-# rexports from LinearAlgebra
+# Imports and exports as needed to maintain backwards compatibility
 for k in (
     :diag,
     :diagm,
@@ -69,6 +69,8 @@ for k in (
         export $k
     end
 end
+using AbstractTrees: children
+using Base: sign
 
 # Constraints
 export Constraint

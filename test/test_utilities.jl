@@ -789,7 +789,7 @@ function Convex.vexity!(x::DictVector, v::Convex.Vexity)
     return global_cache[x.id_hash][:vexity] = v
 end
 
-Base.sign(x::DictVector) = global_cache[x.id_hash][:sign]
+Convex.sign(x::DictVector) = global_cache[x.id_hash][:sign]
 
 Convex.sign!(x::DictVector, s::Convex.Sign) = global_cache[x.id_hash][:sign] = s
 
@@ -850,7 +850,7 @@ end
 
 Convex.get_constraints(ρ::DensityMatrix) = [ρ ⪰ 0, tr(ρ) == 1]
 
-Base.sign(::DensityMatrix) = Convex.ComplexSign()
+Convex.sign(::DensityMatrix) = Convex.ComplexSign()
 
 Convex.vartype(::DensityMatrix) = Convex.ContVar
 
@@ -901,7 +901,7 @@ end
 
 Convex.get_constraints(p::ProbabilityVector) = [sum(p) == 1]
 
-Base.sign(::ProbabilityVector) = Convex.Positive()
+Convex.sign(::ProbabilityVector) = Convex.Positive()
 
 Convex.vartype(::ProbabilityVector) = Convex.ContVar
 
