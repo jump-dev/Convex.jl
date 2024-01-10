@@ -1,71 +1,49 @@
-#############################################################################
-# diagm.jl
-# Converts a vector of size n into an n x n diagonal
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
 mutable struct DiagMatrixAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
     function DiagMatrixAtom(x::AbstractExpr)
-        (num_rows, num_cols) = x.size
-
+        num_rows, num_cols = x.size
         if num_rows == 1
-            sz = num_cols
+            return new((x,), (num_cols, num_cols))
         elseif num_cols == 1
-            sz = num_rows
+            return new((x,), (num_rows, num_rows))
         else
-            throw(
-                ArgumentError(
-                    "Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?",
-                ),
-            )
+            msg = "Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?"
+            throw(ArgumentError(msg))
         end
-
-        children = (x,)
-        return new(children, (sz, sz))
     end
 end
 
 head(io::IO, ::DiagMatrixAtom) = print(io, "diagm")
 
-function Base.sign(x::DiagMatrixAtom)
-    return sign(x.children[1])
-end
+Base.sign(x::DiagMatrixAtom) = sign(x.children[1])
 
-# The monotonicity
-function monotonicity(x::DiagMatrixAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::DiagMatrixAtom) = (Nondecreasing(),)
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
-# this represents the first term
-function curvature(x::DiagMatrixAtom)
-    return ConstVexity()
-end
+curvature(::DiagMatrixAtom) = ConstVexity()
 
 function evaluate(x::DiagMatrixAtom)
     return LinearAlgebra.Diagonal(vec(evaluate(x.children[1])))
 end
 
 function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
-    d == 0 || throw(ArgumentError("only the main diagonal is supported"))
+    if d != 0
+        throw(ArgumentError("only the main diagonal is supported"))
+    end
     return DiagMatrixAtom(x)
 end
+
 LinearAlgebra.Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+
 LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
 
 function new_conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
-
     sz = x.size[1]
     I = collect(1:sz+1:sz*sz)
     J = collect(1:sz)
     V = one(T)
     coeff = create_sparse(T, I, J, V, sz * sz, sz)
-    # coeff = create_sparse(, 1:sz, one(T),
-
     return operate(add_operation, T, sign(x), coeff, obj)
 end

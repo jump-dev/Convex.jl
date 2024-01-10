@@ -1,53 +1,30 @@
-#############################################################################
-# add_subtract.jl
-# Handles unary negation, addition and subtraction of variables, constants
-# and expressions.
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Unary Negation
-
 mutable struct NegateAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function NegateAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, x.size)
-    end
-end
-head(io::IO, ::NegateAtom) = print(io, "-")
-
-function Base.sign(x::NegateAtom)
-    return -sign(x.children[1])
+    NegateAtom(x::AbstractExpr) = new((x,), x.size)
 end
 
-function monotonicity(x::NegateAtom)
-    return (Nonincreasing(),)
-end
+Base.sign(x::NegateAtom) = -sign(x.children[1])
 
-function curvature(x::NegateAtom)
-    return ConstVexity()
-end
+monotonicity(::NegateAtom) = (Nonincreasing(),)
 
-function evaluate(x::NegateAtom)
-    return -evaluate(x.children[1])
-end
+curvature(::NegateAtom) = ConstVexity()
+
+evaluate(x::NegateAtom) = -evaluate(x.children[1])
 
 Base.:-(x::AbstractExpr) = NegateAtom(x)
+
 Base.:-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
 function new_conic_form!(context::Context{T}, A::NegateAtom) where {T}
     subobj = conic_form!(context, only(AbstractTrees.children(A)))
     if subobj isa Value
         return -subobj
-    else
-        return operate(-, T, sign(A), subobj)
     end
+    return operate(-, T, sign(A), subobj)
 end
 
-### Addition
 mutable struct AdditionAtom <: AbstractExpr
     children::Array{AbstractExpr,1}
     size::Tuple{Int,Int}
@@ -65,7 +42,6 @@ mutable struct AdditionAtom <: AbstractExpr
         else
             error("Cannot add expressions of sizes $(x.size) and $(y.size)")
         end
-
         if x.size != y.size
             if (x isa Constant || x isa ComplexConstant) && (x.size == (1, 1))
                 x = constant(fill(evaluate(x), y.size))
@@ -74,7 +50,6 @@ mutable struct AdditionAtom <: AbstractExpr
                 y = constant(fill(evaluate(y), x.size))
             end
         end
-
         # see if we're forming a sum of more than two terms and condense them
         children = AbstractExpr[]
         if isa(x, AdditionAtom)
@@ -93,38 +68,37 @@ end
 
 head(io::IO, ::AdditionAtom) = print(io, "+")
 
-function Base.sign(x::AdditionAtom)
-    return sum(Sign[sign(child) for child in x.children])
-    # Creating an array of type Sign and adding all the sign of xhildren of x so if anyone is complex the resultant sign would be complex.
-end
+# Creating an array of type Sign and adding all the sign of children of x,
+# so if anyone is complex the resultant sign would be complex.
+Base.sign(x::AdditionAtom) = sum(sign.(x.children))
 
-function monotonicity(x::AdditionAtom)
-    return Monotonicity[Nondecreasing() for child in x.children]
-end
+monotonicity(x::AdditionAtom) = [Nondecreasing() for _ in x.children]
 
-function curvature(x::AdditionAtom)
-    return ConstVexity()
-end
+curvature(::AdditionAtom) = ConstVexity()
 
 function evaluate(x::AdditionAtom)
-    # broadcast is used in reduction instead of using sum directly to support addition
-    # between scalars and arrays
+    # broadcast is used in reduction instead of using sum directly to support
+    # addition between scalars and arrays
     return mapreduce(evaluate, (a, b) -> a .+ b, x.children)
 end
 
 function new_conic_form!(context::Context{T}, x::AdditionAtom) where {T}
-    obj = operate(
+    return operate(
         +,
         T,
         sign(x),
         (conic_form!(context, c) for c in AbstractTrees.children(x))...,
     )
-    return obj
 end
 
 Base.:+(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
+
 Base.:+(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
+
 Base.:+(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
+
 Base.:-(x::AbstractExpr, y::AbstractExpr) = x + (-y)
+
 Base.:-(x::Value, y::AbstractExpr) = constant(x) + (-y)
+
 Base.:-(x::AbstractExpr, y::Value) = x + constant(-y)

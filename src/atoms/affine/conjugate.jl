@@ -2,28 +2,18 @@ mutable struct ConjugateAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function ConjugateAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, (x.size[1], x.size[2]))
-    end
+    ConjugateAtom(x::AbstractExpr) = new((x,), x.size)
 end
+
 head(io::IO, ::ConjugateAtom) = print(io, "conj")
 
-function Base.sign(x::ConjugateAtom)
-    return sign(x.children[1])
-end
+Base.sign(x::ConjugateAtom) = sign(x.children[1])
 
-function monotonicity(x::ConjugateAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::ConjugateAtom) = (Nondecreasing(),)
 
-function curvature(x::ConjugateAtom)
-    return ConstVexity()
-end
+curvature(::ConjugateAtom) = ConstVexity()
 
-function evaluate(x::ConjugateAtom)
-    return conj(evaluate(x.children[1]))
-end
+evaluate(x::ConjugateAtom) = conj(evaluate(x.children[1]))
 
 function new_conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
     objective = conic_form!(context, only(AbstractTrees.children(x)))
@@ -33,9 +23,10 @@ end
 function Base.conj(x::AbstractExpr)
     if sign(x) == ComplexSign()
         return ConjugateAtom(x)
-    else
-        return x
     end
+    return x
 end
+
 Base.conj(x::Constant) = x
+
 Base.conj(x::ComplexConstant) = ComplexConstant(real(x), -imag(x))

@@ -1,18 +1,8 @@
-#############################################################################
-# real_imag.jl
-# Handles real and imaginary part of the variables, constants
-# and expressions.
-#############################################################################
-
-### Real
 mutable struct RealAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function RealAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, x.size)
-    end
+    RealAtom(x::AbstractExpr) = new((x,), x.size)
 end
 
 head(io::IO, ::RealAtom) = print(io, "real")
@@ -20,22 +10,15 @@ head(io::IO, ::RealAtom) = print(io, "real")
 function Base.sign(x::RealAtom)
     if sign(x.children[1]) == ComplexSign()
         return NoSign()
-    else
-        return sign(x.children[1])
     end
+    return sign(x.children[1])
 end
 
-function monotonicity(x::RealAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::RealAtom) = (Nondecreasing(),)
 
-function curvature(x::RealAtom)
-    return ConstVexity()
-end
+curvature(::RealAtom) = ConstVexity()
 
-function evaluate(x::RealAtom)
-    return real.(evaluate(x.children[1]))
-end
+evaluate(x::RealAtom) = real.(evaluate(x.children[1]))
 
 function new_conic_form!(context::Context{T}, x::RealAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
@@ -43,38 +26,31 @@ function new_conic_form!(context::Context{T}, x::RealAtom) where {T}
 end
 
 Base.real(x::AbstractExpr) = RealAtom(x)
+
 Base.real(x::ComplexConstant) = x.real_constant
+
 Base.real(x::Constant) = x
 
-### Imaginary
 mutable struct ImaginaryAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function ImaginaryAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, x.size)
-    end
+    ImaginaryAtom(x::AbstractExpr) = new((x,), x.size)
 end
 
 head(io::IO, ::ImaginaryAtom) = print(io, "imag")
 
 function Base.sign(x::ImaginaryAtom)
+    # FIXME(odow): what is this?
     sign(x.children[1]) == ComplexSign()
     return NoSign()
 end
 
-function monotonicity(x::ImaginaryAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::ImaginaryAtom) = (Nondecreasing(),)
 
-function curvature(x::ImaginaryAtom)
-    return ConstVexity()
-end
+curvature(::ImaginaryAtom) = ConstVexity()
 
-function evaluate(x::ImaginaryAtom)
-    return imag.(evaluate(x.children[1]))
-end
+evaluate(x::ImaginaryAtom) = imag.(evaluate(x.children[1]))
 
 function new_conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
@@ -82,5 +58,7 @@ function new_conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
 end
 
 Base.imag(x::AbstractExpr) = ImaginaryAtom(x)
+
 Base.imag(x::ComplexConstant) = x.imag_constant
+
 Base.imag(x::Constant) = Constant(zero(x.value))
