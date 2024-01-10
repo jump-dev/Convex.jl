@@ -6,24 +6,19 @@ mutable struct QuadOverLinAtom <: AbstractExpr
         if x.size[2] != 1 && y.size != (1, 1)
             error("quad over lin arguments must be a vector and a scalar")
         end
-        children = (x, y)
-        return new(children, (1, 1))
+        return new((x, y), (1, 1))
     end
 end
 
 head(io::IO, ::QuadOverLinAtom) = print(io, "qol")
 
-function Base.sign(q::QuadOverLinAtom)
-    return Positive()
-end
+Base.sign(::QuadOverLinAtom) = Positive()
 
 function monotonicity(q::QuadOverLinAtom)
     return (sign(q.children[1]) * Nondecreasing(), Nonincreasing())
 end
 
-function curvature(q::QuadOverLinAtom)
-    return ConvexVexity()
-end
+curvature(::QuadOverLinAtom) = ConvexVexity()
 
 function evaluate(q::QuadOverLinAtom)
     x = evaluate(q.children[1])

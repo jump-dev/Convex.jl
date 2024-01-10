@@ -1,59 +1,32 @@
-#############################################################################
-# LinearAlgebra.norm2.jl
-# Handles the euclidean norm (also called frobenius norm for matrices)
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
 mutable struct EucNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function EucNormAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, (1, 1))
-    end
+    EucNormAtom(x::AbstractExpr) = new((x,), (1, 1))
 end
 
 head(io::IO, ::EucNormAtom) = print(io, "norm2")
 
-function Base.sign(x::EucNormAtom)
-    return Positive()
-end
+Base.sign(::EucNormAtom) = Positive()
 
-function monotonicity(x::EucNormAtom)
-    return (sign(x.children[1]) * Nondecreasing(),)
-end
+monotonicity(x::EucNormAtom) = (sign(x.children[1]) * Nondecreasing(),)
 
-function curvature(x::EucNormAtom)
-    return ConvexVexity()
-end
+curvature(::EucNormAtom) = ConvexVexity()
 
-function evaluate(x::EucNormAtom)
-    return norm(vec(evaluate(x.children[1])))
-end
+evaluate(x::EucNormAtom) = norm(vec(evaluate(x.children[1])))
 
-## Create a new variable euc_norm to represent the norm
-## Additionally, create the second order conic constraint (euc_norm, x) in SOC
 function new_conic_form!(context::Context{T}, A::EucNormAtom) where {T}
-    obj = conic_form!(context, only(AbstractTrees.children(A)))
-
     x = only(AbstractTrees.children(A))
-    d = length(x)
-
-    t_obj = conic_form!(context, Variable())
-
-    f = operate(vcat, T, sign(A), t_obj, obj)
-    set = MOI.SecondOrderCone(d + 1)
-    MOI_add_constraint(context.model, f, set)
-
-    return t_obj
+    t = conic_form!(context, Variable())
+    obj = conic_form!(context, x)
+    f = operate(vcat, T, sign(A), t, obj)
+    MOI_add_constraint(context.model, f, MOI.SecondOrderCone(length(x) + 1))
+    return t
 end
 
 function LinearAlgebra.norm2(x::AbstractExpr)
     if sign(x) == ComplexSign()
         return EucNormAtom([real(x); imag(x)])
-    else
-        return EucNormAtom(x)
     end
+    return EucNormAtom(x)
 end

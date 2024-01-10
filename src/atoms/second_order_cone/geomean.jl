@@ -9,28 +9,23 @@ mutable struct GeoMeanAtom <: AbstractExpr
             error("geo mean must take arguments of the same size")
         elseif any(x -> sign(x) == ComplexSign(), args)
             error("The arguments should be real, not complex")
-        else
-            children = args
-            return new(children, sz)
         end
+        return new(args, sz)
     end
 end
 
 head(io::IO, ::GeoMeanAtom) = print(io, "geomean")
 
-function Base.sign(q::GeoMeanAtom)
-    return Positive()
-end
+Base.sign(::GeoMeanAtom) = Positive()
 
 function monotonicity(q::GeoMeanAtom)
     return fill(Nondecreasing(), length(q.children))
 end
 
-function curvature(q::GeoMeanAtom)
-    return ConcaveVexity()
-end
+curvature(::GeoMeanAtom) = ConcaveVexity()
 
 _geomean(scalar_args...) = prod(scalar_args)^(1 / length(scalar_args))
+
 function evaluate(q::GeoMeanAtom)
     n = length(q.children)
     children = evaluate.(q.children)

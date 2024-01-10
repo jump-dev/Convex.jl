@@ -8,24 +8,19 @@ mutable struct QolElemAtom <: AbstractExpr
                 "elementwise quad over lin must take two arguments of the same size",
             )
         end
-        children = (x, y)
-        return new(children, x.size)
+        return new((x, y), x.size)
     end
 end
 
 head(io::IO, ::QolElemAtom) = print(io, "qol_elem")
 
-function Base.sign(q::QolElemAtom)
-    return Positive()
-end
+Base.sign(::QolElemAtom) = Positive()
 
 function monotonicity(q::QolElemAtom)
     return (sign(q.children[1]) * Nondecreasing(), Nonincreasing())
 end
 
-function curvature(q::QolElemAtom)
-    return ConvexVexity()
-end
+curvature(::QolElemAtom) = ConvexVexity()
 
 function evaluate(q::QolElemAtom)
     return (evaluate(q.children[1]) .^ 2) ./ evaluate(q.children[2])
@@ -36,7 +31,6 @@ function new_conic_form!(context::Context{T}, q::QolElemAtom) where {T}
     t = Variable(sz[1], sz[2])
     t_obj = conic_form!(context, t)
     x, y = q.children
-
     for i in 1:length(q.children[1])
         add_constraint!(
             context,
@@ -50,11 +44,12 @@ end
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 
 function Base.Broadcast.broadcasted(::typeof(^), x::AbstractExpr, k::Int)
-    return k == 2 ? QolElemAtom(x, constant(ones(x.size[1], x.size[2]))) :
-           error("raising variables to powers other than 2 is not implemented")
+    if k != 2
+        error("raising variables to powers other than 2 is not implemented")
+    end
+    return QolElemAtom(x, constant(ones(x.size[1], x.size[2])))
 end
 
-# handle literal case
 function Base.Broadcast.broadcasted(
     ::typeof(Base.literal_pow),
     ::typeof(^),
@@ -65,13 +60,16 @@ function Base.Broadcast.broadcasted(
 end
 
 invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size[1], x.size[2])), x)
+
 function Base.Broadcast.broadcasted(::typeof(/), x::Value, y::AbstractExpr)
     return dotmultiply(constant(x), invpos(y))
 end
 
 function Base.:/(x::Value, y::AbstractExpr)
-    return size(y) == (1, 1) ? MultiplyAtom(constant(x), invpos(y)) :
-           error("cannot divide by a variable of size $(size(y))")
+    if size(y) != (1, 1)
+        error("cannot divide by a variable of size $(size(y))")
+    end
+    return MultiplyAtom(constant(x), invpos(y))
 end
 
 sumsquares(x::AbstractExpr) = square(norm2(x))
@@ -81,7 +79,6 @@ function square(x::AbstractExpr)
         error(
             "Square of complex number is not DCP. Did you mean square_modulus?",
         )
-    else
-        QolElemAtom(x, constant(ones(x.size[1], x.size[2])))
     end
+    return QolElemAtom(x, constant(ones(x.size[1], x.size[2])))
 end

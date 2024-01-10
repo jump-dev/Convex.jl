@@ -5,28 +5,21 @@ mutable struct HuberAtom <: AbstractExpr
 
     function HuberAtom(x::AbstractExpr, M::Real)
         if sign(x) == ComplexSign()
-            error("Arguemt must be real")
+            error("Argument must be real")
         elseif M <= 0
             error("Huber parameter must by a positive scalar")
         end
-        children = (x,)
-        return new(children, x.size, M)
+        return new((x,), x.size, M)
     end
 end
 
 head(io::IO, ::HuberAtom) = print(io, "huber")
 
-function Base.sign(x::HuberAtom)
-    return Positive()
-end
+Base.sign(::HuberAtom) = Positive()
 
-function monotonicity(x::HuberAtom)
-    return (Nondecreasing() * sign(x.children[1]),)
-end
+monotonicity(x::HuberAtom) = (Nondecreasing() * sign(x.children[1]),)
 
-function curvature(x::HuberAtom)
-    return ConvexVexity()
-end
+curvature(::HuberAtom) = ConvexVexity()
 
 function evaluate(x::HuberAtom)
     c = evaluate(x.children[1])
@@ -44,11 +37,9 @@ function new_conic_form!(context::Context, x::HuberAtom)
     c = x.children[1]
     s = Variable(c.size)
     n = Variable(c.size)
-
-    # objective given by s.^2 + 2 * M * |n|
-    objective = conic_form!(context, square(s) + 2 * x.M * abs(n))
     add_constraint!(context, c == s + n)
-    return objective
+    # objective given by s.^2 + 2 * M * |n|
+    return conic_form!(context, square(s) + 2 * x.M * abs(n))
 end
 
 huber(x::AbstractExpr, M::Real = 1.0) = HuberAtom(x, M)

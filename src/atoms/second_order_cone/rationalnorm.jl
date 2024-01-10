@@ -1,6 +1,3 @@
-#############################################################################
-# rationalnorm.jl
-#
 # Handles the k-norms for k > 1 where k is rational. Reduces the
 # k-norm constraint to at most 2d ceil(log2(n + m)) + O(d) second
 # order cone constraints. Here d is the dimension of the problem and k
@@ -9,9 +6,6 @@
 # F. Alizadeh and D. Goldfarb, Mathematical Programming, Series B,
 # 95:3-51, 2001, and is documented in the pdf available at
 # https://github.com/jump-dev/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf
-#############################################################################
-
-### k-norm for rational k
 
 mutable struct RationalNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
@@ -19,26 +13,22 @@ mutable struct RationalNormAtom <: AbstractExpr
     k::Rational{Int64}
 
     function RationalNormAtom(x::AbstractExpr, k::Rational{Int})
-        children = (x,)
-        k >= 1 || error("p-norms not defined for p < 1")
-        return new(children, (1, 1), k)
+        if k < 1
+            error("p-norms not defined for p < 1")
+        end
+        return new((x,), (1, 1), k)
     end
 end
 
 head(io::IO, ::RationalNormAtom) = print(io, "rationalnorm")
 
-function Base.sign(x::RationalNormAtom)
-    return Positive()
-end
+Base.sign(::RationalNormAtom) = Positive()
 
-# The monotonicity
 function monotonicity(x::RationalNormAtom)
     return (sign(x.children[1]) * Nondecreasing(),)
 end
 
-function curvature(x::RationalNormAtom)
-    return ConvexVexity()
-end
+curvature(::RationalNormAtom) = ConvexVexity()
 
 function evaluate(x::RationalNormAtom)
     return sum(abs.(evaluate(x.children[1])) .^ x.k)^(1 / x.k)
@@ -60,7 +50,8 @@ function rationalnorm(x::AbstractExpr, k::Rational{Int})
         if row == 1 || col == 1
             return RationalNormAtom(abs(x), k)
         end
-    else
-        return RationalNormAtom(x, k)
+        # FIXME(odow): what happens if x is a matrix?
+        return nothing
     end
+    return RationalNormAtom(x, k)
 end
