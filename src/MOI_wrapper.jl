@@ -217,6 +217,24 @@ function MOI.is_valid(model::Optimizer, i::MOI.Index)
     return MOI.is_valid(model.context.model, i)
 end
 
+function MOI.supports(
+    ::Optimizer,
+    ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
+)
+    return true
+end
+
+function MOI.set(
+    model::Optimizer,
+    ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
+    func::MOI.ScalarNonlinearFunction,
+)
+    cfp = conic_form!(model.context, _expr(model, func))
+    obj = scalar_fn(cfp)
+    MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+    return
+end
+
 MOI.optimize!(model::Optimizer) = MOI.optimize!(model.context.model)
 
 function MOI.supports(
@@ -289,6 +307,21 @@ function MOI.get(
     ci::MOI.ConstraintIndex,
 )
     return MOI.get(model.context.model, attr, ci)
+end
+
+# See `constraints/constraints.jl`
+# `LessThan` constraints are reformulated as `rhs - lhs` unlike MOI while
+# `GreaterThan` constraints are reformulated as `lhs - rhs` like in MOI
+_flip_dual(x, ::Type{S}) where {S<:MOI.LessThan} = -x
+_flip_dual(x, ::Type{S}) where {S<:MOI.AbstractScalarSet} = x
+
+function MOI.get(
+    model::Optimizer,
+    attr::Union{MOI.ConstraintDual,MOI.ConstraintPrimal},
+    ci::MOI.ConstraintIndex{MOI.ScalarNonlinearFunction,S},
+) where {S<:MOI.AbstractScalarSet}
+    ret = MOI.get(model.context.model, attr, model.constraint_map[ci.value])
+    return _flip_dual(ret[], S)
 end
 
 function MOI.get(model::Optimizer, I::Type{<:MOI.Index}, name::String)

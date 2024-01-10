@@ -38,7 +38,10 @@ function test_runtests()
             MOI.ObjectiveBound,
         ],
     )
-    MOI.Test.runtests(optimizer, config)
+    MOI.Test.runtests(optimizer, config, exclude = [
+        # HS071 is not convex
+        "hs071",
+    ])
     return
 end
 
