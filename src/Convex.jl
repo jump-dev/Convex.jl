@@ -70,7 +70,7 @@ export conv,
     IntVar,
     ContVar,
     vartype,
-    vartype!
+    vartype!,
     get_constraints,
     add_constraint!,
     set_value!,
