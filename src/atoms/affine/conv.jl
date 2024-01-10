@@ -1,8 +1,3 @@
-#############################################################################
-# conv.jl
-# Handles convolution between a constant vector and an expression vector.
-#############################################################################
-
 function conv(x::Value, y::AbstractExpr)
     if (size(x, 2) != 1 && length(size(x)) != 1) || size(y, 2) != 1
         error("convolution only supported between two vectors")

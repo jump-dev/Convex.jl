@@ -3,9 +3,8 @@ mutable struct HcatAtom <: AbstractExpr
     size::Tuple{Int,Int}
 
     function HcatAtom(args...)
-        args = map(arg -> convert(AbstractExpr, arg), args)
-        num_rows = args[1].size[1]
-        num_cols = 0
+        args = convert.(AbstractExpr, args)
+        num_cols, num_rows = 0, args[1].size[1]
         for arg in args
             if arg.size[1] != num_rows
                 error(
@@ -14,32 +13,24 @@ mutable struct HcatAtom <: AbstractExpr
             end
             num_cols += arg.size[2]
         end
-        children = tuple(args...)
-        return new(children, (num_rows, num_cols))
+        return new(args, (num_rows, num_cols))
     end
 end
 
 head(io::IO, ::HcatAtom) = print(io, "hcat")
 
-function Base.sign(x::HcatAtom)
-    return sum(map(sign, x.children))
-end
+Base.sign(x::HcatAtom) = sum(map(sign, x.children))
 
-function monotonicity(x::HcatAtom)
-    return [Nondecreasing() for c in x.children]
-end
+monotonicity(x::HcatAtom) = [Nondecreasing() for _ in x.children]
 
-function curvature(x::HcatAtom)
-    return ConstVexity()
-end
+curvature(::HcatAtom) = ConstVexity()
 
-function evaluate(x::HcatAtom)
-    return hcat(map(evaluate, x.children)...)
-end
+evaluate(x::HcatAtom) = hcat(map(evaluate, x.children)...)
 
 function new_conic_form!(context::Context{T}, x::HcatAtom) where {T}
     objectives = map(c -> conic_form!(context, c), AbstractTrees.children(x))
-    # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2) look something like
+    # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2)
+    # look something like
     #  e1: x => 1 2 3
     #           4 5 6
     #      y => 2 4
@@ -61,8 +52,8 @@ function new_conic_form!(context::Context{T}, x::HcatAtom) where {T}
     #                 0 0
     #                 0 0
     #                 0 0
-    # builds the objective by aggregating a list of coefficients for each variable
-    # from each child objective, and then vertically concatenating them
+    # builds the objective by aggregating a list of coefficients for each
+    # variable from each child objective, and then vertically concatenating them
     return operate(vcat, T, sign(x), objectives...)
 end
 # TODO: fix piracy!

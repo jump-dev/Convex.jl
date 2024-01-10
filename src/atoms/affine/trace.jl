@@ -1,3 +1,1 @@
-function LinearAlgebra.tr(e::AbstractExpr)
-    return sum(LinearAlgebra.diag(e))
-end
+LinearAlgebra.tr(e::AbstractExpr) = sum(LinearAlgebra.diag(e))

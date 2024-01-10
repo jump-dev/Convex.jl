@@ -10,4 +10,5 @@ function LinearAlgebra.transpose(x::Union{Constant,ComplexConstant})
 end
 
 LinearAlgebra.adjoint(x::AbstractExpr) = transpose(conj(x))
+
 LinearAlgebra.adjoint(x::Union{Constant,ComplexConstant}) = constant(x.value')

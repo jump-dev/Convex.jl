@@ -1,4 +1,3 @@
-
 # We compute the partial trace of x by summing over
 # (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I) for all j's
 # in the system we want to trace out.
@@ -25,26 +24,20 @@ end
 """
     partialtrace(x, sys::Int, dims::Vector)
 
-Returns the partial trace of `x` over the `sys`th system, where `dims` is a vector of integers encoding the dimensions of each subsystem.
+Returns the partial trace of `x` over the `sys`th system, where `dims` is a
+vector of integers encoding the dimensions of each subsystem.
 """
 function partialtrace(x, sys::Int, dims::Vector)
-    if size(x, 1) ≠ size(x, 2)
+    if size(x, 1) != size(x, 2)
         throw(ArgumentError("Only square matrices are supported"))
     end
-    if !(1 ≤ sys ≤ length(dims))
-        throw(
-            ArgumentError(
-                "Invalid system index, should between 1 and $(length(dims)), got $sys",
-            ),
-        )
+    if !(1 <= sys <= length(dims))
+        msg = "Invalid system index, should between 1 and $(length(dims)), got $sys"
+        throw(ArgumentError(msg))
     end
-    if size(x, 1) ≠ prod(dims)
-        throw(
-            ArgumentError(
-                "Dimension of system doesn't correspond to dimension of subsystems",
-            ),
-        )
+    if size(x, 1) != prod(dims)
+        msg = "Dimension of system doesn't correspond to dimension of subsystems"
+        throw(ArgumentError(msg))
     end
-
     return sum(j -> _term(x, j, sys, dims), 1:dims[sys])
 end

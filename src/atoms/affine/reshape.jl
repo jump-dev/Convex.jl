@@ -11,19 +11,14 @@ mutable struct ReshapeAtom <: AbstractExpr
         return new((x,), (m, n))
     end
 end
+
 head(io::IO, ::ReshapeAtom) = print(io, "reshape")
 
-function Base.sign(x::ReshapeAtom)
-    return sign(x.children[1])
-end
+Base.sign(x::ReshapeAtom) = sign(x.children[1])
 
-function monotonicity(x::ReshapeAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::ReshapeAtom) = (Nondecreasing(),)
 
-function curvature(x::ReshapeAtom)
-    return ConstVexity()
-end
+curvature(::ReshapeAtom) = ConstVexity()
 
 function evaluate(x::ReshapeAtom)
     val = evaluate(x.children[1])
@@ -38,4 +33,5 @@ function new_conic_form!(context::Context, A::ReshapeAtom)
 end
 
 Base.reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
+
 Base.vec(x::AbstractExpr) = reshape(x, length(x), 1)

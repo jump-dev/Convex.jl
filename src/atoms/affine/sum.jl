@@ -1,46 +1,26 @@
-#############################################################################
-# sum.jl
-# Handles sums of expressions.
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Sum Atom
 mutable struct SumAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function SumAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, (1, 1))
-    end
+    SumAtom(x::AbstractExpr) = new((x,), (1, 1))
 end
 
 head(io::IO, ::SumAtom) = print(io, "sum")
 
-function Base.sign(x::SumAtom)
-    return sign(x.children[1])
-end
+Base.sign(x::SumAtom) = sign(x.children[1])
 
-# The monotonicity
-function monotonicity(x::SumAtom)
-    return (Nondecreasing(),)
-end
+monotonicity(::SumAtom) = (Nondecreasing(),)
 
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
+# If we have h(x) = f o g(x), the chain rule says
+# h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
 # this represents the first term
-function curvature(x::SumAtom)
-    return ConstVexity()
-end
+curvature(::SumAtom) = ConstVexity()
 
-function evaluate(x::SumAtom)
-    return sum(evaluate(x.children[1]))
-end
+evaluate(x::SumAtom) = sum(evaluate(x.children[1]))
 
 function new_conic_form!(context::Context{T}, A::SumAtom) where {T}
     subobj = conic_form!(context, only(AbstractTrees.children(A)))
-    obj = operate(sum, T, sign(A), subobj)
-    return obj
+    return operate(sum, T, sign(A), subobj)
 end
 
 # Dispatch to an internal helper function that handles the dimension argument in
