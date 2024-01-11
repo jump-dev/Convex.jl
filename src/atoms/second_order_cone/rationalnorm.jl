@@ -14,7 +14,7 @@ mutable struct RationalNormAtom <: AbstractExpr
 
     function RationalNormAtom(x::AbstractExpr, k::Rational{Int})
         if k < 1
-            error("p-norms not defined for p < 1")
+            error("[RationalNormAtom] p-norms not defined for p < 1. Got $k")
         end
         return new((x,), (1, 1), k)
     end
@@ -47,11 +47,10 @@ end
 function rationalnorm(x::AbstractExpr, k::Rational{Int})
     if sign(x) == ComplexSign()
         row, col = size(x)
-        if row == 1 || col == 1
-            return RationalNormAtom(abs(x), k)
+        if !(row == 1 || col == 1)
+            error("[RationalNormAtom] not defined for complex matrices")
         end
-        # FIXME(odow): what happens if x is a matrix?
-        return nothing
+        return RationalNormAtom(abs(x), k)
     end
     return RationalNormAtom(x, k)
 end
