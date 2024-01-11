@@ -223,10 +223,13 @@ include("expressions.jl")
 include("variable.jl")
 include("variable_template.jl")
 include("constant.jl")
-include("constraints/constraints.jl")
-include("constraints/soc_constraints.jl")
-include("constraints/exp_constraints.jl")
-include("constraints/sdp_constraints.jl")
+
+for (root, _, files) in walkdir(joinpath(@__DIR__, "constraints"))
+    for file in files
+        include(joinpath(root, file))
+    end
+end
+
 include("problems.jl")
 include("SparseTape.jl")
 include("VectorAffineFunctionAsMatrix.jl")

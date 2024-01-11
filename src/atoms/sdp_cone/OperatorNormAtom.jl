@@ -1,39 +1,19 @@
-#############################################################################
-# operatornorm.jl
-# Handles matrix operator norm (the maximum singular value of a matrix)
-# and creates the alias sigmamax
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-### Operator norm
-
 mutable struct OperatorNormAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function OperatorNormAtom(x::AbstractExpr)
-        children = (x,)
-        return new(children, (1, 1))
-    end
+    OperatorNormAtom(x::AbstractExpr) = new((x,), (1, 1))
 end
 
 head(io::IO, ::OperatorNormAtom) = print(io, "opnorm")
 
-function Base.sign(x::OperatorNormAtom)
-    return Positive()
-end
+Base.sign(::OperatorNormAtom) = Positive()
 
-# The monotonicity
-function monotonicity(x::OperatorNormAtom)
-    return (NoMonotonicity(),)
-end
+monotonicity(::OperatorNormAtom) = (NoMonotonicity(),)
 
-function curvature(x::OperatorNormAtom)
-    return ConvexVexity()
-end
+curvature(::OperatorNormAtom) = ConvexVexity()
 
-# in julia, `norm` on matrices is the operator norm
+# In julia, `norm` on matrices is the operator norm.
 function evaluate(x::OperatorNormAtom)
     return LinearAlgebra.opnorm(evaluate(x.children[1]), 2)
 end
@@ -66,17 +46,17 @@ function new_conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
         #   minimize t
         #   subject to
         #            [tI_m A; A' tI_n] is positive semidefinite
-        # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization"
+        # see eg Recht, Fazel, Parillo 2008 "Guaranteed Minimum-Rank Solutions
+        # of Linear Matrix Equations via Nuclear Norm Minimization"
         # http://arxiv.org/pdf/0706.4138v1.pdf
         m, n = size(A)
         t = Variable()
         p = minimize(t, [t*spidentity(T, m) A; A' t*spidentity(T, n)] ⪰ 0)
         return conic_form!(context, p)
-    else
-        t = conic_form!(context, Variable())
-        f = operate(vcat, T, sign(x), t, conic_form!(context, A))
-        m, n = size(A)
-        MOI_add_constraint(context.model, f, MOI.NormSpectralCone(m, n))
-        return t
     end
+    t = conic_form!(context, Variable())
+    f = operate(vcat, T, sign(x), t, conic_form!(context, A))
+    m, n = size(A)
+    MOI_add_constraint(context.model, f, MOI.NormSpectralCone(m, n))
+    return t
 end

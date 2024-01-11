@@ -1,11 +1,3 @@
-#############################################################################
-# sumlargesteigs.jl
-# Handles top k eigenvalues of a symmetric or Hermitian matrix
-# (and imposes the constraint that its argument be symmetric or Hermitian)
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
 mutable struct SumLargestEigs <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
@@ -13,27 +5,20 @@ mutable struct SumLargestEigs <: AbstractExpr
     function SumLargestEigs(x::AbstractExpr, k::AbstractExpr)
         children = (x, k)
         m, n = size(x)
-        if m == n
-            return new(children, (1, 1))
-        else
+        if m != n
             error("sumlargesteigs can only be applied to a square matrix.")
         end
+        return new(children, (1, 1))
     end
 end
 
 head(io::IO, ::SumLargestEigs) = print(io, "sumlargesteigs")
 
-function Base.sign(x::SumLargestEigs)
-    return NoSign()
-end
+Base.sign(::SumLargestEigs) = NoSign()
 
-function monotonicity(x::SumLargestEigs)
-    return (Nondecreasing(), NoMonotonicity())
-end
+monotonicity(::SumLargestEigs) = (Nondecreasing(), NoMonotonicity())
 
-function curvature(x::SumLargestEigs)
-    return ConvexVexity()
-end
+curvature(::SumLargestEigs) = ConvexVexity()
 
 function evaluate(x::SumLargestEigs)
     return LinearAlgebra.eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
@@ -52,16 +37,16 @@ end
 # See Ben-Tal and Nemirovski, "Lectures on Modern Convex Optimization"
 # Example 18.c
 function new_conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
-    X = x.children[1]
-    k = x.children[2]
+    X, k = x.children
     m, n = size(X)
-    if iscomplex(sign(X))
-        Z = ComplexVariable(n, n)
+    Z = if iscomplex(sign(X))
+        ComplexVariable(n, n)
     else
-        Z = Variable(n, n)
+        Variable(n, n)
     end
     s = Variable()
-    # Note: we know the trace is real, since Z is PSD, but we need to tell Convex.jl that.
+    # Note: we know the trace is real, since Z is PSD, but we need to tell
+    # Convex.jl that.
     p = minimize(
         s * k + real(LinearAlgebra.tr(Z)),
         [Z - X + s * Matrix(1.0 * LinearAlgebra.I, n, n) ⪰ 0, Z ⪰ 0, X == X'],
