@@ -6,6 +6,7 @@ Random.seed!(2)
 
 @testset "Convex" begin
     include("test_utilities.jl")
+    include("test_atoms.jl")
     include("test_problem_depot.jl")
     include("MOI_wrapper.jl")
 end
