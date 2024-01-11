@@ -157,5 +157,4 @@ function _add_constraint!(
         add_constraint!(context, Z in GeomMeanHypoCone(A, B, 2 - t, false))
     end
     return
-
 end

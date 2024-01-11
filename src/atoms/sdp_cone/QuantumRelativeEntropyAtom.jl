@@ -45,7 +45,9 @@ mutable struct QuantumRelativeEntropy1Atom <: AbstractExpr
     end
 end
 
-head(io::IO, ::QuantumRelativeEntropy1Atom) = print(io, "quantum_relative_entropy")
+function head(io::IO, ::QuantumRelativeEntropy1Atom)
+    return print(io, "quantum_relative_entropy")
+end
 
 mutable struct QuantumRelativeEntropy2Atom <: AbstractExpr
     children::Tuple{AbstractExpr}
@@ -86,9 +88,13 @@ mutable struct QuantumRelativeEntropy2Atom <: AbstractExpr
     end
 end
 
-head(io::IO, ::QuantumRelativeEntropy2Atom) = print(io, "quantum_relative_entropy")
+function head(io::IO, ::QuantumRelativeEntropy2Atom)
+    return print(io, "quantum_relative_entropy")
+end
 
-function Base.sign(::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom})
+function Base.sign(
+    ::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom},
+)
     return Positive()
 end
 
@@ -98,7 +104,9 @@ end
 
 monotonicity(::QuantumRelativeEntropy2Atom) = (NoMonotonicity(),)
 
-function curvature(::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom})
+function curvature(
+    ::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom},
+)
     return ConvexVexity()
 end
 
