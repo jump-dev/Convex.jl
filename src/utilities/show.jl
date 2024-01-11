@@ -33,6 +33,7 @@ end
 Prints a one-line summary of a variable `x` to `io`.
 
 ## Examples
+
 ```julia-repl
 julia> x = ComplexVariable(3,2);
 
@@ -51,6 +52,7 @@ function Base.summary(io::IO, x::AbstractVariable)
     else
         print(io, "$(size(x,1))×$(size(x,2)) $(sgn) variable$(cst)")
     end
+    return
 end
 
 function Base.summary(io::IO, x::Union{Constant,ComplexConstant})
@@ -62,19 +64,25 @@ function Base.summary(io::IO, x::Union{Constant,ComplexConstant})
     else
         print(io, "$(size(x,1))×$(size(x,2)) $(sgn) constant")
     end
+    return
 end
 
 Base.summary(io::IO, ::AffineVexity) = print(io, "affine")
+
 Base.summary(io::IO, ::ConvexVexity) = print(io, "convex")
+
 Base.summary(io::IO, ::ConcaveVexity) = print(io, "concave")
+
 Base.summary(io::IO, ::ConstVexity) = print(io, "constant")
 
 Base.summary(io::IO, ::Positive) = print(io, "positive")
+
 Base.summary(io::IO, ::Negative) = print(io, "negative")
+
 Base.summary(io::IO, ::NoSign) = print(io, "real")
+
 Base.summary(io::IO, ::ComplexSign) = print(io, "complex")
 
-# Fallback
 head(io::IO, x::AbstractExpr) = print(io, typeof(x))
 
 function Base.summary(io::IO, c::Constraint)
@@ -85,7 +93,7 @@ function Base.summary(io::IO, c::Constraint)
         summary(io, vexity(c))
         print(io, ")")
     end
-    return nothing
+    return
 end
 
 function Base.summary(io::IO, e::AbstractExpr)
@@ -121,6 +129,7 @@ function Base.show(io::IO, x::AbstractVariable)
     if _value(x) !== nothing
         print(io, "\nvalue: $(evaluate(x))")
     end
+    return
 end
 
 """
@@ -135,15 +144,12 @@ function print_tree_rstrip(io::IO, x)
     return print(io, rstrip(str))
 end
 
-# This object is used to work around the fact that
-# Convex overloads booleans for AbstractExpr's
-# in order to generate constraints. This is problematic
-# for `AbstractTrees.print_tree` which wants to compare
-# the root of the tree to itself at some point.
-# By wrapping all tree roots in structs, this comparison
-# occurs on the level of the `struct`, and `==` falls
-# back to object equality (`===`), which is what we
-# want in this case.
+# This object is used to work around the fact that Convex overloads booleans for
+# AbstractExpr's in order to generate constraints. This is problematic for
+# `AbstractTrees.print_tree` which wants to compare the root of the tree to
+# itself at some point. By wrapping all tree roots in structs, this comparison
+# occurs on the level of the `struct`, and `==` falls back to object equality
+# (`===`), which is what we want in this case.
 #
 # The same construct is used below for other tree roots.
 struct ConstraintRoot
@@ -153,7 +159,9 @@ end
 function TreePrint.print_tree(io::IO, c::Constraint, args...; kwargs...)
     return TreePrint.print_tree(io, ConstraintRoot(c), args...; kwargs...)
 end
+
 AbstractTrees.children(c::ConstraintRoot) = AbstractTrees.children(c.constraint)
+
 function AbstractTrees.printnode(io::IO, c::ConstraintRoot)
     return AbstractTrees.printnode(io, c.constraint)
 end
@@ -163,10 +171,13 @@ Base.show(io::IO, c::Constraint) = print_tree_rstrip(io, c)
 struct ExprRoot
     expr::AbstractExpr
 end
+
 function TreePrint.print_tree(io::IO, e::AbstractExpr, args...; kwargs...)
     return TreePrint.print_tree(io, ExprRoot(e), args...; kwargs...)
 end
+
 AbstractTrees.children(e::ExprRoot) = AbstractTrees.children(e.expr)
+
 function AbstractTrees.printnode(io::IO, e::ExprRoot)
     return AbstractTrees.printnode(io, e.expr)
 end
@@ -179,6 +190,7 @@ struct ProblemObjectiveRoot
 end
 
 AbstractTrees.children(p::ProblemObjectiveRoot) = (p.objective,)
+
 function AbstractTrees.printnode(io::IO, p::ProblemObjectiveRoot)
     return print(io, string(p.head))
 end
@@ -188,6 +200,7 @@ struct ProblemConstraintsRoot
 end
 
 AbstractTrees.children(p::ProblemConstraintsRoot) = p.constraints
+
 function AbstractTrees.printnode(io::IO, p::ProblemConstraintsRoot)
     return print(io, "subject to")
 end
@@ -199,7 +212,7 @@ function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
         args...;
         kwargs...,
     )
-    if !(isempty(p.constraints))
+    if !isempty(p.constraints)
         TreePrint.print_tree(
             io,
             ProblemConstraintsRoot(p.constraints),
@@ -207,6 +220,7 @@ function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
             kwargs...,
         )
     end
+    return
 end
 
 function Base.show(io::IO, p::Problem)
@@ -221,4 +235,5 @@ function Base.show(io::IO, p::Problem)
     if p.status == "solved"
         print(io, " with optimal value of $(round(p.optval, digits=4))")
     end
+    return
 end
