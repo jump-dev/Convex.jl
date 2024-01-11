@@ -40,11 +40,7 @@ end
 
 head(io::IO, ::ImaginaryAtom) = print(io, "imag")
 
-function Base.sign(x::ImaginaryAtom)
-    # FIXME(odow): what is this?
-    sign(x.children[1]) == ComplexSign()
-    return NoSign()
-end
+Base.sign(::ImaginaryAtom) = NoSign()
 
 monotonicity(::ImaginaryAtom) = (Nondecreasing(),)
 
