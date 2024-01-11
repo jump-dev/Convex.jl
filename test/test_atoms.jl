@@ -23,6 +23,17 @@ function test_RationalNormAtom_complex_matrix()
     return
 end
 
+function test_RationalNormAtom_complex_vector()
+    x = Variable(2)
+    y = Variable(2)
+    x.value = [1.0, -2.0]
+    y.value = [-3.0, 4.0]
+    atom = rationalnorm(x + im * y, 3 // 2)
+    z = abs.([1-3im, -2+4im])
+    @test evaluate(atom) ≈ sum(abs.(z) .^ (3 // 2))^(2 // 3)
+    return
+end
+
 function test_RationalNormAtom_matrix()
     x = Variable(2, 2)
     atom = rationalnorm(x, 3 // 2)
