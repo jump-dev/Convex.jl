@@ -22,13 +22,13 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct QuantumEntropy <: AbstractExpr
+mutable struct QuantumEntropyAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
     k::Integer
 
-    function QuantumEntropy(X::AbstractExpr, m::Integer, k::Integer)
+    function QuantumEntropyAtom(X::AbstractExpr, m::Integer, k::Integer)
         children = (X,)
         n = size(X)[1]
         if size(X) != (n, n)
@@ -38,20 +38,20 @@ mutable struct QuantumEntropy <: AbstractExpr
     end
 end
 
-head(io::IO, ::QuantumEntropy) = print(io, "quantum_entropy")
+head(io::IO, ::QuantumEntropyAtom) = print(io, "quantum_entropy")
 
-Base.sign(::QuantumEntropy) = Positive()
+Base.sign(::QuantumEntropyAtom) = Positive()
 
-monotonicity(::QuantumEntropy) = (NoMonotonicity(),)
+monotonicity(::QuantumEntropyAtom) = (NoMonotonicity(),)
 
-curvature(::QuantumEntropy) = ConcaveVexity()
+curvature(::QuantumEntropyAtom) = ConcaveVexity()
 
-function evaluate(atom::QuantumEntropy)
+function evaluate(atom::QuantumEntropyAtom)
     return quantum_entropy(evaluate(atom.children[1]))
 end
 
 function quantum_entropy(X::AbstractExpr, m::Integer = 3, k::Integer = 3)
-    return QuantumEntropy(X, m, k)
+    return QuantumEntropyAtom(X, m, k)
 end
 
 function quantum_entropy(
@@ -62,7 +62,7 @@ function quantum_entropy(
     return -quantum_relative_entropy(X, Matrix(1.0 * LinearAlgebra.I, size(X)))
 end
 
-function new_conic_form!(context::Context, atom::QuantumEntropy)
+function new_conic_form!(context::Context, atom::QuantumEntropyAtom)
     X = atom.children[1]
     n = size(X, 1)
     eye = Matrix(1.0 * LinearAlgebra.I, n, n)

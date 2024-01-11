@@ -1,8 +1,8 @@
-mutable struct SumLargestEigs <: AbstractExpr
+mutable struct SumLargestEigsAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
-    function SumLargestEigs(x::AbstractExpr, k::AbstractExpr)
+    function SumLargestEigsAtom(x::AbstractExpr, k::AbstractExpr)
         children = (x, k)
         m, n = size(x)
         if m != n
@@ -12,20 +12,20 @@ mutable struct SumLargestEigs <: AbstractExpr
     end
 end
 
-head(io::IO, ::SumLargestEigs) = print(io, "sumlargesteigs")
+head(io::IO, ::SumLargestEigsAtom) = print(io, "sumlargesteigs")
 
-Base.sign(::SumLargestEigs) = NoSign()
+Base.sign(::SumLargestEigsAtom) = NoSign()
 
-monotonicity(::SumLargestEigs) = (Nondecreasing(), NoMonotonicity())
+monotonicity(::SumLargestEigsAtom) = (Nondecreasing(), NoMonotonicity())
 
-curvature(::SumLargestEigs) = ConvexVexity()
+curvature(::SumLargestEigsAtom) = ConvexVexity()
 
-function evaluate(x::SumLargestEigs)
+function evaluate(x::SumLargestEigsAtom)
     return LinearAlgebra.eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
 end
 
 function sumlargesteigs(x::AbstractExpr, k::Int)
-    return k == 0 ? Constant(0) : SumLargestEigs(x, Constant(k))
+    return k == 0 ? Constant(0) : SumLargestEigsAtom(x, Constant(k))
 end
 
 # Create the equivalent conic problem:
@@ -36,7 +36,7 @@ end
 #            Z + sI ⪰ A
 # See Ben-Tal and Nemirovski, "Lectures on Modern Convex Optimization"
 # Example 18.c
-function new_conic_form!(context::Context{T}, x::SumLargestEigs) where {T}
+function new_conic_form!(context::Context{T}, x::SumLargestEigsAtom) where {T}
     X, k = x.children
     m, n = size(X)
     Z = if iscomplex(sign(X))

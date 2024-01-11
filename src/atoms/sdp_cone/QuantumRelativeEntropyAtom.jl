@@ -21,13 +21,13 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct QuantumRelativeEntropy1 <: AbstractExpr
+mutable struct QuantumRelativeEntropy1Atom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
     k::Integer
 
-    function QuantumRelativeEntropy1(
+    function QuantumRelativeEntropy1Atom(
         A::AbstractExpr,
         B::AbstractExpr,
         m::Integer,
@@ -45,9 +45,9 @@ mutable struct QuantumRelativeEntropy1 <: AbstractExpr
     end
 end
 
-head(io::IO, ::QuantumRelativeEntropy1) = print(io, "quantum_relative_entropy")
+head(io::IO, ::QuantumRelativeEntropy1Atom) = print(io, "quantum_relative_entropy")
 
-mutable struct QuantumRelativeEntropy2 <: AbstractExpr
+mutable struct QuantumRelativeEntropy2Atom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -56,7 +56,7 @@ mutable struct QuantumRelativeEntropy2 <: AbstractExpr
     J::AbstractMatrix
     K::AbstractMatrix
 
-    function QuantumRelativeEntropy2(
+    function QuantumRelativeEntropy2Atom(
         A::AbstractExpr,
         B::AbstractMatrix,
         m::Integer,
@@ -86,29 +86,29 @@ mutable struct QuantumRelativeEntropy2 <: AbstractExpr
     end
 end
 
-head(io::IO, ::QuantumRelativeEntropy2) = print(io, "quantum_relative_entropy")
+head(io::IO, ::QuantumRelativeEntropy2Atom) = print(io, "quantum_relative_entropy")
 
-function Base.sign(::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2})
+function Base.sign(::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom})
     return Positive()
 end
 
-function monotonicity(::QuantumRelativeEntropy1)
+function monotonicity(::QuantumRelativeEntropy1Atom)
     return (NoMonotonicity(), NoMonotonicity())
 end
 
-monotonicity(::QuantumRelativeEntropy2) = (NoMonotonicity(),)
+monotonicity(::QuantumRelativeEntropy2Atom) = (NoMonotonicity(),)
 
-function curvature(::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2})
+function curvature(::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom})
     return ConvexVexity()
 end
 
-function evaluate(atom::QuantumRelativeEntropy1)
+function evaluate(atom::QuantumRelativeEntropy1Atom)
     A = evaluate(atom.children[1])
     B = evaluate(atom.children[2])
     return quantum_relative_entropy(A, B)
 end
 
-function evaluate(atom::QuantumRelativeEntropy2)
+function evaluate(atom::QuantumRelativeEntropy2Atom)
     A = evaluate(atom.children[1])
     return quantum_relative_entropy(A, atom.B)
 end
@@ -119,7 +119,7 @@ function quantum_relative_entropy(
     m::Integer = 3,
     k::Integer = 3,
 )
-    return QuantumRelativeEntropy1(A, B, m, k)
+    return QuantumRelativeEntropy1Atom(A, B, m, k)
 end
 
 function quantum_relative_entropy(
@@ -129,7 +129,7 @@ function quantum_relative_entropy(
     k::Integer = 3,
     nullspace_tol::Real = 1e-6,
 )
-    return QuantumRelativeEntropy2(A, evaluate(B), m, k, nullspace_tol)
+    return QuantumRelativeEntropy2Atom(A, evaluate(B), m, k, nullspace_tol)
 end
 
 function quantum_relative_entropy(
@@ -176,7 +176,7 @@ function quantum_relative_entropy(
     return real(LinearAlgebra.tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1Atom)
     A = atom.children[1]
     B = atom.children[2]
     m = atom.m
@@ -194,7 +194,7 @@ function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     return conic_form!(context, minimize(τ))
 end
 
-function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2Atom)
     A = atom.children[1]
     B = atom.B
     J = atom.J

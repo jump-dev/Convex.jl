@@ -13,13 +13,13 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct TraceMpower <: AbstractExpr
+mutable struct TraceMpowerAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     C::AbstractMatrix
     t::Rational
 
-    function TraceMpower(A::AbstractExpr, t::Rational, C::AbstractMatrix)
+    function TraceMpowerAtom(A::AbstractExpr, t::Rational, C::AbstractMatrix)
         children = (A,)
         if size(A) != size(C)
             throw(DimensionMismatch("A and C must be the same size"))
@@ -41,13 +41,13 @@ mutable struct TraceMpower <: AbstractExpr
     end
 end
 
-head(io::IO, ::TraceMpower) = print(io, "trace_mpower")
+head(io::IO, ::TraceMpowerAtom) = print(io, "trace_mpower")
 
-Base.sign(::TraceMpower) = NoSign()
+Base.sign(::TraceMpowerAtom) = NoSign()
 
-monotonicity(::TraceMpower) = (NoMonotonicity(),)
+monotonicity(::TraceMpowerAtom) = (NoMonotonicity(),)
 
-function curvature(atom::TraceMpower)
+function curvature(atom::TraceMpowerAtom)
     if 0 <= atom.t <= 1
         return ConcaveVexity()
     else
@@ -55,7 +55,7 @@ function curvature(atom::TraceMpower)
     end
 end
 
-function evaluate(atom::TraceMpower)
+function evaluate(atom::TraceMpowerAtom)
     return trace_mpower(evaluate(atom.children[1]), atom.t, atom.C)
 end
 
@@ -64,7 +64,7 @@ function trace_mpower(
     t::Rational,
     C::Union{AbstractMatrix,Constant},
 )
-    return TraceMpower(A, t, evaluate(C))
+    return TraceMpowerAtom(A, t, evaluate(C))
 end
 
 function trace_mpower(
@@ -83,7 +83,7 @@ function trace_mpower(
     return trace_mpower(A, t // 1, C)
 end
 
-function new_conic_form!(context::Context{T}, atom::TraceMpower) where {T}
+function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     A = atom.children[1]
     tmp = if sign(A) == ComplexSign()
         HermitianSemidefinite(size(A, 1))

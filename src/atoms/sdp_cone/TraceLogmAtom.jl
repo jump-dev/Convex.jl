@@ -22,14 +22,14 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct TraceLogm <: AbstractExpr
+mutable struct TraceLogmAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     C::AbstractMatrix
     m::Integer
     k::Integer
 
-    function TraceLogm(
+    function TraceLogmAtom(
         X::AbstractExpr,
         C::AbstractMatrix,
         m::Integer,
@@ -53,15 +53,15 @@ mutable struct TraceLogm <: AbstractExpr
     end
 end
 
-head(io::IO, ::TraceLogm) = print(io, "trace_logm")
+head(io::IO, ::TraceLogmAtom) = print(io, "trace_logm")
 
-Base.sign(::TraceLogm) = NoSign()
+Base.sign(::TraceLogmAtom) = NoSign()
 
-monotonicity(::TraceLogm) = (NoMonotonicity(),)
+monotonicity(::TraceLogmAtom) = (NoMonotonicity(),)
 
-curvature(::TraceLogm) = ConcaveVexity()
+curvature(::TraceLogmAtom) = ConcaveVexity()
 
-function evaluate(atom::TraceLogm)
+function evaluate(atom::TraceLogmAtom)
     return trace_logm(evaluate(atom.children[1]), atom.C)
 end
 
@@ -71,7 +71,7 @@ function trace_logm(
     m::Integer = 3,
     k::Integer = 3,
 )
-    return TraceLogm(X, evaluate(C), m, k)
+    return TraceLogmAtom(X, evaluate(C), m, k)
 end
 
 function trace_logm(
@@ -84,7 +84,7 @@ function trace_logm(
     return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, eye)
 end
 
-function new_conic_form!(context::Context{T}, atom::TraceLogm) where {T}
+function new_conic_form!(context::Context{T}, atom::TraceLogmAtom) where {T}
     X = atom.children[1]
     τ = if sign(X) == ComplexSign() || sign(constant(atom.C)) == ComplexSign()
         ComplexVariable(size(X))
