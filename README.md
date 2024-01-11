@@ -69,11 +69,11 @@ problem.optval
 
 The `master` branch of this package (not yet released) contains an experimental
 JuMP solver. This solver reformulates a nonlinear JuMP model into a conic
-program using DCP. Note that it currently only supports scalar nonlinear
-programs. Also note that `add_bridges = false` must be used.
+program using DCP. Note that it currently supports only a limited subset of
+scalar nonlinear programs, such as those involving `log` and `exp`.
 
 ```julia
-julia> model = Model(() -> Convex.Optimizer(Clarabel.Optimizer); add_bridges = false)
+julia> model = Model(() -> Convex.Optimizer(Clarabel.Optimizer))
 A JuMP Model
 Feasibility problem with:
 Variables: 0
