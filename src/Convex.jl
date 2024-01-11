@@ -244,6 +244,12 @@ for (root, _, files) in walkdir(joinpath(@__DIR__, "atoms"))
     end
 end
 
+for (root, _, files) in walkdir(joinpath(@__DIR__, "reformulations"))
+    for file in files
+        include(joinpath(root, file))
+    end
+end
+
 ### utilities
 include("utilities/tree_print.jl")
 include("utilities/tree_interface.jl")
