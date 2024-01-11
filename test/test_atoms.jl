@@ -99,16 +99,15 @@ function _test_model_equal(f, target_string::String)
 end
 
 function test_RationalNormAtom()
-    _test_model_equal(
-        """
-        variables: x1, x2, t
-        [-1.0+1.0*x1, -2.0+1.0*x2] in Nonnegatives(2)
-        [1.0*t, 1.0*x1, 1.0*x2] in NormCone(1.5, 3)
-        """,
-    ) do context
+    target = """
+    variables: x1, x2, t
+    [-1.0+1.0*x1, -2.0+1.0*x2] in Nonnegatives(2)
+    [1.0*t, 1.0*x1, 1.0*x2] in NormCone(1.5, 3)
+    """
+    _test_model_equal(target) do context
         x = Variable(2)
         Convex.add_constraint!(context, x >= [1, 2])
-        t = Convex.conic_form!(context, rationalnorm(x, 3 // 2))
+        return Convex.conic_form!(context, rationalnorm(x, 3 // 2))
     end
     _test_model_equal(
         """
@@ -119,7 +118,7 @@ function test_RationalNormAtom()
     ) do context
         x = Variable(2, 2)
         Convex.add_constraint!(context, x >= [1 2; 3 4])
-        t = Convex.conic_form!(context, rationalnorm(x, 2 // 1))
+        return Convex.conic_form!(context, rationalnorm(x, 2 // 1))
     end
     return
 end
