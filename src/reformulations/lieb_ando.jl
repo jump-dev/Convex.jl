@@ -18,12 +18,10 @@
 #   Fawzi and James Saunderson (arXiv:1512.03401)
 #############################################################################
 
-const MatrixOrConstant = Union{AbstractMatrix,Constant}
-
 function lieb_ando(
-    A::MatrixOrConstant,
-    B::MatrixOrConstant,
-    K::MatrixOrConstant,
+    A::Union{AbstractMatrix,Constant},
+    B::Union{AbstractMatrix,Constant},
+    K::Union{AbstractMatrix,Constant},
     t::Rational,
 )
     if t < -1 || t > 2
@@ -33,9 +31,9 @@ function lieb_ando(
 end
 
 function lieb_ando(
-    A::MatrixOrConstant,
+    A::Union{AbstractMatrix,Constant},
     B::AbstractExpr,
-    K::MatrixOrConstant,
+    K::Union{AbstractMatrix,Constant},
     t::Rational,
 )
     if t < -1 || t > 2
@@ -48,8 +46,8 @@ end
 
 function lieb_ando(
     A::AbstractExpr,
-    B::MatrixOrConstant,
-    K::MatrixOrConstant,
+    B::Union{AbstractMatrix,Constant},
+    K::Union{AbstractMatrix,Constant},
     t::Rational,
 )
     if t < -1 || t > 2
@@ -63,7 +61,7 @@ end
 function lieb_ando(
     A::AbstractExpr,
     B::AbstractExpr,
-    K::MatrixOrConstant,
+    K::Union{AbstractMatrix,Constant},
     t::Rational,
 )
     n = size(A, 1)

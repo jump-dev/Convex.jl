@@ -1,11 +1,3 @@
-#############################################################################
-# matrixfrac.jl
-# implements the atom for x^T*P^{-1}*x, where P is a positive semidefinite
-# matrix.
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
 mutable struct MatrixFracAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
@@ -18,24 +10,17 @@ mutable struct MatrixFracAtom <: AbstractExpr
         elseif x.size[1] != P.size[1]
             error("sizes must agree for arguments of matrix frac")
         end
-        children = (x, P)
-        return new(children, (1, 1))
+        return new((x, P), (1, 1))
     end
 end
 
 head(io::IO, ::MatrixFracAtom) = print(io, "matrixfrac")
 
-function Base.sign(m::MatrixFracAtom)
-    return Positive()
-end
+Base.sign(::MatrixFracAtom) = Positive()
 
-function monotonicity(m::MatrixFracAtom)
-    return (NoMonotonicity(), NoMonotonicity())
-end
+monotonicity(::MatrixFracAtom) = (NoMonotonicity(), NoMonotonicity())
 
-function curvature(m::MatrixFracAtom)
-    return ConvexVexity()
-end
+curvature(::MatrixFracAtom) = ConvexVexity()
 
 function evaluate(m::MatrixFracAtom)
     x = evaluate(m.children[1])
@@ -43,12 +28,13 @@ function evaluate(m::MatrixFracAtom)
 end
 
 matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
+
 matrixfrac(x::Value, P::AbstractExpr) = MatrixFracAtom(constant(x), P)
+
 matrixfrac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, constant(P))
 
 function new_conic_form!(context::Context, m::MatrixFracAtom)
-    x = m.children[1]
-    P = m.children[2]
+    x, P = m.children
     t = Variable()
     # the matrix [t x'; x P] has Schur complement t - x'*P^{-1}*x
     # this matrix is PSD <=> t >= x'*P^{-1}*x

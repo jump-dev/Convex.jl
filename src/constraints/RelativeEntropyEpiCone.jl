@@ -1,22 +1,20 @@
-#############################################################################
-# relative_entropy_epicone.jl
-# Constrains τ to
-#   τ ⪰ e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e
-#
-# This function implements the semidefinite programming approximation given in
-# the reference below.  Parameters m and k control the accuracy of this
-# approximation: m is the number of quadrature nodes to use and k the number
-# of square-roots to take. See reference for more details.
-#
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#
-#REFERENCE
-#   Ported from CVXQUAD which is based on the paper: "Semidefinite
-#   approximations of matrix logarithm" by Hamza Fawzi, James Saunderson and
-#   Pablo A. Parrilo (arXiv:1705.00812)
-#############################################################################
+"""
+Constrains τ to
+  τ ⪰ e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e
 
+This function implements the semidefinite programming approximation given in
+the reference below.  Parameters m and k control the accuracy of this
+approximation: m is the number of quadrature nodes to use and k the number
+of square-roots to take. See reference for more details.
+
+All expressions and atoms are subtypes of AbstractExpr.
+Please read expressions.jl first.
+
+REFERENCE
+  Ported from CVXQUAD which is based on the paper: "Semidefinite
+  approximations of matrix logarithm" by Hamza Fawzi, James Saunderson and
+  Pablo A. Parrilo (arXiv:1705.00812)
+"""
 mutable struct RelativeEntropyEpiCone
     X::AbstractExpr
     Y::AbstractExpr
@@ -58,6 +56,7 @@ mutable struct RelativeEntropyEpiCone
     )
         return RelativeEntropyEpiCone(constant(X), Y, m, k, e)
     end
+
     function RelativeEntropyEpiCone(
         X::AbstractExpr,
         Y::Value,
@@ -67,6 +66,7 @@ mutable struct RelativeEntropyEpiCone
     )
         return RelativeEntropyEpiCone(X, constant(Y), m, k, e)
     end
+
     function RelativeEntropyEpiCone(
         X::Value,
         Y::Value,
@@ -89,7 +89,6 @@ mutable struct RelativeEntropyEpiConeConstraint <: Constraint
         if size(τ) != cone.size
             throw(DimensionMismatch("τ must be size $(cone.size)"))
         end
-
         return new(τ, cone)
     end
 
@@ -119,7 +118,6 @@ function vexity(constraint::RelativeEntropyEpiConeConstraint)
     X = vexity(constraint.cone.X)
     Y = vexity(constraint.cone.Y)
     τ = vexity(constraint.τ)
-
     # NOTE: can't say X == NotDcp() because the NotDcp constructor prints a warning message.
     if typeof(X) == ConcaveVexity || typeof(X) == NotDcp
         return NotDcp()
@@ -127,10 +125,9 @@ function vexity(constraint::RelativeEntropyEpiConeConstraint)
     if typeof(Y) == ConcaveVexity || typeof(Y) == NotDcp
         return NotDcp()
     end
-    # Copied from vexity(c::GtConstraint)
     vex = ConvexVexity() + (-τ)
     if vex == ConcaveVexity()
-        vex = NotDcp()
+        return NotDcp()
     end
     return vex
 end
@@ -162,9 +159,7 @@ function _add_constraint!(
     τ = constraint.τ
     n = size(X)[1]
     r = size(e)[2]
-
     s, w = glquad(m)
-
     is_complex =
         sign(X) == ComplexSign() ||
         sign(Y) == ComplexSign() ||
@@ -176,14 +171,11 @@ function _add_constraint!(
         Z = Variable(n, n)
         T = [Variable(r, r) for i in 1:m]
     end
-
     add_constraint!(context, Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false))
-
     for ii in 1:m
         # Note that we are dividing by w here because it is easier
         # to do this than to do sum w_i T(:,...,:,ii) later (cf. line that
         # involves τ)
-
         add_constraint!(
             context,
             [
@@ -192,8 +184,6 @@ function _add_constraint!(
             ] ⪰ 0,
         )
     end
-
     add_constraint!(context, (2^k) * sum(T) + τ ⪰ 0)
-
-    return nothing
+    return
 end

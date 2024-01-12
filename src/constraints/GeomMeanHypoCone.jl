@@ -1,31 +1,29 @@
-#############################################################################
-# geom_mean_hypocone.jl
-# Constrains T to
-#   A #_t B ⪰ T
-# where:
-#   * A #_t B is the t-weighted geometric mean of A and B:
-#     A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}
-#     Parameter t should be in [0,1].
-#   * Constraints A ⪰ 0, B ⪰ 0 are added.
-#
-# Note on parameter fullhyp:
-#   In many applications one doesn't need the full hypograph
-#     hyp_t = {(A,B,T) : A #_t B ⪰ T}
-#   but rather it is enough to work with a convex set C_t that satisfies
-#     (A,B,A #_t B) \in C_t
-#     (A,B,T) \in C_t  =>  A #_t B ⪰ T
-#   In this case one should set fullhyp = false. The SDP description will be
-#   (slightly) smaller. (By default fullhyp is set to true).
-#
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#
-#REFERENCE
-#   Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-#   theorem, matrix geometric means and semidefinite optimization" by Hamza
-#   Fawzi and James Saunderson (arXiv:1512.03401)
-#############################################################################
+"""
+Constrains T to
+  A #_t B ⪰ T
+where:
+  * A #_t B is the t-weighted geometric mean of A and B:
+    A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}
+    Parameter t should be in [0,1].
+  * Constraints A ⪰ 0, B ⪰ 0 are added.
 
+Note on parameter fullhyp:
+  In many applications one doesn't need the full hypograph
+    hyp_t = {(A,B,T) : A #_t B ⪰ T}
+  but rather it is enough to work with a convex set C_t that satisfies
+    (A,B,A #_t B) \\in C_t
+    (A,B,T) \\in C_t  =>  A #_t B ⪰ T
+  In this case one should set fullhyp = false. The SDP description will be
+  (slightly) smaller. (By default fullhyp is set to true).
+
+All expressions and atoms are subtypes of AbstractExpr.
+Please read expressions.jl first.
+
+REFERENCE
+  Ported from CVXQUAD which is based on the paper: "Lieb's concavity
+  theorem, matrix geometric means and semidefinite optimization" by Hamza
+  Fawzi and James Saunderson (arXiv:1512.03401)
+"""
 mutable struct GeomMeanHypoCone
     A::AbstractExpr
     B::AbstractExpr
@@ -60,6 +58,7 @@ mutable struct GeomMeanHypoCone
     )
         return GeomMeanHypoCone(constant(A), B, t, fullhyp)
     end
+
     function GeomMeanHypoCone(
         A::AbstractExpr,
         B::Value,
@@ -68,6 +67,7 @@ mutable struct GeomMeanHypoCone
     )
         return GeomMeanHypoCone(A, constant(B), t, fullhyp)
     end
+
     function GeomMeanHypoCone(
         A::Value,
         B::Value,
@@ -123,17 +123,16 @@ function vexity(constraint::GeomMeanHypoConeConstraint)
     B = vexity(constraint.cone.B)
     T = vexity(constraint.T)
 
-    # NOTE: can't say A == NotDcp() because the NotDcp constructor prints a warning message.
+    # NOTE: can't say A == NotDcp() because the NotDcp constructor prints a
+    # warning message.
     if typeof(A) == ConvexVexity || typeof(A) == NotDcp
         return NotDcp()
-    end
-    if typeof(B) == ConvexVexity || typeof(B) == NotDcp
+    elseif typeof(B) == ConvexVexity || typeof(B) == NotDcp
         return NotDcp()
     end
-    # Copied from vexity(c::GtConstraint)
     vex = -ConcaveVexity() + T
     if vex == ConcaveVexity()
-        vex = NotDcp()
+        return NotDcp()
     end
     return vex
 end

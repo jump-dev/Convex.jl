@@ -1,36 +1,33 @@
-#############################################################################
-# quantum_relative_entropy returns LinearAlgebra.tr(A*(log(A)-log(B))) where A and B
-# are positive semidefinite matrices.  Note this function uses logarithm
-# base e, not base 2, so return value is in units of nats, not bits.
-#
-# Quantum relative entropy is convex (jointly) in (A,B). This function
-# implements the semidefinite programming approximation given in the reference
-# below.  Parameters m and k control the accuracy of this approximation: m is
-# the number of quadrature nodes to use and k the number of square-roots to
-# take. See reference for more details.
-#
-# Implementation uses the expression
-#    D(A||B) = e'*D_{op} (A \otimes I || I \otimes B) )*e
-# where D_{op} is the operator relative entropy and e = vec(Matrix(I, n, n)).
-#
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#
-#REFERENCE
-#   Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-#   theorem, matrix geometric means and semidefinite optimization" by Hamza
-#   Fawzi and James Saunderson (arXiv:1512.03401)
-#############################################################################
+"""
+quantum_relative_entropy returns LinearAlgebra.tr(A*(log(A)-log(B))) where A and B
+are positive semidefinite matrices.  Note this function uses logarithm
+base e, not base 2, so return value is in units of nats, not bits.
 
-const MatrixOrConstant = Union{AbstractMatrix,Constant}
+Quantum relative entropy is convex (jointly) in (A,B). This function
+implements the semidefinite programming approximation given in the reference
+below.  Parameters m and k control the accuracy of this approximation: m is
+the number of quadrature nodes to use and k the number of square-roots to
+take. See reference for more details.
 
-mutable struct QuantumRelativeEntropy1 <: AbstractExpr
+Implementation uses the expression
+   D(A||B) = e'*D_{op} (A \\otimes I || I \\otimes B) )*e
+where D_{op} is the operator relative entropy and e = vec(Matrix(I, n, n)).
+
+All expressions and atoms are subtypes of AbstractExpr.
+Please read expressions.jl first.
+
+REFERENCE
+  Ported from CVXQUAD which is based on the paper: "Lieb's concavity
+  theorem, matrix geometric means and semidefinite optimization" by Hamza
+  Fawzi and James Saunderson (arXiv:1512.03401)
+"""
+mutable struct QuantumRelativeEntropy1Atom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
     k::Integer
 
-    function QuantumRelativeEntropy1(
+    function QuantumRelativeEntropy1Atom(
         A::AbstractExpr,
         B::AbstractExpr,
         m::Integer,
@@ -48,9 +45,11 @@ mutable struct QuantumRelativeEntropy1 <: AbstractExpr
     end
 end
 
-head(io::IO, ::QuantumRelativeEntropy1) = print(io, "quantum_relative_entropy")
+function head(io::IO, ::QuantumRelativeEntropy1Atom)
+    return print(io, "quantum_relative_entropy")
+end
 
-mutable struct QuantumRelativeEntropy2 <: AbstractExpr
+mutable struct QuantumRelativeEntropy2Atom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
     m::Integer
@@ -59,7 +58,7 @@ mutable struct QuantumRelativeEntropy2 <: AbstractExpr
     J::AbstractMatrix
     K::AbstractMatrix
 
-    function QuantumRelativeEntropy2(
+    function QuantumRelativeEntropy2Atom(
         A::AbstractExpr,
         B::AbstractMatrix,
         m::Integer,
@@ -78,7 +77,6 @@ mutable struct QuantumRelativeEntropy2 <: AbstractExpr
         if norm(B - B') > nullspace_tol
             throw(DomainError(B, "B must be Hermitian"))
         end
-
         # nullspace of A must contain nullspace of B
         v, U = LinearAlgebra.eigen(LinearAlgebra.Hermitian(B))
         if any(v .< -nullspace_tol)
@@ -86,33 +84,39 @@ mutable struct QuantumRelativeEntropy2 <: AbstractExpr
         end
         J = U'[v.>nullspace_tol, :]
         K = U'[v.<nullspace_tol, :]
-
         return new(children, (1, 1), m, k, B, J, K)
     end
 end
 
-head(io::IO, ::QuantumRelativeEntropy2) = print(io, "quantum_relative_entropy")
+function head(io::IO, ::QuantumRelativeEntropy2Atom)
+    return print(io, "quantum_relative_entropy")
+end
 
-function Base.sign(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2})
+function Base.sign(
+    ::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom},
+)
     return Positive()
 end
 
-function monotonicity(atom::QuantumRelativeEntropy1)
+function monotonicity(::QuantumRelativeEntropy1Atom)
     return (NoMonotonicity(), NoMonotonicity())
 end
-monotonicity(atom::QuantumRelativeEntropy2) = (NoMonotonicity(),)
 
-function curvature(atom::Union{QuantumRelativeEntropy1,QuantumRelativeEntropy2})
+monotonicity(::QuantumRelativeEntropy2Atom) = (NoMonotonicity(),)
+
+function curvature(
+    ::Union{QuantumRelativeEntropy1Atom,QuantumRelativeEntropy2Atom},
+)
     return ConvexVexity()
 end
 
-function evaluate(atom::QuantumRelativeEntropy1)
+function evaluate(atom::QuantumRelativeEntropy1Atom)
     A = evaluate(atom.children[1])
     B = evaluate(atom.children[2])
     return quantum_relative_entropy(A, B)
 end
 
-function evaluate(atom::QuantumRelativeEntropy2)
+function evaluate(atom::QuantumRelativeEntropy2Atom)
     A = evaluate(atom.children[1])
     return quantum_relative_entropy(A, atom.B)
 end
@@ -123,57 +127,47 @@ function quantum_relative_entropy(
     m::Integer = 3,
     k::Integer = 3,
 )
-    #println("quantum_relative_entropy general case")
-    return QuantumRelativeEntropy1(A, B, m, k)
+    return QuantumRelativeEntropy1Atom(A, B, m, k)
 end
 
 function quantum_relative_entropy(
     A::AbstractExpr,
-    B::MatrixOrConstant,
+    B::Union{AbstractMatrix,Constant},
     m::Integer = 3,
     k::Integer = 3,
     nullspace_tol::Real = 1e-6,
 )
-    #println("quantum_relative_entropy general case")
-    return QuantumRelativeEntropy2(A, evaluate(B), m, k, nullspace_tol)
+    return QuantumRelativeEntropy2Atom(A, evaluate(B), m, k, nullspace_tol)
 end
 
 function quantum_relative_entropy(
-    A::MatrixOrConstant,
+    A::Union{AbstractMatrix,Constant},
     B::AbstractExpr,
     m::Integer = 3,
     k::Integer = 3,
 )
-    #println("quantum_relative_entropy constant A")
     A = evaluate(A)
     return -quantum_entropy(A, m, k) - trace_logm(B, A, m, k)
 end
 
 function quantum_relative_entropy(
-    A::MatrixOrConstant,
-    B::MatrixOrConstant,
+    A::Union{AbstractMatrix,Constant},
+    B::Union{AbstractMatrix,Constant},
     m::Integer = 0,
     k::Integer = 0,
     nullspace_tol::Real = 1e-6,
 )
-    #println("quantum_relative_entropy constant A and B")
     A = evaluate(A)
     B = evaluate(B)
-
     if size(A) != size(B)
         throw(DimensionMismatch("A and B must be the same size"))
-    end
-    if size(A) != (size(A)[1], size(A)[1])
+    elseif size(A) != (size(A)[1], size(A)[1])
         throw(DimensionMismatch("A and B must be square"))
-    end
-    if norm(A - A') > nullspace_tol
+    elseif norm(A - A') > nullspace_tol
         throw(DomainError(A, "A must be Hermitian"))
-    end
-    if norm(B - B') > nullspace_tol
+    elseif norm(B - B') > nullspace_tol
         throw(DomainError(B, "B must be Hermitian"))
     end
-
-    # need to project down to support of A
     v, U = LinearAlgebra.eigen(LinearAlgebra.Hermitian(A))
     if any(v .< -nullspace_tol)
         throw(DomainError(A, "A must be positive semidefinite"))
@@ -184,15 +178,13 @@ function quantum_relative_entropy(
     J = U'[v.>nullspace_tol, :]
     Ap = LinearAlgebra.Hermitian(J * A * J')
     Bp = LinearAlgebra.Hermitian(J * B * J')
-
     if any(LinearAlgebra.eigvals(Bp) .< nullspace_tol)
         return Inf
     end
-
     return real(LinearAlgebra.tr(Ap * (log(Ap) - log(Bp))))
 end
 
-function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1Atom)
     A = atom.children[1]
     B = atom.children[2]
     m = atom.m
@@ -200,37 +192,31 @@ function new_conic_form!(context::Context, atom::QuantumRelativeEntropy1)
     n = size(A)[1]
     eye = Matrix(1.0 * LinearAlgebra.I, n, n)
     e = vec(eye)
-
     add_constraint!(context, A ⪰ 0)
     add_constraint!(context, B ⪰ 0)
-
     τ = Variable()
     add_constraint!(
         context,
         τ in RelativeEntropyEpiCone(kron(A, eye), kron(eye, conj(B)), m, k, e),
     )
-
     return conic_form!(context, minimize(τ))
 end
 
-function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2)
+function new_conic_form!(context::Context, atom::QuantumRelativeEntropy2Atom)
     A = atom.children[1]
     B = atom.B
     J = atom.J
     K = atom.K
     m = atom.m
     k = atom.k
-
     add_constraint!(context, A ⪰ 0)
-
-    if length(K) > 0
+    τ = if length(K) > 0
         add_constraint!(context, K * A * K' == 0)
         Ap = J * A * J'
         Bp = LinearAlgebra.Hermitian(J * B * J')
-        τ = -quantum_entropy(Ap, m, k) - real(LinearAlgebra.tr(Ap * log(Bp)))
+        -quantum_entropy(Ap, m, k) - real(LinearAlgebra.tr(Ap * log(Bp)))
     else
-        τ = -quantum_entropy(A, m, k) - real(LinearAlgebra.tr(A * log(B)))
+        -quantum_entropy(A, m, k) - real(LinearAlgebra.tr(A * log(B)))
     end
-
     return conic_form!(context, minimize(τ))
 end

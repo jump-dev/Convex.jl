@@ -1,25 +1,23 @@
-#############################################################################
-# geom_mean_epicone.jl
-# Constrains T to
-#   A #_t B ⪯ T
-# where:
-#   * A #_t B is the t-weighted geometric mean of A and B:
-#     A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}
-#     Parameter t should be in [-1, 0] or [1, 2].
-#   * Constraints A ⪰ 0, B ⪰ 0 are added.
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#
-# Note on fullhyp: GeomMeanEpiCone will always return a full epigraph cone
-# (unlike GeomMeanHypoCone) and so this parameter is not really used.  It is
-# here just for consistency with the GeomMeanHypoCone function.
-#
-#REFERENCE
-#   Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-#   theorem, matrix geometric means and semidefinite optimization" by Hamza
-#   Fawzi and James Saunderson (arXiv:1512.03401)
-#############################################################################
+"""
+Constrains T to
+  A #_t B ⪯ T
+where:
+  * A #_t B is the t-weighted geometric mean of A and B:
+    A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}
+    Parameter t should be in [-1, 0] or [1, 2].
+  * Constraints A ⪰ 0, B ⪰ 0 are added.
+All expressions and atoms are subtypes of AbstractExpr.
+Please read expressions.jl first.
 
+Note on fullhyp: GeomMeanEpiCone will always return a full epigraph cone
+(unlike GeomMeanHypoCone) and so this parameter is not really used.  It is
+here just for consistency with the GeomMeanHypoCone function.
+
+REFERENCE
+  Ported from CVXQUAD which is based on the paper: "Lieb's concavity
+  theorem, matrix geometric means and semidefinite optimization" by Hamza
+  Fawzi and James Saunderson (arXiv:1512.03401)
+"""
 mutable struct GeomMeanEpiCone
     A::AbstractExpr
     B::AbstractExpr
@@ -53,6 +51,7 @@ mutable struct GeomMeanEpiCone
     )
         return GeomMeanEpiCone(constant(A), B, t, fullhyp)
     end
+
     function GeomMeanEpiCone(
         A::AbstractExpr,
         B::Value,
@@ -61,6 +60,7 @@ mutable struct GeomMeanEpiCone
     )
         return GeomMeanEpiCone(A, constant(B), t, fullhyp)
     end
+
     function GeomMeanEpiCone(
         A::Value,
         B::Value,
@@ -109,24 +109,24 @@ function AbstractTrees.children(constraint::GeomMeanEpiConeConstraint)
     )
 end
 
-# For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex (arxiv:1512.03401).
+# For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex
+# (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
 function vexity(constraint::GeomMeanEpiConeConstraint)
     A = vexity(constraint.cone.A)
     B = vexity(constraint.cone.B)
     T = vexity(constraint.T)
 
-    # NOTE: can't say A == NotDcp() because the NotDcp constructor prints a warning message.
+    # NOTE: can't say A == NotDcp() because the NotDcp constructor prints a
+    # warning message.
     if typeof(A) == ConcaveVexity || typeof(A) == NotDcp
         return NotDcp()
-    end
-    if typeof(B) == ConcaveVexity || typeof(B) == NotDcp
+    elseif typeof(B) == ConcaveVexity || typeof(B) == NotDcp
         return NotDcp()
     end
-    # Copied from vexity(c::GtConstraint)
     vex = ConvexVexity() + (-T)
     if vex == ConcaveVexity()
-        vex = NotDcp()
+        return NotDcp()
     end
     return vex
 end
@@ -143,14 +143,11 @@ function _add_constraint!(
         sign(A) == ComplexSign() ||
         sign(B) == ComplexSign() ||
         sign(T) == ComplexSign()
-    if is_complex
-        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+    Z = if is_complex
+        HermitianSemidefinite(size(A)[1])
     else
-        make_temporary = () -> Semidefinite(size(A)[1])
+        Semidefinite(size(A)[1])
     end
-
-    Z = make_temporary()
-
     if t <= 0
         add_constraint!(context, [T A; A Z] ⪰ 0)
         add_constraint!(context, Z in GeomMeanHypoCone(A, B, -t, false))
@@ -159,5 +156,5 @@ function _add_constraint!(
         add_constraint!(context, [T B; B Z] ⪰ 0)
         add_constraint!(context, Z in GeomMeanHypoCone(A, B, 2 - t, false))
     end
-    return nothing
+    return
 end
