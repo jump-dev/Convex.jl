@@ -11,9 +11,6 @@ Base.sign(x::SumAtom) = sign(x.children[1])
 
 monotonicity(::SumAtom) = (Nondecreasing(),)
 
-# If we have h(x) = f o g(x), the chain rule says
-# h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
-# this represents the first term
 curvature(::SumAtom) = ConstVexity()
 
 evaluate(x::SumAtom) = sum(evaluate(x.children[1]))
@@ -35,6 +32,6 @@ function _sum(x::AbstractExpr, dimension::Integer)
     elseif dimension == 2
         return x * Constant(ones(x.size[2], 1), Positive())
     else
-        error("Sum not implemented for dimension $dimension")
+        error("[SumAtom] sum not implemented for `dims=$dimension`")
     end
 end
