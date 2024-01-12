@@ -1,36 +1,30 @@
 mutable struct AdditionAtom <: AbstractExpr
-    children::Array{AbstractExpr,1}
+    children::Vector{AbstractExpr}
     size::Tuple{Int,Int}
 
     function AdditionAtom(x::AbstractExpr, y::AbstractExpr)
         # find the size of the expression = max of size of x and size of y
-        if x.size == y.size || y.size == (1, 1)
-            sz = x.size
-            if y.size == (1, 1)
-                y = y * ones(sz)
-            end
+        sz = if x.size == y.size
+            x.size
+        elseif y.size == (1, 1)
+            y = y * ones(x.size)
+            x.size
         elseif x.size == (1, 1)
-            sz = y.size
-            x = x * ones(sz)
+            x = x * ones(y.size)
+            y.size
         else
-            error("Cannot add expressions of sizes $(x.size) and $(y.size)")
+            error(
+                "[AdditionAtom] cannot add expressions of sizes $(x.size) and $(y.size)",
+            )
         end
-        if x.size != y.size
-            if (x isa Constant || x isa ComplexConstant) && (x.size == (1, 1))
-                x = constant(fill(evaluate(x), y.size))
-            elseif (y isa Constant || y isa ComplexConstant) &&
-                   (y.size == (1, 1))
-                y = constant(fill(evaluate(y), x.size))
-            end
-        end
-        # see if we're forming a sum of more than two terms and condense them
+        # See if we're forming a sum of more than two terms and condense them
         children = AbstractExpr[]
-        if isa(x, AdditionAtom)
+        if x isa AdditionAtom
             append!(children, x.children)
         else
             push!(children, x)
         end
-        if isa(y, AdditionAtom)
+        if y isa AdditionAtom
             append!(children, y.children)
         else
             push!(children, y)
@@ -45,7 +39,7 @@ head(io::IO, ::AdditionAtom) = print(io, "+")
 # so if anyone is complex the resultant sign would be complex.
 Base.sign(x::AdditionAtom) = sum(sign.(x.children))
 
-monotonicity(x::AdditionAtom) = [Nondecreasing() for _ in x.children]
+monotonicity(x::AdditionAtom) = ntuple(i -> Nondecreasing(), length(x.children))
 
 curvature(::AdditionAtom) = ConstVexity()
 
