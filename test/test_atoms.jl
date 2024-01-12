@@ -196,6 +196,100 @@ function test_AdditionAtom_errors()
     return
 end
 
+### affine/ConjugateAtom
+
+function test_ConjugateAtom()
+    x = Variable()
+    y = constant(2.0)
+    @test isequal(conj(x), x)
+    @test isequal(conj(y), y)
+    z = conj(im * x)
+    @test z isa Convex.ConjugateAtom
+    @test sprint(Convex.head, z) == "conj"
+    @test Base.sign(z) == Convex.ComplexSign()
+    @test Convex.monotonicity(z) == (Convex.Nondecreasing(),)
+    @test Convex.curvature(z) == Convex.ConstVexity()
+    @test Convex.evaluate(conj(Convex.ComplexConstant(y, y))) == 2.0 - 2.0im
+    return
+end
+
+### affine/DiagAtom
+
+function test_DiagAtom()
+    target = """
+    variables: x11, x21, x21, x22
+    minobjective: [1.0 * x11, 1.0 * x22]
+    """
+    _test_atom(target) do context
+        return diag(Variable(2, 2))
+    end
+    target = """
+    variables: x11, x21, x12
+    minobjective: 0.0 + 1.0 * x12
+    """
+    _test_atom(target) do context
+        return diag(Variable(2, 2), 1)
+    end
+    target = """
+    variables: x11, x21
+    minobjective: 1.0 * x21
+    """
+    _test_atom(target) do context
+        return diag(Variable(2, 2), -1)
+    end
+    @test_throws(
+        ErrorException(
+            "[DiagAtom] bounds error in calling diag. Got 3 but it must be in -2..2",
+        ),
+        diag(Variable(2, 2), 3),
+    )
+    @test_throws(
+        ErrorException(
+            "[DiagAtom] bounds error in calling diag. Got -5 but it must be in -3..3",
+        ),
+        diag(Variable(3, 4), -5),
+    )
+    return
+end
+
+### affine/DiagMatrixAtom
+
+function test_DiagMatrixAtom()
+    target = """
+    variables: x, y
+    minobjective: [1.0 * x, 0.0, 0.0, 1.0 * y]
+
+    """
+    _test_atom(target) do context
+        return diagm(Variable(2))
+    end
+    _test_atom(target) do context
+        return diagm(0 => Variable(2))
+    end
+    _test_atom(target) do context
+        return Diagonal(Variable(2))
+    end
+    _test_atom(target) do context
+        return Diagonal(Variable(1, 2))
+    end
+    _test_atom(target) do context
+        return Diagonal(Variable(2, 1))
+    end
+    @test_throws(
+        ArgumentError(
+            "[DiagMatrixAtom] only vectors are allowed for `diagm(x)` and `Diagonal(x). Did you mean to use `diag(x, 0)`?",
+        ),
+        diagm(Variable(2, 2)),
+    )
+    @test_throws(
+        ArgumentError(
+            "[DiagMatrixAtom] only the main diagonal is supported. Got `d=1`",
+        ),
+        diagm(1 => Variable(2)),
+    )
+    return
+end
+
 ### second_order_cone/RationalNormAtom
 
 function test_RationalNormAtom()

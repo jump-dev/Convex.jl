@@ -6,7 +6,9 @@ mutable struct DiagAtom <: AbstractExpr
     function DiagAtom(x::AbstractExpr, k::Int = 0)
         K = min(x.size[1], x.size[2])
         if !(-K < k < K)
-            error("Bounds error in calling diag")
+            error(
+                "[DiagAtom] bounds error in calling diag. Got $k but it must be in -$K..$K",
+            )
         end
         return new((x,), (K - k, 1), k)
     end
@@ -55,6 +57,6 @@ function new_conic_form!(context::Context{T}, x::DiagAtom) where {T}
         select_diag[i, start_index] = 1
         start_index += num_rows + 1
     end
-    child_obj = conic_form!(context, only(AbstractTrees.children(x)))
+    child_obj = conic_form!(context, x.children[1])
     return operate(add_operation, T, sign(x), select_diag, child_obj)
 end
