@@ -7,9 +7,8 @@ mutable struct HcatAtom <: AbstractExpr
         num_cols, num_rows = 0, args[1].size[1]
         for arg in args
             if arg.size[1] != num_rows
-                error(
-                    "Cannot horizontally stack expressions of varying number of rows",
-                )
+                msg = "[HcatAtom] cannot stack expressions of incompatible size. Got $(arg.size[1]) expected $num_rows."
+                throw(DimensionMismatch(msg))
             end
             num_cols += arg.size[2]
         end
@@ -21,7 +20,7 @@ head(io::IO, ::HcatAtom) = print(io, "hcat")
 
 Base.sign(x::HcatAtom) = sum(map(sign, x.children))
 
-monotonicity(x::HcatAtom) = [Nondecreasing() for _ in x.children]
+monotonicity(x::HcatAtom) = ntuple(_ -> Nondecreasing(), length(x.children))
 
 curvature(::HcatAtom) = ConstVexity()
 

@@ -40,7 +40,7 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     @test sprint(Convex.head, atom) isa String
     @test Base.sign(atom) isa Convex.Sign
     N = length(atom.children)
-    @test Convex.monotonicity(atom) isa NTuple{N,<:Convex.Monotonicity}
+    @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
     t = Convex.conic_form!(context, atom)
     MOI.set(context.model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
@@ -192,6 +192,304 @@ function test_AdditionAtom_errors()
             "[AdditionAtom] cannot add expressions of sizes $(x.size) and $(y.size)",
         ),
         x + y,
+    )
+    return
+end
+
+### affine/ConjugateAtom
+
+function test_ConjugateAtom()
+    x = Variable()
+    y = constant(2.0)
+    @test isequal(conj(x), x)
+    @test isequal(conj(y), y)
+    z = conj(im * x)
+    @test z isa Convex.ConjugateAtom
+    @test sprint(Convex.head, z) == "conj"
+    @test Base.sign(z) == Convex.ComplexSign()
+    @test Convex.monotonicity(z) == (Convex.Nondecreasing(),)
+    @test Convex.curvature(z) == Convex.ConstVexity()
+    @test Convex.evaluate(conj(Convex.ComplexConstant(y, y))) == 2.0 - 2.0im
+    return
+end
+
+### affine/DiagAtom
+
+function test_DiagAtom()
+    target = """
+    variables: x11, x21, x21, x22
+    minobjective: [1.0 * x11, 1.0 * x22]
+    """
+    _test_atom(target) do context
+        return diag(Variable(2, 2))
+    end
+    target = """
+    variables: x11, x21, x12
+    minobjective: 0.0 + 1.0 * x12
+    """
+    _test_atom(target) do context
+        return diag(Variable(2, 2), 1)
+    end
+    target = """
+    variables: x11, x21
+    minobjective: 1.0 * x21
+    """
+    _test_atom(target) do context
+        return diag(Variable(2, 2), -1)
+    end
+    @test_throws(
+        ErrorException(
+            "[DiagAtom] bounds error in calling diag. Got 3 but it must be in -2..2",
+        ),
+        diag(Variable(2, 2), 3),
+    )
+    @test_throws(
+        ErrorException(
+            "[DiagAtom] bounds error in calling diag. Got -5 but it must be in -3..3",
+        ),
+        diag(Variable(3, 4), -5),
+    )
+    return
+end
+
+### affine/DiagMatrixAtom
+
+function test_DiagMatrixAtom()
+    target = """
+    variables: x, y
+    minobjective: [1.0 * x, 0.0, 0.0, 1.0 * y]
+
+    """
+    _test_atom(target) do context
+        return diagm(Variable(2))
+    end
+    _test_atom(target) do context
+        return diagm(0 => Variable(2))
+    end
+    _test_atom(target) do context
+        return Diagonal(Variable(2))
+    end
+    _test_atom(target) do context
+        return Diagonal(Variable(1, 2))
+    end
+    _test_atom(target) do context
+        return Diagonal(Variable(2, 1))
+    end
+    @test_throws(
+        ArgumentError(
+            "[DiagMatrixAtom] only vectors are allowed for `diagm(x)` and `Diagonal(x). Did you mean to use `diag(x, 0)`?",
+        ),
+        diagm(Variable(2, 2)),
+    )
+    @test_throws(
+        ArgumentError(
+            "[DiagMatrixAtom] only the main diagonal is supported. Got `d=1`",
+        ),
+        diagm(1 => Variable(2)),
+    )
+    return
+end
+
+### affine/HcatAtom
+
+function test_HcatAtom()
+    target = """
+    variables: x
+    minobjective: [1.0 * x, 1.0 * x]
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return hcat(x, x)
+    end
+    _test_atom(target) do context
+        x = Variable()
+        return vcat(x, x)
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 1.0 * x2, 2.0]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = constant(2)
+        return vcat(x, y)
+    end
+    _test_atom(target) do context
+        x = Variable(2)
+        return vcat(x, 2)
+    end
+    _test_atom(target) do context
+        x = Variable(1, 2)
+        return hcat(x, 2)
+    end
+    @test_throws(
+        DimensionMismatch(
+            "[HcatAtom] cannot stack expressions of incompatible size. Got 1 expected 2.",
+        ),
+        hcat(Variable(2), constant(2)),
+    )
+    @test_throws(
+        DimensionMismatch(
+            "[HcatAtom] cannot stack expressions of incompatible size. Got 2 expected 1.",
+        ),
+        vcat(Variable(2, 1), Variable(1, 2)),
+    )
+    return
+end
+
+### affine/ImaginaryAtom
+
+function test_ImaginaryAtom()
+    target = """
+    variables: x
+    minobjective: 1.0 * x
+    """
+    _test_atom(target) do context
+        return imag(im * Variable())
+    end
+    target = """
+    variables: x
+    minobjective: 1.0 * x + 3.0
+    """
+    _test_atom(target) do context
+        y = constant(2 + 3im)
+        return Variable() + imag(y)
+    end
+    return
+end
+
+### affine/IndexAtom
+
+function test_IndexAtom()
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 1.0 * x2]
+    """
+    _test_atom(target) do context
+        return Variable(2)[:, 1]
+    end
+    _test_atom(target) do context
+        return Variable(2)[:, :]
+    end
+    target = """
+    variables: x1, x2, x3
+    minobjective: [1.0 * x1, 1.0 * x3]
+    """
+    _test_atom(target) do context
+        return Variable(3)[[1, 3]]
+    end
+    target = """
+    variables: x1, x2, x3
+    minobjective: [1.0 * x1, 1.0 * x3]
+    """
+    _test_atom(target) do context
+        return Variable(2, 2)[1, :]
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x2, 1.0 * x4]
+    """
+    _test_atom(target) do context
+        return Variable(2, 2)[2, :]
+    end
+    _test_atom(target) do context
+        return Variable(2, 2)[2:2, :]
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 1.0 * x2]
+    """
+    _test_atom(target) do context
+        return Variable(2, 2)[:, 1]
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x3, 1.0 * x4]
+    """
+    _test_atom(target) do context
+        return Variable(2, 2)[:, 2]
+    end
+    return
+end
+
+### affine/NegateAtom
+
+function test_NegateAtom()
+    target = """
+    variables: x
+    minobjective: -1.0 + -1.0 * x
+    """
+    _test_atom(target) do context
+        return -(1 + Variable())
+    end
+    target = """
+    variables: x
+    minobjective: 1.0 * x + -1.0
+    """
+    _test_atom(target) do context
+        return Variable() + -constant(1.0)
+    end
+    return
+end
+
+### affine/RealAtom
+
+function test_RealAtom()
+    target = """
+    variables: x
+    minobjective: 1.0 * x
+    """
+    _test_atom(target) do context
+        return real(Variable())
+    end
+    _test_atom(target) do context
+        return real(Variable() + im * Variable())
+    end
+    target = """
+    variables: x
+    minobjective: 1.0 * x + 2.0
+    """
+    _test_atom(target) do context
+        y = constant(2 + 3im)
+        return Variable() + real(y)
+    end
+    return
+end
+
+### affine/SumAtom
+
+function test_SumAtom()
+    target = """
+    variables: x1, x2
+    minobjective: 1.0 * x1 + 1.0 * x2
+    """
+    _test_atom(target) do context
+        return sum(Variable(2))
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: 1.0 * x1 + 1.0 * x2 + 1.0 * x3 + 1.0 * x4
+    """
+    _test_atom(target) do context
+        return sum(Variable(2, 2))
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1 + 1.0 * x2,  1.0 * x3 + 1.0 * x4]
+    """
+    _test_atom(target) do context
+        return sum(Variable(2, 2); dims = 1)
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1 + 1.0 * x3,  1.0 * x2 + 1.0 * x4]
+    """
+    _test_atom(target) do context
+        return sum(Variable(2, 2); dims = 2)
+    end
+    @test_throws(
+        ErrorException("[SumAtom] sum not implemented for `dims=3`"),
+        sum(Variable(2, 2); dims = 3),
     )
     return
 end

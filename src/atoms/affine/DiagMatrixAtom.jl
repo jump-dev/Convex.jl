@@ -9,7 +9,7 @@ mutable struct DiagMatrixAtom <: AbstractExpr
         elseif num_cols == 1
             return new((x,), (num_rows, num_rows))
         else
-            msg = "Only vectors are allowed for diagm/Diagonal. Did you mean to use diag?"
+            msg = "[DiagMatrixAtom] only vectors are allowed for `diagm(x)` and `Diagonal(x). Did you mean to use `diag(x, 0)`?"
             throw(ArgumentError(msg))
         end
     end
@@ -29,21 +29,19 @@ end
 
 function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
     if d != 0
-        throw(ArgumentError("only the main diagonal is supported"))
+        msg = "[DiagMatrixAtom] only the main diagonal is supported. Got `d=$d`"
+        throw(ArgumentError(msg))
     end
-    return DiagMatrixAtom(x)
+    return diagm(x)
 end
 
-LinearAlgebra.Diagonal(x::AbstractExpr) = DiagMatrixAtom(x)
+LinearAlgebra.Diagonal(x::AbstractExpr) = diagm(x)
 
 LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
 
 function new_conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
-    obj = conic_form!(context, only(AbstractTrees.children(x)))
-    sz = x.size[1]
-    I = collect(1:sz+1:sz*sz)
-    J = collect(1:sz)
-    V = one(T)
-    coeff = create_sparse(T, I, J, V, sz * sz, sz)
+    I = 1:(x.size[1]+1):x.size[1]^2
+    coeff = create_sparse(T, I, 1:x.size[1], one(T), x.size[1]^2, x.size[1])
+    obj = conic_form!(context, x.children[1])
     return operate(add_operation, T, sign(x), coeff, obj)
 end
