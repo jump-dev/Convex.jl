@@ -262,4 +262,6 @@ include("utilities/show.jl")
 include("utilities/iteration.jl")
 include("problem_depot/problem_depot.jl")
 
+include("deprecations.jl")
+
 end

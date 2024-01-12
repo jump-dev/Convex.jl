@@ -557,7 +557,7 @@ function test_add_constraints!_issue_380()
     x = Variable(3, 3)
     p = minimize(norm_1(x))
     y = randn(3, 3)
-    c = (norm2(x - y) < 1)
+    c = (norm2(x - y) <= 1)
     @test length(p.constraints) == 0
     add_constraint!(p, c)
     @test length(p.constraints) == 1
@@ -568,7 +568,7 @@ function test_add_constraints!_issue_380()
     add_constraint!(p, [c])
     @test length(p.constraints) == 1
     empty!(p.constraints)
-    c2 = (norm2(x - rand(3, 3)) < 3)
+    c2 = (norm2(x - rand(3, 3)) <= 3)
     add_constraints!(p, [c, c2])
     @test length(p.constraints) == 2
     return
