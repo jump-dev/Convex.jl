@@ -488,8 +488,8 @@ function test_SumAtom()
         return sum(Variable(2, 2); dims = 2)
     end
     @test_throws(
-        ErrorException("[SumAtom] sum not implemented for `dims=$dimension`"),
-        sum(Variable(2, 2); dims = 2),
+        ErrorException("[SumAtom] sum not implemented for `dims=3`"),
+        sum(Variable(2, 2); dims = 3),
     )
     return
 end
