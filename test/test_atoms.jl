@@ -16,109 +16,211 @@ function runtests()
     return
 end
 
-function _test_structural_identical(a::MOI.ModelLike, b::MOI.ModelLike)
-    # Test that the variables are the same. We make the strong assumption that
-    # the variables are added in the same order to both models.
-    a_x = MOI.get(a, MOI.ListOfVariableIndices())
-    b_x = MOI.get(b, MOI.ListOfVariableIndices())
-    attr = MOI.NumberOfVariables()
-    Test.@test MOI.get(a, attr) == MOI.get(b, attr)
-    Test.@test length(a_x) == length(b_x)
-    # A dictionary that maps things from `b`-space to `a`-space.
-    x_map = Dict(bx => a_x[i] for (i, bx) in enumerate(b_x))
-    # To check that the constraints, we need to first cache all of the
-    # constraints in `a`.
-    constraints = Dict{Any,Any}()
-    for (F, S) in MOI.get(a, MOI.ListOfConstraintTypesPresent())
-        Test.@test MOI.supports_constraint(a, F, S)
-        constraints[(F, S)] =
-            map(MOI.get(a, MOI.ListOfConstraintIndices{F,S}())) do ci
-                return (
-                    MOI.get(a, MOI.ConstraintFunction(), ci),
-                    MOI.get(a, MOI.ConstraintSet(), ci),
-                )
-            end
+function _to_moi(x::MOI.AbstractVectorFunction)
+    if MOI.output_dimension(x) > 1
+        return x
     end
-    # Now compare the constraints in `b` with the cache in `constraints`.
-    b_constraint_types = MOI.get(b, MOI.ListOfConstraintTypesPresent())
-    # There may be constraint types reported in `a` that are not in `b`, but
-    # have zero constraints in `a`.
-    for (F, S) in keys(constraints)
-        attr = MOI.NumberOfConstraints{F,S}()
-        Test.@test (F, S) in b_constraint_types || MOI.get(a, attr) == 0
+    return only(MOI.Utilities.scalarize(x))
+end
+
+_to_moi(x::Convex.SparseTape) = _to_moi(Convex.to_vaf(x))
+
+_to_moi(v::MOI.AbstractScalarFunction) = v
+
+"""
+    _test_atom(f, target_string::String; value_type = Float64)
+"""
+function _test_atom(build_fn, target_string::String; value_type = Float64)
+    context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
+    atom = build_fn(context)
+    # All atoms must be an AbstractExpr
+    @test atom isa Convex.AbstractExpr
+    # All atoms must be mutable
+    @test ismutable(atom)
+    @test sprint(Convex.head, atom) isa String
+    @test Base.sign(atom) isa Convex.Sign
+    N = length(atom.children)
+    @test Convex.monotonicity(atom) isa NTuple{N,<:Convex.Monotonicity}
+    @test Convex.curvature(atom) isa Convex.Vexity
+    t = Convex.conic_form!(context, atom)
+    MOI.set(context.model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+    obj = _to_moi(t)
+    MOI.set(context.model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+    target = MOI.Utilities.Model{value_type}()
+    MOI.Utilities.loadfromstring!(target, target_string)
+    # Use the same names for each model
+    for (x, y) in zip(
+        MOI.get(context.model, MOI.ListOfVariableIndices()),
+        MOI.get(target, MOI.ListOfVariableIndices()),
+    )
+        name = MOI.get(target, MOI.VariableName(), y)
+        MOI.set(context.model, MOI.VariableName(), x, name)
     end
-    for (F, S) in b_constraint_types
-        # Check that the same number of constraints are present
-        attr = MOI.NumberOfConstraints{F,S}()
-        if !haskey(constraints, (F, S))
-            # Constraint is reported in `b`, but not in `a`. Check that there
-            # are no actual constraints in `b`.
-            Test.@test MOI.get(b, attr) == 0
-            continue
-        else
-            Test.@test MOI.get(a, attr) == MOI.get(b, attr)
-        end
-        # Check that supports_constraint is implemented
-        Test.@test MOI.supports_constraint(b, F, S)
-        # Check that each function in `b` matches a function in `a`
-        for ci in MOI.get(b, MOI.ListOfConstraintIndices{F,S}())
-            f_b = MOI.get(b, MOI.ConstraintFunction(), ci)
-            f_b = MOI.Utilities.map_indices(x_map, f_b)
-            s_b = MOI.get(b, MOI.ConstraintSet(), ci)
-            # We don't care about the order that constraints are added, only
-            # that one matches.
-            Test.@test any(constraints[(F, S)]) do (f, s)
-                return s_b == s && isapprox(f, f_b) && typeof(f) == typeof(f_b)
-            end
-        end
+    context_string = sprint(print, context.model)
+    target_string = sprint(print, target)
+    if context_string != target_string
+        @info "Target model\n$target_string"
+        @info "context.model\n$context_string"
     end
-    # Test model attributes are set, like ObjectiveSense and ObjectiveFunction.
-    a_attrs = MOI.get(a, MOI.ListOfModelAttributesSet())
-    b_attrs = MOI.get(b, MOI.ListOfModelAttributesSet())
-    Test.@test length(a_attrs) == length(b_attrs)
-    for attr in b_attrs
-        Test.@test attr in a_attrs
-        if attr == MOI.ObjectiveSense()
-            # map_indices isn't defined for `OptimizationSense`
-            Test.@test MOI.get(a, attr) == MOI.get(b, attr)
-        else
-            attr_b = MOI.Utilities.map_indices(x_map, MOI.get(b, attr))
-            Test.@test isapprox(MOI.get(a, attr), attr_b)
-        end
+    @test context_string == target_string
+    return
+end
+
+### affine/AdditionAtom
+
+function test_AdditionAtom()
+    target = """
+    variables: x
+    minobjective: 1.0 + 1.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return x + 1
+    end
+    target = """
+    variables: x
+    minobjective: 2.0 + 1.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return 2.0 + x
+    end
+    target = """
+    variables: x
+    minobjective: 2.0 + 3.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return 2.0 + 3.0 * x
+    end
+    target = """
+    variables: x
+    minobjective: 0.0 + 5.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return 2.0 * x + 3.0 * x
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [2.0 + x1, 2.0 + x2]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        return x + 2
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [2.0 + x1, 2.0 + x2]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        return 2 + x
+    end
+    target = """
+    variables: x
+    minobjective: 2.0 + 3.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        a = x + x
+        b = 2 + x
+        return a + b
+    end
+    target = """
+    variables: x1, x2, y
+    minobjective: [1.0 * x1 + 1.0 * y, 1.0 * x2 + 1.0 * y]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = Variable()
+        return x + y
+    end
+    target = """
+    variables: y, x1, x2
+    minobjective: [1.0 * y + 1.0 * x1, 1.0 * y + 1.0 * x2]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = Variable()
+        return y + x
     end
     return
 end
 
-function _test_model_equal(f, target_string::String)
-    context = Convex.Context{Float64}(MOI.Utilities.Model{Float64})
-    f(context)
-    target = MOI.Utilities.Model{Float64}()
-    MOI.Utilities.loadfromstring!(target, target_string)
-    _test_structural_identical(context.model, target)
+function test_AdditionAtom_negate()
+    target = """
+    variables: x
+    minobjective: -1.0 + 1.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return x - 1
+    end
+    target = """
+    variables: x
+    minobjective: 2.0 + -1.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return 2.0 - x
+    end
+    target = """
+    variables: x
+    minobjective: 2.0 + -3.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return 2.0 - 3.0 * x
+    end
+    target = """
+    variables: x
+    minobjective: 0.0 + -1.0 * x
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return 2.0 * x - 3.0 * x
+    end
     return
 end
+
+function test_AdditionAtom_errors()
+    x = Variable(2, 2)
+    y = Variable(2, 3)
+    @test_throws(
+        ErrorException(
+            "[AdditionAtom] cannot add expressions of sizes $(x.size) and $(y.size)",
+        ),
+        x + y,
+    )
+    return
+end
+
+### second_order_cone/RationalNormAtom
 
 function test_RationalNormAtom()
     target = """
     variables: x1, x2, t
+    minobjective: 1.0 * t + 0.0
     [-1.0+1.0*x1, -2.0+1.0*x2] in Nonnegatives(2)
     [1.0*t, 1.0*x1, 1.0*x2] in NormCone(1.5, 3)
     """
-    _test_model_equal(target) do context
+    _test_atom(target) do context
         x = Variable(2)
         Convex.add_constraint!(context, x >= [1, 2])
-        return Convex.conic_form!(context, rationalnorm(x, 3 // 2))
+        return rationalnorm(x, 3 // 2)
     end
-    _test_model_equal(
+    _test_atom(
         """
         variables: x1, x2, x3, x4, t
+        minobjective: 1.0 * t + 0.0
         [-1.0+1.0*x1, -3.0+1.0*x2, -2.0+1.0*x3, -4.0+1.0*x4] in Nonnegatives(4)
         [1.0*t, 1.0*x1, 1.0*x2, 1.0*x3, 1.0*x4] in NormCone(2.0, 5)
         """,
     ) do context
         x = Variable(2, 2)
         Convex.add_constraint!(context, x >= [1 2; 3 4])
-        return Convex.conic_form!(context, rationalnorm(x, 2 // 1))
+        return rationalnorm(x, 2 // 1)
     end
     return
 end
