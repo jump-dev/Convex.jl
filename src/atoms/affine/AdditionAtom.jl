@@ -54,7 +54,7 @@ function new_conic_form!(context::Context{T}, x::AdditionAtom) where {T}
         +,
         T,
         sign(x),
-        (conic_form!(context, c) for c in AbstractTrees.children(x))...,
+        (conic_form!(context, c) for c in x.children)...,
     )
 end
 

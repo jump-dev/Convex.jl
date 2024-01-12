@@ -136,16 +136,15 @@ function test_AdditionAtom()
         y = Variable()
         return x + y
     end
-    # TODO(odow): fix me
-    # target = """
-    # variables: x1, x2, y
-    # minobjective: [1.0 * x1 + 1.0 * y, 1.0 * x2 + 1.0 * y]
-    # """
-    # _test_atom(target) do context
-    #     x = Variable(2)
-    #     y = Variable()
-    #     return y + x
-    # end
+    target = """
+    variables: y, x1, x2
+    minobjective: [1.0 * y + 1.0 * x1, 1.0 * y + 1.0 * x2]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = Variable()
+        return y + x
+    end
     return
 end
 
