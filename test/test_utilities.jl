@@ -937,7 +937,7 @@ function test_write_to_file()
 end
 
 function test_strict_inequality_deprecation()
-    x = VariableIndex()
+    x = Variable()
     err = ErrorException(
         "Strict inequality `<` has been removed. Use `<=` instead.",
     )
