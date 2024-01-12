@@ -936,6 +936,23 @@ function test_write_to_file()
     return
 end
 
+function test_strict_inequality_deprecation()
+    x = VariableIndex()
+    err = ErrorException(
+        "Strict inequality `<` has been removed. Use `<=` instead.",
+    )
+    @test_throws(err, x < 1)
+    @test_throws(err, 1 < x)
+    @test_throws(err, x < x)
+    err = ErrorException(
+        "Strict inequality `>` has been removed. Use `>=` instead.",
+    )
+    @test_throws(err, x > 1)
+    @test_throws(err, 1 > x)
+    @test_throws(err, x > x)
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
