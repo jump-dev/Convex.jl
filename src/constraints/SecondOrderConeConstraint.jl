@@ -1,13 +1,18 @@
-mutable struct SOCConstraint <: Constraint
+mutable struct SecondOrderConeConstraint <: Constraint
     children::Tuple
     dual::Union{Value,Nothing}
 
-    SOCConstraint(args::AbstractExpr...) = new(args, nothing)
+    SecondOrderConeConstraint(args::AbstractExpr...) = new(args, nothing)
 end
 
-head(io::IO, ::SOCConstraint) = print(io, "soc")
+head(io::IO, ::SecondOrderConeConstraint) = print(io, "soc")
 
-function _add_constraint!(context::Context{T}, c::SOCConstraint) where {T}
+AbstractTrees.children(C::SecondOrderConeConstraint) = C.children
+
+function _add_constraint!(
+    context::Context{T},
+    c::SecondOrderConeConstraint,
+) where {T}
     f = operate(
         vcat,
         T,
@@ -22,7 +27,11 @@ function _add_constraint!(context::Context{T}, c::SOCConstraint) where {T}
     return
 end
 
-function populate_dual!(model::MOI.ModelLike, c::SOCConstraint, indices)
+function populate_dual!(
+    model::MOI.ModelLike,
+    c::SecondOrderConeConstraint,
+    indices,
+)
     c.dual = output(MOI.get(model, MOI.ConstraintDual(), indices))
     return
 end

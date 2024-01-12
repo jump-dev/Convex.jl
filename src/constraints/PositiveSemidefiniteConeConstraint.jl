@@ -1,9 +1,9 @@
-mutable struct SDPConstraint <: Constraint
+mutable struct PositiveSemidefiniteConeConstraint <: Constraint
     child::AbstractExpr
     size::Tuple{Int,Int}
     dual::Union{Value,Nothing}
 
-    function SDPConstraint(child::AbstractExpr)
+    function PositiveSemidefiniteConeConstraint(child::AbstractExpr)
         if child.size[1] != child.size[2]
             error("Positive semidefinite expressions must be square")
         end
@@ -11,9 +11,11 @@ mutable struct SDPConstraint <: Constraint
     end
 end
 
-head(io::IO, ::SDPConstraint) = print(io, "sdp")
+head(io::IO, ::PositiveSemidefiniteConeConstraint) = print(io, "sdp")
 
-function vexity(c::SDPConstraint)
+AbstractTrees.children(C::PositiveSemidefiniteConeConstraint) = (C.child,)
+
+function vexity(c::PositiveSemidefiniteConeConstraint)
     vex = vexity(c.child)
     if vex == AffineVexity() || vex == ConstVexity()
         return AffineVexity()
@@ -21,7 +23,10 @@ function vexity(c::SDPConstraint)
     return NotDcp()
 end
 
-function _add_constraint!(context::Context, c::SDPConstraint)
+function _add_constraint!(
+    context::Context,
+    c::PositiveSemidefiniteConeConstraint,
+)
     if vexity(c.child) == ConstVexity()
         x = evaluate(c.child)
         if !(x ≈ transpose(x))
@@ -42,7 +47,11 @@ function _add_constraint!(context::Context, c::SDPConstraint)
     return
 end
 
-function populate_dual!(model::MOI.ModelLike, c::SDPConstraint, indices)
+function populate_dual!(
+    model::MOI.ModelLike,
+    c::PositiveSemidefiniteConeConstraint,
+    indices,
+)
     dual = MOI.get(model, MOI.ConstraintDual(), indices)
     c.dual = output(reshape(dual, c.size))
     return
@@ -57,9 +66,11 @@ function Base.in(x::AbstractExpr, y::Symbol)
         error("Set $y not understood")
     end
     if iscomplex(x)
-        return SDPConstraint([real(x) -imag(x); imag(x) real(x)])
+        return PositiveSemidefiniteConeConstraint(
+            [real(x) -imag(x); imag(x) real(x)],
+        )
     end
-    return SDPConstraint(x)
+    return PositiveSemidefiniteConeConstraint(x)
 end
 
 ⪰(x::AbstractExpr, y::AbstractExpr) = in(x - y, :SDP)

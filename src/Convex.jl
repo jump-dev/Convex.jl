@@ -148,6 +148,8 @@ Set via:
 """
 const MAXDIGITS = Ref(3)
 
+const CONSTANT_CONSTRAINT_TOL = Ref(1e-6)
+
 # where do these go?
 # used so far only in `Constant`
 vectorize(v::AbstractVector) = v
