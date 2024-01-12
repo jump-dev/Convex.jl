@@ -16,7 +16,7 @@ scalar_fn(x::SparseTape) = scalar_fn(to_vaf(x))
 scalar_fn(v::MOI.AbstractScalarFunction) = v
 
 """
-    latex_formulation(problem::Problem, optimizer=MOI.Utilities.Model{Float64}())
+    latex_formulation(problem::Problem, optimizer=MOI.Utilities.Model{Float64})
 
 Prints a LaTeX formulation of the problem. Optionally, pass an `optimizer`
 (like `SCS.Optimizer`) as the second argument, to see the formulation provided
@@ -27,7 +27,7 @@ Uses `MathOptInterface.Utilities.latex_formulation`.
 """
 function latex_formulation(
     problem::Problem,
-    optimizer = MOI.Utilities.Model{Float64}(),
+    optimizer = MOI.Utilities.Model{Float64},
 )
     context = Context(problem, optimizer)
     return MOI.Utilities.latex_formulation(context.model)

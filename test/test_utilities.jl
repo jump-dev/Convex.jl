@@ -936,6 +936,20 @@ function test_write_to_file()
     return
 end
 
+function test_latex_formulation()
+    x = Variable(3)
+    p = minimize(logsumexp(x))
+    for latex_model in (
+        Convex.latex_formulation(p),
+        Convex.latex_formulation(p, SCS.Optimizer),
+    )
+        str = sprint(show, latex_model)
+        @test contains(str, "ExponentialCone()")
+        @test contains(str, "Nonnegatives(1)")
+    end
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
