@@ -34,7 +34,7 @@ function new_conic_form!(context::Context{T}, q::QolElemAtom) where {T}
     for i in 1:length(q.children[1])
         add_constraint!(
             context,
-            SOCConstraint(y[i] + t[i], y[i] - t[i], 2 * x[i]),
+            SecondOrderConeConstraint(y[i] + t[i], y[i] - t[i], 2 * x[i]),
         )
     end
     add_constraint!(context, y >= 0)

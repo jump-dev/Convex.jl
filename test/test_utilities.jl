@@ -408,7 +408,7 @@ function test_Constructors()
         Semidefinite(2),
     ]
         @test length(get_constraints(x)) == 1
-        @test get_constraints(x)[] isa Convex.SDPConstraint
+        @test get_constraints(x)[] isa Convex.PositiveSemidefiniteConeConstraint
     end
 
     @test_throws ErrorException HermitianSemidefinite(2, 3)

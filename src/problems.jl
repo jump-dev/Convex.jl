@@ -233,7 +233,6 @@ function satisfy(constraint::Constraint; numeric_type = Float64)
     return satisfy([constraint]; numeric_type = numeric_type)
 end
 
-# +(constraints, constraints) is defined in constraints.jl
 function add_constraints!(p::Problem, constraints::Array{<:Constraint})
     return append!(p.constraints, constraints)
 end
@@ -246,6 +245,23 @@ function add_constraint!(p::Problem, constraints::Array{<:Constraint})
 end
 function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
+end
+
+Base.:+(x::Array{<:Constraint}, y::Array{<:Constraint}) = vcat(x, y)
+
+Base.:+(x::Constraint, y::Constraint) = [x, y]
+
+Base.:+(x::Constraint, y::Array{<:Constraint}) = vcat(x, y)
+
+Base.:+(x::Array{<:Constraint}, y::Constraint) = vcat(x, y)
+
+iscomplex(c::Constraint) = iscomplex(c.lhs) || iscomplex(c.rhs)
+
+function add_constraint!(context::Context, c::Constraint)
+    if c in keys(context.constr_to_moi_inds)
+        return
+    end
+    return _add_constraint!(context, c)
 end
 
 """
