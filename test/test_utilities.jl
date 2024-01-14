@@ -938,18 +938,14 @@ end
 
 function test_strict_inequality_deprecation()
     x = Variable()
-    err = ErrorException(
-        "Strict inequality `<` has been removed. Use `<=` instead.",
-    )
-    @test_throws(err, x < 1)
-    @test_throws(err, 1 < x)
-    @test_throws(err, x < x)
-    err = ErrorException(
-        "Strict inequality `>` has been removed. Use `>=` instead.",
-    )
-    @test_throws(err, x > 1)
-    @test_throws(err, 1 > x)
-    @test_throws(err, x > x)
+    @test_logs (:warn,) x < 1
+    @test_logs (:warn,) 1 < x
+    @test_logs (:warn,) x < x
+    @test_logs (:warn,) x > 1
+    @test_logs (:warn,) 1 > x
+    @test_logs (:warn,) x > x
+    @test string(x < 1) == string(x <= 1)
+    @test string(x > 1) == string(x >= 1)
     return
 end
 
