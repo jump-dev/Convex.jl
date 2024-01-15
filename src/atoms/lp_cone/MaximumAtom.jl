@@ -4,7 +4,9 @@ mutable struct MaximumAtom <: AbstractExpr
 
     function MaximumAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("[MaximumAtom] argument should be real instead it is $(sign(x))")
+            error(
+                "[MaximumAtom] argument should be real instead it is $(sign(x))",
+            )
         end
         return new((x,), (1, 1))
     end
