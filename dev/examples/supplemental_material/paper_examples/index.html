@@ -10,8 +10,8 @@ e = 0;
     p = minimize(e, x &gt;= 1)
 end
 @time solve!(p, ECOS.Optimizer; silent_solver = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Summation example
-  0.040633 seconds (31.82 k allocations: 13.157 MiB, 95.62% compilation time)
-  5.655644 seconds (8.82 M allocations: 528.643 MiB, 2.16% gc time, 7.48% compilation time)</code></pre><p>Indexing.</p><pre><code class="language-julia hljs">println(&quot;Indexing example&quot;)
+  0.041541 seconds (31.82 k allocations: 13.157 MiB, 94.79% compilation time)
+  5.684651 seconds (8.79 M allocations: 526.230 MiB, 2.11% gc time, 6.66% compilation time)</code></pre><p>Indexing.</p><pre><code class="language-julia hljs">println(&quot;Indexing example&quot;)
 x = Variable(1000, 1);
 e = 0;
 @time begin
@@ -22,8 +22,8 @@ e = 0;
     p = minimize(e, x &gt;= ones(1000, 1))
 end
 @time solve!(p, ECOS.Optimizer; silent_solver = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Indexing example
-  0.078527 seconds (63.15 k allocations: 14.736 MiB, 98.01% compilation time)
-  0.144666 seconds (130.59 k allocations: 47.801 MiB, 28.56% gc time, 76.95% compilation time)</code></pre><p>Matrix constraints.</p><pre><code class="language-julia hljs">println(&quot;Matrix constraint example&quot;)
+  0.078817 seconds (63.15 k allocations: 14.736 MiB, 97.91% compilation time)
+  0.106318 seconds (125.13 k allocations: 47.401 MiB, 65.24% compilation time)</code></pre><p>Matrix constraints.</p><pre><code class="language-julia hljs">println(&quot;Matrix constraint example&quot;)
 n, m, p = 100, 100, 100
 X = Variable(m, n);
 A = randn(p, m);
@@ -32,8 +32,8 @@ b = randn(p, n);
     p = minimize(norm(X), A * X == b)
 end
 @time solve!(p, ECOS.Optimizer; silent_solver = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Matrix constraint example
-  0.041866 seconds (37.53 k allocations: 2.347 MiB, 99.65% compilation time)
-  2.335060 seconds (2.01 M allocations: 319.700 MiB, 2.51% gc time)</code></pre><p>Transpose.</p><pre><code class="language-julia hljs">println(&quot;Transpose example&quot;)
+  0.042249 seconds (37.53 k allocations: 2.347 MiB, 99.65% compilation time)
+  2.331361 seconds (2.00 M allocations: 318.284 MiB, 2.79% gc time)</code></pre><p>Transpose.</p><pre><code class="language-julia hljs">println(&quot;Transpose example&quot;)
 X = Variable(5, 5);
 A = randn(5, 5);
 @time begin
@@ -48,5 +48,5 @@ X = Variable(n, n);
 p = minimize(norm(X&#39; - A), X[1, 1] == 1);
 solve!(p, ECOS.Optimizer; silent_solver = true)
 #end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Transpose example
-  0.033722 seconds (27.97 k allocations: 1.494 MiB, 99.48% compilation time)
-  0.021068 seconds (13.97 k allocations: 814.635 KiB, 95.65% compilation time)</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Convex.jl_intro_ISMP2015/">« Convex Optimization in Julia</a><a class="docs-footer-nextpage" href="../../time_series/time_series/">Time Series Analysis »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 12 January 2024 09:11">Friday 12 January 2024</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  0.033649 seconds (27.97 k allocations: 1.494 MiB, 99.43% compilation time)
+  0.021223 seconds (13.97 k allocations: 814.416 KiB, 95.50% compilation time)</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Convex.jl_intro_ISMP2015/">« Convex Optimization in Julia</a><a class="docs-footer-nextpage" href="../../time_series/time_series/">Time Series Analysis »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Monday 15 January 2024 00:51">Monday 15 January 2024</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
