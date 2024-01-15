@@ -4,7 +4,9 @@ mutable struct LogAtom <: AbstractExpr
 
     function LogAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("The argument should be real but it's instead complex")
+            error(
+                "[LogAtom] the argument should be real but it's instead complex",
+            )
         end
         return new((x,), x.size)
     end

@@ -156,21 +156,6 @@ vectorize(v::AbstractVector) = v
 vectorize(v::Number) = [v]
 vectorize(v::AbstractMatrix) = vec(v)
 
-# where should these go?
-function vec_triu(M)
-    L = LinearIndices(size(M))
-    n, m = size(M)
-    inds = [L[i, j] for i in 1:n for j in i:m]
-    return M[inds]
-end
-
-function vec_tril(M)
-    L = LinearIndices(size(M))
-    n, m = size(M)
-    inds = [L[i, j] for i in 1:n for j in 1:i]
-    return M[inds]
-end
-
 # using SuiteSparseGraphBLAS
 #
 

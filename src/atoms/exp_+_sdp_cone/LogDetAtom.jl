@@ -16,15 +16,12 @@ curvature(::LogDetAtom) = ConcaveVexity()
 evaluate(x::LogDetAtom) = log(LinearAlgebra.det(evaluate(x.children[1])))
 
 function new_conic_form!(context::Context{T}, x::LogDetAtom) where {T}
-    # the object we want the logdet of. Should be a PSD matrix, but may not be a
-    # `AbstractVariable` itself.
-    A = only(AbstractTrees.children(x))
-    v = vec_triu(A)
-    add_constraint!(context, v == vec_tril(A))
     t = conic_form!(context, Variable())
-    X = conic_form!(context, v)
-    f = operate(vcat, T, sign(x), t, SPARSE_VECTOR{T}([one(T)]), X)
-    MOI_add_constraint(context.model, f, MOI.LogDetConeTriangle(size(A, 1)))
+    A = only(AbstractTrees.children(x))
+    X = conic_form!(context, A)
+    u = SPARSE_VECTOR{T}([one(T)])
+    f = operate(vcat, T, sign(x), t, u, X)
+    MOI_add_constraint(context.model, f, MOI.LogDetConeSquare(size(A, 1)))
     return t
 end
 

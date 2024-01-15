@@ -5,7 +5,7 @@ mutable struct RelativeEntropyAtom <: AbstractExpr
     function RelativeEntropyAtom(x::AbstractExpr, y::AbstractExpr)
         if sign(x) == ComplexSign() || sign(y) == ComplexSign()
             error(
-                "Both the arguments should be real but these are instead $(sign(x)) and $(sign(y))",
+                "[RelativeEntropyAtom] both the arguments should be real but these are instead $(sign(x)) and $(sign(y))",
             )
         end
         return new((x, y), (1, 1))
