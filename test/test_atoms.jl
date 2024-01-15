@@ -729,6 +729,261 @@ function test_RelativeEntropyAtom()
     return
 end
 
+### lp_cone/AbsAtom
+
+function test_AbsAtom()
+    target = """
+    variables: t, x
+    minobjective: 1.0 * t
+    [1.0 * t + -1.0 * x] in Nonnegatives(1)
+    [1.0 * t + 1.0 * x] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return abs(Variable())
+    end
+    target = """
+    variables: w, t, x
+    minobjective: 1.0 * w
+    [1.0 * t + -1.0 * x] in Nonnegatives(1)
+    [1.0 * t + 1.0 * x] in Nonnegatives(1)
+    [1.0 + 1.0*w, 1.0 + -1.0*w, 2.0*t] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return abs2(Variable())
+    end
+    target = """
+    variables: t1, t2, x1, x2, w1, w2
+    minobjective: [1.0 * t1, 1.0*t2]
+    [1.0 * t1 + -1.0 * x1] in Nonnegatives(1)
+    [1.0 * t2 + -1.0 * w2] in Nonnegatives(1)
+    [1.0 * x1, 1.0 * x2, 2.0] in SecondOrderCone(3)
+    [1.0 * w2, 1.0 * w1, 2.0] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return abs(Variable(2) + 2im)
+    end
+    return
+end
+
+### lp_cone/DotSortAtom
+
+# TODO
+
+### lp_cone/MaxAtom
+
+function test_MaxAtom()
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t + -1.0 * x] in Nonnegatives(1)
+    [1.0 * t + -1.0 * y] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return max(Variable(), Variable())
+    end
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t + -1.0 * x] in Nonnegatives(1)
+    [1.0 * t + -1.0] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return max(Variable(), 1)
+    end
+    _test_atom(target) do context
+        return max(Variable(), constant(1))
+    end
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t + -1.0] in Nonnegatives(1)
+    [1.0 * t + -1.0 * x] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return max(1, Variable())
+    end
+    _test_atom(target) do context
+        return max(constant(1), Variable())
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * t1 + -1.0 * x1, 1.0 * t2 + -1.0 * x2] in Nonnegatives(2)
+    [1.0 * t1, 1.0 * t2] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return pos(Variable(2))
+    end
+    target = """
+    variables: t, x
+    minobjective: 1.0 * t
+    [-1.0 + 1.0 * t + 1.0 * x] in Nonnegatives(1)
+    [1.0 * t] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return hinge_loss(Variable())
+    end
+    x = Variable()
+    @test sign(max(square(x), 1)) == Convex.Positive()
+    @test sign(max(-square(x), -1)) == Convex.Negative()
+    @test sign(max(x, -1)) == Convex.NoSign()
+    @test sign(max(x, 1)) == Convex.Positive()
+    return
+end
+
+### lp_cone/MaximumAtom
+
+function test_MaximumAtom()
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t + -1.0 * x, 1.0 * t + -1.0 * y] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return maximum(Variable(2))
+    end
+    x = im * Variable(2)
+    @test_throws(
+        ErrorException(
+            "[MaximumAtom] argument should be real instead it is $(sign(x))",
+        ),
+        maximum(x),
+    )
+    return
+end
+
+### lp_cone/MinAtom
+
+function test_MinAtom()
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [-1.0 * t + 1.0 * x] in Nonnegatives(1)
+    [-1.0 * t + 1.0 * y] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return min(Variable(), Variable())
+    end
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [-1.0 * t + 1.0 * x] in Nonnegatives(1)
+    [-1.0 * t + 1.0] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return min(Variable(), 1)
+    end
+    _test_atom(target) do context
+        return min(Variable(), constant(1))
+    end
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [-1.0 * t + 1.0] in Nonnegatives(1)
+    [-1.0 * t + 1.0 * x] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return min(1, Variable())
+    end
+    _test_atom(target) do context
+        return min(constant(1), Variable())
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * t1 + 1.0 * x1, 1.0 * t2 + 1.0 * x2] in Nonnegatives(2)
+    [1.0 * t1, 1.0 * t2] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return neg(Variable(2))
+    end
+    x = Variable()
+    @test sign(min(square(x), 1)) == Convex.Positive()
+    @test sign(min(-square(x), -1)) == Convex.Negative()
+    @test sign(min(x, -1)) == Convex.Negative()
+    @test sign(min(x, 1)) == Convex.NoSign()
+    x, y = Variable(2), Variable(3)
+    @test_throws(
+        ErrorException(
+            "[MinAtom] got different sizes for x as $(x.size) and y as $(y.size)",
+        ),
+        min(x, y),
+    )
+    x = im * x
+    @test_throws(
+        ErrorException(
+            "[MinAtom] both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
+        ),
+        min(x, y),
+    )
+    return
+end
+
+### lp_cone/MinimumAtom
+
+function test_MimimumAtom()
+    target = """
+    variables: x, y, t
+    minobjective: 1.0 * t
+    [1.0 * x + -1.0 * t, 1.0 * y + -1.0 * t] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return minimum(Variable(2))
+    end
+    x = im * Variable(2)
+    @test_throws(
+        ErrorException(
+            "[MinimumAtom] argument should be real instead it is $(sign(x))",
+        ),
+        minimum(x),
+    )
+    return
+end
+
+### lp_cone/SumLargestAtom
+
+function test_SumLargestAtom()
+    target = """
+    variables: t1, t2, t3, q, x1, x2, x3
+    minobjective: 1.0 * t1 + 1.0 * t2 + 1.0 * t3 + 2.0 * q
+    [1.0*t1 + 1.0*q + -1.0*x1, 1.0*t2 + 1.0*q + -1.0*x2, 1.0*t3 + 1.0*q + -1.0*x3] in Nonnegatives(3)
+    [1.0 * t1, 1.0 * t2, 1.0 * t3] in Nonnegatives(3)
+    """
+    _test_atom(target) do context
+        return sumlargest(Variable(3), 2)
+    end
+    target = """
+    variables: t1, t2, t3, q, x1, x2, x3
+    minobjective: 1.0 + -1.0 * t1 + -1.0 * t2 + -1.0 * t3 + -2.0 * q
+    [1.0*t1 + 1.0*q + 1.0*x1, 1.0*t2 + 1.0*q + 1.0*x2, 1.0*t3 + 1.0*q + 1.0*x3] in Nonnegatives(3)
+    [1.0 * t1, 1.0 * t2, 1.0 * t3] in Nonnegatives(3)
+    """
+    _test_atom(target) do context
+        return 1 + sumsmallest(Variable(3), 2)
+    end
+    @test string(sumlargest(Variable(3), 0)) == "0"
+    x = im * Variable(3)
+    @test_throws(
+        ErrorException(
+            "[SumLargestAtom] argument should be real instead it is $(sign(x))",
+        ),
+        sumlargest(x, 2),
+    )
+    @test_throws(
+        ErrorException(
+            "[SumLargestAtom] sumlargest and sumsmallest only support positive values of k",
+        ),
+        sumlargest(Variable(3), -2),
+    )
+    @test_throws(
+        ErrorException(
+            "[SumLargestAtom] k cannot be larger than the number of entries in x",
+        ),
+        sumlargest(Variable(3), 4),
+    )
+    return
+end
+
 ### second_order_cone/RationalNormAtom
 
 function test_RationalNormAtom()
