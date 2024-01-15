@@ -4,7 +4,9 @@ mutable struct ExpAtom <: AbstractExpr
 
     function ExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("The argument should be real but it's instead complex")
+            error(
+                "[ExpAtom] the argument should be real but it's instead complex",
+            )
         end
         return new((x,), x.size)
     end

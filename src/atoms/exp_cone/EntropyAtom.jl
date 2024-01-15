@@ -4,7 +4,9 @@ mutable struct EntropyAtom <: AbstractExpr
 
     function EntropyAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("The argument should be real but it's instead complex")
+            error(
+                "[EntropyAtom] the argument should be real but it's instead complex",
+            )
         end
         # TODO check positivity or enforce it
         return new((x,), size(x))
@@ -21,7 +23,7 @@ curvature(::EntropyAtom) = ConcaveVexity()
 
 function evaluate(x::EntropyAtom)
     c = evaluate(x.children[1])
-    return -c .* log.(c)
+    return -sum(c .* log.(c))
 end
 
 entropy(x::AbstractExpr) = sum(EntropyAtom(x))

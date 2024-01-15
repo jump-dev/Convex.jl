@@ -210,6 +210,9 @@ function test_ConjugateAtom()
     @test Convex.monotonicity(z) == (Convex.Nondecreasing(),)
     @test Convex.curvature(z) == Convex.ConstVexity()
     @test Convex.evaluate(conj(Convex.ComplexConstant(y, y))) == 2.0 - 2.0im
+    x.value = [-2.0]
+    @test evaluate(conj(x)) ≈ -2.0
+    @test evaluate(conj(im * x)) ≈ 0 + 2.0im
     return
 end
 
@@ -355,6 +358,14 @@ function test_ImaginaryAtom()
         y = constant(2 + 3im)
         return Variable() + imag(y)
     end
+    target = """
+    variables: x
+    minobjective: 1.0 * x
+    """
+    _test_atom(target) do context
+        y = constant(2)
+        return Variable() + imag(y)
+    end
     return
 end
 
@@ -409,8 +420,15 @@ function test_IndexAtom()
     _test_atom(target) do context
         return Variable(2, 2)[:, 2]
     end
+    y = [true, false, true]
+    x = Variable(3)
+    @test string(x[y]) == string([x[1], x[3]])
     return
 end
+
+### affine/MultiplyAtom
+
+# TODO
 
 ### affine/NegateAtom
 
@@ -453,8 +471,20 @@ function test_RealAtom()
         y = constant(2 + 3im)
         return Variable() + real(y)
     end
+    target = """
+    variables: x
+    minobjective: 1.0 * x + 2.0
+    """
+    _test_atom(target) do context
+        y = constant(2)
+        return Variable() + real(y)
+    end
     return
 end
+
+### affine/ReshapeAtom
+
+# TODO
 
 ### affine/SumAtom
 
@@ -491,6 +521,211 @@ function test_SumAtom()
         ErrorException("[SumAtom] sum not implemented for `dims=3`"),
         sum(Variable(2, 2); dims = 3),
     )
+    return
+end
+
+### exp_+_sdp_cone/LogDetAtom
+
+function test_LogDetAtom()
+    target = """
+    variables: t, x11, x12, x21, x22
+    minobjective: 1.0 * t + 0.0
+    [1.0*t, 1.0, 1.0*x11, 1.0 *x12, 1.0*x21, 1.0*x22] in LogDetConeSquare(2)
+    """
+    _test_atom(target) do context
+        return logdet(Variable(2, 2))
+    end
+    return
+end
+
+### exp_cone/EntropyAtom
+
+function test_EntropyAtom()
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: 1.0 * t1 + 1.0 * t2
+    [1.0 * t1, 1.0 * x1, 1.0] in ExponentialCone()
+    [1.0 * t2, 1.0 * x2, 1.0] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        return entropy(Variable(2))
+    end
+    @test_throws(
+        ErrorException(
+            "[EntropyAtom] the argument should be real but it's instead complex",
+        ),
+        entropy(im * Variable(2)),
+    )
+    x = Variable(2)
+    atom = entropy(x)
+    x.value = [1.0 2.0]
+    @test evaluate(atom) ≈ -sum(xi * log(xi) for xi in x.value)
+    return
+end
+
+### exp_cone/ExpAtom
+
+function test_ExpAtom()
+    target = """
+    variables: x, z
+    minobjective: 1.0 * z + 0.0
+    [1.0 * x, 1.0, 1.0 * z] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        return exp(Variable())
+    end
+    target = """
+    variables: x1, x2, z1, z2
+    minobjective: [1.0 * z1, 1.0 * z2]
+    [1.0 * x1, 1.0, 1.0 * z1] in ExponentialCone()
+    [1.0 * x2, 1.0, 1.0 * z2] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        return exp(Variable(2))
+    end
+    @test_throws(
+        ErrorException(
+            "[ExpAtom] the argument should be real but it's instead complex",
+        ),
+        exp(im * Variable()),
+    )
+    x = Variable(2)
+    atom = exp(x)
+    x.value = [1.0, 2.0]
+    @test evaluate(atom) ≈ exp.([1.0, 2.0])
+    return
+end
+
+### exp_cone/LogAtom
+
+function test_LogAtom()
+    target = """
+    variables: x, z
+    minobjective: 1.0 * x + 0.0
+    [1.0 * x, 1.0, 1.0 * z] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        return log(Variable())
+    end
+    target = """
+    variables: x1, x2, z1, z2
+    minobjective: [1.0 * x1, 1.0 * x2]
+    [1.0 * x1, 1.0, 1.0 * z1] in ExponentialCone()
+    [1.0 * x2, 1.0, 1.0 * z2] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        return log(Variable(2))
+    end
+    @test_throws(
+        ErrorException(
+            "[LogAtom] the argument should be real but it's instead complex",
+        ),
+        log(im * Variable()),
+    )
+    x = Variable(2)
+    atom = log(x)
+    x.value = [1.0, 2.0]
+    @test evaluate(atom) ≈ log.([1.0, 2.0])
+    return
+end
+
+### exp_cone/LogSumExp
+
+function test_LogSumExpAtom()
+    target = """
+    variables: x1, x2, t, z1, z2
+    minobjective: 1.0 * t
+    [1.0 * x1 + -1.0 * t, 1.0, 1.0 * z1] in ExponentialCone()
+    [1.0 * x2 + -1.0 * t, 1.0, 1.0 * z2] in ExponentialCone()
+    [1.0 + -1.0*z1 + -1.0*z2] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return logsumexp(Variable(2))
+    end
+    target = """
+    variables: x1, t, z1, z2
+    minobjective: 1.0 * t
+    [1.0 * x1 + -1.0 * t, 1.0, 1.0 * z1] in ExponentialCone()
+    [-1.0 * t, 1.0, 1.0 * z2] in ExponentialCone()
+    [1.0 + -1.0*z1 + -1.0*z2] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return logisticloss(Variable())
+    end
+    target = """
+    variables: x1, x1_, t, z1, z2, t_, z1_, z2_
+    minobjective: 1.0 * t + 1.0 * t_
+    [1.0 * x1 + -1.0 * t, 1.0, 1.0 * z1] in ExponentialCone()
+    [-1.0 * t, 1.0, 1.0 * z2] in ExponentialCone()
+    [1.0 * x1_ + -1.0 * t_, 1.0, 1.0 * z1_] in ExponentialCone()
+    [-1.0 * t_, 1.0, 1.0 * z2_] in ExponentialCone()
+    [1.0 + -1.0*z1 + -1.0*z2] in Nonnegatives(1)
+    [1.0 + -1.0*z1_ + -1.0*z2_] in Nonnegatives(1)
+    """
+    _test_atom(target) do context
+        return logisticloss(Variable(2))
+    end
+    @test_throws(
+        ErrorException(
+            "[LogSumExpAtom] the argument should be real but it's instead complex",
+        ),
+        logsumexp(im * Variable()),
+    )
+    x = Variable(2)
+    atom = logsumexp(x)
+    x.value = [1.0 1_000.0]
+    @test evaluate(atom) ≈ 1_000.0
+    return
+end
+
+### exp_cone/RelativeEntropyAtom
+
+function test_RelativeEntropyAtom()
+    target = """
+    variables: w1, w2, v1, v2, u
+    minobjective: 1.0 * u + 0.0
+    [1.0*u, 1.0*v1, 1.0*v2, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = Variable(2)
+        return relative_entropy(x, y)
+    end
+    target = """
+    variables: w1, w2, v1, v2, u
+    minobjective: -1.0 * u + 1.0
+    [1.0*u, 1.0*v1, 1.0*v2, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = Variable(2)
+        return 1.0 + log_perspective(x, y)
+    end
+    x, y = Variable(2), im * Variable(2)
+    @test_throws(
+        ErrorException(
+            "[RelativeEntropyAtom] both the arguments should be real but these are instead $(sign(x)) and $(sign(y))",
+        ),
+        relative_entropy(x, y),
+    )
+    @test_throws(
+        ErrorException(
+            "[RelativeEntropyAtom] both the arguments should be real but these are instead $(sign(y)) and $(sign(x))",
+        ),
+        relative_entropy(y, x),
+    )
+    x = Variable(2)
+    y = Variable(2)
+    atom = relative_entropy(x, y)
+    x.value = [1.0, 1_000.0]
+    y.value = [1.0, NaN]
+    @test evaluate(atom) ≈ Inf
+    x.value = [0.0, 1.0]
+    y.value = [1.0, 2.0]
+    @test evaluate(atom) ≈ log(0.5)
+    x.value = [5.0, 1.0]
+    y.value = [3.0, 2.0]
+    @test evaluate(atom) ≈ 5 * log(5 / 3) + log(0.5)
     return
 end
 

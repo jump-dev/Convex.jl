@@ -4,7 +4,9 @@ mutable struct LogSumExpAtom <: AbstractExpr
 
     function LogSumExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("The argument should be real but it's instead complex")
+            error(
+                "[LogSumExpAtom] the argument should be real but it's instead complex",
+            )
         end
         return new((x,), (1, 1))
     end
