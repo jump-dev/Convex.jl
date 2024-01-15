@@ -423,7 +423,6 @@ function test_IndexAtom()
     y = [true, false, true]
     x = Variable(3)
     @test string(x[y]) == string([x[1], x[3]])
-    end
     return
 end
 
