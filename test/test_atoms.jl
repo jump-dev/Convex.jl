@@ -210,6 +210,9 @@ function test_ConjugateAtom()
     @test Convex.monotonicity(z) == (Convex.Nondecreasing(),)
     @test Convex.curvature(z) == Convex.ConstVexity()
     @test Convex.evaluate(conj(Convex.ComplexConstant(y, y))) == 2.0 - 2.0im
+    x.value = [-2.0]
+    @test evaluate(conj(x)) ≈ -2.0
+    @test evaluate(conj(im * x)) ≈ 0 + 2.0im
     return
 end
 
@@ -355,6 +358,14 @@ function test_ImaginaryAtom()
         y = constant(2 + 3im)
         return Variable() + imag(y)
     end
+    target = """
+    variables: x
+    minobjective: 1.0 * x
+    """
+    _test_atom(target) do context
+        y = constant(2)
+        return Variable() + imag(y)
+    end
     return
 end
 
@@ -409,6 +420,10 @@ function test_IndexAtom()
     _test_atom(target) do context
         return Variable(2, 2)[:, 2]
     end
+    y = [true, false, true]
+    x = Variable(3)
+    @test string(x[y]) == string([x[1], x[3]])
+    end
     return
 end
 
@@ -455,6 +470,14 @@ function test_RealAtom()
     """
     _test_atom(target) do context
         y = constant(2 + 3im)
+        return Variable() + real(y)
+    end
+    target = """
+    variables: x
+    minobjective: 1.0 * x + 2.0
+    """
+    _test_atom(target) do context
+        y = constant(2)
         return Variable() + real(y)
     end
     return
@@ -567,6 +590,10 @@ function test_ExpAtom()
         ),
         exp(im * Variable()),
     )
+    x = Variable(2)
+    atom = exp(x)
+    x.value = [1.0, 2.0]
+    @test evaluate(atom) ≈ exp.([1.0, 2.0])
     return
 end
 
@@ -596,6 +623,10 @@ function test_LogAtom()
         ),
         log(im * Variable()),
     )
+    x = Variable(2)
+    atom = log(x)
+    x.value = [1.0, 2.0]
+    @test evaluate(atom) ≈ log.([1.0, 2.0])
     return
 end
 
