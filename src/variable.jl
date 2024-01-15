@@ -102,9 +102,10 @@ sign!(x::AbstractVariable, s::Sign) = x.sign = s
 Returns the current value of `x` if assigned; errors otherwise.
 """
 function evaluate(x::AbstractVariable)
-    return _value(x) === nothing ?
-           error("Value of the variable is yet to be calculated") :
-           output(_value(x))
+    if _value(x) === nothing
+        error("Value of the variable is yet to be calculated")
+    end
+    return output(copy(_value(x)))
 end
 
 """
@@ -112,7 +113,7 @@ end
 
 Raw access to the current value of `x`; used internally by Convex.jl.
 """
-_value(x::AbstractVariable) = copy(x.value)
+_value(x::AbstractVariable) = x.value
 
 """
     set_value!(x::AbstractVariable, v)
