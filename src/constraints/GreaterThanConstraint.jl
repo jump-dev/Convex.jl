@@ -66,12 +66,6 @@ Base.:>=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
 
 Base.:>=(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
 
-Base.:>(lhs::AbstractExpr, rhs::AbstractExpr) = GreaterThanConstraint(lhs, rhs)
-
-Base.:>(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
-
-Base.:>(lhs::Value, rhs::AbstractExpr) = >=(constant(lhs), rhs)
-
 function populate_dual!(model::MOI.ModelLike, c::GreaterThanConstraint, indices)
     ret = MOI.get(model, MOI.ConstraintDual(), indices)
     c.dual = output(reshape(ret, c.size))

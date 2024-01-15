@@ -223,8 +223,8 @@ end
     x = Variable(4)
     p = minimize(
         sum(invpos(x)),
-        invpos(x) < 2,
-        x > 1,
+        invpos(x) <= 2,
+        x >= 1,
         x == 2,
         2 == x;
         numeric_type = T,
@@ -275,14 +275,14 @@ end
     if test
         @test problem_vexity(p) == ConcaveVexity()
     end
-    p = maximize(geomean(x, y), 1 < x, x < 2, y < 2; numeric_type = T)
+    p = maximize(geomean(x, y), 1 <= x, x <= 2, y <= 2; numeric_type = T)
 
     # Just gave it a vector as an objective, not okay
     if test
         @test_throws Exception handle_problem!(p)
     end
 
-    p = maximize(sum(geomean(x, y)), 1 < x, x < 2, y < 2; numeric_type = T)
+    p = maximize(sum(geomean(x, y)), 1 <= x, x <= 2, y <= 2; numeric_type = T)
 
     handle_problem!(p)
     if test
@@ -294,10 +294,10 @@ end
     z = Variable(2)
     p = maximize(
         sum(geomean(x, y, z)),
-        1 < x,
-        x < 2,
-        y < 2,
-        z < 2;
+        1 <= x,
+        x <= 2,
+        y <= 2,
+        z <= 2;
         numeric_type = T,
     )
     handle_problem!(p)
@@ -308,9 +308,9 @@ end
 
     p = maximize(
         sum(geomean(x, y, 4 * ones(2))),
-        1 < x,
-        x < 2,
-        y < 2;
+        1 <= x,
+        x <= 2,
+        y <= 2;
         numeric_type = T,
     )
     handle_problem!(p)

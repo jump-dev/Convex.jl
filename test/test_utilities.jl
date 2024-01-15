@@ -557,7 +557,7 @@ function test_add_constraints!_issue_380()
     x = Variable(3, 3)
     p = minimize(norm_1(x))
     y = randn(3, 3)
-    c = (norm2(x - y) < 1)
+    c = (norm2(x - y) <= 1)
     @test length(p.constraints) == 0
     add_constraint!(p, c)
     @test length(p.constraints) == 1
@@ -568,7 +568,7 @@ function test_add_constraints!_issue_380()
     add_constraint!(p, [c])
     @test length(p.constraints) == 1
     empty!(p.constraints)
-    c2 = (norm2(x - rand(3, 3)) < 3)
+    c2 = (norm2(x - rand(3, 3)) <= 3)
     add_constraints!(p, [c, c2])
     @test length(p.constraints) == 2
     return
@@ -933,6 +933,19 @@ function test_write_to_file()
     @test occursin("ExponentialCone", read(filename, String))
     p_int = minimize(logsumexp(x); numeric_type = Int)
     @test_throws MethodError write_to_file(p_int, filename)
+    return
+end
+
+function test_strict_inequality_deprecation()
+    x = Variable()
+    @test_logs (:warn,) x < 1
+    @test_logs (:warn,) 1 < x
+    @test_logs (:warn,) x < x
+    @test_logs (:warn,) x > 1
+    @test_logs (:warn,) 1 > x
+    @test_logs (:warn,) x > x
+    @test string(x < 1) == string(x <= 1)
+    @test string(x > 1) == string(x >= 1)
     return
 end
 
