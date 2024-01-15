@@ -1,16 +1,19 @@
+_to_expr(x::AbstractExpr) = x
+_to_expr(x::Value) = constant(x)
+
 mutable struct GeoMeanAtom <: AbstractExpr
-    children::NTuple{N,AbstractExpr} where {N}
+    children::Vector{AbstractExpr}
     size::Tuple{Int,Int}
 
     function GeoMeanAtom(args::AbstractExprOrValue...)
-        args = Tuple(arg isa Value ? constant(arg) : arg for arg in args)
-        sz = size(first(args))
-        if any(!=(sz), size.(args))
-            error("geo mean must take arguments of the same size")
-        elseif any(x -> sign(x) == ComplexSign(), args)
-            error("The arguments should be real, not complex")
+        new_args = AbstractExpr[_to_expr(arg) for arg in args]
+        sz = size(first(new_args))
+        if any(!=(sz), size.(new_args))
+            error("[GeoMeanAtom] geomean must take arguments of the same size")
+        elseif any(x -> sign(x) == ComplexSign(), new_args)
+            error("[GeoMeanAtom] the arguments must be real, not complex")
         end
-        return new(args, sz)
+        return new(new_args, sz)
     end
 end
 
@@ -19,19 +22,14 @@ head(io::IO, ::GeoMeanAtom) = print(io, "geomean")
 Base.sign(::GeoMeanAtom) = Positive()
 
 function monotonicity(q::GeoMeanAtom)
-    return fill(Nondecreasing(), length(q.children))
+    return ntuple(_ -> Nondecreasing(), length(q.children))
 end
 
 curvature(::GeoMeanAtom) = ConcaveVexity()
 
 _geomean(scalar_args...) = prod(scalar_args)^(1 / length(scalar_args))
 
-function evaluate(q::GeoMeanAtom)
-    n = length(q.children)
-    children = evaluate.(q.children)
-    c1 = first(children)
-    return [_geomean((children[i][I] for i in 1:n)...) for I in eachindex(c1)]
-end
+evaluate(q::GeoMeanAtom) = _geomean.(evaluate.(q.children)...)
 
 function new_conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
     n = length(q.children)

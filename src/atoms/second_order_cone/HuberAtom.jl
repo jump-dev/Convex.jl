@@ -5,9 +5,9 @@ mutable struct HuberAtom <: AbstractExpr
 
     function HuberAtom(x::AbstractExpr, M::Real)
         if sign(x) == ComplexSign()
-            error("Argument must be real")
+            error("[HuberAtom] argument must be real")
         elseif M <= 0
-            error("Huber parameter must by a positive scalar")
+            error("[HuberAtom] parameter must by a positive scalar. Got `M=$M`")
         end
         return new((x,), x.size, M)
     end
@@ -38,7 +38,6 @@ function new_conic_form!(context::Context, x::HuberAtom)
     s = Variable(c.size)
     n = Variable(c.size)
     add_constraint!(context, c == s + n)
-    # objective given by s.^2 + 2 * M * |n|
     return conic_form!(context, square(s) + 2 * x.M * abs(n))
 end
 

@@ -112,7 +112,7 @@ end
 
 Raw access to the current value of `x`; used internally by Convex.jl.
 """
-_value(x::AbstractVariable) = x.value
+_value(x::AbstractVariable) = copy(x.value)
 
 """
     set_value!(x::AbstractVariable, v)
