@@ -4,7 +4,7 @@ mutable struct MinimumAtom <: AbstractExpr
 
     function MinimumAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
-            error("Argument should be real instead it is $(sign(x))")
+            error("[MinimumAtom] argument should be real instead it is $(sign(x))")
         end
         return new((x,), (1, 1))
     end

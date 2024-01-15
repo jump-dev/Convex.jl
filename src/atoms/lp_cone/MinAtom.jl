@@ -5,7 +5,7 @@ mutable struct MinAtom <: AbstractExpr
     function MinAtom(x::AbstractExpr, y::AbstractExpr)
         if sign(x) == ComplexSign() || sign(y) == ComplexSign()
             error(
-                "Both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
+                "[MinAtom] both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
             )
         end
         sz = if x.size == y.size
@@ -15,7 +15,9 @@ mutable struct MinAtom <: AbstractExpr
         elseif y.size == (1, 1)
             x.size
         else
-            error("Got different sizes for x as $(x.size) and y as $(y.size)")
+            error(
+                "[MinAtom] got different sizes for x as $(x.size) and y as $(y.size)",
+            )
         end
         return new((x, y), sz)
     end
@@ -42,9 +44,12 @@ curvature(::MinAtom) = ConcaveVexity()
 evaluate(x::MinAtom) = min.(evaluate(x.children[1]), evaluate(x.children[2]))
 
 function new_conic_form!(context::Context, x::MinAtom)
-    t = Variable(x.size[1], x.size[2])
-    p = maximize(t, (t <= child for child in x.children)...)
-    return conic_form!(context, p)
+    t = Variable(x.size)
+    t_obj = conic_form!(context, t)
+    for child in x.children
+        add_constraint!(context, t <= child)
+    end
+    return t_obj
 end
 
 Base.min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)

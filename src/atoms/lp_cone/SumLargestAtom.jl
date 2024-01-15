@@ -5,13 +5,17 @@ mutable struct SumLargestAtom <: AbstractExpr
 
     function SumLargestAtom(x::AbstractExpr, k::Int)
         if sign(x) == ComplexSign()
-            error("Argument should be real instead it is $(sign(x))")
+            error(
+                "[SumLargestAtom] argument should be real instead it is $(sign(x))",
+            )
         elseif k <= 0
             error(
-                "sumlargest and sumsmallest only support positive values of k",
+                "[SumLargestAtom] sumlargest and sumsmallest only support positive values of k",
             )
         elseif k > length(x)
-            error("k cannot be larger than the number of entries in x")
+            error(
+                "[SumLargestAtom] k cannot be larger than the number of entries in x",
+            )
         end
         return new((x,), (1, 1), k)
     end
