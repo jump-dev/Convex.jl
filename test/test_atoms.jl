@@ -984,6 +984,125 @@ function test_SumLargestAtom()
     return
 end
 
+### EigMaxAtom
+
+function test_EigMaxAtom()
+    target = """
+    variables: t, x11, x21, x12, x22
+    minobjective: 1.0 * t
+    [1.0 * t + -1.0 * x11, -1.0*x21, -1.0*x12, 1.0 * t + -1.0 * x22] in PositiveSemidefiniteConeSquare(2)
+    """
+    _test_atom(target) do context
+        return eigmax(Variable(2, 2))
+    end
+    @test_throws(
+        ErrorException(
+            "[EigMaxAtom] eigmax can only be applied to a square matrix.",
+        ),
+        eigmax(Variable(2, 3)),
+    )
+    return
+end
+
+### EigMinAtom
+
+function test_EigMinAtom()
+    target = """
+    variables: x11, x21, x12, x22, t
+    minobjective: 1.0 * t
+    [-1.0 * t + 1.0 * x11, 1.0*x21, 1.0*x12, -1.0 * t + 1.0 * x22] in PositiveSemidefiniteConeSquare(2)
+    """
+    _test_atom(target) do context
+        return eigmin(Variable(2, 2))
+    end
+    @test_throws(
+        ErrorException(
+            "[EigMinAtom] eigmin can only be applied to a square matrix.",
+        ),
+        eigmin(Variable(2, 3)),
+    )
+    return
+end
+
+### MatrixFracAtom
+
+function test_MatrixFracAtom()
+    target = """
+    variables: x1, x2, t, P11, P21, P12, P22
+    minobjective: 1.0 * t
+    [1.0 * x1, 1.0 * x2] in Nonnegatives(2)
+    [1.0*t, 1.0*x1, 1.0*x2, 1.0*x1, 1.0*P11, 1.0*P21, 1.0*x2, 1.0*P12, 1.0*P22] in PositiveSemidefiniteConeSquare(3)
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        add_constraint!(context, x >= 0)
+        return matrixfrac(x, Variable(2, 2))
+    end
+    target = """
+    variables: t, P11, P21, P12, P22
+    minobjective: 1.0 * t
+    [1.0*t, 1.0, 2.0, 1.0, 1.0*P11, 1.0*P21, 2.0, 1.0*P12, 1.0*P22] in PositiveSemidefiniteConeSquare(3)
+    """
+    _test_atom(target) do context
+        return matrixfrac([1, 2], Variable(2, 2))
+    end
+    target = """
+    variables: t, x1, x2
+    minobjective: 1.0 * t
+    [1.0*t, 1.0*x1, 1.0*x2, 1.0*x1, 2.0, 0.0, 1.0*x2, 0.0, 3.0] in PositiveSemidefiniteConeSquare(3)
+    """
+    _test_atom(target) do context
+        return matrixfrac(Variable(2), [2 0; 0 3])
+    end
+    @test_throws(
+        ErrorException(
+            "[MatrixFracAtom] first argument of matrixfrac must be a vector",
+        ),
+        matrixfrac(Variable(2, 2), Variable(2, 2)),
+    )
+    @test_throws(
+        ErrorException(
+            "[MatrixFracAtom] second argument of matrixfrac must be square",
+        ),
+        matrixfrac(Variable(2), Variable(2, 3)),
+    )
+    @test_throws(
+        ErrorException(
+            "[MatrixFracAtom] sizes must agree for arguments of matrixfrac",
+        ),
+        matrixfrac(Variable(2), Variable(3, 3)),
+    )
+    return
+end
+
+### NuclearNormAtom
+
+# TODO
+
+### OperatorNormAtom
+
+# TODO
+
+### QuantumEntropyAtom
+
+# TODO
+
+### QuantumRelativeEntropyAtom
+
+# TODO
+
+### SumLargestEigsAtom
+
+# TODO
+
+### TraceLogmAtom
+
+# TODO
+
+### TraceMpowerAtom
+
+# TODO
+
 ### second_order_cone/EuclideanNormAtom
 
 function test_EuclideanNormAtom()

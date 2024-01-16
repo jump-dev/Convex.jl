@@ -4,7 +4,7 @@ mutable struct EigMaxAtom <: AbstractExpr
 
     function EigMaxAtom(x::AbstractExpr)
         if size(x, 1) != size(x, 2)
-            error("eigmax can only be applied to a square matrix.")
+            error("[EigMaxAtom] eigmax can only be applied to a square matrix.")
         end
         return new((x,), (1, 1))
     end
@@ -24,15 +24,10 @@ end
 
 LinearAlgebra.eigmax(x::AbstractExpr) = EigMaxAtom(x)
 
-# Create the equivalent conic problem:
-#   minimize t
-#   subject to
-#            tI - A is positive semidefinite
-#            A      is positive semidefinite
 function new_conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
-    A = x.children[1]
+    A = only(x.children)
     m, n = size(A)
     t = Variable()
-    p = minimize(t, t * Matrix(one(T) * LinearAlgebra.I, n, n) - A ⪰ 0)
-    return conic_form!(context, p)
+    add_constraint!(context, t * LinearAlgebra.I(n) - A ⪰ 0)
+    return conic_form!(context, t)
 end
