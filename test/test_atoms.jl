@@ -771,7 +771,7 @@ function test_DotSortAtom()
     target = """
     variables: v1, v2, u1, u2, x1, x2
     minobjective: 1.0 * u1 + u2 + v1 + v2
-    [v1 + u1, v1 + u2, v2 + u1 + -1.0*x1, v2 + u2 + -1.0*x2] in Nonnegatives(4)
+    [v1+u1, v1+u2, v2+u1+-1.0*x1, v2+u2+-1.0*x2] in Nonnegatives(4)
     """
     _test_atom(target) do context
         return dotsort(Variable(2), [0, 1])
@@ -779,7 +779,7 @@ function test_DotSortAtom()
     target = """
     variables: v1, v2, u1, u2, x1, x2
     minobjective: 1.0 * u1 + u2 + v1 + v2
-    [v1 + u1 + 2.0*x1, v1 + u2 +2.0*x2, v2 + u1 + -3.0*x1, v2 + u2 + -3.0*x2] in Nonnegatives(4)
+    [v1+u1+2.0*x1, v1+u2+2.0*x2, v2+u1+-3.0*x1, v2+u2+-3.0*x2] in Nonnegatives(4)
     """
     _test_atom(target) do context
         return dotsort(Variable(2), [-2, 3])
@@ -787,7 +787,7 @@ function test_DotSortAtom()
     target = """
     variables: v1, v2, u1, u2, x1, x2
     minobjective: 1.0 * u1 + u2 + v1 + v2
-    [v1 + u1 + 2.0*x1, v1 + u2 +2.0*x2, v2 + u1 + 3.0*x1, v2 + u2 + 3.0*x2] in Nonnegatives(4)
+    [v1+u1+2.0*x1, v1+u2+2.0*x2, v2+u1+3.0*x1, v2+u2+3.0*x2] in Nonnegatives(4)
     """
     _test_atom(target) do context
         return dotsort(Variable(2), [-2, -3])
