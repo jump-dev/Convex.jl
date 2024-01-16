@@ -20,21 +20,20 @@ end
 head(io::IO, ::DotSortAtom) = print(io, "dotsort")
 
 function Base.sign(x::DotSortAtom)
-    if all(x.w .>= 0)
+    if all(>=(0), x.w)
         return sign(x.children[1])
-    elseif all(x.w .<= 0)
-        # FIXME: shouldn't this be -sign?
-        return sign(x.children[1])
-    else
-        return NoSign()
+    elseif all(<=(0), x.w)
+        return -sign(x.children[1])
     end
+    return NoSign()
 end
 
 function monotonicity(x::DotSortAtom)
-    if all(x.w .>= 0)
+    if all(>=(0), x.w)
         return (Nondecreasing(),)
+    elseif all(<=(0), x.w)
+        return (Nonincreasing(),)
     end
-    # FIXME: if all(x.w .<= 0) isn't it (Nonincreasing(),)?
     return (NoMonotonicity(),)
 end
 

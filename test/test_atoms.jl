@@ -811,6 +811,17 @@ function test_DotSortAtom()
     atom = dotsort(x, [1 2; 0 0])
     x.value = [1.5, 2.5, 3.0, 2.0]
     @test evaluate(atom) ≈ 8.5
+    x = Variable(2)
+    atom = dotsort(square(x), [1, 2])
+    @test curvature(atom) == Convex.ConvexVexity()
+    @test sign(atom) == Convex.Positive()
+    @test monotonicity(atom) == (Convex.Nondecreasing(),)
+    atom = dotsort(square(x), [-1, -2])
+    @test sign(atom) == Convex.Negative()
+    @test monotonicity(atom) == (Convex.Nonincreasing(),)
+    atom = dotsort(square(x), [-1, 2])
+    @test sign(atom) == Convex.NoSign()
+    @test monotonicity(atom) == (Convex.NoMonotonicity(),)
     return
 end
 
