@@ -794,11 +794,13 @@ function test_DotSortAtom()
     end
     x = im * Variable(2)
     @test_throws(
-        "[DotSortAtom] argument should be real instead it is $(sign(x))",
+        ErrorException(
+            "[DotSortAtom] argument should be real instead it is $(sign(x))",
+        ),
         dotsort(x, [0, 1]),
     )
     @test_throws(
-        "[DotSortAtom] x and w must be the same size",
+        ErrorException("[DotSortAtom] x and w must be the same size"),
         dotsort(Variable(2), [0, 1, 2]),
     )
     x = Variable(2, 2)
