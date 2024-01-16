@@ -3,8 +3,10 @@ mutable struct QuadOverLinAtom <: AbstractExpr
     size::Tuple{Int,Int}
 
     function QuadOverLinAtom(x::AbstractExpr, y::AbstractExpr)
-        if x.size[2] != 1 && y.size != (1, 1)
-            error("quad over lin arguments must be a vector and a scalar")
+        if x.size[2] != 1 || y.size != (1, 1)
+            error(
+                "[QuadOverLinAtom] quadoverlin arguments must be a vector and a scalar",
+            )
         end
         return new((x, y), (1, 1))
     end

@@ -1046,7 +1046,6 @@ function test_GeoMeanAtom()
     return
 end
 
-
 ### second_order_cone/HuberAtom
 
 function test_HuberAtom()
@@ -1082,11 +1081,115 @@ end
 
 ### second_order_cone/QolElemAtom
 
-# TODO
+function test_QolElemAtom()
+    target = """
+    variables: y1, y2, t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * y1, 1.0 * y2] in Nonnegatives(2)
+    [1.0 * y1 + 1.0 * t1, 1.0 * y1 + -1.0 * t1, 2.0 * x1] in SecondOrderCone(3)
+    [1.0 * y2 + 1.0 * t2, 1.0 * y2 + -1.0 * t2, 2.0 * x2] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return qol_elementwise(Variable(2), Variable(2))
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 + 1.0 * t1, 1.0 + -1.0 * t1, 2.0 * x1] in SecondOrderCone(3)
+    [1.0 + 1.0 * t2, 1.0 + -1.0 * t2, 2.0 * x2] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return qol_elementwise(Variable(2), constant([1, 1]))
+    end
+    _test_atom(target) do context
+        return square(Variable(2))
+    end
+    _test_atom(target) do context
+        return Variable(2) .^ 2
+    end
+    _test_atom(target) do context
+        a = 2
+        return Variable(2) .^ a
+    end
+    target = """
+    variables: y1, y2, t1, t2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * y1, 1.0 * y2] in Nonnegatives(2)
+    [1.0 * y1 + 1.0 * t1, 1.0 * y1 + -1.0 * t1, 2.0] in SecondOrderCone(3)
+    [1.0 * y2 + 1.0 * t2, 1.0 * y2 + -1.0 * t2, 2.0] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return invpos(Variable(2))
+    end
+    _test_atom(target) do context
+        return 1 ./ Variable(2)
+    end
+    target = """
+    variables: y, t
+    minobjective: 3.0 * t
+    [1.0 * y] in Nonnegatives(1)
+    [1.0 * y + 1.0 * t, 1.0 * y + -1.0 * t, 2.0] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return 3 / Variable()
+    end
+    y = Variable(2)
+    @test_throws(
+        ErrorException("cannot divide by a variable of size $(size(y))"),
+        1 / y,
+    )
+
+    @test_throws(
+        ErrorException(
+            "square of a complex number is not DCP. Did you mean square_modulus?",
+        ),
+        square(im * Variable()),
+    )
+    @test_throws(
+        ErrorException(
+            "raising variables to powers other than 2 is not implemented",
+        ),
+        Variable() .^ 3,
+    )
+    @test_throws(
+        ErrorException(
+            "[QolElemAtom] elementwise quad over lin must take two arguments of the same size",
+        ),
+        qol_elementwise(Variable(2), Variable())
+    )
+    x = Variable(2)
+    x.value = [2.0, 3.0]
+    y = Variable(2)
+    y.value = [4.0, 5.0]
+    atom = qol_elementwise(x, y)
+    @test evaluate(atom) ≈ [1.0, 9.0 / 5.0]
+    return
+end
 
 ### second_order_cone/QuadOverLinAtom
 
-# TODO
+function test_QuadOverLinAtom()
+    target = """
+    variables: y, t, x1, x2
+    minobjective: 1.0 * t
+    [1.0 * y] in Nonnegatives(1)
+    [1.0 * y + 1.0 * t, 1.0 * y + -1.0 * t, 2.0 * x1, 2.0 * x2] in SecondOrderCone(4)
+    """
+    _test_atom(target) do context
+        return quadoverlin(Variable(2), Variable())
+    end
+    @test_throws(
+        ErrorException(
+            "[QuadOverLinAtom] quadoverlin arguments must be a vector and a scalar",
+        ),
+        quadoverlin(Variable(2), Variable(2))
+    )
+    x = Variable(2)
+    x.value = [2.0, 3.0]
+    atom = quadoverlin(x, constant(2.0))
+    @test evaluate(atom) ≈ 13 / 2
+    return
+end
 
 ### second_order_cone/RationalNormAtom
 

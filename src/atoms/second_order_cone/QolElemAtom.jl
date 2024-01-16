@@ -5,7 +5,7 @@ mutable struct QolElemAtom <: AbstractExpr
     function QolElemAtom(x::AbstractExpr, y::AbstractExpr)
         if x.size != y.size
             error(
-                "elementwise quad over lin must take two arguments of the same size",
+                "[QolElemAtom] elementwise quad over lin must take two arguments of the same size",
             )
         end
         return new((x, y), x.size)
@@ -27,39 +27,32 @@ function evaluate(q::QolElemAtom)
 end
 
 function new_conic_form!(context::Context{T}, q::QolElemAtom) where {T}
-    sz = q.children[1].size
-    t = Variable(sz[1], sz[2])
-    t_obj = conic_form!(context, t)
     x, y = q.children
-    for i in 1:length(q.children[1])
+    t = Variable(x.size)
+    for i in 1:length(x)
         add_constraint!(
             context,
             SecondOrderConeConstraint(y[i] + t[i], y[i] - t[i], 2 * x[i]),
         )
     end
     add_constraint!(context, y >= 0)
-    return t_obj
+    return conic_form!(context, t)
 end
 
 qol_elementwise(x::AbstractExpr, y::AbstractExpr) = QolElemAtom(x, y)
 
-function Base.Broadcast.broadcasted(::typeof(^), x::AbstractExpr, k::Int)
-    if k != 2
-        error("raising variables to powers other than 2 is not implemented")
+function square(x::AbstractExpr)
+    if sign(x) == ComplexSign()
+        error(
+            "square of a complex number is not DCP. Did you mean square_modulus?",
+        )
     end
-    return QolElemAtom(x, constant(ones(x.size[1], x.size[2])))
+    return QolElemAtom(x, constant(ones(x.size)))
 end
 
-function Base.Broadcast.broadcasted(
-    ::typeof(Base.literal_pow),
-    ::typeof(^),
-    x::AbstractExpr,
-    ::Val{k},
-) where {k}
-    return Base.Broadcast.broadcasted(^, x, k)
-end
+sumsquares(x::AbstractExpr) = square(norm2(x))
 
-invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size[1], x.size[2])), x)
+invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size)), x)
 
 function Base.Broadcast.broadcasted(::typeof(/), x::Value, y::AbstractExpr)
     return dotmultiply(constant(x), invpos(y))
@@ -72,13 +65,18 @@ function Base.:/(x::Value, y::AbstractExpr)
     return MultiplyAtom(constant(x), invpos(y))
 end
 
-sumsquares(x::AbstractExpr) = square(norm2(x))
-
-function square(x::AbstractExpr)
-    if sign(x) == ComplexSign()
-        error(
-            "Square of complex number is not DCP. Did you mean square_modulus?",
-        )
+function Base.Broadcast.broadcasted(::typeof(^), x::AbstractExpr, k::Int)
+    if k != 2
+        error("raising variables to powers other than 2 is not implemented")
     end
-    return QolElemAtom(x, constant(ones(x.size[1], x.size[2])))
+    return square(x)
+end
+
+function Base.Broadcast.broadcasted(
+    ::typeof(Base.literal_pow),
+    ::typeof(^),
+    x::AbstractExpr,
+    ::Val{k},
+) where {k}
+    return Base.Broadcast.broadcasted(^, x, k)
 end
