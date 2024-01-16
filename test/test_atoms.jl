@@ -984,6 +984,213 @@ function test_SumLargestAtom()
     return
 end
 
+### second_order_cone/EuclideanNormAtom
+
+function test_EuclideanNormAtom()
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t, 1.0 * x, 1.0 * y] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return norm2(Variable(2))
+    end
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t, 1.0 * x, 2.0 * x] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return norm2((1 + 2im) * x)
+    end
+    return
+end
+
+### second_order_cone/GeoMeanAtom
+
+function test_GeoMeanAtom()
+    target = """
+    variables: t, x, y
+    minobjective: 1.0 * t
+    [1.0 * t, 1.0 * x, 1.0 * y] in GeometricMeanCone(3)
+    """
+    _test_atom(target) do context
+        return geomean(Variable(), Variable())
+    end
+    target = """
+    variables: t1, t2, x1, x2, y1, y2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * t1, 1.0 * x1, 1.0 * y1] in GeometricMeanCone(3)
+    [1.0 * t2, 1.0 * x2, 1.0 * y2] in GeometricMeanCone(3)
+    """
+    _test_atom(target) do context
+        return geomean(Variable(2), Variable(2))
+    end
+    @test_throws(
+        ErrorException(
+            "[GeoMeanAtom] geomean must take arguments of the same size",
+        ),
+        geomean(Variable(2), Variable(3)),
+    )
+    @test_throws(
+        ErrorException("[GeoMeanAtom] the arguments must be real, not complex"),
+        geomean(Variable(), 2im),
+    )
+    x = Variable(2)
+    x.value = [2.0, 3.0]
+    y = Variable(2)
+    y.value = [4.0, 5.0]
+    atom = geomean(x, y)
+    @test evaluate(atom) ≈ [sqrt(8), sqrt(15)]
+    return
+end
+
+### second_order_cone/HuberAtom
+
+function test_HuberAtom()
+    target = """
+    variables: c, s, n, t, n_abs
+    minobjective: 1.0 * t + 4.0 * n_abs
+    [1.0 * c + -1.0 * s + -1.0 * n] in Zeros(1)
+    [-1.0 * n + 1.0 * n_abs] in Nonnegatives(1)
+    [1.0 * n + 1.0 * n_abs] in Nonnegatives(1)
+    [1.0 + 1.0 * t, 1.0 + -1.0 * t, 2.0 * s] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return huber(Variable(), 2.0)
+    end
+    @test_throws(
+        ErrorException(
+            "[HuberAtom] parameter must by a positive scalar. Got `M=-2.0`",
+        ),
+        huber(Variable(2), -2.0),
+    )
+    @test_throws(
+        ErrorException("[HuberAtom] argument must be real"),
+        huber(im * Variable(2)),
+    )
+    x = Variable(2)
+    x.value = [2.0, 3.0]
+    atom = huber(x, 2.0)
+    @test evaluate(atom) ≈ [4.0, 8.0]
+    atom = huber(x)
+    @test evaluate(atom) ≈ [3.0, 5.0]
+    return
+end
+
+### second_order_cone/QolElemAtom
+
+function test_QolElemAtom()
+    target = """
+    variables: y1, y2, t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * y1, 1.0 * y2] in Nonnegatives(2)
+    [1.0 * y1 + 1.0 * t1, 1.0 * y1 + -1.0 * t1, 2.0 * x1] in SecondOrderCone(3)
+    [1.0 * y2 + 1.0 * t2, 1.0 * y2 + -1.0 * t2, 2.0 * x2] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return qol_elementwise(Variable(2), Variable(2))
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 + 1.0 * t1, 1.0 + -1.0 * t1, 2.0 * x1] in SecondOrderCone(3)
+    [1.0 + 1.0 * t2, 1.0 + -1.0 * t2, 2.0 * x2] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return qol_elementwise(Variable(2), constant([1, 1]))
+    end
+    _test_atom(target) do context
+        return square(Variable(2))
+    end
+    _test_atom(target) do context
+        return Variable(2) .^ 2
+    end
+    _test_atom(target) do context
+        a = 2
+        return Variable(2) .^ a
+    end
+    target = """
+    variables: y1, y2, t1, t2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * y1, 1.0 * y2] in Nonnegatives(2)
+    [1.0 * y1 + 1.0 * t1, 1.0 * y1 + -1.0 * t1, 2.0] in SecondOrderCone(3)
+    [1.0 * y2 + 1.0 * t2, 1.0 * y2 + -1.0 * t2, 2.0] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return invpos(Variable(2))
+    end
+    _test_atom(target) do context
+        return 1 ./ Variable(2)
+    end
+    target = """
+    variables: y, t
+    minobjective: 3.0 * t
+    [1.0 * y] in Nonnegatives(1)
+    [1.0 * y + 1.0 * t, 1.0 * y + -1.0 * t, 2.0] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        return 3 / Variable()
+    end
+    y = Variable(2)
+    @test_throws(
+        ErrorException("cannot divide by a variable of size $(size(y))"),
+        1 / y,
+    )
+
+    @test_throws(
+        ErrorException(
+            "square of a complex number is not DCP. Did you mean square_modulus?",
+        ),
+        square(im * Variable()),
+    )
+    @test_throws(
+        ErrorException(
+            "raising variables to powers other than 2 is not implemented",
+        ),
+        Variable() .^ 3,
+    )
+    @test_throws(
+        ErrorException(
+            "[QolElemAtom] elementwise quad over lin must take two arguments of the same size",
+        ),
+        qol_elementwise(Variable(2), Variable())
+    )
+    x = Variable(2)
+    x.value = [2.0, 3.0]
+    y = Variable(2)
+    y.value = [4.0, 5.0]
+    atom = qol_elementwise(x, y)
+    @test evaluate(atom) ≈ [1.0, 9.0 / 5.0]
+    return
+end
+
+### second_order_cone/QuadOverLinAtom
+
+function test_QuadOverLinAtom()
+    target = """
+    variables: y, t, x1, x2
+    minobjective: 1.0 * t
+    [1.0 * y] in Nonnegatives(1)
+    [1.0 * y + 1.0 * t, 1.0 * y + -1.0 * t, 2.0 * x1, 2.0 * x2] in SecondOrderCone(4)
+    """
+    _test_atom(target) do context
+        return quadoverlin(Variable(2), Variable())
+    end
+    @test_throws(
+        ErrorException(
+            "[QuadOverLinAtom] quadoverlin arguments must be a vector and a scalar",
+        ),
+        quadoverlin(Variable(2), Variable(2))
+    )
+    x = Variable(2)
+    x.value = [2.0, 3.0]
+    atom = quadoverlin(x, constant(2.0))
+    @test evaluate(atom) ≈ 13 / 2
+    return
+end
+
 ### second_order_cone/RationalNormAtom
 
 function test_RationalNormAtom()
