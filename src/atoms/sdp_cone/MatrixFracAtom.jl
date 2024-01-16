@@ -4,11 +4,17 @@ mutable struct MatrixFracAtom <: AbstractExpr
 
     function MatrixFracAtom(x::AbstractExpr, P::AbstractExpr)
         if x.size[2] != 1
-            error("first argument of matrix frac must be a vector")
+            error(
+                "[MatrixFracAtom] first argument of matrixfrac must be a vector",
+            )
         elseif P.size[1] != P.size[2]
-            error("second argument of matrix frac must be square")
+            error(
+                "[MatrixFracAtom] second argument of matrixfrac must be square",
+            )
         elseif x.size[1] != P.size[1]
-            error("sizes must agree for arguments of matrix frac")
+            error(
+                "[MatrixFracAtom] sizes must agree for arguments of matrixfrac",
+            )
         end
         return new((x, P), (1, 1))
     end
@@ -24,7 +30,7 @@ curvature(::MatrixFracAtom) = ConvexVexity()
 
 function evaluate(m::MatrixFracAtom)
     x = evaluate(m.children[1])
-    return x' * inv(evaluate(m.children[2])) * x
+    return x' * (evaluate(m.children[2]) \ x)
 end
 
 matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
@@ -38,6 +44,6 @@ function new_conic_form!(context::Context, m::MatrixFracAtom)
     t = Variable()
     # the matrix [t x'; x P] has Schur complement t - x'*P^{-1}*x
     # this matrix is PSD <=> t >= x'*P^{-1}*x
-    p = minimize(t, [t x'; x P] ⪰ 0)
-    return conic_form!(context, p)
+    add_constraint!(context, [t x'; x P] ⪰ 0)
+    return conic_form!(context, t)
 end
