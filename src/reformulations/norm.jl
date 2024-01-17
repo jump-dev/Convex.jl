@@ -1,5 +1,5 @@
 """
-    norm(x::AbstractExpr, p::Real=2)
+    norm(x::AbstractExpr, p::Real = 2)
 
 Computes the `p`-norm `‖x‖ₚ = (∑ᵢ |xᵢ|^p)^(1/p)` of a vector expression `x`.
 

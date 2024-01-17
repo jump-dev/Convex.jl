@@ -594,11 +594,11 @@ end
 function _test_is_psd(T)
     A = zeros(T, 3, 3)
     A[1, 1] = one(T)
-    @test Convex.is_psd(A)
-    @test Convex.is_psd(SparseArrays.sparse(A))
+    @test Convex._is_psd(A)
+    @test Convex._is_psd(SparseArrays.sparse(A))
     B = A .- one(T) / T(5000)
-    @test !Convex.is_psd(B)
-    @test !Convex.is_psd(SparseArrays.sparse(B))
+    @test !Convex._is_psd(B)
+    @test !Convex._is_psd(SparseArrays.sparse(B))
 
     # See https://github.com/jump-dev/Convex.jl/issues/452 for details
     C = [
@@ -641,8 +641,8 @@ function _test_is_psd(T)
         0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -70.12718378756115 0.0 -103.46633673574595 277.05985725905305 -103.46633673574595
         0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 -103.46633673574595 103.46633673574595
     ]
-    @test Convex.is_psd(C)
-    @test Convex.is_psd(SparseArrays.sparse(C))
+    @test Convex._is_psd(C)
+    @test Convex._is_psd(SparseArrays.sparse(C))
     return
 end
 

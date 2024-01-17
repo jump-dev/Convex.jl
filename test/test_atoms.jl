@@ -3,6 +3,9 @@ module TestAtoms
 using Convex
 using Test
 
+# Do not use `using LinearAlgebra` to check symbols are re-exported by Convex.
+import LinearAlgebra
+
 import MathOptInterface as MOI
 
 function runtests()
@@ -28,7 +31,30 @@ _to_moi(x::Convex.SparseTape) = _to_moi(Convex.to_vaf(x))
 _to_moi(v::MOI.AbstractScalarFunction) = v
 
 """
-    _test_atom(f, target_string::String; value_type = Float64)
+    _test_atom(build_fn::Function, target_string::String; value_type = Float64)
+
+The same arguments and behavior as `_test_reformulation`, but in addition, tests
+a number of properties that all atoms must satisfy.
+
+ 1. the atom is a subtype of `AbstractExpr`
+ 2. the atom is mutable
+ 3. `Convex.head` is implemented and prints a string
+ 4. `Base.sign` is implemented and returns a `Convex.Sign` object
+ 5. `Covnex.monotonicity` is implemented and returns a tuple of
+    `Convex.Monotonicity` objects, with one element for each child
+ 6. `Convex.curvature` is implemented and returns a `Convex.Vexity` object
+
+ ## Example
+
+ ```julia
+ target = \"\"\"
+ variables: x
+ minobjective: 1.0 + 1.0 * x
+ \"\"\"
+ _test_atom(target) do context
+     return Variable() + 1
+ end
+ ```
 """
 function _test_atom(build_fn, target_string::String; value_type = Float64)
     context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
@@ -42,6 +68,49 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     N = length(atom.children)
     @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
+    _test_reformulation(build_fn, target_string; value_type)
+    return
+end
+
+"""
+    _test_reformulation(
+        build_fn::Function,
+        target_string::String;
+        value_type = Float64,
+    )
+
+Test the reformulation constructed by `build_fn(::Convex.Context)` produces an
+optimization problem given by `target_string` when the result returned by
+`build_fn` is set as the objective function.
+
+## Arguments
+
+ * `build_fn`: a function called with a new `context::Convex.Context` object
+   that returns an expression for the objective and may optionally modify
+   `context` as well.
+ * `target_string`: the string representation of the model as needed by
+   `MOI.Utilities.loadfromstring!`.
+ * `value_type`: the numeric value type of the model.
+
+## Example
+
+```julia
+target = \"\"\"
+variables: x
+minobjective: 1.0 + 1.0 * x
+\"\"\"
+_test_reformulation(target) do context
+    return Variable() + 1
+end
+```
+"""
+function _test_reformulation(
+    build_fn,
+    target_string::String;
+    value_type = Float64,
+)
+    context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
+    atom = build_fn(context)
     t = Convex.conic_form!(context, atom)
     MOI.set(context.model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
     obj = _to_moi(t)
@@ -1621,6 +1690,313 @@ function test_RationalNormAtom_less_than_1()
         ),
         rationalnorm(x, k),
     )
+    return
+end
+
+### reformulations/conv
+
+function test_conv()
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 2.0 * x1 + 1.0 * x2, 2.0 * x2]
+    """
+    _test_reformulation(target) do context
+        return conv(Variable(2), [1, 2])
+    end
+    _test_reformulation(target) do context
+        return conv([1, 2], Variable(2))
+    end
+    target = """
+    variables: x1, x2, x3
+    minobjective: [1.0*x1, -3.0*x1+1.0*x2, 2.0*x1+-3.0*x2+1.0*x3, 2.0*x2+-3.0*x3, 2.0*x3]
+    """
+    _test_reformulation(target) do context
+        return conv(Variable(3), [1, -3, 2])
+    end
+    @test_throws(
+        ErrorException("convolution only supported between two vectors"),
+        conv([1 2; 3 4], Variable(2, 2)),
+    )
+    @test_throws(
+        ErrorException("convolution only supported between two vectors"),
+        conv([1, 2], Variable(2, 2)),
+    )
+    return
+end
+
+### reformulations/dot
+
+function test_dot()
+    target = """
+    variables: x1, x2
+    minobjective: 1.0 * x1 + 2.0 * x2
+    """
+    _test_reformulation(target) do context
+        return dot(Variable(2), [1, 2])
+    end
+    _test_reformulation(target) do context
+        return dot([1, 2], Variable(2))
+    end
+    _test_reformulation(target) do context
+        return dot(constant([1, 2]), Variable(2))
+    end
+    _test_reformulation(target) do context
+        return dot(Variable(2), constant([1, 2]))
+    end
+    return
+end
+
+### reformulations/inner_product
+
+function test_inner_product()
+    target = """
+    variables: x
+    minobjective: 1.0 * x
+    """
+    _test_reformulation(target) do context
+        return inner_product(Variable(1), [1;;])
+    end
+    _test_reformulation(target) do context
+        return inner_product([1;;], Variable(1))
+    end
+    _test_reformulation(target) do context
+        return inner_product(constant([1;;]), Variable(1))
+    end
+    target = """
+    variables: x11, x21, x12, x22
+    minobjective: 1.0 * x11 + 3.0 * x21 + 2.0 * x12 + 4.0 * x22
+    """
+    _test_reformulation(target) do context
+        return inner_product(Variable(2, 2), [1 2; 3 4])
+    end
+    _test_reformulation(target) do context
+        return inner_product([1 2; 3 4], Variable(2, 2))
+    end
+    @test_throws(
+        ErrorException(
+            "arguments must be square matrices of the same dimension",
+        ),
+        inner_product([1;;], Variable(2)),
+    )
+    @test_throws(
+        ErrorException(
+            "arguments must be square matrices of the same dimension",
+        ),
+        inner_product([1 2; 3 4], Variable(3, 3)),
+    )
+    return
+end
+
+### reformulations/norm
+
+function test_norm()
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: 1.0 * t1 + t2
+    [1.0*t1+-1.0*x1, 1.0*t2+-1.0*x2] in Nonnegatives(2)
+    [1.0*t1+1.0*x1, 1.0*t2+1.0*x2] in Nonnegatives(2)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(2), 1)
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: 1.0 * t1 + t2
+    [1.0*t1+-1.0*x1, 1.0*t2+-1.0*x2] in Nonnegatives(2)
+    [1.0*t1+1.0*x1, 1.0*t2+1.0*x2] in Nonnegatives(2)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(1, 2), 1)
+    end
+    target = """
+    variables: t, x1, x2
+    minobjective: 1.0 * t
+    [1.0*t, 1.0*x1, 1.0*x2] in SecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(2), 2)
+    end
+    target = """
+    variables: t, t1, t2, x1, x2
+    minobjective: 1.0 * t
+    [1.0*t1+-1.0*x1, 1.0*t2+-1.0*x2] in Nonnegatives(2)
+    [1.0*t1+1.0*x1, 1.0*t2+1.0*x2] in Nonnegatives(2)
+    [1.0*t + -1.0t1, 1.0*t + -1.0*t2] in Nonnegatives(2)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(2), Inf)
+    end
+    target = """
+    variables: x1, x2, t
+    minobjective: 1.0 * t
+    [1.0*t, 1.0*x1, 1.0*x2] in NormCone(1.5, 3)
+    """
+    _test_atom(target) do context
+        return norm(Variable(2), 1.5)
+    end
+    @test_throws(
+        ErrorException("vector p-norms not defined for p < 1"),
+        norm(Variable(2), 0.5),
+    )
+    return
+end
+
+### reformulations/partialtranspose
+
+function test_partialtranspose()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0*x1, 1.0*x2, 1.0*x3, 1.0*x4]
+    [1.0+x1, 2.0+x2, 3.0+x3, 4.0+x4] in Nonnegatives(4)
+    """
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, [1 3; 2 4] + x >= 0)
+        return partialtranspose(x, 1, [1, 2])
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0*x1, 1.0*x3, 1.0*x2, 1.0*x4]
+    [1.0+x1, 2.0+x2, 3.0+x3, 4.0+x4] in Nonnegatives(4)
+    """
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, [1 3; 2 4] + x >= 0)
+        return partialtranspose(x, 1, [2, 1])
+    end
+    x = [1 2 3; 4 5 6; 7 8 9]
+    @test partialtranspose(x, 1, [1, 3]) == x
+    @test partialtranspose(x, 1, [3, 1]) == x'
+    @test partialtranspose(x, 2, [3, 1]) == x
+    @test partialtranspose(x, 2, [1, 3]) == x'
+    for x in (Variable(2, 3), [1 2; 3 4; 5 6])
+        @test_throws(
+            ArgumentError("Only square matrices are supported"),
+            partialtranspose(x, 1, [2, 3]),
+        )
+    end
+    for x in (Variable(2, 2), [1 2; 3 4])
+        @test_throws(
+            ArgumentError("Invalid system, should between 1 and 2; got 0"),
+            partialtranspose(x, 0, [2, 2]),
+        )
+        @test_throws(
+            ArgumentError("Invalid system, should between 1 and 2; got 3"),
+            partialtranspose(x, 3, [2, 2]),
+        )
+        @test_throws(
+            ArgumentError(
+                "Dimension of system doesn't correspond to dimension of subsystems",
+            ),
+            partialtranspose(x, 1, [2, 2]),
+        )
+    end
+    return
+end
+
+### reformulations/quadform
+
+function test_quadform()
+    target = """
+    variables: x11, x21, x12, x22
+    minobjective: 1.0 * x11 + 2.0 * x21 + 2.0 * x12 + 4.0 * x22
+    """
+    _test_reformulation(target) do context
+        return quadform([1, 2], Variable(2, 2))
+    end
+    _test_reformulation(target) do context
+        return quadform([1, 2], Variable(2, 2); assume_psd = true)
+    end
+    _test_reformulation(target) do context
+        return quadform(constant([1, 2]), Variable(2, 2))
+    end
+    target = """
+    variables: u, t, x1, x2
+    minobjective: 1.0 * u
+    [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
+    [1.0+1.0*u, 1.0+-1.0*u, 2.0*t] in SecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return quadform(Variable(2), [20.0 16.0; 16.0 20.0])
+    end
+    _test_reformulation(target) do context
+        return quadform(Variable(2), [20.0 16.0; 16.0 20.0]; assume_psd = true)
+    end
+    _test_reformulation(target) do context
+        return quadform(Variable(2), constant([20.0 16.0; 16.0 20.0]))
+    end
+    target = """
+    variables: u, t, x1, x2
+    minobjective: 1.0 + -1.0 * u
+    [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
+    [1.0+1.0*u, 1.0+-1.0*u, 2.0*t] in SecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return 1 + quadform(Variable(2), -[20 16; 16 20])
+    end
+    _test_reformulation(target) do context
+        return 1 + quadform(Variable(2), constant(-[20 16; 16 20]))
+    end
+    @test_throws(
+        ErrorException(
+            "either `x` or `A` must be constant in `quadform(x, A)`",
+        ),
+        quadform(Variable(2), Variable(2, 2)),
+    )
+    @test_throws(
+        ErrorException("quadform only takes square matrices"),
+        quadform(Variable(2), [1 2; 3 4; 5 6]),
+    )
+    @test_throws(
+        ErrorException("quadform only defined for Hermitian matrices"),
+        quadform(Variable(2), [1 0; -2 1]),
+    )
+    return
+end
+
+### reformulations/tr
+
+function test_tr()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: 1.0 * x1 + 1.0 * x4
+    """
+    _test_reformulation(target) do context
+        return tr(Variable(2, 2))
+    end
+    return
+end
+
+### reformulations/transpose
+
+function test_transpose()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1, 1.0 * x3, 1.0 * x2, 1.0 * x4]
+    [1.0 + x1, 3.0 + x2, 2.0 + x3, 4.0 + x4] in Nonnegatives(4)
+    """
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x + [1 2; 3 4] >= 0)
+        return x'
+    end
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x + [1 2; 3 4] >= 0)
+        return LinearAlgebra.transpose(x)
+    end
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x + [1 2; 3 4] >= 0)
+        return LinearAlgebra.adjoint(x)
+    end
+    for a in (2, 2.0, [1, 2], [1 2; 3 4], 2 + 3im, 2 - 3im)
+        b = constant(a)
+        @test evaluate(LinearAlgebra.transpose(b)) ==
+              LinearAlgebra.transpose(evaluate(b))
+        @test evaluate(LinearAlgebra.adjoint(b)) ==
+              LinearAlgebra.adjoint(evaluate(b))
+    end
     return
 end
 
