@@ -56,4 +56,3 @@ function permutedims_matrix(dims, p)
     )
     return SparseArrays.sparse(dense)
 end
-
