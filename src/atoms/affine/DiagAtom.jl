@@ -10,7 +10,7 @@ mutable struct DiagAtom <: AbstractExpr
                 "[DiagAtom] bounds error in calling diag. Got $k but it must be in -$K..$K",
             )
         end
-        return new((x,), (K - k, 1), k)
+        return new((x,), (K - abs(k), 1), k)
     end
 end
 
