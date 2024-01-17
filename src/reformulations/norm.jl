@@ -6,7 +6,7 @@ norm_1(x::AbstractExpr) = sum(abs(x))
 norm_fro(x::AbstractExpr) = LinearAlgebra.norm2(vec(x))
 
 """
-    norm(x::AbstractExpr, p::Real=2)
+    norm(x::AbstractExpr, p::Real = 2)
 
 Computes the `p`-norm `‖x‖ₚ = (∑ᵢ |xᵢ|^p)^(1/p)` of a vector expression `x`.
 
@@ -22,7 +22,6 @@ function LinearAlgebra.norm(x::AbstractExpr, p::Real = 2)
     if size(x, 2) > 1
         x = vec(x)
     end
-    # x is a vector
     if p == 1
         return norm_1(x)
     elseif p == 2

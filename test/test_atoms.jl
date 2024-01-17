@@ -3,6 +3,9 @@ module TestAtoms
 using Convex
 using Test
 
+# Do not use `using LinearAlgebra` to check symbols are re-exported by Convex.
+import LinearAlgebra
+
 import MathOptInterface as MOI
 
 function runtests()
@@ -1592,6 +1595,169 @@ function test_inner_product()
         ),
         inner_product([1 2; 3 4], Variable(3, 3)),
     )
+    return
+end
+
+### reformulations/norm
+
+function test_norm()
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: 1.0 * t1 + t2
+    [1.0*t1+-1.0*x1, 1.0*t2+-1.0*x2] in Nonnegatives(2)
+    [1.0*t1+1.0*x1, 1.0*t2+1.0*x2] in Nonnegatives(2)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(2), 1)
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: 1.0 * t1 + t2
+    [1.0*t1+-1.0*x1, 1.0*t2+-1.0*x2] in Nonnegatives(2)
+    [1.0*t1+1.0*x1, 1.0*t2+1.0*x2] in Nonnegatives(2)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(1, 2), 1)
+    end
+    target = """
+    variables: t, x1, x2
+    minobjective: 1.0 * t
+    [1.0*t, 1.0*x1, 1.0*x2] in SecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(2), 2)
+    end
+    target = """
+    variables: t, t1, t2, x1, x2
+    minobjective: 1.0 * t
+    [1.0*t1+-1.0*x1, 1.0*t2+-1.0*x2] in Nonnegatives(2)
+    [1.0*t1+1.0*x1, 1.0*t2+1.0*x2] in Nonnegatives(2)
+    [1.0*t + -1.0t1, 1.0*t + -1.0*t2] in Nonnegatives(2)
+    """
+    _test_reformulation(target) do context
+        return norm(Variable(2), Inf)
+    end
+    target = """
+    variables: x1, x2, t
+    minobjective: 1.0 * t
+    [1.0*t, 1.0*x1, 1.0*x2] in NormCone(1.5, 3)
+    """
+    _test_atom(target) do context
+        return norm(Variable(2), 1.5)
+    end
+    @test_throws(
+        ErrorException("vector p-norms not defined for p < 1"),
+        norm(Variable(2), 0.5),
+    )
+    return
+end
+
+### reformulations/quadform
+
+function test_quadform()
+    target = """
+    variables: x11, x21, x12, x22
+    minobjective: 1.0 * x11 + 2.0 * x21 + 2.0 * x12 + 4.0 * x22
+    """
+    _test_reformulation(target) do context
+        return quadform([1, 2], Variable(2, 2))
+    end
+    _test_reformulation(target) do context
+        return quadform([1, 2], Variable(2, 2); assume_psd = true)
+    end
+    _test_reformulation(target) do context
+        return quadform(constant([1, 2]), Variable(2, 2))
+    end
+    target = """
+    variables: u, t, x1, x2
+    minobjective: 1.0 * u
+    [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
+    [1.0+1.0*u, 1.0+-1.0*u, 2.0*t] in SecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return quadform(Variable(2), [20.0 16.0; 16.0 20.0])
+    end
+    _test_reformulation(target) do context
+        return quadform(Variable(2), [20.0 16.0; 16.0 20.0]; assume_psd = true)
+    end
+    _test_reformulation(target) do context
+        return quadform(Variable(2), constant([20.0 16.0; 16.0 20.0]))
+    end
+    target = """
+    variables: u, t, x1, x2
+    minobjective: 1.0 + -1.0 * u
+    [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
+    [1.0+1.0*u, 1.0+-1.0*u, 2.0*t] in SecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return 1 + quadform(Variable(2), -[20 16; 16 20])
+    end
+    _test_reformulation(target) do context
+        return 1 + quadform(Variable(2), -[20 16; 16 20]; assume_psd = true)
+    end
+    _test_reformulation(target) do context
+        return 1 + quadform(Variable(2), constant(-[20 16; 16 20]))
+    end
+    @test_throws(
+        ErrorException(
+            "either `x` or `A` must be constant in `quadform(x, A)`",
+        ),
+        quadform(Variable(2), Variable(2, 2)),
+    )
+    @test_throws(
+        ErrorException("quadform only takes square matrices"),
+        quadform(Variable(2), [1 2; 3 4; 5 6]),
+    )
+    @test_throws(
+        ErrorException("quadform only defined for Hermitian matrices"),
+        quadform(Variable(2), [1 0; -2 1]),
+    )
+    return
+end
+
+### reformulations/tr
+
+function test_tr()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: 1.0 * x1 + 1.0 * x4
+    """
+    _test_reformulation(target) do context
+        return tr(Variable(2, 2))
+    end
+    return
+end
+
+### reformulations/transpose
+
+function test_transpose()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1, 1.0 * x3, 1.0 * x2, 1.0 * x4]
+    [1.0 + x1, 3.0 + x2, 2.0 + x3, 4.0 + x4] in Nonnegatives(4)
+    """
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x + [1 2; 3 4] >= 0)
+        return x'
+    end
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x + [1 2; 3 4] >= 0)
+        return LinearAlgebra.transpose(x)
+    end
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x + [1 2; 3 4] >= 0)
+        return LinearAlgebra.adjoint(x)
+    end
+    for a in (2, 2.0, [1, 2], [1 2; 3 4], 2 + 3im, 2 - 3im)
+        b = constant(a)
+        @test evaluate(LinearAlgebra.transpose(b)) ==
+              LinearAlgebra.transpose(evaluate(b))
+        @test evaluate(LinearAlgebra.adjoint(b)) ==
+              LinearAlgebra.adjoint(evaluate(b))
+    end
     return
 end
 
