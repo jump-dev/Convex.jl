@@ -23,10 +23,12 @@ curvature(::EntropyAtom) = ConcaveVexity()
 
 function evaluate(x::EntropyAtom)
     c = evaluate(x.children[1])
-    return -sum(c .* log.(c))
+    return -c .* log.(c)
 end
 
 entropy(x::AbstractExpr) = sum(EntropyAtom(x))
+
+entropy_elementwise(x::AbstractExpr) = EntropyAtom(x)
 
 function new_conic_form!(context::Context, e::EntropyAtom)
     # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone

@@ -765,6 +765,23 @@ function test_EntropyAtom()
     return
 end
 
+function test_EntropyAtom_elementwise()
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, + 1.0 * t2]
+    [1.0 * t1, 1.0 * x1, 1.0] in ExponentialCone()
+    [1.0 * t2, 1.0 * x2, 1.0] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        return entropy_elementwise(Variable(2))
+    end
+    x = Variable(2)
+    atom = entropy_elementwise(x)
+    x.value = [1.0, 2.0]
+    @test evaluate(atom) ≈ -x.value .* log.(x.value)
+    return
+end
+
 ### exp_cone/ExpAtom
 
 function test_ExpAtom()
