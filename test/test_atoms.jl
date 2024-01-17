@@ -1652,6 +1652,59 @@ function test_norm()
     return
 end
 
+### reformulations/partialtranspose
+
+function test_partialtranspose()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0*x1, 1.0*x2, 1.0*x3, 1.0*x4]
+    [1.0+x1, 2.0+x2, 3.0+x3, 4.0+x4] in Nonnegatives(4)
+    """
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, [1 3; 2 4] + x >= 0)
+        return partialtranspose(x, 1, [1, 2])
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0*x1, 1.0*x3, 1.0*x2, 1.0*x4]
+    [1.0+x1, 2.0+x2, 3.0+x3, 4.0+x4] in Nonnegatives(4)
+    """
+    _test_reformulation(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, [1 3; 2 4] + x >= 0)
+        return partialtranspose(x, 1, [2, 1])
+    end
+    x = [1 2 3; 4 5 6; 7 8 9]
+    @test partialtranspose(x, 1, [1, 3]) == x
+    @test partialtranspose(x, 1, [3, 1]) == x'
+    @test partialtranspose(x, 2, [3, 1]) == x
+    @test partialtranspose(x, 2, [1, 3]) == x'
+    for x in (Variable(2, 3), [1 2; 3 4; 5 6])
+        @test_throws(
+            ArgumentError("Only square matrices are supported"),
+            partialtranspose(x, 1, [2, 3]),
+        )
+    end
+    for x in (Variable(2, 2), [1 2; 3 4])
+        @test_throws(
+            ArgumentError("Invalid system, should between 1 and 2; got 0"),
+            partialtranspose(x, 0, [2, 2]),
+        )
+        @test_throws(
+            ArgumentError("Invalid system, should between 1 and 2; got 3"),
+            partialtranspose(x, 3, [2, 2]),
+        )
+        @test_throws(
+            ArgumentError(
+                "Dimension of system doesn't correspond to dimension of subsystems",
+            ),
+            partialtranspose(x, 1, [2, 2]),
+        )
+    end
+    return
+end
+
 ### reformulations/quadform
 
 function test_quadform()
