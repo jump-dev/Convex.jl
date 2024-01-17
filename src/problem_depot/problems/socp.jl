@@ -62,7 +62,7 @@
     b = [2; 3; 4]
     lambda = 1
     p = minimize(
-        norm2(A * x + b) + lambda * norm_1(x),
+        norm2(A * x + b) + lambda * norm(x, 1),
         x >= 1;
         numeric_type = T,
     )
@@ -73,7 +73,7 @@
     handle_problem!(p)
     if test
         @test p.optval ≈ 15.4907 atol = atol rtol = rtol
-        @test evaluate(norm2(A * x + b) + lambda * norm_1(x)) ≈ 15.4907 atol =
+        @test evaluate(norm2(A * x + b) + lambda * norm(x, 1)) ≈ 15.4907 atol =
             atol rtol = rtol
         @test p.constraints[1].dual ≈ [4.7062, 5.4475] atol = atol rtol = rtol
     end
