@@ -33,3 +33,7 @@ Base.:>(lhs::Value, rhs::AbstractExpr) = >(constant(lhs), rhs)
 @deprecate norm_1(x::AbstractExpr) norm(x, 1)
 
 @deprecate norm_fro(x::AbstractExpr) norm(x, 2)
+
+@deprecate get_vectorized_size(x::AbstractExpr) length(x)
+
+@deprecate operatornorm(x::AbstractExpr) LinearAlgebra.opnorm(x)
