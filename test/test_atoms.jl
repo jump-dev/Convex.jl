@@ -1522,15 +1522,11 @@ function test_conv()
         return conv(Variable(3), [1, -3, 2])
     end
     @test_throws(
-        ErrorException(
-            "convolution only supported between two vectors",
-        ),
+        ErrorException("convolution only supported between two vectors"),
         conv([1 2; 3 4], Variable(2, 2)),
     )
     @test_throws(
-        ErrorException(
-            "convolution only supported between two vectors",
-        ),
+        ErrorException("convolution only supported between two vectors"),
         conv([1, 2], Variable(2, 2)),
     )
     return
