@@ -5,7 +5,7 @@ mutable struct MaxAtom <: AbstractExpr
     function MaxAtom(x::AbstractExpr, y::AbstractExpr)
         if sign(x) == ComplexSign() || sign(y) == ComplexSign()
             error(
-                "Both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
+                "[MaxAtom] both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
             )
         end
         sz = if x.size == y.size
@@ -15,7 +15,9 @@ mutable struct MaxAtom <: AbstractExpr
         elseif y.size == (1, 1)
             x.size
         else
-            error("Got different sizes for x as $(x.size) and y as $(y.size)")
+            error(
+                "[MaxAtom] got different sizes for x as $(x.size) and y as $(y.size)",
+            )
         end
         return new((x, y), sz)
     end

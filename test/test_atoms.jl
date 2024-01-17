@@ -908,6 +908,9 @@ function test_DotSortAtom()
     _test_atom(target) do context
         return dotsort(Variable(2), [0, 1])
     end
+    _test_atom(target) do context
+        return dotsort([0, 1], Variable(2))
+    end
     target = """
     variables: v1, v2, u1, u2, x1, x2
     minobjective: 1.0 * u1 + u2 + v1 + v2
@@ -915,6 +918,9 @@ function test_DotSortAtom()
     """
     _test_atom(target) do context
         return dotsort(Variable(2), [-2, 3])
+    end
+    _test_atom(target) do context
+        return dotsort([-2, 3], Variable(2))
     end
     target = """
     variables: v1, v2, u1, u2, x1, x2
@@ -970,6 +976,24 @@ function test_MaxAtom()
         return max(Variable(), Variable())
     end
     target = """
+    variables: t1, t2, x, y, z
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * t1 + -1.0 * x, t2 + -1.0 * y] in Nonnegatives(2)
+    [1.0 * t1 + -1.0 * z, t2 + -1.0 * z] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return max(Variable(2), Variable())
+    end
+    target = """
+    variables: t1, t2, x, y, z
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [1.0 * t1 + -1.0 * x, t2 + -1.0 * x] in Nonnegatives(2)
+    [1.0 * t1 + -1.0 * y, t2 + -1.0 * z] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return max(Variable(), Variable(2))
+    end
+    target = """
     variables: t, x, y
     minobjective: 1.0 * t
     [1.0 * t + -1.0 * x] in Nonnegatives(1)
@@ -1016,6 +1040,20 @@ function test_MaxAtom()
     @test sign(max(-square(x), -1)) == Convex.Negative()
     @test sign(max(x, -1)) == Convex.NoSign()
     @test sign(max(x, 1)) == Convex.Positive()
+    x, y = Variable(2), Variable(3)
+    @test_throws(
+        ErrorException(
+            "[MaxAtom] got different sizes for x as $(x.size) and y as $(y.size)",
+        ),
+        max(x, y),
+    )
+    x = im * x
+    @test_throws(
+        ErrorException(
+            "[MaxAtom] both the arguments should be real instead they are $(sign(x)) and $(sign(y))",
+        ),
+        max(x, y),
+    )
     return
 end
 
@@ -1075,6 +1113,24 @@ function test_MinAtom()
     end
     _test_atom(target) do context
         return min(constant(1), Variable())
+    end
+    target = """
+    variables: t1, t2, x, y, z
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [-1.0 * t1 + x, -1.0 * t2 + y] in Nonnegatives(2)
+    [-1.0 * t1 + z, -1.0 * t2 + z] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return min(Variable(2), Variable())
+    end
+    target = """
+    variables: t1, t2, x, y, z
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [-1.0 * t1 + x, -1.0 * t2 + x] in Nonnegatives(2)
+    [-1.0 * t1 + y, -1.0 * t2 + z] in Nonnegatives(2)
+    """
+    _test_atom(target) do context
+        return min(Variable(), Variable(2))
     end
     target = """
     variables: t1, t2, x1, x2
