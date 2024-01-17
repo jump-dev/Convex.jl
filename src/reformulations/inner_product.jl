@@ -1,6 +1,6 @@
 function inner_product(x::AbstractExpr, y::AbstractExpr)
     if !(x.size == y.size && x.size[1] == x.size[2])
-        error("Arguments must be square matrix of same dimension")
+        error("arguments must be square matrices of the same dimension")
     end
     return real(LinearAlgebra.tr(x' * y))
 end

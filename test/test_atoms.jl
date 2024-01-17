@@ -28,7 +28,30 @@ _to_moi(x::Convex.SparseTape) = _to_moi(Convex.to_vaf(x))
 _to_moi(v::MOI.AbstractScalarFunction) = v
 
 """
-    _test_atom(f, target_string::String; value_type = Float64)
+    _test_atom(build_fn::Function, target_string::String; value_type = Float64)
+
+The same arguments and behavior as `_test_reformulation`, but in addition, tests
+a number of properties that all atoms must satisfy.
+
+ 1. the atom is a subtype of `AbstractExpr`
+ 2. the atom is mutable
+ 3. `Convex.head` is implemented and prints a string
+ 4. `Base.sign` is implemented and returns a `Convex.Sign` object
+ 5. `Covnex.monotonicity` is implemented and returns a tuple of
+    `Convex.Monotonicity` objects, with one element for each child
+ 6. `Convex.curvature` is implemented and returns a `Convex.Vexity` object
+
+ ## Example
+
+ ```julia
+ target = \"\"\"
+ variables: x
+ minobjective: 1.0 + 1.0 * x
+ \"\"\"
+ _test_atom(target) do context
+     return Variable() + 1
+ end
+ ```
 """
 function _test_atom(build_fn, target_string::String; value_type = Float64)
     context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
@@ -42,6 +65,49 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     N = length(atom.children)
     @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
+    _test_reformulation(build_fn, target_string; value_type)
+    return
+end
+
+"""
+    _test_reformulation(
+        build_fn::Function,
+        target_string::String;
+        value_type = Float64,
+    )
+
+Test the reformulation constructed by `build_fn(::Convex.Context)` produces an
+optimization problem given by `target_string` when the result returned by
+`build_fn` is set as the objective function.
+
+## Arguments
+
+ * `build_fn`: a function called with a new `context::Convex.Context` object
+   that returns an expression for the objective and may optionally modify
+   `context` as well.
+ * `target_string`: the string representation of the model as needed by
+   `MOI.Utilities.loadfromstring!`.
+ * `value_type`: the numeric value type of the model.
+
+## Example
+
+```julia
+target = \"\"\"
+variables: x
+minobjective: 1.0 + 1.0 * x
+\"\"\"
+_test_reformulation(target) do context
+    return Variable() + 1
+end
+```
+"""
+function _test_reformulation(
+    build_fn,
+    target_string::String;
+    value_type = Float64,
+)
+    context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
+    atom = build_fn(context)
     t = Convex.conic_form!(context, atom)
     MOI.set(context.model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
     obj = _to_moi(t)
@@ -1431,6 +1497,104 @@ function test_RationalNormAtom_less_than_1()
             "[RationalNormAtom] p-norms not defined for p < 1. Got $k",
         ),
         rationalnorm(x, k),
+    )
+    return
+end
+
+### reformulations/conv
+
+function test_conv()
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 2.0 * x1 + 1.0 * x2, 2.0 * x2]
+    """
+    _test_reformulation(target) do context
+        return conv(Variable(2), [1, 2])
+    end
+    _test_reformulation(target) do context
+        return conv([1, 2], Variable(2))
+    end
+    target = """
+    variables: x1, x2, x3
+    minobjective: [1.0*x1, -3.0*x1+1.0*x2, 2.0*x1+-3.0*x2+1.0*x3, 2.0*x2+-3.0*x3, 2.0*x3]
+    """
+    _test_reformulation(target) do context
+        return conv(Variable(3), [1, -3, 2])
+    end
+    @test_throws(
+        ErrorException(
+            "convolution only supported between two vectors",
+        ),
+        conv([1 2; 3 4], Variable(2, 2)),
+    )
+    @test_throws(
+        ErrorException(
+            "convolution only supported between two vectors",
+        ),
+        conv([1, 2], Variable(2, 2)),
+    )
+    return
+end
+
+### reformulations/dot
+
+function test_dot()
+    target = """
+    variables: x1, x2
+    minobjective: 1.0 * x1 + 2.0 * x2
+    """
+    _test_reformulation(target) do context
+        return dot(Variable(2), [1, 2])
+    end
+    _test_reformulation(target) do context
+        return dot([1, 2], Variable(2))
+    end
+    _test_reformulation(target) do context
+        return dot(constant([1, 2]), Variable(2))
+    end
+    _test_reformulation(target) do context
+        return dot(Variable(2), constant([1, 2]))
+    end
+    return
+end
+
+### reformulations/inner_product
+
+function test_inner_product()
+    target = """
+    variables: x
+    minobjective: 1.0 * x
+    """
+    _test_reformulation(target) do context
+        return inner_product(Variable(1), [1;;])
+    end
+    _test_reformulation(target) do context
+        return inner_product([1;;], Variable(1))
+    end
+    _test_reformulation(target) do context
+        return inner_product(constant([1;;]), Variable(1))
+    end
+    target = """
+    variables: x11, x21, x12, x22
+    minobjective: 1.0 * x11 + 3.0 * x21 + 2.0 * x12 + 4.0 * x22
+    """
+    _test_reformulation(target) do context
+        return inner_product(Variable(2, 2), [1 2; 3 4])
+    end
+    _test_reformulation(target) do context
+        return inner_product([1 2; 3 4], Variable(2, 2))
+    end
+    @test_throws(
+        ErrorException(
+            "arguments must be square matrices of the same dimension",
+        ),
+        inner_product([1;;], Variable(2)),
+    )
+    @test_throws(
+        ErrorException(
+            "arguments must be square matrices of the same dimension",
+        ),
+        inner_product([1 2; 3 4], Variable(3, 3)),
     )
     return
 end

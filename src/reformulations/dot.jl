@@ -1,21 +1,18 @@
-function ismatrix(x::AbstractExpr)
-    s = size(x)
-    return length(s) == 2 && s[1] > 1 && s[2] > 1
-end
-
-ismatrix(::AbstractMatrix) = true
-
-ismatrix(::Any) = false
-
-# NOTE: Using asvec avoids broadcast-specific behaviors that we want to avoid,
+# Using _vec avoids broadcast-specific behaviors that we want to avoid,
 # such as extending singleton dimensions. We need to ensure that the inputs have
 # the same length, which broadcast will check for us if both inputs are vectors.
-asvec(x) = convert(AbstractExpr, ismatrix(x) ? vec(x) : x)
+_vec(x::AbstractExpr) = size(x, 1) > 1 && size(x, 2) > 1 ? vec(x) : x
 
-_vecdot(x, y) = sum(broadcast(*, conj(asvec(x)), asvec(y)))
+_vec(x::AbstractMatrix) = vec(x)
 
-LinearAlgebra.dot(x::AbstractExpr, y::AbstractExpr) = _vecdot(x, y)
+_vec(x::Any) = x
 
-LinearAlgebra.dot(x::Value, y::AbstractExpr) = _vecdot(x, y)
+_expr_vec(x) = convert(AbstractExpr, _vec(x))
 
-LinearAlgebra.dot(x::AbstractExpr, y::Value) = _vecdot(x, y)
+_dot(x, y) = sum(broadcast(*, conj(_expr_vec(x)), _expr_vec(y)))
+
+LinearAlgebra.dot(x::AbstractExpr, y::AbstractExpr) = _dot(x, y)
+
+LinearAlgebra.dot(x::Value, y::AbstractExpr) = _dot(x, y)
+
+LinearAlgebra.dot(x::AbstractExpr, y::Value) = _dot(x, y)
