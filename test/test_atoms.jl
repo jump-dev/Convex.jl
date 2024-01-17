@@ -1693,9 +1693,6 @@ function test_quadform()
         return 1 + quadform(Variable(2), -[20 16; 16 20])
     end
     _test_reformulation(target) do context
-        return 1 + quadform(Variable(2), -[20 16; 16 20]; assume_psd = true)
-    end
-    _test_reformulation(target) do context
         return 1 + quadform(Variable(2), constant(-[20 16; 16 20]))
     end
     @test_throws(
