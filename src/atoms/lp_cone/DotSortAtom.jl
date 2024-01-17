@@ -1,12 +1,5 @@
-#############################################################################
-# dotsort.jl
-# dotsort(a,b) computes dot(sort(a), sort(b))
-# All expressions and atoms are subtpyes of AbstractExpr.
-# Please read expressions.jl first.
-#############################################################################
-
-# This atom computes dot(sort(x), sort(w)), where w is constant
-# for example, if w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
+# This atom computes dot(sort(x), sort(w)), where w is constant. For example, if
+# w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
 mutable struct DotSortAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -14,67 +7,52 @@ mutable struct DotSortAtom <: AbstractExpr
 
     function DotSortAtom(x::AbstractExpr, w::Value)
         if sign(x) == ComplexSign()
-            error("Argument should be real instead it is $(sign(x))")
-        else
-            if !(length(w) == length(x))
-                error("x and w must be the same size")
-            end
-            children = (x,)
-            vecw = reshape(w, length(x))
-            return new(children, (1, 1), vecw)
+            error(
+                "[DotSortAtom] argument should be real instead it is $(sign(x))",
+            )
+        elseif length(w) != length(x)
+            error("[DotSortAtom] x and w must be the same size")
         end
+        return new((x,), (1, 1), reshape(w, length(x)))
     end
 end
 
 head(io::IO, ::DotSortAtom) = print(io, "dotsort")
 
 function Base.sign(x::DotSortAtom)
-    if all(x.w .>= 0)
+    if all(>=(0), x.w)
         return sign(x.children[1])
-    elseif all(x.w .<= 0)
-        return sign(x.children[1])
-    else
-        return NoSign()
+    elseif all(<=(0), x.w)
+        return -sign(x.children[1])
     end
+    return NoSign()
 end
 
 function monotonicity(x::DotSortAtom)
-    if all(x.w .>= 0)
+    if all(>=(0), x.w)
         return (Nondecreasing(),)
-    else
-        return (NoMonotonicity(),)
+    elseif all(<=(0), x.w)
+        return (Nonincreasing(),)
     end
+    return (NoMonotonicity(),)
 end
 
-function curvature(x::DotSortAtom)
-    return ConvexVexity()
-end
+curvature(::DotSortAtom) = ConvexVexity()
 
 function evaluate(x::DotSortAtom)
-    return sum(
-        sort(vec(evaluate(x.children[1])), rev = true) .*
-        sort(vec(x.w), rev = true),
-    )
+    y = only(x.children)
+    return sum(a * b for (a, b) in zip(sort(vec(evaluate(y))), sort(x.w)))
 end
 
 function new_conic_form!(context::Context{T}, x::DotSortAtom) where {T}
     y = only(x.children)
-    w = x.w
-    sy = size(y)
-    if sy[1] > 1 && sy[2] > 1
+    if size(y, 1) > 1 && size(y, 2) > 1
         y = vec(y)
     end
-    mu = Variable(size(y))
-    nu = Variable(size(y))
-    onesvec = ones(size(y))
-    # given by the solution to
-    # minimize sum(mu) + sum(nu)
-    # subject to y*w' <= onesvec*nu' + mu*onesvec'
-    add_constraint!(context, y * w' <= onesvec * nu' + mu * onesvec')
-    objective = conic_form!(context, sum(mu) + sum(nu))
-    return objective
+    μ, ν, e = Variable(size(y)), Variable(size(y)), ones(T, size(y))
+    add_constraint!(context, y * x.w' <= e * ν' + μ * e')
+    return conic_form!(context, sum(μ) + sum(ν))
 end
 
 dotsort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)
-
 dotsort(b::Value, a::AbstractExpr) = DotSortAtom(a, b)

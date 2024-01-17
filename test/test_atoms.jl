@@ -767,7 +767,63 @@ end
 
 ### lp_cone/DotSortAtom
 
-# TODO
+function test_DotSortAtom()
+    target = """
+    variables: v1, v2, u1, u2, x1, x2
+    minobjective: 1.0 * u1 + u2 + v1 + v2
+    [v1+u1, v1+u2, v2+u1+-1.0*x1, v2+u2+-1.0*x2] in Nonnegatives(4)
+    """
+    _test_atom(target) do context
+        return dotsort(Variable(2), [0, 1])
+    end
+    target = """
+    variables: v1, v2, u1, u2, x1, x2
+    minobjective: 1.0 * u1 + u2 + v1 + v2
+    [v1+u1+2.0*x1, v1+u2+2.0*x2, v2+u1+-3.0*x1, v2+u2+-3.0*x2] in Nonnegatives(4)
+    """
+    _test_atom(target) do context
+        return dotsort(Variable(2), [-2, 3])
+    end
+    target = """
+    variables: v1, v2, u1, u2, x1, x2
+    minobjective: 1.0 * u1 + u2 + v1 + v2
+    [v1+u1+2.0*x1, v1+u2+2.0*x2, v2+u1+3.0*x1, v2+u2+3.0*x2] in Nonnegatives(4)
+    """
+    _test_atom(target) do context
+        return dotsort(Variable(2), [-2, -3])
+    end
+    x = im * Variable(2)
+    @test_throws(
+        ErrorException(
+            "[DotSortAtom] argument should be real instead it is $(sign(x))",
+        ),
+        dotsort(x, [0, 1]),
+    )
+    @test_throws(
+        ErrorException("[DotSortAtom] x and w must be the same size"),
+        dotsort(Variable(2), [0, 1, 2]),
+    )
+    x = Variable(2, 2)
+    atom = dotsort(x, [2 0; 0 1])
+    x.value = [1.5 2.5; 3.0 2.0]
+    @test evaluate(atom) ≈ 8.5
+    x = Variable(4)
+    atom = dotsort(x, [1 2; 0 0])
+    x.value = [1.5, 2.5, 3.0, 2.0]
+    @test evaluate(atom) ≈ 8.5
+    x = Variable(2)
+    atom = dotsort(square(x), [1, 2])
+    @test curvature(atom) == Convex.ConvexVexity()
+    @test sign(atom) == Convex.Positive()
+    @test monotonicity(atom) == (Convex.Nondecreasing(),)
+    atom = dotsort(square(x), [-1, -2])
+    @test sign(atom) == Convex.Negative()
+    @test monotonicity(atom) == (Convex.Nonincreasing(),)
+    atom = dotsort(square(x), [-1, 2])
+    @test sign(atom) == Convex.NoSign()
+    @test monotonicity(atom) == (Convex.NoMonotonicity(),)
+    return
+end
 
 ### lp_cone/MaxAtom
 
