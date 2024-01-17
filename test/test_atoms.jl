@@ -428,7 +428,106 @@ end
 
 ### affine/MultiplyAtom
 
-# TODO
+function test_MultiplyAtom()
+    target = """
+    variables: x
+    minobjective: 2.0 * x
+    """
+    _test_atom(target) do context
+        return 2 * Variable()
+    end
+    _test_atom(target) do context
+        return Variable() * 2
+    end
+    target = """
+    variables: x, y
+    minobjective: [2.0 * x, 2.0 * y]
+    """
+    _test_atom(target) do context
+        return 2 * Variable(2)
+    end
+    _test_atom(target) do context
+        return Variable(2) * 2
+    end
+    target = """
+    variables: x11, x21, x12, x22
+    minobjective: [2.0 * x11 + 3.0 * x12, 2.0 * x21 + 3.0 * x22]
+    """
+    _test_atom(target) do context
+        return Variable(2, 2) * [2, 3]
+    end
+    target = """
+    variables: x11, x21, x12, x22
+    minobjective: [2.0 * x11 + 3.0 * x21, 2.0 * x12 + 3.0 * x22]
+    """
+    _test_atom(target) do context
+        return [2, 3]' * Variable(2, 2)
+    end
+    target = """
+    variables: t, x
+    minobjective: 1.0 * t
+    [1.0 + 1.0 * t, 1.0 + -1.0 * t, 2.0 * x] in SecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return x * x
+    end
+    target = """
+    variables: x
+    minobjective: 0.5 * x
+    """
+    _test_atom(target) do context
+        return Variable() / 2
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [0.25 * x1, 0.25 * x2]
+    """
+    _test_atom(target) do context
+        return Variable(2) / 4
+    end
+    _test_atom(target) do context
+        return 0.25 .* Variable(2)
+    end
+    _test_atom(target) do context
+        return Variable(2) .* 0.25
+    end
+    _test_atom(target) do context
+        return Variable(2) ./ 4
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [0.5 * x1, 0.25 * x2]
+    """
+    _test_atom(target) do context
+        return Variable(2) ./ [2, 4]
+    end
+    @test_throws(
+        ErrorException(
+            "[MultiplyAtom] cannot multiply two expressions of sizes (2, 2) and (3, 3)",
+        ),
+        Variable(2, 2) * Variable(3, 3)
+    )
+    @test_throws(
+        ErrorException(
+            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+        ),
+        _test_atom(_ -> Variable(2)' * Variable(2), ""),
+    )
+    @test_throws(
+        ErrorException(
+            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+        ),
+        _test_atom(_ -> Variable(2) .* Variable(2), ""),
+    )
+    @test_throws(
+        ErrorException(
+            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+        ),
+        _test_atom(_ -> Variable() * Variable(), ""),
+    )
+    return
+end
 
 ### affine/NegateAtom
 
@@ -484,7 +583,40 @@ end
 
 ### affine/ReshapeAtom
 
-# TODO
+function test_ReshapeAtom()
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1, 1.0 * x2, 1.0 * x3, 1.0 * x4]
+    """
+    _test_atom(target) do context
+        return reshape(Variable(4), 2, 2)
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1 + 2.0 * x3, 1.0 * x2 + 2.0 * x4]
+    [-1.0 + x1, -2.0 + x2, -3.0 + x3, -4.0 + x4] in Nonnegatives(4)
+    """
+    _test_atom(target) do context
+        x = Variable(4)
+        add_constraint!(context, x - [1, 2, 3, 4] >= 0)
+        return reshape(x, 2, 2) * [1, 2]
+    end
+    @test_throws(
+        ErrorException(
+            "[ReshapeAtom] cannot reshape expression of size (4, 1) to (2, 3)",
+        ),
+        reshape(Variable(4), 2, 3),
+    )
+    x = Variable(4)
+    x.value = [1, 2, 3, 4]
+    atom = reshape(x, 2, 2)
+    @test evaluate(atom) == [1 3; 2 4]
+    x = Variable()
+    x.value = 2
+    atom = reshape(x, 1, 1)
+    @test evaluate(atom) == 2
+    return
+end
 
 ### affine/SumAtom
 
@@ -1040,7 +1172,7 @@ function test_SumLargestAtom()
     return
 end
 
-### EigMaxAtom
+### sdp_cone/EigMaxAtom
 
 function test_EigMaxAtom()
     target = """
@@ -1060,7 +1192,7 @@ function test_EigMaxAtom()
     return
 end
 
-### EigMinAtom
+### sdp_cone/EigMinAtom
 
 function test_EigMinAtom()
     target = """
@@ -1080,7 +1212,7 @@ function test_EigMinAtom()
     return
 end
 
-### MatrixFracAtom
+### sdp_cone/MatrixFracAtom
 
 function test_MatrixFracAtom()
     target = """
@@ -1131,31 +1263,31 @@ function test_MatrixFracAtom()
     return
 end
 
-### NuclearNormAtom
+### sdp_cone/NuclearNormAtom
 
 # TODO
 
-### OperatorNormAtom
+### sdp_cone/OperatorNormAtom
 
 # TODO
 
-### QuantumEntropyAtom
+### sdp_cone/QuantumEntropyAtom
 
 # TODO
 
-### QuantumRelativeEntropyAtom
+### sdp_cone/QuantumRelativeEntropyAtom
 
 # TODO
 
-### SumLargestEigsAtom
+### sdp_cone/SumLargestEigsAtom
 
 # TODO
 
-### TraceLogmAtom
+### sdp_cone/TraceLogmAtom
 
 # TODO
 
-### TraceMpowerAtom
+### sdp_cone/TraceMpowerAtom
 
 # TODO
 

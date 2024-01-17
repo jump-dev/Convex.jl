@@ -6,7 +6,9 @@ mutable struct ReshapeAtom <: AbstractExpr
 
     function ReshapeAtom(x::AbstractExpr, m::Int, n::Int)
         if m * n != length(x)
-            error("Cannot reshape expression of size $(x.size) to ($(m), $(n))")
+            error(
+                "[ReshapeAtom] cannot reshape expression of size $(x.size) to ($m, $n)",
+            )
         end
         return new((x,), (m, n))
     end
@@ -21,11 +23,11 @@ monotonicity(::ReshapeAtom) = (Nondecreasing(),)
 curvature(::ReshapeAtom) = ConstVexity()
 
 function evaluate(x::ReshapeAtom)
-    val = evaluate(x.children[1])
-    if val isa Number
-        return val
+    ret = evaluate(x.children[1])
+    if ret isa Number
+        return ret
     end
-    return reshape(val, x.size[1], x.size[2])
+    return reshape(ret, x.size)
 end
 
 function new_conic_form!(context::Context, A::ReshapeAtom)

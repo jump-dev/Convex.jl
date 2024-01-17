@@ -11,7 +11,7 @@ mutable struct MultiplyAtom <: AbstractExpr
             (x.size[1], y.size[2])
         else
             error(
-                "Cannot multiply two expressions of sizes $(x.size) and $(y.size)",
+                "[MultiplyAtom] cannot multiply two expressions of sizes $(x.size) and $(y.size)",
             )
         end
         return new((x, y), sz)
@@ -41,7 +41,12 @@ end
 
 evaluate(x::MultiplyAtom) = evaluate(x.children[1]) * evaluate(x.children[2])
 
-complex_convert(::Type{T}, x) where {T} = real_convert(Complex{T}, x)
+function _complex_convert(::Type{T}, x) where {T}
+    if iscomplex(x)
+        return real_convert(Complex{T}, x)
+    end
+    return real_convert(T, x)
+end
 
 real_convert(::Type{T}, x::Number) where {T} = T(x)
 
@@ -54,62 +59,49 @@ real_convert(::Type{T}, x::SPARSE_VECTOR{T}) where {T} = x
 real_convert(::Type{T}, x::AbstractVector) where {T} = SPARSE_VECTOR{T}(x)
 
 function new_conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
+    if curvature(x) == NotDcp()
+        error(
+            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+        )
+    end
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
         # scalar multiplication
         if vexity(x.children[1]) == ConstVexity()
-            const_child, expr_child = x.children
-        elseif vexity(x.children[2]) == ConstVexity()
-            expr_child, const_child = x.children
+            lhs, expr = x.children
         else
-            error(
-                "multiplication of two non-constant expressions is not DCP compliant",
-            )
+            @assert vexity(x.children[2]) == ConstVexity()
+            expr, lhs = x.children
         end
-        objective = conic_form!(context, expr_child)
-        # make sure all 1x1 sized objects are interpreted as scalars, since
-        # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
-        const_multiplier = if const_child.size == (1, 1)  # Scalar
-            evaluate(const_child)[1]
-        else  # Matrix
-            reshape(evaluate(const_child), length(const_child), 1)
-        end
-        const_multiplier = if iscomplex(const_multiplier)
-            complex_convert(T, const_multiplier)
+        lhs = if lhs.size == (1, 1)
+            # Make sure all 1x1 sized objects are interpreted as scalars, since
+            # [1] * [1, 2, 3] is illegal in julia, but 1 * [1, 2, 3] is ok
+            only(evaluate(lhs))
         else
-            real_convert(T, const_multiplier)
+            reshape(evaluate(lhs), length(lhs), 1)
         end
-        return operate(add_operation, T, sign(x), const_multiplier, objective)
+        lhs = _complex_convert(T, lhs)
+        rhs = conic_form!(context, expr)
+        return operate(add_operation, T, sign(x), lhs, rhs)
     elseif vexity(x.children[1]) == ConstVexity()
         # left matrix multiplication
-        objective = conic_form!(context, x.children[2])
-        const_multiplier = evaluate(x.children[1])
-        const_multiplier = if iscomplex(const_multiplier)
-            complex_convert(T, const_multiplier)
-        else
-            real_convert(T, const_multiplier)
-        end
+        lhs = _complex_convert(T, evaluate(x.children[1]))
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(spidentity(T, x.size[2]), const_multiplier),
-            objective,
+            kron(spidentity(T, x.size[2]), lhs),
+            conic_form!(context, x.children[2]),
         )
     else
+        @assert vexity(x.children[2]) == ConstVexity()
         # right matrix multiplication
-        objective = conic_form!(context, x.children[1])
-        const_multiplier = evaluate(x.children[2])
-        const_multiplier = if iscomplex(const_multiplier)
-            complex_convert(T, const_multiplier)
-        else
-            real_convert(T, const_multiplier)
-        end
+        rhs = _complex_convert(T, evaluate(x.children[2]))
         return operate(
             add_operation,
             T,
             sign(x),
-            kron(transpose(const_multiplier), spidentity(T, x.size[1])),
-            objective,
+            kron(transpose(rhs), spidentity(T, x.size[1])),
+            conic_form!(context, x.children[1]),
         )
     end
 end
@@ -127,42 +119,14 @@ Base.:*(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
 
 Base.:/(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))
 
-# ambiguity
-#
-# function Base.:(*)(
-#     x::Convex.AbstractExpr,
-#     y::Union{
-#         LinearAlgebra.Transpose{
-#             <:Any,
-#             <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-#         },
-#         SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-#     },
-# ) where {T,F,O}
-#     return MultiplyAtom(x, constant(y))
-# end
-#
-# function Base.:(*)(
-#     x::Union{
-#         LinearAlgebra.Transpose{
-#             <:Any,
-#             <:SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-#         },
-#         SuiteSparseGraphBLAS.AbstractGBArray{T,F,O},
-#     },
-#     y::Convex.AbstractExpr,
-# ) where {T,F,O}
-#     return MultiplyAtom(constant(x), y)
-# end
-
-function dotmultiply(x, y)
+function _dot_multiply(x, y)
     if size(x) == (1, 1) || size(y) == (1, 1)
         return x * y
     end
     if vexity(x) != ConstVexity()
         if vexity(y) != ConstVexity()
             error(
-                "multiplication of two non-constant expressions is not DCP compliant",
+                "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
             )
         end
         x, y = y, x
@@ -170,18 +134,16 @@ function dotmultiply(x, y)
     # promote the size of the coefficient matrix, so e.g., 3 .* x works
     # regardless of the size of x
     coeff = evaluate(x) .* ones(size(y))
-    # promote the size of the variable
-    # we've previously ensured neither x nor y is 1x1
-    # and that the sizes are compatible,
-    # so if the sizes aren't equal the smaller one is size 1
-    var = y
-    if size(var, 1) < size(coeff, 1)
-        var = ones(size(coeff, 1)) * var
-    elseif size(var, 2) < size(coeff, 2)
-        var = var * ones(1, size(coeff, 1))
+    # Promote the size of the variable. We've previously ensured neither x nor y
+    # is 1x1 and that the sizes are compatible, so if the sizes aren't equal the
+    # smaller one is size 1.
+    if size(y, 1) < size(coeff, 1)
+        y = ones(size(coeff, 1)) * y
+    elseif size(y, 2) < size(coeff, 2)
+        y = y * ones(1, size(coeff, 1))
     end
-    const_multiplier = LinearAlgebra.Diagonal(vec(coeff))
-    return reshape(const_multiplier * vec(var), size(var)...)
+    ret = LinearAlgebra.Diagonal(vec(coeff)) * vec(y)
+    return reshape(ret, size(y, 1), size(y, 2))
 end
 
 # if neither is a constant it's not DCP, but might be nice to support anyway for
@@ -194,19 +156,19 @@ function Base.Broadcast.broadcasted(
     if isequal(x, y)
         return square(x)
     end
-    return dotmultiply(x, y)
+    return _dot_multiply(x, y)
 end
 
 function Base.Broadcast.broadcasted(::typeof(*), x::Value, y::AbstractExpr)
-    return dotmultiply(constant(x), y)
+    return _dot_multiply(constant(x), y)
 end
 
 function Base.Broadcast.broadcasted(::typeof(*), x::AbstractExpr, y::Value)
-    return dotmultiply(constant(y), x)
+    return _dot_multiply(constant(y), x)
 end
 
 function Base.Broadcast.broadcasted(::typeof(/), x::AbstractExpr, y::Value)
-    return dotmultiply(constant(1 ./ y), x)
+    return _dot_multiply(constant(1 ./ y), x)
 end
 
 # x ./ y and x / y for x constant, y variable is defined in
