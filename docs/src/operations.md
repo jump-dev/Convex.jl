@@ -99,6 +99,7 @@ exponential cone solver (SCS).
 | `exp(x)`              | $\exp(x)$                         | convex  | increasing    | none           |
 | `log(x)`              | $\log(x)$                         | concave | increasing    | IC: $x>0$      |
 | `entropy(x)`          | $\sum_{ij} -x_{ij} \log(x_{ij})$  | concave | not monotonic | IC: $x>0$      |
+| `entropy_elementwise(x)` | $-x \log(x)$                   | concave | not monotonic | IC: $x>0$      |
 | `logisticloss(x)`     | $\log(1 + \exp(x_i))$             | convex  | increasing    | none           |
 | `relative_entropy(x, y)` | $\sum_i x_i \log(x_i / y_i)$      | convex  | not monotonic | IC: $x>0, y>0$ |
 

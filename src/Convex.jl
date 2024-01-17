@@ -10,6 +10,7 @@ import SparseArrays
 export conv,
     dotsort,
     entropy,
+    entropy_elementwise,
     exp,
     geomean,
     hinge_loss,
