@@ -349,7 +349,7 @@ end
     ::Type{T},
 ) where {T,test}
     x = Variable(3)
-    p = minimize(norm_inf(x), [-2 <= x, x <= 1]; numeric_type = T)
+    p = minimize(norm(x, Inf), [-2 <= x, x <= 1]; numeric_type = T)
 
     if test
         @test problem_vexity(p) == ConvexVexity()
@@ -357,7 +357,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol = atol rtol = rtol
-        @test evaluate(norm_inf(x)) ≈ 0 atol = atol rtol = rtol
+        @test evaluate(norm(x, Inf)) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[1].dual) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[2].dual) ≈ 0 atol = atol rtol = rtol
     end
@@ -371,7 +371,7 @@ end
     ::Type{T},
 ) where {T,test}
     x = Variable(3)
-    p = minimize(norm_1(x), [-2 <= x, x <= 1]; numeric_type = T)
+    p = minimize(norm(x, 1), [-2 <= x, x <= 1]; numeric_type = T)
 
     if test
         @test problem_vexity(p) == ConvexVexity()
@@ -379,7 +379,7 @@ end
     handle_problem!(p)
     if test
         @test p.optval ≈ 0 atol = atol rtol = rtol
-        @test evaluate(norm_1(x)) ≈ 0 atol = atol rtol = rtol
+        @test evaluate(norm(x, 1)) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[1].dual) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[2].dual) ≈ 0 atol = atol rtol = rtol
     end

@@ -555,7 +555,7 @@ end
 
 function test_add_constraints!_issue_380()
     x = Variable(3, 3)
-    p = minimize(norm_1(x))
+    p = minimize(norm(x, 1))
     y = randn(3, 3)
     c = (norm2(x - y) <= 1)
     @test length(p.constraints) == 0
@@ -936,7 +936,7 @@ function test_write_to_file()
     return
 end
 
-function test_strict_inequality_deprecation()
+function test_deprecation_strict_inequality()
     x = Variable()
     @test_logs (:warn,) x < 1
     @test_logs (:warn,) 1 < x
@@ -946,6 +946,14 @@ function test_strict_inequality_deprecation()
     @test_logs (:warn,) x > x
     @test string(x < 1) == string(x <= 1)
     @test string(x > 1) == string(x >= 1)
+    return
+end
+
+function test_deprecation_norm()
+    x = Variable(2)
+    @test_deprecated norm_inf(x)
+    @test_deprecated norm_1(x)
+    @test_deprecated norm_fro(x)
     return
 end
 

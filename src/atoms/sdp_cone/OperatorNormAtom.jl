@@ -37,8 +37,6 @@ function LinearAlgebra.opnorm(x::AbstractExpr, p::Real = 2)
     end
 end
 
-Base.@deprecate operatornorm(x::AbstractExpr) LinearAlgebra.opnorm(x)
-
 function new_conic_form!(context::Context{T}, x::OperatorNormAtom) where {T}
     A = x.children[1]
     if sign(A) == ComplexSign()
