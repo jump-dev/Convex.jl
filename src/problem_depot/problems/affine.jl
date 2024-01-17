@@ -475,13 +475,6 @@ end
         @test p.optval ≈ 11 / 6 atol = atol rtol = rtol
         @test evaluate(sum(x ./ [1 2 3])) ≈ 11 / 6 atol = atol rtol = rtol
     end
-
-    # Broadcast fusion works
-    x = Variable(5, 5)
-    a = 2.0 .* x .* ones(Int, 5)
-    if test
-        # @test a isa Convex.DotMultiplyAtom
-    end
 end
 
 @add_problem affine function affine_reshape_atom(
