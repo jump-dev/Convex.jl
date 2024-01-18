@@ -11,15 +11,14 @@ mutable struct Problem{T<:Real} <: AbstractExpr
     ) where {T<:Real}
         if objective !== nothing && sign(objective) == Convex.ComplexSign()
             error("Objective cannot be a complex expression")
-        else
-            return new(
-                head,
-                objective,
-                constraints,
-                MOI.OPTIMIZE_NOT_CALLED,
-                nothing,
-            )
         end
+        return new(
+            head,
+            objective,
+            constraints,
+            MOI.OPTIMIZE_NOT_CALLED,
+            nothing,
+        )
     end
 end
 
@@ -30,14 +29,16 @@ function Base.getproperty(p::Problem, s::Symbol)
         else
             return objective_value(p)
         end
-    else
-        return getfield(p, s)
     end
+    return getfield(p, s)
 end
 
 dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
+
 primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
+
 termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
+
 function objective_value(p::Problem)
     # These don't have an objective value, and it would be confusing to return one
     if p.head === :satisfy
@@ -54,13 +55,16 @@ function problem_vexity(p::Problem)
     constr_vex = ConstVexity()
     for i in 1:length(p.constraints)
         vex = vexity(p.constraints[i])
-        typeof(vex) in bad_vex &&
+        if typeof(vex) in bad_vex
             @warn "Problem not DCP compliant: constraint $i is not DCP"
+        end
         constr_vex += vex
     end
     problem_vex = obj_vex + constr_vex
     # this check is redundant
-    typeof(problem_vex) in bad_vex && @warn("Problem not DCP compliant")
+    if typeof(problem_vex) in bad_vex
+        @warn("Problem not DCP compliant")
+    end
     return problem_vex
 end
 
@@ -75,10 +79,9 @@ function objective_vexity(p::Problem)
     else
         error("Unknown type of problem $(p.head)")
     end
-
-    typeof(obj_vex) in bad_vex &&
+    if typeof(obj_vex) in bad_vex
         @warn "Problem not DCP compliant: objective is not DCP"
-
+    end
     return obj_vex
 end
 
@@ -97,18 +100,26 @@ vexity(p::Problem) = objective_vexity(p)
 #     return obj_vexity + constr_vexity
 # end
 
-for f in (:monotonicity, :curvature)
-    @eval function $f(p::Problem)
-        if p.head === :satisfy
-            error("Satisfiability problem cannot be used as subproblem")
-        end
-        m = $f(p.objective)
-        if p.head === :maximize
-            return (-).(m)
-        else
-            return m
-        end
+function monotonicity(p::Problem)
+    if p.head === :satisfy
+        error("Satisfiability problem cannot be used as subproblem")
     end
+    m = monotonicity(p.objective)
+    if p.head === :maximize
+        return (-).(m)
+    end
+    return m
+end
+
+function curvature(p::Problem)
+    if p.head === :satisfy
+        error("Satisfiability problem cannot be used as subproblem")
+    end
+    m = curvature(p.objective)
+    if p.head === :maximize
+        return (-).(m)
+    end
+    return m
 end
 
 function Base.sign(p::Problem)
@@ -118,40 +129,34 @@ function Base.sign(p::Problem)
     m = sign(p.objective)
     if p.head === :maximize
         return (-).(m)
-    else
-        return m
     end
+    return m
 end
 
 function new_conic_form!(context::Context, p::Problem)
     for c in p.constraints
         add_constraint!(context, c)
     end
-    if p.head !== :satisfy
-        return conic_form!(context, p.objective)
-    else
-        return nothing
+    if p.head == :satisfy
+        return
     end
+    return conic_form!(context, p.objective)
 end
 
 function Context(p::Problem{T}, optimizer_factory) where {T}
     context = Context{T}(optimizer_factory)
     cfp = conic_form!(context, p)
-
     # Save some memory before the solve;
     # we don't need these anymore,
     # since we don't re-use contexts between solves currently
     empty!(context.conic_form_cache)
-
-    model = context.model
-
     if p.head == :satisfy
-        MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
+        MOI.set(context.model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
     else
         obj = scalar_fn(cfp)
-        MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+        MOI.set(context.model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
         MOI.set(
-            model,
+            context.model,
             MOI.ObjectiveSense(),
             p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE,
         )
@@ -175,6 +180,7 @@ function minimize(
 )
     return Problem{numeric_type}(:minimize, objective, collect(constraints))
 end
+
 function minimize(
     objective::AbstractExpr,
     constraints::Array{<:Constraint} = Constraint[];
@@ -182,9 +188,11 @@ function minimize(
 )
     return Problem{numeric_type}(:minimize, objective, constraints)
 end
+
 function minimize(::Value, constraints::Constraint...; numeric_type = Float64)
     return satisfy(collect(constraints); numeric_type = numeric_type)
 end
+
 function minimize(
     ::Value,
     constraints::Array{<:Constraint} = Constraint[];
@@ -201,6 +209,7 @@ function maximize(
 )
     return Problem{numeric_type}(:maximize, objective, collect(constraints))
 end
+
 function maximize(
     objective::AbstractExpr,
     constraints::Array{<:Constraint} = Constraint[];
@@ -208,9 +217,11 @@ function maximize(
 )
     return Problem{numeric_type}(:maximize, objective, constraints)
 end
+
 function maximize(::Value, constraints::Constraint...; numeric_type = Float64)
     return satisfy(collect(constraints); numeric_type = numeric_type)
 end
+
 function maximize(
     ::Value,
     constraints::Array{<:Constraint} = Constraint[];
@@ -223,12 +234,14 @@ end
 function satisfy(constraints::Constraint...; numeric_type = Float64)
     return Problem{numeric_type}(:satisfy, nothing, [constraints...])
 end
+
 function satisfy(
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
     return Problem{numeric_type}(:satisfy, nothing, constraints)
 end
+
 function satisfy(constraint::Constraint; numeric_type = Float64)
     return satisfy([constraint]; numeric_type = numeric_type)
 end
@@ -236,6 +249,7 @@ end
 function add_constraints!(p::Problem, constraints::Array{<:Constraint})
     return append!(p.constraints, constraints)
 end
+
 function add_constraints!(p::Problem, constraint::Constraint)
     return add_constraints!(p, [constraint])
 end
@@ -243,6 +257,7 @@ end
 function add_constraint!(p::Problem, constraints::Array{<:Constraint})
     return add_constraints!(p, constraints)
 end
+
 function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
 end
@@ -279,7 +294,7 @@ Currently, `Float64` is the only supported coefficient type. This may be
 relaxed in future if file formats support other types.
 """
 function write_to_file(p::Problem{T}, filename::String) where {T<:Float64}
-    if isnothing(p.model)
+    if p.model === nothing
         msg = """
         Problem has not been loaded into a MathOptInterface model;
         call `solve!(problem, optimizer)` before writing problem to file.

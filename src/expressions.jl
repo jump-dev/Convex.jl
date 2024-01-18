@@ -26,9 +26,11 @@
 #
 #############################################################################
 
-### Abstract types
 abstract type AbstractExpr end
+
 abstract type Constraint end
+
+const Value = Union{Number,AbstractArray}
 
 # We commandeer `==` to create a constraint.
 # Therefore we define `isequal` to still have a notion of equality
@@ -36,9 +38,13 @@ abstract type Constraint end
 # All `AbstractExpr` (Constraints are not AbstractExpr's!) are compared by value, except for AbstractVariables,
 # which use their `id_hash` field.
 function Base.isequal(x::AbstractExpr, y::AbstractExpr)
-    typeof(x) == typeof(y) || return false
+    if typeof(x) != typeof(y)
+        return false
+    end
     for i in 1:fieldcount(typeof(x))
-        isequal(getfield(x, i), getfield(y, i)) || return false
+        if !isequal(getfield(x, i), getfield(y, i))
+            return false
+        end
     end
     return true
 end
@@ -64,42 +70,14 @@ function vexity(x::AbstractExpr)
     return vex
 end
 
-# This function should never be reached
-function monotonicity(x::AbstractExpr)
-    return error("monotonicity not implemented for $(x.head).")
-end
-
-# This function should never be reached
-function curvature(x::AbstractExpr)
-    return error("curvature not implemented for $(x.head).")
-end
-
-# This function should never be reached
-function evaluate(x::AbstractExpr)
-    return error("evaluate not implemented for $(x.head).")
-end
-
 evaluate(x) = output(x) # fallback
 
-# This function should never be reached
-function Base.sign(x::AbstractExpr)
-    return error("sign not implemented for $(x.head).")
-end
+Base.size(x::AbstractExpr) = x.size
 
-function Base.size(x::AbstractExpr)
-    return x.size
-end
-
-function Base.length(x::AbstractExpr)
-    return prod(x.size)
-end
-
-### User-defined Unions
-const Value = Union{Number,AbstractArray}
-const ValueOrNothing = Union{Value,Nothing}
-const AbstractExprOrValue = Union{AbstractExpr,Value}
+Base.length(x::AbstractExpr) = x.size
 
 Base.convert(::Type{AbstractExpr}, x::Value) = constant(x)
+
 Base.convert(::Type{AbstractExpr}, x::AbstractExpr) = x
 
 function Base.size(x::AbstractExpr, dim::Integer)
@@ -107,14 +85,16 @@ function Base.size(x::AbstractExpr, dim::Integer)
         error("dimension out of range")
     elseif dim > 2
         return 1
-    else
-        return size(x)[dim]
     end
+    return size(x)[dim]
 end
 
 Base.ndims(x::AbstractExpr) = 2
+
 Base.lastindex(x::AbstractExpr) = length(x)
 
 Base.axes(x::AbstractExpr) = (Base.OneTo(size(x, 1)), Base.OneTo(size(x, 2)))
+
 Base.axes(x::AbstractExpr, n::Integer) = axes(x)[n]
+
 Base.lastindex(x::AbstractExpr, n::Integer) = last(axes(x, n))

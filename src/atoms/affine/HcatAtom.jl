@@ -61,7 +61,7 @@ end
 # * splatting creates zero-argument functions, which again are not owned by Convex.jl
 Base.hcat(args::AbstractExpr...) = HcatAtom(args...)
 
-function Base.hcat(args::AbstractExprOrValue...)
+function Base.hcat(args::Union{AbstractExpr,Value}...)
     if all(Base.Fix2(isa, Value), args)
         return Base.cat(args..., dims = Val(2))
     end
@@ -71,14 +71,17 @@ end
 # TODO: implement vertical concatenation in a more efficient way
 Base.vcat(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)...))
 
-function Base.vcat(args::AbstractExprOrValue...)
+function Base.vcat(args::Union{AbstractExpr,Value}...)
     if all(Base.Fix2(isa, Value), args)
         return Base.cat(args..., dims = Val(1))
     end
     return transpose(HcatAtom(map(transpose, args)...))
 end
 
-function Base.hvcat(rows::Tuple{Vararg{Int}}, args::AbstractExprOrValue...)
+function Base.hvcat(
+    rows::Tuple{Vararg{Int}},
+    args::Union{AbstractExpr,Value}...,
+)
     nbr = length(rows)
     rs = Vector{Any}(undef, nbr)
     a = 1

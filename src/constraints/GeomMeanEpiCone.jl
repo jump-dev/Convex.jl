@@ -71,8 +71,8 @@ mutable struct GeomMeanEpiCone
     end
 
     function GeomMeanEpiCone(
-        A::AbstractExprOrValue,
-        B::AbstractExprOrValue,
+        A::Union{AbstractExpr,Value},
+        B::Union{AbstractExpr,Value},
         t::Integer,
         fullhyp::Bool = true,
     )

@@ -5,7 +5,7 @@ mutable struct GeoMeanAtom <: AbstractExpr
     children::Vector{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function GeoMeanAtom(args::AbstractExprOrValue...)
+    function GeoMeanAtom(args::Union{AbstractExpr,Value}...)
         new_args = AbstractExpr[_to_expr(arg) for arg in args]
         sz = size(first(new_args))
         if any(!=(sz), size.(new_args))
@@ -48,7 +48,7 @@ function new_conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
     return conic_form!(context, t)
 end
 
-geomean(args::AbstractExprOrValue...) = GeoMeanAtom(args...)
+geomean(args::Union{AbstractExpr,Value}...) = GeoMeanAtom(args...)
 
 function Base.sqrt(x::AbstractExpr)
     return GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
