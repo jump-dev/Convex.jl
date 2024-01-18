@@ -15,7 +15,8 @@ of the same solvers are available in both.
 
 Convex.jl converts problems to a standard conic form. This approach requires
 (and certifies) that the problem is convex and DCP compliant, and guarantees
-global optimality of the resulting solution.
+global optimality of the resulting solution (if the solver succeeds. For some
+models, the solver may experience numerical difficulty).
 
 JuMP allows nonlinear programming through an interface that learns about
 functions via their derivatives. This approach is more flexible (for example,

@@ -211,8 +211,7 @@ Documenter.makedocs(
         "Manual" => [
             "manual/types.md",
             "manual/operations.md",
-            "Complex-domain Optimization" =>
-                "manual/complex-domain_optimization.md",
+            "Complex-domain Optimization" => "manual/complex-domain_optimization.md",
             "manual/solvers.md",
             "manual/advanced.md",
         ],

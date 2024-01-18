@@ -20,7 +20,7 @@ The Convex.jl developers also thank:
  * [Stephen Boyd](http://www.stanford.edu/~boyd/), co-author of the book
    [Convex Optimization](http://www.stanford.edu/~boyd/books.html)
  * [Steven Diamond](http://www.stanford.edu/~stevend2/), developer of
-   [cvxpy](https://github.com/cvxgrp/cvxpy) and of a
+   [CVXPY](https://github.com/cvxgrp/cvxpy) and of a
    [DCP tutorial website](http://dcp.stanford.edu/) to teach disciplined convex
    programming.
  * [Michael Grant](http://www.cvxr.com/bio), developer of [CVX](http://www.cvxr.com).
