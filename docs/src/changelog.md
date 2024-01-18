@@ -1,25 +1,72 @@
+```@meta
+CurrentModule = Convex
+```
+
 # Release notes
 
-## v0.16.0
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Breaking changes:
+## v0.16.0 (unreleased)
 
-* `x + A` will error if `x` is a scalar variable and `A` is an array. Instead, use `x * ones(size(A)) + A`.
-* The `RelativeEntropyAtom` now returns a scalar value instead of elementwise values. This does not affect the result of `relative_entropy`.
-* The function `constant` should be used instead of the type `Constant` (which now refers to exclusively real constants).
-* The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild) type piracy.
-* `vecdot(x,y)` has been removed. Call `dot(vec(x), vec(y))` instead.
-* The function `constraints`, used to get constraints associated to an individual variable, has been renamed `get_constraints`.
-* DCP violations now throw a `DCPViolationError` exception, rather than a warning. Relatedly, `Convex.emit_dcp_warnings` has been removed.
+This release contains a large number of changes, including some breaking
+changes.
 
-Other changes:
+### Breaking
 
-* SDP, SOC, and exponential cone constraints now have dual values populated.
-* `geomean` supports more than 2 arguments
-* [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) of `imag` and `real` has been removed. This should not affect use of Convex. Unfortunately, piracy of `hcat`, `vcat`, and `hvcat` still remains.
-* `sumlargesteigs` now enforces that it's argument is hermitian.
-* Bugfix: `dot` now correctly complex-conjugates its first argument
-* `norm` on `AbstractExpr` objects now supports matrices (treating them like vectors), matching Base's behavior.
+ * This release involved a substantial rewrite of Convex.jl to integrate better
+   with MathOptInterface. (#504)
+    * `x + A` will error if `x` is a scalar variable and `A` is an array.
+      Instead, use `x * ones(size(A)) + A`.
+    * The `RelativeEntropyAtom` now returns a scalar value instead o
+      elementwise values. This does not affect the result of `relative_entropy`.
+    * The function `constant` should be used instead of the type `Constant`
+      (which now refers to exclusively real constants).
+ * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
+   explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
+   type piracy. In addition, `vecdot(x,y)` has been removed. Call
+   `dot(vec(x), vec(y))` instead. (#524)
+ * The function `constraints`, used to get constraints associated to an
+   individual variable, has been renamed `get_constraints` (#527)
+ * DCP violations now throw a `DCPViolationError` exception, rather than a
+   warning. Relatedly, `Convex.emit_dcp_warnings` has been removed (#523)
+ * Removed the undocumented an internal function `latex_formulation` (#551)
+ * The strict inequalities `>` and `<` have been deprecated. They will be
+   removed in the next breaking release. Note that these never inforced strict
+   inequalities, but instead were equivalent to `>=` and `<=` respectively (#555)
+ * The functions `norm_inf`, `norm_1`, and `norm_fro` have been deprecated. They
+   will be removed in the next breaking release (#567)
+
+### Added
+
+ * SDP, SOC, and exponential cone constraints now have dual values populated
+   (#504)
+ * `geomean` supports more than 2 arguments (#504)
+ * Added `Convex.Optimizer` (#511), (#530), (#534)
+ * Added `write_to_file` (#531)
+ * Added `entropy_elementwise` (#570)
+ * `norm` on `AbstractExpr` objects now supports matrices (treating them like
+   vectors), matching Base's behavior (#528)
+
+### Fixed
+
+ * `sumlargesteigs` now enforces that it's argument is hermitian. (#504)
+ * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
+   of `imag` and `real` has been removed. This should not affect use of Convex. (#504)
+ * Bugfix: `dot` now correctly complex-conjugates its first argument (#524)
+ * Add tests and fix  a number of bugs in various atoms (#546), (#550), (#554),
+   (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566), (#567) (#568)
+
+### Other
+
+ * Improved the documentation (#517), (#529)
+ * Refactored the tests into a functional form (#532)
+ * Added `test/Project.toml` (#536)
+ * Refactored imports to explicitly overload methods (#537)
+ * Tidied and renamed various atoms and files clarity. This should be
+   non-breaking as no public API was changed. (#538), (#539), (#540), (#541),
+   (#543), (#545)
+ * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
 
 ## v0.15.4 (October 24, 2023)
 
