@@ -23,11 +23,11 @@ changes.
     * The function `constant` should be used instead of the type `Constant`
       (which now refers to exclusively real constants).
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
-  explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
-  type piracy. In addition, `vecdot(x,y)` has been removed. Call
-  `dot(vec(x), vec(y))` instead. (#524)
+   explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
+   type piracy. In addition, `vecdot(x,y)` has been removed. Call
+   `dot(vec(x), vec(y))` instead. (#524)
  * The function `constraints`, used to get constraints associated to an
-  individual variable, has been renamed `get_constraints` (#527)
+   individual variable, has been renamed `get_constraints` (#527)
  * DCP violations now throw a `DCPViolationError` exception, rather than a
    warning. Relatedly, `Convex.emit_dcp_warnings` has been removed (#523)
  * Removed the undocumented an internal function `latex_formulation` (#551)
@@ -54,9 +54,8 @@ changes.
  * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
    of `imag` and `real` has been removed. This should not affect use of Convex. (#504)
  * Bugfix: `dot` now correctly complex-conjugates its first argument (#524)
- * Add tests and fix  a number of bugs in various atoms (#546), (#546), (#550),
-   (#554), (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566),
-   (#567) (#568)
+ * Add tests and fix  a number of bugs in various atoms (#546), (#550), (#554),
+   (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566), (#567) (#568)
 
 ### Other
 
