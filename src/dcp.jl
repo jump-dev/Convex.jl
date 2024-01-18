@@ -10,14 +10,6 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-# Vexity subtypes
-abstract type Vexity end
-Base.broadcastable(v::Vexity) = Ref(v)
-struct ConstVexity <: Vexity end
-struct AffineVexity <: Vexity end
-struct ConvexVexity <: Vexity end
-struct ConcaveVexity <: Vexity end
-
 struct DCPViolationError <: Exception end
 
 function Base.showerror(io::IO, ::DCPViolationError)
@@ -32,115 +24,134 @@ function Base.showerror(io::IO, ::DCPViolationError)
     )
 end
 
+abstract type Vexity end
+
+struct ConstVexity <: Vexity end
+struct AffineVexity <: Vexity end
+struct ConvexVexity <: Vexity end
+struct ConcaveVexity <: Vexity end
 struct NotDcp <: Vexity end
 
-# Monotonocity subtypes
+Base.broadcastable(v::Vexity) = Ref(v)
+
 abstract type Monotonicity end
+
 struct Nonincreasing <: Monotonicity end
 struct Nondecreasing <: Monotonicity end
 struct ConstMonotonicity <: Monotonicity end
 struct NoMonotonicity <: Monotonicity end
 
-# Sign subtypes
 abstract type Sign end
-Base.broadcastable(s::Sign) = Ref(s)
+
 struct Positive <: Sign end
 struct Negative <: Sign end
 struct NoSign <: Sign end
-
-# New coded
-
-# Also create a new subtype of Sign "NotDefined to handle the ComplexSign case"
 struct ComplexSign <: Sign end
 
+Base.broadcastable(s::Sign) = Ref(s)
+
+# -(::Vexity)
+
 Base.:-(v::Vexity) = v
-Base.:-(v::ConcaveVexity) = ConvexVexity()
-Base.:-(v::ConvexVexity) = ConcaveVexity()
+Base.:-(::ConcaveVexity) = ConvexVexity()
+Base.:-(::ConvexVexity) = ConcaveVexity()
+
+# -(::Monotonicity)
 
 Base.:-(m::Monotonicity) = m
-Base.:-(m::Nonincreasing) = Nondecreasing()
-Base.:-(m::Nondecreasing) = Nonincreasing()
+Base.:-(::Nonincreasing) = Nondecreasing()
+Base.:-(::Nondecreasing) = Nonincreasing()
+
+# -(::Sign)
 
 Base.:-(s::Sign) = s
-Base.:-(s::Positive) = Negative()
-Base.:-(s::Negative) = Positive()
-Base.:-(s::ComplexSign) = ComplexSign()
+Base.:-(::Positive) = Negative()
+Base.:-(::Negative) = Positive()
 
-Base.:+(v::NotDcp, w::NotDcp) = v
-Base.:+(v::NotDcp, w::Vexity) = v
-Base.:+(v::Vexity, w::NotDcp) = w
+# +(::Sign)
 
-Base.:+(v::ConstVexity, w::ConstVexity) = v
-Base.:+(v::ConstVexity, w::NotDcp) = w
-Base.:+(v::NotDcp, w::ConstVexity) = v
-Base.:+(v::ConstVexity, w::Vexity) = w
-Base.:+(v::Vexity, w::ConstVexity) = v
-
-Base.:+(v::AffineVexity, w::AffineVexity) = v
-Base.:+(v::AffineVexity, w::ConvexVexity) = w
-Base.:+(v::ConvexVexity, w::AffineVexity) = v
-Base.:+(v::AffineVexity, w::ConcaveVexity) = w
-Base.:+(v::ConcaveVexity, w::AffineVexity) = v
-
-Base.:+(v::ConvexVexity, w::ConvexVexity) = v
-Base.:+(v::ConcaveVexity, w::ConcaveVexity) = v
-Base.:+(v::ConcaveVexity, w::ConvexVexity) = NotDcp()
-Base.:+(v::ConvexVexity, w::ConcaveVexity) = NotDcp()
-
-#Base.:+(::Convex.Positive, ::Convex.NoSign)
 Base.:+(s::Sign) = s
-Base.:+(s::Positive, t::Positive) = s
-Base.:+(s::Negative, t::Negative) = s
-Base.:+(s::Positive, t::Negative) = NoSign()
-Base.:+(s::Negative, t::Positive) = NoSign()
-Base.:+(s::NoSign, t::NoSign) = s
-Base.:+(s::NoSign, t::Positive) = s
-Base.:+(t::Positive, s::NoSign) = s + t
-Base.:+(s::NoSign, t::Negative) = s
-Base.:+(t::Negative, s::NoSign) = s + t
 
-# Any sign + ComplexSign = ComplexSign
-Base.:+(s::ComplexSign) = s
-Base.:+(s::ComplexSign, t::ComplexSign) = s
-Base.:+(s::Sign, t::ComplexSign) = t
-Base.:+(t::ComplexSign, s::Sign) = s + t
+# +(::Vexity, ::Vexity)
 
-Base.:*(s::NoSign, t::NoSign) = s
-Base.:*(s::NoSign, t::Positive) = s
-Base.:*(s::Positive, t::NoSign) = t
-Base.:*(s::NoSign, t::Negative) = s
-Base.:*(s::Negative, t::NoSign) = t
-Base.:*(s::Positive, t::Positive) = s
-Base.:*(s::Positive, t::Negative) = t
-Base.:*(s::Negative, t::Positive) = s
-Base.:*(s::Negative, t::Negative) = Positive()
+Base.:+(v::ConvexVexity, ::ConvexVexity) = v
+Base.:+(v::ConvexVexity, ::AffineVexity) = v
+Base.:+(::ConvexVexity, ::ConcaveVexity) = NotDcp()
+Base.:+(v::ConcaveVexity, ::ConcaveVexity) = v
+Base.:+(v::ConcaveVexity, ::AffineVexity) = v
+Base.:+(::ConcaveVexity, ::ConvexVexity) = NotDcp()
+Base.:+(v::ConstVexity, ::ConstVexity) = v
+Base.:+(::ConstVexity, v::NotDcp) = v
+Base.:+(::ConstVexity, v::Vexity) = v
+Base.:+(::AffineVexity, v::ConvexVexity) = v
+Base.:+(::AffineVexity, v::ConcaveVexity) = v
+Base.:+(v::AffineVexity, ::AffineVexity) = v
+Base.:+(v::NotDcp, ::ConstVexity) = v
+Base.:+(v::NotDcp, ::NotDcp) = v
+Base.:+(v::NotDcp, ::Vexity) = v
+Base.:+(v::Vexity, ::ConstVexity) = v
+Base.:+(::Vexity, v::NotDcp) = v
 
-# ComplexSign * Any Sign = NotDefined(Though ComplexSign and its conjugate is real but we ignore that case)
-Base.:*(t::ComplexSign, s::ComplexSign) = t
-Base.:*(t::ComplexSign, s::Sign) = t
-Base.:*(s::Sign, t::ComplexSign) = t
+# +(::Sign, ::Sign)
 
-Base.:*(s::Positive, m::Monotonicity) = m
-Base.:*(s::Negative, m::Monotonicity) = -m
-Base.:*(s::NoSign, m::Monotonicity) = NoMonotonicity()
+Base.:+(s::Positive, ::Positive) = s
+Base.:+(s::Negative, ::Negative) = s
+Base.:+(::Positive, ::Negative) = NoSign()
+Base.:+(::Negative, ::Positive) = NoSign()
+Base.:+(s::NoSign, ::NoSign) = s
+Base.:+(s::NoSign, ::Sign) = s
+Base.:+(::Sign, s::NoSign) = s
+Base.:+(s::ComplexSign, ::ComplexSign) = s
+Base.:+(::NoSign, s::ComplexSign) = s
+Base.:+(s::ComplexSign, ::NoSign) = s
+Base.:+(::Sign, s::ComplexSign) = s
+Base.:+(s::ComplexSign, ::Sign) = s
 
-# ComplexSign * Any monotonivity = NoMonotonicity
-Base.:*(s::ComplexSign, m::Monotonicity) = NoMonotonicity()
+# *(::Sign, ::Sign)
+
+Base.:*(s::Positive, ::Positive) = s
+Base.:*(::Negative, ::Negative) = Positive()
+Base.:*(::Positive, s::Negative) = s
+Base.:*(s::Negative, ::Positive) = s
+Base.:*(s::NoSign, ::NoSign) = s
+Base.:*(s::NoSign, ::Sign) = s
+Base.:*(::Sign, s::NoSign) = s
+Base.:*(s::ComplexSign, ::ComplexSign) = s
+Base.:*(::NoSign, s::ComplexSign) = s
+Base.:*(s::ComplexSign, ::NoSign) = s
+Base.:*(::Sign, s::ComplexSign) = s
+Base.:*(s::ComplexSign, ::Sign) = s
+
+# *(::Sign, ::Monotonicity)
+
+Base.:*(::Positive, m::Monotonicity) = m
+Base.:*(::Negative, m::Monotonicity) = -m
+Base.:*(::NoSign, ::Monotonicity) = NoMonotonicity()
+Base.:*(::ComplexSign, ::Monotonicity) = NoMonotonicity()
+
+# *(::Monotonicity, ::Sign)
+
 Base.:*(m::Monotonicity, s::Sign) = s * m
 
-Base.:*(m::Nondecreasing, v::Vexity) = v
-Base.:*(m::Nonincreasing, v::Vexity) = -v
-Base.:*(m::NoMonotonicity, v::Vexity) = v
-Base.:*(m::NoMonotonicity, v::ConvexVexity) = NotDcp()
-Base.:*(m::NoMonotonicity, v::ConcaveVexity) = NotDcp()
+# *(::Monotonicity, ::Vexity)
 
-# ComplexSign * Affine = Affine
-# ComplexSign * Concave = NotDcp
-# ComplexSign * NotDcp = NotDcp
-# ComplexSign * NotDcp = NotDcp
-Base.:*(s::ComplexSign, v::ConstVexity) = v
-Base.:*(s::ComplexSign, v::AffineVexity) = v
-Base.:*(s::ComplexSign, v::ConvexVexity) = NotDcp()
-Base.:*(s::ComplexSign, v::ConcaveVexity) = NotDcp()
-Base.:*(s::ComplexSign, v::NotDcp) = v
-Base.:*(v::Vexity, s::ComplexSign) = s * v
+Base.:*(::Nondecreasing, v::Vexity) = v
+Base.:*(::Nonincreasing, v::Vexity) = -v
+Base.:*(::ConstMonotonicity, v::Vexity) = v
+Base.:*(::NoMonotonicity, v::Vexity) = v
+Base.:*(::NoMonotonicity, ::ConvexVexity) = NotDcp()
+Base.:*(::NoMonotonicity, ::ConcaveVexity) = NotDcp()
+
+# *(::Vexity, ::Monotonicity)
+
+Base.:*(v::Vexity, m::Monotonicity) = m * v
+
+# *(::Sign, ::Vexity)
+
+Base.:*(::ComplexSign, v::ConcaveVexity) = NotDcp()
+Base.:*(::ComplexSign, v::ConvexVexity) = NotDcp()
+Base.:*(::Sign, v::Vexity) = v
+
+# *(::Vexity, ::Sign)
+
+Base.:*(v::Vexity, s::Sign) = s * v
