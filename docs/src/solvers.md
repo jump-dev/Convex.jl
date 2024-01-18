@@ -58,7 +58,7 @@ solve!(
 ```
 
 As another example, if we wish to turn off printing for the SCS solver
-(i.e., run in quiet mode), we can do so as follows:
+(that is, run in quiet mode), we can do so as follows:
 ```julia
 using Convex, SCS
 const MOI = Convex.MOI

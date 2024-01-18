@@ -58,12 +58,12 @@ Most of the second order cone function listed under
 [Second-Order Cone Representable Functions](@ref)
 operate on complex variables as well. Notable exceptions include:
 
-> -   inverse
-> -   square
-> -   quadoverlin
-> -   sqrt
-> -   geomean
-> -   huber
+> -   `inverse`
+> -   `square`
+> -   `quadoverlin`
+> -   `sqrt`
+> -   `geomean`
+> -   `huber`
 
 One new function is available:
 
@@ -81,7 +81,7 @@ work for complex variables.
 Exponential + SDP representable Functions (complex variables)
 -------------------------------------------------------------
 
-Complex variables also support logdet function.
+Complex variables also support `logdet` function.
 
 Optimizing over quantum states
 ------------------------------

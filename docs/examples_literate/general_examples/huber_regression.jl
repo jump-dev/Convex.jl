@@ -44,7 +44,7 @@ for i in 1:length(p_vals)
     lsq_data[i] = evaluate(fit)
 
     ## Form and solve a prescient regression problem,
-    ## i.e., where the sign changes are known.
+    ## that is, where the sign changes are known.
     cost = norm(factor .* (X' * beta) - Y)
     solve!(minimize(cost), SCS.Optimizer; silent_solver = true)
     prescient_data[i] = evaluate(fit)

@@ -6,7 +6,7 @@ using Convex
 using SCS
 
 # This is an example logistic regression using `RDatasets`'s iris data.
-# Our goal is to gredict whether the iris species is versicolor
+# Our goal is to predict whether the iris species is versicolor
 # using the sepal length and width and petal length and width.
 iris = dataset("datasets", "iris");
 iris[1:10, :]

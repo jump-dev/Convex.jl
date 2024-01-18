@@ -176,7 +176,7 @@ tree-traversal functions of that package can be used with Convex.jl problems and
 structures. This is what allows powers the printing of problems, expressions,
 and constraints. The depth to which the tree corresponding to a problem,
 expression, or constraint is printed is controlled by the global variable
-[`Convex.MAXDEPTH`](@ref), which defaults to 3. This can be changed by e.g.
+[`Convex.MAXDEPTH`](@ref), which defaults to 3. This can be changed by for example,
 setting
 
 ```julia
@@ -186,7 +186,7 @@ Convex.MAXDEPTH[] = 5
 Likewise, [`Convex.MAXWIDTH`](@ref), which defaults to 15, controls the "width"
 of the printed tree. For example, when printing a problem with 20 constraints,
 only the first `MAXWIDTH` of the constraints will be printed. Vertical dots,
-"⋮", will be printed indicating that some constraints were omitted in the
+`⋮`, will be printed indicating that some constraints were omitted in the
 printing.
 
 A related setting is [`Convex.MAXDIGITS`](@ref), which controls

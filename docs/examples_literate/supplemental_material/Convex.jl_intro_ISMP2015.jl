@@ -154,7 +154,7 @@ evaluate(objective)
 
 #-
 
-# to solve problem using a different solver, just import the solver package and pass the solver to the `solve!` method: eg
+# to solve problem using a different solver, just import the solver package and pass the solver to the `solve!` method:
 #
 #     using Mosek
 #     solve!(p, Mosek.Optimizer)

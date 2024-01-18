@@ -7,7 +7,7 @@ Where can I get help?
 
 For usage questions, please contact us via the
 [Julia Discourse](https://discourse.julialang.org/c/domain/opt). If you're
-running into bugs or have feature requests, please use the [Github Issue
+running into bugs or have feature requests, please use the [GitHub Issue
 Tracker](https://github.com/JuliaOpt/Convex.jl/issues).
 
 How does Convex.jl differ from JuMP?
@@ -48,8 +48,8 @@ this [DCP tutorial website](http://dcp.stanford.edu/).
 Are there similar packages available in other languages?
 --------------------------------------------------------
 
-Indeed! You might use [CVXPY](http://www.cvxpy.org) in Python, or
-[CVX](http://cvxr.com/) in Matlab.
+You might use [CVXPY](http://www.cvxpy.org) in Python, or [CVX](http://cvxr.com/)
+in Matlab.
 
 How does Convex.jl work?
 ------------------------

@@ -1,5 +1,5 @@
 # # Binary (or 0-1) knapsack problem
-# Given a knapsack of some capacity $C$ and $n$ objects with object $i$ having weight $w_i$ and profit $p_i$, the goal is to choose some subset of the objects that can fit in the knapsack (i.e. the sum of their weights is no more than $C$) while maximizing profit.
+# Given a knapsack of some capacity $C$ and $n$ objects with object $i$ having weight $w_i$ and profit $p_i$, the goal is to choose some subset of the objects that can fit in the knapsack (that is, the sum of their weights is no more than $C$) while maximizing profit.
 #
 # This can be formulated as a mixed-integer program as:
 #

@@ -2,7 +2,7 @@
 #
 # In this problem, we will find the unconstrained portfolio allocation where we introduce the weighting parameter $\lambda \;(0 \leq \lambda \leq$ 1) and minimize $\lambda * \text{risk} - (1-\lambda)* \text{expected return}$. By varying the values of $\lambda$, we trace out the efficient frontier.
 #
-# Suppose that we know the mean returns $\mu \in \mathbf{R}^n$ of each asset and the covariance $\Sigma \in \mathbf{R}^{n \times n}$ between the assets. Our objective is to find a portfolio allocation that minimizes the *risk* (which we measure as the variance $w^T \Sigma w$) and maximizes the *expected return* ($w^T \mu$) of the portfolio of the simulataneously. We require $w \in \mathbf{R}^n$ and $\sum_i w_i = 1$.
+# Suppose that we know the mean returns $\mu \in \mathbf{R}^n$ of each asset and the covariance $\Sigma \in \mathbf{R}^{n \times n}$ between the assets. Our objective is to find a portfolio allocation that minimizes the *risk* (which we measure as the variance $w^T \Sigma w$) and maximizes the *expected return* ($w^T \mu$) of the portfolio of the simultaneously. We require $w \in \mathbf{R}^n$ and $\sum_i w_i = 1$.
 #
 # This problem can be written as
 #
@@ -90,7 +90,7 @@ plot(
 )
 scatter!(sqrt.(diag(Σ)), μ, color = :red, label = "assets")
 
-# We now instead impose a restriction on  $\sum_i |w_i| - 1$, allowing for varying degrees of "leverage".
+# We now instead impose a restriction on  $\sum_i |w_i| - 1$, allowing for varying degrees of leverage.
 
 Lmax = 0.5
 

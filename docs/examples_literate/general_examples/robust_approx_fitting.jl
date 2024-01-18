@@ -5,7 +5,7 @@
 # Adapted for Convex by Joelle Skaf - 10/03/05
 #
 # Adapted for Convex.jl by Karanveer Mohan and David Zeng - 26/05/14
-# Original cvx code and plots here:
+# Original CVX code and plots here:
 # <http://web.cvxr.com/cvx/examples/cvxbook/Ch06_approx_fitting/html/fig6_15.html>
 #
 # Consider the least-squares problem:
@@ -13,7 +13,7 @@
 # where $t$ is an uncertain parameter in [-1,1]
 # Three approximate solutions are found:
 #
-#   1. nominal optimal (i.e. letting t=0)
+#   1. nominal optimal (that is, letting t=0)
 #   2. stochastic robust approximation:
 #           minimize $\mathbb{E}\|(A+tB)x - b\|_2$
 #      assuming $u$ is uniformly distributed on [-1,1].
@@ -39,18 +39,18 @@ B = B / norm(B);
 b = randn(m, 1);
 x = Variable(n)
 
-# Case 1: Nominal optimal solution
+# Case 1: nominal optimal solution
 p = minimize(norm(A * x - b, 2))
 solve!(p, SCS.Optimizer; silent_solver = true)
 x_nom = evaluate(x)
 
-# Case 2: Stochastic robust approximation
+# Case 2: stochastic robust approximation
 P = 1 / 3 * B' * B;
 p = minimize(square(pos(norm(A * x - b))) + quadform(x, Symmetric(P)))
 solve!(p, SCS.Optimizer; silent_solver = true)
 x_stoch = evaluate(x)
 
-# Case 3: Worst-case robust approximation
+# Case 3: worst-case robust approximation
 p = minimize(max(norm((A - B) * x - b), norm((A + B) * x - b)))
 solve!(p, SCS.Optimizer; silent_solver = true)
 x_wc = evaluate(x)

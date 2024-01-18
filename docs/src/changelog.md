@@ -32,7 +32,7 @@ changes.
    warning. Relatedly, `Convex.emit_dcp_warnings` has been removed (#523)
  * Removed the undocumented an internal function `latex_formulation` (#551)
  * The strict inequalities `>` and `<` have been deprecated. They will be
-   removed in the next breaking release. Note that these never inforced strict
+   removed in the next breaking release. Note that these never enforced strict
    inequalities, but instead were equivalent to `>=` and `<=` respectively (#555)
  * The functions `norm_inf`, `norm_1`, and `norm_fro` have been deprecated. They
    will be removed in the next breaking release (#567)
@@ -214,11 +214,11 @@ changes.
   [docs](https://www.juliaopt.org/Convex.jl/dev/advanced/#Custom-Variable-Types-1)
   for more information. You can also add constraints directly to a variable
   using `add_constraint!` ([#358](https://github.com/JuliaOpt/Convex.jl/pull/358)).
-* Accessors `vexity(x::Variable)`, `sign(x::Variable)`, and
+* Functions `vexity(x::Variable)`, `sign(x::Variable)`, and
   `evaluate(x::Variable)` should now be the preferred way to access properties
   of a variable; likewise use `set_value!` to set the initial value of a
   variable ([#358](https://github.com/JuliaOpt/Convex.jl/pull/358)).
-* To create integer or binary constraints, use the `VarType` enum (e.g.
+* To create integer or binary constraints, use the `VarType` enum (for example,
   `Variable(BinVar)`). Access or set this via `vartype` and `vartype!` ([#358](https://github.com/JuliaOpt/Convex.jl/pull/358)).
 
 ## v0.13.3 (March 22, 2020)
@@ -252,5 +252,5 @@ changes.
 * `evaluate(x::Variable)` and `evaluate(c::Constant)` now return scalars and
   vectors as appropriate, instead of `(1,1)`- and `(d,1)`-matrices
   ([#359](https://github.com/JuliaOpt/Convex.jl/pull/359)). This affects
-  functions which used to return `(1,1)`-matrices; e.g., now
+  functions which used to return `(1,1)`-matrices; for example, now
   `evaluate(quadform(...))` yields a scalar.

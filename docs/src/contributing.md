@@ -17,13 +17,13 @@ progress by putting \[WIP\] in the name of the PR.)
 Adding examples
 ---------------
 
- -   Take a look at our exising [usage
+ -   Take a look at our existing [usage
      examples](https://github.com/jump-dev/Convex.jl/tree/master/examples)
      and add another in similar style.
  -   Submit a PR. (Let us know if it's a work in progress by putting
      \[WIP\] in the name of the PR.)
  -   We'll look it over, fix up anything that doesn't work, and merge
-     it!
+     it.
 
 Adding atoms
 ------------
@@ -36,9 +36,9 @@ Convex.jl. Let's say you're adding the new function $f$.
      for an example of how to construct atoms, and see the [norm
      atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/second_order_cone/norm.jl)
      for an example of an atom that depends on a parameter.
- -   Copy paste (eg) the nuclear norm file, replace anything saying
+ -   Copy paste (for example, the nuclear norm file), replace anything saying
      nuclear norm with the name of the atom $f$, fill in monotonicity,
-     curvature, etc. Save it in the appropriate subfolder of
+     curvature, etc. Save it in the appropriate subdirectory of
      `src/atoms/`.
  -   Add as a comment a description of what the atom does and its
      parameters.
@@ -49,14 +49,14 @@ Convex.jl. Let's say you're adding the new function $f$.
      you would normally in Convex.jl, and then call `conic_form!`
      on that problem.
  -   Add a test for the atom so we can verify it works in
-     `src/problem_depot/problem/<cone>`, where `<cone>` matches the subfolder of
+     `src/problem_depot/problem/<cone>`, where `<cone>` matches the subdirectory of
      `src/atoms`. See [How to write a ProblemDepot problem](@ref) for details
      on how to write the tests.
  -   Submit a PR, including a description of what the atom does and its
      parameters. (Let us know if it's a work in progress by putting
      \[WIP\] in the name of the PR.)
  -   We'll look it over, fix up anything that doesn't work, and merge
-     it!
+     it.
 
 ```@docs
 Convex.conic_form!
@@ -70,7 +70,7 @@ If you want to do a more major bug fix, you may need to understand how
 Convex.jl thinks about conic form. To do this, start by reading [the
 Convex.jl paper](http://arxiv.org/pdf/1410.4821.pdf). You may find our
 [JuliaCon 2014 talk](https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s)
-helpful as well; you can find the ipython notebook presented in the talk
+helpful as well; you can find the Jupyter notebook presented in the talk
 [here](https://github.com/JuliaCon/presentations/tree/master/CVX).
 
 Convex has been updated several times over the years however, so older information
@@ -90,9 +90,9 @@ may be out of date. Here is a brief summary of how the package works (as of July
    or `ComplexStructOfVec{T}`. Here a `Tape` refers to a lazy sequence of sparse affine
    operators that will be applied to a vector of variables. The central computational task of Convex
    is to compose this sequence of operators (and thus enact it's extended formulations). For atoms,
-   `conic_form!` generally either creates a new object using Convex' primitives (e.g. another problem)
+   `conic_form!` generally either creates a new object using Convex' primitives (for example, another problem)
    and calls `conic_form!` on that, or, when that isn't possible, calls `operate` to
-   manipulate the tape objects themselves (e.g. to add a new operation to the composition).
+   manipulate the tape objects themselves (for example, to add a new operation to the composition).
    We try to minimize the amount of `operate` methods and defer to existing primitives when possible.
    `conic_form!` can also create new constraints and add them directly to the model. It is easy
    to create constraints of the form "vector-affine-function-in-cone" for any of MOI's many supported cones;

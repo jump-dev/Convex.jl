@@ -34,7 +34,7 @@ Convex.jl works by transforming the problem—which possibly has nonsmooth,
 nonlinear constructions like the nuclear norm, the log determinant, and so
 forth—into a linear optimization problem subject to conic constraints. This
 reformulation often involves adding auxiliary variables, and is called an
-"extended formulation", since the original problem has been extended with
+"extended formulation," since the original problem has been extended with
 additional variables. These formulations rely on the problem being modelled by
 combining Convex.jl's "atoms" or primitives according to certain rules which
 ensure convexity, called the [disciplined convex programming (DCP)

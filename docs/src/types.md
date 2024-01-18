@@ -26,15 +26,15 @@ x = Variable(4, 6)
 Variables may also be declared as having special properties, such as
 being
 
--   (entrywise) positive: `x = Variable(4, Positive())`
--   (entrywise) negative: `x = Variable(4, Negative())`
+-   (elementwise) positive: `x = Variable(4, Positive())`
+-   (elementwise) negative: `x = Variable(4, Negative())`
 -   integral: `x = Variable(4, IntVar)`
 -   binary: `x = Variable(4, BinVar)`
--   (for a matrix) being symmetric, with nonnegative eigenvalues (ie,
+-   (for a matrix) being symmetric, with nonnegative eigenvalues (that is,
      positive semidefinite): `z = Semidefinite(4)`
 
 The order of the arguments is the size, the sign, and then the
-[`Convex.VarType`](@ref) (i.e., integer, binary, or continuous), and any may be omitted
+[`Convex.VarType`](@ref) (that is, integer, binary, or continuous), and any may be omitted
 to use the default.
 The current value of a variable `x` can be accessed with `evaluate(x)`. After
 `solve!`ing a problem, the value of each variable used in the problem is set to
