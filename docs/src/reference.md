@@ -1,7 +1,5 @@
 # Reference
 
-The `AbstractVariable` interface:
-
 ```@docs
 Convex.AbstractVariable
 Convex._value
@@ -15,13 +13,17 @@ Convex.sign!
 Convex.VarType
 Convex.vartype
 Convex.vartype!
-```
-
-Functions:
-
-```@docs
 Convex.fix!
 Convex.free!
 Convex.evaluate
 Convex.solve!
+Convex.MAXDEPTH
+Convex.MAXWIDTH
+Convex.MAXDIGITS
+Convex.ProblemDepot.run_tests
+Convex.ProblemDepot.benchmark_suite
+Convex.ProblemDepot.foreach_problem
+Convex.ProblemDepot.PROBLEMS
+Convex.conic_form!
+Convex.new_conic_form!
 ```

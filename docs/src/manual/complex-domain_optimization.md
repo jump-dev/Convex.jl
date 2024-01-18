@@ -1,5 +1,4 @@
-Optimization with Complex Variables
-===================================
+# Optimization with Complex Variables
 
 Convex.jl also supports optimization with complex variables. Below, we
 present a quick start guide on how to use Convex.jl for optimization
@@ -15,8 +14,7 @@ real-domain problem using a bijective mapping. It then solves the
 real-domain problem and transforms the solution back to the complex
 domain.
 
-Complex Variables
------------------
+## Complex Variables
 
 Complex Variables in Convex.jl are declared in the same way as the
 variables are declared but using the different keyword
@@ -36,8 +34,7 @@ variables are declared but using the different keyword
   z = HermitianSemidefinite(4)
 ```
 
-Linear Program Representable Functions (complex variables)
-----------------------------------------------------------
+## Linear Program Representable Functions (complex variables)
 
 All of the linear functions that are listed under
 [Linear Program Representable Functions](@ref) operate
@@ -51,8 +48,7 @@ for complex variables are available:
 | `conj(x)`           | element-wise complex conjugate          | affine | increasing | none                         |
 | `innerproduct(x,y)` | `real(trace(x'*y))`                     | affine | increasing | PR: one argument is constant |
 
-Second-Order Cone Representable Functions (complex variables)
--------------------------------------------------------------
+## Second-Order Cone Representable Functions (complex variables)
 
 Most of the second order cone function listed under
 [Second-Order Cone Representable Functions](@ref)
@@ -71,20 +67,17 @@ One new function is available:
 | --------- | ---------------- | ------ | ---------- | ----- |
 | `abs2(z)` | `square(abs(z))` | convex | increasing | none  |
 
-Semidefinite Program Representable Functions (complex variables)
-----------------------------------------------------------------
+## Semidefinite Program Representable Functions (complex variables)
 
 All SDP-representable functions listed under
 [Semidefinite Program Representable Functions](@ref)
 work for complex variables.
 
-Exponential + SDP representable Functions (complex variables)
--------------------------------------------------------------
+## Exponential + SDP representable Functions (complex variables)
 
 Complex variables also support `logdet` function.
 
-Optimizing over quantum states
-------------------------------
+## Optimizing over quantum states
 
 The complex and Hermitian matrix variables, along with the
 `kron` and `partialtrace` operations, enable the
