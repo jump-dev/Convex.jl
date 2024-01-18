@@ -162,12 +162,12 @@ end
 
 function fix_release_line(
     line::String,
-    url::String = "https://github.com/jump-dev/Convex.jl"
+    url::String = "https://github.com/jump-dev/Convex.jl",
 )
     # (#XXXX) -> ([#XXXX](url/issue/XXXX))
     while (m = match(r"\(\#([0-9]+)\)", line)) !== nothing
-       id = m.captures[1]
-       line = replace(line, m.match => "([#$id]($url/issues/$id))")
+        id = m.captures[1]
+        line = replace(line, m.match => "([#$id]($url/issues/$id))")
     end
     # ## vX.Y.Z -> [vX.Y.Z](url/releases/tag/vX.Y.Z)
     while (m = match(r"\#\# (v[0-9]+.[0-9]+.[0-9]+)", line)) !== nothing
