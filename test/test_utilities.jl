@@ -957,6 +957,116 @@ function test_deprecation_norm()
     return
 end
 
+function test_dcp_rules()
+    vexities = (
+        Convex.ConcaveVexity(),
+        Convex.ConvexVexity(),
+        Convex.ConstVexity(),
+        Convex.AffineVexity(),
+        Convex.NotDcp(),
+    )
+    signs = (
+        Convex.Positive(),
+        Convex.Negative(),
+        Convex.NoSign(),
+        Convex.ComplexSign(),
+    )
+    monotonicities = (
+        Convex.Nondecreasing(),
+        Convex.Nonincreasing(),
+        Convex.ConstMonotonicity(),
+        Convex.NoMonotonicity(),
+    )
+    # -(::Vexity)
+    for (i, j) in enumerate([2, 1, 3, 4, 5])
+        @test -vexities[i] == vexities[j]
+    end
+    # -(::Monotonicity)
+    for (i, j) in enumerate([2, 1, 3, 4])
+        @test -monotonicities[i] == monotonicities[j]
+    end
+    # +(::Vexity, ::Vexity)
+    add_rule_vexity = [
+        1 5 1 1 5
+        5 2 2 2 5
+        1 2 3 4 5
+        1 2 4 4 5
+        5 5 5 5 5
+    ]
+    for i in 1:size(add_rule_vexity, 1), j in 1:size(add_rule_vexity, 2)
+        @test vexities[i] + vexities[j] == vexities[add_rule_vexity[i, j]]
+    end
+    # +(::Sign)
+    for i in 1:4
+        @test +(signs[i]) == signs[i]
+    end
+    # -(::Sign)
+    for (i, j) in enumerate([2, 1, 3, 4])
+        @test -signs[i] == signs[j]
+    end
+    # +(::Sign, ::Sign)
+    add_rule_sign = [
+        1 3 3 4
+        3 2 3 4
+        3 3 3 4
+        4 4 4 4
+    ]
+    for i in 1:size(add_rule_sign, 1), j in 1:size(add_rule_sign, 2)
+        @test signs[i] + signs[j] == signs[add_rule_sign[i, j]]
+    end
+    # *(::Sign, ::Sign)
+    mul_rule_sign = [
+        1 2 3 4
+        2 1 3 4
+        3 3 3 4
+        4 4 4 4
+    ]
+    for i in 1:size(mul_rule_sign, 1), j in 1:size(mul_rule_sign, 2)
+        @test signs[i] * signs[j] == signs[mul_rule_sign[i, j]]
+    end
+    # *(::Sign, ::Monotonicity)
+    # *(::Monotonicity, ::Sign)
+    mul_rule_sign_mon = [
+        1 2 3 4
+        2 1 3 4
+        4 4 4 4
+        4 4 4 4
+    ]
+    for i in 1:size(mul_rule_sign_mon, 1), j in 1:size(mul_rule_sign_mon, 2)
+        @test signs[i] * monotonicities[j] ==
+              monotonicities[mul_rule_sign_mon[i, j]]
+        @test monotonicities[j] * signs[i] ==
+              monotonicities[mul_rule_sign_mon[i, j]]
+    end
+    # *(::Vexity, ::Monotonicity)
+    # *(::Monotonicity, ::Vexity)
+    mul_rule_mon_vex = [
+        1 2 3 4 5
+        2 1 3 4 5
+        1 2 3 4 5
+        5 5 3 4 5
+    ]
+    for i in 1:size(mul_rule_mon_vex, 1), j in 1:size(mul_rule_mon_vex, 2)
+        @test monotonicities[i] * vexities[j] ==
+              vexities[mul_rule_mon_vex[i, j]]
+        @test vexities[j] * monotonicities[i] ==
+              vexities[mul_rule_mon_vex[i, j]]
+    end
+    # *(::Vexity, ::Sign)
+    # *(::Sign, ::Vexity)
+    mul_rule_sign_vex = [
+        1 2 3 4 5
+        1 2 3 4 5
+        1 2 3 4 5
+        5 5 3 4 5
+    ]
+    for i in 1:size(mul_rule_sign_vex, 1), j in 1:size(mul_rule_sign_vex, 2)
+        @test signs[i] * vexities[j] == vexities[mul_rule_sign_vex[i, j]]
+        @test vexities[j] * signs[i] == vexities[mul_rule_sign_vex[i, j]]
+    end
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
