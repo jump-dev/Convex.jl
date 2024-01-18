@@ -1,6 +1,6 @@
 # # Support vector machine
 # ### Support Vector Machine (SVM)
-# We are given two sets of points in ${\bf R}^n$, $\{x_1, \ldots, x_N\}$ and $\{y_1, \ldots, y_M\}$, and wish to find a function $f(x) = w^T x - b$ that linearly separates the points, i.e. $f(x_i) \geq 1$ for $i = 1, \ldots, N$ and $f(y_i) \leq -1$ for $i = 1, \ldots, M$. That is, the points are separated by two hyperplanes, $w^T x - b = 1$ and $w^T x - b = -1$.
+# We are given two sets of points in ${\bf R}^n$, $\{x_1, \ldots, x_N\}$ and $\{y_1, \ldots, y_M\}$, and wish to find a function $f(x) = w^T x - b$ that linearly separates the points, that is, $f(x_i) \geq 1$ for $i = 1, \ldots, N$ and $f(y_i) \leq -1$ for $i = 1, \ldots, M$. That is, the points are separated by two hyperplanes, $w^T x - b = 1$ and $w^T x - b = -1$.
 #
 # Perfect linear separation is not always possible, so we seek to minimize the amount that these inequalities are violated. The violation of point $x_i$ is $\text{max} \{1 + b - w^T x_i, 0\}$, and the violation of point $y_i$ is $\text{max} \{1 - b + w^T y_i, 0\}$. We tradeoff the error $\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\}$ with the distance between the two hyperplanes, which we want to be large, via minimizing $\|w\|^2$.
 #

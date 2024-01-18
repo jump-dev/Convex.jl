@@ -51,7 +51,7 @@
 #   \end{aligned}.
 # $$
 #
-# Here, $a(t)$ denotes the acceleration at time $t$, for which we we use
+# Here, $a(t)$ denotes the acceleration at time $t$, for which we use
 # $a(t) = f(t) / m + g - d v(t)$,
 # where $m$, $d$, $g$ are constants for the mass of the object, the drag
 # coefficient of the fluid, and the acceleration from gravity, respectively.

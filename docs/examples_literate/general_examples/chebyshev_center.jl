@@ -4,8 +4,8 @@
 #
 # Adapted for Convex.jl by Karanveer Mohan and David Zeng - 26/05/14
 #
-# The goal is to find the largest Euclidean ball (i.e. its center and
-# radius) that lies in a polyhedron described by affine inequalites in this
+# The goal is to find the largest Euclidean ball (that is, its center and
+# radius) that lies in a polyhedron described by affine inequalities in this
 # fashion: $P = \{x : a_i'*x \leq b_i, i=1,\ldots,m \}$ where $x \in \mathbb{R}^2$.
 
 using Convex

@@ -185,29 +185,43 @@ open(joinpath(@__DIR__, "src", "changelog.md"), "r") do in_io
     end
 end
 
+# ==============================================================================
+#  Build annd release
+# ==============================================================================
+
 Documenter.makedocs(
     sitename = "Convex.jl",
     repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
     # TODO(odow): uncomment this once all docstrings are in the manual
     # modules = [Convex],
-    format = Documenter.HTML(; ansicolor = true),
+    format = Documenter.HTML(;
+        ansicolor = true,
+        collapselevel = 1,
+        prettyurls = get(ENV, "CI", nothing) == "true",
+    ),
     strict = true,
     pages = [
-        "Home" => "index.md",
-        "Installation" => "installation.md",
-        "Quick Tutorial" => "quick_tutorial.md",
-        "Basic Types" => "types.md",
-        "Supported Operations" => "operations.md",
-        "Complex-domain Optimization" => "complex-domain_optimization.md",
-        "Solvers" => "solvers.md",
-        "FAQ" => "faq.md",
-        "Advanced" => "advanced.md",
-        "Problem Depot" => "problem_depot.md",
-        "Contributing" => "contributing.md",
-        "Credits" => "credits.md",
+        "Introduction" => [
+            "Home" => "index.md",
+            "Installation" => "installation.md",
+            "Quick Tutorial" => "quick_tutorial.md",
+            "FAQ" => "faq.md",
+        ],
+        "Examples" => examples_nav,
+        "Manual" => [
+            "Basic Types" => "types.md",
+            "Supported Operations" => "operations.md",
+            "Complex-domain Optimization" => "complex-domain_optimization.md",
+            "Solvers" => "solvers.md",
+            "Advanced" => "advanced.md",
+        ],
+        "Developer Docs" => [
+            "Problem Depot" => "problem_depot.md",
+            "Contributing" => "contributing.md",
+            "Credits" => "credits.md",
+        ],
         "Reference" => "reference.md",
         "Release notes" => "release_notes.md",
-        "Examples" => examples_nav,
     ],
 )
 

@@ -9,3 +9,4 @@ benchmark/*.json
 test/Project.toml
 dev
 testproblem/D0W.jls
+docs/src/release_notes.md

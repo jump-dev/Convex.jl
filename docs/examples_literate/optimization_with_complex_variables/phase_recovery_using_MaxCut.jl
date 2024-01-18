@@ -14,7 +14,7 @@
 #
 # Recovering the phase of $Ax$ from $|Ax|$ is a **nonconvex optimization problem**. Using results from [this paper](https://arxiv.org/abs/1206.0102), the problem can be relaxed to a (complex) semidefinite program (complex SDP).
 #
-# The original reprsentation of the problem is as follows:
+# The original representation of the problem is as follows:
 #
 # $$
 # \begin{array}{ll}

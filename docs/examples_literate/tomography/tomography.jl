@@ -24,7 +24,7 @@
 #  \|y - Ax\|_2^2.
 # $$
 #
-# This is simply an unconstrained least squares problem; something we can readily solve!
+# This is simply an unconstrained least squares problem; something we can readily solve.
 
 using Convex, ECOS, DelimitedFiles, SparseArrays
 aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
@@ -73,7 +73,7 @@ for i in 1:img_size
     end
 end
 
-# Plot the image using the pixel values obtained!
+# Plot the image using the pixel values obtained:
 
 using Plots
 image = reshape(evaluate(pixel_colors), img_size, img_size)
