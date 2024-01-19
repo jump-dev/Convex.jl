@@ -74,7 +74,7 @@ evaluate(x) = output(x) # fallback
 
 Base.size(x::AbstractExpr) = x.size
 
-Base.length(x::AbstractExpr) = x.size
+Base.length(x::AbstractExpr) = prod(x.size)
 
 Base.convert(::Type{AbstractExpr}, x::Value) = constant(x)
 
