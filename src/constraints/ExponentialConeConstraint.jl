@@ -32,19 +32,14 @@ function ExponentialConeConstraint(x, y::AbstractExpr, z::AbstractExpr)
     return ExponentialConeConstraint(constant(x), y, z)
 end
 
-# function vexity(c::ExponentialConeConstraint)
-#     # TODO: check these...
-#     if vexity(c.children[1]) == ConcaveVexity()
-#         error("Exponential constraint requires x to be convex")
-#     end
-#     if vexity(c.children[2]) != ConstVexity()
-#         error("Exponential constraint requires y to be constant")
-#     end
-#     if vexity(c.children[3]) == ConvexVexity()
-#         error("Exponential constraint requires z to be concave")
-#     end
-#     return ConvexVexity()
-# end
+function vexity(c::ExponentialConeConstraint)
+    for child in c.children
+        if !(vexity(child) in (ConstVexity(), AffineVexity()))
+            return NotDcp()
+        end
+    end
+    return ConvexVexity()
+end
 
 function _add_constraint!(
     context::Context{T},

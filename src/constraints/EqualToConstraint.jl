@@ -35,18 +35,17 @@ function vexity(c::EqualToConstraint)
     return vex
 end
 
-function _add_constraint!(context::Context{T}, eq::EqualToConstraint) where {T}
-    f = conic_form!(context, eq.lhs - eq.rhs)
+function _add_constraint!(context::Context{T}, c::EqualToConstraint) where {T}
+    f = conic_form!(context, c.lhs - c.rhs)
     if f isa AbstractVector
-        # a trivial constraint without variables like `5 == 0`
         if !all(abs.(f) .<= CONSTANT_CONSTRAINT_TOL[])
             @warn "Constant constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
         return
     end
-    context.constr_to_moi_inds[eq] =
-        MOI_add_constraint(context.model, f, MOI.Zeros(MOI.output_dimension(f)))
+    set = MOI.Zeros(MOI.output_dimension(f))
+    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, set)
     return
 end
 
