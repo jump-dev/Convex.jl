@@ -71,18 +71,18 @@ x = Variable()
 p = maximize( log(x), x &gt;= 1, x &lt;= 3 )
 for leaf in AbstractTrees.Leaves(p)
     println(&quot;Here&#39;s a leaf: $(summary(leaf))&quot;)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s a leaf: real variable (id: 942…157)
-Here&#39;s a leaf: real variable (id: 942…157)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s a leaf: real variable (id: 772…411)
+Here&#39;s a leaf: real variable (id: 772…411)
 Here&#39;s a leaf: positive constant
-Here&#39;s a leaf: real variable (id: 942…157)
+Here&#39;s a leaf: real variable (id: 772…411)
 Here&#39;s a leaf: positive constant</code></pre><p>We can also iterate over the problem in various orders. The following descriptions are taken from the AbstractTrees.jl docstrings, which have more information.</p><h3 id="PostOrderDFS"><a class="docs-heading-anchor" href="#PostOrderDFS">PostOrderDFS</a><a id="PostOrderDFS-1"></a><a class="docs-heading-anchor-permalink" href="#PostOrderDFS" title="Permalink"></a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that children will be visited before their parents.</p><pre><code class="language-julia hljs">for (i, node) in enumerate(AbstractTrees.PostOrderDFS(p))
     println(&quot;Here&#39;s node $i via PostOrderDFS: $(summary(node))&quot;)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PostOrderDFS: real variable (id: 942…157)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PostOrderDFS: real variable (id: 772…411)
 Here&#39;s node 2 via PostOrderDFS: log (concave; real)
-Here&#39;s node 3 via PostOrderDFS: real variable (id: 942…157)
+Here&#39;s node 3 via PostOrderDFS: real variable (id: 772…411)
 Here&#39;s node 4 via PostOrderDFS: positive constant
 Here&#39;s node 5 via PostOrderDFS: ≥ constraint (affine)
-Here&#39;s node 6 via PostOrderDFS: real variable (id: 942…157)
+Here&#39;s node 6 via PostOrderDFS: real variable (id: 772…411)
 Here&#39;s node 7 via PostOrderDFS: positive constant
 Here&#39;s node 8 via PostOrderDFS: ≤ constraint (affine)
 Here&#39;s node 9 via PostOrderDFS: 2-element Vector{Constraint}
@@ -90,22 +90,22 @@ Here&#39;s node 10 via PostOrderDFS: Problem{Float64} (convex; real)</code></pre
     println(&quot;Here&#39;s node $i via PreOrderDFS: $(summary(node))&quot;)
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PreOrderDFS: Problem{Float64} (convex; real)
 Here&#39;s node 2 via PreOrderDFS: log (concave; real)
-Here&#39;s node 3 via PreOrderDFS: real variable (id: 942…157)
+Here&#39;s node 3 via PreOrderDFS: real variable (id: 772…411)
 Here&#39;s node 4 via PreOrderDFS: 2-element Vector{Constraint}
 Here&#39;s node 5 via PreOrderDFS: ≥ constraint (affine)
-Here&#39;s node 6 via PreOrderDFS: real variable (id: 942…157)
+Here&#39;s node 6 via PreOrderDFS: real variable (id: 772…411)
 Here&#39;s node 7 via PreOrderDFS: positive constant
 Here&#39;s node 8 via PreOrderDFS: ≤ constraint (affine)
-Here&#39;s node 9 via PreOrderDFS: real variable (id: 942…157)
+Here&#39;s node 9 via PreOrderDFS: real variable (id: 772…411)
 Here&#39;s node 10 via PreOrderDFS: positive constant</code></pre><h3 id="StatelessBFS"><a class="docs-heading-anchor" href="#StatelessBFS">StatelessBFS</a><a id="StatelessBFS-1"></a><a class="docs-heading-anchor-permalink" href="#StatelessBFS" title="Permalink"></a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that all nodes of a level will be visited before their children.</p><pre><code class="language-julia hljs">for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
     println(&quot;Here&#39;s node $i via StatelessBFS: $(summary(node))&quot;)
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via StatelessBFS: Problem{Float64} (convex; real)
 Here&#39;s node 2 via StatelessBFS: log (concave; real)
 Here&#39;s node 3 via StatelessBFS: 2-element Vector{Constraint}
-Here&#39;s node 4 via StatelessBFS: real variable (id: 942…157)
+Here&#39;s node 4 via StatelessBFS: real variable (id: 772…411)
 Here&#39;s node 5 via StatelessBFS: ≥ constraint (affine)
 Here&#39;s node 6 via StatelessBFS: ≤ constraint (affine)
-Here&#39;s node 7 via StatelessBFS: real variable (id: 942…157)
+Here&#39;s node 7 via StatelessBFS: real variable (id: 772…411)
 Here&#39;s node 8 via StatelessBFS: positive constant
-Here&#39;s node 9 via StatelessBFS: real variable (id: 942…157)
-Here&#39;s node 10 via StatelessBFS: positive constant</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../solvers/">« Solvers</a><a class="docs-footer-nextpage" href="../../developer/problem_depot/">Problem Depot »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 19 January 2024 04:25">Friday 19 January 2024</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Here&#39;s node 9 via StatelessBFS: real variable (id: 772…411)
+Here&#39;s node 10 via StatelessBFS: positive constant</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../solvers/">« Solvers</a><a class="docs-footer-nextpage" href="../../developer/problem_depot/">Problem Depot »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 19 January 2024 21:51">Friday 19 January 2024</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
