@@ -107,7 +107,7 @@ x = Variable(3, 3)
 y = Variable(3, 1)
 z = Variable()
 # constrain [x y; y' z] to be positive semidefinite
-constraint = ([x y; y' z] in :SDP)
+constraint = isposdef([x y; y' z])
 # or equivalently,
 constraint = ([x y; y' z] ⪰ 0)
 ```

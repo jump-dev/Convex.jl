@@ -38,11 +38,14 @@ Base.:>(lhs::Value, rhs::AbstractExpr) = >(constant(lhs), rhs)
 
 @deprecate operatornorm(x::AbstractExpr) LinearAlgebra.opnorm(x)
 
-function LinearAlgebra.isposdef(x::AbstractExpr)
+function Base.in(x::AbstractExpr, y::Symbol)
+    if !(y in (:semidefinite, :SDP))
+        error("Set $y not understood")
+    end
     @warn(
-        "Using isposdef(x) to construct a semidefinite constraint is " *
-        "deprecated. Use `x in :semidefinite` or `x ⪰ 0` instead.",
+        "Using `x in $y` to construct a semidefinite constraint is " *
+        "deprecated. Use `isposdef(x)` or `x ⪰ 0` instead.",
         maxlog = 1,
     )
-    return x in :SDP
+    return isposdef(x)
 end

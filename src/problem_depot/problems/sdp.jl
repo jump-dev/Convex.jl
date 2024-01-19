@@ -418,7 +418,7 @@ end
     constraints = [
         partialtrace(ρ, 1, [2; 2]) ==
         [0.09942819 0.29923607; 0.29923607 0.90057181],
-        ρ in :SDP,
+        isposdef(ρ),
     ]
     p = satisfy(constraints; numeric_type = T)
 
@@ -651,7 +651,7 @@ end
     A = A + A' # now A is hermitian
     x = ComplexVariable(n, n)
     objective = sumsquares(A - x)
-    c1 = x in :SDP
+    c1 = isposdef(x)
     p = minimize(objective, c1; numeric_type = T)
 
     handle_problem!(p)
