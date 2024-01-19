@@ -960,7 +960,7 @@ end
 
 function test_deprecation_in_symbol()
     x = Variable(2, 2)
-    @test_logs (:warn,) in(x, :SDP)
+    @test_logs (:warn,) (x in :SDP)
     @test in(x, :semidefinite) isa Convex.PositiveSemidefiniteConeConstraint
     return
 end
