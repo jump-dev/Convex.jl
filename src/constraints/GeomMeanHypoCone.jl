@@ -78,8 +78,8 @@ mutable struct GeomMeanHypoCone
     end
 
     function GeomMeanHypoCone(
-        A::AbstractExprOrValue,
-        B::AbstractExprOrValue,
+        A::Union{AbstractExpr,Value},
+        B::Union{AbstractExpr,Value},
         t::Integer,
         fullhyp::Bool = true,
     )

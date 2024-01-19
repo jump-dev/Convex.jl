@@ -12,7 +12,7 @@ AbstractTrees.printnode(io::IO, node::AbstractExpr) = summary(io, node)
 
 AbstractTrees.printnode(io::IO, node::Constraint) = summary(io, node)
 
-function AbstractTrees.printnode(io::IO, node::Vector{Constraint})
+function AbstractTrees.printnode(io::IO, node::Vector{<:Constraint})
     if length(node) == 0
         print(io, "no constraints")
     else

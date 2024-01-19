@@ -182,7 +182,7 @@ mutable struct Variable <: AbstractVariable
     variable has been used in a problem which has been solved, at which
     point the optimal value is populated into this field.
     """
-    value::ValueOrNothing
+    value::Union{Value,Nothing}
     """
     The size of the variable. Scalar variables have size `(1,1)`;
     `d`-dimensional vectors have size `(d, 1)`, and `n` by `m` matrices
@@ -245,7 +245,7 @@ mutable struct ComplexVariable <: AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int,Int}
-    value::ValueOrNothing
+    value::Union{Value,Nothing}
     vexity::Vexity
     constraints::Vector{Constraint}
     function ComplexVariable(sz::Tuple{Int,Int})

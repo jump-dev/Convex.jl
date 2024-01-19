@@ -3,6 +3,7 @@ module TestUtilities
 using Convex
 using Test
 
+import AbstractTrees
 import LinearAlgebra
 import MathOptInterface as MOI
 import SCS
@@ -833,7 +834,7 @@ mutable struct DensityMatrix{T} <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int,Int}
-    value::Convex.ValueOrNothing
+    value::Union{Convex.Value,Nothing}
     vexity::Convex.Vexity
     function DensityMatrix(d)
         this = new{ComplexF64}(
@@ -889,7 +890,7 @@ mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int,Int}
-    value::Convex.ValueOrNothing
+    value::Union{Convex.Value,Nothing}
     vexity::Convex.Vexity
     function ProbabilityVector(d)
         this =
@@ -1064,6 +1065,73 @@ function test_dcp_rules()
         @test signs[i] * vexities[j] == vexities[mul_rule_sign_vex[i, j]]
         @test vexities[j] * signs[i] == vexities[mul_rule_sign_vex[i, j]]
     end
+    return
+end
+
+function test_problem_maximize()
+    x = Variable(1, Positive())
+    p = maximize(exp(x), x <= 1)
+    @test monotonicity(p) == (Convex.Nonincreasing(),)
+    @test curvature(p) == Convex.ConcaveVexity()
+    @test sign(p) == Convex.Negative()
+    return
+end
+
+function test_problem_minimize()
+    x = Variable(1, Positive())
+    p = minimize(exp(x), x <= 1)
+    @test monotonicity(p) == (Convex.Nondecreasing(),)
+    @test curvature(p) == Convex.ConvexVexity()
+    @test sign(p) == Convex.Positive()
+    return
+end
+
+function test_problem_satisfy()
+    p = satisfy(Variable() >= 0)
+    @test_throws(
+        ErrorException("Satisfiability problem cannot be used as subproblem"),
+        monotonicity(p),
+    )
+    @test_throws(
+        ErrorException("Satisfiability problem cannot be used as subproblem"),
+        curvature(p),
+    )
+    @test_throws(
+        ErrorException("Satisfiability problem cannot be used as subproblem"),
+        sign(p),
+    )
+    return
+end
+
+function test_expressions()
+    x = Variable(2)
+    @test hash(x) isa UInt
+    @test size(x) == (2, 1)
+    @test size(x, 1) == 2
+    @test size(x, 2) == 1
+    @test size(x, 3) == 1
+    @test_throws ErrorException("dimension out of range") size(x, -1)
+    @test ndims(x) == 2
+    @test lastindex(x) == 2
+    @test axes(x) == (1:2, 1:1)
+    @test axes(x, 1) == 1:2
+    @test axes(x, 2) == 1:1
+    @test lastindex(x, 1) == 2
+    @test lastindex(x, 2) == 1
+    return
+end
+
+function test_tree_interface()
+    x = Variable()
+    objective = exp(x)
+    constraints = [x >= 0]
+    p = minimize(objective, constraints)
+    o, c = AbstractTrees.children(p)
+    @test o === objective
+    @test c[1] === constraints[1]
+    @test sprint(AbstractTrees.printnode, constraints) === "constraints"
+    @test sprint(AbstractTrees.printnode, p) === "minimize"
+    @test sprint(AbstractTrees.printnode, Constraint[]) === "no constraints"
     return
 end
 

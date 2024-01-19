@@ -110,7 +110,7 @@ mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
     id_hash::UInt64
     size::Tuple{Int, Int}
-    value::Convex.ValueOrNothing
+    value::Union{Convex.Value,Nothing}
     vexity::Convex.Vexity
     function ProbabilityVector(d)
         this = new(:ProbabilityVector, 0, (d,1), nothing, Convex.AffineVexity())

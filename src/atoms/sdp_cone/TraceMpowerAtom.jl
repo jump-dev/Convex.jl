@@ -76,7 +76,7 @@ function trace_mpower(
 end
 
 function trace_mpower(
-    A::AbstractExprOrValue,
+    A::Union{AbstractExpr,Value},
     t::Integer,
     C::Union{AbstractMatrix,Constant},
 )
