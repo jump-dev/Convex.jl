@@ -60,7 +60,7 @@ function test_EqualToConstraint_dual_complex()
     c = 3 * x == 1 - 2im
     p = minimize(real(x) + 2imag(x), [c])
     solve!(p, SCS.Optimizer; silent_solver = true)
-    @test isapprox(c.dual, 1/3 - 2/3im; atol = 1e-4)
+    @test isapprox(c.dual, 1 / 3 - 2 / 3im; atol = 1e-4)
     return
 end
 
@@ -96,13 +96,13 @@ function test_GreaterThanConstraint()
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign NoSign() and ComplexSign()",
+            "Cannot create inequality constraint between expressions of sign $(Convex.NoSign()) and $(Convex.ComplexSign())",
         ),
         Variable() >= 2 + 3im,
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign ComplexSign() and NoSign()",
+            "Cannot create inequality constraint between expressions of sign $(Convex.ComplexSign()) and $(Convex.NoSign())",
         ),
         2 + 3im >= Variable(),
     )
@@ -145,13 +145,13 @@ function test_LessThanConstraint()
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign NoSign() and ComplexSign()",
+            "Cannot create inequality constraint between expressions of sign $(Convex.NoSign()) and $(Convex.ComplexSign())",
         ),
         Variable() <= 2 + 3im,
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign ComplexSign() and NoSign()",
+            "Cannot create inequality constraint between expressions of sign $(Convex.ComplexSign()) and $(Convex.NoSign())",
         ),
         2 + 3im <= Variable(),
     )
