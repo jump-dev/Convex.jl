@@ -28,15 +28,16 @@ progress by putting \[WIP\] in the name of the PR.)
 Here are the steps to add a new function or operation (atom) to
 Convex.jl. Let's say you're adding the new function $f$.
 
- -   Take a look at the [nuclear norm
-     atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/sdp_cone/nuclearnorm.jl)
-     for an example of how to construct atoms, and see the [norm
-     atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/second_order_cone/norm.jl)
+ -   Take a look at the
+     [nuclear norm atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/sdp_cone/nuclearnorm.jl)
+     for an example of how to construct atoms, and see the
+     [norm atom](https://github.com/jump-dev/Convex.jl/blob/master/src/atoms/second_order_cone/norm.jl)
      for an example of an atom that depends on a parameter.
  -   Copy paste (for example, the nuclear norm file), replace anything saying
      nuclear norm with the name of the atom $f$, fill in monotonicity,
      curvature, etc. Save it in the appropriate subdirectory of
      `src/atoms/`.
+ -   Ensure the atom is a mutable struct, so that `objectid` can be called.
  -   Add as a comment a description of what the atom does and its
      parameters.
  -   The most mathematically interesting part is the `new_conic_form!`
@@ -49,6 +50,7 @@ Convex.jl. Let's say you're adding the new function $f$.
      `src/problem_depot/problem/<cone>`, where `<cone>` matches the subdirectory of
      `src/atoms`. See [How to write a ProblemDepot problem](@ref) for details
      on how to write the tests.
+ -   Following the other examples, add a test to `test/test_atoms.jl`.
  -   Submit a PR, including a description of what the atom does and its
      parameters. (Let us know if it's a work in progress by putting
      \[WIP\] in the name of the PR.)
