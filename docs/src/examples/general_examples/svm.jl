@@ -6,11 +6,11 @@
 #
 # We can write this problem as
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #     \text{minimize}   & \|w\|^2 + C * (\sum_{i=1}^N \text{max} \{1 + b - w^T x_i, 0\} + \sum_{i=1}^M \text{max} \{1 - b + w^T y_i, 0\})
 # \end{array},
-# $$
+# ```
 #
 # where $w \in {\bf R}^n$ and $b \in {\bf R}$ are our optimization variables.
 #

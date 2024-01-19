@@ -23,9 +23,7 @@ plot(
 # We can represent this model as a vector $s$ where $s_i$ denotes the temperature on the $i$-th day.
 # To force this trend to repeat yearly, we simply want
 #
-# $$
-#  s_i = s_{i + 365}
-# $$
+# $$s_i = s_{i + 365}$$
 #
 # for each applicable $i$.
 #
@@ -34,9 +32,7 @@ plot(
 # - The first is that the temperature on each day in our model should be relatively close to the actual temperature of that day.
 # - The second is that our model needs to be smooth, so the change in temperature from day to day should be relatively small. The following objective would capture both properties:
 #
-# $$
-#  \sum_{i = 1}^n (s_i - x_i)^2 + \lambda \sum_{i = 2}^n(s_i - s_{i - 1})^2
-# $$
+# $$\sum_{i = 1}^n (s_i - x_i)^2 + \lambda \sum_{i = 2}^n(s_i - s_{i - 1})^2$$
 #
 # where $\lambda$ is the smoothing parameter. The larger $\lambda$ is, the smoother our model will be.
 #
@@ -81,15 +77,11 @@ root_mean_square_error = sqrt(sum(x -> x^2, residuals) / length(residuals))
 #
 # We now make the hypothesis that the residual temperature on a given day is some linear combination of the previous $5$ days. Such a model is called autoregressive. We are essentially trying to fit the residuals as a function of other parts of the data itself. We want to find a vector of coefficients $a$ such that
 #
-# $$
-#  \text{r}(i) \approx \sum_{j = 1}^5 a_j \text{r}(i - j)
-# $$
+# $$\text{r}(i) \approx \sum_{j = 1}^5 a_j \text{r}(i - j)$$
 #
 # This can be done by simply minimizing the following sum of squares objective
 #
-# $$
-#  \sum_{i = 6}^n \left(\text{r}(i) - \sum_{j = 1}^5 a_j \text{r}(i - j)\right)^2
-# $$
+# $$\sum_{i = 6}^n \left(\text{r}(i) - \sum_{j = 1}^5 a_j \text{r}(i - j)\right)^2$$
 #
 # The following Convex code solves this problem and plots our autoregressive model against the actual residual temperatures:
 
