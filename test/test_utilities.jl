@@ -962,7 +962,7 @@ function test_deprecation_isposdef()
     x = Variable(2, 2)
     @test_logs (:warn,) LinearAlgebra.isposdef(x)
     c = LinearAlgebra.isposdef(x)
-    @test c isa Constraint.PositiveSemidefiniteConstraint
+    @test c isa Convex.PositiveSemidefiniteConstraint
     return
 end
 
