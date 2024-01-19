@@ -42,18 +42,15 @@ end
 function _add_constraint!(context::Context{T}, lt::LessThanConstraint) where {T}
     f = conic_form!(context, lt.rhs - lt.lhs)
     if f isa AbstractVector
-        # a trivial constraint without variables like `5 >= 0`
-        if !all(f .<= CONSTANT_CONSTRAINT_TOL[])
+        # a trivial constraint without variables like `5 <= 0`
+        if !all(f .>= -CONSTANT_CONSTRAINT_TOL[])
             @warn "Constant constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
         return
     end
-    context.constr_to_moi_inds[lt] = MOI_add_constraint(
-        context.model,
-        f,
-        MOI.Nonnegatives(MOI.output_dimension(f)),
-    )
+    set = MOI.Nonnegatives(MOI.output_dimension(f))
+    context.constr_to_moi_inds[lt] = MOI_add_constraint(context.model, f, set)
     return
 end
 
@@ -64,6 +61,10 @@ Base.:<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
 Base.:<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
 
 function populate_dual!(model::MOI.ModelLike, c::LessThanConstraint, indices)
+    # FIXME(odow): this dual is the 'wrong' sign, because Convex implements
+    # rhs - lhs in Nonnegatives for a LessThanConstraint, instead of
+    # lhs - rhs in Nonpositives.
+    # Should we fix this?
     ret = MOI.get(model, MOI.ConstraintDual(), indices)
     c.dual = output(reshape(ret, c.size))
     return
