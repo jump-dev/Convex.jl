@@ -1,12 +1,10 @@
-Basic Types
-===========
+# Basic Types
 
 The basic building block of Convex.jl is called an *expression*, which
 can represent a variable, a constant, or a function of another
 expression. We discuss each kind of expression in turn.
 
-Variables
----------
+## Variables
 
 The simplest kind of expression in Convex.jl is a variable. Variables in
 Convex.jl are declared using the `Variable` keyword, along
@@ -43,20 +41,18 @@ its optimal value.
 See also [Custom Variable Types](@ref) for how to implement your own variable
 types.
 
-Constants
----------
+## Constants
 
 Numbers, vectors, and matrices present in the Julia environment are
 wrapped automatically into a `Constant` expression when used
 in a Convex.jl expression.
 
-Expressions
------------
+## Expressions
 
 Expressions in Convex.jl are formed by applying any *atom* (mathematical
 function defined in Convex.jl) to variables, constants, and other
 expressions. For a list of these functions, see
-[Operations](@ref). Atoms are applied to expressions using
+[Supported Operations](@ref). Atoms are applied to expressions using
 operator overloading. For example, `2+2` calls Julia's built-in
 addition operator, while `2+x` calls the Convex.jl addition method and
 returns a Convex.jl expression. Many of the useful language features in
@@ -89,8 +85,7 @@ solve!(problem, SCS.Optimizer)
 evaluate(expr)
 ```
 
-Constraints
------------
+## Constraints
 
 *Constraints* in Convex.jl are declared using the standard comparison
 operators `<=`, `>=`, and `==`. They specify relations that must hold
@@ -127,16 +122,14 @@ add_constraint!(x, sum(x) == 1)
 
 Now, in any problem in which `x` is used, the constraint `sum(x) == 1` will be added.
 
-Objective
----------
+## Objective
 
 The objective of the problem is a scalar expression to be maximized or
 minimized by using `maximize` or `minimize` respectively. Feasibility
 problems can be expressed by either giving a constant as the objective,
 or using `problem = satisfy(constraints)`.
 
-Problem
--------
+## Problem
 
 A *problem* in Convex.jl consists of a *sense* (minimize, maximize, or
 satisfy), an *objective* (an expression to which the sense verb is to be

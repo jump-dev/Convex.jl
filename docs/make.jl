@@ -203,25 +203,25 @@ Documenter.makedocs(
     pages = [
         "Introduction" => [
             "Home" => "index.md",
-            "Installation" => "installation.md",
-            "Quick Tutorial" => "quick_tutorial.md",
-            "FAQ" => "faq.md",
+            "introduction/installation.md",
+            "introduction/quick_tutorial.md",
+            "introduction/faq.md",
         ],
         "Examples" => examples_nav,
         "Manual" => [
-            "Basic Types" => "types.md",
-            "Supported Operations" => "operations.md",
-            "Complex-domain Optimization" => "complex-domain_optimization.md",
-            "Solvers" => "solvers.md",
-            "Advanced" => "advanced.md",
+            "manual/types.md",
+            "manual/operations.md",
+            "Complex-domain Optimization" => "manual/complex-domain_optimization.md",
+            "manual/solvers.md",
+            "manual/advanced.md",
         ],
         "Developer Docs" => [
-            "Problem Depot" => "problem_depot.md",
-            "Contributing" => "contributing.md",
-            "Credits" => "credits.md",
+            "developer/problem_depot.md",
+            "developer/contributing.md",
+            "developer/credits.md",
         ],
-        "Reference" => "reference.md",
-        "Release notes" => "release_notes.md",
+        "reference.md",
+        "release_notes.md",
     ],
 )
 

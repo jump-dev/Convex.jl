@@ -1,5 +1,4 @@
-Problem Depot
-=============
+# Problem Depot
 
 Convex.jl has a submodule, `ProblemDepot` which holds a collection of convex optimization problems. The problems are used by Convex itself to test and benchmark its code, but can also be used by solvers to test and benchmark their code. These tests have been used with many solvers at [ConvexTests.jl](https://github.com/ericphanson/ConvexTests.jl).
 
@@ -17,8 +16,7 @@ const MOI = Convex.MOI
 end
 ```
 
-How to write a ProblemDepot problem
------------------------------------
+## How to write a ProblemDepot problem
 
 The problems are organized into folders in `src/problem_depot/problems`. Each is written as a function, annotated by `@add_problem`, and a name, which is used to group the problems. For example, here is a simple problem:
 
@@ -65,8 +63,7 @@ if test
 end
 ```
 
-Benchmark-only problems
------------------------
+## Benchmark-only problems
 
 To add problems for benchmarking without tests, place problems in `src/problem_depot/problems/benchmark`, and include `benchmark` in the name. These problems will be automatically skipped during `run_tests` calls. For example, to benchmark the time it takes to add an SDP constraint, we have the problem
 
@@ -85,14 +82,4 @@ Note, we use `args...` in the function signature so that it may be called with t
 
 ```julia
 f(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
-```
-
-Reference
----------
-
-```@docs
-Convex.ProblemDepot.run_tests
-Convex.ProblemDepot.benchmark_suite
-Convex.ProblemDepot.foreach_problem
-Convex.ProblemDepot.PROBLEMS
 ```

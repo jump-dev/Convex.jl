@@ -1,8 +1,6 @@
-Advanced Features
-=================
+# Advanced Features
 
-DCP Errors
-----------
+## DCP Errors
 
 When a problem is solved that involves an expression which is not of [DCP
 form](https://dcp.stanford.edu/), an error is emitted. For example,
@@ -17,8 +15,7 @@ solve!(p, SCS.Optimizer)
 
 See [Extended formulations and the DCP ruleset](@ref) for more discussion on why these errors occur.
 
-Dual Variables
---------------
+## Dual Variables
 
 Convex.jl also returns the optimal dual variables for a problem. These
 are stored in the `dual` field associated with each constraint.
@@ -37,8 +34,7 @@ p.constraints[1].dual
 constraint.dual
 ```
 
-Fixing and freeing variables
-----------------------------
+## Fixing and freeing variables
 
 Convex.jl allows you to fix a variable `x` to a value by calling the `fix!`
 method. Fixing the variable essentially turns it into a constant. Fixed
@@ -81,9 +77,7 @@ for i=1:10
 end
 ```
 
-
-Custom Variable Types
----------------------
+## Custom Variable Types
 
 By making subtypes of [`Convex.AbstractVariable`](@ref) that conform to the appropriate
 interface (see the [`Convex.AbstractVariable`](@ref) docstring for details), one can
@@ -163,8 +157,7 @@ Subtypes of `AbstractVariable` must have the fields `head`, `id_hash`, and
   after construction.)
 
 
-Printing and the tree structure
--------------------------------
+## Printing and the tree structure
 
 A Convex problem is structured as a *tree*, with the *root* being the problem
 object, with branches to the objective and the set of constraints. The objective
@@ -240,13 +233,4 @@ will be visited before their children.
 for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
     println("Here's node $i via StatelessBFS: $(summary(node))")
 end
-```
-
-Reference
----------
-
-```@docs
-Convex.MAXDEPTH
-Convex.MAXWIDTH
-Convex.MAXDIGITS
 ```

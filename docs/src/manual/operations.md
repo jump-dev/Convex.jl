@@ -1,0 +1,142 @@
+# Supported Operations
+
+Convex.jl currently supports the following functions. These functions may be
+composed according to the [DCP](http://dcp.stanford.edu) composition rules to
+form new convex, concave, or affine expressions.
+
+Convex.jl transforms each problem into an equivalent conic program in order to
+pass the problem to a specialized solver. Depending on the types of functions
+used in the problem, the conic constraints may include linear, second-order,
+exponential, or semidefinite constraints, as well as any binary or integer
+constraints placed on the variables.
+
+Below, we list each function available in Convex.jl organized by the (most
+complex) type of cone used to represent that function, and indicate which
+solvers may be used to solve problems with those cones. Problems mixing many
+different conic constraints can be solved by any solver that supports every kind
+of cone present in the problem.
+
+In the notes column in the tables below, we denote implicit constraints imposed
+on the arguments to the function by IC, and parameter restrictions that the
+arguments must obey by PR. Convex.jl will automatically impose ICs; the user
+must make sure to satisfy PRs.
+
+Elementwise means that the function operates elementwise on vector arguments,
+returning a vector of the same size.
+
+## Linear Program Representable Functions
+
+An optimization problem using only these functions can be solved by any LP
+solver.
+
+| operation                           | description                                       | vexity  | slope      | notes           |
+|:------------------------------------|:--------------------------------------------------|:--------|:-----------|:----------------|
+| `x+y` or `x.+y`                     | addition                                          | affine  | increasing |                 |
+| `x-y` or `x.-y`                     | subtraction                                       | affine  | increasing in $x$ decreasing in $y$ | |
+| `x*y`                               | multiplication                                    | affine  | increasing if constant term $\ge 0$ decreasing if constant term $\le 0$ not monotonic otherwise | PR: one argument is constant |
+| `x/y`                               | division                                          | affine  | increasing | PR: $y$ is scalar constant |
+| `x .* y`                            | elementwise multiplication                        | affine  | increasing | PR: one argument is constant |
+| `x ./ y`                            | elementwise division                              | affine  | increasing | PR: one argument is constant |
+| `x[1:4, 2:3]`                       | indexing and slicing                              | affine  | increasing |                 |
+| `diag(x, k)`                        | $k$-th diagonal of a matrix                       | affine  | increasing |                 |
+| `diagm(x)`                          | construct diagonal matrix                         | affine  | increasing | PR: $x$ is a vector |
+| `x'`                                | transpose                                         | affine  | increasing |                 |
+| `vec(x)`                            | vector representation                             | affine  | increasing |                 |
+| `dot(x,y)`                          | $\sum_i x_i y_i$                                  | affine  | increasing | PR: one argument is constant |
+| `kron(x,y)`                         | Kronecker product                                 | affine  | increasing | PR: one argument is constant |
+| `sum(x)`                            | $\sum_{ij} x_{ij}$                                | affine  | increasing |                 |
+| `sum(x, k)`                         | sum elements across dimension $k$                 | affine  | increasing |                 |
+| `sumlargest(x, k)`                  | sum of $k$ largest elements of $x$                | convex  | increasing |                 |
+| `sumsmallest(x, k)`                 | sum of $k$ smallest elements of $x$               | concave | increasing |                 |
+| `dotsort(a, b)`                     | `dot(sort(a),sort(b))`                            | convex  | increasing | PR: one argument is constant |
+| `reshape(x, m, n)`                  | reshape into $m \times n$                         | affine  | increasing |                 |
+| `minimum(x)`                        | $\min(x)$                                         | concave | increasing |                 |
+| `maximum(x)`                        | $\max(x)$                                         | convex  | increasing |                 |
+| `[x y]` or `[x; y]` `hcat(x, y)` or `vcat(x, y)` | stacking                             | affine  | increasing |                 |
+| `tr(x)`                             | computes the trace $\mathrm{tr} \left(X \right)$  | affine  | increasing |                 |
+| `partialtrace(x,sys,dims)`          | Partial trace                                     | affine  | increasing |                 |
+| `partialtranspose(x,sys,dims)`      | Partial transpose                                 | affine  | increasing |                 |
+| `conv(h,x)`                         | $h \in \mathbb{R}^m$, $x \in \mathbb{R}^n$, $h\star x \in \mathbb{R}^{m+n-1}$; entry $i$ is given by $\sum_{j=1}^m h_jx_{i-j+1}$ with $x_k=0$ for $k$ out of bounds | affine  | increasing if $h\ge 0$ decreasing if $h\le 0$ not monotonic otherwise | PR: $h$ is constant |
+| `min(x,y)`                          | $\min(x,y)$                                       | concave | increasing |                 |
+| `max(x,y)`                          | $\max(x,y)$                                       | convex  | increasing |                 |
+| `pos(x)`                            | $\max(x,0)$                                       | convex  | increasing |                 |
+| `neg(x)`                            | $\max(-x,0)$                                      | convex  | decreasing |                 |
+| `invpos(x)`                         | $1/x$                                             | convex  | decreasing | IC: $x>0$       |
+| `abs(x)`                            | $\left\|x\right\|$                                | convex  | increasing on $x \ge 0$ decreasing on $x \le 0$     | |
+| `opnorm(x, 1)`                      | maximum absolute column sum: $\max_{1 ≤ j ≤ n} \sum_{i=1}^m \left\|x_{ij}\right\|$ | convex  | increasing on $x \ge 0$ decreasing on $x \le 0$ | |
+| `opnorm(x, Inf)`                    | maximum absolute row sum: $\max_{1 ≤ i ≤ m} \sum_{j=1}^n \left\|x_{ij}\right\|$    | convex  | increasing on $x \ge 0$ decreasing on $x \le 0$ | |
+
+## Second-Order Cone Representable Functions
+
+An optimization problem using these functions can be solved by any SOCP
+solver (including ECOS, SCS, Mosek, Gurobi, and CPLEX). Of course, if an
+optimization problem has both LP and SOCP representable functions, then
+any solver that can solve both LPs and SOCPs can solve the problem.
+
+| operation           | description                     | vexity         | slope                   | notes                           |
+|:--------------------|:--------------------------------|:---------------|:------------------------|:--------------------------------|
+| `norm(x, p)`        | $(\sum \|x_i\|^p)^{1/p}$        | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ | PR: `p >= 1` |
+| `quadform(x, P; assume_psd=false)`    | $x^T P x$     | convex in $x$ affine in $P$ | increasing on $x \ge 0$ decreasing on $x \le 0$ increasing in $P$ | PR: either $x$ or $P$ must be constant; if $x$ is not constant, then $P$ must be symmetric and positive semidefinite. Pass `assume_psd=true` to skip checking if `P` is positive semidefinite. |
+| `quadoverlin(x, y)` | $x^T x/y$                       | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ decreasing in $y$ | IC: $y > 0$ |
+| `sumsquares(x)`     | $\sum x_i^2$                    | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ |         |
+| `sqrt(x)`           | $\sqrt{x}$                      | concave        | decreasing              | IC: $x>0$                       |
+| `square(x), x^2`    | $x^2$                           | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ | PR : $x$ is scalar |
+| `x .^ 2`            | $x.^2$                          | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ | elementwise |
+| `geomean(x, y)`     | $\sqrt{xy}$                     | concave        | increasing              | IC: $x\ge0$, $y\ge0$            |
+| `huber(x, M=1)`     | $\begin{cases} x^2 &\|x\| \leq M \\ 2M\|x\| - M^2 &\|x\| > M \end{cases}$ | convex | increasing on $x \ge 0$ decreasing on $x \le 0$ | PR: $M>=1$ |
+
+Note that for `p=1` and `p=Inf`, the function `norm(x,p)` is a linear-program representable, and does not need a SOCP solver, and for a matrix `x`, `norm(x,p)` is defined as `norm(vec(x), p)`.
+
+## Exponential Cone Representable Functions
+
+An optimization problem using these functions can be solved by any
+exponential cone solver (SCS).
+
+| operation         | description              | vexity  | slope         | notes          |
+|:------------------|:-------------------------|:--------|:--------------|:---------------|
+| `logsumexp(x)`    | $\log(\sum_i \exp(x_i))$ | convex  | increasing    |                |
+| `exp(x)`          | $\exp(x)$                | convex  | increasing    |                |
+| `log(x)`          | $\log(x)$                | concave | increasing    | IC: $x>0$      |
+| `entropy(x)`      | $\sum_{ij} -x_{ij} \log(x_{ij})$ | concave | not monotonic | IC: $x>0$ |
+| `entropy_elementwise(x)` | $-x \log(x)$      | concave | not monotonic | IC: $x>0$      |
+| `logisticloss(x)` | $\log(1 + \exp(x_i))$    | convex  | increasing    |                |
+| `relative_entropy(x, y)` | $\sum_i x_i \log(x_i / y_i)$ | convex | not monotonic | IC: $x>0, y>0$ |
+
+## Semidefinite Program Representable Functions
+
+An optimization problem using these functions can be solved by any SDP
+solver (including SCS and Mosek).
+
+| operation                         | description                        | vexity       | slope         | notes                  |
+|:----------------------------------|:-----------------------------------|:-------------|:--------------|:-----------------------|
+| `nuclearnorm(x)`                  | sum of singular values of $x$      | convex       | not monotonic |                        |
+| `opnorm(x, 2)` (`operatornorm(x)`)| max of singular values of $x$      | convex       | not monotonic |                        |
+| `eigmax(x)`                       | max eigenvalue of $x$              | convex       | not monotonic |                        |
+| `eigmin(x)`                       | min eigenvalue of $x$              | concave      | not monotonic |                        |
+| `matrixfrac(x, P)`                | $x^TP^{-1}x$                       | convex       | not monotonic | IC: P is positive semidefinite |
+| `sumlargesteigs(x, k)`            | sum of top $k$ eigenvalues of $x$  | convex       | not monotonic | IC: P symmetric        |
+| `T in GeomMeanHypoCone(A, B, t)`  | $T \preceq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | concave | increasing    | IC: $A \succeq 0$, $B \succeq 0$, $t \in [0,1]$ |
+| `T in GeomMeanEpiCone(A, B, t)`   | $T \succeq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | convex  | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $t \in [-1, 0] \cup [1, 2]$ |
+| `quantum_entropy(X)`              | $-\textrm{Tr}(X \log X)$           | concave      | not monotonic | IC: $X \succeq 0$; uses natural log |
+| `quantum_relative_entropy(A, B)`  | $\textrm{Tr}(A \log A - A \log B)$ | convex       | not monotonic | IC: $A \succeq 0$, $B \succeq 0$; uses natural log |
+| `trace_logm(X, C)`                | $\textrm{Tr}(C \log X)$            | concave in X | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant; uses natural log |
+| `trace_mpower(A, t, C)`           | $\textrm{Tr}(C A^t)$ | concave in A for $t \in [0,1]$, convex for $t \in [-1,0] \cup [1,2]$   | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant, $t \in [-1, 2]$ |
+| `lieb_ando(A, B, K, t)`           | $\textrm{Tr}(K' A^{1-t} K B^t)$    | concave in A,B for $t \in [0,1]$, convex for $t \in [-1,0] \cup [1,2]$ | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $K$ constant, $t \in [-1, 2]$ |
+| `T in RelativeEntropyEpiCone(X, Y, m, k, e)` | $T \succeq e' X^{1/2} \log(X^{1/2} Y^{-1} X^{1/2}) X^{1/2} e$ | convex | not monotonic | IC: $e$ constant; uses natural log |
+
+## Exponential + SDP representable Functions
+
+An optimization problem using these functions can be solved by any
+solver that supports exponential constraints *and* semidefinite
+constraints simultaneously (SCS).
+
+| operation   | description               | vexity  | slope      | notes                          |
+|:------------|:--------------------------|:--------|:-----------|:-------------------------------|
+| `logdet(x)` | log of determinant of $x$ | concave | increasing | IC: x is positive semidefinite |
+
+## Promotions
+
+When an atom or constraint is applied to a scalar and a higher dimensional
+variable, the scalars are promoted. For example, we can do `max(x, 0)` gives an
+expression with the shape of `x` whose elements are the maximum of the
+corresponding element of `x` and `0`.

@@ -1,5 +1,4 @@
-Contributing
-============
+# Contributing
 
 We'd welcome contributions to the Convex.jl package. Here are some
 short instructions on how to get started. If you don't know what you'd
@@ -14,8 +13,7 @@ like to contribute, you could
 Then submit a pull request (PR). (Let us know if it's a work in
 progress by putting \[WIP\] in the name of the PR.)
 
-Adding examples
----------------
+## Adding examples
 
  -   Take a look at our existing [usage
      examples](https://github.com/jump-dev/Convex.jl/tree/master/examples)
@@ -25,8 +23,7 @@ Adding examples
  -   We'll look it over, fix up anything that doesn't work, and merge
      it.
 
-Adding atoms
-------------
+## Adding atoms
 
 Here are the steps to add a new function or operation (atom) to
 Convex.jl. Let's say you're adding the new function $f$.
@@ -58,13 +55,7 @@ Convex.jl. Let's say you're adding the new function $f$.
  -   We'll look it over, fix up anything that doesn't work, and merge
      it.
 
-```@docs
-Convex.conic_form!
-Convex.new_conic_form!
-```
-
-Fixing the guts
----------------
+## Fixing the guts
 
 If you want to do a more major bug fix, you may need to understand how
 Convex.jl thinks about conic form. To do this, start by reading [the

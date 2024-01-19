@@ -1,5 +1,4 @@
-Quick Tutorial
-==============
+# Quick Tutorial
 
 Consider a constrained least squares problem
 
@@ -15,8 +14,7 @@ Consider a constrained least squares problem
 with variable $x\in \mathbf{R}^{n}$, and problem data
 $A \in \mathbf{R}^{m \times n}$, $b \in \mathbf{R}^{m}$.
 
-This problem can be solved in Convex.jl as follows: :
-
+This problem can be solved in Convex.jl as follows:
 ```@example
 # Make the Convex.jl module available
 using Convex, SCS

@@ -1,5 +1,4 @@
-Solvers
-=======
+# Solvers
 
 Convex.jl transforms each problem into an equivalent [cone
 program](http://mathprogbasejl.readthedocs.org/en/latest/conic.html) in
