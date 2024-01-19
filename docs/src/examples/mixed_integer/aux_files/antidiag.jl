@@ -8,27 +8,24 @@
 # All expressions and atoms are subtpyes of AbstractExpr.
 # Please read expressions.jl first.
 #############################################################################
-import Convex.sign,
-    Convex.monotonicity, Convex.curvature, Convex.evaluate, Convex.conic_form!
-using Convex: AbstractExpr, ConstVexity, Nondecreasing
+
+import Convex
 export antidiag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
-struct AntidiagAtom <: AbstractExpr
+struct AntidiagAtom <: Convex.AbstractExpr
     head::Symbol
     id_hash::UInt64
-    children::Tuple{AbstractExpr}
+    children::Tuple{Convex.AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
 
-    function AntidiagAtom(x::AbstractExpr, k::Int = 0)
-        (num_rows, num_cols) = x.size
-
-        if k >= num_cols || k <= -num_rows
+    function AntidiagAtom(x::Convex.AbstractExpr, k::Int = 0)
+        num_rows, num_cols = x.size
+        if !(-num_rows <= k <= num_cols)
             error("Bounds error in calling diag")
         end
-
         children = (x,)
         return new(
             :antidiag,
@@ -40,26 +37,17 @@ struct AntidiagAtom <: AbstractExpr
     end
 end
 
-function sign(x::AntidiagAtom)
-    return sign(x.children[1])
+Base.sign(x::AntidiagAtom) = sign(x.children[1])
+
+Convex.monotonicity(::AntidiagAtom) = (Convex.Nondecreasing(),)
+
+Convex.curvature(::AntidiagAtom) = Convex.ConstVexity()
+
+function Convex.evaluate(x::AntidiagAtom)
+    return diag(reverse(Convex.evaluate(x.children[1]), dims = 1), x.k)
 end
 
-# The monotonicity
-function monotonicity(x::AntidiagAtom)
-    return (Nondecreasing(),)
-end
-
-# If we have h(x) = f o g(x), the chain rule says h''(x) = g'(x)^T f''(g(x))g'(x) + f'(g(x))g''(x);
-# this represents the first term
-function curvature(x::AntidiagAtom)
-    return ConstVexity()
-end
-
-function evaluate(x::AntidiagAtom)
-    return diag(reverse(evaluate(x.children[1]), dims = 1), x.k)
-end
-
-antidiag(x::AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
+antidiag(x::Convex.AbstractExpr, k::Int = 0) = AntidiagAtom(x, k)
 
 # Finds the "k"-th diagonal of x as a column vector
 # If k == 0, it returns the main diagonal and so on
@@ -79,7 +67,6 @@ function Convex.new_conic_form!(
 ) where {T}
     (num_rows, num_cols) = x.children[1].size
     k = x.k
-
     if k >= 0
         start_index = k * num_rows + num_rows
         sz_diag = Base.min(num_rows, num_cols - k)
@@ -87,14 +74,12 @@ function Convex.new_conic_form!(
         start_index = num_rows + k
         sz_diag = Base.min(num_rows + k, num_cols)
     end
-
     select_diag = spzeros(T, sz_diag, length(x.children[1]))
     for i in 1:sz_diag
         select_diag[i, start_index] = 1
         start_index += num_rows - 1
     end
-
-    objective = conic_form!(context, Convex.only(Convex.children(x)))
+    objective = Convex.conic_form!(context, only(Convex.children(x)))
     return Convex.operate(
         Convex.add_operation,
         T,

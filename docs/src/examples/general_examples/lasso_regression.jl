@@ -14,7 +14,8 @@ using DelimitedFiles, LinearAlgebra, Statistics, Plots, Convex, SCS
 #
 # All data series are standardised (see below) to have zero means and unit standard deviation, which improves the numerical stability. (Efron et al do not standardise the scale of the response variable.)
 
-(x, header) = readdlm("aux_files/diabetes.csv", ',', header = true)
+x, header =
+    readdlm(joinpath(@__DIR__, "aux_files/diabetes.csv"), ',', header = true)
 #display(header)
 #display(x)
 
