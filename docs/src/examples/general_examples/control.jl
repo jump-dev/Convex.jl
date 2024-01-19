@@ -18,21 +18,19 @@
 # $u(t)$ that will allow the state $x(t)$ to achieve specified values
 # at certain times. For example, we can specify initial and final states of the system:
 #
-# $$
+# ```math
 # \begin{aligned}
 #   x(0) &= x_i \\
 #   x(T) &= x_f
 # \end{aligned}
-# $$
+# ```
 #
 # Additional states between the initial and final states can also be specified. These
 # are known as waypoint constraints. Often, the input and state of the system will
 # have physical meaning, so we often want to find a sequence inputs that also
 # minimizes a least squares objective like the following:
 #
-# $$
-#   \sum_{t = 0}^T \|Fx(t)\|^2_2 + \sum_{t = 1}^T\|Gu(t)\|^2_2,
-# $$
+# $$\sum_{t = 0}^T \|Fx(t)\|^2_2 + \sum_{t = 1}^T\|Gu(t)\|^2_2,$$
 #
 # where $F$ and $G$ are numerical matrices.
 #

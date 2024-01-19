@@ -31,7 +31,7 @@ p.optval
 evaluate(objective)
 #15.1258578588357
 
-output = matopen("Res.mat")
+output = matopen(joinpath(@__DIR__, "Res.mat"))
 names(output)
 outputData = read(output, "Wres");
 Wres = outputData

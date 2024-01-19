@@ -1,4 +1,5 @@
 build/
-src/examples
+src/examples/*.md
+src/examples/*/*.md
 notebooks
 docs/src/release_notes.md

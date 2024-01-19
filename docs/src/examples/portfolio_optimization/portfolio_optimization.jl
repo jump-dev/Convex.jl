@@ -6,14 +6,14 @@
 #
 # This problem can be written as
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #     \text{minimize}   & w^T \Sigma w \\
 #     \text{subject to} & w^T \mu >= R_\text{target} \\
 #                       & \sum_i w_i = 1 \\
 #                       & w_\text{lower} \leq w \leq w_\text{upper}
 # \end{array}
-# $$
+# ```
 #
 # where $w \in \mathbf{R}^n$ is our optimization variable.
 
