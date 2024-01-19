@@ -28,11 +28,7 @@ function _literate_directory(dir)
             mod = @eval module $(gensym()) end
             Base.include(mod, filename)
         end
-        Literate.markdown(
-            filename,
-            dir;
-            documenter = true,
-        )
+        Literate.markdown(filename, dir; documenter = true)
     end
     return
 end
