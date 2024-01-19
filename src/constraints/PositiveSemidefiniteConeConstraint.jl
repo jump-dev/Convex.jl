@@ -13,14 +13,13 @@ end
 
 head(io::IO, ::PositiveSemidefiniteConeConstraint) = print(io, "sdp")
 
-AbstractTrees.children(C::PositiveSemidefiniteConeConstraint) = (C.child,)
+AbstractTrees.children(c::PositiveSemidefiniteConeConstraint) = (c.child,)
 
 function vexity(c::PositiveSemidefiniteConeConstraint)
-    vex = vexity(c.child)
-    if vex == AffineVexity() || vex == ConstVexity()
-        return AffineVexity()
+    if !(vexity(c.child) in (AffineVexity(), ConstVexity()))
+        return NotDcp()
     end
-    return NotDcp()
+    return AffineVexity()
 end
 
 function _add_constraint!(
@@ -29,21 +28,19 @@ function _add_constraint!(
 )
     if vexity(c.child) == ConstVexity()
         x = evaluate(c.child)
+        tol = CONSTANT_CONSTRAINT_TOL[]
         if !(x ≈ transpose(x))
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
-        end
-        if evaluate(LinearAlgebra.eigmin(c.child)) < -CONSTANT_CONSTRAINT_TOL[]
+        elseif evaluate(LinearAlgebra.eigmin(c.child)) < -tol
             @warn "constant SDP constraint is violated"
             context.detected_infeasible_during_formulation[] = true
         end
         return
     end
-    context.constr_to_moi_inds[c] = MOI_add_constraint(
-        context.model,
-        conic_form!(context, c.child),
-        MOI.PositiveSemidefiniteConeSquare(c.size[1]),
-    )
+    f = conic_form!(context, c.child)
+    set = MOI.PositiveSemidefiniteConeSquare(c.size[1])
+    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, set)
     return
 end
 

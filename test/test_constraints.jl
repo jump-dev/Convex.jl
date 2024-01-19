@@ -187,6 +187,56 @@ function test_LessThanConstraint_dual_maximize()
     return
 end
 
+### constraints/PositiveSemidefiniteConeConstraint
+
+function test_PositiveSemidefiniteConeConstraint()
+    @test_throws(
+        ErrorException("Positive semidefinite expressions must be square"),
+        Convex.PositiveSemidefiniteConeConstraint(Variable(2, 3)),
+    )
+    X = Variable(2, 2)
+    c = Convex.PositiveSemidefiniteConeConstraint(X)
+    p = minimize(tr(X), [c, X >= [1 2; 3 4]])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(X.value, [2.25 3; 3 4]; atol = 1e-3)
+    y = (c.dual + c.dual') / 2
+    @test isapprox(y[1], 1; atol = 1e-3)
+    @test (0 ⪯ X) isa Convex.PositiveSemidefiniteConeConstraint
+    @test (-X ⪯ 0) isa Convex.PositiveSemidefiniteConeConstraint
+    @test (-X ⪯ constant(0)) isa Convex.PositiveSemidefiniteConeConstraint
+    @test (constant(0) ⪯ X) isa Convex.PositiveSemidefiniteConeConstraint
+    @test_throws(ErrorException("Set PSD not understood"), X in :PSD)
+    @test vexity(X ⪯ square(Variable())) == Convex.NotDcp()
+    return
+end
+
+function test_PositiveSemidefiniteConeConstraint_violated()
+    X = constant([1 2; 3 4])
+    p = satisfy([X ⪰ 0])
+    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    X = constant([1 2; 2 3])
+    p = satisfy([X ⪰ 0])
+    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    return
+end
+
+### constraints/SecondOrderConeConstraint
+
+function test_SecondOrderConeConstraint()
+    x = Variable(3)
+    t = Variable()
+    c = Convex.SecondOrderConeConstraint(t, x)
+    p = minimize(t, [c, x >= [2, 3, 4]])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
+    t_ = sqrt(29)
+    @test isapprox(t.value, t_; atol = 1e-3)
+    @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
+    c = Convex.SecondOrderConeConstraint(square(t), x)
+    @test vexity(c) === Convex.NotDcp()
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()
