@@ -72,14 +72,7 @@ end
 ) where {T,test}
     x = Variable(Positive())
     y = Variable((3, 3))
-    p = minimize(
-        x + y[1, 1],
-        y ⪰ 0,
-        x >= 1,
-        y[2, 1] == 1;
-        numeric_type = T,
-    )
-
+    p = minimize(x + y[1, 1], y ⪰ 0, x >= 1, y[2, 1] == 1; numeric_type = T)
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
