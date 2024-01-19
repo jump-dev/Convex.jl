@@ -37,3 +37,12 @@ Base.:>(lhs::Value, rhs::AbstractExpr) = >(constant(lhs), rhs)
 @deprecate get_vectorized_size(x::AbstractExpr) length(x)
 
 @deprecate operatornorm(x::AbstractExpr) LinearAlgebra.opnorm(x)
+
+function LinearAlgebra.isposdef(x::AbstractExpr)
+    @warn(
+        "Using isposdef(x) to construct a semidefinite constraint is " *
+        "deprecated. Use `x in :semidefinite` or `x ⪰ 0` instead.",
+        maxlog = 1,
+    )
+    return x in :SDP
+end

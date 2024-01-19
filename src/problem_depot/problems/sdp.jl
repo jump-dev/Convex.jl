@@ -74,7 +74,7 @@ end
     y = Variable((3, 3))
     p = minimize(
         x + y[1, 1],
-        LinearAlgebra.isposdef(y),
+        y ⪰ 0,
         x >= 1,
         y[2, 1] == 1;
         numeric_type = T,

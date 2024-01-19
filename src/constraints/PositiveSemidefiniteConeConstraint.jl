@@ -54,10 +54,6 @@ function populate_dual!(
     return
 end
 
-# TODO: Remove isposdef, change tests to use in. Update documentation and
-# notebooks
-LinearAlgebra.isposdef(x::AbstractExpr) = in(x, :SDP)
-
 function Base.in(x::AbstractExpr, y::Symbol)
     if !(y in (:semidefinite, :SDP))
         error("Set $y not understood")
