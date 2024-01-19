@@ -94,13 +94,13 @@ evaluate(y)
 
 # ### Mixed integer program
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{minimize} & \sum_{i=1}^n x_i \\
 #     \text{subject to} & x \in \mathbb{Z}^n \\
 #   & x \geq 0.5 \\
 # \end{array}
-# $$
+# ```
 #
 
 using GLPK

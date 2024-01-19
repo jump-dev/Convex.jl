@@ -2,13 +2,13 @@
 #
 # Here is a constrained entropy maximization problem:
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #     \text{maximize}   & -\sum_{i=1}^n x_i \log x_i \\
 #     \text{subject to} & \mathbf{1}' x = 1 \\
 #                   & Ax \leq b
 # \end{array}
-# $$
+# ```
 #
 # where $x \in \mathbf{R}^n$ is our optimization variable and $A \in \mathbf{R}^{m \times n}, b \in \mathbf{R}^{m}$.
 #

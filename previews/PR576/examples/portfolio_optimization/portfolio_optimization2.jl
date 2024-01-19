@@ -6,12 +6,12 @@
 #
 # This problem can be written as
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #     \text{minimize}   & \lambda*w^T \Sigma w - (1-\lambda)*w^T \mu \\
 #     \text{subject to} & \sum_i w_i = 1
 # \end{array}
-# $$
+# ```
 #
 # where $w \in \mathbf{R}^n$ is the vector containing weights allocated to each asset.
 
