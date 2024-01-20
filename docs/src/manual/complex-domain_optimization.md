@@ -95,9 +95,11 @@ using Convex, SCS
 A = [ 0.47213595 0.11469794+0.48586827im; 0.11469794-0.48586827im  0.52786405]
 B = ComplexVariable(2, 2)
 ρ = kron(A, B)
-constraints = [partialtrace(ρ, 1, [2; 2]) == [1 0; 0 0]
-               tr(ρ) == 1
-               ρ in :SDP]
+constraints = [
+    partialtrace(ρ, 1, [2; 2]) == [1 0; 0 0],
+    tr(ρ) == 1,
+    isposdef(ρ),
+  ]
 p = satisfy(constraints)
 solve!(p, SCS.Optimizer; silent_solver = true)
 p.status

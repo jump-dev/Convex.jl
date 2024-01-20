@@ -54,14 +54,7 @@ function populate_dual!(
     return
 end
 
-# TODO: Remove isposdef, change tests to use in. Update documentation and
-# notebooks
-LinearAlgebra.isposdef(x::AbstractExpr) = in(x, :SDP)
-
-function Base.in(x::AbstractExpr, y::Symbol)
-    if !(y in (:semidefinite, :SDP))
-        error("Set $y not understood")
-    end
+function LinearAlgebra.isposdef(x::AbstractExpr)
     if iscomplex(x)
         return PositiveSemidefiniteConeConstraint(
             [real(x) -imag(x); imag(x) real(x)],
@@ -70,20 +63,20 @@ function Base.in(x::AbstractExpr, y::Symbol)
     return PositiveSemidefiniteConeConstraint(x)
 end
 
-⪰(x::AbstractExpr, y::AbstractExpr) = in(x - y, :SDP)
+⪰(x::AbstractExpr, y::AbstractExpr) = isposdef(x - y)
 
 function ⪰(x::AbstractExpr, y::Value)
     if all(y .== 0)
-        return in(x, :SDP)
+        return isposdef(x)
     end
-    return in(x - constant(y), :SDP)
+    return isposdef(x - constant(y))
 end
 
 function ⪰(x::Value, y::AbstractExpr)
     if all(x .== 0)
-        return in(-y, :SDP)
+        return isposdef(-y)
     end
-    return in(constant(x) - y, :SDP)
+    return isposdef(constant(x) - y)
 end
 
 ⪯(x::AbstractExpr, y::AbstractExpr) = ⪰(y, x)

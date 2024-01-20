@@ -958,6 +958,13 @@ function test_deprecation_norm()
     return
 end
 
+function test_deprecation_in_symbol()
+    x = Variable(2, 2)
+    @test_logs (:warn,) (x in :SDP)
+    @test in(x, :semidefinite) isa Convex.PositiveSemidefiniteConeConstraint
+    return
+end
+
 function test_dcp_rules()
     vexities = (
         Convex.ConcaveVexity(),

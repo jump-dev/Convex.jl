@@ -88,7 +88,7 @@ p.optval
 x = Variable()
 y = Variable((2, 2))
 ## SDP constraints
-p = minimize(x + y[1, 1], isposdef(y), x >= 1, y[2, 1] == 1)
+p = minimize(x + y[1, 1], y ⪰ 0, x >= 1, y[2, 1] == 1)
 solve!(p, SCS.Optimizer; silent_solver = true)
 evaluate(y)
 

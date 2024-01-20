@@ -63,7 +63,7 @@ M = diagm(b) * (I(n) - A * A') * diagm(b)
 U = ComplexVariable(n, n)
 objective = inner_product(U, M)
 c1 = diag(U) == 1
-c2 = U in :SDP
+c2 = isposdef(U)
 p = minimize(objective, c1, c2)
 solve!(p, SCS.Optimizer; silent_solver = true)
 evaluate(U)

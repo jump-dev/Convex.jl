@@ -37,3 +37,15 @@ Base.:>(lhs::Value, rhs::AbstractExpr) = >(constant(lhs), rhs)
 @deprecate get_vectorized_size(x::AbstractExpr) length(x)
 
 @deprecate operatornorm(x::AbstractExpr) LinearAlgebra.opnorm(x)
+
+function Base.in(x::AbstractExpr, y::Symbol)
+    if !(y in (:semidefinite, :SDP))
+        error("Set $y not understood")
+    end
+    @warn(
+        "Using `x in $y` to construct a semidefinite constraint is " *
+        "deprecated. Use `isposdef(x)` or `x ⪰ 0` instead.",
+        maxlog = 1,
+    )
+    return isposdef(x)
+end
