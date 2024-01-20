@@ -20,7 +20,7 @@ c1 = Constraint[];
 for i in 2:n
     push!(c1, sum(W[i, :] .* (Y[i, :]')) == inj[i])
 end
-c2 = W in :SDP
+c2 = isposdef(W)
 c3 = real(W[1, 1]) == 1.06^2;
 push!(c1, c2)
 push!(c1, c3)
