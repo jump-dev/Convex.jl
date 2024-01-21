@@ -69,10 +69,7 @@ function test_Clarabel()
     #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
     #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
     Convex.ProblemDepot.run_tests(;
-        exclude = [
-            r"mip",
-            r"sdp_quantum_relative_entropy3_lowrank",
-        ],
+        exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
     ) do p
         return solve!(p, Clarabel.Optimizer; silent_solver = true)
     end
