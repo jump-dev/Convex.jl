@@ -225,12 +225,12 @@ function MOI.supports(
 end
 
 function MOI.set(
-    model::Optimizer,
+    model::Optimizer{T},
     ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
     func::MOI.ScalarNonlinearFunction,
-)
+) where {T}
     cfp = conic_form!(model.context, _expr(model, func))
-    obj = scalar_fn(cfp)
+    obj = _to_scalar_moi(T, cfp)
     MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
     return
 end
