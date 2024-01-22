@@ -1144,9 +1144,18 @@ end
 
 function test_scalar_fn_constant_objective()
     x = Variable()
-    p = minimize(2, [x >= 1])
-    solve!(p, SCS.Optimizer)
-    @test_broken isapprox(p.optval, 2.0; atol = 1e-5)
+    p = minimize(2.1, [x >= 1])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.1; atol = 1e-5)
+    p = minimize(2.2, x >= 1)
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.2; atol = 1e-5)
+    p = maximize(2.3, [x >= 1])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.3; atol = 1e-5)
+    p = maximize(2.4, x >= 1)
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.4; atol = 1e-5)
     return
 end
 

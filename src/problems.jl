@@ -203,16 +203,20 @@ function minimize(
     return Problem{numeric_type}(:minimize, objective, constraints)
 end
 
-function minimize(::Value, constraints::Constraint...; numeric_type = Float64)
-    return satisfy(collect(constraints); numeric_type = numeric_type)
+function minimize(
+    objective::Value,
+    constraints::Constraint...;
+    numeric_type = Float64,
+)
+    return minimize(objective, collect(constraints); numeric_type)
 end
 
 function minimize(
-    ::Value,
+    objective::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return satisfy(constraints; numeric_type = numeric_type)
+    return minimize(constant(objective), constraints; numeric_type)
 end
 
 # Allow users to simply type maximize
@@ -232,16 +236,20 @@ function maximize(
     return Problem{numeric_type}(:maximize, objective, constraints)
 end
 
-function maximize(::Value, constraints::Constraint...; numeric_type = Float64)
-    return satisfy(collect(constraints); numeric_type = numeric_type)
+function maximize(
+    objective::Value,
+    constraints::Constraint...;
+    numeric_type = Float64,
+)
+    return maximize(objective, collect(constraints); numeric_type)
 end
 
 function maximize(
-    ::Value,
+    objective::Value,
     constraints::Array{<:Constraint} = Constraint[];
     numeric_type = Float64,
 )
-    return satisfy(constraints; numeric_type = numeric_type)
+    return maximize(constant(objective), constraints; numeric_type)
 end
 
 # Allow users to simply type satisfy (if there is no objective)
