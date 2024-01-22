@@ -65,16 +65,11 @@ test_problem_depot_load_BigFloat() = _test_problem_depot_load(BigFloat)
 # end
 
 function test_Clarabel()
-    # TODO(odow): investigate sdp_lieb_ando
-    # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with 
+    # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
     #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
     #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
     Convex.ProblemDepot.run_tests(;
-        exclude = [
-            r"mip",
-            r"sdp_lieb_ando",
-            r"sdp_quantum_relative_entropy3_lowrank",
-        ],
+        exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
     ) do p
         return solve!(p, Clarabel.Optimizer; silent_solver = true)
     end
@@ -83,9 +78,8 @@ end
 
 # Slow, and also hits linear algebra issues with BigFloat matrices
 # function test_Clarabel_BigFloat()
-#     # TODO(odow): investigate sdp_lieb_ando
 #     Convex.ProblemDepot.run_tests(;
-#         exclude = [r"mip", r"sdp_lieb_ando"],
+#         exclude = [r"mip"],
 #         T = BigFloat,
 #     ) do p
 #         return solve!(p, Clarabel.Optimizer{BigFloat}; silent_solver = true)
