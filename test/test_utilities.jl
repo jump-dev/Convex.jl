@@ -1142,6 +1142,46 @@ function test_tree_interface()
     return
 end
 
+function test_scalar_fn_constant_objective()
+    x = Variable()
+    p = minimize(2, [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test_broken isapprox(p.optval, 2.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_number()
+    x = Variable()
+    p = minimize(constant(2), [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 2.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_variable()
+    x = Variable()
+    p = minimize(x, [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 1.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_affine()
+    x = Variable()
+    p = minimize(x + 1, [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 2.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_square()
+    x = Variable()
+    p = minimize(square(x - 2), [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 0.0; atol = 1e-3)
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()

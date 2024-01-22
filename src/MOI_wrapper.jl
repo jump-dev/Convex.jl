@@ -230,7 +230,7 @@ function MOI.set(
     func::MOI.ScalarNonlinearFunction,
 ) where {T}
     cfp = conic_form!(model.context, _expr(model, func))
-    obj = scalar_fn(T, cfp)
+    obj = _to_scalar_moi(T, cfp)
     MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
     return
 end

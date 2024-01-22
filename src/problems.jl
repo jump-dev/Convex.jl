@@ -143,19 +143,19 @@ function new_conic_form!(context::Context, p::Problem)
     return conic_form!(context, p.objective)
 end
 
-function scalar_fn(::Type{T}, x) where {T}
-    return scalar_fn(T, only(MOI.Utilities.scalarize(x)))
+function _to_scalar_moi(::Type{T}, x) where {T}
+    return _to_scalar_moi(T, only(MOI.Utilities.scalarize(x)))
 end
 
-function scalar_fn(::Type{T}, x::SparseTape) where {T}
-    return scalar_fn(T, to_vaf(x))
+function _to_scalar_moi(::Type{T}, x::SparseTape) where {T}
+    return _to_scalar_moi(T, to_vaf(x))
 end
 
-function scalar_fn(::Type{T}, x::Number) where {T<:Real}
+function _to_scalar_moi(::Type{T}, x::Number) where {T<:Real}
     return MOI.ScalarAffineFunction{T}(MOI.ScalarAffineTerm{T}[], x)
 end
 
-scalar_fn(::Type{T}, f::MOI.AbstractScalarFunction) where {T} = f
+_to_scalar_moi(::Type{T}, f::MOI.AbstractScalarFunction) where {T} = f
 
 function Context(p::Problem{T}, optimizer_factory) where {T}
     context = Context{T}(optimizer_factory)
@@ -167,8 +167,7 @@ function Context(p::Problem{T}, optimizer_factory) where {T}
     if p.head == :satisfy
         MOI.set(context.model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
     else
-        @show typeof(cfp)
-        obj = scalar_fn(T, cfp)
+        obj = _to_scalar_moi(T, cfp)
         MOI.set(context.model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
         MOI.set(
             context.model,
@@ -288,7 +287,7 @@ Base.:+(x::Array{<:Constraint}, y::Constraint) = vcat(x, y)
 iscomplex(c::Constraint) = iscomplex(c.lhs) || iscomplex(c.rhs)
 
 function add_constraint!(context::Context, c::Constraint)
-    if haskey(context.constr_to_moi_inds, c)
+    if c in keys(context.constr_to_moi_inds)
         return
     end
     return _add_constraint!(context, c)

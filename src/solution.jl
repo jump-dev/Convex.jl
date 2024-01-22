@@ -10,11 +10,6 @@ function add_variables!(model, var::AbstractVariable)
     end
 end
 
-scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
-scalar_fn(x) = only(MOI.Utilities.scalarize(x))
-scalar_fn(x::SparseTape) = scalar_fn(to_vaf(x))
-scalar_fn(v::MOI.AbstractScalarFunction) = v
-
 """
     solve!(problem::Problem, optimizer_factory;
         silent_solver = false,
