@@ -7,11 +7,6 @@ function add_variables!(model, var::AbstractVariable)
     return MOI.add_variables(model, length(var))
 end
 
-scalar_fn(x::Number) = x # for `satisfy` problems? Not sure...
-scalar_fn(x) = only(MOI.Utilities.scalarize(x))
-scalar_fn(x::SparseTape) = scalar_fn(to_vaf(x))
-scalar_fn(v::MOI.AbstractScalarFunction) = v
-
 """
     solve!(
         problem::Problem,

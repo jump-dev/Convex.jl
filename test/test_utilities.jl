@@ -90,18 +90,12 @@ function test_complex_objective_function_errors()
     return
 end
 
-function test_constant_objective()
+function test_satisfy_constant_objective()
     x = Variable()
-    for p in [
-        satisfy(x == 0, x == 1),
-        satisfy(Constraint[]),
-        minimize(0, x == 0),
-        minimize(0, Constraint[]),
-        maximize(0, x == 0),
-        maximize(0, Constraint[]),
-    ]
-        @test isnothing(p.objective)
-    end
+    p = satisfy(x == 0, x == 1)
+    @test isnothing(p.objective)
+    p = satisfy(Constraint[])
+    @test isnothing(p.objective)
     return
 end
 
@@ -1159,6 +1153,55 @@ function test_fixed_variable_value()
     solve!(p, SCS.Optimizer)
     @test isapprox(x.value, 2.0; atol = 1e-5)
     @test isapprox(y.value, -1.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_constant_objective()
+    x = Variable()
+    p = minimize(2.1, [x >= 1])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.1; atol = 1e-5)
+    p = minimize(2.2, x >= 1)
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.2; atol = 1e-5)
+    p = maximize(2.3, [x >= 1])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.3; atol = 1e-5)
+    p = maximize(2.4, x >= 1)
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(p.optval, 2.4; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_number()
+    x = Variable()
+    p = minimize(constant(2), [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 2.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_variable()
+    x = Variable()
+    p = minimize(x, [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 1.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_affine()
+    x = Variable()
+    p = minimize(x + 1, [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 2.0; atol = 1e-5)
+    return
+end
+
+function test_scalar_fn_objective_square()
+    x = Variable()
+    p = minimize(square(x - 2), [x >= 1])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(p.optval, 0.0; atol = 1e-3)
     return
 end
 

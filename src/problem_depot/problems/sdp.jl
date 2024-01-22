@@ -1499,7 +1499,7 @@ function sdp_quantum_relative_entropy_impl(
                 atol rtol = rtol
         elseif mode == 5
             # Satisfiability problem
-            @test p.optval === nothing
+            @test p.optval ≈ 0 atol = atol rtol = rtol
         end
     end
 end

@@ -218,13 +218,13 @@ for (root, _, files) in walkdir(joinpath(@__DIR__, "constraints"))
     end
 end
 
-include("problems.jl")
 include("SparseTape.jl")
 include("VectorAffineFunctionAsMatrix.jl")
 include("ComplexTape.jl")
 include("operate.jl")
 include("complex_operate.jl")
 include("real_operate.jl")
+include("problems.jl")
 include("solution.jl")
 include("MOI_wrapper.jl")
 
