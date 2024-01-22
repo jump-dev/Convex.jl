@@ -78,6 +78,13 @@ function solve!(p::Problem, optimizer_factory; silent_solver = false)
     return
 end
 
+function populate_dual!(::MOI.ModelLike, c::Constraint, ::Nothing)
+    # If the Constraint does not support `populate_dual!` it must return
+    # `nothing` from `_add_constraint!`.
+    c.dual = nothing
+    return
+end
+
 function _unpack_vector(v::AbstractVector, size::Tuple{Int,Int})
     if length(v) == 1
         return v[]
