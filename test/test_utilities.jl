@@ -90,14 +90,12 @@ function test_complex_objective_function_errors()
     return
 end
 
-function test_constant_objective()
+function test_satisfy_constant_objective()
     x = Variable()
-    for p in [
-        satisfy(x == 0, x == 1),
-        satisfy(Constraint[]),
-    ]
-        @test isnothing(p.objective)
-    end
+    p = satisfy(x == 0, x == 1)
+    @test isnothing(p.objective)
+    p = satisfy(Constraint[])
+    @test isnothing(p.objective)
     return
 end
 
