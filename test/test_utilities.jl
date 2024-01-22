@@ -1136,6 +1136,26 @@ function test_tree_interface()
     return
 end
 
+function test_multiple_constraint_dual()
+    x = Variable()
+    c = x >= 1
+    p = minimize(x, [c, c])
+    solve!(p, SCS.Optimizer)
+    @test isapprox(c.dual, 1.0; atol = 1e-5)
+    return
+end
+
+function test_fixed_variable_value()
+    x = Variable()
+    y = Variable()
+    fix!(x, 2.0)
+    p = minimize(y, x + y >= 1)
+    solve!(p, SCS.Optimizer)
+    @test isapprox(x.value, 2.0; atol = 1e-5)
+    @test isapprox(y.value, -1.0; atol = 1e-5)
+    return
+end
+
 function test_scalar_fn_constant_objective()
     x = Variable()
     p = minimize(2.1, [x >= 1])
