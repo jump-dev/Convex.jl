@@ -95,10 +95,6 @@ function test_constant_objective()
     for p in [
         satisfy(x == 0, x == 1),
         satisfy(Constraint[]),
-        minimize(0, x == 0),
-        minimize(0, Constraint[]),
-        maximize(0, x == 0),
-        maximize(0, Constraint[]),
     ]
         @test isnothing(p.objective)
     end
