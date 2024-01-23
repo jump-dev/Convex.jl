@@ -104,7 +104,7 @@ evaluate(y)
 #
 
 using GLPK
-x = Variable(4, :Int)
+x = Variable(4, IntVar)
 p = minimize(sum(x), x >= 0.5)
 solve!(p, GLPK.Optimizer; silent_solver = true)
 evaluate(x)

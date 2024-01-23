@@ -6,7 +6,7 @@ include(aux("antidiag.jl"))
 
 n = 8
 # We encode the locations of the queens with a matrix of binary random variables.
-x = Variable((n, n), :Bin)
+x = Variable((n, n), BinVar)
 
 # Now we impose the constraints: at most one queen on any anti-diagonal, at most one queen on any diagonal, and we must have exactly one queen per row and per column.
 ## At most one queen on any anti-diagonal

@@ -49,3 +49,72 @@ function Base.in(x::AbstractExpr, y::Symbol)
     )
     return isposdef(x)
 end
+
+# Compatability with old `sets` model.
+#
+# Only dispatch to these methods when at least one set is given.
+function Variable(
+    size::Tuple{Int,Int},
+    sign::Sign,
+    set::Symbol,
+    sets::Symbol...,
+)
+    @warn(
+        "Using symbols in `Variable` constructor is deprecated. Use " *
+        "`Convex.BinVar` or `Convex.IntVar` instead.",
+        maxlog = 1,
+    )
+    sets = [set, sets...]
+    x = if :Bin in sets
+        Variable(size, sign, BinVar)
+    elseif :Int in sets
+        Variable(size, sign, IntVar)
+    else
+        Variable(size, sign, ContVar)
+    end
+    if :Semidefinite in sets
+        add_constraint!(x, x ⪰ 0)
+    end
+    return x
+end
+
+function Variable(sign::Sign, set::Symbol, sets::Symbol...)
+    return Variable((1, 1), sign, set, sets...)
+end
+
+function Variable(size::Tuple{Int,Int}, set::Symbol, sets::Symbol...)
+    return Variable(size, NoSign(), set, sets...)
+end
+
+function Variable(m::Int, set::Symbol, sets::Symbol...)
+    return Variable((m, 1), NoSign(), set, sets...)
+end
+
+function Variable(set::Symbol, sets::Symbol...)
+    return Variable((1, 1), NoSign(), set, sets...)
+end
+
+function ComplexVariable(size::Tuple{Int,Int}, set::Symbol, sets::Symbol...)
+    @warn(
+        "Using symbols in `ComplexVariable` constructor is deprecated. Use " *
+        "`isposdef(x)` to enforce semidefiniteness instead of `:Semidefinite.",
+        maxlog = 1,
+    )
+    sets = [set, sets...]
+    if :Bin in sets
+        throw(ArgumentError("Complex variables cannot be restricted to binary"))
+    elseif :Int in sets
+        throw(
+            ArgumentError("Complex variables cannot be restricted to integer"),
+        )
+    end
+    x = ComplexVariable(size)
+    if :Semidefinite in sets
+        add_constraint!(x, x ⪰ 0)
+    end
+    return x
+end
+
+function ComplexVariable(set::Symbol, sets::Symbol...)
+    return ComplexVariable((1, 1), set, sets...)
+end

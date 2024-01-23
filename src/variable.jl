@@ -1,8 +1,3 @@
-#############################################################################
-# variable.jl
-# Defines Variable, which is a subtype of AbstractExpr
-#############################################################################
-
 """
     VarType
 
@@ -38,7 +33,6 @@ to allow users to modify those values or add a constraint.
 """
 abstract type AbstractVariable <: AbstractExpr end
 
-# Default implementation of `AbstractVariable` interface
 """
     get_constraints(x::AbstractVariable)
 
@@ -120,106 +114,129 @@ _value(x::AbstractVariable) = x.value
 
 Sets the current value of `x` to `v`.
 """
-function set_value! end
-
 set_value!(x::AbstractVariable, ::Nothing) = x.value = nothing
 
 function set_value!(x::AbstractVariable, v::AbstractArray)
-    size(x) == size(v) ||
+    if size(x) != size(v)
         throw(DimensionMismatch("Variable and value sizes do not match!"))
+    end
     if iscomplex(x) && !(eltype(v) <: Complex)
-        v = complex.(v)
+        return x.value = complex.(v)
     end
     return x.value = v
 end
 
 function set_value!(x::AbstractVariable, v::AbstractVector)
-    size(x, 2) == 1 || throw(
-        DimensionMismatch(
-            "Cannot set value of a variable of size $(size(x)) to a vector",
-        ),
-    )
-    size(x, 1) == length(v) ||
+    if size(x, 2) != 1
+        throw(
+            DimensionMismatch(
+                "Cannot set value of a variable of size $(size(x)) to a vector",
+            ),
+        )
+    elseif size(x, 1) != length(v)
         throw(DimensionMismatch("Variable and value sizes do not match!"))
+    end
     if iscomplex(x) && !(eltype(v) <: Complex)
-        v = complex.(v)
+        return x.value = complex.(v)
     end
     return x.value = v
 end
 
 function set_value!(x::AbstractVariable, v::Number)
-    size(x) == (1, 1) ||
+    if size(x) != (1, 1)
         throw(DimensionMismatch("Variable and value sizes do not match!"))
+    end
     if sign(x) == ComplexSign() && !(v isa Complex)
-        v = complex(v)
+        return x.value = complex(v)
     end
     return x.value = v
 end
-# End of `AbstractVariable` interface
 
-# Some helpers for the constructors for `Variable`
-iscomplex(sign::Sign) = sign == ComplexSign()
-iscomplex(x::AbstractVariable) = iscomplex(sign(x))
-iscomplex(x::AbstractExpr) = iscomplex(sign(x))
-iscomplex(x::Complex) = true
-iscomplex(x::Real) = false
-iscomplex(x::AbstractArray{<:Complex}) = true
-iscomplex(x::AbstractArray{<:Real}) = false
+"""
+    fix!(x::AbstractVariable, v = value(x))
 
-# A concrete implementation of the `AbstractVariable` interface
+Fixes `x` to `v`. It is subsequently treated as a constant in future
+optimization problems. See also [`free!`](@ref).
+"""
+function fix!(x::AbstractVariable)
+    if _value(x) === nothing
+        error("This variable has no value yet; cannot fix value to nothing!")
+    end
+    vexity!(x, ConstVexity())
+    return x
+end
+
+function fix!(x::AbstractVariable, v)
+    set_value!(x, v)
+    return fix!(x)
+end
+
+"""
+    free!(x::AbstractVariable)
+
+Frees a previously [`fix!`](@ref)'d variable `x`, to treat it once again as a
+variable to optimize over.
+"""
+function free!(x::AbstractVariable)
+    vexity!(x, AffineVexity())
+    return x
+end
+
+function Base.isequal(x::AbstractVariable, y::AbstractVariable)
+    return x.id_hash == y.id_hash
+end
+
+Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
+
+iscomplex(x::Sign) = x == ComplexSign()
+
+iscomplex(x::Union{AbstractVariable,AbstractExpr}) = iscomplex(sign(x))
+
+iscomplex(::Union{Complex,AbstractArray{<:Complex}}) = true
+
+iscomplex(::Union{Real,AbstractArray{<:Real}}) = false
+
 mutable struct Variable <: AbstractVariable
-    """
-    Every `AbstractExpr` has a `head`; for a Variable it is set to `:variable`.
-    """
+    # Every `AbstractExpr` has a `head`; for a Variable it is set to `:variable`.
     head::Symbol
-    """
-    A unique identifying hash used for caching.
-    """
+    # A unique identifying hash used for caching.
     id_hash::UInt64
-    """
-    The current value of the variable. Defaults to `nothing` until the
-    variable has been [`fix!`](@ref)'d to a particular value, or the
-    variable has been used in a problem which has been solved, at which
-    point the optimal value is populated into this field.
-    """
+    # The current value of the variable. Defaults to `nothing` until the
+    # variable has been [`fix!`](@ref)'d to a particular value, or the
+    # variable has been used in a problem which has been solved, at which
+    # point the optimal value is populated into this field.
     value::Union{Value,Nothing}
-    """
-    The size of the variable. Scalar variables have size `(1,1)`;
-    `d`-dimensional vectors have size `(d, 1)`, and `n` by `m` matrices
-    have size `(n,m)`.
-    """
+    # The size of the variable. Scalar variables have size `(1,1)`;
+    # `d`-dimensional vectors have size `(d, 1)`, and `n` by `m` matrices
+    # have size `(n,m)`.
     size::Tuple{Int,Int}
-    """
-    `AffineVexity()` unless the variable is `fix!`'d, in which case it is
-    `ConstVexity()`. Accessed by `vexity(v::Variable)`. To check if a
-    `Variable` is fixed, use `vexity(v) == ConstVexity()`.
-    """
+    # `AffineVexity()` unless the variable is `fix!`'d, in which case it is
+    # `ConstVexity()`. Accessed by `vexity(v::Variable)`. To check if a
+    # `Variable` is fixed, use `vexity(v) == ConstVexity()`.
     vexity::Vexity
-    """
-    The sign of the variable. Can be  `Positive()`, `Negative()`, `NoSign()`
-    (i.e. real), or `ComplexSign()`. Accessed by `sign(v::Variable)`.
-    """
+    # The sign of the variable. Can be  `Positive()`, `Negative()`, `NoSign()`
+    # (i.e. real), or `ComplexSign()`. Accessed by `sign(v::Variable)`.
     sign::Sign
-    """
-    Vector of constraints which are enforced whenever the variable is used
-    in a problem.
-    """
+    # Vector of constraints which are enforced whenever the variable is used
+    # in a problem.
     constraints::Vector{Constraint}
-    """
-    The `VarType` of the variable (binary, integer, or continuous).
-    """
+    # The `VarType` of the variable (binary, integer, or continuous).
     vartype::VarType
-    function Variable(size::Tuple{Int,Int}, sign::Sign, vartype::VarType)
+
+    function Variable(
+        size::Tuple{Int,Int} = (1, 1),
+        sign::Sign = NoSign(),
+        vartype::VarType = ContVar,
+    )
         if iscomplex(sign)
             if vartype == ContVar
                 return ComplexVariable(size)
-            else
-                throw(
-                    ArgumentError(
-                        "vartype must be `ContVar` for complex variables; got vartype = $vartype",
-                    ),
-                )
             end
+            throw(
+                ArgumentError(
+                    "vartype must be `ContVar` for complex variables; got vartype = $vartype",
+                ),
+            )
         end
         this = new(
             :variable,
@@ -236,10 +253,19 @@ mutable struct Variable <: AbstractVariable
     end
 end
 
-function Base.isequal(x::AbstractVariable, y::AbstractVariable)
-    return x.id_hash == y.id_hash
+function Variable(size::Tuple{Int,Int}, vartype::VarType)
+    return Variable(size, NoSign(), vartype)
 end
-Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
+
+Variable(m::Int, n::Int, args...) = Variable((m, n), args...)
+
+Variable(m::Int, args...) = Variable((m, 1), args...)
+
+function Variable(sign::Sign, vartype::VarType = ContVar)
+    return Variable((1, 1), sign, vartype)
+end
+
+Variable(vartype::VarType) = Variable((1, 1), NoSign(), vartype)
 
 mutable struct ComplexVariable <: AbstractVariable
     head::Symbol
@@ -248,11 +274,12 @@ mutable struct ComplexVariable <: AbstractVariable
     value::Union{Value,Nothing}
     vexity::Vexity
     constraints::Vector{Constraint}
-    function ComplexVariable(sz::Tuple{Int,Int})
+
+    function ComplexVariable(size::Tuple{Int,Int} = (1, 1))
         return new(
             :ComplexVariable,
             rand(UInt64),
-            sz,
+            size,
             nothing,
             AffineVexity(),
             Constraint[],
@@ -260,186 +287,36 @@ mutable struct ComplexVariable <: AbstractVariable
     end
 end
 
+ComplexVariable(m::Int, args...) = ComplexVariable((m, 1), args...)
+
+ComplexVariable(m::Int, n::Int, args...) = ComplexVariable((m, n), args...)
+
 vartype(::ComplexVariable) = ContVar
+
 Base.sign(::ComplexVariable) = ComplexSign()
-
-Variable(size::Tuple{Int,Int}, sign::Sign) = Variable(size, sign, ContVar)
-function Variable(size::Tuple{Int,Int}, vartype::VarType)
-    return Variable(size, NoSign(), vartype)
-end
-Variable(size::Tuple{Int,Int}) = Variable(size, NoSign(), ContVar)
-
-function Variable(m::Int, n::Int, sign::Sign, vartype::VarType)
-    return Variable((m, n), sign, vartype)
-end
-Variable(m::Int, n::Int, sign::Sign) = Variable((m, n), sign, ContVar)
-Variable(m::Int, n::Int, vartype::VarType) = Variable((m, n), NoSign(), vartype)
-Variable(m::Int, n::Int) = Variable((m, n), NoSign(), ContVar)
-ComplexVariable(m::Int, n::Int) = ComplexVariable((m, n))
-
-Variable(m::Int, sign::Sign, vartype::VarType) = Variable((m, 1), sign, vartype)
-Variable(m::Int, sign::Sign) = Variable((m, 1), sign, ContVar)
-Variable(m::Int, vartype::VarType) = Variable((m, 1), NoSign(), vartype)
-Variable(m::Int) = Variable((m, 1), NoSign(), ContVar)
-ComplexVariable(m::Int) = ComplexVariable((m, 1))
-
-Variable(sign::Sign, vartype::VarType) = Variable((1, 1), sign, vartype)
-Variable(sign::Sign) = Variable((1, 1), sign, ContVar)
-Variable(vartype::VarType) = Variable((1, 1), NoSign(), vartype)
-Variable() = Variable((1, 1), NoSign(), ContVar)
-ComplexVariable() = ComplexVariable((1, 1))
-
-###
-# Compatability with old `sets` model
-# Only dispatch to these methods when at least one set is given;
-# otherwise dispatch to the inner constructors.
-# There are choices of sign, no sign, or `ComplexVariable` and various
-# ways to enter the size for each. We will start with:
-# Case 1: with sign
-function Variable(
-    size::Tuple{Int,Int},
-    sign::Sign,
-    first_set::Symbol,
-    more_sets::Symbol...,
-)
-    sets = [first_set]
-    append!(sets, more_sets)
-    if :Bin in sets
-        vartype = BinVar
-    elseif :Int in sets
-        vartype = IntVar
-    else
-        vartype = ContVar
-    end
-    x = Variable(size, sign, vartype)
-    if :Semidefinite in sets
-        add_constraint!(x, x ⪰ 0)
-    end
-    return x
-end
-function Variable(
-    m::Int,
-    n::Int,
-    sign::Sign,
-    first_set::Symbol,
-    more_sets::Symbol...,
-)
-    return Variable((m, n), sign, first_set, more_sets...)
-end
-function Variable(m::Int, sign::Sign, first_set::Symbol, more_sets::Symbol...)
-    return Variable((m, 1), sign, first_set, more_sets...)
-end
-function Variable(sign::Sign, first_set::Symbol, more_sets::Symbol...)
-    return Variable((1, 1), sign, first_set, more_sets...)
-end
-
-# Case 2: no sign
-function Variable(size::Tuple{Int,Int}, first_set::Symbol, more_sets::Symbol...)
-    return Variable(size, NoSign(), first_set, more_sets...)
-end
-function Variable(m::Int, n::Int, first_set::Symbol, more_sets::Symbol...)
-    return Variable((m, n), NoSign(), first_set, more_sets...)
-end
-function Variable(m::Int, first_set::Symbol, more_sets::Symbol...)
-    return Variable((m, 1), NoSign(), first_set, more_sets...)
-end
-function Variable(first_set::Symbol, more_sets::Symbol...)
-    return Variable((1, 1), NoSign(), first_set, more_sets...)
-end
-
-# Case 3: ComplexVariable
-function ComplexVariable(
-    size::Tuple{Int,Int},
-    first_set::Symbol,
-    more_sets::Symbol...,
-)
-    sets = [first_set]
-    append!(sets, more_sets)
-    if :Bin in sets
-        throw(ArgumentError("Complex variables cannot be restricted to binary"))
-    elseif :Int in sets
-        throw(
-            ArgumentError("Complex variables cannot be restricted to integer"),
-        )
-    end
-    x = ComplexVariable(size)
-    if :Semidefinite in sets
-        add_constraint!(x, x ⪰ 0)
-    end
-    return x
-end
-function ComplexVariable(
-    m::Int,
-    n::Int,
-    first_set::Symbol,
-    more_sets::Symbol...,
-)
-    return ComplexVariable((m, n), first_set, more_sets...)
-end
-function ComplexVariable(m::Int, first_set::Symbol, more_sets::Symbol...)
-    return ComplexVariable((m, 1), first_set, more_sets...)
-end
-function ComplexVariable(first_set::Symbol, more_sets::Symbol...)
-    return ComplexVariable((1, 1), first_set, more_sets...)
-end
 
 Semidefinite(m::Integer) = Semidefinite(m, m)
 
 function Semidefinite(m::Integer, n::Integer)
-    if m == n
-        x = Variable((m, m), NoSign(), ContVar)
-        add_constraint!(x, x ⪰ 0)
-        return x
-    else
+    if m != n
         error("Semidefinite matrices must be square")
     end
+    x = Variable((m, m), NoSign(), ContVar)
+    add_constraint!(x, x ⪰ 0)
+    return x
 end
 
 Semidefinite((m, n)::Tuple{Integer,Integer}) = Semidefinite(m, n)
 
 function HermitianSemidefinite(m::Integer, n::Integer = m)
-    if m == n
-        x = ComplexVariable((m, n))
-        add_constraint!(x, x ⪰ 0)
-        return x
-    else
+    if m != n
         error("`HermitianSemidefinite` matrices must be square")
     end
+    x = ComplexVariable((m, n))
+    add_constraint!(x, x ⪰ 0)
+    return x
 end
 
 function HermitianSemidefinite((m, n)::Tuple{Integer,Integer})
     return HermitianSemidefinite(m, n)
-end
-
-"""
-    fix!(x::AbstractVariable, v = value(x))
-
-Fixes `x` to `v`. It is subsequently treated as a constant in future
-optimization problems. See also [`free!`](@ref).
-"""
-function fix! end
-
-function fix!(x::AbstractVariable)
-    _value(x) === nothing &&
-        error("This variable has no value yet; cannot fix value to nothing!")
-    vexity!(x, ConstVexity())
-    return x
-end
-
-function fix!(x::AbstractVariable, v)
-    set_value!(x, v)
-    return fix!(x)
-end
-
-"""
-    free!(x::AbstractVariable)
-
-Frees a previously [`fix!`](@ref)'d variable `x`, to treat it once again as a
-variable to optimize over.
-"""
-function free! end
-
-function free!(x::AbstractVariable)
-    vexity!(x, AffineVexity())
-    return x
 end
