@@ -121,7 +121,7 @@ end
         @test p.optval ≈ 2 atol = atol rtol = rtol
     end
 
-    x = Variable(2, :BinVar)
+    x = Variable(2, BinVar)
     p = minimize(sum(x), x[1] >= 0.5, x >= 0; numeric_type = T)
 
     if test

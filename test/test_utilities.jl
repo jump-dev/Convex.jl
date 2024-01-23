@@ -1246,7 +1246,6 @@ function test_set_value_complex()
     return
 end
 
-
 end  # TestUtilities
 
 TestUtilities.runtests()
