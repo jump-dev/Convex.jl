@@ -1205,6 +1205,47 @@ function test_scalar_fn_objective_square()
     return
 end
 
+function test_variable_errors()
+    @test_throws ArgumentError Variable((2, 2), ComplexSign(), BinVar)
+    return
+end
+
+function test_complex_variable_errors()
+    y = @test_logs (:warn,) ComplexVariable(:Semidefinite)
+    @test size(y) == (1, 1)
+    return
+end
+
+function test_set_value_errors()
+    x = Variable()
+    @test_throws DimensionMismatch set_value!(x, [1.0 2.0; 3.0 4.0])
+    @test_throws DimensionMismatch set_value!(x, [1.0, 2.0])
+    return
+end
+
+function test_set_value_nothing()
+    x = Variable()
+    @test_throws(
+        ErrorException("Value of the variable is yet to be calculated"),
+        evaluate(x)
+    )
+    set_value!(x, 1.0)
+    @test x.value == 1.0
+    set_value!(x, nothing)
+    @test x.value === nothing
+    return
+end
+
+function test_set_value_complex()
+    x = ComplexVariable()
+    set_value!(x, 1.0)
+    @test x.value == 1.0 + 0.0im
+    y = ComplexVariable(2)
+    set_value!(y, [1.0, 2.0])
+    @test y.value == [1.0 + 0.0im, 2.0 + 0.0im]
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()

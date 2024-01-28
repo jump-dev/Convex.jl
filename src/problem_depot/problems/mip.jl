@@ -46,7 +46,7 @@ end
         @test p.optval ≈ 5 atol = atol rtol = rtol
     end
 
-    x = Variable(2, :Int)
+    x = Variable(2, IntVar)
     p = minimize(sum(x), x >= 4.3; numeric_type = T)
 
     if test
@@ -69,7 +69,7 @@ end
         @test p.optval ≈ 12 atol = atol rtol = rtol
     end
 
-    x = Variable(2, :Int)
+    x = Variable(2, IntVar)
     p = minimize(norm(x, 1), x[1] >= 4.3; numeric_type = T)
 
     if test
@@ -80,7 +80,7 @@ end
         @test p.optval ≈ 5 atol = atol rtol = rtol
     end
 
-    x = Variable(2, :Int)
+    x = Variable(2, IntVar)
     p = minimize(sum(x), x[1] >= 4.3, x >= 0; numeric_type = T)
 
     if test
@@ -91,7 +91,7 @@ end
         @test p.optval ≈ 5 atol = atol rtol = rtol
     end
 
-    x = Variable(2, :Int)
+    x = Variable(2, IntVar)
     p = minimize(sum(x), x >= 0.5; numeric_type = T)
 
     if test
@@ -110,7 +110,7 @@ end
     rtol,
     ::Type{T},
 ) where {T,test}
-    x = Variable(2, :Bin)
+    x = Variable(2, BinVar)
     p = minimize(sum(x), x >= 0.5; numeric_type = T)
 
     if test
@@ -121,7 +121,7 @@ end
         @test p.optval ≈ 2 atol = atol rtol = rtol
     end
 
-    x = Variable(2, :Bin)
+    x = Variable(2, BinVar)
     p = minimize(sum(x), x[1] >= 0.5, x >= 0; numeric_type = T)
 
     if test

@@ -6,7 +6,7 @@
     rtol,
     ::Type{T},
 ) where {T,test}
-    y = Variable((2, 2), :Semidefinite)
+    y = Semidefinite((2, 2))
     p = minimize(y[1, 1]; numeric_type = T)
 
     # @fact problem_vexity(p) --> ConvexVexity()
@@ -15,7 +15,7 @@
         @test p.optval ≈ 0 atol = atol rtol = rtol
     end
 
-    y = Variable((3, 3), :Semidefinite)
+    y = Semidefinite((3, 3))
     p = minimize(y[1, 1], y[2, 2] == 1; numeric_type = T)
 
     # @fact problem_vexity(p) --> ConvexVexity()
@@ -27,7 +27,7 @@
     # Solution is obtained as y[2,2] -> infinity
     # This test fails on Mosek. See
     # https://github.com/JuliaOpt/Mosek.jl/issues/29
-    # y = Variable((2, 2), :Semidefinite)
+    # y = Semidefinite((2, 2))
     # p = minimize(y[1, 1], y[1, 2] == 1; numeric_type = T)
 
     # # @fact problem_vexity(p) --> ConvexVexity()
@@ -43,7 +43,7 @@
         @test p.optval ≈ 1 atol = atol rtol = rtol
     end
 
-    y = Variable((3, 3), :Semidefinite)
+    y = Semidefinite((3, 3))
     p = minimize(tr(y), y[2, 1] <= 4, y[2, 2] >= 3; numeric_type = T)
 
     # @fact problem_vexity(p) --> ConvexVexity()
