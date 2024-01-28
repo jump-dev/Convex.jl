@@ -7,7 +7,7 @@
 # 10,000 or a large number would mean the student can not attend that section).
 #
 # The goal will be to get an allocation matrix $X$, where $X_{ij} = 1$ if
-# student $i$ is assigned to section $j$ and $0$ otherwise. 
+# student $i$ is assigned to section $j$ and $0$ otherwise.
 
 using Convex, GLPK
 aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
@@ -15,7 +15,7 @@ aux(str) = joinpath(@__DIR__, "aux_files", str) # path to auxiliary files
 # Load our preference matrix, `P`
 include(aux("data.jl"))
 
-X = Variable(size(P), :Bin)
+X = Variable(size(P), BinVar)
 
 # We want every student to be assigned to exactly one section. So, every row
 # must have exactly one non-zero entry. In other words, the sum of all the
