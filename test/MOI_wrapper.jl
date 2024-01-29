@@ -22,7 +22,10 @@ function test_runtests()
     T = Float64
     optimizer = MOI.Utilities.CachingOptimizer(
         MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
-        Convex.Optimizer(ECOS.Optimizer),
+        MOI.instantiate(
+            () -> Convex.Optimizer(ECOS.Optimizer);
+            with_bridge_type = Float64,
+        ),
     )
     MOI.set(optimizer, MOI.Silent(), true)
     MOI.Bridges.remove_bridge(
@@ -42,6 +45,15 @@ function test_runtests()
         # HS071 is not convex
         "hs071",
     ])
+    return
+end
+
+function test_issue_564()
+    model = MOI.instantiate(
+        () -> Convex.Optimizer(ECOS.Optimizer);
+        with_bridge_type = Float64,
+    )
+    MOI.Test.test_add_parameter(model, MOI.Test.Config())
     return
 end
 

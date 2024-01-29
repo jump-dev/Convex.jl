@@ -24,7 +24,10 @@ mutable struct Context{T,M}
 end
 
 function Context{T}(optimizer_factory) where {T}
-    model = MOI.instantiate(optimizer_factory, with_bridge_type = T)
+    model = MOI.Utilities.CachingOptimizer(
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
+        MOI.instantiate(optimizer_factory; with_bridge_type = T),
+    )
     return Context{T,typeof(model)}(
         model,
         OrderedCollections.OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
