@@ -19,12 +19,14 @@ function runtests()
 end
 
 function test_runtests()
+    inner = Convex.Optimizer(ECOS.Optimizer)
     model = MOI.Utilities.CachingOptimizer(
         MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
-        MOI.instantiate(
-            () -> Convex.Optimizer(ECOS.Optimizer);
-            with_bridge_type = Float64,
-        ),
+        MOI.Bridges.full_bridge_optimizer(inner, Float64),
+    )
+    MOI.Bridges.remove_bridge(
+        inner.context.model.optimizer,
+        MOI.Bridges.Variable.ZerosBridge{Float64},
     )
     MOI.set(model, MOI.Silent(), true)
     MOI.Test.runtests(
