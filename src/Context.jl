@@ -23,11 +23,15 @@ mutable struct Context{T,M}
     conic_form_cache::IdDict{Any,Any}
 end
 
-function Context{T}(optimizer_factory) where {T}
-    model = MOI.Utilities.CachingOptimizer(
-        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
-        MOI.instantiate(optimizer_factory; with_bridge_type = T),
-    )
+function Context{T}(optimizer_factory; add_cache::Bool = false) where {T}
+    model = if add_cache
+        MOI.Utilities.CachingOptimizer(
+            MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
+            MOI.instantiate(optimizer_factory; with_bridge_type = T),
+        )
+    else
+        MOI.instantiate(optimizer_factory; with_bridge_type = T)
+    end
     return Context{T,typeof(model)}(
         model,
         OrderedCollections.OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),

@@ -12,7 +12,7 @@ struct Optimizer{T,M} <: MOI.AbstractOptimizer
         )
     end
     function Optimizer{T}(optimizer_constructor) where {T}
-        return Optimizer(Context{T}(optimizer_constructor))
+        return Optimizer(Context{T}(optimizer_constructor; add_cache = true))
     end
 end
 
