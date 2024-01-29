@@ -19,33 +19,27 @@ function runtests()
 end
 
 function test_runtests()
-    T = Float64
-    inner = MOI.instantiate(
-        () -> Convex.Optimizer(ECOS.Optimizer);
-        with_bridge_type = Float64,
-    )
     model = MOI.Utilities.CachingOptimizer(
-        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
-        inner,
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+        MOI.instantiate(
+            () -> Convex.Optimizer(ECOS.Optimizer);
+            with_bridge_type = Float64,
+        ),
     )
     MOI.set(model, MOI.Silent(), true)
-    MOI.Bridges.remove_bridge(
-        model.optimizer.context.model,
-        MOI.Bridges.Variable.ZerosBridge{T},
+    MOI.Test.runtests(
+        model,
+        MOI.Test.Config(;
+            atol = 1e-3,
+            rtol = 1e-3,
+            exclude = Any[
+                MOI.ConstraintBasisStatus,
+                MOI.VariableBasisStatus,
+                MOI.ObjectiveBound,
+            ],
+        );
+        exclude = ["hs071"],  # HS071 is not convex
     )
-    config = MOI.Test.Config(;
-        atol = 1e-3,
-        rtol = 1e-3,
-        exclude = Any[
-            MOI.ConstraintBasisStatus,
-            MOI.VariableBasisStatus,
-            MOI.ObjectiveBound,
-        ],
-    )
-    MOI.Test.runtests(model, config, exclude = [
-        # HS071 is not convex
-        "hs071",
-    ])
     return
 end
 
