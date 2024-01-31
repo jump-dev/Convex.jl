@@ -12,7 +12,8 @@ struct Optimizer{T,M} <: MOI.AbstractOptimizer
         )
     end
     function Optimizer{T}(optimizer_constructor) where {T}
-        return Optimizer(Context{T}(optimizer_constructor))
+        # See https://github.com/jump-dev/Convex.jl/issues/564 for details
+        return Optimizer(Context{T}(optimizer_constructor; add_cache = true))
     end
 end
 

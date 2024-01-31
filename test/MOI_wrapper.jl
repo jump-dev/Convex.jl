@@ -19,29 +19,38 @@ function runtests()
 end
 
 function test_runtests()
-    T = Float64
-    optimizer = MOI.Utilities.CachingOptimizer(
-        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{T}()),
-        Convex.Optimizer(ECOS.Optimizer),
+    inner = Convex.Optimizer(ECOS.Optimizer)
+    model = MOI.Utilities.CachingOptimizer(
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+        MOI.Bridges.full_bridge_optimizer(inner, Float64),
     )
-    MOI.set(optimizer, MOI.Silent(), true)
     MOI.Bridges.remove_bridge(
-        optimizer.optimizer.context.model,
-        MOI.Bridges.Variable.ZerosBridge{T},
+        inner.context.model.optimizer,
+        MOI.Bridges.Variable.ZerosBridge{Float64},
     )
-    config = MOI.Test.Config(;
-        atol = 1e-3,
-        rtol = 1e-3,
-        exclude = Any[
-            MOI.ConstraintBasisStatus,
-            MOI.VariableBasisStatus,
-            MOI.ObjectiveBound,
-        ],
+    MOI.set(model, MOI.Silent(), true)
+    MOI.Test.runtests(
+        model,
+        MOI.Test.Config(;
+            atol = 1e-3,
+            rtol = 1e-3,
+            exclude = Any[
+                MOI.ConstraintBasisStatus,
+                MOI.VariableBasisStatus,
+                MOI.ObjectiveBound,
+            ],
+        );
+        exclude = ["hs071"],  # HS071 is not convex
     )
-    MOI.Test.runtests(optimizer, config, exclude = [
-        # HS071 is not convex
-        "hs071",
-    ])
+    return
+end
+
+function test_issue_564()
+    model = MOI.instantiate(
+        () -> Convex.Optimizer(ECOS.Optimizer);
+        with_bridge_type = Float64,
+    )
+    MOI.Test.test_add_parameter(model, MOI.Test.Config())
     return
 end
 
