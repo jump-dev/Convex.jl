@@ -1954,11 +1954,19 @@ function test_quadform()
     _test_reformulation(target) do context
         return 1 + quadform(Variable(2), constant(-[20 16; 16 20]))
     end
+    H = Variable(2, 2)
+    fix!(H, [1 0; 0 1])
     @test_throws(
         ErrorException(
-            "either `x` or `A` must be constant in `quadform(x, A)`",
+            "Convex.jl v0.13.5 introduced the ability to use `fix!`ed variables " *
+            "in `quadform`. However, this did not consider the case that the " *
+            "value of `fix!`ed variables is changed between solves. Due to the " *
+            "risk that this may silently produce incorrect solutions, this " *
+            "behavior has been removed. Use `evaluate(H)` to obtain the value of " *
+            "a fixed variable. If the value changes between solves, rebuild the " *
+            "problem for the change to take effect.",
         ),
-        quadform(Variable(2), Variable(2, 2)),
+        quadform(Variable(2), H),
     )
     @test_throws(
         ErrorException("quadform only takes square matrices"),

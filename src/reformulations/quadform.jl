@@ -49,6 +49,18 @@ function _is_psd(
     end
 end
 
+"""
+    quadform(x::AbstractExpr, A::AbstractExpr; assume_psd=false)
+
+Represents `x' * A * x` where either:
+
+ * `x` is a vector-valued variable and `A` is a positive semidefinite or
+   negative semidefinite matrix (and in particular Hermitian or real symmetric).
+   If `assume_psd=true`, then `A` will be assumed to be positive semidefinite.
+   Otherwise, `Convex._is_psd` will be used to check if `A` is positive
+   semidefinite or negative semidefinite.
+ * or `A` is a matrix-valued variable and `x` is a vector.
+"""
 quadform(x::Value, A::AbstractExpr; assume_psd = false) = x' * A * x
 
 function quadform(x::AbstractExpr, A::Value; assume_psd = false)
@@ -68,24 +80,22 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     return factor * square(norm2(P * x))
 end
 
-"""
-    quadform(x::AbstractExpr, A::AbstractExpr; assume_psd=false)
+function quadform(x::Constant, A::AbstractExpr; assume_psd = false)
+    return quadform(evaluate(x), A; assume_psd)
+end
 
-Represents `x' * A * x` where either:
+function quadform(x::AbstractExpr, A::Constant; assume_psd = false)
+    return quadform(x, evaluate(A); assume_psd)
+end
 
- * `x` is a vector-valued variable and `A` is a positive semidefinite or
-   negative semidefinite matrix (and in particular Hermitian or real symmetric).
-   If `assume_psd=true`, then `A` will be assumed to be positive semidefinite.
-   Otherwise, `Convex._is_psd` will be used to check if `A` is positive
-   semidefinite or negative semidefinite.
- * or `A` is a matrix-valued variable and `x` is a vector.
-"""
 function quadform(x::AbstractExpr, A::AbstractExpr; assume_psd = false)
-    if vexity(x) == ConstVexity()
-        return quadform(evaluate(x), A; assume_psd = assume_psd)
-    elseif vexity(A) == ConstVexity()
-        return quadform(x, evaluate(A); assume_psd = assume_psd)
-    else
-        error("either `x` or `A` must be constant in `quadform(x, A)`")
-    end
+    return error(
+        "Convex.jl v0.13.5 introduced the ability to use `fix!`ed variables " *
+        "in `quadform`. However, this did not consider the case that the " *
+        "value of `fix!`ed variables is changed between solves. Due to the " *
+        "risk that this may silently produce incorrect solutions, this " *
+        "behavior has been removed. Use `evaluate(H)` to obtain the value of " *
+        "a fixed variable. If the value changes between solves, rebuild the " *
+        "problem for the change to take effect.",
+    )
 end
