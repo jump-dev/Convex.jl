@@ -48,16 +48,14 @@ function test_SCS_with_warmstarts()
             r"sdp_lieb_ando",
             # Tolerance issue with SCS 3.0
             r"sdp_Real_Variables_with_complex_equality_constraints",
+            r"sdp_geom_mean_hypocone_fullhyp",
+            r"sdp_trace_mpower_real_neg1_4",
         ],
     ) do p
         return solve!(
             p,
-            MOI.OptimizerWithAttributes(
-                SCS.Optimizer,
-                "verbose" => 0,
-                "eps_rel" => 1e-6,
-                "eps_abs" => 1e-6,
-            );
+            SCS.Optimizer;
+            silentsolver = true,
             warmstart = true,
         )
     end
