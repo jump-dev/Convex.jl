@@ -67,7 +67,7 @@ Optional keyword arguments:
 
  * `silent_solver`: whether the solver should be silent (and not emit output or
    logs) during the solution process.
- * `warmstart` (default: `true`): whether the solver should start the
+ * `warmstart` (default: `false`): whether the solver should start the
    optimization from a previous optimal value (according to the current primal
    value of the variables in the problem, which can be set by [`set_value!`](@ref).
 """
@@ -75,7 +75,7 @@ function solve!(
     p::Problem,
     optimizer_factory;
     silent_solver = false,
-    warmstart::Bool = true,
+    warmstart::Bool = false,
 )
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())

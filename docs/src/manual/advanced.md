@@ -34,6 +34,31 @@ p.constraints[1].dual
 constraint.dual
 ```
 
+## Warmstarting
+
+If you're solving the same problem many times with different values of a
+parameter, Convex.jl can initialize many solvers with the solution to the
+previous problem, which sometimes speeds up the solution time. This is called a
+**warm start**.
+
+To use this feature, pass the optional argument `warmstart=true` to the `solve!`
+method.
+
+```julia
+using Convex, SCS
+n = 1_000
+y = rand(n)
+x = Variable(n)
+lambda = Variable(Positive())
+fix!(lambda, 100)
+problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
+@time solve!(problem, SCS.Optimizer)
+# Now warmstart. If the solver takes advantage of warmstarts, this run will be
+# faster
+fix!(lambda, 105)
+@time solve!(problem, SCS.Optimizer; warmstart = true)
+```
+
 ## Fixing and freeing variables
 
 Convex.jl allows you to fix a variable `x` to a value by calling the `fix!`
