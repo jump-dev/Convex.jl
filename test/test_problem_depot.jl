@@ -52,12 +52,7 @@ function test_SCS_with_warmstarts()
             r"sdp_trace_mpower_real_neg1_4",
         ],
     ) do p
-        return solve!(
-            p,
-            SCS.Optimizer;
-            silentsolver = true,
-            warmstart = true,
-        )
+        return solve!(p, SCS.Optimizer; silent_solver = true, warmstart = true)
     end
     return
 end
