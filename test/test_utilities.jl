@@ -1259,7 +1259,8 @@ function test_variable_primal_start()
     problem = satisfy([x1 >= 0, x2 <= 0, x3 <= 1, x4 == 5, x5 == 0])
     context = Convex.Context(
         problem,
-        () -> MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+        () ->
+            MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
     )
     Convex._add_variable_primal_start(context)
     for (key, query) in (
