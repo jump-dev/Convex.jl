@@ -7,11 +7,56 @@ function add_variables!(model, var::AbstractVariable)
     return MOI.add_variables(model, length(var))
 end
 
+function _primal_start(
+    ::Type{T},
+    x::Vector{MOI.VariableIndex},
+    start::AbstractArray,
+) where {T}
+    return convert(Vector{T}, real.(reshape(start, length(x))))
+end
+
+function _primal_start(
+    ::Type{T},
+    x::Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
+    start::AbstractArray,
+) where {T}
+    y = reshape(start, length(x[1]))
+    return convert(Vector{T}, real.(y)), convert(Vector{T}, imag.(y))
+end
+
+function _primal_start(::Type{T}, x::Vector, start::Number) where {T}
+    return _primal_start(T, x, fill(start, length(x)))
+end
+
+function _primal_start(::Type{T}, x::Tuple, start::Number) where {T}
+    return _primal_start(T, x, fill(start, length(x[1])))
+end
+
+function _add_variable_primal_start(context::Convex.Context{T}) where {T}
+    attr = MOI.VariablePrimalStart()
+    for (id, moi_indices) in context.var_id_to_moi_indices
+        x = context.id_to_variables[id]
+        if x.value === nothing
+            continue
+        elseif moi_indices isa Tuple  # Variable is complex
+            start_re, start_im = _primal_start(T, moi_indices, x.value)
+            MOI.set(context.model, attr, moi_indices[1], start_re)
+            MOI.set(context.model, attr, moi_indices[2], start_im)
+        else
+            @assert moi_indices isa Vector{MOI.VariableIndex}
+            start = _primal_start(T, moi_indices, x.value)
+            MOI.set(context.model, attr, moi_indices, start)
+        end
+    end
+    return
+end
+
 """
     solve!(
         problem::Problem,
         optimizer_factory;
         silent_solver = false,
+        warmstart::Bool = true,
     )
 
 Solves the problem, populating `problem.optval` with the optimal value, as well
@@ -22,14 +67,26 @@ Optional keyword arguments:
 
  * `silent_solver`: whether the solver should be silent (and not emit output or
    logs) during the solution process.
+ * `warmstart` (default: `true`): whether the solver should start the
+   optimization from a previous optimal value (according to the current primal
+   value of the variables in the problem, which can be set by [`set_value!`](@ref).
 """
-function solve!(p::Problem, optimizer_factory; silent_solver = false)
+function solve!(
+    p::Problem,
+    optimizer_factory;
+    silent_solver = false,
+    warmstart::Bool = true,
+)
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
     context = Context(p, optimizer_factory)
     if silent_solver
         MOI.set(context.model, MOI.Silent(), true)
+    end
+    attr = MOI.VariablePrimalStart()
+    if warmstart && MOI.supports(context.model, attr, MOI.VariableIndex)
+        _add_variable_primal_start(context)
     end
     if context.detected_infeasible_during_formulation[]
         p.status = MOI.INFEASIBLE
