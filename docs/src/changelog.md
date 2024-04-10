@@ -7,7 +7,7 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.16.0 (unreleased)
+## v0.16.0 (April 11, 2024)
 
 This release contains a large number of changes, including some breaking
 changes.
@@ -15,7 +15,7 @@ changes.
 ### Breaking
 
  * This release involved a substantial rewrite of Convex.jl to integrate better
-   with MathOptInterface. (#504)
+   with MathOptInterface. (#504), (#584), (#588)
     * `x + A` will error if `x` is a scalar variable and `A` is an array.
       Instead, use `x * ones(size(A)) + A`.
     * The `RelativeEntropyAtom` now returns a scalar value instead o
@@ -44,6 +44,11 @@ changes.
    inequalities, but instead were equivalent to `>=` and `<=` respectively (#555)
  * The functions `norm_inf`, `norm_1`, and `norm_fro` have been deprecated. They
    will be removed in the next breaking release (#567)
+ * The syntax `x in :PSD` to create a semidefinite constraint is deprecated and
+   will be removed in the next breaking release (#578)
+ * `quadform` now errors when fixed variables are used instead of silently
+   giving incorrect answers if the value of the fixed variable is modified
+   between solves (#586)
 
 ### Added
 
@@ -61,20 +66,22 @@ changes.
  * `sumlargesteigs` now enforces that it's argument is hermitian. (#504)
  * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
    of `imag` and `real` has been removed. This should not affect use of Convex. (#504)
- * Bugfix: `dot` now correctly complex-conjugates its first argument (#524)
+ * Fix `dot` to correctly complex-conjugates its first argument (#524)
  * Add tests and fix  a number of bugs in various atoms (#546), (#550), (#554),
    (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566), (#567) (#568)
 
 ### Other
 
- * Improved the documentation (#517), (#529)
+ * Improved the documentation (#517), (#529), (#571), (#573), (#574), (#576),
+   (#579), (#587)
  * Refactored the tests into a functional form (#532)
  * Added `test/Project.toml` (#536)
  * Refactored imports to explicitly overload methods (#537)
  * Tidied and renamed various atoms and files clarity. This should be
    non-breaking as no public API was changed. (#538), (#539), (#540), (#541),
-   (#543), (#545)
+   (#543), (#545), (#582), (#583)
  * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
+ * Added various tests to improve code coverage (#572), (#575), (#577), (#580)
 
 ## v0.15.4 (October 24, 2023)
 
