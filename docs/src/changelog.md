@@ -46,6 +46,8 @@ changes.
    will be removed in the next breaking release (#567)
  * The syntax `x in :PSD` to create a semidefinite constraint is deprecated and
    will be removed in the next breaking release (#578)
+ * Fixed setting a `Constant` objective function. This is breaking because it
+   now has ann objective sense instead of ignoring the objective. (#581)
  * `quadform` now errors when fixed variables are used instead of silently
    giving incorrect answers if the value of the fixed variable is modified
    between solves (#586)
@@ -67,21 +69,24 @@ changes.
  * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
    of `imag` and `real` has been removed. This should not affect use of Convex. (#504)
  * Fix `dot` to correctly complex-conjugates its first argument (#524)
- * Add tests and fix  a number of bugs in various atoms (#546), (#550), (#554),
-   (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566), (#567) (#568)
+ * Add tests and fix  a number of bugs in various atoms (#546), (#547), (#550),
+   (#554), (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566),
+   (#567), (#568)
 
 ### Other
 
- * Improved the documentation (#517), (#529), (#571), (#573), (#574), (#576),
-   (#579), (#587)
+ * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
+   (#576), (#579), (#587)
  * Refactored the tests into a functional form (#532)
+ * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
  * Refactored imports to explicitly overload methods (#537)
  * Tidied and renamed various atoms and files clarity. This should be
    non-breaking as no public API was changed. (#538), (#539), (#540), (#541),
-   (#543), (#545), (#582), (#583)
+   (#543), (#545), (#549), (#553), (#582), (#583)
  * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
- * Added various tests to improve code coverage (#572), (#575), (#577), (#580)
+ * Added various tests to improve code coverage (#522), (#572), (#575), (#577),
+   (#580)
 
 ## v0.15.4 (October 24, 2023)
 
