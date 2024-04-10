@@ -59,37 +59,45 @@ Convex.jl. Let's say you're adding the new function $f$.
 
 ## Fixing the guts
 
-If you want to do a more major bug fix, you may need to understand how
-Convex.jl thinks about conic form. To do this, start by reading [the
-Convex.jl paper](http://arxiv.org/pdf/1410.4821.pdf). You may find our
-[JuliaCon 2014 talk](https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s)
+If you want to do a more major bug fix, you may need to understand how Convex.jl
+thinks about conic form.
+
+To do this, start by reading [the Convex.jl paper](http://arxiv.org/pdf/1410.4821.pdf).
+
+You may find our [JuliaCon 2014 talk](https://www.youtube.com/watch?v=SoI0lEaUvTs&t=128s)
 helpful as well; you can find the Jupyter notebook presented in the talk
 [here](https://github.com/JuliaCon/presentations/tree/master/CVX).
 
-Convex has been updated several times over the years however, so older information
-may be out of date. Here is a brief summary of how the package works (as of July 2023).
+Convex has been updated several times over the years however, so older
+information may be out of date. Here is a brief summary of how the package works
+(as of July 2023).
 
-1. A `Problem{T}` struct is created by putting together an objective function and constraints.
-   This forms a tree of sorts, in which variables and constants are the leaves, and atoms form the
-   intermediate branches. Here `T` refers to the numeric type of the problem. Variables and constants don't have such a type, and can
-   be used in multiple problems with different types. We only have the final type when we have
-   constructed the problem itself at the end.
-2. When we go to `solve!` a problem, we first load it into a MathOptInterface (MOI) model.
-   To do so, we need to traverse the problem and apply our extended formulations. This occurs
-   via `conic_form!`. We construct a `Context{T}` associated to the problem, which holds an MOI
-   model, and progressively load it by applying `conic_form!` to each object's children and then itself.
-   For variables outputs of `conic_form!` are of types: `SparseTape{T}` or `ComplexTape{T}`,
-   depending on the sign variable. Likewise for constant, the outputs of `conic_form!` are either `Vector{T}`
-   or `ComplexStructOfVec{T}`. Here a `Tape` refers to a lazy sequence of sparse affine
-   operators that will be applied to a vector of variables. The central computational task of Convex
-   is to compose this sequence of operators (and thus enact it's extended formulations). For atoms,
-   `conic_form!` generally either creates a new object using Convex' primitives (for example, another problem)
-   and calls `conic_form!` on that, or, when that isn't possible, calls `operate` to
-   manipulate the tape objects themselves (for example, to add a new operation to the composition).
-   We try to minimize the amount of `operate` methods and defer to existing primitives when possible.
-   `conic_form!` can also create new constraints and add them directly to the model. It is easy
-   to create constraints of the form "vector-affine-function-in-cone" for any of MOI's many supported cones;
-   these constraints do not need to be exposed at the level of Convex itself as `Constraint` objects, although they can be.
+1. A `Problem{T}` struct is created by putting together an objective function
+   and constraints. The problem is an expression graph, in which variables and
+   constants are the leaf nodes, and atoms form the intermediate nodes. Here `T`
+   refers to the numeric type of the problem that all data coefficients will be
+   coerced to when we pass the data to a solver.
+2. When we go to `solve!` a problem, we first load it into a MathOptInterface
+   (MOI) model. To do so, we traverse the `Problem` and apply our extended
+   formulations. This occurs via `conic_form!`. We construct a `Context{T}`
+   associated to the problem, which holds an MOI model, and progressively load
+   it by applying `conic_form!` to each object's children and then itself. For
+   variables, `conic_form!` returns `SparseTape{T}` or `ComplexTape{T}`,
+   depending on the sign variable. Likewise for constants, `conic_form!` returns
+   either `Vector{T}` or `ComplexStructOfVec{T}`. Here a `Tape` refers to a lazy
+   sequence of sparse affine operators that will be applied to a vector of
+   variables. The central computational task of Convex is to compose this
+   sequence of operators (and thus enact it's extended formulations). For atoms,
+   `conic_form!` generally either creates a new object using Convex' primitives
+   (for example, another problem) and calls `conic_form!` on that, or, when that
+   isn't possible, calls `operate` to manipulate the tape objects themselves
+   (for example, to add a new operation to the composition). We try to minimize
+   the amount of `operate` methods and defer to existing primitives when possible.
+   `conic_form!` can also create new constraints and add them directly to the
+   model. It is easy to create constraints of the form "vector-affine-function-in-cone"
+   for any of MOI's many supported cones; these constraints do not need to be
+   exposed at the level of Convex itself as `Constraint` objects, although they
+   can be.
 3. Once we have filled our `Context{T}`, we go to solve it with MOI. Then we
    recover the solution status and values of primal and dual variables, and
    populate them using dictionaries stored in the `Context`.
