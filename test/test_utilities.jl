@@ -1246,6 +1246,44 @@ function test_set_value_complex()
     return
 end
 
+function test_variable_primal_start()
+    x1 = Variable()
+    x2 = Variable(2)
+    x2.value = [1.0, 2.0]
+    x3 = Variable(3, 3)
+    x3.value = 3.0
+    x4 = ComplexVariable()
+    x4.value = 1 + 2im
+    x5 = ComplexVariable(2, 2)
+    x5.value = [1 2; 3im 4]
+    problem = satisfy([x1 >= 0, x2 <= 0, x3 <= 1, x4 == 5, x5 == 0])
+    context = Convex.Context(
+        problem,
+        () ->
+            MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+    )
+    Convex._add_variable_primal_start(context)
+    for (key, query) in (
+        x1 => [nothing],
+        x2 => [1.0, 2.0],
+        x3 => fill(3.0, 9),
+        x4 => ([1.0], [2.0]),
+        x5 => ([1.0, 0.0, 2.0, 4.0], [0.0, 3.0, 0.0, 0.0]),
+    )
+        variable = context.var_id_to_moi_indices[key.id_hash]
+        start = if variable isa Tuple
+            (
+                MOI.get(context.model, MOI.VariablePrimalStart(), variable[1]),
+                MOI.get(context.model, MOI.VariablePrimalStart(), variable[2]),
+            )
+        else
+            MOI.get(context.model, MOI.VariablePrimalStart(), variable)
+        end
+        @test start == query
+    end
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()

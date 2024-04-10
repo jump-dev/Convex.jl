@@ -7,7 +7,6 @@ import Clarabel
 # import ECOS
 import GLPK
 import MathOptInterface as MOI
-# import SCS
 
 function runtests()
     for name in names(@__MODULE__; all = true)
@@ -40,29 +39,22 @@ end
 test_problem_depot_load_Float64() = _test_problem_depot_load(Float64)
 test_problem_depot_load_BigFloat() = _test_problem_depot_load(BigFloat)
 
-# function test_SCS_with_warmstarts()
-#     Convex.ProblemDepot.run_tests(
-#         exclude = [
-#             r"mip",
-#             # TODO(odow): investigate
-#             r"sdp_lieb_ando",
-#             # Tolerance issue with SCS 3.0
-#             r"sdp_Real_Variables_with_complex_equality_constraints",
-#         ],
-#     ) do p
-#         return solve!(
-#             p,
-#             MOI.OptimizerWithAttributes(
-#                 SCS.Optimizer,
-#                 "verbose" => 0,
-#                 "eps_rel" => 1e-6,
-#                 "eps_abs" => 1e-6,
-#             );
-#             warmstart = true,
-#         )
-#     end
-#     return
-# end
+function test_Clarabel_warmstarts()
+    # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
+    #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
+    #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
+    Convex.ProblemDepot.run_tests(;
+        exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
+    ) do p
+        return solve!(
+            p,
+            Clarabel.Optimizer;
+            silent_solver = true,
+            warmstart = true,
+        )
+    end
+    return
+end
 
 function test_Clarabel()
     # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
