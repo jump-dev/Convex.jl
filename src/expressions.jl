@@ -28,7 +28,9 @@
 
 abstract type AbstractExpr end
 
-struct Constraint{S<:MOI.AbstractSet}
+abstract type Constraint end
+
+struct GenericConstraint{S<:MOI.AbstractSet}
     child::AbstractExpr
     set::S
     dual::ValueOrNothing
@@ -38,6 +40,34 @@ struct Constraint{S<:MOI.AbstractSet}
     function Constraint{S}(child) where {S<:MOI.AbstractSet}
         return Constraint(child, set_with_size(S, size(child)))
     end
+end
+
+head(io::IO, c::GenericConstraint) = head(io, c.set)
+
+AbstractTrees.children(c::GenericConstraint) = (c.child,)
+
+function _add_constraint!(
+    context::Context,
+    c::GenericConstraint,
+)
+    if vexity(c.child) == ConstVexity()
+        x = evaluate(c.child)
+        if !is_feasible(x, c.set, CONSTANT_CONSTRAINT_TOL[])
+            context.detected_infeasible_during_formulation[] = true
+        end
+        return
+    end
+    f = conic_form!(context, c.child)
+    set = MOI.PositiveSemidefiniteConeSquare(c.size[1])
+    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, set)
+    return
+end
+
+
+function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
+    ret = MOI.get(model, MOI.ConstraintDual(), indices)
+    c.dual = output(reshape(ret, c.size))
+    return
 end
 
 const Value = Union{Number,AbstractArray}

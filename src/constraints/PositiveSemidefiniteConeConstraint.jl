@@ -1,4 +1,3 @@
-const PositiveSemidefiniteConeConstraint = Constraint{MOI.PositiveSemidefiniteConeTriangle}
 function set_with_size(::Type{MOI.PositiveSemidefiniteConeTriangle}, sz::Tuple{Int,Int})
     if sz[1] != sz[2]
         error("Positive semidefinite expressions must be square")
@@ -6,47 +5,24 @@ function set_with_size(::Type{MOI.PositiveSemidefiniteConeTriangle}, sz::Tuple{I
     return MOI.PositiveSemidefiniteConeTriangle(sz[1])
 end
 
-head(io::IO, ::PositiveSemidefiniteConeConstraint) = print(io, "sdp")
+head(io::IO, ::MOI.PositiveSemidefiniteConeTriangle) = print(io, "sdp")
 
-AbstractTrees.children(c::PositiveSemidefiniteConeConstraint) = (c.child,)
-
-function vexity(c::PositiveSemidefiniteConeConstraint)
-    if !(vexity(c.child) in (AffineVexity(), ConstVexity()))
+function vexity(vex, ::MOI.PositiveSemidefiniteConeTriangle)
+    if !(vex in (AffineVexity(), ConstVexity()))
         return NotDcp()
     end
     return AffineVexity()
 end
 
-function _add_constraint!(
-    context::Context,
-    c::PositiveSemidefiniteConeConstraint,
-)
-    if vexity(c.child) == ConstVexity()
-        x = evaluate(c.child)
-        tol = CONSTANT_CONSTRAINT_TOL[]
-        if !(x ≈ transpose(x))
-            @warn "constant SDP constraint is violated"
-            context.detected_infeasible_during_formulation[] = true
-        elseif evaluate(LinearAlgebra.eigmin(c.child)) < -tol
-            @warn "constant SDP constraint is violated"
-            context.detected_infeasible_during_formulation[] = true
-        end
-        return
+function is_feasible(x, ::MOI.PositiveSemidefiniteConeTriangle, tol)
+    if !(x ≈ transpose(x))
+        @warn "constant SDP constraint is violated"
+        return false
+    elseif evaluate(LinearAlgebra.eigmin(c.child)) < -tol
+        @warn "constant SDP constraint is violated"
+        return false
     end
-    f = conic_form!(context, c.child)
-    set = MOI.PositiveSemidefiniteConeSquare(c.size[1])
-    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, set)
-    return
-end
-
-function populate_dual!(
-    model::MOI.ModelLike,
-    c::PositiveSemidefiniteConeConstraint,
-    indices,
-)
-    dual = MOI.get(model, MOI.ConstraintDual(), indices)
-    c.dual = output(reshape(dual, c.size))
-    return
+    return true
 end
 
 function LinearAlgebra.isposdef(x::AbstractExpr)
