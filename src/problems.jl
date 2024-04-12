@@ -313,10 +313,10 @@ Currently, `Float64` is the only supported coefficient type. This may be
 relaxed in future if file formats support other types.
 """
 function write_to_file(p::Problem{T}, filename::String) where {T<:Float64}
-    src = backend(p, MOI.Utilities.Model{T})
+    src = Context(p, MOI.Utilities.Model{T})
     dest = MOI.FileFormats.Model(; filename)
     model = MOI.Bridges.full_bridge_optimizer(dest, T)
-    MOI.copy_to(model, src)
+    MOI.copy_to(model, src.model)
     MOI.write_to_file(dest, filename)
     return
 end
