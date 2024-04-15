@@ -46,7 +46,7 @@ changes.
  * The syntax `x in :PSD` to create a semidefinite constraint is deprecated and
    will be removed in the next breaking release (#578)
  * Fixed setting a `Constant` objective function. This is breaking because it
-   now has ann objective sense instead of ignoring the objective. (#581)
+   now has an objective sense instead of ignoring the objective. (#581)
  * `quadform` now errors when fixed variables are used instead of silently
    giving incorrect answers if the value of the fixed variable is modified
    between solves (#586)
