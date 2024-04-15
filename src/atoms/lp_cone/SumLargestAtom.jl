@@ -40,7 +40,7 @@ function new_conic_form!(context::Context, x::SumLargestAtom)
     # sum k largest given by the solution to
     # minimize sum(t) + k*q
     # subject to c <= t + q, t >= 0
-    add_constraint!(context, c <= t + q)
+    add_constraint!(context, t + q >= c)
     add_constraint!(context, t >= 0)
     return conic_form!(context, sum(t) + x.k * q)
 end

@@ -22,6 +22,11 @@ changes.
       elementwise values. This does not affect the result of `relative_entropy`.
     * The function `constant` should be used instead of the type `Constant`
       (which now refers to exclusively real constants).
+    * The constraint `a <= b` now produces `a - b in Nonpositives()` instead of
+      `b - a in Nonnegatives()`. The primal solutions are equivalent, but **the
+      dual variable associated with such constraints is now reversed in sign**.
+      (Following the convention in MathOptInterface, the dual of `a <= b` is
+      always, negative, regardless of optimization sense.) (#593)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call

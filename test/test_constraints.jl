@@ -170,9 +170,7 @@ function test_LessThanConstraint_dual_minimize()
     c = 1 <= 3 * x
     p = minimize(2.0 * x + 1.0, [c])
     solve!(p, SCS.Optimizer; silent_solver = true)
-    # This dual is currently positive despite a <= constraint because Convex
-    # implements rhs - lhs in R_+ instead of lhs - rhs in R_-.
-    @test isapprox(c.dual, 2 / 3; atol = 1e-4)
+    @test isapprox(c.dual, -2 / 3; atol = 1e-4)
     return
 end
 
@@ -181,9 +179,7 @@ function test_LessThanConstraint_dual_maximize()
     c = 3 * x <= 1
     p = maximize(2.0 * x + 1.0, [c])
     solve!(p, SCS.Optimizer; silent_solver = true)
-    # This dual is currently positive despite a <= constraint because Convex
-    # implements rhs - lhs in R_+ instead of lhs - rhs in R_-.
-    @test isapprox(c.dual, 2 / 3; atol = 1e-4)
+    @test isapprox(c.dual, -2 / 3; atol = 1e-4)
     return
 end
 

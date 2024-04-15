@@ -15,7 +15,7 @@
     if test
         @test p.optval ≈ 1 atol = atol rtol = rtol
         @test evaluate(abs(x)) ≈ 1 atol = atol rtol = rtol
-        @test p.constraints[1].dual ≈ 1 atol = atol rtol = rtol
+        @test p.constraints[1].dual ≈ -1 atol = atol rtol = rtol
     end
 
     x = Variable(2, 2)

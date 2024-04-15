@@ -50,7 +50,7 @@ function new_conic_form!(context::Context{T}, x::DotSortAtom) where {T}
         y = vec(y)
     end
     μ, ν, e = Variable(size(y)), Variable(size(y)), ones(T, size(y))
-    add_constraint!(context, y * x.w' <= e * ν' + μ * e')
+    add_constraint!(context, e * ν' + μ * e' >= y * x.w')
     return conic_form!(context, sum(μ) + sum(ν))
 end
 
