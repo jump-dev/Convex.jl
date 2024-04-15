@@ -15,7 +15,7 @@ changes.
 ### Breaking
 
  * This release involved a substantial rewrite of Convex.jl to integrate better
-   with MathOptInterface. (#504), (#584), (#588)
+   with MathOptInterface. (#504), (#551), (#584), (#588)
     * `x + A` will error if `x` is a scalar variable and `A` is an array.
       Instead, use `x * ones(size(A)) + A`.
     * The `RelativeEntropyAtom` now returns a scalar value instead o
@@ -38,7 +38,6 @@ changes.
    individual variable, has been renamed `get_constraints` (#527)
  * DCP violations now throw a `DCPViolationError` exception, rather than a
    warning. Relatedly, `Convex.emit_dcp_warnings` has been removed (#523)
- * Removed the undocumented an internal function `latex_formulation` (#551)
  * The strict inequalities `>` and `<` have been deprecated. They will be
    removed in the next breaking release. Note that these never enforced strict
    inequalities, but instead were equivalent to `>=` and `<=` respectively (#555)
