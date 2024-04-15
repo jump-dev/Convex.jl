@@ -58,7 +58,7 @@ changes.
    (#504)
  * `geomean` supports more than 2 arguments (#504)
  * Added `Convex.Optimizer` (#511), (#530), (#534)
- * Added `write_to_file` (#531)
+ * Added `write_to_file` (#531), (#591)
  * Added `entropy_elementwise` (#570)
  * `norm` on `AbstractExpr` objects now supports matrices (treating them like
    vectors), matching Base's behavior (#528)
