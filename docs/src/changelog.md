@@ -30,7 +30,6 @@ changes.
    individual variable, has been renamed `get_constraints` (#527)
  * DCP violations now throw a `DCPViolationError` exception, rather than a
    warning. Relatedly, `Convex.emit_dcp_warnings` has been removed (#523)
- * Removed the undocumented an internal function `latex_formulation` (#551)
  * The strict inequalities `>` and `<` have been deprecated. They will be
    removed in the next breaking release. Note that these never enforced strict
    inequalities, but instead were equivalent to `>=` and `<=` respectively (#555)
