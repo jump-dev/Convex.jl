@@ -310,19 +310,13 @@ function MOI.get(
     return MOI.get(model.context.model, attr, ci)
 end
 
-# See `constraints/constraints.jl`
-# `LessThan` constraints are reformulated as `rhs - lhs` unlike MOI while
-# `GreaterThan` constraints are reformulated as `lhs - rhs` like in MOI
-_flip_dual(x, ::Type{S}) where {S<:MOI.LessThan} = -x
-_flip_dual(x, ::Type{S}) where {S<:MOI.AbstractScalarSet} = x
-
 function MOI.get(
     model::Optimizer,
     attr::Union{MOI.ConstraintDual,MOI.ConstraintPrimal},
     ci::MOI.ConstraintIndex{MOI.ScalarNonlinearFunction,S},
 ) where {S<:MOI.AbstractScalarSet}
     ret = MOI.get(model.context.model, attr, model.constraint_map[ci.value])
-    return _flip_dual(ret[], S)
+    return ret[]
 end
 
 function MOI.get(model::Optimizer, I::Type{<:MOI.Index}, name::String)

@@ -762,7 +762,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.constraints[1].dual ≈ 1 atol = atol rtol = rtol
+        @test p.constraints[1].dual ≈ -1 atol = atol rtol = rtol
     end
 
     x = Variable()
