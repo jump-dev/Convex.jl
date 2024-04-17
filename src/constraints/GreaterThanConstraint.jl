@@ -9,8 +9,10 @@ function is_feasible(f, ::MOI.Nonnegatives, tol)
 end
 
 function vexity(vex, ::MOI.Nonnegatives)
-    if vex == ConvexVexity()
+    if vex  == ConvexVexity()
         return NotDcp()
+    elseif vex == ConcaveVexity()
+        return ConvexVexity()
     end
     return vex
 end

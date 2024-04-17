@@ -112,7 +112,7 @@ end
 
 function test_GreaterThanConstraint_violated()
     p = satisfy([constant(5) >= 6])
-    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
@@ -161,7 +161,7 @@ end
 
 function test_LessThanConstraint_violated()
     p = satisfy([constant(5) <= 4])
-    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
