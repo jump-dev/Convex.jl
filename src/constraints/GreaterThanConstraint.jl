@@ -5,7 +5,7 @@ end
 head(io::IO, ::MOI.Nonnegatives) = print(io, "≥")
 
 function is_feasible(f, ::MOI.Nonnegatives, tol)
-    return all(f .>= tol)
+    return all(f .>= -tol)
 end
 
 function vexity(vex, ::MOI.Nonnegatives)
