@@ -171,7 +171,7 @@ function test_show()
        └─ real variable ($(Convex.show_id(x)))
     subject to
     ├─ ≥ constraint (affine)
-    |  └─ + (affine; real)
+    │  └─ + (affine; real)
     │     ├─ real variable ($(Convex.show_id(x)))
     │     └─ $(reshape([-1], 1, 1))
     └─ ≤ constraint (affine)
