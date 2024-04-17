@@ -185,7 +185,7 @@ end
 
 ### constraints/GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
 
-function test_GenericConstraint{MOI.PositiveSemidefiniteConeSquare}()
+function test_GenericConstraint_PositiveSemidefiniteConeSquare()
     @test_throws(
         ErrorException("Positive semidefinite expressions must be square"),
         Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(Variable(2, 3)),
@@ -206,7 +206,7 @@ function test_GenericConstraint{MOI.PositiveSemidefiniteConeSquare}()
     return
 end
 
-function test_GenericConstraint{MOI.PositiveSemidefiniteConeSquare}_violated()
+function test_GenericConstraint_PositiveSemidefiniteConeSquare_violated()
     X = constant([1 2; 3 4])
     p = satisfy([X ⪰ 0])
     @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)

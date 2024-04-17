@@ -18,7 +18,7 @@ function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
     if !(x ≈ transpose(x))
         @warn "constant SDP constraint is violated"
         return false
-    elseif evaluate(LinearAlgebra.eigmin(c.child)) < -tol
+    elseif LinearAlgebra.eigmin(x) < -tol
         @warn "constant SDP constraint is violated"
         return false
     end
