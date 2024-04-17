@@ -1,20 +1,20 @@
-function set_with_size(::Type{MOI.PositiveSemidefiniteConeTriangle}, sz::Tuple{Int,Int})
+function set_with_size(::Type{MOI.PositiveSemidefiniteConeSquare}, sz::Tuple{Int,Int})
     if sz[1] != sz[2]
         error("Positive semidefinite expressions must be square")
     end
-    return MOI.PositiveSemidefiniteConeTriangle(sz[1])
+    return MOI.PositiveSemidefiniteConeSquare(sz[1])
 end
 
-head(io::IO, ::MOI.PositiveSemidefiniteConeTriangle) = print(io, "sdp")
+head(io::IO, ::MOI.PositiveSemidefiniteConeSquare) = print(io, "sdp")
 
-function vexity(vex, ::MOI.PositiveSemidefiniteConeTriangle)
+function vexity(vex, ::MOI.PositiveSemidefiniteConeSquare)
     if !(vex in (AffineVexity(), ConstVexity()))
         return NotDcp()
     end
     return AffineVexity()
 end
 
-function is_feasible(x, ::MOI.PositiveSemidefiniteConeTriangle, tol)
+function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
     if !(x ≈ transpose(x))
         @warn "constant SDP constraint is violated"
         return false
@@ -27,11 +27,11 @@ end
 
 function LinearAlgebra.isposdef(x::AbstractExpr)
     if iscomplex(x)
-        return GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}(
+        return GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(
             [real(x) -imag(x); imag(x) real(x)],
         )
     end
-    return GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}(x)
+    return GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(x)
 end
 
 ⪰(x::AbstractExpr, y::AbstractExpr) = isposdef(x - y)

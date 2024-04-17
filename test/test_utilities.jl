@@ -171,11 +171,13 @@ function test_show()
        └─ real variable ($(Convex.show_id(x)))
     subject to
     ├─ ≥ constraint (affine)
-    │  ├─ real variable ($(Convex.show_id(x)))
-    │  └─ $(reshape([1], 1, 1))
+    |  └─ + (affine; real)
+    │     ├─ real variable ($(Convex.show_id(x)))
+    │     └─ $(reshape([-1], 1, 1))
     └─ ≤ constraint (affine)
-       ├─ real variable ($(Convex.show_id(x)))
-       └─ $(reshape([3], 1, 1))
+       └─ + (affine; real)
+          ├─ real variable ($(Convex.show_id(x)))
+          └─ $(reshape([-3], 1, 1))
 
     status: `solve!` not called yet"""
 
@@ -258,8 +260,9 @@ function test_show()
             └─ nothing
             subject to
             └─ ≥ constraint (affine)
-               ├─ real variable ($(Convex.show_id(x)))
-               └─ $(reshape([0], 1, 1))
+               └─ + (affine; real)
+                  ├─ real variable ($(Convex.show_id(x)))
+                  └─ $(reshape([0], 1, 1))
 
             termination status: OPTIMAL
             primal status: FEASIBLE_POINT
@@ -403,7 +406,7 @@ function test_Constructors()
         Semidefinite(2),
     ]
         @test length(get_constraints(x)) == 1
-        @test get_constraints(x)[] isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
+        @test get_constraints(x)[] isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
     end
 
     @test_throws ErrorException HermitianSemidefinite(2, 3)
@@ -953,7 +956,7 @@ end
 function test_deprecation_in_symbol()
     x = Variable(2, 2)
     @test_logs (:warn,) (x in :SDP)
-    @test in(x, :semidefinite) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
+    @test in(x, :semidefinite) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
     return
 end
 

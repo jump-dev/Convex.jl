@@ -32,7 +32,7 @@ abstract type AbstractExpr end
 
 abstract type Constraint end
 
-struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
+mutable struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
     child::AbstractExpr
     set::S
     dual::Union{Value,Nothing}
@@ -49,7 +49,7 @@ head(io::IO, c::GenericConstraint) = head(io, c.set)
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
 
 function vexity(c::GenericConstraint)
-    return vexity(c.child, c.set)
+    return vexity(vexity(c.child), c.set)
 end
 
 function _add_constraint!(
@@ -71,7 +71,7 @@ end
 
 function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
     ret = MOI.get(model, MOI.ConstraintDual(), indices)
-    c.dual = output(reshape(ret, c.size))
+    c.dual = output(reshape(ret, c.child.size))
     return
 end
 
