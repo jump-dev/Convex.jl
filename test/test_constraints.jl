@@ -183,30 +183,30 @@ function test_LessThanConstraint_dual_maximize()
     return
 end
 
-### constraints/PositiveSemidefiniteConeConstraint
+### constraints/GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
 
-function test_PositiveSemidefiniteConeConstraint()
+function test_GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}()
     @test_throws(
         ErrorException("Positive semidefinite expressions must be square"),
-        Convex.PositiveSemidefiniteConeConstraint(Variable(2, 3)),
+        Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}(Variable(2, 3)),
     )
     X = Variable(2, 2)
-    c = Convex.PositiveSemidefiniteConeConstraint(X)
+    c = Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}(X)
     p = minimize(tr(X), [c, X >= [1 2; 3 4]])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(X.value, [2.25 3; 3 4]; atol = 1e-3)
     y = (c.dual + c.dual') / 2
     @test isapprox(y[1], 1; atol = 1e-3)
-    @test (0 ⪯ X) isa Convex.PositiveSemidefiniteConeConstraint
-    @test (-X ⪯ 0) isa Convex.PositiveSemidefiniteConeConstraint
-    @test (-X ⪯ constant(0)) isa Convex.PositiveSemidefiniteConeConstraint
-    @test (constant(0) ⪯ X) isa Convex.PositiveSemidefiniteConeConstraint
+    @test (0 ⪯ X) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
+    @test (-X ⪯ 0) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
+    @test (-X ⪯ constant(0)) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
+    @test (constant(0) ⪯ X) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
     @test_throws(ErrorException("Set PSD not understood"), X in :PSD)
     @test vexity(X ⪯ square(Variable())) == Convex.NotDcp()
     return
 end
 
-function test_PositiveSemidefiniteConeConstraint_violated()
+function test_GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}_violated()
     X = constant([1 2; 3 4])
     p = satisfy([X ⪰ 0])
     @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)

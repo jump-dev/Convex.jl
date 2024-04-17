@@ -26,25 +26,31 @@
 #
 #############################################################################
 
+const Value = Union{Number,AbstractArray}
+
 abstract type AbstractExpr end
 
 abstract type Constraint end
 
-struct GenericConstraint{S<:MOI.AbstractSet}
+struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
     child::AbstractExpr
     set::S
-    dual::ValueOrNothing
-    function Constraint(child, set::MOI.AbstractSet)
+    dual::Union{Value,Nothing}
+    function GenericConstraint(child, set::MOI.AbstractSet)
         return new{typeof(set)}(child, set)
     end
-    function Constraint{S}(child) where {S<:MOI.AbstractSet}
-        return Constraint(child, set_with_size(S, size(child)))
+    function GenericConstraint{S}(child) where {S<:MOI.AbstractSet}
+        return GenericConstraint(child, set_with_size(S, size(child)))
     end
 end
 
 head(io::IO, c::GenericConstraint) = head(io, c.set)
 
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
+
+function vexity(c::GenericConstraint)
+    return vexity(c.child, c.set)
+end
 
 function _add_constraint!(
     context::Context,
@@ -58,8 +64,7 @@ function _add_constraint!(
         return
     end
     f = conic_form!(context, c.child)
-    set = MOI.PositiveSemidefiniteConeSquare(c.size[1])
-    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, set)
+    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, c.set)
     return
 end
 
@@ -69,8 +74,6 @@ function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
     c.dual = output(reshape(ret, c.size))
     return
 end
-
-const Value = Union{Number,AbstractArray}
 
 # We commandeer `==` to create a constraint.
 # Therefore we define `isequal` to still have a notion of equality

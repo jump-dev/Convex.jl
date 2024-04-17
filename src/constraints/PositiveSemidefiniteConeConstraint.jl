@@ -27,11 +27,11 @@ end
 
 function LinearAlgebra.isposdef(x::AbstractExpr)
     if iscomplex(x)
-        return PositiveSemidefiniteConeConstraint(
+        return GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}(
             [real(x) -imag(x); imag(x) real(x)],
         )
     end
-    return PositiveSemidefiniteConeConstraint(x)
+    return GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}(x)
 end
 
 ⪰(x::AbstractExpr, y::AbstractExpr) = isposdef(x - y)

@@ -403,7 +403,7 @@ function test_Constructors()
         Semidefinite(2),
     ]
         @test length(get_constraints(x)) == 1
-        @test get_constraints(x)[] isa Convex.PositiveSemidefiniteConeConstraint
+        @test get_constraints(x)[] isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
     end
 
     @test_throws ErrorException HermitianSemidefinite(2, 3)
@@ -953,7 +953,7 @@ end
 function test_deprecation_in_symbol()
     x = Variable(2, 2)
     @test_logs (:warn,) (x in :SDP)
-    @test in(x, :semidefinite) isa Convex.PositiveSemidefiniteConeConstraint
+    @test in(x, :semidefinite) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeTriangle}
     return
 end
 

@@ -1,3 +1,7 @@
+function set_with_size(::Type{MOI.Nonnegatives}, sz::Tuple{Int,Int})
+    return MOI.Nonnegatives(prod(sz))
+end
+
 head(io::IO, ::MOI.Nonnegatives) = print(io, "nonneg")
 
 function is_feasible(f, ::MOI.Nonnegatives, tol)
