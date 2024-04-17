@@ -22,7 +22,7 @@ end
 function test_EqualToConstraint()
     @test_throws(
         ErrorException(
-            "Cannot create equality constraint between expressions of size (2, 3) and (3, 2)",
+            "Cannot create constraint between expressions of size (2, 3) and (3, 2)",
         ),
         Variable(2, 3) == Variable(3, 2),
     )
@@ -33,7 +33,7 @@ end
 
 function test_EqualToConstraint_violated()
     p = satisfy([constant(5) == 0])
-    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
@@ -90,19 +90,19 @@ end
 function test_GreaterThanConstraint()
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of size (2, 3) and (3, 2)",
+            "Cannot create constraint between expressions of size (2, 3) and (3, 2)",
         ),
         Variable(2, 3) >= Variable(3, 2),
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign $(Convex.NoSign()) and $(Convex.ComplexSign())",
+            "Cannot create constraint between expressions of sign $(Convex.NoSign()) and $(Convex.ComplexSign())",
         ),
         Variable() >= 2 + 3im,
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign $(Convex.ComplexSign()) and $(Convex.NoSign())",
+            "Cannot create constraint between expressions of sign $(Convex.ComplexSign()) and $(Convex.NoSign())",
         ),
         2 + 3im >= Variable(),
     )
@@ -139,19 +139,19 @@ end
 function test_LessThanConstraint()
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of size (2, 3) and (3, 2)",
+            "Cannot create constraint between expressions of size (2, 3) and (3, 2)",
         ),
         Variable(2, 3) <= Variable(3, 2),
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign $(Convex.NoSign()) and $(Convex.ComplexSign())",
+            "Cannot create constraint between expressions of sign $(Convex.NoSign()) and $(Convex.ComplexSign())",
         ),
         Variable() <= 2 + 3im,
     )
     @test_throws(
         ErrorException(
-            "Cannot create inequality constraint between expressions of sign $(Convex.ComplexSign()) and $(Convex.NoSign())",
+            "Cannot create constraint between expressions of sign $(Convex.ComplexSign()) and $(Convex.NoSign())",
         ),
         2 + 3im <= Variable(),
     )

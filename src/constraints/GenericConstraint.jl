@@ -37,6 +37,37 @@ function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
     return
 end
 
+function populate_dual!(
+    model::MOI.ModelLike,
+    c::GenericConstraint,
+    indices::NTuple{2},
+)
+    re = MOI.get(model, MOI.ConstraintDual(), indices[1])
+    imag = MOI.get(model, MOI.ConstraintDual(), indices[2])
+    c.dual = output(reshape(re + im * imag, c.child.size))
+    return
+end
+
+function _promote_size(lhs::AbstractExpr, rhs::AbstractExpr)
+    if lhs.size == rhs.size || lhs.size == (1, 1)
+        sz = rhs.size
+        if lhs.size == (1, 1) && rhs.size != (1, 1)
+            lhs = lhs * ones(rhs.size)
+        end
+    elseif rhs.size == (1, 1)
+        sz = lhs.size
+        if rhs.size == (1, 1) && lhs.size != (1, 1)
+            rhs = rhs * ones(lhs.size)
+        end
+    else
+        error(
+            "Cannot create constraint between expressions of size " *
+            "$(lhs.size) and $(rhs.size)",
+        )
+    end
+    return lhs, rhs
+end
+
 # ==============================================================================
 #     Nonnegatives
 # ==============================================================================
@@ -58,33 +89,13 @@ function vexity(vex, ::MOI.Nonnegatives)
     return vex
 end
 
-function _promote_size(lhs::AbstractExpr, rhs::AbstractExpr)
+function Base.:>=(lhs::AbstractExpr, rhs::AbstractExpr)
     if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
         error(
-            "Cannot create inequality constraint between expressions of sign " *
+            "Cannot create constraint between expressions of sign " *
             "$(sign(lhs)) and $(sign(rhs))",
         )
     end
-    if lhs.size == rhs.size || lhs.size == (1, 1)
-        sz = rhs.size
-        if lhs.size == (1, 1) && rhs.size != (1, 1)
-            lhs = lhs * ones(rhs.size)
-        end
-    elseif rhs.size == (1, 1)
-        sz = lhs.size
-        if rhs.size == (1, 1) && lhs.size != (1, 1)
-            rhs = rhs * ones(lhs.size)
-        end
-    else
-        error(
-            "Cannot create inequality constraint between expressions of size " *
-            "$(lhs.size) and $(rhs.size)",
-        )
-    end
-    return lhs, rhs
-end
-
-function Base.:>=(lhs::AbstractExpr, rhs::AbstractExpr)
     lhs, rhs = _promote_size(lhs, rhs)
     return GenericConstraint{MOI.Nonnegatives}(lhs - rhs)
 end
@@ -113,6 +124,12 @@ function vexity(vex, ::MOI.Nonpositives)
 end
 
 function Base.:<=(lhs::AbstractExpr, rhs::AbstractExpr)
+    if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
+        error(
+            "Cannot create constraint between expressions of sign " *
+            "$(sign(lhs)) and $(sign(rhs))",
+        )
+    end
     lhs, rhs = _promote_size(lhs, rhs)
     return GenericConstraint{MOI.Nonpositives}(lhs - rhs)
 end
@@ -120,6 +137,34 @@ end
 Base.:<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
 
 Base.:<=(lhs::Value, rhs::AbstractExpr) = <=(constant(lhs), rhs)
+
+# ==============================================================================
+#     Zeros
+# ==============================================================================
+
+function set_with_size(::Type{MOI.Zeros}, sz::Tuple{Int,Int})
+    return MOI.Zeros(prod(sz))
+end
+
+head(io::IO, ::MOI.Zeros) = print(io, "==")
+
+is_feasible(f, ::MOI.Zeros, tol) = all(abs.(f) .<= tol)
+
+function vexity(vex, ::MOI.Zeros)
+    if vex == ConvexVexity() || vex == ConcaveVexity()
+        return NotDcp()
+    end
+    return vex
+end
+
+function Base.:(==)(lhs::AbstractExpr, rhs::AbstractExpr)
+    lhs, rhs = _promote_size(lhs, rhs)
+    return GenericConstraint{MOI.Zeros}(lhs - rhs)
+end
+
+Base.:(==)(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
+
+Base.:(==)(lhs::Value, rhs::AbstractExpr) = ==(constant(lhs), rhs)
 
 # ==============================================================================
 #     PositiveSemidefiniteConeSquare

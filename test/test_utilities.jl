@@ -200,27 +200,19 @@ function test_show()
     p = minimize(sum(x), root == root)
     @test curvature(p) == Convex.ConstVexity()
     @test sprint(show, p) == """
-    minimize
-    └─ sum (affine; real)
-       └─ 2-element real variable ($(Convex.show_id(x)))
-    subject to
-    └─ == constraint (affine)
-       ├─ hcat (affine; real)
-       │  ├─ hcat (affine; real)
-       │  │  ├─ …
-       │  │  └─ …
-       │  └─ hcat (affine; real)
-       │     ├─ …
-       │     └─ …
-       └─ hcat (affine; real)
-          ├─ hcat (affine; real)
-          │  ├─ …
-          │  └─ …
-          └─ hcat (affine; real)
-             ├─ …
-             └─ …
+        minimize
+        └─ sum (affine; real)
+           └─ 2-element real variable ($(Convex.show_id(x)))
+        subject to
+        └─ == constraint (affine)
+           └─ + (affine; real)
+              ├─ hcat (affine; real)
+              │  ├─ …
+              │  └─ …
+              └─ Convex.NegateAtom (affine; real)
+                 └─ …
 
-    status: `solve!` not called yet"""
+        status: `solve!` not called yet"""
 
     # test `MAXWIDTH`
     x = Variable()
@@ -234,11 +226,13 @@ function test_show()
         └─ nothing
         subject to
         ├─ == constraint (affine)
-        │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ $(reshape([1], 1, 1))
+        │  └─ + (affine; real)
+        │     ├─ real variable ($(Convex.show_id(x)))
+        │     └─ [-1;;]
         ├─ == constraint (affine)
-        │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ $(reshape([2], 1, 1))
+        │  └─ + (affine; real)
+        │     ├─ real variable ($(Convex.show_id(x)))
+        │     └─ [-2;;]
         ⋮
 
         status: `solve!` not called yet"""
