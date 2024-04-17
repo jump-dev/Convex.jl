@@ -26,50 +26,11 @@
 #
 #############################################################################
 
-const Value = Union{Number,AbstractArray}
-
 abstract type AbstractExpr end
 
 abstract type Constraint end
 
-mutable struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
-    child::AbstractExpr
-    set::S
-    dual::Union{Value,Nothing}
-    function GenericConstraint(child, set::MOI.AbstractSet)
-        return new{typeof(set)}(child, set)
-    end
-    function GenericConstraint{S}(child) where {S<:MOI.AbstractSet}
-        return GenericConstraint(child, set_with_size(S, size(child)))
-    end
-end
-
-head(io::IO, c::GenericConstraint) = head(io, c.set)
-
-AbstractTrees.children(c::GenericConstraint) = (c.child,)
-
-function vexity(c::GenericConstraint)
-    return vexity(vexity(c.child), c.set)
-end
-
-function _add_constraint!(context::Context, c::GenericConstraint)
-    if vexity(c.child) == ConstVexity()
-        x = evaluate(c.child)
-        if !is_feasible(x, c.set, CONSTANT_CONSTRAINT_TOL[])
-            context.detected_infeasible_during_formulation[] = true
-        end
-        return
-    end
-    f = conic_form!(context, c.child)
-    context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, c.set)
-    return
-end
-
-function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
-    ret = MOI.get(model, MOI.ConstraintDual(), indices)
-    c.dual = output(reshape(ret, c.child.size))
-    return
-end
+const Value = Union{Number,AbstractArray}
 
 # We commandeer `==` to create a constraint.
 # Therefore we define `isequal` to still have a notion of equality
