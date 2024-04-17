@@ -215,10 +215,10 @@ end
 function test_GenericConstraint_PositiveSemidefiniteConeSquare_violated()
     X = constant([1 2; 3 4])
     p = satisfy([X ⪰ 0])
-    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:warn,) solve!(p, SCS.Optimizer)
     X = constant([1 2; 2 3])
     p = satisfy([X ⪰ 0])
-    @test_logs (:warn,) (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 

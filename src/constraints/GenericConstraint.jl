@@ -2,21 +2,21 @@ mutable struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
     child::AbstractExpr
     set::S
     dual::Union{Value,Nothing}
-    function GenericConstraint(child, set::MOI.AbstractSet)
-        return new{typeof(set)}(child, set)
+
+    function GenericConstraint(child::AbstractExpr, set::MOI.AbstractSet)
+        return new{typeof(set)}(child, set, nothing)
     end
-    function GenericConstraint{S}(child) where {S<:MOI.AbstractSet}
-        return GenericConstraint(child, set_with_size(S, size(child)))
-    end
+end
+
+function GenericConstraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
+    return GenericConstraint(child, set_with_size(S, size(child)))
 end
 
 head(io::IO, c::GenericConstraint) = head(io, c.set)
 
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
 
-function vexity(c::GenericConstraint)
-    return vexity(vexity(c.child), c.set)
-end
+vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
@@ -47,9 +47,7 @@ end
 
 head(io::IO, ::MOI.Nonnegatives) = print(io, "≥")
 
-function is_feasible(f, ::MOI.Nonnegatives, tol)
-    return all(f .>= -tol)
-end
+is_feasible(f, ::MOI.Nonnegatives, tol) = all(f .>= -tol)
 
 function vexity(vex, ::MOI.Nonnegatives)
     if vex == ConvexVexity()
@@ -63,7 +61,8 @@ end
 function _promote_size(lhs::AbstractExpr, rhs::AbstractExpr)
     if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
         error(
-            "Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))",
+            "Cannot create inequality constraint between expressions of sign " *
+            "$(sign(lhs)) and $(sign(rhs))",
         )
     end
     if lhs.size == rhs.size || lhs.size == (1, 1)
@@ -78,7 +77,8 @@ function _promote_size(lhs::AbstractExpr, rhs::AbstractExpr)
         end
     else
         error(
-            "Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)",
+            "Cannot create inequality constraint between expressions of size " *
+            "$(lhs.size) and $(rhs.size)",
         )
     end
     return lhs, rhs
@@ -103,9 +103,7 @@ end
 
 head(io::IO, ::MOI.Nonpositives) = print(io, "≤")
 
-function is_feasible(f, ::MOI.Nonpositives, tol)
-    return all(f .<= tol)
-end
+is_feasible(f, ::MOI.Nonpositives, tol) = all(f .<= tol)
 
 function vexity(vex, ::MOI.Nonpositives)
     if vex == ConcaveVexity()
@@ -147,14 +145,7 @@ function vexity(vex, ::MOI.PositiveSemidefiniteConeSquare)
 end
 
 function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
-    if !(x ≈ transpose(x))
-        @warn "constant SDP constraint is violated"
-        return false
-    elseif LinearAlgebra.eigmin(x) < -tol
-        @warn "constant SDP constraint is violated"
-        return false
-    end
-    return true
+    return x ≈ transpose(x) && LinearAlgebra.eigmin(x) >= -tol
 end
 
 function LinearAlgebra.isposdef(x::AbstractExpr)
@@ -183,5 +174,7 @@ function ⪰(x::Value, y::AbstractExpr)
 end
 
 ⪯(x::AbstractExpr, y::AbstractExpr) = ⪰(y, x)
+
 ⪯(x::Value, y::AbstractExpr) = ⪰(y, x)
+
 ⪯(x::AbstractExpr, y::Value) = ⪰(y, x)
