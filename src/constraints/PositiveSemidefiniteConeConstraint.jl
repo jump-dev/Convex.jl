@@ -1,4 +1,7 @@
-function set_with_size(::Type{MOI.PositiveSemidefiniteConeSquare}, sz::Tuple{Int,Int})
+function set_with_size(
+    ::Type{MOI.PositiveSemidefiniteConeSquare},
+    sz::Tuple{Int,Int},
+)
     if sz[1] != sz[2]
         error("Positive semidefinite expressions must be square")
     end

@@ -188,7 +188,9 @@ end
 function test_GenericConstraint_PositiveSemidefiniteConeSquare()
     @test_throws(
         ErrorException("Positive semidefinite expressions must be square"),
-        Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(Variable(2, 3)),
+        Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(
+            Variable(2, 3),
+        ),
     )
     X = Variable(2, 2)
     c = Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(X)
@@ -197,10 +199,14 @@ function test_GenericConstraint_PositiveSemidefiniteConeSquare()
     @test isapprox(X.value, [2.25 3; 3 4]; atol = 1e-3)
     y = (c.dual + c.dual') / 2
     @test isapprox(y[1], 1; atol = 1e-3)
-    @test (0 ⪯ X) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
-    @test (-X ⪯ 0) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
-    @test (-X ⪯ constant(0)) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
-    @test (constant(0) ⪯ X) isa Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+    @test (0 ⪯ X) isa
+          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+    @test (-X ⪯ 0) isa
+          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+    @test (-X ⪯ constant(0)) isa
+          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+    @test (constant(0) ⪯ X) isa
+          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
     @test_throws(ErrorException("Set PSD not understood"), X in :PSD)
     @test vexity(X ⪯ square(Variable())) == Convex.NotDcp()
     return

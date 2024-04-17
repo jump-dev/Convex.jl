@@ -52,10 +52,7 @@ function vexity(c::GenericConstraint)
     return vexity(vexity(c.child), c.set)
 end
 
-function _add_constraint!(
-    context::Context,
-    c::GenericConstraint,
-)
+function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
         x = evaluate(c.child)
         if !is_feasible(x, c.set, CONSTANT_CONSTRAINT_TOL[])
@@ -67,7 +64,6 @@ function _add_constraint!(
     context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, c.set)
     return
 end
-
 
 function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
     ret = MOI.get(model, MOI.ConstraintDual(), indices)
