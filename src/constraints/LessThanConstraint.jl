@@ -12,26 +12,7 @@ function vexity(vex, ::MOI.Nonpositives)
 end
 
 function Base.:<=(lhs::AbstractExpr, rhs::AbstractExpr)
-    if sign(lhs) == ComplexSign() || sign(rhs) == ComplexSign()
-        error(
-            "Cannot create inequality constraint between expressions of sign $(sign(lhs)) and $(sign(rhs))",
-        )
-    end
-    if lhs.size == rhs.size || lhs.size == (1, 1)
-        sz = rhs.size
-        if lhs.size == (1, 1) && rhs.size != (1, 1)
-            lhs = lhs * ones(rhs.size)
-        end
-    elseif rhs.size == (1, 1)
-        sz = lhs.size
-        if rhs.size == (1, 1) && lhs.size != (1, 1)
-            rhs = rhs * ones(lhs.size)
-        end
-    else
-        error(
-            "Cannot create inequality constraint between expressions of size $(lhs.size) and $(rhs.size)",
-        )
-    end
+    lhs, rhs = _promote_size(lhs, rhs)
     return GenericConstraint{MOI.Nonpositives}(lhs - rhs)
 end
 
