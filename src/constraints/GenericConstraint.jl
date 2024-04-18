@@ -25,7 +25,6 @@ end
 function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
     return is_feasible([x], set, tol)
 end
-    
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 function _add_constraint!(context::Context, c::GenericConstraint)
