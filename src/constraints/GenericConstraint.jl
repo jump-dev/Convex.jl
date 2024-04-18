@@ -16,12 +16,17 @@ head(io::IO, c::GenericConstraint) = head(io, c.set)
 
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
 
+# A fallback. Define a new method if `MOI.Utilities.distance_to_set`
+# is not defined.
+function is_feasible(x, set, tol)
+    return MOI.Utilities.distance_to_set(x, set) <= tol
+end
+    
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
-        dist = MOI.Utilities.distance_to_set(evaluate(c.child), c.set)
-        if dist > CONSTANT_CONSTRAINT_TOL[]
+        if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
             context.detected_infeasible_during_formulation[] = true
         end
         return
@@ -181,6 +186,10 @@ function vexity(vex, ::MOI.PositiveSemidefiniteConeSquare)
         return NotDcp()
     end
     return AffineVexity()
+end
+
+function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
+    return x ≈ transpose(x) && LinearAlgebra.eigmin(x) >= -tol
 end
 
 function LinearAlgebra.isposdef(x::AbstractExpr)
