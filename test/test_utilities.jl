@@ -228,11 +228,11 @@ function test_show()
         ├─ == constraint (affine)
         │  └─ + (affine; real)
         │     ├─ real variable ($(Convex.show_id(x)))
-        │     └─ [-1;;]
+        │     └─ $(reshape([-1], 1, 1))
         ├─ == constraint (affine)
         │  └─ + (affine; real)
         │     ├─ real variable ($(Convex.show_id(x)))
-        │     └─ [-2;;]
+        │     └─ $(reshape([-2], 1, 1))
         ⋮
 
         status: `solve!` not called yet"""
