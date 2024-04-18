@@ -12,6 +12,14 @@ function GenericConstraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
     return GenericConstraint(child, set_with_size(S, size(child)))
 end
 
+function set_with_size(::Type{S}, sz::Tuple{Int,Int}) where {S<:MOI.AbstractVectorSet}
+    if sz[2] != 1
+        error("Cannot constrain a matrix of size `$sz` to be long to the cone" *
+            "`$S``, there should be only one column.")
+    end
+    return MOI.Utilities.set_with_dimension(S, sz[1])
+end
+
 head(io::IO, c::GenericConstraint) = head(io, c.set)
 
 # A default fallback that skips the feasibiltiy check.
@@ -230,10 +238,6 @@ end
 # ==============================================================================
 #     SecondOrderCone
 # ==============================================================================
-
-function set_with_size(::Type{MOI.SecondOrderCone}, sz::Tuple{Int,Int})
-    return MOI.SecondOrderCone(prod(sz))
-end
 
 head(io::IO, ::MOI.SecondOrderCone) = print(io, "soc")
 
