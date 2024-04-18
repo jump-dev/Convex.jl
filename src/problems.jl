@@ -30,8 +30,11 @@ primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
 termination_status(p::Problem) = getfield(p, :status)
 
 function objective_value(p::Problem)
-    # These don't have an objective value, and it would be confusing to return one
+    # These don't have an objective value, and it would be confusing to return
+    # one.
     if p.head === :satisfy
+        return nothing
+    elseif termination_status(p) == MOI.OPTIMIZE_NOT_CALLED
         return nothing
     end
     return MOI.get(p.model, MOI.ObjectiveValue())
