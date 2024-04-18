@@ -20,7 +20,7 @@ vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
-        dist = MOI.Utilities.distance_to_set(evaluate(c.child), set)
+        dist = MOI.Utilities.distance_to_set(evaluate(c.child), c.set)
         if dist > CONSTANT_CONSTRAINT_TOL[]
             context.detected_infeasible_during_formulation[] = true
         end
