@@ -1282,6 +1282,15 @@ function test_variable_primal_start()
     return
 end
 
+function test_broadcasting()
+    A = [1 2; 3 4]
+    x = Variable(2)
+    y = [1.1, 2.2]
+    @test_throws MethodError (A * x) .<= y
+    @test sprint(show, x .== y) == sprint(show, [x[i] == y[i] for i in 1:2])
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
