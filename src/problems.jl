@@ -22,22 +22,12 @@ mutable struct Problem{T<:Real} <: AbstractExpr
     end
 end
 
-function Base.getproperty(p::Problem, s::Symbol)
-    if s === :optval
-        if getfield(p, :status) == MOI.OPTIMIZE_NOT_CALLED
-            return nothing
-        else
-            return objective_value(p)
-        end
-    end
-    return getfield(p, s)
-end
-
 dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
 
 primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
 
-termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
+# Use getfield because getproperty has a deprecation warning.
+termination_status(p::Problem) = getfield(p, :status)
 
 function objective_value(p::Problem)
     # These don't have an objective value, and it would be confusing to return one

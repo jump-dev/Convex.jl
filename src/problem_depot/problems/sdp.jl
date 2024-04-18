@@ -12,7 +12,7 @@
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
     end
 
     y = Semidefinite((3, 3))
@@ -21,7 +21,7 @@
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
     end
 
     # Solution is obtained as y[2,2] -> infinity
@@ -32,7 +32,7 @@
 
     # # @fact problem_vexity(p) --> ConvexVexity()
     # handle_problem!(p)
-    # @fact p.optval --> roughly(0, atol)
+    # @fact objective_value(p) --> roughly(0, atol)
 
     y = Semidefinite(3)
     p = minimize(sum(diag(y)), y[1, 1] == 1; numeric_type = T)
@@ -40,7 +40,7 @@
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
     end
 
     y = Semidefinite((3, 3))
@@ -49,7 +49,7 @@
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
     end
 
     x = Variable(Positive())
@@ -59,7 +59,7 @@
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
     end
 end
 
@@ -76,7 +76,7 @@ end
     # @fact problem_vexity(p) --> ConvexVexity()
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
     end
 end
 
@@ -101,7 +101,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
         @test evaluate(nuclearnorm(y)) ≈ 3 atol = atol rtol = rtol
     end
 end
@@ -122,7 +122,8 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ sum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ sum(LinearAlgebra.svdvals(A)) atol = atol rtol =
+            rtol
         @test evaluate(nuclearnorm(y)) ≈ sum(LinearAlgebra.svdvals(A)) atol =
             atol rtol = rtol
     end
@@ -149,7 +150,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test evaluate(LinearAlgebra.opnorm(y)) ≈ 4 atol = atol rtol = rtol
     end
 end
@@ -170,7 +171,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol =
+        @test objective_value(p) ≈ maximum(LinearAlgebra.svdvals(A)) atol = atol rtol =
             rtol
         @test evaluate(LinearAlgebra.opnorm(y)) ≈
               maximum(LinearAlgebra.svdvals(A)) atol = atol rtol = rtol
@@ -198,7 +199,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test evaluate(sigmamax(y)) ≈ 4 atol = atol rtol = rtol
     end
 end
@@ -218,7 +219,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test evaluate(eigmax(y)) ≈ 4 atol = atol rtol = rtol
     end
 
@@ -231,7 +232,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1.5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1.5 atol = atol rtol = rtol
         @test p.constraints[1].dual ≈ im atol = atol rtol = rtol
         @test p.constraints[2].dual ≈ 0.75 atol = atol rtol = rtol
     end
@@ -252,7 +253,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test evaluate(eigmin(y)) ≈ 2 atol = atol rtol = rtol
     end
 end
@@ -278,7 +279,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 7 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 7 atol = atol rtol = rtol
         @test (evaluate(matrixfrac(x, P)))[1] ≈ 7 atol = atol rtol = rtol
     end
 end
@@ -299,7 +300,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.5 atol = atol rtol = rtol
         @test (evaluate(matrixfrac(x, P)))[1] ≈ 0.5 atol = atol rtol = rtol
     end
 end
@@ -317,7 +318,7 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
         @test evaluate(x) ≈ ones(3, 3) atol = atol rtol = rtol
     end
 
@@ -331,7 +332,7 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ 8.4853 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 8.4853 atol = atol rtol = rtol
     end
 
     A = [
@@ -347,8 +348,8 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ sum(LinearAlgebra.eigvals(A)[2:end]) atol = atol rtol =
-            rtol
+        @test objective_value(p) ≈ sum(LinearAlgebra.eigvals(A)[2:end]) atol =
+            atol rtol = rtol
     end
 
     x1 = Semidefinite(3)
@@ -362,7 +363,7 @@ end
     handle_problem!(p2)
 
     if test
-        @test p1.optval ≈ p2.optval atol = atol rtol = rtol
+        @test objective_value(p1) ≈ objective_value(p2) atol = atol rtol = rtol
     end
 
     x1 = Semidefinite(3)
@@ -380,7 +381,7 @@ end
     handle_problem!(p2)
 
     if test
-        @test p1.optval ≈ p2.optval atol = atol rtol = rtol
+        @test objective_value(p1) ≈ objective_value(p2) atol = atol rtol = rtol
     end
 end
 
@@ -401,7 +402,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
     end
 end
 
@@ -564,9 +565,9 @@ end
 
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test termination_status(p) == MOI.OPTIMAL
         @test evaluate(ρ) ≈ [1.0 0.0; 0.0 1.0] atol = atol rtol = rtol
-        @test p.optval === nothing
+        @test objective_value(p) === nothing
     end
 end
 
@@ -585,7 +586,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(objective) ≈ 0 atol = atol rtol = rtol
 
         @test real(evaluate(x)) ≈ real(a) atol = atol rtol = rtol
@@ -608,7 +609,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(objective) ≈ 0.0 atol = atol rtol = rtol
 
         @test real.(evaluate(x)) ≈ real.(a) atol = atol rtol = rtol
@@ -631,7 +632,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(objective) ≈ 0.0 atol = atol rtol = rtol
 
         @test real(evaluate(x)) ≈ real(a) atol = atol rtol = rtol
@@ -1213,7 +1214,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.status == MOI.INFEASIBLE
+        @test termination_status(p) == MOI.INFEASIBLE
     end
 
     p = minimize(
@@ -1223,7 +1224,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.status in (MOI.OPTIMAL, MOI.ALMOST_OPTIMAL)
+        @test termination_status(p) in (MOI.OPTIMAL, MOI.ALMOST_OPTIMAL)
     end
 end
 
@@ -1483,23 +1484,23 @@ function sdp_quantum_relative_entropy_impl(
         if mode != 5
             @test real.(evaluate(B)) ≈ real.(X) atol = atol rtol = rtol
             @test imag.(evaluate(B)) ≈ imag.(X) atol = atol rtol = rtol
-            @test p.optval ≈ 0 atol = atol rtol = rtol
+            @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         end
         if mode == 1
-            @test p.optval ≈ evaluate(quantum_relative_entropy(A, B)) atol =
+            @test objective_value(p) ≈ evaluate(quantum_relative_entropy(A, B)) atol =
                 atol rtol = rtol
         elseif mode == 2
-            @test p.optval ≈ evaluate(quantum_relative_entropy(X, B)) atol =
+            @test objective_value(p) ≈ evaluate(quantum_relative_entropy(X, B)) atol =
                 atol rtol = rtol
         elseif mode == 3
-            @test p.optval ≈ evaluate(quantum_relative_entropy(B, A)) atol =
+            @test objective_value(p) ≈ evaluate(quantum_relative_entropy(B, A)) atol =
                 atol rtol = rtol
         elseif mode == 4
-            @test p.optval ≈ evaluate(quantum_relative_entropy(B, X)) atol =
+            @test objective_value(p) ≈ evaluate(quantum_relative_entropy(B, X)) atol =
                 atol rtol = rtol
         elseif mode == 5
             # Satisfiability problem
-            @test p.optval ≈ 0 atol = atol rtol = rtol
+            @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         end
     end
 end
@@ -1755,7 +1756,7 @@ end
         v = -r' * log2.(r)
 
         if test
-            @test p.optval ≈ v atol = atol rtol = rtol
+            @test objective_value(p) ≈ v atol = atol rtol = rtol
             @test evaluate(objective) ≈ v atol = atol rtol = rtol
 
             @test_throws DimensionMismatch quantum_entropy(Variable(2, 3))
@@ -1832,9 +1833,10 @@ end
     if test
         @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
         @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
-        @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * A^t) atol = atol rtol = rtol
+        @test objective_value(p) ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
+        @test objective_value(p) ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -1864,9 +1866,10 @@ end
     if test
         @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
         @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
-        @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * A^t) atol = atol rtol = rtol
+        @test objective_value(p) ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
+        @test objective_value(p) ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -1900,9 +1903,10 @@ end
     if test
         @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
         @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
-        @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * A^t) atol = atol rtol = rtol
+        @test objective_value(p) ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
+        @test objective_value(p) ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -1936,9 +1940,10 @@ end
     if test
         @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
         @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
-        @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * A^t) atol = atol rtol = rtol
+        @test objective_value(p) ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
+        @test objective_value(p) ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -1972,9 +1977,10 @@ end
     if test
         @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
         @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
-        @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * A^t) atol = atol rtol = rtol
+        @test objective_value(p) ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
+        @test objective_value(p) ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -2008,9 +2014,10 @@ end
     if test
         @test real.(evaluate(B)) ≈ real.(A) atol = atol rtol = rtol
         @test imag.(evaluate(B)) ≈ imag.(A) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * A^t) atol = atol rtol = rtol
-        @test p.optval ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * A^t) atol = atol rtol = rtol
+        @test objective_value(p) ≈ trace_mpower(A, t, C) atol = atol rtol = rtol
+        @test objective_value(p) ≈ evaluate(trace_mpower(B, t, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -2057,9 +2064,12 @@ end
     if test
         @test real.(evaluate(X)) ≈ real.(eye(n)) atol = atol rtol = rtol
         @test imag.(evaluate(X)) ≈ imag.(eye(n)) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * log(evaluate(X))) atol = atol rtol = rtol
-        @test p.optval ≈ trace_logm(evaluate(X), C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_logm(X, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * log(evaluate(X))) atol = atol rtol =
+            rtol
+        @test objective_value(p) ≈ trace_logm(evaluate(X), C) atol = atol rtol =
+            rtol
+        @test objective_value(p) ≈ evaluate(trace_logm(X, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -2085,9 +2095,12 @@ end
     if test
         @test real.(evaluate(X)) ≈ real.(eye(n)) atol = atol rtol = rtol
         @test imag.(evaluate(X)) ≈ imag.(eye(n)) atol = atol rtol = rtol
-        @test p.optval ≈ tr(C * log(evaluate(X))) atol = atol rtol = rtol
-        @test p.optval ≈ trace_logm(evaluate(X), C) atol = atol rtol = rtol
-        @test p.optval ≈ evaluate(trace_logm(X, C)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ tr(C * log(evaluate(X))) atol = atol rtol =
+            rtol
+        @test objective_value(p) ≈ trace_logm(evaluate(X), C) atol = atol rtol =
+            rtol
+        @test objective_value(p) ≈ evaluate(trace_logm(X, C)) atol = atol rtol =
+            rtol
     end
 end
 
@@ -2180,7 +2193,7 @@ end
                 end
                 handle_problem!(p)
                 if test
-                    @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
+                    @test objective_value(p) ≈ QtAB atol = atol * 5 rtol = rtol
                 end
 
                 objective = lieb_ando(A, Y, eye(n), t)
@@ -2191,7 +2204,7 @@ end
                 end
                 handle_problem!(p)
                 if test
-                    @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
+                    @test objective_value(p) ≈ QtAB atol = atol * 5 rtol = rtol
                 end
 
                 objective = lieb_ando(X, Y, eye(n), t)
@@ -2202,7 +2215,7 @@ end
                 end
                 handle_problem!(p)
                 if test
-                    @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
+                    @test objective_value(p) ≈ QtAB atol = atol * 5 rtol = rtol
                 end
             end
         end
@@ -2290,8 +2303,8 @@ end
     p = minimize(LinearAlgebra.opnorm(J, Inf), constraints; numeric_type = T)
     handle_problem!(p)
     if test
-        @test p.optval ≈ LinearAlgebra.opnorm(evaluate(J), Inf) atol = atol rtol =
-            rtol
+        @test objective_value(p) ≈ LinearAlgebra.opnorm(evaluate(J), Inf) atol =
+            atol rtol = rtol
         @test tr(evaluate(ρ)) ≈ 1 atol = atol rtol = rtol
     end
 end

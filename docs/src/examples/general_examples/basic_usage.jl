@@ -27,7 +27,7 @@ p.constraints += A * x <= b
 p.constraints += [x >= 1; x <= 10; x[2] <= 5; x[1] + x[4] - x[2] <= 10]
 solve!(p, SCS.Optimizer; silent_solver = true)
 
-println(round(p.optval, digits = 2))
+println(round(objective_value(p), digits = 2))
 println(round.(evaluate(x), digits = 2))
 println(evaluate(x[1] + x[4] - x[2]))
 
@@ -51,7 +51,7 @@ p = minimize(norm(X) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
 solve!(p, SCS.Optimizer; silent_solver = true)
 println(round.(evaluate(X), digits = 2))
 println(evaluate(y))
-p.optval
+objective_value(p)
 
 # ### Norm, exponential and geometric mean
 #
@@ -73,7 +73,7 @@ p = satisfy(
     geomean(x[3], x[4]) >= x[2],
 )
 solve!(p, SCS.Optimizer; silent_solver = true)
-println(p.status)
+println(termination_status(p))
 evaluate(x)
 
 # ### SDP cone and Eigenvalues
@@ -81,7 +81,7 @@ evaluate(x)
 y = Semidefinite(2)
 p = maximize(eigmin(y), tr(y) <= 6)
 solve!(p, SCS.Optimizer; silent_solver = true)
-p.optval
+objective_value(p)
 
 #-
 

@@ -29,7 +29,7 @@ The problems are organized into folders in `src/problem_depot/problems`. Each is
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol=atol rtol=rtol
+        @test objective_value(p) ≈ 0 atol=atol rtol=rtol
         @test evaluate(-x) ≈ 0 atol=atol rtol=rtol
     end
 end

@@ -69,8 +69,10 @@ function LassoEN(Y, X, γ, λ = 0)
         Sol = minimize(L1 - 2 * L2 + γ * L3)               #u'u/T + γ*sum(|b|) where u = Y-Xb
     end
     solve!(Sol, SCS.Optimizer; silent_solver = true)
-    Sol.status == Convex.MOI.OPTIMAL ? b_i = vec(evaluate(b)) : b_i = NaN
-
+    b_i = NaN
+    if termination_status(Sol) == Convex.MOI.OPTIMAL
+        b_i = vec(evaluate(b))
+    end
     return b_i, b_ls
 end
 

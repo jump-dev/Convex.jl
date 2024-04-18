@@ -109,9 +109,9 @@ end
 function test_optval_is_nothing_before_solve!()
     x = Variable()
     p = minimize(x, x >= 0)
-    @test p.optval === nothing
+    @test objective_value(p) === nothing
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    @test p.optval ≈ 0.0 atol = 1e-3
+    @test objective_value(p) ≈ 0.0 atol = 1e-3
     @test Convex.termination_status(p) == MOI.OPTIMAL
     @test Convex.objective_value(p) ≈ 0.0 atol = 1e-3
     return
@@ -809,12 +809,12 @@ function test_DictVectors()
     p = minimize(x + y, [x >= 3, y >= 2])
     @test vexity(p) == Convex.AffineVexity()
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    @test p.optval ≈ 5 atol = 1e-3
+    @test objective_value(p) ≈ 5 atol = 1e-3
     @test evaluate(x + y) ≈ 5 atol = 1e-3
 
     add_constraint!(x, x >= 4)
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    @test p.optval ≈ 6 atol = 1e-3
+    @test objective_value(p) ≈ 6 atol = 1e-3
     @test evaluate(x + y) ≈ 6 atol = 1e-3
     @test length(get_constraints(x)) == 1
     return
@@ -865,12 +865,12 @@ function test_DensityMatrix()
     ρ = DensityMatricies.DensityMatrix(4)
     prob = maximize(real(tr(ρ * X)))
     solve!(prob, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    @test prob.optval ≈ e_val atol = 1e-3
+    @test objective_value(prob) ≈ e_val atol = 1e-3
     @test evaluate(ρ) ≈ proj atol = 1e-3
     ρ2 = real(ρ) + im * imag(ρ)
     prob = maximize(real(tr(ρ2 * X)))
     solve!(prob, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    @test prob.optval ≈ e_val atol = 1e-3
+    @test objective_value(prob) ≈ e_val atol = 1e-3
     @test evaluate(ρ) ≈ proj atol = 1e-3
     @test evaluate(ρ) ≈ evaluate(ρ2) atol = 1e-3
     return
@@ -911,7 +911,7 @@ function test_ProbabilityVectors()
     @test sign(p) == Positive()
     prob = minimize(p(x))
     solve!(prob, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
-    @test prob.optval ≈ 1.0 atol = 1e-3
+    @test objective_value(prob) ≈ 1.0 atol = 1e-3
     @test evaluate(p(x)) ≈ 1.0 atol = 1e-3
     @test evaluate(p) ≈ [1.0, 0.0, 0.0] atol = 1e-3
     return
@@ -1158,16 +1158,16 @@ function test_scalar_fn_constant_objective()
     x = Variable()
     p = minimize(2.1, [x >= 1])
     solve!(p, SCS.Optimizer; silent_solver = true)
-    @test isapprox(p.optval, 2.1; atol = 1e-5)
+    @test isapprox(objective_value(p), 2.1; atol = 1e-5)
     p = minimize(2.2, x >= 1)
     solve!(p, SCS.Optimizer; silent_solver = true)
-    @test isapprox(p.optval, 2.2; atol = 1e-5)
+    @test isapprox(objective_value(p), 2.2; atol = 1e-5)
     p = maximize(2.3, [x >= 1])
     solve!(p, SCS.Optimizer; silent_solver = true)
-    @test isapprox(p.optval, 2.3; atol = 1e-5)
+    @test isapprox(objective_value(p), 2.3; atol = 1e-5)
     p = maximize(2.4, x >= 1)
     solve!(p, SCS.Optimizer; silent_solver = true)
-    @test isapprox(p.optval, 2.4; atol = 1e-5)
+    @test isapprox(objective_value(p), 2.4; atol = 1e-5)
     return
 end
 
@@ -1175,7 +1175,7 @@ function test_scalar_fn_objective_number()
     x = Variable()
     p = minimize(constant(2), [x >= 1])
     solve!(p, SCS.Optimizer)
-    @test isapprox(p.optval, 2.0; atol = 1e-5)
+    @test isapprox(objective_value(p), 2.0; atol = 1e-5)
     return
 end
 
@@ -1183,7 +1183,7 @@ function test_scalar_fn_objective_variable()
     x = Variable()
     p = minimize(x, [x >= 1])
     solve!(p, SCS.Optimizer)
-    @test isapprox(p.optval, 1.0; atol = 1e-5)
+    @test isapprox(objective_value(p), 1.0; atol = 1e-5)
     return
 end
 
@@ -1191,7 +1191,7 @@ function test_scalar_fn_objective_affine()
     x = Variable()
     p = minimize(x + 1, [x >= 1])
     solve!(p, SCS.Optimizer)
-    @test isapprox(p.optval, 2.0; atol = 1e-5)
+    @test isapprox(objective_value(p), 2.0; atol = 1e-5)
     return
 end
 
@@ -1199,7 +1199,7 @@ function test_scalar_fn_objective_square()
     x = Variable()
     p = minimize(square(x - 2), [x >= 1])
     solve!(p, SCS.Optimizer)
-    @test isapprox(p.optval, 0.0; atol = 1e-3)
+    @test isapprox(objective_value(p), 0.0; atol = 1e-3)
     return
 end
 
@@ -1288,6 +1288,24 @@ function test_broadcasting()
     y = [1.1, 2.2]
     @test_throws MethodError (A * x) .<= y
     @test sprint(show, x .== y) == sprint(show, [x[i] == y[i] for i in 1:2])
+    return
+end
+
+function test_deprecation_optval()
+    x = Variable()
+    p = minimize(x, x >= 0)
+    @test_logs (:warn,) p.optval === nothing
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test_logs (:warn,) abs(p.optval) <= 1e-4
+    return
+end
+
+function test_deprecation_status()
+    x = Variable()
+    p = minimize(x, x >= 0)
+    @test_logs (:warn,) p.status === MOI.OPTIMIZE_NOT_CALLED
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test_logs (:warn,) p.status === MOI.OPTIMAL
     return
 end
 

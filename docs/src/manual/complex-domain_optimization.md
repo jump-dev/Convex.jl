@@ -102,7 +102,7 @@ constraints = [
   ]
 p = satisfy(constraints)
 solve!(p, SCS.Optimizer; silent_solver = true)
-p.status
+termination_status(p)
 ```
 
 Since we fix both components as trace-1 positive semidefinite matrices,

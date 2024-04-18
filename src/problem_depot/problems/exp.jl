@@ -13,7 +13,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
         @test evaluate(exp(y)) ≈ 1 atol = atol rtol = rtol
     end
 
@@ -25,7 +25,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ exp(1) atol = atol rtol = rtol
+        @test objective_value(p) ≈ exp(1) atol = atol rtol = rtol
         @test evaluate(exp(y)) ≈ exp(1) atol = atol rtol = rtol
     end
 
@@ -37,7 +37,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 atol = atol rtol = rtol
         @test evaluate(sum(exp(y))) ≈ 5 atol = atol rtol = rtol
     end
 
@@ -49,7 +49,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 atol = atol rtol = rtol
     end
 end
 
@@ -68,7 +68,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
     end
 
     y = Variable()
@@ -79,7 +79,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ log(2) atol = atol rtol = rtol
+        @test objective_value(p) ≈ log(2) atol = atol rtol = rtol
     end
 
     y = Variable()
@@ -90,7 +90,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ log(2) atol = atol rtol = rtol
+        @test objective_value(p) ≈ log(2) atol = atol rtol = rtol
     end
 end
 
@@ -109,7 +109,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ log(exp(1) * 5) atol = atol rtol = rtol
+        @test objective_value(p) ≈ log(exp(1) * 5) atol = atol rtol = rtol
     end
 end
 
@@ -128,7 +128,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ log(exp(1) + 1) * 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ log(exp(1) + 1) * 5 atol = atol rtol = rtol
     end
 end
 
@@ -147,7 +147,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ -(log(1 / 5)) atol = atol rtol = rtol
+        @test objective_value(p) ≈ -(log(1 / 5)) atol = atol rtol = rtol
     end
 end
 
@@ -168,7 +168,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 * log(2) atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 * log(2) atol = atol rtol = rtol
     end
 end
 
@@ -189,6 +189,6 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 * log(2) atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 * log(2) atol = atol rtol = rtol
     end
 end

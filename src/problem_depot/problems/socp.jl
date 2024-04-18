@@ -15,7 +15,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.64888 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.64888 atol = atol rtol = rtol
         @test evaluate(norm2(A * x + b)) ≈ 0.64888 atol = atol rtol = rtol
     end
 
@@ -30,7 +30,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 14.9049 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 14.9049 atol = atol rtol = rtol
         @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol =
             atol rtol = rtol
         @test p.constraints[1].dual ≈ [4.4134, 5.1546] atol = atol rtol = rtol
@@ -51,7 +51,7 @@
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 14.9049 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 14.9049 atol = atol rtol = rtol
         @test evaluate(norm2(A * x + b) + lambda * norm2(x)) ≈ 14.9049 atol =
             atol rtol = rtol
         @test p.constraints[1].dual ≈ [4.4134, 5.1546] atol = atol rtol = rtol
@@ -72,7 +72,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 15.4907 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 15.4907 atol = atol rtol = rtol
         @test evaluate(norm2(A * x + b) + lambda * norm(x, 1)) ≈ 15.4907 atol =
             atol rtol = rtol
         @test p.constraints[1].dual ≈ [4.7062, 5.4475] atol = atol rtol = rtol
@@ -95,7 +95,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ sqrt(35) atol = atol rtol = rtol
+        @test objective_value(p) ≈ sqrt(35) atol = atol rtol = rtol
         @test evaluate(norm(m, 2)) ≈ sqrt(35) atol = atol rtol = rtol
         @test p.constraints[1].dual ≈ 0.6761 atol = atol rtol = rtol
         dual = 0.1690 .* ones(4, 5)
@@ -123,7 +123,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 17.7831 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 17.7831 atol = atol rtol = rtol
         @test evaluate(quadoverlin(A * x + b, dot(c, x) + d)) ≈ 17.7831 atol =
             atol rtol = rtol
     end
@@ -146,7 +146,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.42105 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.42105 atol = atol rtol = rtol
         @test (evaluate(sumsquares(A * x + b)))[1] ≈ 0.42105 atol = atol rtol =
             rtol
     end
@@ -169,7 +169,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.42105 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.42105 atol = atol rtol = rtol
         @test evaluate(sum(square(A * x + b))) ≈ 0.42105 atol = atol rtol = rtol
     end
 
@@ -184,7 +184,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.42105 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.42105 atol = atol rtol = rtol
         @test evaluate(sum(broadcast(^, expr, 2))) ≈ 0.42105 atol = atol rtol =
             rtol
     end
@@ -197,7 +197,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.42105 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.42105 atol = atol rtol = rtol
         @test evaluate(sum(broadcast(^, expr, 2))) ≈ 0.42105 atol = atol rtol =
             rtol
     end
@@ -208,7 +208,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.42105 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.42105 atol = atol rtol = rtol
         @test evaluate(sum(expr .* expr)) ≈ 0.42105 atol = atol rtol = rtol
     end
 end
@@ -235,7 +235,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test evaluate(sum(invpos(x))) ≈ 2 atol = atol rtol = rtol
     end
 
@@ -245,7 +245,7 @@ end
     handle_problem!(p)
     if test
         @test evaluate(x) ≈ fill(3.0, (3, 1)) atol = atol rtol = rtol
-        @test p.optval ≈ 6 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 6 atol = atol rtol = rtol
         @test evaluate(sum([3, 6, 9] ./ x)) ≈ 6 atol = atol rtol = rtol
     end
 
@@ -255,7 +255,7 @@ end
     handle_problem!(p)
     if test
         @test evaluate(x) ≈ 3 atol = atol rtol = rtol
-        @test p.optval ≈ 6 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 6 atol = atol rtol = rtol
         @test evaluate(sum([3, 6, 9] / x)) ≈ 6 atol = atol rtol = rtol
     end
 end
@@ -286,7 +286,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test evaluate(sum(geomean(x, y))) ≈ 4 atol = atol rtol = rtol
     end
 
@@ -302,7 +302,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test evaluate(sum(geomean(x, y, z))) ≈ 4 atol = atol rtol = rtol
     end
 
@@ -315,7 +315,7 @@ end
     )
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 * 4^(2 / 3) atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 * 4^(2 / 3) atol = atol rtol = rtol
         @test evaluate(sum(geomean(x, y, 4 * ones(2)))) ≈ 2 * 4^(2 / 3) atol =
             atol rtol = rtol
     end
@@ -348,7 +348,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 6.1464 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 6.1464 atol = atol rtol = rtol
         @test evaluate(quadform(x, A)) ≈ 6.1464 atol = atol rtol = rtol
     end
 
@@ -364,7 +364,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3.7713 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3.7713 atol = atol rtol = rtol
         @test evaluate(quadform(x, A)) ≈ -1 atol = atol rtol = rtol
     end
 
@@ -383,7 +383,7 @@ end
     handle_problem!(p2)
 
     if test
-        @test p.optval ≈ p2.optval atol = atol rtol = rtol
+        @test objective_value(p) ≈ objective_value(p2) atol = atol rtol = rtol
         @test evaluate(H) ≈ Hval atol = atol rtol = rtol
     end
 
@@ -432,7 +432,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 9 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 9 atol = atol rtol = rtol
         @test evaluate(sum(huber(x, 1))) ≈ 9 atol = atol rtol = rtol
     end
 end
@@ -455,7 +455,7 @@ end
     # Solution is approximately x = [1, .93138, 1.04575]
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1.2717 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1.2717 atol = atol rtol = rtol
         @test evaluate(norm(x, 4.5)) ≈ 1.2717 atol = atol rtol = rtol
     end
 end
@@ -479,7 +479,7 @@ end
     end
     handle_problem!(p) # Solution is -norm(v, q / (q - 1))
     if test
-        @test p.optval ≈ -2.144087 atol = atol rtol = rtol
+        @test objective_value(p) ≈ -2.144087 atol = atol rtol = rtol
         @test sum(evaluate(x' * v)) ≈ -2.144087 atol = atol rtol = rtol
         @test evaluate(norm(x, q)) ≈ 1 atol = atol rtol = rtol
         @test sum(evaluate(x' * v)) ≈ -(sum(abs.(v) .^ qs)^(1 / qs)) atol = atol rtol =
@@ -519,7 +519,7 @@ end
         qs = q / (q - 1)  # Conjugate
         denom = sum(abs.(margins) .^ q)^(1 / qs)
         g = x_opt + A' * (abs.(margins) .^ (q - 1) .* sign.(margins)) / denom
-        @test p.optval ≈ 1.7227 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1.7227 atol = atol rtol = rtol
         @test norm(g, 2)^2 ≈ 0 atol = atol rtol = rtol
     end
 end
@@ -568,20 +568,20 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
     end
 
     set_value!(y, 4)
     fix!(y)
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
     end
 
     free!(y)
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
     end
 end
 
@@ -604,7 +604,7 @@ end
 
     handle_problem!(p)
     if test
-        o1 = p.optval
+        o1 = objective_value(p)
         # x should be very close to a
         @test o1 ≈ 0.7 * norm(a[1:end-1] - a[2:end]) atol = atol rtol = rtol
     end
@@ -613,7 +613,7 @@ end
     handle_problem!(p)
 
     if test
-        o2 = p.optval
+        o2 = objective_value(p)
         # x should be very close to mean(a)
         @test o2 ≈ norm(a .- mean(a)) atol = atol rtol = rtol
     end
@@ -641,10 +641,11 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1.5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1.5 atol = atol rtol = rtol
         @test evaluate(x) ≈ [0, 1.5] atol = atol rtol = rtol
-        @test evaluate(norm(x, 1)) ≈ p.optval atol = atol rtol = rtol
-        @test dot(b, p.constraints[1].dual) ≈ p.optval atol = atol rtol = rtol
+        @test evaluate(norm(x, 1)) ≈ objective_value(p) atol = atol rtol = rtol
+        @test dot(b, p.constraints[1].dual) ≈ objective_value(p) atol = atol rtol =
+            rtol
     end
 
     x = Variable(2)
@@ -657,10 +658,11 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ 3 / sqrt(5) atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 / sqrt(5) atol = atol rtol = rtol
         @test evaluate(x) ≈ [3 / 5, 6 / 5] atol = atol rtol = rtol
-        @test evaluate(norm(x, 2)) ≈ p.optval atol = atol rtol = rtol
-        @test dot(b, p.constraints[1].dual) ≈ p.optval atol = atol rtol = rtol
+        @test evaluate(norm(x, 2)) ≈ objective_value(p) atol = atol rtol = rtol
+        @test dot(b, p.constraints[1].dual) ≈ objective_value(p) atol = atol rtol =
+            rtol
     end
 
     x = Variable(2)
@@ -673,9 +675,11 @@ end
     handle_problem!(p)
 
     if test
-        @test p.optval ≈ 1.0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1.0 atol = atol rtol = rtol
         @test evaluate(x) ≈ [1, 1] atol = atol rtol = rtol
-        @test evaluate(norm(x, Inf)) ≈ p.optval atol = atol rtol = rtol
-        @test dot(b, p.constraints[1].dual) ≈ p.optval atol = atol rtol = rtol
+        @test evaluate(norm(x, Inf)) ≈ objective_value(p) atol = atol rtol =
+            rtol
+        @test dot(b, p.constraints[1].dual) ≈ objective_value(p) atol = atol rtol =
+            rtol
     end
 end

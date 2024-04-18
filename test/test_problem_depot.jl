@@ -41,7 +41,7 @@ test_problem_depot_load_BigFloat() = _test_problem_depot_load(BigFloat)
 
 function test_Clarabel_warmstarts()
     # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
-    #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
+    #   Expression: ≈(objective_value(p), evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
     #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
     Convex.ProblemDepot.run_tests(;
         exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
@@ -58,7 +58,7 @@ end
 
 function test_Clarabel()
     # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
-    #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
+    #   Expression: ≈(objective_value(p), evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
     #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
     Convex.ProblemDepot.run_tests(;
         exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],

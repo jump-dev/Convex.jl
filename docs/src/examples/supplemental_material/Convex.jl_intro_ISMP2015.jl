@@ -46,8 +46,8 @@ problem = minimize(
 ## Solve the problem by calling solve!
 solve!(problem, SCS.Optimizer; silent_solver = true)
 
-println("problem status is ", problem.status) # :Optimal, :Infeasible, :Unbounded etc.
-println("optimal value is ", problem.optval)
+println("problem status is ", termination_status(problem))
+println("optimal value is ", objective_value(problem))
 
 #-
 
@@ -134,7 +134,7 @@ p = minimize(objective, constraint)
 
 ## solve the problem
 solve!(p, SCS.Optimizer; silent_solver = true)
-p.status
+termination_status(p)
 
 #-
 

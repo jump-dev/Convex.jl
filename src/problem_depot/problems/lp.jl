@@ -13,7 +13,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
         @test evaluate(abs(x)) ≈ 1 atol = atol rtol = rtol
         @test p.constraints[1].dual ≈ -1 atol = atol rtol = rtol
     end
@@ -32,7 +32,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test evaluate(sum(abs(x))) ≈ 2 atol = atol rtol = rtol
         @test p.constraints[1].dual ≈ 1 atol = atol rtol = rtol
         @test p.constraints[2].dual ≈ 1 atol = atol rtol = rtol
@@ -63,7 +63,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ maximum(a) atol = atol rtol = rtol
+        @test objective_value(p) ≈ maximum(a) atol = atol rtol = rtol
         @test evaluate(maximum(x)) ≈ maximum(a) atol = atol rtol = rtol
     end
 end
@@ -84,7 +84,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ minimum(a) atol = atol rtol = rtol
+        @test objective_value(p) ≈ minimum(a) atol = atol rtol = rtol
         @test evaluate(minimum(x)) ≈ minimum(a) atol = atol rtol = rtol
     end
 
@@ -102,7 +102,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 130 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 130 atol = atol rtol = rtol
         @test (evaluate(objective))[1] ≈ 130 atol = atol rtol = rtol
     end
 end
@@ -127,7 +127,8 @@ end
     max_a = maximum(a)
     max_b = maximum(b)
     if test
-        @test p.optval ≈ max(max_a, max_b) atol = 10atol atol = atol rtol = rtol
+        @test objective_value(p) ≈ max(max_a, max_b) atol = 10atol atol = atol rtol =
+            rtol
         @test evaluate(maximum(max(x, y))) ≈ max(max_a, max_b) atol = 10atol atol =
             atol rtol = rtol
     end
@@ -153,7 +154,8 @@ end
     min_a = minimum(a)
     min_b = minimum(b)
     if test
-        @test p.optval ≈ min(min_a, min_b) atol = 10atol atol = atol rtol = rtol
+        @test objective_value(p) ≈ min(min_a, min_b) atol = 10atol atol = atol rtol =
+            rtol
         @test evaluate(minimum(min(x, y))) ≈ min(min_a, min_b) atol = 10atol atol =
             atol rtol = rtol
     end
@@ -175,7 +177,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
         @test evaluate(sum(pos(x))) ≈ 3 atol = atol rtol = rtol
     end
 end
@@ -195,7 +197,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval === 1.0
+        @test objective_value(p) === 1.0
         @test evaluate(sum(neg(x))) ≈ 6 atol = atol rtol = rtol
     end
 end
@@ -219,7 +221,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test evaluate(sumlargest(x, 2)) ≈ 2 atol = atol rtol = rtol
     end
 
@@ -237,7 +239,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4.6 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4.6 atol = atol rtol = rtol
         @test evaluate(sumlargest(x, 2)) ≈ 3.6 atol = atol rtol = rtol
     end
 end
@@ -261,7 +263,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0.5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0.5 atol = atol rtol = rtol
         @test evaluate(sumsmallest(x, 4)) ≈ 1 atol = atol rtol = rtol
     end
 
@@ -279,7 +281,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 12 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 12 atol = atol rtol = rtol
         @test evaluate(sumsmallest(x, 3)) ≈ 12 atol = atol rtol = rtol
     end
 end
@@ -306,7 +308,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 19 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 19 atol = atol rtol = rtol
         @test vec(evaluate(x)) ≈ [2; 2; 2; 1] atol = atol rtol = rtol
         @test evaluate(dotsort(x, [1, 2, 3, 4])) ≈ 19 atol = atol rtol = rtol
     end
@@ -326,7 +328,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 19 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 19 atol = atol rtol = rtol
         @test evaluate(dotsort(x, [1, 2, 3, 4])) ≈ 19 atol = atol rtol = rtol
     end
 end
@@ -356,7 +358,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(norm(x, Inf)) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[1].dual) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[2].dual) ≈ 0 atol = atol rtol = rtol
@@ -378,7 +380,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(norm(x, 1)) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[1].dual) ≈ 0 atol = atol rtol = rtol
         @test norm(p.constraints[2].dual) ≈ 0 atol = atol rtol = rtol

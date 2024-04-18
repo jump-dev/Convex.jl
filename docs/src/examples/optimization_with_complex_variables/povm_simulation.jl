@@ -50,7 +50,7 @@ function get_visibility(K)
     constraints += t * K[4] + (1 - t) * noise[4] == P[3][2] + P[5][2] + P[6][2]
     p = maximize(t, constraints)
     solve!(p, SCS.Optimizer; silent_solver = true)
-    return p.optval
+    return objective_value(p)
 end
 
 # We check this function using the tetrahedron measurement (see Appendix B in [arXiv:quant-ph/0702021](https://arxiv.org/abs/quant-ph/0702021)). This measurement is non-simulable, so we expect a value below one.

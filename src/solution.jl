@@ -59,9 +59,9 @@ end
         warmstart::Bool = true,
     )
 
-Solves the problem, populating `problem.optval` with the optimal value, as well
-as the values of the variables (accessed by [`evaluate`](@ref)) and constraint
-duals (accessed by `cons.dual`), where applicable.
+Solves the problem, populating `objective_value(problem)` with the optimal value,
+as well as the values of the variables (accessed by [`evaluate`](@ref)) and
+constraint duals (accessed by `cons.dual`), where applicable.
 
 Optional keyword arguments:
 
@@ -95,8 +95,8 @@ function solve!(
         p.status = MOI.get(context.model, MOI.TerminationStatus())
     end
     p.model = context.model
-    if p.status != MOI.OPTIMAL
-        @warn "Problem wasn't solved optimally" status = p.status
+    if termination_status(p) != MOI.OPTIMAL
+        @warn "Problem wasn't solved optimally" status = termination_status(p)
     end
     primal_status = MOI.get(context.model, MOI.PrimalStatus())
     for (id, indices) in context.var_id_to_moi_indices

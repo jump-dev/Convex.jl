@@ -19,8 +19,9 @@
 
     handle_problem!(problem)
     if test
-        @test problem.optval ≈ evaluate(sum(c * β)) atol = atol rtol = rtol
-        @test problem.optval ≈ 0.0 atol = atol rtol = rtol
+        @test objective_value(problem) ≈ evaluate(sum(c * β)) atol = atol rtol =
+            rtol
+        @test objective_value(problem) ≈ 0.0 atol = atol rtol = rtol
         @test evaluate(β) ≈ zeros(5) atol = atol rtol = rtol
     end
 end
@@ -39,14 +40,14 @@ end
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 0.0 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 0.0 atol = atol rtol = rtol
     end
 
     prob = minimize(x' * y, [y >= 0]; numeric_type = T)
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 0.0 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 0.0 atol = atol rtol = rtol
     end
 end
 
@@ -64,20 +65,20 @@ end
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 1.0 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 1.0 atol = atol rtol = rtol
     end
 
     fix!(x, 2.0)
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 4.0 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 4.0 atol = atol rtol = rtol
     end
 
     free!(x)
     fix!(y, 1.0)
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 0.5 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 0.5 atol = atol rtol = rtol
     end
 end
 
@@ -95,7 +96,7 @@ end
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 2.0 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 2.0 atol = atol rtol = rtol
         @test evaluate(tr(p * x)) ≈ 2.0 atol = atol rtol = rtol
     end
 end
@@ -118,7 +119,7 @@ end
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 0.5 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 0.5 atol = atol rtol = rtol
         @test evaluate(real(x * y)) ≈ 0.5 atol = atol rtol = rtol
         @test evaluate(y) ≈ 0.5 atol = atol rtol = rtol
     end
@@ -131,7 +132,7 @@ end
     end
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 0.25 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 0.25 atol = atol rtol = rtol
         @test evaluate(real(x * y)) ≈ 0.25 atol = atol rtol = rtol
         @test real(evaluate(x)) ≈ 0.5 atol = atol rtol = rtol
         @test evaluate(y) ≈ 0.5 atol = atol rtol = rtol
@@ -161,7 +162,7 @@ end
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 2.5 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 2.5 atol = atol rtol = rtol
         @test evaluate(real(y * sum(x))) ≈ 2.5 atol = atol rtol = rtol
         @test evaluate(y) ≈ 0.5 atol = atol rtol = rtol
     end
@@ -175,7 +176,7 @@ end
 
     handle_problem!(prob)
     if test
-        @test prob.optval ≈ 1.25 atol = atol rtol = rtol
+        @test objective_value(prob) ≈ 1.25 atol = atol rtol = rtol
         @test evaluate(real(y * sum(x))) ≈ 1.25 atol = atol rtol = rtol
         @test real(evaluate(x)) ≈ 0.5 * ones(5) atol = atol rtol = rtol
         @test evaluate(y) ≈ 0.5 atol = atol rtol = rtol

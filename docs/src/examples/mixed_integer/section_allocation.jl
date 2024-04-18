@@ -32,4 +32,4 @@ constraints =
 p = minimize(vec(X)' * vec(P), constraints)
 
 solve!(p, GLPK.Optimizer)
-p.optval
+objective_value(p)

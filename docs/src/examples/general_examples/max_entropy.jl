@@ -24,7 +24,7 @@ b = rand(m, 1);
 x = Variable(n);
 problem = maximize(entropy(x), sum(x) == 1, A * x <= b)
 solve!(problem, SCS.Optimizer; silent_solver = true)
-problem.optval
+objective_value(problem)
 
 #-
 

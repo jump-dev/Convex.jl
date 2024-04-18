@@ -13,7 +13,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = 10atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = 10atol rtol = rtol
         @test evaluate(logdet(x)) ≈ 0 atol = 10atol rtol = rtol
     end
 end

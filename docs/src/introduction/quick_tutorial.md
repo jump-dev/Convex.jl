@@ -34,8 +34,8 @@ problem = minimize(sumsquares(A * x - b), [x >= 0])
 solve!(problem, SCS.Optimizer; silent_solver = true)
 
 # Check the status of the problem
-problem.status # :Optimal, :Infeasible, :Unbounded etc.
+termination_status(problem)
 
 # Get the optimum value
-problem.optval
+objective_value(problem)
 ```

@@ -13,7 +13,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(-x) ≈ 0 atol = atol rtol = rtol
     end
 end
@@ -48,7 +48,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test (evaluate(2.0x))[1] ≈ 4 atol = atol rtol = rtol
     end
 
@@ -61,7 +61,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2.93333 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2.93333 atol = atol rtol = rtol
         @test (evaluate([2 2] * x))[1] ≈ 2.93333 atol = atol rtol = rtol
         @test vec(evaluate(A * x)) ≈ [1.1; 1.1] atol = atol rtol = rtol
     end
@@ -78,7 +78,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
     end
 
     p = Problem{T}(:minimize, o, c...)
@@ -87,7 +87,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
     end
 
     # Check #274
@@ -100,7 +100,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1.0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1.0 atol = atol rtol = rtol
     end
 end
 
@@ -119,7 +119,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4.4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4.4 atol = atol rtol = rtol
         @test (evaluate(dot([2.0; 2.0], x)))[1] ≈ 4.4 atol = atol rtol = rtol
     end
 end
@@ -139,7 +139,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 8.8 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 8.8 atol = atol rtol = rtol
         @test (evaluate(dot(fill(2.0, (2, 2)), x)))[1] ≈ 8.8 atol = atol rtol =
             rtol
     end
@@ -161,7 +161,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 atol = atol rtol = rtol
         @test evaluate(x + y) ≈ 5 atol = atol rtol = rtol
     end
 
@@ -173,7 +173,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 0 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 0 atol = atol rtol = rtol
         @test evaluate(eye(2) + x * ones(2, 2)) ≈ eye(2) atol = atol rtol = rtol
     end
 
@@ -185,7 +185,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ -6 atol = atol rtol = rtol
+        @test objective_value(p) ≈ -6 atol = atol rtol = rtol
         @test evaluate(y - 5) ≈ -6 atol = atol rtol = rtol
     end
 end
@@ -206,7 +206,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test (evaluate(x' * c))[1] ≈ 2 atol = atol rtol = rtol
     end
 
@@ -219,7 +219,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test (evaluate(c' * X' * c))[1] ≈ 4 atol = atol rtol = rtol
     end
 
@@ -241,7 +241,7 @@ end
     handle_problem!(p)
     s = sum(max.(r, r_2')) * 3
     if test
-        @test p.optval ≈ s atol = atol rtol = rtol
+        @test objective_value(p) ≈ s atol = atol rtol = rtol
         @test (evaluate(
             c * x' * d + d' * x * c' + (c * ((((x')')')')' * d)',
         ))[1] ≈ s atol = atol rtol = rtol
@@ -263,7 +263,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test (evaluate(x[1] + x[2]))[1] ≈ 2 atol = atol rtol = rtol
     end
 
@@ -276,7 +276,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test (evaluate(sum(x[I])))[1] ≈ 2 atol = atol rtol = rtol
     end
 
@@ -294,7 +294,7 @@ end
     handle_problem!(p)
     s = c * A[1:n, 5:5+n-1]' * c'
     if test
-        @test p.optval ≈ s[1] atol = atol rtol = rtol
+        @test objective_value(p) ≈ s[1] atol = atol rtol = rtol
         @test evaluate(c * (X[1:n, 5:(5+n)-1])' * c') ≈ s atol = atol rtol =
             rtol
     end
@@ -315,7 +315,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4 atol = atol rtol = rtol
         @test evaluate(sum(x)) ≈ 4 atol = atol rtol = rtol
     end
 
@@ -327,7 +327,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
         @test (evaluate(sum(x) - 2 * x[1, 1]))[1] ≈ 1 atol = atol rtol = rtol
     end
 
@@ -340,7 +340,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ sum(a[2:6]) atol = atol rtol = rtol
+        @test objective_value(p) ≈ sum(a[2:6]) atol = atol rtol = rtol
         @test evaluate(sum(x[2:6])) ≈ sum(a[2:6]) atol = atol rtol = rtol
     end
 end
@@ -360,7 +360,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
         @test evaluate(sum(diag(x, 1))) ≈ 1 atol = atol rtol = rtol
     end
 
@@ -372,7 +372,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 8 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 8 atol = atol rtol = rtol
         @test evaluate(sum(diag(x))) ≈ 8 atol = atol rtol = rtol
     end
 end
@@ -392,7 +392,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
         @test evaluate(tr(x)) ≈ 2 atol = atol rtol = rtol
     end
 end
@@ -412,7 +412,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 6 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 6 atol = atol rtol = rtol
         @test evaluate(sum(x .* [1, 2, 3])) ≈ 6 atol = atol rtol = rtol
     end
 
@@ -424,7 +424,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
         @test evaluate(sum(x .* eye(3))) ≈ 3 atol = atol rtol = rtol
     end
 
@@ -436,7 +436,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
         @test (evaluate(x[1, 1]))[1] ≈ 1 atol = atol rtol = rtol
     end
 
@@ -448,7 +448,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 9 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 9 atol = atol rtol = rtol
         @test (evaluate(x[1, 1]))[1] ≈ 1 atol = atol rtol = rtol
     end
 
@@ -460,7 +460,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 9 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 9 atol = atol rtol = rtol
         @test (evaluate(x[1, 1]))[1] ≈ 1 atol = atol rtol = rtol
     end
 
@@ -472,7 +472,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 11 / 6 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 11 / 6 atol = atol rtol = rtol
         @test evaluate(sum(x ./ [1 2 3])) ≈ 11 / 6 atol = atol rtol = rtol
     end
 end
@@ -494,7 +494,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ sum(A .+ c) atol = atol rtol = rtol
+        @test objective_value(p) ≈ sum(A .+ c) atol = atol rtol = rtol
         @test evaluate(sum(reshape(X, 2, 3) + A)) ≈ sum(A .+ c) atol = atol rtol =
             rtol
     end
@@ -507,7 +507,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ sum(b .+ c) atol = atol rtol = rtol
+        @test objective_value(p) ≈ sum(b .+ c) atol = atol rtol = rtol
         @test evaluate(sum(vec(X) + b)) ≈ sum(b .+ c) atol = atol rtol = rtol
     end
 
@@ -523,7 +523,7 @@ end
     handle_problem!(p)
     # TODO: why is accuracy lower here?
     if test
-        @test p.optval ≈ 136 atol = 10atol atol = atol rtol = rtol
+        @test objective_value(p) ≈ 136 atol = 10atol atol = atol rtol = rtol
         @test (evaluate(c' * reshaped))[1] ≈ 136 atol = 10atol atol = atol rtol =
             rtol
     end
@@ -549,7 +549,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 96 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 96 atol = atol rtol = rtol
         @test evaluate(sum(x) + sum([y fill(4.0, 4)])) ≈ 96 atol = atol rtol =
             rtol
         @test evaluate([x y fill(2.0, (4, 2))]) ≈ fill(2.0, (4, 12)) atol = atol rtol =
@@ -580,7 +580,7 @@ end
     handle_problem!(p)
     # TODO: why is accuracy lower here?
     if test
-        @test p.optval ≈ 104 atol = 10atol atol = atol rtol = rtol
+        @test objective_value(p) ≈ 104 atol = 10atol atol = atol rtol = rtol
         @test evaluate(sum(x) + sum([y 4*eye(4); x -(ones(4, 6))])) ≈ 104 atol =
             10atol atol = atol rtol = rtol
         @test evaluate([x; y']) ≈ 2 * ones(10, 4) atol = atol rtol = rtol
@@ -599,7 +599,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 8 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 8 atol = atol rtol = rtol
     end
 end
 
@@ -615,7 +615,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.optval ≈ 8 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 8 atol = atol rtol = rtol
     end
 end
 
@@ -639,7 +639,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 10 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 10 atol = atol rtol = rtol
         @test all(abs.(evaluate(Diagonal(x)) - Diagonal([1, 2, 3, 4])) .<= atol)
     end
 
@@ -652,7 +652,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 21 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 21 atol = atol rtol = rtol
     end
 
     x = Variable(3)
@@ -660,7 +660,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.status != MOI.OPTIMAL
+        @test termination_status(p) != MOI.OPTIMAL
     end
 end
 
@@ -680,7 +680,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
         @test evaluate(sum(conv(h, x))) ≈ 0 atol = atol rtol = rtol
     end
 
@@ -693,7 +693,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 3 atol = atol rtol = rtol
         @test evaluate(sum(conv(h, x))) ≈ 0 atol = atol rtol = rtol
     end
 end
@@ -712,21 +712,21 @@ end
     add_constraints!(p, [x >= -1, x <= 4])
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test termination_status(p) == MOI.OPTIMAL
     end
 
     p = satisfy([x >= 0, x >= 1, x <= 2]; numeric_type = T)
 
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test termination_status(p) == MOI.OPTIMAL
     end
 
     p = satisfy([x >= 1, x <= 2]; numeric_type = T)
 
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test termination_status(p) == MOI.OPTIMAL
     end
 
     constr = x >= 0
@@ -738,7 +738,7 @@ end
 
     handle_problem!(p)
     if test
-        @test p.status == MOI.OPTIMAL
+        @test termination_status(p) == MOI.OPTIMAL
     end
 end
 

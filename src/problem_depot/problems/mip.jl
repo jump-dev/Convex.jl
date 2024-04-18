@@ -13,7 +13,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4.3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4.3 atol = atol rtol = rtol
     end
 
     x = Variable(2)
@@ -24,7 +24,7 @@
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 4.3 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 4.3 atol = atol rtol = rtol
     end
 end
 
@@ -43,7 +43,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 atol = atol rtol = rtol
     end
 
     x = Variable(2, IntVar)
@@ -54,7 +54,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 10 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 10 atol = atol rtol = rtol
     end
 
     x = Variable(:Int)
@@ -66,7 +66,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 12 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 12 atol = atol rtol = rtol
     end
 
     x = Variable(2, IntVar)
@@ -77,7 +77,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 atol = atol rtol = rtol
     end
 
     x = Variable(2, IntVar)
@@ -88,7 +88,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 5 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 5 atol = atol rtol = rtol
     end
 
     x = Variable(2, IntVar)
@@ -99,7 +99,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
     end
 end
 
@@ -118,7 +118,7 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 2 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 2 atol = atol rtol = rtol
     end
 
     x = Variable(2, BinVar)
@@ -129,6 +129,6 @@ end
     end
     handle_problem!(p)
     if test
-        @test p.optval ≈ 1 atol = atol rtol = rtol
+        @test objective_value(p) ≈ 1 atol = atol rtol = rtol
     end
 end

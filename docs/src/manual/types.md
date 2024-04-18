@@ -167,10 +167,9 @@ solve!(problem, solver)
 ```
 
 passing a solver such as `SCS.Optimizer()` from the package `SCS` as the
-second argument. After the problem is solved, `problem.status` records
-the status returned by the optimization solver, and can be `:Optimal`,
-`:Infeasible`, `:Unbounded`, `:Indeterminate` or `:Error`. If the status
-is `:Optimal`, `problem.optval` will record the optimum value of the
+second argument. After the problem is solved, `termination_status(problem`
+records the status returned by the optimization solver. If the status is
+`MOI.OPTIMAL`, `objective_value(problem)` will record the optimum value of the
 problem. The optimal value for each variable `x` participating in the
 problem can be found in `evaluate(x)`. The optimal value of an expression
 can be found by calling the `evaluate()` function on the expression as

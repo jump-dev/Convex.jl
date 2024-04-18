@@ -118,3 +118,23 @@ end
 function ComplexVariable(set::Symbol, sets::Symbol...)
     return ComplexVariable((1, 1), set, sets...)
 end
+
+function Base.getproperty(p::Problem, s::Symbol)
+    if s === :optval
+        @warn(
+            "Using `p.optval` is deprecated. Use `objective_value(p) instead.",
+            maxlog = 1,
+        )
+        if getfield(p, :status) == MOI.OPTIMIZE_NOT_CALLED
+            return nothing
+        end
+        return objective_value(p)
+    elseif s == :status
+        @warn(
+            "Using `p.status` is deprecated. Use `termination_status(p) instead.",
+            maxlog = 1,
+        )
+        return termination_status(p)
+    end
+    return getfield(p, s)
+end
