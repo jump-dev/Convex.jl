@@ -21,6 +21,10 @@ AbstractTrees.children(c::GenericConstraint) = (c.child,)
 function is_feasible(x, set, tol)
     return MOI.Utilities.distance_to_set(x, set) <= tol
 end
+
+function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
+    return is_feasible([x], set, tol)
+end
     
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
