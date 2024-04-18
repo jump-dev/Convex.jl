@@ -100,6 +100,11 @@ constraint = x == 0
 constraint = x >= 1
 ```
 
+Note that constraints apply elementwise automatically; that is, `x >= 1` means
+that `x[i, j] >= 1` for `i in 1:5` and `j in 1:5`. Consequently, broadcasting
+should not be used to constrain arrays, that is, use `x >= y` instead of
+`x .>= y`.
+
 Matrices can also be constrained to be positive semidefinite.
 
 ```julia
