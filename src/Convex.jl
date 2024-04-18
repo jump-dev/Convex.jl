@@ -88,7 +88,11 @@ export conv,
     satisfy,
     solve!,
     write_to_file,
-    DCPViolationError
+    DCPViolationError,
+    objective_value,
+    termination_status,
+    primal_status,
+    dual_status
 
 # Imports and exports as needed to maintain backwards compatibility
 for k in (
