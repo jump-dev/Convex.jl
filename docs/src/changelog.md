@@ -27,6 +27,9 @@ changes.
       dual variable associated with such constraints is now reversed in sign**.
       (Following the convention in MathOptInterface, the dual of `a <= b` is
       always negative, regardless of optimization sense.) (#593)
+    * The structs `LessThanConstraint`, `GreaterThanConstraint`, `EqualToConstraint`
+      `SecondOrderConeConstraint` and `PostiveSemidefinteConeConstraint` have
+      been replaced by `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call

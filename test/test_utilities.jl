@@ -171,11 +171,13 @@ function test_show()
        └─ real variable ($(Convex.show_id(x)))
     subject to
     ├─ ≥ constraint (affine)
-    │  ├─ real variable ($(Convex.show_id(x)))
-    │  └─ $(reshape([1], 1, 1))
+    │  └─ + (affine; real)
+    │     ├─ real variable ($(Convex.show_id(x)))
+    │     └─ $(reshape([-1], 1, 1))
     └─ ≤ constraint (affine)
-       ├─ real variable ($(Convex.show_id(x)))
-       └─ $(reshape([3], 1, 1))
+       └─ + (affine; real)
+          ├─ real variable ($(Convex.show_id(x)))
+          └─ $(reshape([-3], 1, 1))
 
     status: `solve!` not called yet"""
 
@@ -198,27 +200,19 @@ function test_show()
     p = minimize(sum(x), root == root)
     @test curvature(p) == Convex.ConstVexity()
     @test sprint(show, p) == """
-    minimize
-    └─ sum (affine; real)
-       └─ 2-element real variable ($(Convex.show_id(x)))
-    subject to
-    └─ == constraint (affine)
-       ├─ hcat (affine; real)
-       │  ├─ hcat (affine; real)
-       │  │  ├─ …
-       │  │  └─ …
-       │  └─ hcat (affine; real)
-       │     ├─ …
-       │     └─ …
-       └─ hcat (affine; real)
-          ├─ hcat (affine; real)
-          │  ├─ …
-          │  └─ …
-          └─ hcat (affine; real)
-             ├─ …
-             └─ …
+        minimize
+        └─ sum (affine; real)
+           └─ 2-element real variable ($(Convex.show_id(x)))
+        subject to
+        └─ == constraint (affine)
+           └─ + (affine; real)
+              ├─ hcat (affine; real)
+              │  ├─ …
+              │  └─ …
+              └─ Convex.NegateAtom (affine; real)
+                 └─ …
 
-    status: `solve!` not called yet"""
+        status: `solve!` not called yet"""
 
     # test `MAXWIDTH`
     x = Variable()
@@ -232,11 +226,13 @@ function test_show()
         └─ nothing
         subject to
         ├─ == constraint (affine)
-        │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ $(reshape([1], 1, 1))
+        │  └─ + (affine; real)
+        │     ├─ real variable ($(Convex.show_id(x)))
+        │     └─ $(reshape([-1], 1, 1))
         ├─ == constraint (affine)
-        │  ├─ real variable ($(Convex.show_id(x)))
-        │  └─ $(reshape([2], 1, 1))
+        │  └─ + (affine; real)
+        │     ├─ real variable ($(Convex.show_id(x)))
+        │     └─ $(reshape([-2], 1, 1))
         ⋮
 
         status: `solve!` not called yet"""
@@ -258,8 +254,9 @@ function test_show()
             └─ nothing
             subject to
             └─ ≥ constraint (affine)
-               ├─ real variable ($(Convex.show_id(x)))
-               └─ $(reshape([0], 1, 1))
+               └─ + (affine; real)
+                  ├─ real variable ($(Convex.show_id(x)))
+                  └─ $(reshape([0], 1, 1))
 
             termination status: OPTIMAL
             primal status: FEASIBLE_POINT
@@ -403,7 +400,8 @@ function test_Constructors()
         Semidefinite(2),
     ]
         @test length(get_constraints(x)) == 1
-        @test get_constraints(x)[] isa Convex.PositiveSemidefiniteConeConstraint
+        @test get_constraints(x)[] isa
+              Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
     end
 
     @test_throws ErrorException HermitianSemidefinite(2, 3)
@@ -953,7 +951,8 @@ end
 function test_deprecation_in_symbol()
     x = Variable(2, 2)
     @test_logs (:warn,) (x in :SDP)
-    @test in(x, :semidefinite) isa Convex.PositiveSemidefiniteConeConstraint
+    @test in(x, :semidefinite) isa
+          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
     return
 end
 
