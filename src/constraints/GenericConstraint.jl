@@ -14,6 +14,9 @@ end
 
 head(io::IO, c::GenericConstraint) = head(io, c.set)
 
+# A default fallback that skips the feasibiltiy check.
+is_feasible(f, ::MOI.AbstractSet, tol) = true
+
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
 
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
@@ -223,3 +226,20 @@ end
 ⪯(x::Value, y::AbstractExpr) = ⪰(y, x)
 
 ⪯(x::AbstractExpr, y::Value) = ⪰(y, x)
+
+# ==============================================================================
+#     SecondOrderCone
+# ==============================================================================
+
+function set_with_size(::Type{MOI.SecondOrderCone}, sz::Tuple{Int,Int})
+    return MOI.SecondOrderCone(prod(sz))
+end
+
+head(io::IO, ::MOI.SecondOrderCone) = print(io, "soc")
+
+function vexity(vex, ::MOI.SecondOrderCone)
+    if !(vex == ConstVexity() || vex == AffineVexity())
+        return NotDcp()
+    end
+    return ConvexVexity()
+end

@@ -222,19 +222,19 @@ function test_GenericConstraint_PositiveSemidefiniteConeSquare_violated()
     return
 end
 
-### constraints/SecondOrderConeConstraint
+### constraints/GenericConstraint_SecondOrderCone
 
-function test_SecondOrderConeConstraint()
+function test_GenericConstraint_SecondOrderCone()
     x = Variable(3)
     t = Variable()
-    c = Convex.SecondOrderConeConstraint(t, x)
+    c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(t, x))
     p = minimize(t, [c, x >= [2, 3, 4]])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
     t_ = sqrt(29)
     @test isapprox(t.value, t_; atol = 1e-3)
     @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
-    c = Convex.SecondOrderConeConstraint(square(t), x)
+    c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
     return
 end
