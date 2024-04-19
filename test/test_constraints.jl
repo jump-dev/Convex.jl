@@ -239,6 +239,20 @@ function test_GenericConstraint_SecondOrderCone()
     return
 end
 
+function test_GenericConstraint_SecondOrderCone_set_with_size()
+    x = Variable(2, 2)
+    S = MOI.SecondOrderCone
+    sz = size(x)
+    @test_throws(
+        ErrorException(
+            "Cannot constrain a matrix of size `$sz` to be long to the cone " *
+            "`$S`, there should be only one column.",
+        ),
+        Convex.GenericConstraint{S}(x),
+    )
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()
