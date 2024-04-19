@@ -34,6 +34,9 @@ function new_conic_form!(context::Context, e::EntropyAtom)
     # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
     t = Variable(e.size)
     x = e.children[1]
-    add_constraint!(context, ExponentialConeConstraint(vcat(t, x, 1)))
+    add_constraint!(
+        context,
+        GenericConstraint{MOI.ExponentialCone}(vcat(t, x, 1)),
+    )
     return conic_form!(context, t)
 end

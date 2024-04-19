@@ -29,6 +29,9 @@ function new_conic_form!(context::Context, e::LogAtom)
     z = e.children[1]
     y = Constant(ones(size(z)))
     x = Variable(size(z))
-    add_constraint!(context, ExponentialConeConstraint(vcat(x, y, z)))
+    add_constraint!(
+        context,
+        GenericConstraint{MOI.ExponentialCone}(vcat(x, y, z)),
+    )
     return conic_form!(context, x)
 end

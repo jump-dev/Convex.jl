@@ -64,9 +64,9 @@ function test_EqualToConstraint_dual_complex()
     return
 end
 
-### constraints/ExponentialConeConstraint
+### constraints/ExponentialCone
 
-function test_ExponentialConeConstraint()
+function test_GenericConstraint_ExponentialCone()
     # y * exp(x / y) <= z  <=>  (x, y, z) in ExpCone
     z = Variable()
     # 1 * exp(1 / 1) <= z

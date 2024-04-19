@@ -47,7 +47,7 @@ function vexity(
         MOI.PositiveSemidefiniteConeSquare,
         MOI.SecondOrderCone,
         MOI.ExponentialCone,
-    }
+    },
 )
     if !(vex == ConstVexity() || vex == AffineVexity())
         return NotDcp()
