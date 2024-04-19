@@ -29,6 +29,6 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     x = e.children[1]
     y = Constant(ones(size(x)))
     z = Variable(size(x))
-    add_constraint!(context, ExponentialConeConstraint(x, y, z))
+    add_constraint!(context, ExponentialConeConstraint(vcat(x, y, z)))
     return conic_form!(context, z)
 end

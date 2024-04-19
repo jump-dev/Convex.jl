@@ -41,6 +41,20 @@ end
 
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
+function vexity(
+    vex::Vexity,
+    ::Union{
+        MOI.PositiveSemidefiniteConeSquare,
+        MOI.SecondOrderCone,
+        MOI.ExponentialCone,
+    }
+)
+    if !(vex == ConstVexity() || vex == AffineVexity())
+        return NotDcp()
+    end
+    return ConvexVexity()
+end
+
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
         if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
@@ -198,13 +212,6 @@ end
 
 head(io::IO, ::MOI.PositiveSemidefiniteConeSquare) = print(io, "sdp")
 
-function vexity(vex, ::MOI.PositiveSemidefiniteConeSquare)
-    if !(vex in (AffineVexity(), ConstVexity()))
-        return NotDcp()
-    end
-    return AffineVexity()
-end
-
 function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
     return x ≈ transpose(x) && LinearAlgebra.eigmin(x) >= -tol
 end
@@ -241,14 +248,9 @@ end
 ⪯(x::AbstractExpr, y::Value) = ⪰(y, x)
 
 # ==============================================================================
-#     SecondOrderCone
+#     SecondOrderCone, ExponentialCone
 # ==============================================================================
 
 head(io::IO, ::MOI.SecondOrderCone) = print(io, "soc")
 
-function vexity(vex, ::MOI.SecondOrderCone)
-    if !(vex == ConstVexity() || vex == AffineVexity())
-        return NotDcp()
-    end
-    return ConvexVexity()
-end
+head(io::IO, ::MOI.ExponentialCone) = print(io, "exp")
