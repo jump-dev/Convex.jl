@@ -18,7 +18,7 @@ function set_with_size(
 ) where {S<:MOI.AbstractVectorSet}
     if sz[2] != 1
         error(
-            "Cannot constrain a matrix of size `$sz` to be long to the cone" *
+            "Cannot constrain a matrix of size `$sz` to be long to the cone " *
             "`$S``, there should be only one column.",
         )
     end
