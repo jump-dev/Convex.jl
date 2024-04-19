@@ -14,17 +14,23 @@ end
 
 head(io::IO, c::GenericConstraint) = head(io, c.set)
 
-# A default fallback that skips the feasibiltiy check.
-is_feasible(f, ::MOI.AbstractSet, tol) = true
-
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
+
+# A fallback. Define a new method if `MOI.Utilities.distance_to_set`
+# is not defined.
+function is_feasible(x, set, tol)
+    return MOI.Utilities.distance_to_set(x, set) <= tol
+end
+
+function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
+    return is_feasible([x], set, tol)
+end
 
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
-        x = evaluate(c.child)
-        if !is_feasible(x, c.set, CONSTANT_CONSTRAINT_TOL[])
+        if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
             context.detected_infeasible_during_formulation[] = true
         end
         return
@@ -81,8 +87,6 @@ end
 
 head(io::IO, ::MOI.Nonnegatives) = print(io, "≥")
 
-is_feasible(f, ::MOI.Nonnegatives, tol) = all(f .>= -tol)
-
 function vexity(vex, ::MOI.Nonnegatives)
     if vex == ConvexVexity()
         return NotDcp()
@@ -117,8 +121,6 @@ end
 
 head(io::IO, ::MOI.Nonpositives) = print(io, "≤")
 
-is_feasible(f, ::MOI.Nonpositives, tol) = all(f .<= tol)
-
 function vexity(vex, ::MOI.Nonpositives)
     if vex == ConcaveVexity()
         return NotDcp()
@@ -150,8 +152,6 @@ function set_with_size(::Type{MOI.Zeros}, sz::Tuple{Int,Int})
 end
 
 head(io::IO, ::MOI.Zeros) = print(io, "==")
-
-is_feasible(f, ::MOI.Zeros, tol) = all(abs.(f) .<= tol)
 
 function vexity(vex, ::MOI.Zeros)
     if vex == ConvexVexity() || vex == ConcaveVexity()
