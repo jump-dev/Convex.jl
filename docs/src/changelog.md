@@ -29,7 +29,7 @@ changes.
       always negative, regardless of optimization sense.) (#593)
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
       `SOCConstraint` and `SDPConstraint` have
-      been replaced by `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590) (#597)
+      been replaced by `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590) (#597) (#598) (#599)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call
@@ -86,7 +86,7 @@ changes.
  * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
  * Added various tests to improve code coverage (#522), (#572), (#575), (#577),
    (#580)
- * Updated versions in GitHub actionsn (#596)
+ * Updated versions in GitHub actions (#596)
 
 ## v0.15.4 (October 24, 2023)
 
