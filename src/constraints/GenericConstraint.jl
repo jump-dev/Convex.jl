@@ -19,7 +19,7 @@ function set_with_size(
     if sz[2] != 1
         error(
             "Cannot constrain a matrix of size `$sz` to be long to the cone " *
-            "`$S``, there should be only one column.",
+            "`$S`, there should be only one column.",
         )
     end
     return MOI.Utilities.set_with_dimension(S, sz[1])
