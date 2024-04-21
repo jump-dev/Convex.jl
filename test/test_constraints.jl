@@ -232,6 +232,27 @@ function test_GenericConstraint_SecondOrderCone_set_with_size()
     return
 end
 
+### constraints/GenericConstraint_ExponentialCone
+
+function test_GenericConstraint_ExponentialConeConstraint()
+    # y * exp(x / y) <= z  <=>  (x, y, z) in ExpCone
+    z = Variable()
+    # 1 * exp(1 / 1) <= z
+    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(1, constant(1), z))
+    p = minimize(z, [c])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(z.value, exp(1); atol = 1e-4)
+    @test isapprox(c.dual, [-exp(1), 0, 1]; atol = 1e-4)
+    z = Variable()
+    # 2 * exp(3 / 2) <= z
+    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(constant(3), 2, z))
+    p = minimize(z, [c])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(z.value, 2 * exp(3 / 2); atol = 1e-4)
+    @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()
