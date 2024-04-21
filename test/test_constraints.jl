@@ -215,6 +215,7 @@ function test_GenericConstraint_SecondOrderCone()
     @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
+    @test Convex.sprint(head, c) == "soc"
     return
 end
 
@@ -229,6 +230,23 @@ function test_GenericConstraint_SecondOrderCone_set_with_size()
         ),
         Convex.GenericConstraint{S}(x),
     )
+    return
+end
+
+### constraints/GenericConstraint_RotatedSecondOrderCone
+
+function test_GenericConstraint_RotatedSecondOrderCone()
+    x = Variable(3)
+    t = Variable()
+    c = Convex.GenericConstraint{MOI.RotatedSecondOrderCone}(vcat(t, 1, x))
+    p = minimize(t, [c, x >= [2, 3, 4]])
+    solve!(p, SCS.Optimizer; silent_solver = true)
+    @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
+    @test isapprox(t.value, 29 / 2; atol = 1e-3)
+    @test isapprox(c.dual, [1, 29 / 2, -2, -3, -4]; atol = 1e-3)
+    c = Convex.GenericConstraint{MOI.RotatedSecondOrderCone}(vcat(square(t), x))
+    @test vexity(c) === Convex.NotDcp()
+    @test Convex.sprint(Convex.head, c) == "rsoc"
     return
 end
 
