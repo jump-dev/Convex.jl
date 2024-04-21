@@ -265,3 +265,16 @@ function vexity(vex, ::MOI.SecondOrderCone)
     end
     return ConvexVexity()
 end
+
+# ==============================================================================
+#     RotatedSecondOrderCone
+# ==============================================================================
+
+head(io::IO, ::MOI.RotatedSecondOrderCone) = print(io, "rsoc")
+
+function vexity(vex, ::MOI.RotatedSecondOrderCone)
+    if !(vex == ConstVexity() || vex == AffineVexity())
+        return NotDcp()
+    end
+    return ConvexVexity()
+end

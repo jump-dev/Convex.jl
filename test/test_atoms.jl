@@ -536,7 +536,7 @@ function test_MultiplyAtom()
     target = """
     variables: t, x
     minobjective: 1.0 * t
-    [1.0 + 1.0 * t, 1.0 + -1.0 * t, 2.0 * x] in SecondOrderCone(3)
+    [t, 0.5, x] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         x = Variable()
@@ -965,7 +965,7 @@ function test_AbsAtom()
     minobjective: 1.0 * w
     [1.0 * t + -1.0 * x] in Nonnegatives(1)
     [1.0 * t + 1.0 * x] in Nonnegatives(1)
-    [1.0 + 1.0*w, 1.0 + -1.0*w, 2.0*t] in SecondOrderCone(3)
+    [w, 0.5, t] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         return abs2(Variable())
@@ -1505,7 +1505,7 @@ function test_HuberAtom()
     [1.0 * c + -1.0 * s + -1.0 * n] in Zeros(1)
     [-1.0 * n + 1.0 * n_abs] in Nonnegatives(1)
     [1.0 * n + 1.0 * n_abs] in Nonnegatives(1)
-    [1.0 + 1.0 * t, 1.0 + -1.0 * t, 2.0 * s] in SecondOrderCone(3)
+    [t, 0.5, s] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         return huber(Variable(), 2.0)
@@ -1533,11 +1533,10 @@ end
 
 function test_QolElemAtom()
     target = """
-    variables: y1, y2, t1, t2, x1, x2
+    variables: t1, t2, y1, y2, x1, x2
     minobjective: [1.0 * t1, 1.0 * t2]
-    [1.0 * y1, 1.0 * y2] in Nonnegatives(2)
-    [1.0 * y1 + 1.0 * t1, 1.0 * y1 + -1.0 * t1, 2.0 * x1] in SecondOrderCone(3)
-    [1.0 * y2 + 1.0 * t2, 1.0 * y2 + -1.0 * t2, 2.0 * x2] in SecondOrderCone(3)
+    [t1, 0.5 * y1, x1] in RotatedSecondOrderCone(3)
+    [t2, 0.5 * y2, x2] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         return qol_elementwise(Variable(2), Variable(2))
@@ -1545,8 +1544,8 @@ function test_QolElemAtom()
     target = """
     variables: t1, t2, x1, x2
     minobjective: [1.0 * t1, 1.0 * t2]
-    [1.0 + 1.0 * t1, 1.0 + -1.0 * t1, 2.0 * x1] in SecondOrderCone(3)
-    [1.0 + 1.0 * t2, 1.0 + -1.0 * t2, 2.0 * x2] in SecondOrderCone(3)
+    [t1, 0.5, x1] in RotatedSecondOrderCone(3)
+    [t2, 0.5, x2] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         return qol_elementwise(Variable(2), constant([1, 1]))
@@ -1562,11 +1561,10 @@ function test_QolElemAtom()
         return Variable(2) .^ a
     end
     target = """
-    variables: y1, y2, t1, t2
+    variables: t1, t2, y1, y2
     minobjective: [1.0 * t1, 1.0 * t2]
-    [1.0 * y1, 1.0 * y2] in Nonnegatives(2)
-    [1.0 * y1 + 1.0 * t1, 1.0 * y1 + -1.0 * t1, 2.0] in SecondOrderCone(3)
-    [1.0 * y2 + 1.0 * t2, 1.0 * y2 + -1.0 * t2, 2.0] in SecondOrderCone(3)
+    [t1, 0.5 * y1, 1.0] in RotatedSecondOrderCone(3)
+    [t2, 0.5 * y2, 1.0] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         return invpos(Variable(2))
@@ -1575,10 +1573,9 @@ function test_QolElemAtom()
         return 1 ./ Variable(2)
     end
     target = """
-    variables: y, t
+    variables: t, y
     minobjective: 3.0 * t
-    [1.0 * y] in Nonnegatives(1)
-    [1.0 * y + 1.0 * t, 1.0 * y + -1.0 * t, 2.0] in SecondOrderCone(3)
+    [t, 0.5 * y, 1.0] in RotatedSecondOrderCone(3)
     """
     _test_atom(target) do context
         return 3 / Variable()
@@ -1620,10 +1617,9 @@ end
 
 function test_QuadOverLinAtom()
     target = """
-    variables: y, t, x1, x2
+    variables: t, y, x1, x2
     minobjective: 1.0 * t
-    [1.0 * y] in Nonnegatives(1)
-    [1.0 * y + 1.0 * t, 1.0 * y + -1.0 * t, 2.0 * x1, 2.0 * x2] in SecondOrderCone(4)
+    [t, 0.5 * y, x1, x2] in RotatedSecondOrderCone(4)
     """
     _test_atom(target) do context
         return quadoverlin(Variable(2), Variable())
@@ -1931,7 +1927,7 @@ function test_quadform()
     variables: u, t, x1, x2
     minobjective: 1.0 * u
     [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
-    [1.0+1.0*u, 1.0+-1.0*u, 2.0*t] in SecondOrderCone(3)
+    [u, 0.5, t] in RotatedSecondOrderCone(3)
     """
     _test_reformulation(target) do context
         return quadform(Variable(2), [20.0 16.0; 16.0 20.0])
@@ -1946,7 +1942,7 @@ function test_quadform()
     variables: u, t, x1, x2
     minobjective: 1.0 + -1.0 * u
     [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
-    [1.0+1.0*u, 1.0+-1.0*u, 2.0*t] in SecondOrderCone(3)
+    [u, 0.5, t] in RotatedSecondOrderCone(3)
     """
     _test_reformulation(target) do context
         return 1 + quadform(Variable(2), -[20 16; 16 20])
