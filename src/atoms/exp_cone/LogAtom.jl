@@ -25,10 +25,13 @@ evaluate(x::LogAtom) = log.(evaluate(x.children[1]))
 Base.log(x::AbstractExpr) = LogAtom(x)
 
 function new_conic_form!(context::Context, e::LogAtom)
-    # log(z) \geq x  <=> (x,ones(),z) \in ExpCone
+    # log(z) \geq x  <=> (x,1,z) \in ExpCone
     z = e.children[1]
-    y = Constant(ones(size(z)))
-    x = Variable(size(z))
-    add_constraint!(context, ExponentialConeConstraint(x, y, z))
+    m, n = size(z)
+    x = Variable(m, n)
+    for i in 1:m, j in 1:n
+        f = vcat(x[i, j], 1, z[i, j])
+        add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
+    end
     return conic_form!(context, x)
 end
