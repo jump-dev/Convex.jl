@@ -215,7 +215,7 @@ function test_GenericConstraint_SecondOrderCone()
     @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
-    @test Convex.sprint(head, c) == "soc"
+    @test Convex.sprint(Convex.head, c) == "soc"
     return
 end
 
