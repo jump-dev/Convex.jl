@@ -250,7 +250,7 @@ function test_GenericConstraint_ExponentialConeConstraint()
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(z.value, 2 * exp(3 / 2); atol = 1e-4)
     @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
-    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(square(z), 1, x))
+    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
     @test vexity(c) === Convex.NotDcp()
     @test sprint(Convex.head, c) == "exp"
     return
