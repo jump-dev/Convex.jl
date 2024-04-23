@@ -25,10 +25,13 @@ evaluate(x::ExpAtom) = exp.(evaluate(x.children[1]))
 Base.exp(x::AbstractExpr) = ExpAtom(x)
 
 function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
-    # exp(x) \leq z  <=>  (x,ones(),z) \in ExpCone
+    # exp(x) \leq z  <=>  (x,1,z) \in ExpCone
     x = e.children[1]
-    y = Constant(ones(size(x)))
-    z = Variable(size(x))
-    add_constraint!(context, ExponentialConeConstraint(x, y, z))
+    m, n = size(x)
+    z = Variable(m, n)
+    for i in 1:m, j in 1:n
+        f = vcat(x[i, j], 1, z[i, j])
+        add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
+    end
     return conic_form!(context, z)
 end

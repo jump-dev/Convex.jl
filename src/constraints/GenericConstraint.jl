@@ -241,6 +241,19 @@ end
 ⪯(x::AbstractExpr, y::Value) = ⪰(y, x)
 
 # ==============================================================================
+#     ExponentialCone
+# ==============================================================================
+
+head(io::IO, ::MOI.ExponentialCone) = print(io, "exp")
+
+function vexity(vex, ::MOI.ExponentialCone)
+    if !(vex == ConstVexity() || vex == AffineVexity())
+        return NotDcp()
+    end
+    return ConvexVexity()
+end
+
+# ==============================================================================
 #     SecondOrderCone
 # ==============================================================================
 
