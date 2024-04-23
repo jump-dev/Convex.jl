@@ -30,10 +30,12 @@ function new_conic_form!(context::Context{T}, q::QolElemAtom) where {T}
     x, y = q.children
     t = Variable(x.size)
     for i in 1:length(x)
-        f = vcat(y[i] + t[i], y[i] - t[i], 2 * x[i])
-        add_constraint!(context, GenericConstraint{MOI.SecondOrderCone}(f))
+        f = vcat(t[i], (1 / T(2)) * y[i], x[i])
+        add_constraint!(
+            context,
+            GenericConstraint{MOI.RotatedSecondOrderCone}(f),
+        )
     end
-    add_constraint!(context, y >= 0)
     return conic_form!(context, t)
 end
 

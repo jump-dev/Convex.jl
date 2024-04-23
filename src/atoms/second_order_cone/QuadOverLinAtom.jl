@@ -27,12 +27,11 @@ function evaluate(q::QuadOverLinAtom)
     return x' * x / evaluate(q.children[2])
 end
 
-function new_conic_form!(context::Context, q::QuadOverLinAtom)
+function new_conic_form!(context::Context{T}, q::QuadOverLinAtom) where {T}
     t = Variable()
     x, y = q.children
-    f = vcat(y + t, y - t, 2 * x)
-    add_constraint!(context, GenericConstraint{MOI.SecondOrderCone}(f))
-    add_constraint!(context, y >= 0)
+    f = vcat(t, (1 / T(2)) * y, x)
+    add_constraint!(context, GenericConstraint{MOI.RotatedSecondOrderCone}(f))
     return conic_form!(context, t)
 end
 
