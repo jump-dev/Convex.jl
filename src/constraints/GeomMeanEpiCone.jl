@@ -24,113 +24,45 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct GeomMeanEpiCone
-    A::AbstractExpr
-    B::AbstractExpr
+struct GeomMeanEpiCone <: MOI.AbstractVectorSet
+    side_dimension::Int
     t::Rational
-    size::Tuple{Int,Int}
 
     function GeomMeanEpiCone(
-        A::AbstractExpr,
-        B::AbstractExpr,
+        side_dimension::Int,
         t::Rational,
-        fullhyp::Bool = true,
     )
-        if size(A) != size(B)
-            throw(DimensionMismatch("A and B must be the same size"))
-        end
-        n = size(A)[1]
-        if size(A) != (n, n)
-            throw(DimensionMismatch("A and B must be square"))
-        end
         if t < -1 || (t > 0 && t < 1) || t > 2
             throw(DomainError(t, "t must be in the range [-1, 0] or [1, 2]"))
         end
-        return new(A, B, t, (n, n))
-    end
-
-    function GeomMeanEpiCone(
-        A::Value,
-        B::AbstractExpr,
-        t::Rational,
-        fullhyp::Bool = true,
-    )
-        return GeomMeanEpiCone(constant(A), B, t, fullhyp)
-    end
-
-    function GeomMeanEpiCone(
-        A::AbstractExpr,
-        B::Value,
-        t::Rational,
-        fullhyp::Bool = true,
-    )
-        return GeomMeanEpiCone(A, constant(B), t, fullhyp)
-    end
-
-    function GeomMeanEpiCone(
-        A::Value,
-        B::Value,
-        t::Rational,
-        fullhyp::Bool = true,
-    )
-        return GeomMeanEpiCone(constant(A), constant(B), t, fullhyp)
-    end
-
-    function GeomMeanEpiCone(
-        A::Union{AbstractExpr,Value},
-        B::Union{AbstractExpr,Value},
-        t::Integer,
-        fullhyp::Bool = true,
-    )
-        return GeomMeanEpiCone(A, B, t // 1, fullhyp)
+        return new(side_dimension, t)
     end
 end
 
-mutable struct GeomMeanEpiConeConstraint <: Constraint
-    T::AbstractExpr
-    cone::GeomMeanEpiCone
+head(io::IO, ::GeomMeanEpiCone) = print(io, "∈(GeomMeanEpiCone)")
 
-    function GeomMeanEpiConeConstraint(T::AbstractExpr, cone::GeomMeanEpiCone)
-        if size(T) != cone.size
-            throw(DimensionMismatch("T must be size $(cone.size)"))
-        end
-        return new(T, cone)
-    end
-
-    function GeomMeanEpiConeConstraint(T::Value, cone::GeomMeanEpiCone)
-        return GeomMeanEpiConeConstraint(constant(T), cone)
-    end
-end
-
-head(io::IO, ::GeomMeanEpiConeConstraint) = print(io, "∈(GeomMeanEpiCone)")
-
-Base.in(T, cone::GeomMeanEpiCone) = GeomMeanEpiConeConstraint(T, cone)
-
-function AbstractTrees.children(constraint::GeomMeanEpiConeConstraint)
-    return (
-        constraint.T,
-        constraint.cone.A,
-        constraint.cone.B,
-        "t=$(constraint.cone.t)",
-    )
-end
+Base.in(T, cone::GeomMeanEpiCone) = GenericConstraint{GeomMeanEpiCone}(T, cone)
 
 # For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex
 # (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
-function vexity(constraint::GeomMeanEpiConeConstraint)
-    A = vexity(constraint.cone.A)
-    B = vexity(constraint.cone.B)
-    T = vexity(constraint.T)
+function vexity(constraint::GenericConstraint{GeomMeanEpiCone})
+    n = constraint.set.side_dimension
+    T = constraint.child[1:n^2]
+    A = constraint.child[n^2 .+ (1:n^2)]
+    B = constraint.child[2n^2 .+ (1:n^2)]
+    vT = vexity(T)
+    vA = vexity(A)
+    vB = vexity(B)
 
     # NOTE: can't say A == NotDcp() because the NotDcp constructor prints a
     # warning message.
-    if typeof(A) == ConcaveVexity || typeof(A) == NotDcp
+    if typeof(vA) == ConcaveVexity || typeof(vA) == NotDcp
         return NotDcp()
-    elseif typeof(B) == ConcaveVexity || typeof(B) == NotDcp
+    elseif typeof(vB) == ConcaveVexity || typeof(vB) == NotDcp
         return NotDcp()
     end
-    vex = ConvexVexity() + (-T)
+    vex = ConvexVexity() + (-vT)
     if vex == ConcaveVexity()
         return NotDcp()
     end
@@ -139,12 +71,13 @@ end
 
 function _add_constraint!(
     context::Context,
-    constraint::GeomMeanEpiConeConstraint,
+    constraint::GenericConstraint{GeomMeanEpiCone},
 )
-    A = constraint.cone.A
-    B = constraint.cone.B
-    t = constraint.cone.t
-    T = constraint.T
+    n = constraint.set.side_dimension
+    T = constraint.child[1:n^2]
+    A = constraint.child[n^2 .+ (1:n^2)]
+    B = constraint.child[2n^2 .+ (1:n^2)]
+    t = constraint.set.t
     is_complex =
         sign(A) == ComplexSign() ||
         sign(B) == ComplexSign() ||
