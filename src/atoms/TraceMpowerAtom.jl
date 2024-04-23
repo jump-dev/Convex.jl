@@ -95,7 +95,10 @@ function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     if 0 <= atom.t <= 1
         add_constraint!(context, tmp in GeomMeanHypoCone(I, A, atom.t, false))
     else
-        add_constraint!(context, tmp in GeomMeanEpiCone(I, A, atom.t, false))
+        add_constraint!(
+            context,
+            (tmp, eye, A) in GeomMeanEpiConeSquare(atom.t, size(A, 1)),
+        )
     end
     # It's already a real mathematically, but Convex doesn't know it
     return conic_form!(context, real(LinearAlgebra.tr(atom.C * tmp)))

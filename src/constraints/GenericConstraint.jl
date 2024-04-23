@@ -4,11 +4,12 @@
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
 mutable struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
-    child::AbstractExpr
+    child::Union{AbstractExpr,Tuple}
     set::S
     dual::Union{Value,Nothing}
 
-    function GenericConstraint(child::AbstractExpr, set::MOI.AbstractSet)
+    function GenericConstraint(child::Union{AbstractExpr,Tuple}, set::MOI.AbstractSet)
+        _dimension_check(child, set)
         return new{typeof(set)}(child, set, nothing)
     end
 end
@@ -16,6 +17,8 @@ end
 function GenericConstraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
     return GenericConstraint(child, set_with_size(S, size(child)))
 end
+
+function _dimension_check(child, set) end
 
 function set_with_size(
     ::Type{S},
@@ -44,7 +47,14 @@ function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
     return is_feasible([x], set, tol)
 end
 
-vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
+function vexity(c::GenericConstraint)
+    if c.child isa AbstractExpr
+        vex = vexity(c.child)
+    else
+        vex = vexity.(c.child)
+    end
+    return vexity(vex, c.set)
+end
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
