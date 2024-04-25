@@ -48,12 +48,10 @@ function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
 end
 
 function vexity(c::GenericConstraint)
-    if c.child isa AbstractExpr
-        vex = vexity(c.child)
-    else
-        vex = vexity.(c.child)
+    if c.child isa Tuple
+        return vexity(vexity.(c.child), c.set)
     end
-    return vexity(vex, c.set)
+    return vexity(vexity(c.child), c.set)
 end
 
 function _add_constraint!(context::Context, c::GenericConstraint)

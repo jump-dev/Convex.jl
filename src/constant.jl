@@ -28,6 +28,8 @@ function _sign(x::Value)
     end
 end
 
+Base.sign(x::Value) = _sign(x)
+
 _matrix(x::AbstractArray) = [x;;]
 _matrix(x::AbstractVector) = reshape(Vector(x), length(x), 1)
 _matrix(x::Number) = _matrix([x])

@@ -753,7 +753,7 @@ end
         V = Variable(2, 3)
         V22 = zeros(3, 3)
         V33 = zeros(3, 3)
-        set = GeomMeanEpiConeSquare(t, 3)
+        set = GeomMeanEpiConeSquare(3 // 2, 3)
         @test_throws DimensionMismatch (Z, Z, Z) in set
         @test_throws DimensionMismatch (Z, Z, V) in set
         @test_throws DimensionMismatch (Z, V, Z) in set
@@ -764,9 +764,9 @@ end
         @test_throws DimensionMismatch (Z22, V33, Z33) in set
         @test_throws DimensionMismatch (Z23, V33, Z33) in set
         @test_throws DimensionMismatch (V22, V33, V33) in set
-        @test_throws DomainError GeomMeanEpiConeSquare(-3 // 2)
-        @test_throws DomainError GeomMeanEpiConeSquare(1 // 2)
-        @test_throws DomainError GeomMeanEpiConeSquare(5 // 2)
+        @test_throws DomainError GeomMeanEpiConeSquare(-3 // 2, 3)
+        @test_throws DomainError GeomMeanEpiConeSquare(1 // 2, 3)
+        @test_throws DomainError GeomMeanEpiConeSquare(5 // 2, 3)
     end
 end
 
@@ -1203,7 +1203,7 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeomMeanEpiConeSquare(-1, n)
+    c1 = (eye(n), A, B) in GeomMeanEpiConeSquare(-1 // 1, n)
     objective = tr(A)
     p = maximize(objective, c1; numeric_type = T)
 
@@ -1229,7 +1229,7 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeomMeanEpiConeSquare(-1, n)
+    c1 = (eye(n), A, B) in GeomMeanEpiConeSquare(-1 // 1, n)
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
