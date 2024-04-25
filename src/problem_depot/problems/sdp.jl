@@ -749,6 +749,7 @@ end
     if test
         Z = zeros(2, 3)
         Z22 = zeros(2, 2)
+        Z23 = zeros(2, 3)
         Z33 = zeros(3, 3)
         V = Variable(2, 3)
         V22 = zeros(2, 2)
