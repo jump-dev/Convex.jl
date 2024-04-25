@@ -1445,6 +1445,10 @@ function test_RootDetAtom()
     _test_atom(target) do context
         return rootdet(Variable(2, 2))
     end
+    x = Variable(2, 2)
+    x.value = [2.0 -1.5; -1.5 3.0]
+    atom = rootdet(x)
+    @test evaluate(atom) ≈ LinearAlgebra.det(x.value)^(1 / 2)
     return
 end
 
