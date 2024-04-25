@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # Here we deal with real -> complex and complex -> complex functions
 
 # Earlier, we called `promote_to_complex` to ensure `Vector{T}` is promoted to `ComplexStructOfVec{T}`. Therefore we are left with three possible input types.

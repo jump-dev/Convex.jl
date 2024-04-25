@@ -1,23 +1,27 @@
-#############################################################################
-# lieb_ando.jl
-# Returns LinearAlgebra.tr(K' * A^{1-t} * K * B^t) where A and B are positive semidefinite
-# matrices and K is an arbitrary matrix (possibly rectangular).
+# Copyright (c) 2014: Madeleine Udell and contributors
+# Copyright (c) 2021: Hamza Fawzi
 #
-# Disciplined convex programming information:
-#    lieb_ando(A,B,K,t) is concave in (A,B) for t in [0,1], and convex
-#    in (A,B) for t in [-1,0] or [1,2]. K is a fixed matrix.
-#
-# Seems numerically unstable when t is on the endpoints of these ranges.
-#
-# All expressions and atoms are subtypes of AbstractExpr.
-# Please read expressions.jl first.
-#
-#REFERENCE
-#   Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-#   theorem, matrix geometric means and semidefinite optimization" by Hamza
-#   Fawzi and James Saunderson (arXiv:1512.03401)
-#############################################################################
+# Use of this source code is governed by an MIT-style license that can be found
+# in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
+"""
+Returns LinearAlgebra.tr(K' * A^{1-t} * K * B^t) where A and B are positive semidefinite
+matrices and K is an arbitrary matrix (possibly rectangular).
+
+Disciplined convex programming information:
+   lieb_ando(A,B,K,t) is concave in (A,B) for t in [0,1], and convex
+   in (A,B) for t in [-1,0] or [1,2]. K is a fixed matrix.
+
+Seems numerically unstable when t is on the endpoints of these ranges.
+
+All expressions and atoms are subtypes of AbstractExpr.
+Please read expressions.jl first.
+
+REFERENCE
+  Ported from CVXQUAD which is based on the paper: "Lieb's concavity
+  theorem, matrix geometric means and semidefinite optimization" by Hamza
+  Fawzi and James Saunderson (arXiv:1512.03401)
+"""
 function lieb_ando(
     A::Union{AbstractMatrix,Constant},
     B::Union{AbstractMatrix,Constant},

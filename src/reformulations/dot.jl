@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # Using _vec avoids broadcast-specific behaviors that we want to avoid,
 # such as extending singleton dimensions. We need to ensure that the inputs have
 # the same length, which broadcast will check for us if both inputs are vectors.

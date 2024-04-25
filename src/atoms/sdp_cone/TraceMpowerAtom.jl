@@ -1,3 +1,9 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+# Copyright (c) 2021: Hamza Fawzi
+#
+# Use of this source code is governed by an MIT-style license that can be found
+# in the LICENSE.md file or at https://opensource.org/licenses/MIT.
+
 """
 trace_mpower(A, t, C) returns LinearAlgebra.tr(C*A^t) where A and C are positive
 definite matrices and C is constant and t ∈ [-1, 2].

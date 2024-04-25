@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # Handles the k-norms for k > 1 where k is rational. Reduces the
 # k-norm constraint to at most 2d ceil(log2(n + m)) + O(d) second
 # order cone constraints. Here d is the dimension of the problem and k
