@@ -113,7 +113,7 @@ solver (including SCS and Mosek).
 | `opnorm(x, 2)` (`operatornorm(x)`)| max of singular values of $x$      | convex       | not monotonic |                        |
 | `eigmax(x)`                       | max eigenvalue of $x$              | convex       | not monotonic |                        |
 | `eigmin(x)`                       | min eigenvalue of $x$              | concave      | not monotonic |                        |
-| `rootdet(X)`                      | root-determinant of the matrix X   | concave      | not monotonic |                        |
+| `rootdet(X)`                      | n-th root-determinant of the $n$-by-$n$ matrix X, that is $det(X)^{1/n}$ | concave      | not monotonic |                        |
 | `matrixfrac(x, P)`                | $x^TP^{-1}x$                       | convex       | not monotonic | IC: P is positive semidefinite |
 | `sumlargesteigs(x, k)`            | sum of top $k$ eigenvalues of $x$  | convex       | not monotonic | IC: P symmetric        |
 | `T in GeomMeanHypoCone(A, B, t)`  | $T \preceq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | concave | increasing    | IC: $A \succeq 0$, $B \succeq 0$, $t \in [0,1]$ |
