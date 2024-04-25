@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # We compute the partial trace of x by summing over
 # (I ⊗ <j| ⊗ I) x (I ⊗ |j> ⊗ I) for all j's
 # in the system we want to trace out.

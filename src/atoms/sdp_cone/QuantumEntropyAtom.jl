@@ -1,3 +1,9 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+# Copyright (c) 2021: Hamza Fawzi
+#
+# Use of this source code is governed by an MIT-style license that can be found
+# in the LICENSE.md file or at https://opensource.org/licenses/MIT.
+
 """
 quantum_entropy returns -LinearAlgebra.tr(X*log(X)) where X is a positive semidefinite.
 Note this function uses logarithm base e, not base 2, so return value is in

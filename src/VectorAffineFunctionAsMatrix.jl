@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # This is a variant of MOI.VectorAffineFunction which represents
 # the transformation `matrix * variables + vector` lazily.
 struct VectorAffineFunctionAsMatrix{T,V}

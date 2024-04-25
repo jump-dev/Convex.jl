@@ -1,3 +1,9 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+# Copyright (c) 2021: Hamza Fawzi
+#
+# Use of this source code is governed by an MIT-style license that can be found
+# in the LICENSE.md file or at https://opensource.org/licenses/MIT.
+
 """
 quantum_relative_entropy returns LinearAlgebra.tr(A*(log(A)-log(B))) where A and B
 are positive semidefinite matrices.  Note this function uses logarithm

@@ -1,3 +1,9 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+# Copyright (c) 2021: Hamza Fawzi
+#
+# Use of this source code is governed by an MIT-style license that can be found
+# in the LICENSE.md file or at https://opensource.org/licenses/MIT.
+
 """
 Constrains τ to
   τ ⪰ e' * X^{1/2} * logm(X^{1/2}*Y^{-1}*X^{1/2}) * X^{1/2} * e

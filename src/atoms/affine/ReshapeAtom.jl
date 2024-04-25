@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # We process all objects on a vectorized level. The `ReshapeAtom` therefore
 # is simply in charge of remembering the new size.
 mutable struct ReshapeAtom <: AbstractExpr

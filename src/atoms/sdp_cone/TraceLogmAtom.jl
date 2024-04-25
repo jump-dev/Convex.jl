@@ -1,3 +1,9 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+# Copyright (c) 2021: Hamza Fawzi
+#
+# Use of this source code is governed by an MIT-style license that can be found
+# in the LICENSE.md file or at https://opensource.org/licenses/MIT.
+
 """
 trace_logm(X, C) returns LinearAlgebra.tr(C*logm(X)) where X and C are a
 positive definite matrices and C is constant.

@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 @add_problem socp function socp_dual_norm_2_atom(
     handle_problem!,
     ::Val{test},

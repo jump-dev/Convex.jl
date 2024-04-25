@@ -1,3 +1,8 @@
+# Copyright (c) 2014: Madeleine Udell and contributors
+#
+# Use of this source code is governed by a BSD-style license that can be found
+# in the LICENSE file or at https://opensource.org/license/bsd-2-clause
+
 # This atom computes dot(sort(x), sort(w)), where w is constant. For example, if
 # w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
 mutable struct DotSortAtom <: AbstractExpr
