@@ -8,7 +8,10 @@ mutable struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
     set::S
     dual::Union{Value,Nothing}
 
-    function GenericConstraint(child::Union{AbstractExpr,Tuple}, set::MOI.AbstractSet)
+    function GenericConstraint(
+        child::Union{AbstractExpr,Tuple},
+        set::MOI.AbstractSet,
+    )
         _dimension_check(child, set)
         return new{typeof(set)}(child, set, nothing)
     end

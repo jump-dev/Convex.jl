@@ -45,13 +45,13 @@ MOI.dimension(set::GeomMeanEpiConeSquare) = 3 * set.side_dimension
 
 head(io::IO, ::GeomMeanEpiConeSquare) = print(io, "∈(GeomMeanEpiConeSquare)")
 
-Base.in(T, cone::GeomMeanEpiConeSquare) = GenericConstraint(T, cone)
+Base.in(func::Tuple, set::GeomMeanEpiConeSquare) = GenericConstraint(func, set)
 
 function _dimension_check(child::Tuple, set::GeomMeanEpiConeSquare)
     for c in child
         n = LinearAlgebra.checksquare(c)
         if n != set.side_dimension
-            msg = "Matrix of side dimension `$n` does not match set of side dimension `$(set.side_dimension)`",
+            msg = "Matrix of side dimension `$n` does not match set of side dimension `$(set.side_dimension)`"
             throw(DimensionMismatch(msg))
         end
     end

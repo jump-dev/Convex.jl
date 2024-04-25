@@ -751,7 +751,7 @@ end
         Z22 = zeros(2, 2)
         Z33 = zeros(3, 3)
         V = Variable(2, 3)
-        V22 = zeros(3, 3)
+        V22 = zeros(2, 2)
         V33 = zeros(3, 3)
         set = GeomMeanEpiConeSquare(3 // 2, 3)
         @test_throws DimensionMismatch (Z, Z, Z) in set
