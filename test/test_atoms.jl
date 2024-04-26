@@ -1439,6 +1439,24 @@ end
 
 # TODO
 
+### sdp_cone/RootDetAtom
+
+function test_RootDetAtom()
+    target = """
+    variables: t, x11, x12, x21, x22
+    minobjective: 1.0 * t + 0.0
+    [1.0*t, 1.0*x11, 1.0 *x12, 1.0*x21, 1.0*x22] in RootDetConeSquare(2)
+    """
+    _test_atom(target) do context
+        return rootdet(Variable(2, 2))
+    end
+    x = Variable(2, 2)
+    x.value = [2.0 -1.5; -1.5 3.0]
+    atom = rootdet(x)
+    @test evaluate(atom) ≈ LinearAlgebra.det(x.value)^(1 / 2)
+    return
+end
+
 ### second_order_cone/EuclideanNormAtom
 
 function test_EuclideanNormAtom()

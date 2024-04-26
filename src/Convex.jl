@@ -52,6 +52,7 @@ export conv,
     trace_logm,
     trace_mpower,
     lieb_ando,
+    rootdet,
     # Constraints
     Constraint,
     ⪰,
