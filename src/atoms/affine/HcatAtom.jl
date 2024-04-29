@@ -41,7 +41,9 @@ end
 Base.hcat(args::AbstractExpr...) = HcatAtom(args...)
 
 function Base.hcat(args::Union{AbstractExpr,Value}...)
-    @assert !all(Base.Fix2(isa, Value), args)
+    if all(Base.Fix2(isa, Value), args)
+        return Base.cat(args..., dims = Val(2))
+    end
     return HcatAtom(args...)
 end
 

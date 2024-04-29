@@ -54,6 +54,8 @@ end
 Base.vcat(args::AbstractExpr...) = VcatAtom(args...)
 
 function Base.vcat(args::Union{AbstractExpr,Value}...)
-    @assert !all(Base.Fix2(isa, Value), args)
+    if all(Base.Fix2(isa, Value), args)
+        return Base.cat(args..., dims = Val(1))
+    end
     return VcatAtom(args...)
 end
