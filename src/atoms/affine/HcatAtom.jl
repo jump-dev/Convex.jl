@@ -54,7 +54,7 @@ function Base.hvcat(
     output_rows = Vector{HcatAtom}(undef, length(rows))
     offset = 0
     for (i, n) in enumerate(rows)
-        output_rows[i] = HcatAtom(args[offset .+ (1:n)]...)
+        output_rows[i] = HcatAtom(args[offset.+(1:n)]...)
         offset += n
     end
     return vcat(output_rows...)
