@@ -379,22 +379,14 @@ function test_HcatAtom()
         x = Variable()
         return hcat(x, x)
     end
-    _test_atom(target) do context
-        x = Variable()
-        return vcat(x, x)
-    end
     target = """
     variables: x1, x2
     minobjective: [1.0 * x1, 1.0 * x2, 2.0]
     """
     _test_atom(target) do context
-        x = Variable(2)
+        x = Variable(1, 2)
         y = constant(2)
-        return vcat(x, y)
-    end
-    _test_atom(target) do context
-        x = Variable(2)
-        return vcat(x, 2)
+        return hcat(x, y)
     end
     _test_atom(target) do context
         x = Variable(1, 2)
@@ -405,12 +397,6 @@ function test_HcatAtom()
             "[HcatAtom] cannot stack expressions of incompatible size. Got 1 expected 2.",
         ),
         hcat(Variable(2), constant(2)),
-    )
-    @test_throws(
-        DimensionMismatch(
-            "[HcatAtom] cannot stack expressions of incompatible size. Got 2 expected 1.",
-        ),
-        vcat(Variable(2, 1), Variable(1, 2)),
     )
     return
 end
@@ -727,6 +713,66 @@ function test_SumAtom()
     @test_throws(
         ErrorException("[SumAtom] sum not implemented for `dims=3`"),
         sum(Variable(2, 2); dims = 3),
+    )
+    return
+end
+
+### affine/VcatAtom
+
+function test_VcatAtom()
+    target = """
+    variables: x
+    minobjective: [1.0 * x, 1.0 * x]
+    """
+    _test_atom(target) do context
+        x = Variable()
+        return vcat(x, x)
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 1.0 * x2, 2.0]
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        y = constant(2)
+        return vcat(x, y)
+    end
+    _test_atom(target) do context
+        x = Variable(2)
+        return vcat(x, 2)
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 2.0, 1.0 * x2, 3.0]
+    """
+    _test_atom(target) do context
+        x = Variable(1, 2)
+        y = constant([2 3])
+        return vcat(x, y)
+    end
+    target = """
+    variables: x1, x2, x3
+    minobjective: [2.0, 1.0 * x1, 2.0, 3.0, 1.0 * x2, 3.0, 4.0, 1.0 * x3, 4.0]
+    """
+    _test_atom(target) do context
+        x = Variable(1, 3)
+        y = constant([2 3 4])
+        return vcat(y, x, y)
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [x1, x2, 2.0, x3, x4, 3.0]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        y = constant([2 3])
+        return vcat(x, y)
+    end
+    @test_throws(
+        DimensionMismatch(
+            "[VcatAtom] cannot stack expressions of incompatible size. Got 2 expected 1.",
+        ),
+        vcat(Variable(2, 1), Variable(1, 2)),
     )
     return
 end

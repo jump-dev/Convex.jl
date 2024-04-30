@@ -29,41 +29,15 @@ monotonicity(x::HcatAtom) = ntuple(_ -> Nondecreasing(), length(x.children))
 
 curvature(::HcatAtom) = ConstVexity()
 
-evaluate(x::HcatAtom) = hcat(map(evaluate, x.children)...)
+evaluate(x::HcatAtom) = reduce(hcat, collect(map(evaluate, x.children)))
 
 function new_conic_form!(context::Context{T}, x::HcatAtom) where {T}
-    objectives = map(c -> conic_form!(context, c), AbstractTrees.children(x))
-    # Suppose the child objectives for two children e1 (2 x 1) and e2 (2 x 2)
-    # look something like
-    #  e1: x => 1 2 3
-    #           4 5 6
-    #      y => 2 4
-    #           7 8
-    #  e2: x => 1 1 1
-    #           2 2 2
-    #           3 3 3
-    #           4 4 4
-    # The objective of [e1 e2] will look like
-    #            x => 1 2 3
-    #                 4 5 6
-    #                 1 1 1
-    #                 2 2 2
-    #                 3 3 3
-    #                 4 4 4
-    #            y => 2 4
-    #                 7 8
-    #                 0 0
-    #                 0 0
-    #                 0 0
-    #                 0 0
-    # builds the objective by aggregating a list of coefficients for each
-    # variable from each child objective, and then vertically concatenating them
-    return operate(vcat, T, sign(x), objectives...)
+    args = map(c -> conic_form!(context, c), AbstractTrees.children(x))
+    # MOI represents matrices by concatenating their columns, so even though
+    # this is an HcatAtom, we built the conic form by vcat'ing the arguments.
+    return operate(vcat, T, sign(x), args...)
 end
-# TODO: fix piracy!
 
-# * `Value` is not owned by Convex.jl
-# * splatting creates zero-argument functions, which again are not owned by Convex.jl
 Base.hcat(args::AbstractExpr...) = HcatAtom(args...)
 
 function Base.hcat(args::Union{AbstractExpr,Value}...)
@@ -73,26 +47,15 @@ function Base.hcat(args::Union{AbstractExpr,Value}...)
     return HcatAtom(args...)
 end
 
-# TODO: implement vertical concatenation in a more efficient way
-Base.vcat(args::AbstractExpr...) = transpose(HcatAtom(map(transpose, args)...))
-
-function Base.vcat(args::Union{AbstractExpr,Value}...)
-    if all(Base.Fix2(isa, Value), args)
-        return Base.cat(args..., dims = Val(1))
-    end
-    return transpose(HcatAtom(map(transpose, args)...))
-end
-
 function Base.hvcat(
     rows::Tuple{Vararg{Int}},
     args::Union{AbstractExpr,Value}...,
 )
-    nbr = length(rows)
-    rs = Vector{Any}(undef, nbr)
-    a = 1
-    for i in 1:nbr
-        rs[i] = HcatAtom(args[a:a-1+rows[i]]...)
-        a += rows[i]
+    output_rows = Vector{HcatAtom}(undef, length(rows))
+    offset = 0
+    for (i, n) in enumerate(rows)
+        output_rows[i] = HcatAtom(args[offset.+(1:n)]...)
+        offset += n
     end
-    return vcat(rs...)
+    return vcat(output_rows...)
 end
