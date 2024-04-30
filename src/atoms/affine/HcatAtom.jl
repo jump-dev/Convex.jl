@@ -29,7 +29,7 @@ monotonicity(x::HcatAtom) = ntuple(_ -> Nondecreasing(), length(x.children))
 
 curvature(::HcatAtom) = ConstVexity()
 
-evaluate(x::HcatAtom) = reduce(hcat, map(evaluate, x.children))
+evaluate(x::HcatAtom) = reduce(hcat, collect(map(evaluate, x.children)))
 
 function new_conic_form!(context::Context{T}, x::HcatAtom) where {T}
     args = map(c -> conic_form!(context, c), AbstractTrees.children(x))

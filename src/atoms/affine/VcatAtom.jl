@@ -29,7 +29,7 @@ monotonicity(x::VcatAtom) = ntuple(_ -> Nondecreasing(), length(x.children))
 
 curvature(::VcatAtom) = ConstVexity()
 
-evaluate(x::VcatAtom) = reduce(vcat, map(evaluate, x.children))
+evaluate(x::VcatAtom) = reduce(vcat, collect(map(evaluate, x.children)))
 
 function new_conic_form!(context::Context{T}, x::VcatAtom) where {T}
     # Converting a VcatAtom to conic form is non-trivial. Consider two matrices:
@@ -46,7 +46,7 @@ function new_conic_form!(context::Context{T}, x::VcatAtom) where {T}
     #   hcat(x^T, y^T) = [1 2 5 6; 3 4 7 8]
     # then transpose this to get:
     #   hcat(x^T, y^T)^T = [1 3; 2 4; 5 7; 6 8]
-    # so our final connic form produces the desired
+    # so our final conic form produces the desired
     #   [1, 2, 5, 6, 3, 4, 7, 8]
     return conic_form!(context, transpose(reduce(hcat, transpose.(x.children))))
 end

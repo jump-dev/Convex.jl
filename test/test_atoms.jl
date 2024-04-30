@@ -741,6 +741,33 @@ function test_VcatAtom()
         x = Variable(2)
         return vcat(x, 2)
     end
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 2.0, 1.0 * x2, 3.0]
+    """
+    _test_atom(target) do context
+        x = Variable(1, 2)
+        y = constant([2 3])
+        return vcat(x, y)
+    end
+    target = """
+    variables: x1, x2, x3
+    minobjective: [2.0, 1.0 * x1, 2.0, 3.0, 1.0 * x2, 3.0, 4.0, 1.0 * x3, 4.0]
+    """
+    _test_atom(target) do context
+        x = Variable(1, 3)
+        y = constant([2 3 4])
+        return vcat(y, x, y)
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [x1, x2, 2.0, x3, x4, 3.0]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        y = constant([2 3])
+        return vcat(x, y)
+    end
     @test_throws(
         DimensionMismatch(
             "[VcatAtom] cannot stack expressions of incompatible size. Got 2 expected 1.",
