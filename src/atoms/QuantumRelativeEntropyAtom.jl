@@ -97,7 +97,7 @@ function new_conic_form!(
     τ = Variable()
     add_constraint!(
         context,
-        τ in  RelativeEntropyEpiCone(kron(A, I), kron(I, conj(B)), m, k, e),
+        τ in RelativeEntropyEpiCone(kron(A, I), kron(I, conj(B)), m, k, e),
     )
     return conic_form!(context, τ)
 end
