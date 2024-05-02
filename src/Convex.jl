@@ -234,7 +234,6 @@ include("problems.jl")
 include("solution.jl")
 include("MOI_wrapper.jl")
 
-### atoms
 for (root, _, files) in walkdir(joinpath(@__DIR__, "atoms"))
     for file in files
         include(joinpath(root, file))
