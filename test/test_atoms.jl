@@ -1479,11 +1479,76 @@ end
 
 ### sdp_cone/TraceLogmAtom
 
-# TODO
+function test_TraceLogmAtom()
+    @test_throws(
+        DimensionMismatch("X and C must be the same size"),
+        trace_logm(Variable(2, 3), [1 0; 0 1]),
+    )
+    @test_throws(
+        DimensionMismatch("X and C must be square"),
+        trace_logm(Variable(2, 3), [1 2 3; 4 5 6]),
+    )
+    C = [1 2; 5 6]
+    @test_throws(
+        DomainError(C, "C must be Hermitian"),
+        trace_logm(Variable(2, 2), C),
+    )
+    C = [-1 0; 0 2]
+    @test_throws(
+        DomainError(C, "C must be positive semidefinite"),
+        trace_logm(Variable(2, 2), C),
+    )
+
+    C = [1 0; 0 1]
+    X = Variable(2, 2)
+    atom = trace_logm(X, C)
+    @test curvature(atom) == Convex.ConcaveVexity()
+    X.value = [2 1; 1 2]
+    @test evaluate(atom) ≈ LinearAlgebra.tr(C * log(X.value))
+    # TODO(odow): add a test for the reformulation
+    return
+end
 
 ### sdp_cone/TraceMpowerAtom
 
-# TODO
+function test_TraceMpowerAtom()
+    @test_throws(
+        DimensionMismatch("A and C must be the same size"),
+        trace_mpower(Variable(2, 3), 1 // 2, [1 0; 0 1]),
+    )
+    @test_throws(
+        DimensionMismatch("A and C must be square"),
+        trace_mpower(Variable(2, 3), 1 // 2, [1 2 3; 4 5 6]),
+    )
+    C = [1 2; 5 6]
+    @test_throws(
+        DomainError(C, "C must be Hermitian"),
+        trace_mpower(Variable(2, 2), 1 // 2, C),
+    )
+    C = [-1 0; 0 2]
+    @test_throws(
+        DomainError(C, "C must be positive semidefinite"),
+        trace_mpower(Variable(2, 2), 1 // 2, C),
+    )
+    @test_throws(
+        DomainError(-2 // 1, "t must be in the range [-1, 2]"),
+        trace_mpower(Variable(2, 2), -2 // 1, [1 0; 0 1]),
+    )
+    t = -1 // 2
+    C = [1 0; 0 1]
+    A = Variable(2, 2)
+    atom = trace_mpower(A, t, C)
+    @test curvature(trace_mpower(A, 0 // 1, C)) == Convex.ConcaveVexity()
+    @test curvature(trace_mpower(A, 1 // 2, C)) == Convex.ConcaveVexity()
+    @test curvature(trace_mpower(A, 1 // 1, C)) == Convex.ConcaveVexity()
+    @test curvature(trace_mpower(A, -1 // 1, C)) == Convex.ConvexVexity()
+    @test curvature(trace_mpower(A, -1 // 2, C)) == Convex.ConvexVexity()
+    @test curvature(trace_mpower(A, 3 // 2, C)) == Convex.ConvexVexity()
+    A.value = [2 1; 1 2]
+    @test evaluate(atom) ≈ LinearAlgebra.tr(C * A.value^t)
+    # TODO(odow): add a test for the reformulation
+    return
+end
 
 ### sdp_cone/RootDetAtom
 
