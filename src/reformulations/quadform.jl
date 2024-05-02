@@ -57,7 +57,7 @@ end
 """
     quadform(x::AbstractExpr, A::AbstractExpr; assume_psd=false)
 
-Represents `x' * A * x` where either:
+Represents \$x^\\top A x\$ where either:
 
  * `x` is a vector-valued variable and `A` is a positive semidefinite or
    negative semidefinite matrix (and in particular Hermitian or real symmetric).
@@ -65,6 +65,46 @@ Represents `x' * A * x` where either:
    Otherwise, `Convex._is_psd` will be used to check if `A` is positive
    semidefinite or negative semidefinite.
  * or `A` is a matrix-valued variable and `x` is a vector.
+
+## Examples
+
+```jldoctest; filter=r"id: [0-9]+…[0-9]+"
+julia> x = Variable(2);
+
+julia> A = [1 0; 0 1]
+2×2 Matrix{Int64}:
+ 1  0
+ 0  1
+
+julia> atom = quadform(x, A)
+* (convex; positive)
+├─ [1;;]
+└─ qol_elem (convex; positive)
+   ├─ norm2 (convex; positive)
+   │  └─ * (affine; real)
+   │     ├─ …
+   │     └─ …
+   └─ [1.0;;]
+
+julia> size(atom)
+(1, 1)
+```
+
+```jldoctest; filter=r"id: [0-9]+…[0-9]+"
+julia> x = [1, 2]
+
+julia> A = Variable(2, 2);
+
+julia> atom = quadform(x, A)
+* (affine; real)
+├─ * (affine; real)
+│  ├─ [1 2]
+│  └─ 2×2 real variable (id: 111…794)
+└─ [1; 2;;]
+
+julia> size(atom)
+(1, 1)
+```
 """
 quadform(x::Value, A::AbstractExpr; kwargs...) = x' * A * x
 

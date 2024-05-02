@@ -37,25 +37,3 @@ function new_conic_form!(context::Context{T}, x::HcatAtom) where {T}
     # this is an HcatAtom, we built the conic form by vcat'ing the arguments.
     return operate(vcat, T, sign(x), args...)
 end
-
-Base.hcat(args::AbstractExpr...) = HcatAtom(args...)
-
-function Base.hcat(args::Union{AbstractExpr,Value}...)
-    if all(Base.Fix2(isa, Value), args)
-        return Base.cat(args..., dims = Val(2))
-    end
-    return HcatAtom(args...)
-end
-
-function Base.hvcat(
-    rows::Tuple{Vararg{Int}},
-    args::Union{AbstractExpr,Value}...,
-)
-    output_rows = Vector{HcatAtom}(undef, length(rows))
-    offset = 0
-    for (i, n) in enumerate(rows)
-        output_rows[i] = HcatAtom(args[offset.+(1:n)]...)
-        offset += n
-    end
-    return vcat(output_rows...)
-end

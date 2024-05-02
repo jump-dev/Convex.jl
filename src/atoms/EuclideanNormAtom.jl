@@ -28,10 +28,3 @@ function new_conic_form!(context::Context{T}, A::EuclideanNormAtom) where {T}
     MOI_add_constraint(context.model, f, MOI.SecondOrderCone(length(x) + 1))
     return t
 end
-
-function LinearAlgebra.norm2(x::AbstractExpr)
-    if sign(x) == ComplexSign()
-        return EuclideanNormAtom([real(x); imag(x)])
-    end
-    return EuclideanNormAtom(x)
-end

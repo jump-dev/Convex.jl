@@ -50,9 +50,3 @@ function new_conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
     end
     return t_tape
 end
-
-geomean(args::Union{AbstractExpr,Value}...) = GeoMeanAtom(args...)
-
-function Base.sqrt(x::AbstractExpr)
-    return GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
-end

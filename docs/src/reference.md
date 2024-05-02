@@ -8,7 +8,7 @@ Convex.get_constraints
 Convex.add_constraint!
 Convex.vexity
 Convex.vexity!
-Convex.sign
+Base.sign(x::Convex.AbstractVariable)
 Convex.sign!
 Convex.VarType
 Convex.vartype
@@ -26,4 +26,5 @@ Convex.ProblemDepot.foreach_problem
 Convex.ProblemDepot.PROBLEMS
 Convex.conic_form!
 Convex.new_conic_form!
+Convex.write_to_file
 ```

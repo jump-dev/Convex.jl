@@ -49,11 +49,3 @@ function new_conic_form!(context::Context, x::SumLargestAtom)
     add_constraint!(context, t >= 0)
     return conic_form!(context, sum(t) + x.k * q)
 end
-
-function sumlargest(x::AbstractExpr, k::Int)
-    return k == 0 ? Constant(0) : SumLargestAtom(x, k)
-end
-
-function sumsmallest(x::AbstractExpr, k::Int)
-    return k == 0 ? Constant(0) : -SumLargestAtom(-x, k)
-end

@@ -93,28 +93,3 @@ function new_conic_form!(
     ret = SparseArrays.sparse(LinearAlgebra.Diagonal(vec(coef))) * vec(rhs)
     return conic_form!(context, reshape(ret, size(rhs, 1), size(rhs, 2)))
 end
-
-function Base.Broadcast.broadcasted(
-    ::typeof(*),
-    x::AbstractExpr,
-    y::AbstractExpr,
-)
-    if isequal(x, y)
-        return square(x)
-    elseif x.size == (1, 1) || y.size == (1, 1)
-        return x * y
-    end
-    return BroadcastMultiplyAtom(x, y)
-end
-
-function Base.Broadcast.broadcasted(::typeof(*), x::Value, y::AbstractExpr)
-    return constant(x) .* y
-end
-
-function Base.Broadcast.broadcasted(::typeof(*), x::AbstractExpr, y::Value)
-    return x .* constant(y)
-end
-
-function Base.Broadcast.broadcasted(::typeof(/), x::AbstractExpr, y::Value)
-    return x .* constant(1 ./ y)
-end

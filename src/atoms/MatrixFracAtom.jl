@@ -38,12 +38,6 @@ function evaluate(m::MatrixFracAtom)
     return x' * (evaluate(m.children[2]) \ x)
 end
 
-matrixfrac(x::AbstractExpr, P::AbstractExpr) = MatrixFracAtom(x, P)
-
-matrixfrac(x::Value, P::AbstractExpr) = MatrixFracAtom(constant(x), P)
-
-matrixfrac(x::AbstractExpr, P::Value) = MatrixFracAtom(x, constant(P))
-
 function new_conic_form!(context::Context, m::MatrixFracAtom)
     x, P = m.children
     t = Variable()

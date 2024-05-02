@@ -106,6 +106,7 @@ for k in (
     :logdet,
     :norm,
     :norm2,
+    :opnorm,
     :tr,
 )
     @eval begin
@@ -238,6 +239,8 @@ for (root, _, files) in walkdir(joinpath(@__DIR__, "atoms"))
         include(joinpath(root, file))
     end
 end
+
+include("supported_operations.jl")
 
 for (root, _, files) in walkdir(joinpath(@__DIR__, "reformulations"))
     for file in files

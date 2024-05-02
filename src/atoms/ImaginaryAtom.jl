@@ -24,9 +24,3 @@ function new_conic_form!(context::Context{T}, x::ImaginaryAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
     return operate(imag, T, sign(x), obj)
 end
-
-Base.imag(x::AbstractExpr) = ImaginaryAtom(x)
-
-Base.imag(x::ComplexConstant) = x.imag_constant
-
-Base.imag(x::Constant) = Constant(zero(x.value))

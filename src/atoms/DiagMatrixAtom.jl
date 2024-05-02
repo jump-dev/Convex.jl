@@ -32,18 +32,6 @@ function evaluate(x::DiagMatrixAtom)
     return LinearAlgebra.Diagonal(vec(evaluate(x.children[1])))
 end
 
-function LinearAlgebra.diagm((d, x)::Pair{<:Integer,<:AbstractExpr})
-    if d != 0
-        msg = "[DiagMatrixAtom] only the main diagonal is supported. Got `d=$d`"
-        throw(ArgumentError(msg))
-    end
-    return diagm(x)
-end
-
-LinearAlgebra.Diagonal(x::AbstractExpr) = diagm(x)
-
-LinearAlgebra.diagm(x::AbstractExpr) = DiagMatrixAtom(x)
-
 function new_conic_form!(context::Context{T}, x::DiagMatrixAtom) where {T}
     I = 1:(x.size[1]+1):x.size[1]^2
     coeff = create_sparse(T, I, 1:x.size[1], one(T), x.size[1]^2, x.size[1])

@@ -62,15 +62,3 @@ function new_conic_form!(context::Context{T}, x::AdditionAtom) where {T}
         (conic_form!(context, c) for c in x.children)...,
     )
 end
-
-Base.:+(x::AbstractExpr, y::AbstractExpr) = AdditionAtom(x, y)
-
-Base.:+(x::Value, y::AbstractExpr) = AdditionAtom(constant(x), y)
-
-Base.:+(x::AbstractExpr, y::Value) = AdditionAtom(x, constant(y))
-
-Base.:-(x::AbstractExpr, y::AbstractExpr) = x + (-y)
-
-Base.:-(x::Value, y::AbstractExpr) = constant(x) + (-y)
-
-Base.:-(x::AbstractExpr, y::Value) = x + constant(-y)

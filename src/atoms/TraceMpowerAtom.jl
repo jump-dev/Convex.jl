@@ -59,32 +59,6 @@ function evaluate(atom::TraceMpowerAtom)
     return trace_mpower(evaluate(atom.children[1]), atom.t, atom.C)
 end
 
-function trace_mpower(
-    A::AbstractExpr,
-    t::Rational,
-    C::Union{AbstractMatrix,Constant},
-)
-    # This `evaluate` is safe since it is not a `fix!`ed variable
-    # (it must be a constant or matrix)
-    return TraceMpowerAtom(A, t, evaluate(C))
-end
-
-function trace_mpower(
-    A::Union{AbstractMatrix,Constant},
-    t::Rational,
-    C::Union{AbstractMatrix,Constant},
-)
-    return LinearAlgebra.tr(C * A^t)
-end
-
-function trace_mpower(
-    A::Union{AbstractExpr,Value},
-    t::Integer,
-    C::Union{AbstractMatrix,Constant},
-)
-    return trace_mpower(A, t // 1, C)
-end
-
 function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     A = atom.children[1]
     n = size(A, 1)

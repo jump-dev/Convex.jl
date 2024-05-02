@@ -48,5 +48,3 @@ function new_conic_form!(context::Context, x::HuberAtom)
     add_constraint!(context, c == s + n)
     return conic_form!(context, square(s) + 2 * x.M * abs(n))
 end
-
-huber(x::AbstractExpr, M::Real = 1.0) = HuberAtom(x, M)

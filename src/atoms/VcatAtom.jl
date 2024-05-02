@@ -51,15 +51,6 @@ function new_conic_form!(context::Context{T}, x::VcatAtom) where {T}
     return conic_form!(context, transpose(reduce(hcat, transpose.(x.children))))
 end
 
-Base.vcat(args::AbstractExpr...) = VcatAtom(args...)
-
-function Base.vcat(args::Union{AbstractExpr,Value}...)
-    if all(Base.Fix2(isa, Value), args)
-        return Base.cat(args..., dims = Val(1))
-    end
-    return VcatAtom(args...)
-end
-
 function Base.getindex(
     x::VcatAtom,
     rows::AbstractVector{<:Real},

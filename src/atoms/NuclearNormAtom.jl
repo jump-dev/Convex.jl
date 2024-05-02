@@ -22,8 +22,6 @@ function evaluate(x::NuclearNormAtom)
     return sum(LinearAlgebra.svdvals(evaluate(x.children[1])))
 end
 
-nuclearnorm(x::AbstractExpr) = NuclearNormAtom(x)
-
 # The complex case is example 1.20 of Watrous' "The Theory of Quantum Information"
 # (the operator A is negated but this doesn't affect the norm)
 # https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf

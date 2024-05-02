@@ -49,8 +49,3 @@ function new_conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
     add_constraint!(context, Constraint{MOI.RelativeEntropyCone}(f))
     return conic_form!(context, u)
 end
-
-relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)
-
-# y*log(x/y)
-log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy(y, x)

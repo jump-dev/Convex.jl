@@ -4,38 +4,6 @@
 # Use of this source code is governed by an MIT-style license that can be found
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
-"""
-    TraceLogmAtom(
-        X::AbstractExpr,
-        C::AbstractMatrix,
-        m::Integer,
-        k::Integer,
-    )
-
-trace_logm(X, C) returns LinearAlgebra.tr(C*logm(X)) where X and C are positive
-definite matrices and C is constant.
-
-trace_logm is concave in X.
-
-This function implements the semidefinite programming approximation given in the
-reference below.  Parameters m and k control the accuracy of this approximation:
-m is the number of quadrature nodes to use and k the number of square-roots to
-take. See reference for more details.
-
-Implementation uses the expression
-
-    LinearAlgebra.tr(C*logm(X)) = -LinearAlgebra.tr(C*D_{op}(I||X))
-
-where D_{op} is the operator relative entropy:
-
-    D_{op}(X||Y) = X^{1/2}*logm(X^{1/2} Y^{-1} X^{1/2})*X^{1/2}
-
-## Reference
-
-Ported from CVXQUAD which is based on the paper: "Lieb's concavity theorem,
-matrix geometric means and semidefinite optimization" by Hamza Fawzi and James
-Saunderson (arXiv:1512.03401)
-"""
 mutable struct TraceLogmAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -72,27 +40,6 @@ monotonicity(::TraceLogmAtom) = (NoMonotonicity(),)
 curvature(::TraceLogmAtom) = ConcaveVexity()
 
 evaluate(atom::TraceLogmAtom) = trace_logm(evaluate(atom.children[1]), atom.C)
-
-function trace_logm(
-    X::AbstractExpr,
-    C::Union{AbstractMatrix,Constant},
-    m::Integer = 3,
-    k::Integer = 3,
-)
-    # This `evaluate` is safe since it is not a `fix!`ed variable
-    # (it must be a constant or matrix)
-    return TraceLogmAtom(X, evaluate(C), m, k)
-end
-
-function trace_logm(
-    X::Union{AbstractMatrix,Constant},
-    C::Union{AbstractMatrix,Constant},
-    m::Integer = 3,
-    k::Integer = 3,
-)
-    I = Matrix(1.0 * LinearAlgebra.I(size(X, 1)))
-    return -quantum_relative_entropy(C, X) + quantum_relative_entropy(C, I)
-end
 
 function new_conic_form!(context::Context{T}, atom::TraceLogmAtom) where {T}
     X = atom.children[1]

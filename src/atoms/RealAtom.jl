@@ -29,9 +29,3 @@ function new_conic_form!(context::Context{T}, x::RealAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
     return operate(real, T, sign(x), obj)
 end
-
-Base.real(x::AbstractExpr) = RealAtom(x)
-
-Base.real(x::ComplexConstant) = x.real_constant
-
-Base.real(x::Constant) = x
