@@ -79,6 +79,32 @@ function Base.getindex(
     return IndexAtom(x, rows, cols)
 end
 
+function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
+    used = falses(length(x.children))
+    offsets = cumsum(size.(x.children, 1))
+    for i in inds
+        row = mod1(i, size(x, 1))
+        child_index = findfirst(Base.Fix1(<=, row), offsets)
+        used[child_index] = true
+    end
+    dropped = cumsum(size.(x.children, 1) .* (1 .- used))
+    if all(used)
+        return IndexAtom(x, inds)
+    end
+    new_inds = map(inds) do i
+        row = mod1(i, size(x, 1))
+        child_index = findfirst(Base.Fix1(<=, row), offsets)
+        col = div(i - 1, size(x, 1)) + 1
+        return i - dropped[end] * (col - 1) + dropped[child_index]
+    end
+    if count(used) == 1
+        child = x.children[first(findall(used))]
+    else
+        child = VcatAtom(x.children[used]...)
+    end
+    return getindex(child, new_inds)
+end
+
 function Base.getindex(x::AbstractExpr, inds::AbstractVector{<:Real})
     return IndexAtom(x, inds)
 end

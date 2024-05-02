@@ -777,6 +777,23 @@ function test_VcatAtom()
     return
 end
 
+function test_getindex_VcatAtom()
+    x = Variable()
+    for v in [
+        vcat(x, square(x), -square(x)),
+        vcat(vcat(x, square(x)), -square(x)),
+    ]
+        @test v[1].children isa Tuple{Variable}
+        @test v[2].children == (square(x),)
+        @test v[2:-1:1].children[1] isa Convex.VcatAtom
+        @test v[2:-1:1].children[1].children == (x, square(x))
+        @test vexity(v[1]) isa Convex.AffineVexity
+        @test vexity(v[2]) isa Convex.ConvexVexity
+        @test vexity(v[3]) isa Convex.ConcaveVexity
+        @test vexity(v[1:2]) isa Convex.ConvexVexity
+    end
+end
+
 ### exp_+_sdp_cone/LogDetAtom
 
 function test_LogDetAtom()
