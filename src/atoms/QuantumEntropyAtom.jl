@@ -5,28 +5,32 @@
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
 """
-quantum_entropy returns -LinearAlgebra.tr(X*log(X)) where X is a positive semidefinite.
+    QuantumEntropyAtom(X::AbstractExpr, m::Integer, k::Integer)
+
+quantum_entropy returns -LinearAlgebra.tr(X*log(X)) where X is a positive
+semidefinite.
+
 Note this function uses logarithm base e, not base 2, so return value is in
 units of nats, not bits.
 
 Quantum entropy is concave. This function implements the semidefinite
 programming approximation given in the reference below.  Parameters m and k
-control the accuracy of this approximation: m is the number of quadrature
-nodes to use and k the number of square-roots to take. See reference for
-more details.
+control the accuracy of this approximation: m is the number of quadrature nodes
+to use and k the number of square-roots to take. See reference for more details.
 
 Implementation uses the expression
-  H(X) = -trace( D_{op}(X||I) )
+
+    H(X) = -trace( D_{op}(X||I) )
+
 where D_{op} is the operator relative entropy:
-  D_{op}(X||Y) = X^{1/2}*logm(X^{1/2} Y^{-1} X^{1/2})*X^{1/2}
 
-All expressions and atoms are subtypes of AbstractExpr.
-Please read expressions.jl first.
+    D_{op}(X||Y) = X^{1/2}*logm(X^{1/2} Y^{-1} X^{1/2})*X^{1/2}
 
-REFERENCE
-  Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-  theorem, matrix geometric means and semidefinite optimization" by Hamza
-  Fawzi and James Saunderson (arXiv:1512.03401)
+## Reference
+
+Ported from CVXQUAD which is based on the paper: "Lieb's concavity theorem,
+matrix geometric means and semidefinite optimization" by Hamza Fawzi and James
+Saunderson (arXiv:1512.03401)
 """
 mutable struct QuantumEntropyAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
@@ -35,12 +39,11 @@ mutable struct QuantumEntropyAtom <: AbstractExpr
     k::Integer
 
     function QuantumEntropyAtom(X::AbstractExpr, m::Integer, k::Integer)
-        children = (X,)
-        n = size(X)[1]
+        n = size(X, 1)
         if size(X) != (n, n)
             throw(DimensionMismatch("X must be square"))
         end
-        return new(children, (1, 1), m, k)
+        return new((X,), (1, 1), m, k)
     end
 end
 
@@ -52,9 +55,7 @@ monotonicity(::QuantumEntropyAtom) = (NoMonotonicity(),)
 
 curvature(::QuantumEntropyAtom) = ConcaveVexity()
 
-function evaluate(atom::QuantumEntropyAtom)
-    return quantum_entropy(evaluate(atom.children[1]))
-end
+evaluate(atom::QuantumEntropyAtom) = quantum_entropy(evaluate(atom.children[1]))
 
 function quantum_entropy(X::AbstractExpr, m::Integer = 3, k::Integer = 3)
     return QuantumEntropyAtom(X, m, k)
@@ -68,21 +69,19 @@ function quantum_entropy(
     return -quantum_relative_entropy(X, Matrix(1.0 * LinearAlgebra.I, size(X)))
 end
 
-function new_conic_form!(context::Context, atom::QuantumEntropyAtom)
-    X = atom.children[1]
-    n = size(X, 1)
-    eye = Matrix(1.0 * LinearAlgebra.I, n, n)
+function new_conic_form!(
+    context::Context{T},
+    atom::QuantumEntropyAtom,
+) where {T}
+    X = only(atom.children)
     add_constraint!(context, X ⪰ 0)
     τ = if sign(X) == ComplexSign()
-        ComplexVariable(n, n)
+        ComplexVariable(size(X))
     else
-        Variable(n, n)
+        Variable(size(X))
     end
-    add_constraint!(
-        context,
-        τ in RelativeEntropyEpiCone(X, eye, atom.m, atom.k),
-    )
+    I = Matrix(one(T) * LinearAlgebra.I(size(X, 1)))
+    add_constraint!(context, τ in RelativeEntropyEpiCone(X, I, atom.m, atom.k))
     # It's already a real mathematically, but need to make it a real type.
-    τ = real(-LinearAlgebra.tr(τ))
-    return conic_form!(context, minimize(τ))
+    return conic_form!(context, real(-LinearAlgebra.tr(τ)))
 end

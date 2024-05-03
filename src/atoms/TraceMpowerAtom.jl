@@ -5,19 +5,19 @@
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
 """
+    TraceMpowerAtom(A::AbstractExpr, t::Rational, C::AbstractMatrix)
+
 trace_mpower(A, t, C) returns LinearAlgebra.tr(C*A^t) where A and C are positive
 definite matrices and C is constant and t ∈ [-1, 2].
 
 When t ∈ [0,1], trace_mpower(A, t, C) is concave in A (for fixed
-positive semidefinite matrix C) and convex for t ∈ [-1,0] or [1,2].
+positive semidefinite matrix C) and convex for t ∈ [-1, 0) or (1, 2].
 
-All expressions and atoms are subtypes of AbstractExpr.
-Please read expressions.jl first.
+## Reference
 
-REFERENCE
-  Ported from CVXQUAD which is based on the paper: "Lieb's concavity
-  theorem, matrix geometric means and semidefinite optimization" by Hamza
-  Fawzi and James Saunderson (arXiv:1512.03401)
+Ported from CVXQUAD which is based on the paper: "Lieb's concavity theorem,
+matrix geometric means and semidefinite optimization" by Hamza Fawzi and James
+Saunderson (arXiv:1512.03401)
 """
 mutable struct TraceMpowerAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
@@ -26,24 +26,19 @@ mutable struct TraceMpowerAtom <: AbstractExpr
     t::Rational
 
     function TraceMpowerAtom(A::AbstractExpr, t::Rational, C::AbstractMatrix)
-        children = (A,)
+        n = size(A, 1)
         if size(A) != size(C)
             throw(DimensionMismatch("A and C must be the same size"))
-        end
-        n = size(A, 1)
-        if size(A) != (n, n)
+        elseif size(A) != (n, n)
             throw(DimensionMismatch("A and C must be square"))
-        end
-        if norm(C - C') > 1e-6
+        elseif norm(C - C') > 1e-6
             throw(DomainError(C, "C must be Hermitian"))
-        end
-        if any(LinearAlgebra.eigvals(LinearAlgebra.Hermitian(C)) .< -1e-6)
+        elseif any(LinearAlgebra.eigvals(LinearAlgebra.Hermitian(C)) .< -1e-6)
             throw(DomainError(C, "C must be positive semidefinite"))
-        end
-        if t < -1 || 2 < t
+        elseif t < -1 || 2 < t
             throw(DomainError(t, "t must be in the range [-1, 2]"))
         end
-        return new(children, (1, 1), C, t)
+        return new((A,), (1, 1), C, t)
     end
 end
 
@@ -56,9 +51,8 @@ monotonicity(::TraceMpowerAtom) = (NoMonotonicity(),)
 function curvature(atom::TraceMpowerAtom)
     if 0 <= atom.t <= 1
         return ConcaveVexity()
-    else
-        return ConvexVexity()
     end
+    return ConvexVexity()
 end
 
 function evaluate(atom::TraceMpowerAtom)
@@ -91,21 +85,18 @@ end
 
 function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     A = atom.children[1]
+    n = size(A, 1)
     tmp = if sign(A) == ComplexSign()
-        HermitianSemidefinite(size(A, 1))
+        HermitianSemidefinite(n)
     else
-        Semidefinite(size(A, 1))
+        Semidefinite(n)
     end
-    eye = Matrix(one(T) * LinearAlgebra.I, size(A))
+    I = Matrix(one(T) * LinearAlgebra.I(n))
     if 0 <= atom.t <= 1
-        add_constraint!(context, tmp in GeomMeanHypoCone(eye, A, atom.t, false))
-        # It's already a real mathematically, but Convex doesn't know it
-        u = real(LinearAlgebra.tr(atom.C * tmp))
-        return conic_form!(context, maximize(u))
+        add_constraint!(context, tmp in GeomMeanHypoCone(I, A, atom.t, false))
     else
-        add_constraint!(context, tmp in GeomMeanEpiCone(eye, A, atom.t, false))
-        # It's already a real mathematically, but Convex doesn't know it
-        u = real(LinearAlgebra.tr(atom.C * tmp))
-        return conic_form!(context, minimize(u))
+        add_constraint!(context, tmp in GeomMeanEpiCone(I, A, atom.t, false))
     end
+    # It's already a real mathematically, but Convex doesn't know it
+    return conic_form!(context, real(LinearAlgebra.tr(atom.C * tmp)))
 end
