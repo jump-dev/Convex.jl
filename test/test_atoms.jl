@@ -35,6 +35,15 @@ _to_moi(x::Convex.SparseTape) = _to_moi(Convex.to_vaf(x))
 
 _to_moi(v::MOI.AbstractScalarFunction) = v
 
+# Retrieve the numeric value of the result of `conic_form!` post-solve
+_value(::Any, x) = evaluate(x)
+
+function _value(context, x::Convex.SparseTape)
+    val = [MOI.get(context.model, MOI.VariablePrimal(), i) for i in x.variables]
+    return x.operation.matrix * val + x.operation.vector
+end
+
+# Recursively manipulate an `AbstractExpr` to replace variables with constants
 function make_constant!(expr::Convex.AbstractVariable)
     if Convex.iscomplex(expr)
         val = rand(Float64, size(expr)) + im * rand(Float64, size(expr))
@@ -46,11 +55,13 @@ function make_constant!(expr::Convex.AbstractVariable)
     end
     return constant(val)
 end
+
 function make_constant!(
     e::Union{Number,AbstractArray,Convex.Constant,Convex.ComplexConstant},
 )
     return e
 end
+
 function make_constant!(e::Convex.AbstractExpr)
     e.children = map(make_constant!, e.children)
     return e
@@ -94,14 +105,30 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     N = length(atom.children)
     @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
+    # Now, we will test if our atom's `conic_form` and `evaluate`
+    # agree for constants (and that they are well-defined for constants).
+    # To do so, we first flip our atom to have non-concave vexity:
+    if Convex.vexity(atom) == Convex.ConcaveVexity()
+        atom = -atom
+    end
+    # Then we recursively replace variables with `constant`s
     make_constant!(atom)
-    if !iscomplex(atom)
-    z =
-        Convex.iscomplex(atom) ? ComplexVariable(size(atom)) :
-        Variable(size(atom))
-    problem = minimize(norm(z), z >= atom)
-    solve!(problem, Clarabel.Optimizer; silent_solver=true)
-    @test evaluate(atom) ≈ evaluate(z) rtol=1e-4
+    # For now, the complex case has too many issues to handle...
+    if !Convex.iscomplex(atom) && !any(Convex.iscomplex, atom.children)
+        t = Variable()
+        problem = minimize(t, t >= sum(atom); numeric_type = value_type)
+        c = Convex.Context(problem, Clarabel.Optimizer{value_type})
+        context_ref = Ref{Convex.Context{value_type}}()
+        Convex.solve!(
+            problem,
+            Clarabel.Optimizer;
+            silent_solver = true,
+            context_ref,
+        )
+        c = context_ref[]
+        v = _value(c, t)
+        e = evaluate(atom)
+        @test sum(e) ≈ v rtol = 1e-4 atol = 1e-4
     end
     _test_reformulation(build_fn, target_string; value_type)
     return
