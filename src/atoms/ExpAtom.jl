@@ -36,8 +36,8 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     z = Variable(m, n)
     # Naive implementation:
     # for i in 1:m, j in 1:n
-    # f = vcat(x[i, j], 1, z[i, j])
-        # add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
+    #     f = vcat(x[i, j], 1, z[i, j])
+    #     add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
     # end
     # return conic_form!(context, z)
     # This is slow, since we are indexing on the Convex side, and convex is based around
@@ -59,7 +59,7 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
         # So we can't use `MOI.Utilities.vectorize`. Instead, we will construct a VectorAffineFunction manually.
         # First, we construct the VectorAffineTerm's for the first and third components.
         terms = [
-            [MOI.VectorAffineTerm(Int64(1), sat) for sat in xs[i].terms];
+            [MOI.VectorAffineTerm(Int64(1), sat) for sat in xs[i].terms]
             MOI.VectorAffineTerm(Int64(3), MOI.ScalarAffineTerm(T(1), zs[i]))
         ]
         # Then we can add in the constants, and we are good to go.
