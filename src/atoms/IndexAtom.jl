@@ -42,17 +42,6 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function _index(tape::SparseTape{T}, keep_rows::Vector{Int}) where {T}
-    @assert issorted(keep_rows)
-    A = tape.operation.matrix
-    af = SparseAffineOperation{T}(
-        A[keep_rows, :],
-        tape.operation.vector[keep_rows],
-    )
-    return SparseTape{T}(af, tape.variables)
-end
-_index(tape::Vector, keep_rows::Vector{Int}) = tape[keep_rows]
-
 function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
     m = length(x)
@@ -74,7 +63,6 @@ function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
             # This speeds up formulation since we reduce the problem size, and send what we have over to MOI already.
             out = Variable(sz)
             out_tape = conic_form!(context, out)
-            # return _index(obj_tape, vec(linear_indices)) # slower, highly allocating
             for (i, I) in enumerate(linear_indices)
                 # For each index, we constrain an element of `out` via ScalarAffineFunction to the indexed value.
                 saf = to_saf(obj_tape, I)
