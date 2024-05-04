@@ -54,7 +54,7 @@ function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
 
             obj = x.children[1]
             obj_tape = conic_form!(context, obj)
-            # Attempt 1:
+            # Attempt 1: ( 31.862136 seconds (30.91 M allocations: 1.890 GiB, 7.93% gc time))
             # vaf = get_vaf!(context, obj_tape)
             # # Restrict to indices of interest
             # linear_indices =
@@ -79,7 +79,7 @@ function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
             # # Add constraint:
             # MOI.add_constraint(context.model, vaf, MOI.Zeros(sz))
 
-            # Attempt 2:
+            # Attempt 2: (27.681815 seconds (30.11 M allocations: 1.777 GiB, 8.38% gc time))
             linear_indices = LinearIndices(CartesianIndices(size(obj)))[x.rows, x.cols]
             for (i, I) in enumerate(linear_indices)
                 saf = to_saf(obj_tape, I)
