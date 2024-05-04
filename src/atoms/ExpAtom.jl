@@ -53,7 +53,7 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
 
     z_tape = conic_form!(context, z)
 
-    xs = MOI.Utilities.scalarize(to_vaf(x + tapi))
+    xs = MOI.Utilities.scalarize(to_vaf(x_tape))
     # Now we have a vector of `m*n` ScalarAffineFunctions in order.
 
     # We just created `z`, so we know the operation is trivial.
