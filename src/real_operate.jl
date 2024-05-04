@@ -314,14 +314,14 @@ end
 
 # Here we have our two complex -> real functions
 # These are allowed these inputs:
-const ComplexToRealInputs2{T} =
+const ComplexToRealInputs{T} =
     Union{ComplexTape{T},SparseTape{T},ComplexStructOfVec{T},Vector{T}}
 
 # `real`
 function real_operate(
     ::typeof(real),
     ::Type{T},
-    c::ComplexToRealInputs2{T},
+    c::ComplexToRealInputs{T},
 ) where {T}
     return real(c)
 end
@@ -330,7 +330,7 @@ end
 function real_operate(
     ::typeof(imag),
     ::Type{T},
-    c::ComplexToRealInputs2{T},
+    c::ComplexToRealInputs{T},
 ) where {T}
     return imag(c)
 end
