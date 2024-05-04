@@ -26,11 +26,6 @@ mutable struct Context{T,M}
     # Cache
     # conic_form_cache::DataStructures.WeakKeyIdDict{Any, Any}
     conic_form_cache::IdDict{Any,Any}
-    vaf_cache::IdDict{Any, MOI.VectorAffineFunction{T}} # keys are SparseTape{T}
-end
-
-function get_vaf!(context::Context, obj)
-    return get!(() -> to_vaf(obj), context.vaf_cache, obj)
 end
 
 function Context{T}(optimizer_factory; add_cache::Bool = false) where {T}
@@ -49,7 +44,6 @@ function Context{T}(optimizer_factory; add_cache::Bool = false) where {T}
         IdDict{Any,Any}(),
         false,
         IdDict{Any,Any}(),
-        IdDict{Any, MOI.VectorAffineFunction{T}}()
     )
 end
 
