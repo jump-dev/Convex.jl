@@ -10,7 +10,7 @@ using Test
 
 # Do not use `using LinearAlgebra` to check symbols are re-exported by Convex.
 import LinearAlgebra
-
+import Clarabel
 import MathOptInterface as MOI
 
 function runtests()
@@ -34,6 +34,27 @@ end
 _to_moi(x::Convex.SparseTape) = _to_moi(Convex.to_vaf(x))
 
 _to_moi(v::MOI.AbstractScalarFunction) = v
+
+function make_constant!(expr::Convex.AbstractVariable)
+    if Convex.iscomplex(expr)
+        val = rand(Float64, size(expr)) + im * rand(Float64, size(expr))
+    else
+        val = rand(Float64, size(expr))
+    end
+    if size(expr, 1) == size(expr, 2)
+        val = val' * val
+    end
+    return constant(val)
+end
+function make_constant!(
+    e::Union{Number,AbstractArray,Convex.Constant,Convex.ComplexConstant},
+)
+    return e
+end
+function make_constant!(e::Convex.AbstractExpr)
+    e.children = map(make_constant!, e.children)
+    return e
+end
 
 """
     _test_atom(build_fn::Function, target_string::String; value_type = Float64)
@@ -73,6 +94,15 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     N = length(atom.children)
     @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
+    make_constant!(atom)
+    if !iscomplex(atom)
+    z =
+        Convex.iscomplex(atom) ? ComplexVariable(size(atom)) :
+        Variable(size(atom))
+    problem = minimize(norm(z), z >= atom)
+    solve!(problem, Clarabel.Optimizer; silent_solver=true)
+    @test evaluate(atom) ≈ evaluate(z) rtol=1e-4
+    end
     _test_reformulation(build_fn, target_string; value_type)
     return
 end

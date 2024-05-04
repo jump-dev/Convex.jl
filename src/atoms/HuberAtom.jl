@@ -28,6 +28,9 @@ curvature(::HuberAtom) = ConvexVexity()
 
 function evaluate(x::HuberAtom)
     c = evaluate(x.children[1])
+    if c isa Number
+        c = [c]
+    end
     for i in 1:length(c)
         if c[i] <= x.M
             c[i] = c[i]^2
