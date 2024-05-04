@@ -50,7 +50,7 @@ function to_saf(tape::SparseTape{T}, output_index) where {T}
     sats = MOI.ScalarAffineTerm{T}[]
     rows = SparseArrays.rowvals(A)
     vals = SparseArrays.nonzeros(A)
-    for j = 1:n # for each column
+    for j in 1:n # for each column
         for i in SparseArrays.nzrange(A, j)
             row = rows[i]
             row == output_index || continue
@@ -58,7 +58,10 @@ function to_saf(tape::SparseTape{T}, output_index) where {T}
             push!(sats, MOI.ScalarAffineTerm{T}(val, tape.variables[j]))
         end
     end
-    return MOI.ScalarAffineFunction{T}(sats, tape.operation.vector[output_index])
+    return MOI.ScalarAffineFunction{T}(
+        sats,
+        tape.operation.vector[output_index],
+    )
 end
 
 # method for adding constraints and coverting to standard VAFs as needed
