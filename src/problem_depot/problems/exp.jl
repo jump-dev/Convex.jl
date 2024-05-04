@@ -22,6 +22,19 @@
         @test evaluate(exp(y)) ≈ 1 atol = atol rtol = rtol
     end
 
+    # Test for constant `exp` (#613)
+    y = Variable()
+    x = constant([1,2,3])
+    p = minimize(sum(exp(x)) + y, y >= 0; numeric_type = T)
+    if test
+        @test problem_vexity(p) == ConvexVexity()
+    end
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ sum(exp.([1,2,3])) atol = atol rtol = rtol
+        @test evaluate(y) ≈ 0 atol = atol
+    end
+
     y = Variable()
     p = minimize(exp(y), y >= 1; numeric_type = T)
 

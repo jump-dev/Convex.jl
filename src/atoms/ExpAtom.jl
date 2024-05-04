@@ -45,6 +45,12 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     # Instead, we will drop to the MOI level to implement this in terms of scalar operations.
     # First, we will get `x` as an MOI.VectorAffineFunction
     x_tape = conic_form!(context, x)
+    # since `ExpAtom` is restricted to `sign(x)` being real, `x_tape` is either `Vector{T}` or `SparseTape{T}`.
+    # The `Vector{T}` case happens when `x` is a constant (or a function of a constant).
+    # In this case, we can just take `exp` directly.
+    if x_tape isa Vector
+        return exp.(x_tape)
+    end
     vaf = to_vaf(x_tape)
     # Next, we can extract the individual components of `x` via `MOI.Utilities.scalarize`
     xs = MOI.Utilities.scalarize(vaf)
