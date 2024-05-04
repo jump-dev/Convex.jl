@@ -35,32 +35,31 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     m, n = size(x)
     z = Variable(m, n)
     # Naive implementation:
+    # ```julia
     # for i in 1:m, j in 1:n
     #     f = vcat(x[i, j], 1, z[i, j])
     #     add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
     # end
     # return conic_form!(context, z)
-    # This is slow, since we are indexing on the Convex side, and convex is based around
-    # vector/matrix operations. We don't want to produce n*m IndexAtoms!
-    # Instead, we will drop to the MOI level to implement this in terms of scalar operations.
+    # ```
+    # This is slow because we are indexing on the Convex side, and Convex is
+    # based around vector/matrix operations. We don't want to produce n*m
+    # IndexAtoms!
+    #
+    # Instead, we will drop to the MOI level to implement this in terms of
+    # scalar operations.
     x_tape = conic_form!(context, x)
-    # since `ExpAtom` is restricted to `sign(x)` being real, `x_tape` is either `SPARSE_VECTOR{T}` or `SparseTape{T}`.
-    # The `SPARSE_VECTOR{T}` case happens when `x` is a constant (or a function of a constant).
-    # In this case, we can just take `exp` directly.
+    # Since `ExpAtom` is restricted to `sign(x)` being real, `x_tape` is either
+    # `SPARSE_VECTOR{T}` or `SparseTape{T}`. The `SPARSE_VECTOR{T}` case happens
+    # when `x` is a constant (or a function of a constant). In this case, we can
+    # just take `exp` directly.
     if x_tape isa SPARSE_VECTOR
         return exp.(x_tape)
     end
-
-    z_tape = conic_form!(context, z)
-
+    # Otherwise, convert x_tape into a vector of `MOI.ScalarAffineFunction`s.
     xs = MOI.Utilities.scalarize(to_vaf(x_tape))
-    # Now we have a vector of `m*n` ScalarAffineFunctions in order.
-
-    # We just created `z`, so we know the operation is trivial.
-    # Therefore we can just take the variables to get a vector of `MOI.VariableIndex`
-    zs = z_tape.variables
-    # now we simply add the constraints
-    for (xi, zi) in zip(xs, zs)
+    z_tape = conic_form!(context, z)
+    for (xi, zi) in zip(xs, z_tape.variables)
         MOI.add_constraint(
             context.model,
             MOI.Utilities.operate(vcat, T, xi, T(1), zi),
