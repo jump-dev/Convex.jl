@@ -42,6 +42,17 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
+function _index(tape::SparseTape{T}, keep_rows::Vector{Int}) where {T}
+    @assert issorted(keep_rows)
+    A = tape.operation.matrix
+    af = SparseAffineOperation{T}(
+        A[keep_rows, :],
+        tape.operation.vector[keep_rows],
+    )
+    return SparseTape{T}(af, tape.variables)
+end
+_index(tape::Vector, keep_rows::Vector{Int}) = tape[keep_rows]
+
 function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
     obj = conic_form!(context, only(AbstractTrees.children(x)))
     m = length(x)
@@ -49,14 +60,28 @@ function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
     if x.inds === nothing
         sz = length(x.cols) * length(x.rows)
         if !iscomplex(x) # only real case handled here, for now
-            out = Variable(sz)
-            out_tape = conic_form!(context, out)
             obj = x.children[1]
             obj_tape = conic_form!(context, obj)
-            linear_indices = LinearIndices(CartesianIndices(size(obj)))[x.rows, x.cols]
+            linear_indices =
+                LinearIndices(CartesianIndices(size(obj)))[x.rows, x.cols]
+            # Here, we are in the real case, so `obj_tape` is either a `SparseTape{T}`, or a `Vector{T}`.
+            # In the latter case, we can handle it directly
+            if obj_tape isa Vector{T}
+                return obj_tape[vec(linear_indices)]
+            end
+            # Ok, in this case we have actual work to do. We will construct an auxiliary variable `out`,
+            # which we will return, and we will constrain it to the values we want.
+            # This speeds up formulation since we reduce the problem size, and send what we have over to MOI already.
+            out = Variable(sz)
+            out_tape = conic_form!(context, out)
+            # return _index(obj_tape, vec(linear_indices)) # slower, highly allocating
             for (i, I) in enumerate(linear_indices)
+                # For each index, we constrain an element of `out` via ScalarAffineFunction to the indexed value.
                 saf = to_saf(obj_tape, I)
-                push!(saf.terms, MOI.ScalarAffineTerm(T(-1), out_tape.variables[i]))
+                push!(
+                    saf.terms,
+                    MOI.ScalarAffineTerm(T(-1), out_tape.variables[i]),
+                )
                 MOI.add_constraint(context.model, saf, MOI.EqualTo(T(0)))
             end
             return out_tape
