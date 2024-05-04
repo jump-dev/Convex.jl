@@ -44,6 +44,23 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
     return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
 end
 
+function to_saf(tape::SparseTape{T}, output_index) where {T}
+    A = tape.operation.matrix
+    m, n = size(A)
+    sats = MOI.ScalarAffineTerm{T}[]
+    rows = SparseArrays.rowvals(A)
+    vals = SparseArrays.nonzeros(A)
+    for j = 1:n # for each column
+        for i in SparseArrays.nzrange(A, j)
+            row = rows[i]
+            row == output_index || continue
+            val = vals[i]
+            push!(sats, MOI.ScalarAffineTerm{T}(val, tape.variables[j]))
+        end
+    end
+    return MOI.ScalarAffineFunction{T}(sats, tape.operation.vector[output_index])
+end
+
 # method for adding constraints and coverting to standard VAFs as needed
 function MOI_add_constraint(model, f, set)
     return MOI.add_constraint(model, f, set)

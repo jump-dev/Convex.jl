@@ -48,16 +48,58 @@ function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
     n = length(x.children[1])
     if x.inds === nothing
         sz = length(x.cols) * length(x.rows)
-        J = Vector{Int}(undef, sz)
-        k = 1
-        num_rows = x.children[1].size[1]
-        for c in x.cols
-            for r in x.rows
-                J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
-                k += 1
+        if !iscomplex(x) # only real case handled here, for now
+            out = Variable(sz)
+            out_tape = conic_form!(context, out)
+
+            obj = x.children[1]
+            obj_tape = conic_form!(context, obj)
+            # Attempt 1:
+            # vaf = get_vaf!(context, obj_tape)
+            # # Restrict to indices of interest
+            # linear_indices =
+            #     LinearIndices(CartesianIndices(size(obj)))[x.rows, x.cols]
+            # vaf = MOI.VectorAffineFunction(
+            #     [
+            #         term for
+            #         term in vaf.terms if term.output_index ∈ linear_indices
+            #     ],
+            #     vaf.constants[vec(linear_indices)],
+            # )
+            # # subtract `out` to get out - obj == 0`
+            # append!(
+            #     vaf.terms,
+            #     [
+            #         MOI.VectorAffineTerm(
+            #             Int64(i),
+            #             MOI.ScalarAffineTerm(T(-1), out_tape.variables[i]),
+            #         ) for i in 1:sz
+            #     ],
+            # )
+            # # Add constraint:
+            # MOI.add_constraint(context.model, vaf, MOI.Zeros(sz))
+
+            # Attempt 2:
+            linear_indices = LinearIndices(CartesianIndices(size(obj)))[x.rows, x.cols]
+            for (i, I) in enumerate(linear_indices)
+                saf = to_saf(obj_tape, I)
+                push!(saf.terms, MOI.ScalarAffineTerm(T(-1), out_tape.variables[i]))
+                MOI.add_constraint(context.model, saf, MOI.EqualTo(T(0)))
             end
+
+            return out_tape
+        else
+            J = Vector{Int}(undef, sz)
+            k = 1
+            num_rows = x.children[1].size[1]
+            for c in x.cols
+                for r in x.rows
+                    J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
+                    k += 1
+                end
+            end
+            index_matrix = create_sparse(T, collect(1:sz), J, one(T), m, n)
         end
-        index_matrix = create_sparse(T, collect(1:sz), J, one(T), m, n)
     else
         index_matrix = create_sparse(
             T,
