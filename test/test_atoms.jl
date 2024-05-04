@@ -1022,12 +1022,10 @@ function test_AbsAtom()
         return abs2(Variable())
     end
     target = """
-    variables: t1, t2, x1, x2, w1, w2
+    variables: t1, t2, x1, x2
     minobjective: [1.0 * t1, 1.0*t2]
-    [1.0 * t1 + -1.0 * x1] in Nonnegatives(1)
-    [1.0 * t2 + -1.0 * w2] in Nonnegatives(1)
-    [1.0 * x1, 1.0 * x2, 2.0] in SecondOrderCone(3)
-    [1.0 * w2, 1.0 * w1, 2.0] in SecondOrderCone(3)
+    [1.0 * t1, 1.0 * x1, 2.0] in SecondOrderCone(3)
+    [1.0 * t2, 1.0 * x2, 2.0] in SecondOrderCone(3)
     """
     _test_atom(target) do context
         return abs(Variable(2) + 2im)

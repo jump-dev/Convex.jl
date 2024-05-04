@@ -20,16 +20,23 @@ curvature(::AbsAtom) = ConvexVexity()
 
 evaluate(x::AbsAtom) = abs.(evaluate(x.children[1]))
 
-function new_conic_form!(context::Context, A::AbsAtom)
+function new_conic_form!(context::Context{T}, A::AbsAtom) where {T}
     x = only(A.children)
     t = Variable(size(x))
     t_obj = conic_form!(context, t)
-    if sign(x) == ComplexSign()
-        for i in 1:length(vec(t))
-            add_constraint!(
-                context,
-                t[i] >= LinearAlgebra.norm2([real(x[i]); imag(x[i])]),
-            )
+    if iscomplex(x)
+        tape = conic_form!(context, x)
+        re_tape = real(tape)
+        im_tape = imag(tape)
+        if re_tape isa SPARSE_VECTOR
+            @assert im_tape isa SPARSE_VECTOR
+            return abs.(re_tape + im * im_tape)
+        end
+        re_safs = MOI.Utilities.scalarize(to_vaf(re_tape))
+        im_safs = MOI.Utilities.scalarize(to_vaf(im_tape))
+        for (re, im, ti) in zip(re_safs, im_safs, t_obj.variables)
+            f = MOI.Utilities.operate(vcat, T, ti, re, im)
+            MOI.add_constraint(context.model, f, MOI.SecondOrderCone(3))
         end
     else
         add_constraint!(context, t >= x)
