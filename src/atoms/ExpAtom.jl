@@ -43,7 +43,6 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     # This is slow, since we are indexing on the Convex side, and convex is based around
     # vector/matrix operations. We don't want to produce n*m IndexAtoms!
     # Instead, we will drop to the MOI level to implement this in terms of scalar operations.
-    # First, we will get `x` as an MOI.VectorAffineFunction
     x_tape = conic_form!(context, x)
     # since `ExpAtom` is restricted to `sign(x)` being real, `x_tape` is either `SPARSE_VECTOR{T}` or `SparseTape{T}`.
     # The `SPARSE_VECTOR{T}` case happens when `x` is a constant (or a function of a constant).
@@ -51,26 +50,22 @@ function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     if x_tape isa SPARSE_VECTOR
         return exp.(x_tape)
     end
-    vaf = to_vaf(x_tape)
-    # Next, we can extract the individual components of `x` via `MOI.Utilities.scalarize`
-    xs = MOI.Utilities.scalarize(vaf)
-    # Now we have a vector of `m*n` ScalarAffineFunctions in order.
-    # We can likewise lower `z` to a vector of `MOI.VariableIndex`
+
     z_tape = conic_form!(context, z)
+
+    xs = MOI.Utilities.scalarize(to_vaf(x + tapi))
+    # Now we have a vector of `m*n` ScalarAffineFunctions in order.
+
+    # We just created `z`, so we know the operation is trivial.
+    # Therefore we can just take the variables to get a vector of `MOI.VariableIndex`
     zs = z_tape.variables
-    for i in eachindex(xs, zs)
-        # Now, we wish to add the constraint `(x[i], 1, z[i]) ∈ MOI.ExponentialCone()`
-        # however, we have 3 different types: x[i] is a ScalarAffineFunction, 1 is a constant,
-        # and `z` is a VariableIndex.
-        # So we can't use `MOI.Utilities.vectorize`. Instead, we will construct a VectorAffineFunction manually.
-        # First, we construct the VectorAffineTerm's for the first and third components.
-        terms = [
-            [MOI.VectorAffineTerm(Int64(1), sat) for sat in xs[i].terms]
-            MOI.VectorAffineTerm(Int64(3), MOI.ScalarAffineTerm(T(1), zs[i]))
-        ]
-        # Then we can add in the constants, and we are good to go.
-        vaf_i = MOI.VectorAffineFunction(terms, [xs[i].constant, T(1), T(0)])
-        MOI.add_constraint(context.model, vaf_i, MOI.ExponentialCone())
+    # now we simply add the constraints
+    for (xi, zi) in zip(xs, zs)
+        MOI.add_constraint(
+            context.model,
+            MOI.Utilities.operate(vcat, T, xi, T(1), zi),
+            MOI.ExponentialCone(),
+        )
     end
     return z_tape
 end
