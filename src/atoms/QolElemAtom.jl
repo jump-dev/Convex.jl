@@ -35,8 +35,8 @@ function new_conic_form!(context::Context{T}, q::QolElemAtom) where {T}
     x, y = q.children
     t = Variable(x.size)
     t_tape = conic_form!(context, t)
-    x_tape = conic_form!(context, x)
     y_tape = conic_form!(context, y)
+    x_tape = conic_form!(context, x)
     x_fn = MOI.Utilities.scalarize(to_vaf(x_tape))
     y_fn = MOI.Utilities.scalarize(to_vaf(y_tape))
     for (ti, yi, xi) in zip(t_tape.variables, y_fn, x_fn)
