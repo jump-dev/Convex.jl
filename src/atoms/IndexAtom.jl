@@ -43,7 +43,6 @@ function evaluate(x::IndexAtom)
 end
 
 function _index(tape::SparseTape{T}, keep_rows::Vector{Int}) where {T}
-    @assert issorted(keep_rows)
     A = tape.operation.matrix
     indexed = A[keep_rows, :]
     af = SparseAffineOperation{T}(indexed, tape.operation.vector[keep_rows])
