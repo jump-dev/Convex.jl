@@ -30,13 +30,12 @@ evaluate(x::LogAtom) = log.(evaluate(x.children[1]))
 Base.log(x::AbstractExpr) = LogAtom(x)
 
 function new_conic_form!(context::Context, e::LogAtom)
-    # log(z) \geq x  <=> (x,1,z) \in ExpCone
-    z = e.children[1]
-    m, n = size(z)
-    x = Variable(m, n)
-    for i in 1:m, j in 1:n
-        f = vcat(x[i, j], 1, z[i, j])
-        add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
-    end
-    return conic_form!(context, x)
+    # log(x) >= t  <=> (t, 1, x) in ExponentialCone()
+    x = e.children[1]
+    # To choose the permutation, we want the elements of the constraint to be:
+    #   (t, 1, x) in ExponentialCone()
+    # The default is:
+    #   (x, 1, t) in ExponentialCone()
+    # so [3, 2, 1] permutes it to the correct order.
+    return _add_vectorized_exp_cone(context, x, [3, 2, 1])
 end

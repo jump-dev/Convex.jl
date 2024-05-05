@@ -36,13 +36,12 @@ entropy(x::AbstractExpr) = sum(EntropyAtom(x))
 entropy_elementwise(x::AbstractExpr) = EntropyAtom(x)
 
 function new_conic_form!(context::Context, e::EntropyAtom)
-    # -x log x >= t  <=>  x exp(t/x) <= 1  <==>  (t,x,1) in exp cone
+    # -x log(x) >= t  <=>  x exp(t/x) <= 1 <=> (t, x, 1) in ExponentialCone()
     x = e.children[1]
-    m, n = size(x)
-    t = Variable(m, n)
-    for i in 1:m, j in 1:n
-        f = vcat(t[i, j], x[i, j], 1)
-        add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
-    end
-    return conic_form!(context, t)
+    # To choose the permutation, we want the elements of the constraint to be
+    #   (t, x, 1) in ExponentialCone()
+    # but with the identity permutation, the default is:
+    #   (x, 1, t) in ExponentialCone()
+    # so [3, 1, 2] permutes it to the correct order.
+    return _add_vectorized_exp_cone(context, x, [3, 1, 2])
 end
