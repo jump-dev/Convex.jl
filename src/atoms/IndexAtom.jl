@@ -9,18 +9,18 @@ mutable struct IndexAtom <: AbstractExpr
     rows::Union{AbstractArray,Nothing}
     cols::Union{AbstractArray,Nothing}
     inds::Union{AbstractArray,Nothing}
+end
 
-    function IndexAtom(
-        x::AbstractExpr,
-        rows::AbstractArray,
-        cols::AbstractArray,
-    )
-        return new((x,), (length(rows), length(cols)), rows, cols, nothing)
-    end
+function IndexAtom(
+    x::AbstractExpr,
+    rows::AbstractArray,
+    cols::AbstractArray,
+)
+    return IndexAtom((x,), (length(rows), length(cols)), rows, cols, nothing)
+end
 
-    function IndexAtom(x::AbstractExpr, inds::AbstractArray)
-        return new((x,), (length(inds), 1), nothing, nothing, inds)
-    end
+function IndexAtom(x::AbstractExpr, inds::AbstractArray)
+    return IndexAtom((x,), (length(inds), 1), nothing, nothing, inds)
 end
 
 head(io::IO, ::IndexAtom) = print(io, "index")
@@ -33,7 +33,11 @@ curvature(::IndexAtom) = ConstVexity()
 
 function evaluate(x::IndexAtom)
     result = if x.inds === nothing
-        getindex(evaluate(x.children[1]), x.rows, x.cols)
+        # reshape to ensure we are respecting that a scalar row index
+        # creates a column vector. We can't just check `length(x.rows)`
+        # since that doesn't distinguish between `i` and `i:i`. But
+        # we had that info when we set the size, so we will use it now.
+        reshape(getindex(evaluate(x.children[1]), x.rows, x.cols), x.size)
     else
         getindex(evaluate(x.children[1]), x.inds)
     end
@@ -98,7 +102,11 @@ function Base.getindex(x::AbstractExpr, row::Real, col::Real)
 end
 
 function Base.getindex(x::AbstractExpr, row::Real, cols::AbstractVector{<:Real})
-    return getindex(x, row:row, cols)
+    # In this case, we must construct a column vector
+    # https://github.com/jump-dev/Convex.jl/issues/509
+    # Here we construct `getindex(x, row:row, cols)`
+    # except with the size set to be that of a column vector
+    return IndexAtom((x,), (length(cols), 1), row:row, cols, nothing)
 end
 
 function Base.getindex(x::AbstractExpr, rows::AbstractVector{<:Real}, col::Real)
