@@ -40,9 +40,11 @@ function real_operate(
     tape::SparseTape{T},
     v::SPARSE_VECTOR{T},
 ) where {T<:Real}
-    op = SparseAffineOperation(tape)
+    # Update `current`
+    op = tape.operation.current
+    current = SparseAffineOperation(op.matrix, op.vector + v)
     return SparseTape(
-        SparseAffineOperation(op.matrix, op.vector + v),
+        LinkedSparseAffineOperation(tape.operation.previous, current),
         tape.variables,
     )
 end
@@ -105,9 +107,11 @@ function real_operate(
     ::Type{T},
     tape::SparseTape{T},
 ) where {T<:Real}
-    op = SparseAffineOperation(tape)
+    # Update `current`
+    op = tape.operation.current
+    current = SparseAffineOperation(-op.matrix, -op.vector)
     return SparseTape(
-        SparseAffineOperation(-op.matrix, -op.vector),
+        LinkedSparseAffineOperation(tape.operation.previous, current),
         tape.variables,
     )
 end
@@ -247,10 +251,13 @@ function real_operate(
     ::Type{T},
     tape::SparseTape{T},
 ) where {T<:Real}
-    op = SparseAffineOperation(tape)
+    # Update `current`
+    op = tape.operation.current
     mat = sum(op.matrix; dims = 1)
     vec = [sum(op.vector)]
-    return SparseTape{T}(SparseAffineOperation(mat, vec), tape.variables)
+    current = SparseAffineOperation(mat, vec)
+    operation = LinkedSparseAffineOperation(tape.operation.previous, current)
+    return SparseTape{T}(operation, tape.variables)
 end
 
 function real_operate(
@@ -273,9 +280,13 @@ function real_operate(
     A::AbstractMatrix,
     tape::SparseTape{T},
 ) where {T<:Real}
-    op = SparseAffineOperation(tape)
+    # We update the `current` operation. Alternatively, we could link in a new `SparseAffineOperation`
+    # to add this lazily, or we could collapse everything. We chose this option so that collapsing only happens
+    # at the end, and laziness happens deliberately.
+    op = tape.operation.current
+    current = SparseAffineOperation(A * op.matrix, A * op.vector)
     return SparseTape(
-        SparseAffineOperation(A * op.matrix, A * op.vector),
+        LinkedSparseAffineOperation(tape.operation.previous, current),
         tape.variables,
     )
     # return add_operation(tape, SparseAffineOperation(A, spzeros(T, size(A, 1))))
@@ -296,9 +307,12 @@ function real_operate(
     x::Real,
     tape::SparseTape{T},
 ) where {T<:Real}
-    op = SparseAffineOperation(tape)
+    # Update current
+    op = tape.operation.current
+    current = SparseAffineOperation(x * op.matrix, x * op.vector)
+    operation = LinkedSparseAffineOperation(tape.operation.previous, current)
     return SparseTape(
-        SparseAffineOperation(x * op.matrix, x * op.vector),
+        operation,
         tape.variables,
     )
 end
