@@ -15,6 +15,12 @@ mutable struct Context{T,M}
             Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
         },
     }
+
+    scalar_id_to_moi_index::OrderedCollections.OrderedDict{
+        UInt64,
+        MOI.VariableIndex,
+    }
+
     # `id_hash` -> `AbstractVariable`
     id_to_variables::OrderedCollections.OrderedDict{UInt64,Any}
 
@@ -40,6 +46,10 @@ function Context{T}(optimizer_factory; add_cache::Bool = false) where {T}
     return Context{T,typeof(model)}(
         model,
         OrderedCollections.OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
+        OrderedCollections.OrderedDict{
+            UInt64,
+            MOI.VariableIndex,
+        }(),
         OrderedCollections.OrderedDict{UInt64,Any}(),
         IdDict{Any,Any}(),
         false,

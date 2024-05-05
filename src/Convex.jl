@@ -233,6 +233,7 @@ include("real_operate.jl")
 include("problems.jl")
 include("solution.jl")
 include("MOI_wrapper.jl")
+include("ArrayVariable.jl")
 
 for (root, _, files) in walkdir(joinpath(@__DIR__, "atoms"))
     for file in files
