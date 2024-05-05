@@ -74,6 +74,46 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
     _test_reformulation(build_fn, target_string; value_type)
+    _test_constant_atom(build_fn; value_type)
+    return
+end
+
+function _to_constant(expr::Convex.AbstractVariable)
+    if Convex.iscomplex(expr)
+        val = rand(Float64, size(expr)) + im * rand(Float64, size(expr))
+    else
+        val = rand(Float64, size(expr))
+    end
+    if size(expr, 1) == size(expr, 2)
+        val = val' * val
+    end
+    return constant(val)
+end
+
+_to_constant(x::Convex.Value) = x
+_to_constant(x::Union{Convex.Constant,Convex.ComplexConstant}) = x
+
+function _to_constant(e::Convex.AbstractExpr)
+    e.children = map(_to_constant, e.children)
+    return e
+end
+
+function _test_constant_atom(build_fn; value_type)
+    context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
+    atom = _to_constant(build_fn(context))
+    if Convex.iscomplex(atom) || any(Convex.iscomplex, atom.children)
+        return
+    end
+    form = Convex.conic_form!(context, atom)
+    answer = evaluate(atom)
+    if !(form isa AbstractVector)
+        return  # The reformulation is still in terms of MOI variables.
+    end
+    if answer isa Number
+        @test only(form) ≈ answer
+    else
+        @test form ≈ vec(answer)
+    end
     return
 end
 
