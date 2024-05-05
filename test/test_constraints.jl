@@ -290,7 +290,7 @@ function test_GenericConstraint_RelativeEntropyConeConstraint()
     p = minimize(u, [c, w >= 2])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(u.value, 2 * log(2 / 1) + 2 * log(2 / 2); atol = 1e-4)
-    @test isapprox(c.dual, [1, 2, 1, -log(2)-1, -1]; atol = 1e-3)
+    @test isapprox(c.dual, [1, 2, 1, -log(2) - 1, -1]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.RelativeEntropyCone}(vcat(square(t), 1, t))
     @test vexity(c) === Convex.NotDcp()
     @test sprint(Convex.head, c) == "RelativeEntropyCone"
