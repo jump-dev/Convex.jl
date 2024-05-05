@@ -45,8 +45,7 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
 end
 
 function to_saf(tape::SparseTape{T}, output_index) where {T}
-    op = SparseAffineOperation(tape)
-    A = op.matrix
+    A = tape.operation.matrix
     m, n = size(A)
     sats = MOI.ScalarAffineTerm{T}[]
     rows = SparseArrays.rowvals(A)
@@ -61,7 +60,7 @@ function to_saf(tape::SparseTape{T}, output_index) where {T}
     end
     return MOI.ScalarAffineFunction{T}(
         sats,
-        op.vector[output_index],
+        tape.operation.vector[output_index],
     )
 end
 

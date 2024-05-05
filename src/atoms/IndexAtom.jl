@@ -42,19 +42,12 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-const CACHE = IdDict()
 function _index(tape::SparseTape{T}, keep_rows::Vector{Int}) where {T}
     @assert issorted(keep_rows)
-    op = SparseAffineOperation(tape)
-    A = op.matrix
-    A_t = get!(CACHE, A) do
-        copy(transpose(A))
-    end
-    indexed = copy(transpose(A_t[:, keep_rows]))
-    previous = LinkedSparseAffineOperation(nothing, SparseAffineOperation{T}(indexed, op.vector[keep_rows]))
-    current = SparseAffineOperation(SparseArrays.sparse([1], [1], [T(1)], 1, 1), [zero(T)])
-    operation = LinkedSparseAffineOperation(previous, current)
-    return SparseTape{T}(operation, tape.variables)
+    A = tape.operation.matrix
+    indexed = A[keep_rows, :]
+    af = SparseAffineOperation{T}(indexed, tape.operation.vector[keep_rows])
+    return SparseTape{T}(af, tape.variables)
 end
 _index(tape::Vector, keep_rows::Vector{Int}) = tape[keep_rows]
 

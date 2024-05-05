@@ -24,31 +24,14 @@ function SparseAffineOperation(
     return SparseAffineOperation{T}(create_sparse(T, A), SPARSE_VECTOR{T}(b))
 end
 
-struct LinkedSparseAffineOperation{T}
-    previous::Union{LinkedSparseAffineOperation{T}, Nothing}
-    current::SparseAffineOperation{T}
-end
-
-function LinkedSparseAffineOperation(sp::SparseAffineOperation{T}) where T
-    return LinkedSparseAffineOperation{T}(nothing, sp)
-end
-
-function SparseAffineOperation(linked::LinkedSparseAffineOperation)
-    if linked.previous === nothing
-        return linked.current
-    else
-        return compose(linked.current, SparseAffineOperation(linked.previous))
-    end
-end
-
 mutable struct SparseTape{T}
-    operation::LinkedSparseAffineOperation{T}
+    operation::SparseAffineOperation{T}
     variables::Vector{MOI.VariableIndex}
     function SparseTape{T}(
         operation::SparseAffineOperation{T},
         variables::Vector{MOI.VariableIndex},
     ) where {T}
-        return new(LinkedSparseAffineOperation(operation), variables)
+        return new(operation, variables)
     end
 
     function SparseTape(
@@ -56,19 +39,6 @@ mutable struct SparseTape{T}
         variables::Vector{MOI.VariableIndex},
     ) where {T}
         return SparseTape{T}(operation, variables)
-    end
-
-    function SparseTape(
-        operation::LinkedSparseAffineOperation{T},
-        variables::Vector{MOI.VariableIndex},
-    ) where {T}
-        return new{T}(operation, variables)
-    end
-    function SparseTape{T}(
-        operation::LinkedSparseAffineOperation{T},
-        variables::Vector{MOI.VariableIndex},
-    ) where {T}
-        return new{T}(operation, variables)
     end
 end
 
@@ -80,17 +50,17 @@ function Base.hash(tape::SparseAffineOperation, h::UInt)
 end
 
 function Base.:(==)(tape1::SparseTape, tape2::SparseTape)
-    return SparseAffineOperation(tape1) == SparseAffineOperation(tape2) &&
+    return tape1.operation == tape1.operation &&
            tape1.variables == tape2.variables
 end
 function Base.hash(tape::SparseTape, h::UInt)
-    return hash(typeof(tape), hash(SparseAffineOperation(tape), hash(tape.variables, h)))
+    return hash(typeof(tape), hash(tape.operation, hash(tape.variables, h)))
 end
 
-MOI.output_dimension(v::SparseTape) = size(v.operation.current.matrix, 1)
+MOI.output_dimension(v::SparseTape) = size(v.operation.matrix, 1)
 
 function SparseAffineOperation(tape::SparseTape)# -> SparseAffineOperation
-    return SparseAffineOperation(tape.operation)
+    return tape.operation
 end
 
 function compose(A::SparseAffineOperation, B::SparseAffineOperation)
@@ -102,7 +72,7 @@ end
 #### SparseTape
 
 function add_operation(tape::SparseTape{T}, op::SparseAffineOperation) where {T}
-    return SparseTape(compose(op, SparseAffineOperation(tape)), tape.variables)
+    return SparseTape(compose(op, tape.operation), tape.variables)
 end
 
 Base.real(tape::SparseTape) = tape
