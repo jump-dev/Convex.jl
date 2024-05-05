@@ -40,17 +40,15 @@ function new_conic_form!(context::Context{T}, q::GeoMeanAtom) where {T}
     n = length(q.children)
     x = first(q.children)
     t = Variable(size(x))
-    for i in 1:size(x, 1), j in 1:size(x, 2)
-        f = operate(
-            vcat,
-            T,
-            sign(q),
-            conic_form!(context, t[i, j]),
-            (conic_form!(context, y[i, j]) for y in q.children)...,
-        )
-        MOI_add_constraint(context.model, f, MOI.GeometricMeanCone(n + 1))
+    t_tape = conic_form!(context, t)
+    child_fns = map(q.children) do y
+        return MOI.Utilities.scalarize(to_vaf(conic_form!(context, y)))
     end
-    return conic_form!(context, t)
+    for (i, ti) in enumerate(t_tape.variables)
+        f = MOI.Utilities.operate(vcat, T, ti, getindex.(child_fns, i)...)
+        MOI.add_constraint(context.model, f, MOI.GeometricMeanCone(n + 1))
+    end
+    return t_tape
 end
 
 geomean(args::Union{AbstractExpr,Value}...) = GeoMeanAtom(args...)
