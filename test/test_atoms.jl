@@ -1022,15 +1022,23 @@ function test_AbsAtom()
         return abs2(Variable())
     end
     target = """
-    variables: t1, t2, x1, x2, w1, w2
+    variables: t1, t2, x1, x2
     minobjective: [1.0 * t1, 1.0*t2]
-    [1.0 * t1 + -1.0 * x1] in Nonnegatives(1)
-    [1.0 * t2 + -1.0 * w2] in Nonnegatives(1)
-    [1.0 * x1, 1.0 * x2, 2.0] in SecondOrderCone(3)
-    [1.0 * w2, 1.0 * w1, 2.0] in SecondOrderCone(3)
+    [1.0 * t1, 1.0 * x1, 2.0] in SecondOrderCone(3)
+    [1.0 * t2, 1.0 * x2, 2.0] in SecondOrderCone(3)
     """
     _test_atom(target) do context
         return abs(Variable(2) + 2im)
+    end
+    target = """
+    variables: y1, y2
+    minobjective: [2 + y1, 5 + y2]
+    """
+    _test_atom(target) do context
+        x = ComplexVariable(2)
+        y = Variable(2)
+        fix!(x, [2, 3 - 4im])
+        return y + abs(x)
     end
     return
 end
