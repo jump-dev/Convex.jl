@@ -30,13 +30,12 @@ evaluate(x::LogAtom) = log.(evaluate(x.children[1]))
 Base.log(x::AbstractExpr) = LogAtom(x)
 
 function new_conic_form!(context::Context, e::LogAtom)
-    # log(x) \geq t  <=> (t,1,x) \in ExpCone
+    # log(x) >= t  <=> (t, 1, x) in ExponentialCone()
     x = e.children[1]
-
-    # to choose the permutation, we want the elements of the constraint to be
-    # (t, 1, x)
-    # but with the identity permutation, the default is
-    # (x, 1, t)
-    # So (3, 2, 1) permutes it to the correct order.
-    return vectorized_exp_cone_triples!(context, x, (3, 2, 1))
+    # To choose the permutation, we want the elements of the constraint to be:
+    #   (t, 1, x) in ExponentialCone()
+    # The default is:
+    #   (x, 1, t) in ExponentialCone()
+    # so [3, 2, 1] permutes it to the correct order.
+    return _add_vectorized_exp_cone(context, x, [3, 2, 1])
 end
