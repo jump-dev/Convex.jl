@@ -39,13 +39,15 @@ function evaluate(e::RelativeEntropyAtom)
 end
 
 function new_conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
-    # relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
-    w = conic_form!(context, e.children[1])
-    v = conic_form!(context, e.children[2])
-    u = conic_form!(context, Variable())
-    f = vcat(u, v, w)
+    u = Variable()
+    x, y = e.children
+    # Convex.jl has the connvention:
+    #   u >= relative_entropy(x,y) = sum_i( x_i log (x_i/y_i) )
+    # But MOI has the reversed convention:
+    #   MOI.RelativeEntropyCone has the order (u, y, x)
+    f = vcat(u, y, x)
     add_constraint!(context, GenericConstraint{MOI.RelativeEntropyCone}(f))
-    return u
+    return conic_form!(context, u)
 end
 
 relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)

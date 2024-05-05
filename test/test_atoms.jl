@@ -952,7 +952,7 @@ end
 
 function test_RelativeEntropyAtom()
     target = """
-    variables: w1, w2, v1, v2, u
+    variables: u, v1, v2, w1, w2
     minobjective: 1.0 * u + 0.0
     [1.0*u, 1.0*v1, 1.0*v2, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
     """
@@ -962,7 +962,7 @@ function test_RelativeEntropyAtom()
         return relative_entropy(x, y)
     end
     target = """
-    variables: w1, w2, v1, v2, u
+    variables: u, v1, v2, w1, w2
     minobjective: -1.0 * u + 1.0
     [1.0*u, 1.0*v1, 1.0*v2, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
     """
