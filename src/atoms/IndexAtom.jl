@@ -11,11 +11,7 @@ mutable struct IndexAtom <: AbstractExpr
     inds::Union{AbstractArray,Nothing}
 end
 
-function IndexAtom(
-    x::AbstractExpr,
-    rows::AbstractArray,
-    cols::AbstractArray,
-)
+function IndexAtom(x::AbstractExpr, rows::AbstractArray, cols::AbstractArray)
     return IndexAtom((x,), (length(rows), length(cols)), rows, cols, nothing)
 end
 

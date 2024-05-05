@@ -282,20 +282,21 @@ end
 
     # *Scalar* indexing creates a column vector
     # https://github.com/jump-dev/Convex.jl/issues/509
-    x = rand(2,3)
+    x = rand(2, 3)
     ϕ = Variable(2, 3)
     Convex.set_value!(ϕ, rand(2, 3))
-    i=j=1
-    @test size(ϕ[i,:]) == (3, 1) # "column-vector" in Convex.jl is a 1 column matrix
-    @test size(ϕ[i,1:2]) == (2, 1)
-    @test size(ϕ[i,[2,1]]) == (2, 1)
+    i = j = 1
+    @test size(ϕ[i, :]) == (3, 1) # "column-vector" in Convex.jl is a 1 column matrix
+    @test size(ϕ[i, 1:2]) == (2, 1)
+    @test size(ϕ[i, [2, 1]]) == (2, 1)
 
-    @test size(ϕ[i:i,:]) == (1,3) # non-scalar: row-vector
-    @test size(evaluate(ϕ[i,:])) == (3,) # evaluates to true column vector
-    @test size(evaluate(ϕ[i:i,:])) == (1, 3,) # row vector
+    @test size(ϕ[i:i, :]) == (1, 3) # non-scalar: row-vector
+    @test size(evaluate(ϕ[i, :])) == (3,) # evaluates to true column vector
+    @test size(evaluate(ϕ[i:i, :])) == (1, 3) # row vector
 
     # "Column vector", not 3x3 matrix!
-    @test size(evaluate(broadcast(*, ϕ[i,:] - ϕ[j,:], x[i,:] - x[j,:]))) == (3, 1)
+    @test size(evaluate(broadcast(*, ϕ[i, :] - ϕ[j, :], x[i, :] - x[j, :]))) ==
+          (3, 1)
 
     x = Variable(2)
     p = minimize(x[1] + x[2], [x >= 1]; numeric_type = T)
