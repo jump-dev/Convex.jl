@@ -81,16 +81,11 @@ function solve!(
     optimizer_factory;
     silent_solver = false,
     warmstart::Bool = false,
-    context_ref = nothing,
 )
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
     context = Context(p, optimizer_factory)
-    # helper for tests, to retrieve the context
-    if context_ref !== nothing
-        context_ref[] = context
-    end
     if silent_solver
         MOI.set(context.model, MOI.Silent(), true)
     end

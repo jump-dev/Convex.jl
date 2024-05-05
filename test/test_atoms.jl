@@ -10,6 +10,7 @@ using Test
 
 # Do not use `using LinearAlgebra` to check symbols are re-exported by Convex.
 import LinearAlgebra
+
 import MathOptInterface as MOI
 
 function runtests()
@@ -72,12 +73,6 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     N = length(atom.children)
     @test Convex.monotonicity(atom) isa NTuple{N,Convex.Monotonicity}
     @test Convex.curvature(atom) isa Convex.Vexity
-    # Now, we will test if our atom's `conic_form` and `evaluate`
-    # agree for constants (and that they are well-defined for constants).
-    # To do so, we first flip our atom to have non-concave vexity:
-    if Convex.vexity(atom) == Convex.ConcaveVexity()
-        atom = -atom
-    end
     _test_reformulation(build_fn, target_string; value_type)
     _test_constant_atom(build_fn; value_type)
     return
