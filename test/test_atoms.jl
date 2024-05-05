@@ -1030,6 +1030,16 @@ function test_AbsAtom()
     _test_atom(target) do context
         return abs(Variable(2) + 2im)
     end
+    target = """
+    variables: y1, y2
+    minobjective: [2 + y1, 5 + y2]
+    """
+    _test_atom(target) do context
+        x = ComplexVariable(2)
+        y = Variable(2)
+        fix!(x, [2, 3 - 4im])
+        return y + abs(x)
+    end
     return
 end
 
