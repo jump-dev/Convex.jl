@@ -43,10 +43,8 @@ function new_conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
     w = conic_form!(context, e.children[1])
     v = conic_form!(context, e.children[2])
     u = conic_form!(context, Variable())
-    f = operate(vcat, T, sign(e), u, v, w)
-    d = MOI.output_dimension(w)
-    @assert d == MOI.output_dimension(v)
-    MOI_add_constraint(context.model, f, MOI.RelativeEntropyCone(2d + 1))
+    f = vcat(u, v, w)
+    add_constraint!(context, GenericConstraint{MOI.RelativeEntropyCone}(f))
     return u
 end
 

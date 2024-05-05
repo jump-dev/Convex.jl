@@ -283,3 +283,16 @@ function vexity(vex, ::MOI.RotatedSecondOrderCone)
     end
     return ConvexVexity()
 end
+
+# ==============================================================================
+#     RelativeEntropyCone
+# ==============================================================================
+
+head(io::IO, ::MOI.RelativeEntropyCone) = print(io, "RelativeEntropyCone")
+
+function vexity(vex, ::MOI.RelativeEntropyCone)
+    if !(vex == ConstVexity() || vex == AffineVexity())
+        return NotDcp()
+    end
+    return ConvexVexity()
+end
