@@ -10,7 +10,6 @@ using Test
 
 # Do not use `using LinearAlgebra` to check symbols are re-exported by Convex.
 import LinearAlgebra
-import Clarabel
 import MathOptInterface as MOI
 
 function runtests()
@@ -34,38 +33,6 @@ end
 _to_moi(x::Convex.SparseTape) = _to_moi(Convex.to_vaf(x))
 
 _to_moi(v::MOI.AbstractScalarFunction) = v
-
-# Retrieve the numeric value of the result of `conic_form!` post-solve
-_value(::Any, x) = evaluate(x)
-
-function _value(context, x::Convex.SparseTape)
-    val = [MOI.get(context.model, MOI.VariablePrimal(), i) for i in x.variables]
-    return x.operation.matrix * val + x.operation.vector
-end
-
-# Recursively manipulate an `AbstractExpr` to replace variables with constants
-function make_constant!(expr::Convex.AbstractVariable)
-    if Convex.iscomplex(expr)
-        val = rand(Float64, size(expr)) + im * rand(Float64, size(expr))
-    else
-        val = rand(Float64, size(expr))
-    end
-    if size(expr, 1) == size(expr, 2)
-        val = val' * val
-    end
-    return constant(val)
-end
-
-function make_constant!(
-    e::Union{Number,AbstractArray,Convex.Constant,Convex.ComplexConstant},
-)
-    return e
-end
-
-function make_constant!(e::Convex.AbstractExpr)
-    e.children = map(make_constant!, e.children)
-    return e
-end
 
 """
     _test_atom(build_fn::Function, target_string::String; value_type = Float64)
@@ -111,26 +78,49 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     if Convex.vexity(atom) == Convex.ConcaveVexity()
         atom = -atom
     end
-    # Then we recursively replace variables with `constant`s
-    make_constant!(atom)
-    # For now, the complex case has too many issues to handle...
-    if !Convex.iscomplex(atom) && !any(Convex.iscomplex, atom.children)
-        t = Variable()
-        problem = minimize(t, t >= sum(atom); numeric_type = value_type)
-        c = Convex.Context(problem, Clarabel.Optimizer{value_type})
-        context_ref = Ref{Convex.Context{value_type}}()
-        Convex.solve!(
-            problem,
-            Clarabel.Optimizer;
-            silent_solver = true,
-            context_ref,
-        )
-        c = context_ref[]
-        v = _value(c, t)
-        e = evaluate(atom)
-        @test sum(e) ≈ v rtol = 1e-4 atol = 1e-4
-    end
     _test_reformulation(build_fn, target_string; value_type)
+    _test_constant_atom(build_fn; value_type)
+    return
+end
+
+# Recursively _make_constant! an `AbstractExpr` to replace variables with
+# constants
+function _to_constant(expr::Convex.AbstractVariable)
+    if Convex.iscomplex(expr)
+        val = rand(Float64, size(expr)) + im * rand(Float64, size(expr))
+    else
+        val = rand(Float64, size(expr))
+    end
+    if size(expr, 1) == size(expr, 2)
+        val = val' * val
+    end
+    return constant(val)
+end
+
+_to_constant(x::Convex.Value) = x
+_to_constant(x::Union{Convex.Constant,Convex.ComplexConstant}) = x
+
+function _to_constant(e::Convex.AbstractExpr)
+    e.children = map(_to_constant, e.children)
+    return e
+end
+
+function _test_constant_atom(build_fn; value_type)
+    context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
+    atom = _to_constant(build_fn(context))
+    if Convex.iscomplex(atom) || any(Convex.iscomplex, atom.children)
+        return
+    end
+    form = Convex.conic_form!(context, atom)
+    if !(form isa AbstractVector)
+        return  # The reformulation is still in terms of MOI variables.
+    end
+    answer = evaluate(atom)
+    if answer isa Number
+        @test only(form) ≈ answer
+    else
+        @test form ≈ vec(answer)
+    end
     return
 end
 
