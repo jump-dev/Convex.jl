@@ -78,8 +78,6 @@ function _test_atom(build_fn, target_string::String; value_type = Float64)
     return
 end
 
-# Recursively _make_constant! an `AbstractExpr` to replace variables with
-# constants
 function _to_constant(expr::Convex.AbstractVariable)
     if Convex.iscomplex(expr)
         val = rand(Float64, size(expr)) + im * rand(Float64, size(expr))
