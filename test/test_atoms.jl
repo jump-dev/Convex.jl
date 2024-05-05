@@ -107,10 +107,10 @@ function _test_constant_atom(build_fn; value_type)
         return
     end
     form = Convex.conic_form!(context, atom)
+    answer = evaluate(atom)
     if !(form isa AbstractVector)
         return  # The reformulation is still in terms of MOI variables.
     end
-    answer = evaluate(atom)
     if answer isa Number
         @test only(form) ≈ answer
     else
