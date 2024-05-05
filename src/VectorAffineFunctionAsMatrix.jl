@@ -21,7 +21,7 @@ function MOI.output_dimension(v::VectorAffineFunctionAsMatrix)
     return size(v.matrix, 1)
 end
 
- to_vaf(tape::SPARSE_VECTOR) = tape
+to_vaf(tape::SPARSE_VECTOR) = tape
 
 function to_vaf(tape::SparseTape)
     op = SparseAffineOperation(tape)
