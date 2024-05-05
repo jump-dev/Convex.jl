@@ -260,6 +260,15 @@ end
     rtol,
     ::Type{T},
 ) where {T,test}
+    x = ComplexVariable(2)
+    fix!(x, [1, 2] + im * [1, 2])
+    t = Variable()
+    p = minimize(t + real(x[1]), t >= 0; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 1 atol = atol rtol = rtol
+    end
+
     x = Variable(2)
     p = minimize(x[1] + x[2], [x >= 1]; numeric_type = T)
 
