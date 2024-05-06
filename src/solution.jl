@@ -85,7 +85,9 @@ function solve!(
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
-    context = Context(p, optimizer_factory)
+    context, formulation_time, formulation_bytes =
+        @timed Context(p, optimizer_factory)
+    # @show (formulation_time, Base.format_bytes(formulation_bytes))
     if silent_solver
         MOI.set(context.model, MOI.Silent(), true)
     end

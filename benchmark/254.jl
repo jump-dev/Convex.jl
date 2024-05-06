@@ -25,5 +25,5 @@ let
         [x ≥ -1e2, x ≤ 1e2],
     )
 
-    @time context = Convex.Context(problem, MOI.Utilities.Model{Float64}())
+    @time context = Convex.Context(problem, MOI.Utilities.Model{Float64})
 end

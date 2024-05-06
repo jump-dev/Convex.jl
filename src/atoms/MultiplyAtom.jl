@@ -147,7 +147,7 @@ function _dot_multiply(x, y)
     elseif size(y, 2) < size(coeff, 2)
         y = y * ones(1, size(coeff, 1))
     end
-    ret = LinearAlgebra.Diagonal(vec(coeff)) * vec(y)
+    ret = SparseArrays.sparse(LinearAlgebra.Diagonal(vec(coeff))) * vec(y)
     return reshape(ret, size(y, 1), size(y, 2))
 end
 

@@ -28,14 +28,18 @@ function _sign(x::Value)
     end
 end
 
-_matrix(x::AbstractArray) = [x;;]
+_matrix(x::AbstractArray) = Matrix(x)
 _matrix(x::AbstractVector) = reshape(Vector(x), length(x), 1)
 _matrix(x::Number) = _matrix([x])
+_matrix(x::SparseArrays.AbstractSparseMatrix) = SparseArrays.sparse(x)
+function _matrix(x::SparseArrays.AbstractSparseVector)
+    return reshape(SparseArrays.sparse(x), length(x), 1)
+end
 
 mutable struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    value::Matrix{T}
+    value::Union{Matrix{T},SparseArrays.SparseMatrixCSC{T,Int64}}
     size::Tuple{Int,Int}
     sign::Sign
 
@@ -54,9 +58,9 @@ mutable struct Constant{T<:Real} <: AbstractExpr
             sign,
         )
     end
-    function Constant(x::Value, check_sign::Bool = true)
-        return Constant(x, check_sign ? _sign(x) : NoSign())
-    end
+end
+function Constant(x::Value, check_sign::Bool = true)
+    return Constant(x, check_sign ? _sign(x) : NoSign())
 end
 # Constant(x::Constant) = x
 
@@ -108,7 +112,7 @@ constant(x::Constant) = x
 constant(x::ComplexConstant) = x
 function constant(x)
     # Convert to matrix
-    x = [x;;]
+    x = _matrix(x)
     if eltype(x) <: Real
         return Constant(x)
     else
