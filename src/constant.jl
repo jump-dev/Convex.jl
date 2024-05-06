@@ -39,7 +39,7 @@ end
 mutable struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
     id_hash::UInt64
-    value::Union{Matrix{T},SparseArrays.SparseMatrixCSC{T,Int64}}
+    value::Union{Matrix{T},SPARSE_MATRIX{T}}
     size::Tuple{Int,Int}
     sign::Sign
 
