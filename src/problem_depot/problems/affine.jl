@@ -272,7 +272,7 @@ end
     x = Variable(4, 2)
     y = [1:4 5:8]
     add_constraint!(x, x == y)
-    p = minimize(dot(x[[4, 3], 2], [7, 13]))
+    p = minimize(dot(x[[4, 3], 2], [7, 13]); numeric_type = T)
     handle_problem!(p)
     if test
         # we would get 153 if we weren't respecting the index ordering
