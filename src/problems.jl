@@ -172,13 +172,13 @@ function Context(p::Problem{T}, optimizer_factory) where {T}
     if p.head == :satisfy
         MOI.set(context.model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
     else
-        obj = _to_scalar_moi(T, cfp)
-        MOI.set(context.model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
         MOI.set(
             context.model,
             MOI.ObjectiveSense(),
             p.head == :maximize ? MOI.MAX_SENSE : MOI.MIN_SENSE,
         )
+        obj = _to_scalar_moi(T, cfp)
+        MOI.set(context.model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
     end
     return context
 end

@@ -42,33 +42,41 @@ function evaluate(x::IndexAtom)
     return output(result)
 end
 
-function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
-    obj = conic_form!(context, only(AbstractTrees.children(x)))
-    m = length(x)
-    n = length(x.children[1])
+function _index(tape::SparseTape{T}, keep_rows::Vector{Int}) where {T}
+    A = tape.operation.matrix
+    indexed = A[keep_rows, :]
+    af = SparseAffineOperation{T}(indexed, tape.operation.vector[keep_rows])
+    return SparseTape{T}(af, tape.variables)
+end
+
+_index(tape::Vector, keep_rows::Vector{Int}) = tape[keep_rows]
+
+function _index_real(
+    obj_size::Tuple,
+    obj_tape::Union{SparseTape,SPARSE_VECTOR},
+    x::IndexAtom,
+)
     if x.inds === nothing
-        sz = length(x.cols) * length(x.rows)
-        J = Vector{Int}(undef, sz)
-        k = 1
-        num_rows = x.children[1].size[1]
-        for c in x.cols
-            for r in x.rows
-                J[k] = num_rows * (convert(Int, c) - 1) + convert(Int, r)
-                k += 1
-            end
-        end
-        index_matrix = create_sparse(T, collect(1:sz), J, one(T), m, n)
-    else
-        index_matrix = create_sparse(
-            T,
-            collect(1:length(x.inds)),
-            collect(x.inds),
-            one(T),
-            m,
-            n,
-        )
+        linear_indices = LinearIndices(CartesianIndices(obj_size))
+        return _index(obj_tape, vec(linear_indices[x.rows, x.cols]))
     end
-    return operate(add_operation, T, sign(x), index_matrix, obj)
+    return _index(obj_tape, vec(collect(x.inds)))
+end
+
+function new_conic_form!(context::Context{T}, x::IndexAtom) where {T}
+    input = x.children[1]
+    if !iscomplex(x) # real case
+        input_tape = conic_form!(context, input)
+        return _index_real(size(input), input_tape, x)
+    end
+    input_tape = conic_form!(context, input)
+    re = _index_real(size(input), real(input_tape), x)
+    im = _index_real(size(input), imag(input_tape), x)
+    if re isa SPARSE_VECTOR
+        @assert im isa SPARSE_VECTOR
+        return ComplexStructOfVec(re, im)
+    end
+    return ComplexTape(re, im)
 end
 
 function Base.getindex(

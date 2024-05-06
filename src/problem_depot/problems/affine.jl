@@ -260,6 +260,26 @@ end
     rtol,
     ::Type{T},
 ) where {T,test}
+    x = ComplexVariable(2)
+    fix!(x, [1, 2] + im * [1, 2])
+    t = Variable()
+    p = minimize(t + real(x[1]), t >= 0; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test p.optval ≈ 1 atol = atol rtol = rtol
+    end
+
+    x = Variable(4, 2)
+    y = [1:4 5:8]
+    add_constraint!(x, x == y)
+    p = minimize(dot(x[[4, 3], 2], [7, 13]); numeric_type = T)
+    handle_problem!(p)
+    if test
+        # we would get 153 if we weren't respecting the index ordering
+        @test dot(y[[4, 3], 2], [7, 13]) == 147
+        @test p.optval ≈ 147 atol = atol rtol = rtol
+    end
+
     x = Variable(2)
     p = minimize(x[1] + x[2], [x >= 1]; numeric_type = T)
 
