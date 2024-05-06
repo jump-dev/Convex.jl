@@ -814,6 +814,37 @@ function test_VcatAtom()
     return
 end
 
+function test_getindex_VcatAtom()
+    x = Variable()
+    sq = square(x)
+    for v in [vcat(x, sq, -sq), vcat(vcat(x, sq), -sq)]
+        @test isequal(v[1], x)
+        @test isequal(v[2], sq)
+        @test v[2:-1:1].children[1] isa Convex.VcatAtom
+        @test v[2:-1:1].children[1].children == (x, sq)
+        @test vexity(v[1]) isa Convex.AffineVexity
+        @test vexity(v[2]) isa Convex.ConvexVexity
+        @test vexity(v[3]) isa Convex.ConcaveVexity
+        @test vexity(v[1:2]) isa Convex.ConvexVexity
+    end
+    x = Variable(2, 2)
+    sq = square(x)
+    for v in [vcat(x, sq, -sq), vcat(vcat(x, sq), -sq)]
+        @test isequal(v[1:2, 1:2], x)
+        @test v[1, 1:2] isa Convex.IndexAtom
+        @test v[1:3, 1:2] isa Convex.IndexAtom
+        @test v[1:3, 1:2].children[1] isa Convex.VcatAtom
+        @test isequal(v[3:4, 1:2], sq)
+        @test v[3:-1:1, 1].children[1] isa Convex.VcatAtom
+        @test v[4:-1:1, :].children[1].children == (x, sq)
+        @test vexity(v[1]) isa Convex.AffineVexity
+        @test vexity(v[3:4, 1:2]) isa Convex.ConvexVexity
+        @test vexity(v[5:6, 1]) isa Convex.ConcaveVexity
+        @test vexity(v[5:6, 1:2]) isa Convex.ConcaveVexity
+        @test vexity(v[1:3, 1]) isa Convex.ConvexVexity
+    end
+end
+
 ### exp_+_sdp_cone/LogDetAtom
 
 function test_LogDetAtom()
