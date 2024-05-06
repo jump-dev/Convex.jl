@@ -99,14 +99,6 @@ function Base.getindex(
     return IndexAtom(remaining, rows, cols)
 end
 
-function Base.getindex(x::VcatAtom, rows::AbstractVector{<:Real}, ::Colon)
-    return x[rows, 1:size(x, 2)]
-end
-
-function Base.getindex(x::VcatAtom, ::Colon, cols::AbstractVector{<:Real})
-    return x[1:size(x, 1), cols]
-end
-
 # linear indexing: very similar to row-indexing above, but with linear indices
 function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
     idx = 0
