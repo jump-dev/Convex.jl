@@ -101,9 +101,6 @@ end
 function _test_constant_atom(build_fn; value_type)
     context = Convex.Context{value_type}(MOI.Utilities.Model{value_type})
     atom = _to_constant(build_fn(context))
-    if Convex.iscomplex(atom) || any(Convex.iscomplex, atom.children)
-        return
-    end
     form = Convex.conic_form!(context, atom)
     answer = evaluate(atom)
     if !(form isa AbstractVector)

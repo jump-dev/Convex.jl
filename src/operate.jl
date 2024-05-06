@@ -13,6 +13,10 @@ function complex_promote(v::AbstractVector{T}) where {T}
     return ComplexStructOfVec(v, spzeros(T, length(v)))
 end
 
+function complex_promote(v::AbstractVector{<:Complex})
+    return ComplexStructOfVec(real.(v), imag.(v))
+end
+
 # Here we run `complex_promote` and dispatch to either `real_operate`
 # or `complex_operate` depending on `sign`. We also check the types
 # at this stage, instead of letting them fall to MethodErrors later.
