@@ -18,7 +18,7 @@ W = ComplexVariable(n, n);
 objective = real(sum(diag(W)));
 c1 = Constraint[];
 for i in 2:n
-    push!(c1, Y[i, :]' * W[i, :] == inj[i])
+    push!(c1, dot(Y[i, :], W[i, :]) == inj[i])
 end
 c2 = isposdef(W)
 c3 = real(W[1, 1]) == 1.06^2;
