@@ -314,8 +314,13 @@ end
 
 # Here we have our two complex -> real functions
 # These are allowed these inputs:
-const ComplexToRealInputs{T} =
-    Union{ComplexTape{T},SparseTape{T},ComplexStructOfVec{T},Vector{T}}
+const ComplexToRealInputs{T} = Union{
+    ComplexTape{T},
+    SparseTape{T},
+    ComplexStructOfVec{T},
+    SPARSE_VECTOR{T},
+    SPARSE_VECTOR{Complex{T}},
+}
 
 # `real`
 function real_operate(

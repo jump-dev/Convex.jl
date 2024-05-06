@@ -22,6 +22,10 @@ function complex_operate(
 ) where {T}
     re = real_operate(+, T, (real(a) for a in args)...)
     im = real_operate(+, T, (imag(a) for a in args)...)
+    if re isa SPARSE_VECTOR
+        @assert im isa SPARSE_VECTOR
+        return re .+ Base.im * im
+    end
     return ComplexTape(re, im)
 end
 
