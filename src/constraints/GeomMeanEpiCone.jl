@@ -45,24 +45,28 @@ MOI.dimension(set::GeomMeanEpiConeSquare) = 3 * set.side_dimension
 
 head(io::IO, ::GeomMeanEpiConeSquare) = print(io, "∈(GeomMeanEpiConeSquare)")
 
-Base.in(func::Tuple, set::GeomMeanEpiConeSquare) = GenericConstraint(func, set)
-
-function _dimension_check(child::Tuple, set::GeomMeanEpiConeSquare)
-    for c in child
-        n = LinearAlgebra.checksquare(c)
+function Base.in(func::Tuple, set::GeomMeanEpiConeSquare)
+    for f in func
+        n = LinearAlgebra.checksquare(f)
         if n != set.side_dimension
-            msg = "Matrix of side dimension `$n` does not match set of side dimension `$(set.side_dimension)`"
-            throw(DimensionMismatch(msg))
+            throw(
+                DimensionMismatch(
+                    "Matrix of side dimension `$n` does not match set of side dimension `$(set.side_dimension)`",
+                ),
+            )
         end
     end
-    return
+    return GenericConstraint(vcat(vec.(func)...), set)
 end
 
 # For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex
 # (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
-function vexity(vex::Tuple{<:Vexity,<:Vexity,<:Vexity}, ::GeomMeanEpiConeSquare)
-    T, A, B = vex
+function vexity(constraint::GenericConstraint{GeomMeanEpiConeSquare})
+    n = constraint.set.side_dimension
+    T = vexity(constraint.child[1:n^2])
+    A = vexity(constraint.child[n^2 .+ (1:n^2)])
+    B = vexity(constraint.child[2n^2 .+ (1:n^2)])
     if A in (ConcaveVexity(), NotDcp()) || B in (ConcaveVexity(), NotDcp())
         return NotDcp()
     end
@@ -73,7 +77,10 @@ function _add_constraint!(
     context::Context,
     constraint::GenericConstraint{GeomMeanEpiConeSquare},
 )
-    T, A, B = constraint.child
+    n = constraint.set.side_dimension
+    T = reshape(constraint.child[1:n^2], n, n)
+    A = reshape(constraint.child[n^2 .+ (1:n^2)], n, n)
+    B = reshape(constraint.child[2n^2 .+ (1:n^2)], n, n)
     t = constraint.set.t
     is_complex =
         sign(A) == ComplexSign() ||
