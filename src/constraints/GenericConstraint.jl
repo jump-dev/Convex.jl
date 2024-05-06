@@ -32,6 +32,10 @@ end
 
 head(io::IO, c::GenericConstraint) = head(io, c.set)
 
+function head(io::IO, set::MOI.AbstractSet)
+    return print(io, replace("$(typeof(set))", "MathOptInterface" => "MOI"))
+end
+
 AbstractTrees.children(c::GenericConstraint) = (c.child,)
 
 # A fallback. Define a new method if `MOI.Utilities.distance_to_set`
@@ -45,6 +49,17 @@ function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
 end
 
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
+
+# The default vexity for MOI sets is assumed to required affine functions and be
+# convex. This is for the most common case of the connic sets. There might be
+# some incorrect answers, like if the user adds something like the `MOI.SOS1` or
+# `MOI.Complements`, but this shouldn't really be relevant for Convex.jl?
+function vexity(vex, ::MOI.AbstractSet)
+    if !(vex == ConstVexity() || vex == AffineVexity())
+        return NotDcp()
+    end
+    return ConvexVexity()
+end
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
@@ -201,14 +216,7 @@ function set_with_size(
     return MOI.PositiveSemidefiniteConeSquare(sz[1])
 end
 
-head(io::IO, ::MOI.PositiveSemidefiniteConeSquare) = print(io, "sdp")
-
-function vexity(vex, ::MOI.PositiveSemidefiniteConeSquare)
-    if !(vex in (AffineVexity(), ConstVexity()))
-        return NotDcp()
-    end
-    return AffineVexity()
-end
+head(io::IO, ::MOI.PositiveSemidefiniteConeSquare) = print(io, "PSD")
 
 function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
     return x ≈ transpose(x) && LinearAlgebra.eigmin(x) >= -tol
@@ -244,55 +252,3 @@ end
 ⪯(x::Value, y::AbstractExpr) = ⪰(y, x)
 
 ⪯(x::AbstractExpr, y::Value) = ⪰(y, x)
-
-# ==============================================================================
-#     ExponentialCone
-# ==============================================================================
-
-head(io::IO, ::MOI.ExponentialCone) = print(io, "exp")
-
-function vexity(vex, ::MOI.ExponentialCone)
-    if !(vex == ConstVexity() || vex == AffineVexity())
-        return NotDcp()
-    end
-    return ConvexVexity()
-end
-
-# ==============================================================================
-#     SecondOrderCone
-# ==============================================================================
-
-head(io::IO, ::MOI.SecondOrderCone) = print(io, "soc")
-
-function vexity(vex, ::MOI.SecondOrderCone)
-    if !(vex == ConstVexity() || vex == AffineVexity())
-        return NotDcp()
-    end
-    return ConvexVexity()
-end
-
-# ==============================================================================
-#     RotatedSecondOrderCone
-# ==============================================================================
-
-head(io::IO, ::MOI.RotatedSecondOrderCone) = print(io, "rsoc")
-
-function vexity(vex, ::MOI.RotatedSecondOrderCone)
-    if !(vex == ConstVexity() || vex == AffineVexity())
-        return NotDcp()
-    end
-    return ConvexVexity()
-end
-
-# ==============================================================================
-#     RelativeEntropyCone
-# ==============================================================================
-
-head(io::IO, ::MOI.RelativeEntropyCone) = print(io, "RelativeEntropyCone")
-
-function vexity(vex, ::MOI.RelativeEntropyCone)
-    if !(vex == ConstVexity() || vex == AffineVexity())
-        return NotDcp()
-    end
-    return ConvexVexity()
-end

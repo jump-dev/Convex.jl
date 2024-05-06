@@ -220,7 +220,7 @@ function test_GenericConstraint_SecondOrderCone()
     @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
-    @test Convex.sprint(Convex.head, c) == "soc"
+    @test Convex.sprint(Convex.head, c) == "MOI.SecondOrderCone"
     return
 end
 
@@ -251,7 +251,7 @@ function test_GenericConstraint_RotatedSecondOrderCone()
     @test isapprox(c.dual, [1, 29 / 2, -2, -3, -4]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.RotatedSecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
-    @test Convex.sprint(Convex.head, c) == "rsoc"
+    @test Convex.sprint(Convex.head, c) == "MOI.RotatedSecondOrderCone"
     return
 end
 
@@ -275,7 +275,7 @@ function test_GenericConstraint_ExponentialConeConstraint()
     @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
     c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
     @test vexity(c) === Convex.NotDcp()
-    @test sprint(Convex.head, c) == "exp"
+    @test sprint(Convex.head, c) == "MOI.ExponentialCone"
     return
 end
 
@@ -293,7 +293,7 @@ function test_GenericConstraint_RelativeEntropyConeConstraint()
     @test isapprox(c.dual, [1, 2, 1, -log(2) - 1, -1]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.RelativeEntropyCone}(vcat(square(u), 1, u))
     @test vexity(c) === Convex.NotDcp()
-    @test sprint(Convex.head, c) == "RelativeEntropyCone"
+    @test sprint(Convex.head, c) == "MOI.RelativeEntropyCone"
     return
 end
 
