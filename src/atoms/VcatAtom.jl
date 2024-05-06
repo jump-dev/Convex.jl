@@ -107,8 +107,7 @@ function Base.getindex(x::VcatAtom, ::Colon, cols::AbstractVector{<:Real})
     return x[1:size(x, 1), cols]
 end
 
-# linear indexing
-# very similar to row-indexing above, but with linear indices
+# linear indexing: very similar to row-indexing above, but with linear indices
 function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
     idx = 0
     inds = collect(inds)

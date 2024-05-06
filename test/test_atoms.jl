@@ -477,9 +477,8 @@ function test_IndexAtom()
     _test_atom(target) do context
         return Variable(2)[:, 1]
     end
-    _test_atom(target) do context
-        return Variable(2)[:, :]
-    end
+    x = Variable(2)
+    @test x[:, :] === x
     target = """
     variables: x1, x2, x3
     minobjective: [1.0 * x1, 1.0 * x3]
@@ -814,22 +813,26 @@ function test_VcatAtom()
     return
 end
 
-function test_getindex_VcatAtom()
+function test_VcatAtom_getindex()
     x = Variable()
     sq = square(x)
     for v in [vcat(x, sq, -sq), vcat(vcat(x, sq), -sq)]
         @test isequal(v[1], x)
         @test isequal(v[2], sq)
+        @test isequal(v[:, 1], v[1:3, 1])
+        @test isequal(v[1:3, :], v[1:3, 1:1])
         @test v[2:-1:1].children[1] isa Convex.VcatAtom
         @test v[2:-1:1].children[1].children == (x, sq)
         @test vexity(v[1]) isa Convex.AffineVexity
         @test vexity(v[2]) isa Convex.ConvexVexity
         @test vexity(v[3]) isa Convex.ConcaveVexity
         @test vexity(v[1:2]) isa Convex.ConvexVexity
+        @test vexity(v[:, 1]) isa Convex.NotDcp
     end
     x = Variable(2, 2)
     sq = square(x)
     for v in [vcat(x, sq, -sq), vcat(vcat(x, sq), -sq)]
+        @test isequal(v[:, :], v)
         @test isequal(v[1:2, 1:2], x)
         @test v[1, 1:2] isa Convex.IndexAtom
         @test v[1:3, 1:2] isa Convex.IndexAtom
@@ -843,6 +846,7 @@ function test_getindex_VcatAtom()
         @test vexity(v[5:6, 1:2]) isa Convex.ConcaveVexity
         @test vexity(v[1:3, 1]) isa Convex.ConvexVexity
     end
+    return
 end
 
 ### exp_+_sdp_cone/LogDetAtom
