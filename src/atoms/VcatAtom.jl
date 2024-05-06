@@ -59,6 +59,7 @@ function Base.vcat(args::Union{AbstractExpr,Value}...)
     end
     return VcatAtom(args...)
 end
+
 function Base.getindex(
     x::VcatAtom,
     rows::AbstractVector{<:Real},
@@ -91,7 +92,6 @@ function Base.getindex(
             end
         end
     end
-
     # If we are here, the indices span multiple children.
     # We can't necessarily index each separately, since they may be out of order.
     # So we will defer to an `IndexAtom` on the remaining children
@@ -133,7 +133,6 @@ function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
             end
         end
     end
-
     remaining = VcatAtom(keep_children...)
     return IndexAtom(remaining, inds)
 end
