@@ -64,9 +64,11 @@ end
 # So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
 function vexity(constraint::GenericConstraint{GeomMeanEpiConeSquare})
     n = constraint.set.side_dimension
-    T = vexity(constraint.child[1:n^2])
-    A = vexity(constraint.child[n^2 .+ (1:n^2)])
-    B = vexity(constraint.child[2n^2 .+ (1:n^2)])
+    d = n^2
+    I = 1:d
+    T = vexity(constraint.child[I])
+    A = vexity(constraint.child[d.+I])
+    B = vexity(constraint.child[2d.+I])
     if A in (ConcaveVexity(), NotDcp()) || B in (ConcaveVexity(), NotDcp())
         return NotDcp()
     end
@@ -78,9 +80,11 @@ function _add_constraint!(
     constraint::GenericConstraint{GeomMeanEpiConeSquare},
 )
     n = constraint.set.side_dimension
-    T = reshape(constraint.child[1:n^2], n, n)
-    A = reshape(constraint.child[n^2 .+ (1:n^2)], n, n)
-    B = reshape(constraint.child[2n^2 .+ (1:n^2)], n, n)
+    d = n^2
+    I = 1:d
+    T = reshape(constraint.child[I], n, n)
+    A = reshape(constraint.child[d.+I], n, n)
+    B = reshape(constraint.child[2d.+I], n, n)
     t = constraint.set.t
     is_complex =
         sign(A) == ComplexSign() ||
