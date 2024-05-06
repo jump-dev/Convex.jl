@@ -523,6 +523,26 @@ function test_IndexAtom()
     return
 end
 
+function test_IndexAtom_issue_509()
+    # *Scalar* indexing creates a column vector
+    # https://github.com/jump-dev/Convex.jl/issues/509
+    x = rand(2, 3)
+    ϕ = Variable(2, 3)
+    Convex.set_value!(ϕ, rand(2, 3))
+    i = j = 1
+    # "column-vector" in Convex.jl is a 1 column matrix
+    @test size(ϕ[i, :]) == (3, 1)
+    @test size(ϕ[i, 1:2]) == (2, 1)
+    @test size(ϕ[i, [2, 1]]) == (2, 1)
+    @test size(ϕ[i:i, :]) == (1, 3)
+    @test size(evaluate(ϕ[i, :])) == (3,)
+    @test size(evaluate(ϕ[i:i, :])) == (1, 3)
+    # "Column vector", not 3x3 matrix!
+    atom = broadcast(*, ϕ[i, :] - ϕ[j, :], x[i, :] - x[j, :])
+    @test size(evaluate(atom)) == (3, 1)
+    return
+end
+
 ### affine/MultiplyAtom
 
 function test_MultiplyAtom()
