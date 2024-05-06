@@ -7,7 +7,7 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.16.0 (April 24, 2024)
+## v0.16.0 (May 7, 2024)
 
 This release contains a large number of changes, including some breaking
 changes.
@@ -30,7 +30,7 @@ changes.
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
       `SOCConstraint`, `ExpConstraint` and `SDPConstraint` have
       been replaced by `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590)
-      (#597) (#598) (#599) (#601) (#602)
+      (#597), (#598), (#599), (#601), (#602), (#623)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call
@@ -62,16 +62,21 @@ changes.
  * Added `entropy_elementwise` (#570)
  * `norm` on `AbstractExpr` objects now supports matrices (treating them like
    vectors), matching Base's behavior (#528)
+ * Added `root_det` (#605)
+ * Added `VcatAtom` which is a more efficient implementation of `vcat` (#607)
 
 ### Fixed
 
  * `sumlargesteigs` now enforces that it's argument is hermitian. (#504)
  * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
-   of `imag` and `real` has been removed. This should not affect use of Convex. (#504)
+   of `imag` and `real` has been removed. This should not affect use of Convex.
+   (#504)
  * Fix `dot` to correctly complex-conjugates its first argument (#524)
  * Add tests and fix  a number of bugs in various atoms (#546), (#547), (#550),
    (#554), (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566),
-   (#567), (#568)
+   (#567), (#568), (#608), (#609), (#617)
+ * Fixed performance issues in a number of issues related to scalar indexing
+   (#618), (#619), (#620), (#621)
 
 ### Other
 
@@ -87,7 +92,8 @@ changes.
  * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
  * Added various tests to improve code coverage (#522), (#572), (#575), (#577),
    (#580)
- * Updated versions in GitHub actions (#596)
+ * Updated versions in GitHub actions (#596), (#612)
+ * Added license headers (#606)
 
 ## v0.15.4 (October 24, 2023)
 
