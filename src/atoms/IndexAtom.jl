@@ -114,10 +114,7 @@ function Base.getindex(x::AbstractExpr, I::AbstractVector{Bool})
 end
 
 # All rows and columns
-function Base.getindex(x::AbstractExpr, ::Colon, ::Colon)
-    rows, cols = size(x)
-    return getindex(x, 1:rows, 1:cols)
-end
+Base.getindex(x::AbstractExpr, ::Colon, ::Colon) = x
 
 # All rows for this column(s)
 function Base.getindex(x::AbstractExpr, ::Colon, col)
