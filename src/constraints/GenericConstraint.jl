@@ -51,7 +51,7 @@ end
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 function vexity(
-    vex, 
+    vex,
     # An enumeration of sets that are most likely to be used by Convex.jl
     ::Union{
         MOI.SecondOrderCone,
@@ -81,7 +81,7 @@ end
 function vexity(::Any, set::MOI.AbstractSet)
     return error(
         "`Convex.vexity(vex, ::$(typeof(set)))`: is not yet implemented. Please open an issue at https://github.com/jump-dev/Convex.jl",
-    ) 
+    )
 end
 
 function _add_constraint!(context::Context, c::GenericConstraint)
