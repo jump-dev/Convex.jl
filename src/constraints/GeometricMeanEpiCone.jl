@@ -43,7 +43,7 @@ function head(io::IO, ::GeometricMeanEpiConeSquare)
     return print(io, "GeometricMeanEpiConeSquare")
 end
 
-function Base.in(func::Tuple, set::GeometricMeanEpiConeSquare)
+function GenericConstraint(func::Tuple, set::GeometricMeanEpiConeSquare)
     for f in func
         n = LinearAlgebra.checksquare(f)
         if n != set.side_dimension

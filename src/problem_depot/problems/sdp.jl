@@ -1172,7 +1172,10 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeometricMeanEpiConeSquare(-1 // 1, n)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-1 // 1, n),
+    )
     objective = tr(A)
     p = maximize(objective, c1; numeric_type = T)
 
@@ -1198,7 +1201,10 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeometricMeanEpiConeSquare(-1 // 1, n)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-1 // 1, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1223,7 +1229,10 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeometricMeanEpiConeSquare(-3 // 5, n)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-3 // 5, n),
+    )
     objective = tr(A)
     p = maximize(objective, c1; numeric_type = T)
 
@@ -1249,7 +1258,10 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeometricMeanEpiConeSquare(-3 // 5, n)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-3 // 5, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1275,7 +1287,10 @@ end
     B /= tr(B) # solver has problems if B is large
     A = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeometricMeanEpiConeSquare(8 // 5, n)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(8 // 5, n),
+    )
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1300,7 +1315,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = (eye(n), A, B) in GeometricMeanEpiConeSquare(8 // 5, n)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(8 // 5, n),
+    )
     objective = tr(B)
     p = maximize(objective, c1; numeric_type = T)
 

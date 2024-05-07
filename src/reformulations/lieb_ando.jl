@@ -97,8 +97,10 @@ function lieb_ando(
         # Convex function
         add_constraint!(
             T,
-            (T, kron(A, Im), kron(In, conj(B))) in
-            GeometricMeanEpiConeSquare(t, size(T, 1)),
+            Convex.GenericConstraint(
+                (T, kron(A, Im), kron(In, conj(B))),
+                GeometricMeanEpiConeSquare(t, size(T, 1)),
+            ),
         )
         return real(LinearAlgebra.tr(KvKv * T))
     else

@@ -325,14 +325,14 @@ function test_GeometricMeanEpiConeSquare()
         (T + C, A, B) => Convex.ConvexVexity(),
         (T * C, A, B) => Convex.ConvexVexity(),
     )
-        c = f in set
+        c = Convex.GenericConstraint(f, set)
         @test vexity(c) == dcp
         @test sign(c.child) == Convex.NoSign()
     end
     Z = Variable(3, 3)
-    @test_throws DimensionMismatch (Z, A, B) in set
-    @test_throws DimensionMismatch (T, Z, B) in set
-    @test_throws DimensionMismatch (T, A, Z) in set
+    @test_throws DimensionMismatch Convex.GenericConstraint((Z, A, B), set)
+    @test_throws DimensionMismatch Convex.GenericConstraint((T, Z, B), set)
+    @test_throws DimensionMismatch Convex.GenericConstraint((T, A, Z), set)
     return
 end
 
