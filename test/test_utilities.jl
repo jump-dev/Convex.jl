@@ -1308,6 +1308,18 @@ function test_matrix_constants()
     return
 end
 
+function test_Constant_complex()
+    @test_throws(
+        DomainError(1 + 2im, "Constant expects real values"),
+        Convex.Constant(1 + 2im, Convex.ComplexSign()),
+    )
+    @test_throws(
+        DomainError([1 + 2im], "Constant expects real values"),
+        Convex.Constant([1 + 2im], Convex.ComplexSign()),
+    )
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()

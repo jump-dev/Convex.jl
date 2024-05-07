@@ -45,7 +45,7 @@ mutable struct Constant{T<:Real} <: AbstractExpr
 
     function Constant(x::Value, sign::Sign)
         if x isa Complex || x isa AbstractArray{<:Complex}
-            return error("Real values expected")
+            throw(DomainError(x, "Constant expects real values"))
         end
         return new{eltype(x)}(
             :constant,
