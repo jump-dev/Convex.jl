@@ -687,6 +687,7 @@ function test_conv1D_matrix()
             @test Convex.conv1D_matrix(x, length(y)) * y ≈ _conv(x, y)
         end
     end
+    return
 end
 
 function test_conj_issue_416()
