@@ -85,11 +85,7 @@ function solve!(
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
-    context, (stats...) = @timed Context(p, optimizer_factory)
-    if !silent_solver
-        s = round(stats.time; digits = 2), Base.format_bytes(stats.bytes)
-        @info "[Convex.jl] Compilation finished: $(s[1]) seconds, $(s[2]) of memory allocated"
-    end
+    context = Context(p, optimizer_factory)
     if silent_solver
         MOI.set(context.model, MOI.Silent(), true)
     end
