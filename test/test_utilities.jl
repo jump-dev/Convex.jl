@@ -1295,6 +1295,31 @@ function test_broadcasting()
     return
 end
 
+function test_matrix_constants()
+    I, V = [1, 3, 4], [2.1, 2.2, 3.3]
+    x = SparseArrays.sparsevec(I, V)
+    y = SparseArrays.sparse(I, [1, 1, 1], V, 4, 1)
+    c = constant(x)
+    @test c.value isa SparseArrays.SparseMatrixCSC
+    @test c.value == y
+    c = constant(y)
+    @test c.value isa SparseArrays.SparseMatrixCSC
+    @test c.value == y
+    return
+end
+
+function test_Constant_complex()
+    @test_throws(
+        DomainError(1 + 2im, "Constant expects real values"),
+        Convex.Constant(1 + 2im, Convex.ComplexSign()),
+    )
+    @test_throws(
+        DomainError([1 + 2im], "Constant expects real values"),
+        Convex.Constant([1 + 2im], Convex.ComplexSign()),
+    )
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()

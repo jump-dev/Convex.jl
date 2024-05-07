@@ -1,3 +1,4 @@
+# https://discourse.julialang.org/t/convex-jl-objective-function-of-matrix-factorization-with-missing-data/34253
 using Clarabel
 using Convex
 using MathOptInterface
@@ -94,6 +95,7 @@ const ϵ = 0.0001
 MAX_ITERS = 2
 
 m, n, k = 125, 125, 3
+# m, n, k = 500, 500, 5
 holdout = 0.80
 
 A = gen_data(m, n, k)
