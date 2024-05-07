@@ -33,7 +33,7 @@ _matrix(x::AbstractVector) = reshape(Vector(x), length(x), 1)
 _matrix(x::Number) = _matrix([x])
 _matrix(x::SparseArrays.AbstractSparseMatrix) = SparseArrays.sparse(x)
 function _matrix(x::SparseArrays.AbstractSparseVector)
-    return reshape(SparseArrays.sparse(x), length(x), 1)
+    return SparseArrays.sparse(reshape(x, length(x), 1))
 end
 
 mutable struct Constant{T<:Real} <: AbstractExpr
@@ -44,12 +44,9 @@ mutable struct Constant{T<:Real} <: AbstractExpr
     sign::Sign
 
     function Constant(x::Value, sign::Sign)
-        x isa Complex && error("Real values expected")
-        x isa AbstractArray &&
-            eltype(x) <: Complex &&
-            error("Real values expected")
-
-        # Convert to matrix
+        if x isa Complex || x isa AbstractArray{<:Complex}
+            return error("Real values expected")
+        end
         return new{eltype(x)}(
             :constant,
             objectid(x),
