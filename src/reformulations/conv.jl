@@ -14,9 +14,9 @@ function conv1D_matrix(h::AbstractVector, n::Integer)
     Is = Int[]
     Js = Int[]
     Vs = eltype(h)[]
-    sizehint!(Is, n*m)
-    sizehint!(Js, n*m)
-    sizehint!(Vs, n*m)
+    sizehint!(Is, n * m)
+    sizehint!(Js, n * m)
+    sizehint!(Vs, n * m)
     # build matrix by columns
     for j in 1:n
         append!(Is, j:(j+m-1))
