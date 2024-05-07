@@ -1968,6 +1968,11 @@ function test_conv()
         ErrorException("convolution only supported between two vectors"),
         conv([1, 2], Variable(2, 2)),
     )
+    @test_throws(
+        ArgumentError("convolution with empty vector not supported"),
+        conv([], Variable(2)),
+    )
+
     return
 end
 

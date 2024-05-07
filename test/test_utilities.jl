@@ -660,6 +660,14 @@ function test_logsumexp_stability()
     return
 end
 
+# simple 1D convolution implementation
+function _conv(h, x)
+    m = length(h)
+    n = length(x)
+    zero_pad_x(i) = 1 <= i <= n ? x[i] : 0
+    return [sum(h[j] * zero_pad_x(i - j + 1) for j in 1:m) for i in 1:m+n-1]
+end
+
 function test_conv_issue_364()
     n = 3
     m = 11
@@ -667,14 +675,18 @@ function test_conv_issue_364()
     x = rand(n)
     hvar = Variable(m)
     hvar.value = h
-    function _conv(h, x)
-        m = length(h)
-        n = length(x)
-        zero_pad_x(i) = 1 <= i <= n ? x[i] : 0
-        return [sum(h[j] * zero_pad_x(i - j + 1) for j in 1:m) for i in 1:m+n-1]
-    end
     @test evaluate(conv(hvar, x)) ≈ _conv(h, x)
     return
+end
+
+function test_conv1D_matrix()
+    for (x_len, y_len) in ((20, 5), (5, 20), (5, 5), (1, 1), (2, 3))
+        for im1 in (im, 0), im2 in (im, 0)
+            x = randn(x_len) + randn(x_len) * im1
+            y = randn(y_len) + randn(y_len) * im2
+            @test Convex.conv1D_matrix(x, length(y)) * y ≈ _conv(x, y)
+        end
+    end
 end
 
 function test_conj_issue_416()
