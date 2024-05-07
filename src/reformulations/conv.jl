@@ -16,10 +16,13 @@ function conv1D_matrix(h::AbstractVector, n::Integer)
     Is = Int[]
     Js = Int[]
     Vs = eltype(h)[]
+    sizehint!(Is, n*m)
+    sizehint!(Js, n*m)
+    sizehint!(Vs, n*m)
     # build matrix by columns
     for j in 1:n
         append!(Is, j:(j+m-1))
-        append!(Js, repeat([j], m))
+        append!(Js, (j for _ in 1:m))
         append!(Vs, h)
     end
     return SparseArrays.sparse(Is, Js, Vs, m + n - 1, n)
