@@ -11,8 +11,6 @@ then we have `A * x ≈ conv1d(h, x)`.
 """
 function conv1D_matrix(h::AbstractVector, n::Integer)
     m = length(h)
-    # It is much more efficient to construct sparse matrices
-    # this way rather than starting from `spzeros` and indexing into it.
     Is = Int[]
     Js = Int[]
     Vs = eltype(h)[]
