@@ -297,6 +297,18 @@ function test_GenericConstraint_RelativeEntropyConeConstraint()
     return
 end
 
+function test_GenericConstraint_NoVexity()
+    x = Variable(2)
+    set = MOI.Complements(2)
+    @test_throws(
+        ErrorException(
+            "`Convex.vexity(vex, ::$(typeof(set)))`: is not yet implemented. Please open an issue at https://github.com/jump-dev/Convex.jl",
+        ),
+        vexity(Convex.GenericConstraint(x, set)),
+    )
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()
