@@ -1972,7 +1972,6 @@ function test_conv()
         ArgumentError("convolution with empty vector not supported"),
         conv([], Variable(2)),
     )
-
     return
 end
 

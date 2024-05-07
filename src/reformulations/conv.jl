@@ -41,9 +41,9 @@ function conv(x::Value, y::AbstractExpr)
     if length(x) != size(x, 1) || size(y, 2) > 1
         error("convolution only supported between two vectors")
     end
-    length(x) > 0 ||
+    if length(x) == 0
         throw(ArgumentError("convolution with empty vector not supported"))
-
+    end
     X = conv1D_matrix(x, length(y))
     return X * y
 end
