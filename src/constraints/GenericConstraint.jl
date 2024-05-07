@@ -50,15 +50,38 @@ end
 
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
-# The default vexity for MOI sets is assumed to required affine functions and be
-# convex. This is for the most common case of the conic sets. There might be
-# some incorrect answers, like if the user adds something like the `MOI.SOS1` or
-# `MOI.Complements`, but this shouldn't really be relevant for Convex.jl?
-function vexity(vex, ::Union{MOI.PositiveSemidefiniteConeSquare,MOI.ExponentialCone,MOI.SecondOrderCone,MOI.RotatedSecondOrderCone,MOI.RelativeEntropyCone})
+function vexity(
+    vex, 
+    # An enumeration of sets that are most likely to be used by Convex.jl
+    ::Union{
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.ExponentialCone,
+        MOI.DualExponentialCone,
+        MOI.PowerCone,
+        MOI.DualPowerCone,
+        MOI.PositiveSemidefiniteConeSquare,
+        MOI.GeometricMeanCone,
+        MOI.NormCone,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.RelativeEntropyCone,
+        MOI.LogDetConeSquare,
+        MOI.RootDetConeSquare,
+    },
+)
     if !(vex == ConstVexity() || vex == AffineVexity())
         return NotDcp()
     end
     return ConvexVexity()
+end
+
+function vexity(::Any, set::MOI.AbstractSet)
+    return error(
+        "`Convex.vexity(vex, ::$(typeof(set)))`: is not yet implemented. Please open an issue at https://github.com/jump-dev/Convex.jl",
+    ) 
 end
 
 function _add_constraint!(context::Context, c::GenericConstraint)
