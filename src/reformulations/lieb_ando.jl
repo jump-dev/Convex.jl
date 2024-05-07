@@ -98,7 +98,7 @@ function lieb_ando(
         add_constraint!(
             T,
             (T, kron(A, Im), kron(In, conj(B))) in
-            GeomMeanEpiConeSquare(t, size(T, 1)),
+            GeometricMeanEpiConeSquare(t, size(T, 1)),
         )
         return real(LinearAlgebra.tr(KvKv * T))
     else

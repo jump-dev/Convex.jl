@@ -97,7 +97,7 @@ function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     else
         add_constraint!(
             context,
-            (tmp, I, A) in GeomMeanEpiConeSquare(atom.t, size(A, 1)),
+            (tmp, I, A) in GeometricMeanEpiConeSquare(atom.t, size(A, 1)),
         )
     end
     # It's already a real mathematically, but Convex doesn't know it

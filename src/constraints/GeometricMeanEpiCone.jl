@@ -5,9 +5,9 @@
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
 """
-    GeomMeanEpiConeSquare(t::Rational, side_dimension::Int)
+    GeometricMeanEpiConeSquare(t::Rational, side_dimension::Int)
 
-The constraint `(T, A, B) in GeomMeanEpiConeSquare(t, side_dimension)`
+The constraint `(T, A, B) in GeometricMeanEpiConeSquare(t, side_dimension)`
 constrains T to
 
   A #_t B ⪯ T
@@ -19,21 +19,17 @@ where:
   * Parameter t must be in [-1, 0] or [1, 2].
   * Constraints A ⪰ 0, B ⪰ 0 are added.
 
-Note on fullhyp: GeomMeanEpiConeSquare will always return a full epigraph cone
-(unlike GeomMeanHypoCone) and so this parameter is not really used. It is here
-just for consistency with the GeomMeanHypoCone function.
-
 ## Reference
 
 Ported from CVXQUAD which is based on the paper: "Lieb's concavity theorem,
 matrix geometric means and semidefinite optimization" by Hamza Fawzi and James
 Saunderson (arXiv:1512.03401)
 """
-struct GeomMeanEpiConeSquare <: MOI.AbstractVectorSet
+struct GeometricMeanEpiConeSquare <: MOI.AbstractVectorSet
     t::Rational
     side_dimension::Int
 
-    function GeomMeanEpiConeSquare(t::Rational, side_dimension::Int)
+    function GeometricMeanEpiConeSquare(t::Rational, side_dimension::Int)
         if !(-1 <= t <= 0 || 1 <= t <= 2)
             throw(DomainError(t, "t must be in the range [-1, 0] or [1, 2]"))
         end
@@ -41,11 +37,13 @@ struct GeomMeanEpiConeSquare <: MOI.AbstractVectorSet
     end
 end
 
-MOI.dimension(set::GeomMeanEpiConeSquare) = 3 * set.side_dimension
+MOI.dimension(set::GeometricMeanEpiConeSquare) = 3 * set.side_dimension^2
 
-head(io::IO, ::GeomMeanEpiConeSquare) = print(io, "∈(GeomMeanEpiConeSquare)")
+function head(io::IO, ::GeometricMeanEpiConeSquare)
+    return print(io, "GeometricMeanEpiConeSquare")
+end
 
-function Base.in(func::Tuple, set::GeomMeanEpiConeSquare)
+function Base.in(func::Tuple, set::GeometricMeanEpiConeSquare)
     for f in func
         n = LinearAlgebra.checksquare(f)
         if n != set.side_dimension
@@ -59,47 +57,44 @@ function Base.in(func::Tuple, set::GeomMeanEpiConeSquare)
     return GenericConstraint(vcat(vec.(func)...), set)
 end
 
+function _get_matrices(c::GenericConstraint{GeometricMeanEpiConeSquare})
+    n = c.set.side_dimension
+    d = n^2
+    T = reshape(c.child[1:d], n, n)
+    A = reshape(c.child[d.+(1:d)], n, n)
+    B = reshape(c.child[2d.+(1:d)], n, n)
+    return T, A, B
+end
+
 # For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex
 # (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
-function vexity(constraint::GenericConstraint{GeomMeanEpiConeSquare})
-    n = constraint.set.side_dimension
-    d = n^2
-    I = 1:d
-    T = vexity(constraint.child[I])
-    A = vexity(constraint.child[d.+I])
-    B = vexity(constraint.child[2d.+I])
-    if A in (ConcaveVexity(), NotDcp()) || B in (ConcaveVexity(), NotDcp())
+function vexity(constraint::GenericConstraint{GeometricMeanEpiConeSquare})
+    T, A, B = _get_matrices(constraint)
+    if vexity(A) in (ConcaveVexity(), NotDcp()) ||
+       vexity(B) in (ConcaveVexity(), NotDcp())
         return NotDcp()
     end
-    return ConvexVexity() + (-T)
+    return ConvexVexity() + -vexity(T)
 end
 
 function _add_constraint!(
     context::Context,
-    constraint::GenericConstraint{GeomMeanEpiConeSquare},
+    constraint::GenericConstraint{GeometricMeanEpiConeSquare},
 )
-    n = constraint.set.side_dimension
-    d = n^2
-    I = 1:d
-    T = reshape(constraint.child[I], n, n)
-    A = reshape(constraint.child[d.+I], n, n)
-    B = reshape(constraint.child[2d.+I], n, n)
+    T, A, B = _get_matrices(constraint)
     t = constraint.set.t
-    is_complex =
-        sign(A) == ComplexSign() ||
-        sign(B) == ComplexSign() ||
-        sign(T) == ComplexSign()
-    Z = if is_complex
-        HermitianSemidefinite(size(A)[1])
+    Z = if sign(constraint.child) == ComplexSign()
+        HermitianSemidefinite(size(A, 1))
     else
-        Semidefinite(size(A)[1])
+        Semidefinite(size(A, 1))
     end
     if t <= 0
         add_constraint!(context, [T A; A Z] ⪰ 0)
         add_constraint!(context, Z in GeomMeanHypoCone(A, B, -t, false))
     else
-        @assert t >= 1 # range of t checked in GeomMeanEpiConeSquare constructor
+        # range of t checked in GeometricMeanEpiConeSquare constructor.
+        @assert t >= 1
         add_constraint!(context, [T B; B Z] ⪰ 0)
         add_constraint!(context, Z in GeomMeanHypoCone(A, B, 2 - t, false))
     end
