@@ -297,7 +297,7 @@ function test_GenericConstraint_RelativeEntropyConeConstraint()
     return
 end
 
-### constraints/GenericConstraint_RelativeEntropyCone
+### constraints/GenericConstraint_GeometricMeanEpiConeSquare
 
 function test_GeometricMeanEpiConeSquare()
     T = Variable(2, 2)
