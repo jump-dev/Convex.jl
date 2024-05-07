@@ -297,6 +297,45 @@ function test_GenericConstraint_RelativeEntropyConeConstraint()
     return
 end
 
+### constraints/GenericConstraint_GeometricMeanEpiConeSquare
+
+function test_GeometricMeanEpiConeSquare()
+    T = Variable(2, 2)
+    A = Variable(2, 2)
+    B = Variable(2, 2)
+    C = [1 0; 0 1]
+    @test_throws DomainError GeometricMeanEpiConeSquare(-3 // 2, 3)
+    @test_throws DomainError GeometricMeanEpiConeSquare(1 // 2, 3)
+    @test_throws DomainError GeometricMeanEpiConeSquare(5 // 2, 3)
+    set = Convex.GeometricMeanEpiConeSquare(3 // 2, 2)
+    @test sprint(Convex.head, set) == "GeometricMeanEpiConeSquare"
+    @test MOI.dimension(set) == 12
+    for (f, dcp) in (
+        (T, A, B) => Convex.ConvexVexity(),
+        (T, A, C) => Convex.ConvexVexity(),
+        (T, C, B) => Convex.ConvexVexity(),
+        (C, A, B) => Convex.ConvexVexity(),
+        (T * T, A, B) => Convex.NotDcp(),
+        (T .^ 2, A, B) => Convex.NotDcp(),
+        (T, A * A, B) => Convex.NotDcp(),
+        (T, sqrt(A), B) => Convex.NotDcp(),
+        (T, A, B * B) => Convex.NotDcp(),
+        (T, A, sqrt(B)) => Convex.NotDcp(),
+        (sqrt(T), A, B) => Convex.ConvexVexity(),
+        (T + C, A, B) => Convex.ConvexVexity(),
+        (T * C, A, B) => Convex.ConvexVexity(),
+    )
+        c = Convex.GenericConstraint(f, set)
+        @test vexity(c) == dcp
+        @test sign(c.child) == Convex.NoSign()
+    end
+    Z = Variable(3, 3)
+    @test_throws DimensionMismatch Convex.GenericConstraint((Z, A, B), set)
+    @test_throws DimensionMismatch Convex.GenericConstraint((T, Z, B), set)
+    @test_throws DimensionMismatch Convex.GenericConstraint((T, A, Z), set)
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()

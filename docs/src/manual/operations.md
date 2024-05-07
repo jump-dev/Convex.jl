@@ -117,7 +117,7 @@ solver (including SCS and Mosek).
 | `matrixfrac(x, P)`                | $x^TP^{-1}x$                       | convex       | not monotonic | IC: P is positive semidefinite |
 | `sumlargesteigs(x, k)`            | sum of top $k$ eigenvalues of $x$  | convex       | not monotonic | IC: P symmetric        |
 | `T in GeomMeanHypoCone(A, B, t)`  | $T \preceq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | concave | increasing    | IC: $A \succeq 0$, $B \succeq 0$, $t \in [0,1]$ |
-| `T in GeomMeanEpiCone(A, B, t)`   | $T \succeq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | convex  | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $t \in [-1, 0] \cup [1, 2]$ |
+| `Convex.GenericConstraint((T, A, B), GeometricMeanEpiConeSquare(t, size(T, 1)))`   | $T \succeq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | convex  | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $t \in [-1, 0] \cup [1, 2]$ |
 | `quantum_entropy(X)`              | $-\textrm{Tr}(X \log X)$           | concave      | not monotonic | IC: $X \succeq 0$; uses natural log |
 | `quantum_relative_entropy(A, B)`  | $\textrm{Tr}(A \log A - A \log B)$ | convex       | not monotonic | IC: $A \succeq 0$, $B \succeq 0$; uses natural log |
 | `trace_logm(X, C)`                | $\textrm{Tr}(C \log X)$            | concave in X | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant; uses natural log |

@@ -739,79 +739,6 @@ end
     end
 end
 
-@add_problem sdp function sdp_geom_mean_epicone_argcheck(
-    handle_problem!,
-    ::Val{test},
-    atol,
-    rtol,
-    ::Type{T},
-) where {T,test}
-    if test
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            zeros(2, 3),
-            zeros(2, 3),
-            -1 // 2,
-        )
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            zeros(2, 3),
-            Variable(2, 3),
-            -1 // 2,
-        )
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            Variable(2, 3),
-            zeros(2, 3),
-            -1 // 2,
-        )
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            Variable(2, 3),
-            Variable(2, 3),
-            -1 // 2,
-        )
-
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            zeros(2, 2),
-            zeros(3, 3),
-            -1 // 2,
-        )
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            zeros(2, 2),
-            Variable(3, 3),
-            -1 // 2,
-        )
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            Variable(2, 2),
-            zeros(3, 3),
-            -1 // 2,
-        )
-        @test_throws DimensionMismatch GeomMeanEpiCone(
-            Variable(2, 2),
-            Variable(2, 3),
-            -1 // 2,
-        )
-
-        @test_throws DimensionMismatch Variable(2, 2) in GeomMeanEpiCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            -1 // 2,
-        )
-        @test_throws DomainError GeomMeanEpiCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            -3 // 2,
-        )
-        @test_throws DomainError GeomMeanEpiCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            1 // 2,
-        )
-        @test_throws DomainError GeomMeanEpiCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            5 // 2,
-        )
-    end
-end
-
 @add_problem sdp function sdp_relative_entropy_argcheck(
     handle_problem!,
     ::Val{test},
@@ -1245,7 +1172,10 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = eye(n) in GeomMeanEpiCone(A, B, -1)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-1 // 1, n),
+    )
     objective = tr(A)
     p = maximize(objective, c1; numeric_type = T)
 
@@ -1271,7 +1201,10 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = eye(n) in GeomMeanEpiCone(A, B, -1)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-1 // 1, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1296,7 +1229,10 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = eye(n) in GeomMeanEpiCone(A, B, -3 // 5)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-3 // 5, n),
+    )
     objective = tr(A)
     p = maximize(objective, c1; numeric_type = T)
 
@@ -1322,7 +1258,10 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = eye(n) in GeomMeanEpiCone(A, B, -3 // 5)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(-3 // 5, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1348,7 +1287,10 @@ end
     B /= tr(B) # solver has problems if B is large
     A = Variable(n, n)
 
-    c1 = eye(n) in GeomMeanEpiCone(A, B, 8 // 5)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(8 // 5, n),
+    )
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1373,7 +1315,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = eye(n) in GeomMeanEpiCone(A, B, 8 // 5)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanEpiConeSquare(8 // 5, n),
+    )
     objective = tr(B)
     p = maximize(objective, c1; numeric_type = T)
 

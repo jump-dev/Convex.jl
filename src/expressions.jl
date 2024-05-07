@@ -75,6 +75,8 @@ function vexity(x::AbstractExpr)
     return vex
 end
 
+vexity(::Value) = ConstVexity()
+
 evaluate(x) = output(x) # fallback
 
 Base.size(x::AbstractExpr) = x.size
