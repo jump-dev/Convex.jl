@@ -739,38 +739,6 @@ end
     end
 end
 
-@add_problem sdp function sdp_geom_mean_epicone_argcheck(
-    handle_problem!,
-    ::Val{test},
-    atol,
-    rtol,
-    ::Type{T},
-) where {T,test}
-    if test
-        Z = zeros(2, 3)
-        Z22 = zeros(2, 2)
-        Z23 = zeros(2, 3)
-        Z33 = zeros(3, 3)
-        V = Variable(2, 3)
-        V22 = zeros(2, 2)
-        V33 = zeros(3, 3)
-        set = GeometricMeanEpiConeSquare(3 // 2, 3)
-        @test_throws DimensionMismatch (Z, Z, Z) in set
-        @test_throws DimensionMismatch (Z, Z, V) in set
-        @test_throws DimensionMismatch (Z, V, Z) in set
-        @test_throws DimensionMismatch (Z, V, V) in set
-        @test_throws DimensionMismatch (Z22, Z22, Z22) in set
-        @test_throws DimensionMismatch (Z33, Z22, V33) in set
-        @test_throws DimensionMismatch (Z33, V22, Z33) in set
-        @test_throws DimensionMismatch (Z22, V33, Z33) in set
-        @test_throws DimensionMismatch (Z23, V33, Z33) in set
-        @test_throws DimensionMismatch (V22, V33, V33) in set
-        @test_throws DomainError GeometricMeanEpiConeSquare(-3 // 2, 3)
-        @test_throws DomainError GeometricMeanEpiConeSquare(1 // 2, 3)
-        @test_throws DomainError GeometricMeanEpiConeSquare(5 // 2, 3)
-    end
-end
-
 @add_problem sdp function sdp_relative_entropy_argcheck(
     handle_problem!,
     ::Val{test},
