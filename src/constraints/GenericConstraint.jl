@@ -51,10 +51,10 @@ end
 vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
 
 # The default vexity for MOI sets is assumed to required affine functions and be
-# convex. This is for the most common case of the connic sets. There might be
+# convex. This is for the most common case of the conic sets. There might be
 # some incorrect answers, like if the user adds something like the `MOI.SOS1` or
 # `MOI.Complements`, but this shouldn't really be relevant for Convex.jl?
-function vexity(vex, ::MOI.AbstractSet)
+function vexity(vex, ::Union{MOI.PositiveSemidefiniteConeSquare,MOI.ExponentialCone,MOI.SecondOrderCone,MOI.RotatedSecondOrderCone,MOI.RelativeEntropyCone})
     if !(vex == ConstVexity() || vex == AffineVexity())
         return NotDcp()
     end
