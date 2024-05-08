@@ -26,12 +26,7 @@ mutable struct AntidiagAtom <: Convex.AbstractExpr
             error("Bounds error in calling diag")
         end
         children = (x,)
-        return new(
-            :antidiag,
-            children,
-            (minimum(x.size) - k, 1),
-            k,
-        )
+        return new(:antidiag, children, (minimum(x.size) - k, 1), k)
     end
 end
 
