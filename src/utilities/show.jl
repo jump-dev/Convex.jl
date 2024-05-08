@@ -230,6 +230,11 @@ end
 
 function Base.show(io::IO, p::Problem)
     TreePrint.print_tree(io, p, MAXDEPTH[], MAXWIDTH[])
+    counts = counts_recursive(p)
+    bytes = Base.format_bytes(Base.summarysize(p))
+    print(io, "contains: ")
+    show(io, counts)
+    print(io, " (total: $bytes)")
     if p.status == MOI.OPTIMIZE_NOT_CALLED
         print(io, "\nstatus: `solve!` not called yet")
     else
