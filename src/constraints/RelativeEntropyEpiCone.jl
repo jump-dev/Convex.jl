@@ -177,7 +177,7 @@ function _add_constraint!(
         Z = Variable(n, n)
         T = [Variable(r, r) for i in 1:m]
     end
-    add_constraint!(context, Z in GeomMeanHypoCone(X, Y, 1 // (2^k), false))
+    add_constraint!(context, Z in GeometricMeanHypoCone(X, Y, 1 // (2^k), false))
     for ii in 1:m
         # Note that we are dividing by w here because it is easier
         # to do this than to do sum w_i T(:,...,:,ii) later (cf. line that

@@ -91,12 +91,12 @@ function _add_constraint!(
     end
     if t <= 0
         add_constraint!(context, [T A; A Z] ⪰ 0)
-        add_constraint!(context, Z in GeomMeanHypoCone(A, B, -t, false))
+        add_constraint!(context, Z in GeometricMeanHypoCone(A, B, -t, false))
     else
         # range of t checked in GeometricMeanEpiConeSquare constructor.
         @assert t >= 1
         add_constraint!(context, [T B; B Z] ⪰ 0)
-        add_constraint!(context, Z in GeomMeanHypoCone(A, B, 2 - t, false))
+        add_constraint!(context, Z in GeometricMeanHypoCone(A, B, 2 - t, false))
     end
     return
 end

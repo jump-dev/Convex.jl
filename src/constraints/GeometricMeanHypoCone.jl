@@ -30,14 +30,14 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct GeomMeanHypoCone
+mutable struct GeometricMeanHypoCone
     A::AbstractExpr
     B::AbstractExpr
     t::Rational
     size::Tuple{Int,Int}
     fullhyp::Bool
 
-    function GeomMeanHypoCone(
+    function GeometricMeanHypoCone(
         A::AbstractExpr,
         B::AbstractExpr,
         t::Rational,
@@ -56,64 +56,64 @@ mutable struct GeomMeanHypoCone
         return new(A, B, t, (n, n), fullhyp)
     end
 
-    function GeomMeanHypoCone(
+    function GeometricMeanHypoCone(
         A::Value,
         B::AbstractExpr,
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(constant(A), B, t, fullhyp)
+        return GeometricMeanHypoCone(constant(A), B, t, fullhyp)
     end
 
-    function GeomMeanHypoCone(
+    function GeometricMeanHypoCone(
         A::AbstractExpr,
         B::Value,
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(A, constant(B), t, fullhyp)
+        return GeometricMeanHypoCone(A, constant(B), t, fullhyp)
     end
 
-    function GeomMeanHypoCone(
+    function GeometricMeanHypoCone(
         A::Value,
         B::Value,
         t::Rational,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(constant(A), constant(B), t, fullhyp)
+        return GeometricMeanHypoCone(constant(A), constant(B), t, fullhyp)
     end
 
-    function GeomMeanHypoCone(
+    function GeometricMeanHypoCone(
         A::Union{AbstractExpr,Value},
         B::Union{AbstractExpr,Value},
         t::Integer,
         fullhyp::Bool = true,
     )
-        return GeomMeanHypoCone(A, B, t // 1, fullhyp)
+        return GeometricMeanHypoCone(A, B, t // 1, fullhyp)
     end
 end
 
-mutable struct GeomMeanHypoConeConstraint <: Constraint
+mutable struct GeometricMeanHypoConeConstraint <: Constraint
     T::AbstractExpr
-    cone::GeomMeanHypoCone
+    cone::GeometricMeanHypoCone
 
-    function GeomMeanHypoConeConstraint(T::AbstractExpr, cone::GeomMeanHypoCone)
+    function GeometricMeanHypoConeConstraint(T::AbstractExpr, cone::GeometricMeanHypoCone)
         if size(T) != cone.size
             throw(DimensionMismatch("T must be size $(cone.size)"))
         end
         return new(T, cone)
     end
 
-    function GeomMeanHypoConeConstraint(T::Value, cone::GeomMeanHypoCone)
-        return GeomMeanHypoConeConstraint(constant(T), cone)
+    function GeometricMeanHypoConeConstraint(T::Value, cone::GeometricMeanHypoCone)
+        return GeometricMeanHypoConeConstraint(constant(T), cone)
     end
 end
 
-head(io::IO, ::GeomMeanHypoConeConstraint) = print(io, "∈(GeomMeanHypoCone)")
+head(io::IO, ::GeometricMeanHypoConeConstraint) = print(io, "∈(GeometricMeanHypoCone)")
 
-Base.in(T, cone::GeomMeanHypoCone) = GeomMeanHypoConeConstraint(T, cone)
+Base.in(T, cone::GeometricMeanHypoCone) = GeometricMeanHypoConeConstraint(T, cone)
 
-function AbstractTrees.children(constraint::GeomMeanHypoConeConstraint)
+function AbstractTrees.children(constraint::GeometricMeanHypoConeConstraint)
     return (
         constraint.T,
         constraint.cone.A,
@@ -124,7 +124,7 @@ end
 
 # For t ∈ [0,1] the t-weighted matrix geometric mean is matrix concave (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪯ A #_t B will be a convex set.
-function vexity(constraint::GeomMeanHypoConeConstraint)
+function vexity(constraint::GeometricMeanHypoConeConstraint)
     A = vexity(constraint.cone.A)
     B = vexity(constraint.cone.B)
     T = vexity(constraint.T)
@@ -145,7 +145,7 @@ end
 
 function _add_constraint!(
     context::Context,
-    constraint::GeomMeanHypoConeConstraint,
+    constraint::GeometricMeanHypoConeConstraint,
 )
     A = constraint.cone.A
     B = constraint.cone.B
@@ -165,7 +165,7 @@ function _add_constraint!(
 
     if fullhyp && t != 0 && t != 1
         W = make_temporary()
-        add_constraint!(context, W in GeomMeanHypoCone(A, B, t, false))
+        add_constraint!(context, W in GeometricMeanHypoCone(A, B, t, false))
         add_constraint!(context, W ⪰ T)
     else
         p = t.num
@@ -190,13 +190,13 @@ function _add_constraint!(
             if t < 1 / 2
                 add_constraint!(
                     context,
-                    Z in GeomMeanHypoCone(A, B, 2 * t, false),
+                    Z in GeometricMeanHypoCone(A, B, 2 * t, false),
                 )
                 add_constraint!(context, [A T; T' Z] ⪰ 0)
             else
                 add_constraint!(
                     context,
-                    Z in GeomMeanHypoCone(A, B, 2 * t - 1, false),
+                    Z in GeometricMeanHypoCone(A, B, 2 * t - 1, false),
                 )
                 add_constraint!(context, [B T; T' Z] ⪰ 0)
             end
@@ -205,7 +205,7 @@ function _add_constraint!(
             Z = make_temporary()
             add_constraint!(
                 context,
-                Z in GeomMeanHypoCone(A, T, (2 * p - q) // p, false),
+                Z in GeometricMeanHypoCone(A, T, (2 * p - q) // p, false),
             )
             add_constraint!(context, [Z T; T B] ⪰ 0)
         elseif t < 1 / 2
@@ -215,15 +215,15 @@ function _add_constraint!(
             l = floor(Int, log2(q))
             add_constraint!(
                 context,
-                X in GeomMeanHypoCone(A, B, p // (2^l), false),
+                X in GeometricMeanHypoCone(A, B, p // (2^l), false),
             )
             add_constraint!(
                 context,
-                T in GeomMeanHypoCone(A, X, (2^l) // q, false),
+                T in GeometricMeanHypoCone(A, X, (2^l) // q, false),
             )
         else
             #println("geom_mean_hypocone p=$p q=$q else")
-            add_constraint!(context, T in GeomMeanHypoCone(B, A, 1 - t, false))
+            add_constraint!(context, T in GeometricMeanHypoCone(B, A, 1 - t, false))
         end
     end
 end
