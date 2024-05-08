@@ -57,7 +57,6 @@ export conv,
     Constraint,
     ⪰,
     ⪯,
-    socp,
     Constraint, # useful for making abstractly-typed vectors via `Constraint[]`
     # Variables
     constant,
