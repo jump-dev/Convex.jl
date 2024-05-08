@@ -28,9 +28,16 @@ changes.
       (Following the convention in MathOptInterface, the dual of `a <= b` is
       always negative, regardless of optimization sense.) (#593)
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
-      `SOCConstraint`, `ExpConstraint` and `SDPConstraint` have
-      been replaced by `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590)
-      (#597), (#598), (#599), (#601), (#602), (#623)
+      `SOCConstraint`, `ExpConstraint`, `GeoMeanEpiConeConstraint`, and
+      `SDPConstraint` have been replaced by `GenericConstraint{S}` where
+      `S<:MOI.AbstractSet` (#590), (#597), (#598), (#599), (#601), (#602),
+      (#604), (#623), (#632)
+ * **Subtle breaking change**: scalar row indexing like `x[i, :]` now produces a
+   column vector instead of a row vector. This better aligns with Julia Base,
+   but it can result in subtle differences, particularly for code like
+   `x[i, :] * y[i, :]'`: this used to be equivalent to the inner product, but it
+   is now the outer product. In Base Julia, this is the outer product, so the
+   previous code may be been silently broken (#624)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call
@@ -64,6 +71,10 @@ changes.
    vectors), matching Base's behavior (#528)
  * Added `root_det` (#605)
  * Added `VcatAtom` which is a more efficient implementation of `vcat` (#607)
+ * Added support for `SparseArrays.SparseMatrixCSC` in `Constant`. This fixed
+   performance problems with some atoms (#631)
+ * `solve!` now reports the time and memory allocation during compilation from
+   the DCP expression graph to MathOptInterface (#633)
 
 ### Fixed
 
@@ -74,14 +85,14 @@ changes.
  * Fix `dot` to correctly complex-conjugates its first argument (#524)
  * Add tests and fix  a number of bugs in various atoms (#546), (#547), (#550),
    (#554), (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566),
-   (#567), (#568), (#608), (#609), (#617)
+   (#567), (#568), (#608), (#609), (#617), (#626)
  * Fixed performance issues in a number of issues related to scalar indexing
-   (#618), (#619), (#620), (#621)
+   (#618), (#619), (#620), (#621), (#625), (#634)
 
 ### Other
 
  * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
-   (#576), (#579), (#587), (#594)
+   (#576), (#579), (#587), (#594), (#628)
  * Refactored the tests into a functional form (#532)
  * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
@@ -92,7 +103,7 @@ changes.
  * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
  * Added various tests to improve code coverage (#522), (#572), (#575), (#577),
    (#580)
- * Updated versions in GitHub actions (#596), (#612)
+ * Updated versions in GitHub actions (#596), (#612), (#629)
  * Added license headers (#606)
 
 ## v0.15.4 (October 24, 2023)
