@@ -21,7 +21,7 @@ mutable struct Context{T,M}
     # Used for populating constraint duals
     constr_to_moi_inds::IdDict{Any,Any}
 
-    detected_infeasible_during_formulation::Ref{Bool}
+    detected_infeasible_during_formulation::Bool
 
     # Cache
     # conic_form_cache::DataStructures.WeakKeyIdDict{Any, Any}
@@ -52,7 +52,7 @@ function Base.empty!(context::Context)
     empty!(context.var_id_to_moi_indices)
     empty!(context.id_to_variables)
     empty!(context.constr_to_moi_inds)
-    context.detected_infeasible_during_formulation[] = false
+    context.detected_infeasible_during_formulation = false
     empty!(context.conic_form_cache)
     return
 end

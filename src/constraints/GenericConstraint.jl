@@ -87,7 +87,7 @@ end
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
         if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
-            context.detected_infeasible_during_formulation[] = true
+            context.detected_infeasible_during_formulation = true
         end
         return
     end

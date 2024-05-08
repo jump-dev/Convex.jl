@@ -97,7 +97,7 @@ function solve!(
     if warmstart && MOI.supports(context.model, attr, MOI.VariableIndex)
         _add_variable_primal_start(context)
     end
-    if context.detected_infeasible_during_formulation[]
+    if context.detected_infeasible_during_formulation
         p.status = MOI.INFEASIBLE
     else
         MOI.optimize!(context.model)
