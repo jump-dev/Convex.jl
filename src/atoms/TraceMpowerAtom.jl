@@ -93,7 +93,10 @@ function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     end
     I = Matrix(one(T) * LinearAlgebra.I(n))
     if 0 <= atom.t <= 1
-        add_constraint!(context, tmp in GeomMeanHypoCone(I, A, atom.t, false))
+        add_constraint!(
+            context,
+            tmp in GeometricMeanHypoCone(I, A, atom.t, false),
+        )
     else
         add_constraint!(
             context,
