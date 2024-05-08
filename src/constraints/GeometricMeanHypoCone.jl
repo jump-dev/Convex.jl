@@ -97,21 +97,31 @@ mutable struct GeometricMeanHypoConeConstraint <: Constraint
     T::AbstractExpr
     cone::GeometricMeanHypoCone
 
-    function GeometricMeanHypoConeConstraint(T::AbstractExpr, cone::GeometricMeanHypoCone)
+    function GeometricMeanHypoConeConstraint(
+        T::AbstractExpr,
+        cone::GeometricMeanHypoCone,
+    )
         if size(T) != cone.size
             throw(DimensionMismatch("T must be size $(cone.size)"))
         end
         return new(T, cone)
     end
 
-    function GeometricMeanHypoConeConstraint(T::Value, cone::GeometricMeanHypoCone)
+    function GeometricMeanHypoConeConstraint(
+        T::Value,
+        cone::GeometricMeanHypoCone,
+    )
         return GeometricMeanHypoConeConstraint(constant(T), cone)
     end
 end
 
-head(io::IO, ::GeometricMeanHypoConeConstraint) = print(io, "∈(GeometricMeanHypoCone)")
+function head(io::IO, ::GeometricMeanHypoConeConstraint)
+    return print(io, "∈(GeometricMeanHypoCone)")
+end
 
-Base.in(T, cone::GeometricMeanHypoCone) = GeometricMeanHypoConeConstraint(T, cone)
+function Base.in(T, cone::GeometricMeanHypoCone)
+    return GeometricMeanHypoConeConstraint(T, cone)
+end
 
 function AbstractTrees.children(constraint::GeometricMeanHypoConeConstraint)
     return (
@@ -223,7 +233,10 @@ function _add_constraint!(
             )
         else
             #println("geom_mean_hypocone p=$p q=$q else")
-            add_constraint!(context, T in GeometricMeanHypoCone(B, A, 1 - t, false))
+            add_constraint!(
+                context,
+                T in GeometricMeanHypoCone(B, A, 1 - t, false),
+            )
         end
     end
 end
