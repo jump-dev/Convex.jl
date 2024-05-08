@@ -8,7 +8,7 @@ using .TreePrint
 """
     show_id(io::IO, x::Union{AbstractVariable}; digits = 3)
 
-Print a truncated version of the objects `id_hash` field.
+Print a truncated version of the object's id.
 
 ## Example
 
@@ -19,12 +19,12 @@ julia> Convex.show_id(stdout, x)
 id: 163…906
 ```
 """
-function show_id(io::IO, x::Union{AbstractVariable}; digits = MAXDIGITS[])
+function show_id(io::IO, x::AbstractVariable; digits = MAXDIGITS[])
     return print(io, show_id(x; digits = digits))
 end
 
-function show_id(x::Union{AbstractVariable}; digits = MAXDIGITS[])
-    hash_str = string(x.id_hash)
+function show_id(x::AbstractVariable; digits = MAXDIGITS[])
+    hash_str = string(objectid(x))
     if length(hash_str) > (2 * digits + 1)
         return "id: " * first(hash_str, digits) * "…" * last(hash_str, digits)
     else

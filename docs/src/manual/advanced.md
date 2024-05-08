@@ -131,16 +131,15 @@ this. To do so, we define
 
 ```@example 1
 using Convex
+
+# Must be mutable! Otherwise variables with the same size/value would be treated as the same object.
 mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
-    id_hash::UInt64
-    size::Tuple{Int, Int}
+    size::Tuple{Int,Int}
     value::Union{Convex.Value,Nothing}
     vexity::Convex.Vexity
     function ProbabilityVector(d)
-        this = new(:ProbabilityVector, 0, (d,1), nothing, Convex.AffineVexity())
-        this.id_hash = objectid(this)
-        this
+        return new(:ProbabilityVector, (d, 1), nothing, Convex.AffineVexity())
     end
 end
 
@@ -165,8 +164,8 @@ solve!(prob, SCS.Optimizer)
 evaluate(p) # [1.0, 0.0, 0.0]
 ```
 
-Subtypes of `AbstractVariable` must have the fields `head`, `id_hash`, and
-`size`, and `id_hash` must be populated as shown in the example. Then they must also
+Subtypes of `AbstractVariable` must have the fields `head` and
+`size`. Then they must also
 
 * either have a field `value`, or implement [`Convex._value`](@ref) and
   [`Convex.set_value!`](@ref)

@@ -5,7 +5,7 @@
 
 struct Optimizer{T,M} <: MOI.AbstractOptimizer
     context::Context{T,M}
-    moi_to_convex::OrderedCollections.OrderedDict{MOI.VariableIndex,UInt64}
+    moi_to_convex::OrderedCollections.OrderedDict{MOI.VariableIndex,Any}
     convex_to_moi::Dict{UInt64,Vector{MOI.VariableIndex}}
     constraint_map::Vector{MOI.ConstraintIndex}
     function Optimizer(context::Context{T,M}) where {T,M}
@@ -47,9 +47,8 @@ end
 
 function _add_variable(model::Optimizer, vi::MOI.VariableIndex)
     var = Variable()
-    model.moi_to_convex[vi] = var.id_hash
-    model.context.var_id_to_moi_indices[var.id_hash] = [vi]
-    model.context.id_to_variables[var.id_hash] = var
+    model.moi_to_convex[vi] = var
+    model.context.var_to_moi_indices[var] = [vi]
     return
 end
 
@@ -129,7 +128,7 @@ function _expr(::Optimizer, v::Value)
 end
 
 function _expr(model::Optimizer, x::MOI.VariableIndex)
-    return model.context.id_to_variables[model.moi_to_convex[x]]
+    return model.moi_to_convex[x]
 end
 
 function _expr(model::Optimizer, f::MOI.AbstractScalarFunction)

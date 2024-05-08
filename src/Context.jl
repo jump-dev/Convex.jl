@@ -8,15 +8,13 @@ mutable struct Context{T,M}
     model::M
 
     # Used for populating variable values after solving
-    var_id_to_moi_indices::OrderedCollections.OrderedDict{
-        UInt64,
+    var_to_moi_indices::IdDict{
+        Any,
         Union{
             Vector{MOI.VariableIndex},
             Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
         },
     }
-    # `id_hash` -> `AbstractVariable`
-    id_to_variables::OrderedCollections.OrderedDict{UInt64,Any}
 
     # Used for populating constraint duals
     constr_to_moi_inds::IdDict{Any,Any}
@@ -24,7 +22,6 @@ mutable struct Context{T,M}
     detected_infeasible_during_formulation::Bool
 
     # Cache
-    # conic_form_cache::DataStructures.WeakKeyIdDict{Any, Any}
     conic_form_cache::IdDict{Any,Any}
 end
 
@@ -39,8 +36,13 @@ function Context{T}(optimizer_factory; add_cache::Bool = false) where {T}
     end
     return Context{T,typeof(model)}(
         model,
-        OrderedCollections.OrderedDict{UInt64,Vector{MOI.VariableIndex}}(),
-        OrderedCollections.OrderedDict{UInt64,Any}(),
+        IdDict{
+            Any,
+            Union{
+                Vector{MOI.VariableIndex},
+                Tuple{Vector{MOI.VariableIndex},Vector{MOI.VariableIndex}},
+            },
+        }(),
         IdDict{Any,Any}(),
         false,
         IdDict{Any,Any}(),
@@ -49,8 +51,7 @@ end
 
 function Base.empty!(context::Context)
     MOI.empty!(context.model)
-    empty!(context.var_id_to_moi_indices)
-    empty!(context.id_to_variables)
+    empty!(context.var_to_moi_indices)
     empty!(context.constr_to_moi_inds)
     context.detected_infeasible_during_formulation = false
     empty!(context.conic_form_cache)
