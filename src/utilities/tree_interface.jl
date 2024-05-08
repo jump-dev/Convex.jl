@@ -141,8 +141,25 @@ function single_count!(seen::Base.IdSet, node)
     end
 end
 
+# This is tricky: variables can carry their own constraints which are accessed via `get_constraints`.
+# These constraints are *not* their children; often the constraint will involve
+# the variable itself, so there would be a cycle (which would break the tree-based printing).
+# However, we *do* want to count these constraints. Therefore, we will
+# specially recurse on them here, whenever we encounter an `AbstractVariable`.
+function single_count!(seen::Base.IdSet, node::AbstractVariable)
+    if node in seen
+        return zero(Counts)
+    else
+        push!(seen, node)
+        return counts(node) + counts_recursive!(seen, get_constraints(node))
+    end
+end
+
 function counts_recursive(node)
-    seen = Base.IdSet()
+    return counts_recursive!(Base.IdSet(), node)
+end
+
+function counts_recursive!(seen, node)
     return sum(
         c -> single_count!(seen, c),
         AbstractTrees.PreOrderDFS(node);
@@ -165,13 +182,13 @@ function counts(node::GenericConstraint)
     f = iscomplex(node) ? 2 : 1
     return Counts(;
         n_constraints = 1,
-        total_len_constraints = f*MOI.dimension(node.set),
+        total_len_constraints = f * MOI.dimension(node.set),
     )
 end
 
 function counts(node::Union{RelativeEntropyEpiCone,GeometricMeanHypoCone})
     f = iscomplex(node) ? 2 : 1
-    return Counts(; n_constraints = 1, total_len_constraints = f*node.size[1])
+    return Counts(; n_constraints = 1, total_len_constraints = f * node.size[1])
 end
 
 function counts(node::Constant)
