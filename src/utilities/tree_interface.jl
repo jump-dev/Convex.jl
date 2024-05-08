@@ -115,11 +115,11 @@ function Base.show(io::IO, c::Counts)
                 underscorise(c.total_nnz_sparse_constants),
                 " sparse nonzero",
                 maybe_s(c.total_nnz_sparse_constants),
-                ")",
             )
         end
-        print(io, ", ", underscorise(c.n_atoms), " atom", maybe_s(c.n_atoms))
+        print(io, ")")
     end
+    print(io, ", ", underscorise(c.n_atoms), " atom", maybe_s(c.n_atoms))
     return nothing
 end
 
@@ -172,14 +172,25 @@ function counts(node::Union{RelativeEntropyEpiCone,GeometricMeanHypoCone})
     return Counts(; n_constraints = 1, total_len_constraints = node.size[1])
 end
 
-function counts(node::Union{Constant,ComplexConstant})
-    f = iscomplex(node) ? 2 : 1
+function counts(node::Constant)
     return Counts(;
         n_constants = 1,
         total_len_dense_constants = SparseArrays.issparse(node.value) ? 0 :
-                                    f * length(node.value),
+                                    length(node.value),
         total_nnz_sparse_constants = SparseArrays.issparse(node.value) ?
-                                     f * SparseArrays.nnz(node.value) : 0,
+                                     SparseArrays.nnz(node.value) : 0,
+    )
+end
+
+function counts(node::ComplexConstant)
+    re = counts(node.real_constant)
+    im = counts(node.imag_constant)
+    return Counts(;
+        n_constants = 1,
+        total_len_dense_constants = re.total_len_dense_constants +
+                                    im.total_len_dense_constants,
+        total_nnz_sparse_constants = re.total_nnz_sparse_constants +
+                                     im.total_nnz_sparse_constants,
     )
 end
 
