@@ -162,14 +162,16 @@ function counts(node::AbstractVariable)
 end
 
 function counts(node::GenericConstraint)
+    f = iscomplex(node) ? 2 : 1
     return Counts(;
         n_constraints = 1,
-        total_len_constraints = MOI.dimension(node.set),
+        total_len_constraints = f*MOI.dimension(node.set),
     )
 end
 
 function counts(node::Union{RelativeEntropyEpiCone,GeometricMeanHypoCone})
-    return Counts(; n_constraints = 1, total_len_constraints = node.size[1])
+    f = iscomplex(node) ? 2 : 1
+    return Counts(; n_constraints = 1, total_len_constraints = f*node.size[1])
 end
 
 function counts(node::Constant)
