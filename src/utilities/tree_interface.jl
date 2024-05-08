@@ -119,7 +119,7 @@ function Base.show(io::IO, c::Counts)
         end
         print(io, ")")
     end
-    print(io, ", ", underscorise(c.n_atoms), " atom", maybe_s(c.n_atoms))
+    print(io, ", and ", underscorise(c.n_atoms), " atom", maybe_s(c.n_atoms))
     return nothing
 end
 
