@@ -1940,6 +1940,41 @@ function test_RationalNormAtom_less_than_1()
     return
 end
 
+function test_OptimizationSenseAtom()
+    t = Variable(Convex.Positive())
+    atom = Convex.OptimizationSenseAtom(t, MOI.MAX_SENSE)
+    @test sprint(Convex.head, atom) == "MAX_SENSE"
+    @test sign(atom) == Convex.Positive()
+    @test vexity(atom) == Convex.ConcaveVexity()
+    atom = Convex.OptimizationSenseAtom(t, MOI.MIN_SENSE)
+    @test sprint(Convex.head, atom) == "MIN_SENSE"
+    @test vexity(atom) == Convex.ConvexVexity()
+    t.value = 2
+    @test evaluate(atom) == 2
+    return
+end
+
+function test_OptimizationSenseAtom_lamba_min()
+    function lamb_min(A::Convex.AbstractExpr)
+       t = Variable()
+       n = size(A, 1)
+       @assert n == size(A, 2)
+       add_constraint!(t, A - t * LinearAlgebra.I(n) ⪰ 0)
+       return Convex.OptimizationSenseAtom(t, MOI.MAX_SENSE)
+    end
+    A = Variable(2, 2)
+    p = maximize(lamb_min(A) + 1)
+    @test vexity(p) == Convex.ConvexVexity()
+    context = Convex.Context(p, MOI.Utilities.Model{Float64});
+    F = MOI.VectorAffineFunction{Float64}
+    S = MOI.PositiveSemidefiniteConeSquare
+    @test (F, S) in MOI.get(context.model, MOI.ListOfConstraintTypesPresent())
+    @test MOI.get(context.model, MOI.NumberOfConstraints{F,S}()) == 1
+    p = minimize(lamb_min(A) + 1)
+    @test vexity(p) == Convex.ConcaveVexity()
+    return
+end
+
 ### reformulations/conv
 
 function test_conv()
