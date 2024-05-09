@@ -2314,16 +2314,11 @@ function test_Problem_array()
         return minimize(square(s) + 2 * M * abs(n), c == s + n)
     end
     x = Variable(2)
-    atom = op_huber(x)
-    @test size(atom) == (2, 1)
-    context_op_huber = Convex.Context(
-        minimize(sum(op_huber(x))),
-        MOI.Utilities.Model{Float64},
-    )
-    context_builtin = Convex.Context(
-        minimize(sum(huber(x))),
-        MOI.Utilities.Model{Float64},
-    )
+    @test size(op_huber(x)) == (2, 1)
+    context_op_huber =
+        Convex.Context(minimize(sum(op_huber(x))), MOI.Utilities.Model{Float64})
+    context_builtin =
+        Convex.Context(minimize(sum(huber(x))), MOI.Utilities.Model{Float64})
     # This test checks that the two printed models are identical. This relies on
     # the conic_form! of HuberAtom being identical to the implementation in
     # op_huber. Feel free to change this test if HuberAtom changes.
