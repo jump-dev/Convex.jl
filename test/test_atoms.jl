@@ -2282,6 +2282,8 @@ function test_Problem_at_atom_lamba_min()
     @test MOI.get(context.model, MOI.NumberOfConstraints{F,S}()) == 1
     p = minimize(lamb_min(A) + 1)
     @test vexity(p) == Convex.NotDcp()
+    p = satisfy([lamb_min(A) >= 1])
+    @test vexity(p) == Convex.ConstVexity()
     return
 end
 
