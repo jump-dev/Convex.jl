@@ -186,9 +186,10 @@ end
 function Problem{T}(
     head::Symbol,
     objective::AbstractExpr,
+    constraint::Constraint,
     constraints::Constraint...,
 ) where {T<:Real}
-    return Problem{T}(head, objective, [constraints...])
+    return Problem{T}(head, objective, [constraint, constraints...])
 end
 
 # Allow users to simply type minimize
