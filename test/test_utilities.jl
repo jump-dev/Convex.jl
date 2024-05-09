@@ -279,7 +279,7 @@ function test_show()
     old_maxdigits = Convex.MAXDIGITS[]
     Convex.MAXDIGITS[] = 100
     @test length(Convex.show_id(x)) ==
-          length("id: ") + length(string(x.id_hash))
+          length("id: ") + length(string(objectid(x)))
     Convex.MAXDIGITS[] = old_maxdigits
     return
 end
@@ -764,16 +764,15 @@ using Convex
 # To make sure `Convex` isn't using field access on `AbstractVariable`'s
 # we'll use a global dictionary to store information about each instance
 # our of mock variable type, `DictVector`.
-const global_cache = Dict{UInt64,Any}()
+const global_cache = IdDict{Any,Any}()
 
+# Must be mutable to have unique object identity even if identical fields
 mutable struct DictVector{T} <: Convex.AbstractVariable
     head::Symbol
-    id_hash::UInt64
     size::Tuple{Int,Int}
     function DictVector{T}(d) where {T}
-        this = new(:DictVector, 0, (d, 1))
-        this.id_hash = objectid(this)
-        global_cache[this.id_hash] = Dict(
+        this = new(:DictVector, (d, 1))
+        global_cache[this] = Dict(
             :value => nothing,
             :sign => T <: Complex ? ComplexSign() : NoSign(),
             :vartype => ContVar,
@@ -784,36 +783,36 @@ mutable struct DictVector{T} <: Convex.AbstractVariable
     end
 end
 
-Convex.evaluate(x::DictVector) = global_cache[x.id_hash][:value]
+Convex.evaluate(x::DictVector) = global_cache[x][:value]
 
 function Convex.set_value!(x::DictVector, v::AbstractArray)
-    return global_cache[x.id_hash][:value] = v
+    return global_cache[x][:value] = v
 end
 
 function Convex.set_value!(x::DictVector, v::Number)
-    return global_cache[x.id_hash][:value] = v
+    return global_cache[x][:value] = v
 end
 
-Convex.vexity(x::DictVector) = global_cache[x.id_hash][:vexity]
+Convex.vexity(x::DictVector) = global_cache[x][:vexity]
 
 function Convex.vexity!(x::DictVector, v::Convex.Vexity)
-    return global_cache[x.id_hash][:vexity] = v
+    return global_cache[x][:vexity] = v
 end
 
-Convex.sign(x::DictVector) = global_cache[x.id_hash][:sign]
+Convex.sign(x::DictVector) = global_cache[x][:sign]
 
-Convex.sign!(x::DictVector, s::Convex.Sign) = global_cache[x.id_hash][:sign] = s
+Convex.sign!(x::DictVector, s::Convex.Sign) = global_cache[x][:sign] = s
 
-Convex.vartype(x::DictVector) = global_cache[x.id_hash][:vartype]
+Convex.vartype(x::DictVector) = global_cache[x][:vartype]
 
 function Convex.vartype!(x::DictVector, s::Convex.VarType)
-    return global_cache[x.id_hash][:vartype] = s
+    return global_cache[x][:vartype] = s
 end
 
-Convex.get_constraints(x::DictVector) = global_cache[x.id_hash][:constraints]
+Convex.get_constraints(x::DictVector) = global_cache[x][:constraints]
 
 function Convex.add_constraint!(x::DictVector, s::Convex.Constraint)
-    return push!(global_cache[x.id_hash][:constraints], s)
+    return push!(global_cache[x][:constraints], s)
 end
 
 end  # DictVector
@@ -842,20 +841,16 @@ using Convex
 
 mutable struct DensityMatrix{T} <: Convex.AbstractVariable
     head::Symbol
-    id_hash::UInt64
     size::Tuple{Int,Int}
     value::Union{Convex.Value,Nothing}
     vexity::Convex.Vexity
     function DensityMatrix(d)
-        this = new{ComplexF64}(
+        return new{ComplexF64}(
             :DensityMatrix,
-            0,
             (d, d),
             nothing,
             Convex.AffineVexity(),
         )
-        this.id_hash = objectid(this)
-        return this
     end
 end
 
@@ -898,15 +893,12 @@ using Convex
 
 mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
-    id_hash::UInt64
     size::Tuple{Int,Int}
     value::Union{Convex.Value,Nothing}
     vexity::Convex.Vexity
+
     function ProbabilityVector(d)
-        this =
-            new(:ProbabilityVector, 0, (d, 1), nothing, Convex.AffineVexity())
-        this.id_hash = objectid(this)
-        return this
+        return new(:ProbabilityVector, (d, 1), nothing, Convex.AffineVexity())
     end
 end
 
@@ -1285,7 +1277,7 @@ function test_variable_primal_start()
         x4 => ([1.0], [2.0]),
         x5 => ([1.0, 0.0, 2.0, 4.0], [0.0, 3.0, 0.0, 0.0]),
     )
-        variable = context.var_id_to_moi_indices[key.id_hash]
+        variable = context.var_to_moi_indices[key]
         start = if variable isa Tuple
             (
                 MOI.get(context.model, MOI.VariablePrimalStart(), variable[1]),

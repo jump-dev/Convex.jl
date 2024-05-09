@@ -38,7 +38,6 @@ end
 
 mutable struct Constant{T<:Real} <: AbstractExpr
     head::Symbol
-    id_hash::UInt64
     value::Union{Matrix{T},SPARSE_MATRIX{T}}
     size::Tuple{Int,Int}
     sign::Sign
@@ -47,13 +46,7 @@ mutable struct Constant{T<:Real} <: AbstractExpr
         if x isa Complex || x isa AbstractArray{<:Complex}
             throw(DomainError(x, "Constant expects real values"))
         end
-        return new{eltype(x)}(
-            :constant,
-            objectid(x),
-            _matrix(x),
-            _size(x),
-            sign,
-        )
+        return new{eltype(x)}(:constant, _matrix(x), _size(x), sign)
     end
 end
 function Constant(x::Value, check_sign::Bool = true)
@@ -63,13 +56,12 @@ end
 
 mutable struct ComplexConstant{T<:Real} <: AbstractExpr
     head::Symbol
-    id_hash::UInt64
     size::Tuple{Int,Int}
     real_constant::Constant{T}
     imag_constant::Constant{T}
     function ComplexConstant(re::Constant{T}, im::Constant{T}) where {T}
         size(re) == size(im) || error("size mismatch")
-        return new{T}(:complex_constant, rand(UInt64), size(re), re, im)
+        return new{T}(:complex_constant, size(re), re, im)
     end
 
     # function ComplexConstant(re::Constant{S1}, im::Constant{S2}) where {S1,S2}

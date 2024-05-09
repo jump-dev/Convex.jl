@@ -14,9 +14,8 @@ export antidiag
 
 ### Diagonal
 ### Represents the kth diagonal of an mxn matrix as a (min(m, n) - k) x 1 vector
-struct AntidiagAtom <: Convex.AbstractExpr
+mutable struct AntidiagAtom <: Convex.AbstractExpr
     head::Symbol
-    id_hash::UInt64
     children::Tuple{Convex.AbstractExpr}
     size::Tuple{Int,Int}
     k::Int
@@ -27,13 +26,7 @@ struct AntidiagAtom <: Convex.AbstractExpr
             error("Bounds error in calling diag")
         end
         children = (x,)
-        return new(
-            :antidiag,
-            hash((children, k)),
-            children,
-            (minimum(x.size) - k, 1),
-            k,
-        )
+        return new(:antidiag, children, (minimum(x.size) - k, 1), k)
     end
 end
 

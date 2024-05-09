@@ -6,15 +6,13 @@
 # It might be useful to get a direct VOV sometimes...
 function _template(a::AbstractVariable, context::Context{T}) where {T}
     first_cache = false
-    var_inds = get!(context.var_id_to_moi_indices, a.id_hash) do
+    var_inds = get!(context.var_to_moi_indices, a) do
         first_cache = true
         return add_variables!(context.model, a)
     end
 
-    context.id_to_variables[a.id_hash] = a
-
     # we only want this to run once, when the variable is first added,
-    # and after `var_id_to_moi_indices` is populated
+    # and after `var_to_moi_indices` is populated
     if first_cache
         if sign(a) == Positive()
             add_constraint!(context, a >= 0)
@@ -97,18 +95,6 @@ accessed in `context[a]`, otherwise, it is created by calling
 with the same expression does not create a duplicate one.
 """
 function conic_form!(context::Context, a::AbstractExpr)
-
-    # Nicer implementation
     d = context.conic_form_cache
     return get!(() -> new_conic_form!(context, a), d, a)
-
-    # Avoid closure
-    # wkh = context.conic_form_cache
-    # default = () -> new_conic_form!(context, a)
-    # key = a
-    # return Base.@lock wkh.lock begin
-    #     get!(default, wkh.ht, DataStructures.WeakRefForWeakDict(key))
-    # end
-
-    return
 end
