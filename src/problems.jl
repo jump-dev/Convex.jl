@@ -34,6 +34,9 @@ function Base.getproperty(p::Problem, s::Symbol)
         else
             return objective_value(p)
         end
+    elseif s === :size
+        # Used when Problem is interpreted as an atom
+        return p.objective.size
     end
     return getfield(p, s)
 end
@@ -90,20 +93,15 @@ function objective_vexity(p::Problem)
     return obj_vex
 end
 
-vexity(p::Problem) = objective_vexity(p)
-
-# is this right?
-# function problem_vexity(sense, obj_vexity, constr_vexity)
-#     if constr_vexity == ConstVexity()
-#         return obj_vexity
-#     end
-
-#     if constr_vexity == AffineVexity() && obj_vexity == AffineVexity()
-#         return sense === :maximize ? ConcaveVexity() : ConvexVexity()
-#     end
-
-#     return obj_vexity + constr_vexity
-# end
+function vexity(p::Problem)
+    if p.head == :satisfy
+        return ConstVexity()
+    elseif p.head == :minimize
+        return vexity(p.objective) + ConvexVexity()
+    elseif p.head == :maximize
+        return vexity(p.objective) + ConcaveVexity()
+    end
+end
 
 function monotonicity(p::Problem)
     if p.head === :satisfy

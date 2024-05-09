@@ -2265,6 +2265,68 @@ function test_transpose()
     return
 end
 
+### src/problems.jl
+
+function test_Problem_at_atom_lamba_min()
+    function lamb_min(A::Convex.AbstractExpr)
+        t = Variable()
+        n = size(A, 1)
+        @assert n == size(A, 2)
+        return maximize(t, [A - t * LinearAlgebra.I(n) ⪰ 0])
+    end
+    A = Variable(2, 2)
+    p = maximize(lamb_min(A) + 1)
+    @test vexity(p) == Convex.ConcaveVexity()
+    context = Convex.Context(p, MOI.Utilities.Model{Float64})
+    F = MOI.VectorAffineFunction{Float64}
+    S = MOI.PositiveSemidefiniteConeSquare
+    @test (F, S) in MOI.get(context.model, MOI.ListOfConstraintTypesPresent())
+    @test MOI.get(context.model, MOI.NumberOfConstraints{F,S}()) == 1
+    # Check DCP error
+    p = minimize(lamb_min(A) + 1)
+    @test vexity(p) == Convex.NotDcp()
+    # Check satisfy
+    p = satisfy([lamb_min(A) >= 1])
+    @test vexity(p) == Convex.ConstVexity()
+    return
+end
+
+function test_Problem_caching()
+    function t_atom()
+        t = Variable()
+        return minimize(t, [t >= 0])
+    end
+    p = minimize(t_atom() + t_atom())
+    context = Convex.Context(p, MOI.Utilities.Model{Float64})
+    @test MOI.get(context.model, MOI.NumberOfVariables()) == 2
+    t = t_atom()
+    p = minimize(t + t)
+    context = Convex.Context(p, MOI.Utilities.Model{Float64})
+    @test MOI.get(context.model, MOI.NumberOfVariables()) == 1
+    return
+end
+
+function test_Problem_array()
+    function op_huber(c)
+        M = 1.0
+        s = Variable(size(c))
+        n = Variable(size(c))
+        return minimize(square(s) + 2 * M * abs(n), c == s + n)
+    end
+    x = Variable(2)
+    @test size(op_huber(x)) == (2, 1)
+    context_op_huber =
+        Convex.Context(minimize(sum(op_huber(x))), MOI.Utilities.Model{Float64})
+    context_builtin =
+        Convex.Context(minimize(sum(huber(x))), MOI.Utilities.Model{Float64})
+    # This test checks that the two printed models are identical. This relies on
+    # the conic_form! of HuberAtom being identical to the implementation in
+    # op_huber. Feel free to change this test if HuberAtom changes.
+    @test sprint(print, context_op_huber.model) ==
+          sprint(print, context_builtin.model)
+    return
+end
+
 end  # TestAtoms
 
 TestAtoms.runtests()
