@@ -66,7 +66,7 @@ Represents `x' * A * x` where either:
    semidefinite or negative semidefinite.
  * or `A` is a matrix-valued variable and `x` is a vector.
 """
-quadform(x::Value, A::AbstractExpr; assume_psd = false) = x' * A * x
+quadform(x::Value, A::AbstractExpr; kwargs...) = x' * A * x
 
 function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     if length(size(A)) != 2 || size(A, 1) != size(A, 2)
@@ -85,15 +85,19 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     return factor * square(norm2(P * x))
 end
 
-function quadform(x::Constant, A::AbstractExpr; assume_psd = false)
-    return quadform(evaluate(x), A; assume_psd)
+function quadform(x::Constant, A::AbstractExpr; kwargs...)
+    return quadform(evaluate(x), A; kwargs...)
 end
 
-function quadform(x::AbstractExpr, A::Constant; assume_psd = false)
-    return quadform(x, evaluate(A); assume_psd)
+function quadform(x::AbstractExpr, A::Constant; kwargs...)
+    return quadform(x, evaluate(A); kwargs...)
 end
 
-function quadform(x::AbstractExpr, A::AbstractExpr; assume_psd = false)
+function quadform(x::Constant, A::Constant; kwargs...)
+    return evaluate(x)' * evaluate(A) * evaluate(x)
+end
+
+function quadform(x::AbstractExpr, A::AbstractExpr; kwargs...)
     return error(
         "Convex.jl v0.13.5 introduced the ability to use `fix!`ed variables " *
         "in `quadform`. However, this did not consider the case that the " *

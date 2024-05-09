@@ -18,9 +18,9 @@ Random.seed!(2)
 end
 
 @testset "Aqua" begin
-    Aqua.test_all(Convex; ambiguities = false, piracies = false)
+    Aqua.test_all(Convex; piracies = false)
     # Convex currently has some light piracy of `hcat`, `vcat` and `hvcat`
     Aqua.test_piracies(Convex; treat_as_own = [hcat, vcat, hvcat])
     # Convex currently has some ambiguities
-    Aqua.test_ambiguities(Convex; broken = true)
+    Aqua.test_ambiguities(Convex)
 end
