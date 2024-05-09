@@ -21,6 +21,4 @@ end
     Aqua.test_all(Convex; piracies = false)
     # Convex currently has some light piracy of `hcat`, `vcat` and `hvcat`
     Aqua.test_piracies(Convex; treat_as_own = [hcat, vcat, hvcat])
-    # Convex currently has some ambiguities
-    Aqua.test_ambiguities(Convex)
 end
