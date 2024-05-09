@@ -40,8 +40,7 @@ const Value = Union{Number,AbstractArray}
 # We commandeer `==` to create a constraint.
 # Therefore we define `isequal` to still have a notion of equality
 # (Normally `isequal` falls back to `==`, so we need to provide a method).
-# All `AbstractExpr` (Constraints are not AbstractExpr's!) are compared by value, except for AbstractVariables,
-# which use their `id_hash` field.
+# All `AbstractExpr` (Constraints are not AbstractExpr's!) are compared by value, except for AbstractVariables, which are compared by `===` (objectid).
 function Base.isequal(x::AbstractExpr, y::AbstractExpr)
     if typeof(x) != typeof(y)
         return false

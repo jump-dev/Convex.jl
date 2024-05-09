@@ -866,6 +866,11 @@ function test_VcatAtom_getindex()
         @test vexity(v[5:6, 1:2]) isa Convex.ConcaveVexity
         @test vexity(v[1:3, 1]) isa Convex.ConvexVexity
     end
+    x = Variable()
+    y = square(x)
+    f = vcat(x, y)
+    @test isequal(f[[true, false]], x)
+    @test isequal(f[[false, true]], y)
     return
 end
 
@@ -2210,6 +2215,7 @@ function test_quadform()
         ErrorException("quadform only defined for Hermitian matrices"),
         quadform(Variable(2), [1 0; -2 1]),
     )
+    @test quadform(constant([1, 2]), constant([1 2; 2 3])) == 21
     return
 end
 

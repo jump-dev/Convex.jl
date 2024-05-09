@@ -127,3 +127,7 @@ function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
     remaining = VcatAtom(keep_children...)
     return IndexAtom(remaining, inds)
 end
+
+function Base.getindex(x::VcatAtom, inds::AbstractVector{Bool})
+    return getindex(x, first.(filter!(last, collect(enumerate(inds)))))
+end

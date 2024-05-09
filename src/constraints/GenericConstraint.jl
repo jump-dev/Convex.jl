@@ -87,7 +87,7 @@ end
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
         if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
-            context.detected_infeasible_during_formulation[] = true
+            context.detected_infeasible_during_formulation = true
         end
         return
     end
@@ -96,7 +96,11 @@ function _add_constraint!(context::Context, c::GenericConstraint)
     return
 end
 
-function populate_dual!(model::MOI.ModelLike, c::GenericConstraint, indices)
+function populate_dual!(
+    model::MOI.ModelLike,
+    c::GenericConstraint,
+    indices::MOI.ConstraintIndex,
+)
     ret = MOI.get(model, MOI.ConstraintDual(), indices)
     c.dual = output(reshape(ret, c.child.size))
     return
@@ -241,7 +245,11 @@ end
 
 head(io::IO, ::MOI.PositiveSemidefiniteConeSquare) = print(io, "PSD")
 
-function is_feasible(x, ::MOI.PositiveSemidefiniteConeSquare, tol)
+function is_feasible(
+    x::AbstractMatrix,
+    ::MOI.PositiveSemidefiniteConeSquare,
+    tol,
+)
     return x ≈ transpose(x) && LinearAlgebra.eigmin(x) >= -tol
 end
 
