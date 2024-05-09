@@ -170,6 +170,7 @@ function test_show()
     @test sign(p) == NoSign()
     @test curvature(p) == Convex.ConvexVexity()
 
+    bytes = Base.format_bytes(Base.summarysize(p))
     @test sprint(show, p) == """
     maximize
     └─ log (concave; real)
@@ -183,7 +184,7 @@ function test_show()
        └─ + (affine; real)
           ├─ real variable ($(Convex.show_id(x)))
           └─ $(reshape([-3], 1, 1))
-
+    expression tree: 1 variable (1 element), 2 constraints (2 elements), 2 constants (2 dense elements), and 4 atoms (total: $bytes)
     status: `solve!` not called yet"""
 
     x = ComplexVariable(2, 3)
@@ -204,6 +205,7 @@ function test_show()
     root = hcat(level2, level2)
     p = minimize(sum(x), root == root)
     @test curvature(p) == Convex.ConstVexity()
+    bytes = Base.format_bytes(Base.summarysize(p))
     @test sprint(show, p) == """
         minimize
         └─ sum (affine; real)
@@ -216,7 +218,7 @@ function test_show()
               │  └─ …
               └─ Convex.NegateAtom (affine; real)
                  └─ …
-
+        expression tree: 2 variables (4 elements), 1 constraint (16 elements), 0 constants, and 7 atoms (total: $bytes)
         status: `solve!` not called yet"""
 
     # test `MAXWIDTH`
@@ -226,6 +228,7 @@ function test_show()
     @test_throws err sign(p)
     old_maxwidth = Convex.MAXWIDTH[]
     Convex.MAXWIDTH[] = 2
+    bytes = Base.format_bytes(Base.summarysize(p))
     @test sprint(show, p) == """
         satisfy
         └─ nothing
@@ -239,7 +242,7 @@ function test_show()
         │     ├─ real variable ($(Convex.show_id(x)))
         │     └─ $(reshape([-2], 1, 1))
         ⋮
-
+        expression tree: 1 variable (1 element), 100 constraints (100 elements), 100 constants (100 dense elements), and 101 atoms (total: $bytes)
         status: `solve!` not called yet"""
     Convex.MAXWIDTH[] = old_maxwidth
 
@@ -254,6 +257,10 @@ function test_show()
             "eps_abs" => 1e-6,
         ),
     )
+    bytes = Base.summarysize(p)
+    model_bytes = Base.summarysize(p.model)
+    str1 = Base.format_bytes(bytes - model_bytes)
+    str2 = Base.format_bytes(model_bytes)
     @test sprint(show, p) == """
             satisfy
             └─ nothing
@@ -262,7 +269,8 @@ function test_show()
                └─ + (affine; real)
                   ├─ real variable ($(Convex.show_id(x)))
                   └─ $(reshape([0], 1, 1))
-
+            expression tree: 1 variable (1 element), 1 constraint (1 element), 1 constant (1 dense element), and 2 atoms (total: $str1)
+            reformulation: 1 scalar variable, 1 constraint (1 element), 2 sparse constants (total: $str2)
             termination status: OPTIMAL
             primal status: FEASIBLE_POINT
             dual status: FEASIBLE_POINT"""
