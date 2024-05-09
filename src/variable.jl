@@ -18,8 +18,7 @@ integer-valued (`IntVar`), or binary (`BinVar`).
 """
     abstract type AbstractVariable <: AbstractExpr end
 
-An `AbstractVariable` should have `head` field, an `id_hash` field
-and a `size` field to conform to the `AbstractExpr` interface, and
+An `AbstractVariable` should have `head` field, and a `size` field to conform to the `AbstractExpr` interface, and
 implement methods (or use the field-access fallbacks) for
 
 * [`_value`](@ref), [`set_value!`](@ref): get or set the numeric value of the variable.
@@ -188,10 +187,10 @@ function free!(x::AbstractVariable)
 end
 
 function Base.isequal(x::AbstractVariable, y::AbstractVariable)
-    return x.id_hash == y.id_hash
+    return x === y
 end
 
-Base.hash(x::AbstractVariable, h::UInt) = hash(x.id_hash, h)
+Base.hash(x::AbstractVariable, h::UInt) = hash(objectid(x), h)
 
 iscomplex(x::Sign) = x == ComplexSign()
 
@@ -204,8 +203,6 @@ iscomplex(::Union{Real,AbstractArray{<:Real}}) = false
 mutable struct Variable <: AbstractVariable
     # Every `AbstractExpr` has a `head`; for a Variable it is set to `:variable`.
     head::Symbol
-    # A unique identifying hash used for caching.
-    id_hash::UInt64
     # The current value of the variable. Defaults to `nothing` until the
     # variable has been [`fix!`](@ref)'d to a particular value, or the
     # variable has been used in a problem which has been solved, at which
@@ -243,9 +240,8 @@ mutable struct Variable <: AbstractVariable
                 ),
             )
         end
-        this = new(
+        return new(
             :variable,
-            0,
             nothing,
             size,
             AffineVexity(),
@@ -253,8 +249,6 @@ mutable struct Variable <: AbstractVariable
             Constraint[],
             vartype,
         )
-        this.id_hash = objectid(this)
-        return this
     end
 end
 
@@ -274,7 +268,6 @@ Variable(vartype::VarType) = Variable((1, 1), NoSign(), vartype)
 
 mutable struct ComplexVariable <: AbstractVariable
     head::Symbol
-    id_hash::UInt64
     size::Tuple{Int,Int}
     value::Union{Value,Nothing}
     vexity::Vexity
@@ -283,7 +276,6 @@ mutable struct ComplexVariable <: AbstractVariable
     function ComplexVariable(size::Tuple{Int,Int} = (1, 1))
         return new(
             :ComplexVariable,
-            rand(UInt64),
             size,
             nothing,
             AffineVexity(),

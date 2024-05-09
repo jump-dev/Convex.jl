@@ -31,8 +31,8 @@ which is licensed under the MIT "Expat" license:
  * src/atoms/sdp_cone/QuantumRelativeEntropyAtom.jl
  * src/atoms/sdp_cone/TraceLogmAtom.jl
  * src/atoms/sdp_cone/TraceMpowerAtom.jl
- * src/constraints/GeomMeanEpiCone.jl
- * src/constraints/GeomMeanHypoCone.jl
+ * src/constraints/GeometricMeanEpiCone.jl
+ * src/constraints/GeometricMeanHypoCone.jl
  * src/constraints/RelativeEntropyEpiCone.jl
  * src/reformulations/lieb_ando.jl,
 

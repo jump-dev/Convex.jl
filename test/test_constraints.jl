@@ -38,7 +38,7 @@ end
 
 function test_EqualToConstraint_violated()
     p = satisfy([constant(5) == 0])
-    @test_logs (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:info,) (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
@@ -96,7 +96,7 @@ end
 
 function test_GreaterThanConstraint_violated()
     p = satisfy([constant(5) >= 6])
-    @test_logs (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:info,) (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
@@ -145,7 +145,7 @@ end
 
 function test_LessThanConstraint_violated()
     p = satisfy([constant(5) <= 4])
-    @test_logs (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:info,) (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
@@ -199,10 +199,10 @@ end
 function test_GenericConstraint_PositiveSemidefiniteConeSquare_violated()
     X = constant([1 2; 3 4])
     p = satisfy([X ⪰ 0])
-    @test_logs (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:info,) (:warn,) solve!(p, SCS.Optimizer)
     X = constant([1 2; 2 3])
     p = satisfy([X ⪰ 0])
-    @test_logs (:warn,) solve!(p, SCS.Optimizer)
+    @test_logs (:info,) (:warn,) solve!(p, SCS.Optimizer)
     return
 end
 
@@ -220,7 +220,7 @@ function test_GenericConstraint_SecondOrderCone()
     @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
-    @test Convex.sprint(Convex.head, c) == "soc"
+    @test Convex.sprint(Convex.head, c) == "MOI.SecondOrderCone"
     return
 end
 
@@ -251,7 +251,7 @@ function test_GenericConstraint_RotatedSecondOrderCone()
     @test isapprox(c.dual, [1, 29 / 2, -2, -3, -4]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.RotatedSecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
-    @test Convex.sprint(Convex.head, c) == "rsoc"
+    @test Convex.sprint(Convex.head, c) == "MOI.RotatedSecondOrderCone"
     return
 end
 
@@ -275,7 +275,7 @@ function test_GenericConstraint_ExponentialConeConstraint()
     @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
     c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
     @test vexity(c) === Convex.NotDcp()
-    @test sprint(Convex.head, c) == "exp"
+    @test sprint(Convex.head, c) == "MOI.ExponentialCone"
     return
 end
 
@@ -293,7 +293,19 @@ function test_GenericConstraint_RelativeEntropyConeConstraint()
     @test isapprox(c.dual, [1, 2, 1, -log(2) - 1, -1]; atol = 1e-3)
     c = Convex.GenericConstraint{MOI.RelativeEntropyCone}(vcat(square(u), 1, u))
     @test vexity(c) === Convex.NotDcp()
-    @test sprint(Convex.head, c) == "RelativeEntropyCone"
+    @test sprint(Convex.head, c) == "MOI.RelativeEntropyCone"
+    return
+end
+
+function test_GenericConstraint_NoVexity()
+    x = Variable(2)
+    set = MOI.Complements(2)
+    @test_throws(
+        ErrorException(
+            "`Convex.vexity(vex, ::$(typeof(set)))`: is not yet implemented. Please open an issue at https://github.com/jump-dev/Convex.jl",
+        ),
+        vexity(Convex.GenericConstraint(x, set)),
+    )
     return
 end
 

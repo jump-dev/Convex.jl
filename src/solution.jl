@@ -39,8 +39,7 @@ end
 
 function _add_variable_primal_start(context::Convex.Context{T}) where {T}
     attr = MOI.VariablePrimalStart()
-    for (id, moi_indices) in context.var_id_to_moi_indices
-        x = context.id_to_variables[id]
+    for (x, moi_indices) in context.var_to_moi_indices
         if x.value === nothing
             continue
         elseif moi_indices isa Tuple  # Variable is complex
@@ -85,7 +84,11 @@ function solve!(
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
-    context = Context(p, optimizer_factory)
+    context, (stats...) = @timed Context(p, optimizer_factory)
+    if !silent_solver
+        s = round(stats.time; digits = 2), Base.format_bytes(stats.bytes)
+        @info "[Convex.jl] Compilation finished: $(s[1]) seconds, $(s[2]) of memory allocated"
+    end
     if silent_solver
         MOI.set(context.model, MOI.Silent(), true)
     end
@@ -93,7 +96,7 @@ function solve!(
     if warmstart && MOI.supports(context.model, attr, MOI.VariableIndex)
         _add_variable_primal_start(context)
     end
-    if context.detected_infeasible_during_formulation[]
+    if context.detected_infeasible_during_formulation
         p.status = MOI.INFEASIBLE
     else
         MOI.optimize!(context.model)
@@ -104,8 +107,7 @@ function solve!(
         @warn "Problem wasn't solved optimally" status = p.status
     end
     primal_status = MOI.get(context.model, MOI.PrimalStatus())
-    for (id, indices) in context.var_id_to_moi_indices
-        var = context.id_to_variables[id]
+    for (var, indices) in context.var_to_moi_indices
         if vexity(var) == ConstVexity()
             continue  # Fixed variable
         elseif primal_status == MOI.NO_SOLUTION
