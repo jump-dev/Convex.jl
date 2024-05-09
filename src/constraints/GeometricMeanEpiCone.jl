@@ -84,19 +84,32 @@ function _add_constraint!(
 )
     T, A, B = _get_matrices(constraint)
     t = constraint.set.t
+    n = size(A, 1)
     Z = if sign(constraint.child) == ComplexSign()
-        HermitianSemidefinite(size(A, 1))
+        HermitianSemidefinite(n)
     else
-        Semidefinite(size(A, 1))
+        Semidefinite(n)
     end
     if t <= 0
         add_constraint!(context, [T A; A Z] ⪰ 0)
-        add_constraint!(context, Z in GeometricMeanHypoCone(A, B, -t, false))
+        add_constraint!(
+            context,
+            GenericConstraint(
+                (Z, A, B),
+                GeometricMeanHypoConeSquare(-t, n, false),
+            ),
+        )
     else
         # range of t checked in GeometricMeanEpiConeSquare constructor.
         @assert t >= 1
         add_constraint!(context, [T B; B Z] ⪰ 0)
-        add_constraint!(context, Z in GeometricMeanHypoCone(A, B, 2 - t, false))
+        add_constraint!(
+            context,
+            GenericConstraint(
+                (Z, A, B),
+                GeometricMeanHypoConeSquare(2 - t, n, false),
+            ),
+        )
     end
     return
 end

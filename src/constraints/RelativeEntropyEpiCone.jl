@@ -185,7 +185,10 @@ function _add_constraint!(
     end
     add_constraint!(
         context,
-        Z in GeometricMeanHypoCone(X, Y, 1 // (2^k), false),
+        GenericConstraint(
+            (Z, X, Y),
+            GeometricMeanHypoConeSquare(1 // (2^k), n, false),
+        ),
     )
     for ii in 1:m
         # Note that we are dividing by w here because it is easier

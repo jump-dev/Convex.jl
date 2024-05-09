@@ -30,158 +30,91 @@ REFERENCE
   theorem, matrix geometric means and semidefinite optimization" by Hamza
   Fawzi and James Saunderson (arXiv:1512.03401)
 """
-mutable struct GeometricMeanHypoCone
-    A::AbstractExpr
-    B::AbstractExpr
+struct GeometricMeanHypoConeSquare <: MOI.AbstractVectorSet
     t::Rational
-    size::Tuple{Int,Int}
+    side_dimension::Int
     fullhyp::Bool
 
-    function GeometricMeanHypoCone(
-        A::AbstractExpr,
-        B::AbstractExpr,
+    function GeometricMeanHypoConeSquare(
         t::Rational,
+        side_dimension::Int,
         fullhyp::Bool = true,
     )
-        if size(A) != size(B)
-            throw(DimensionMismatch("A and B must be the same size"))
-        end
-        n = size(A)[1]
-        if size(A) != (n, n)
-            throw(DimensionMismatch("A and B must be square"))
-        end
         if t < 0 || t > 1
             throw(DomainError(t, "t must be in the range [0, 1]"))
         end
-        return new(A, B, t, (n, n), fullhyp)
-    end
-
-    function GeometricMeanHypoCone(
-        A::Value,
-        B::AbstractExpr,
-        t::Rational,
-        fullhyp::Bool = true,
-    )
-        return GeometricMeanHypoCone(constant(A), B, t, fullhyp)
-    end
-
-    function GeometricMeanHypoCone(
-        A::AbstractExpr,
-        B::Value,
-        t::Rational,
-        fullhyp::Bool = true,
-    )
-        return GeometricMeanHypoCone(A, constant(B), t, fullhyp)
-    end
-
-    function GeometricMeanHypoCone(
-        A::Value,
-        B::Value,
-        t::Rational,
-        fullhyp::Bool = true,
-    )
-        return GeometricMeanHypoCone(constant(A), constant(B), t, fullhyp)
-    end
-
-    function GeometricMeanHypoCone(
-        A::Union{AbstractExpr,Value},
-        B::Union{AbstractExpr,Value},
-        t::Integer,
-        fullhyp::Bool = true,
-    )
-        return GeometricMeanHypoCone(A, B, t // 1, fullhyp)
+        return new(t, side_dimension, fullhyp)
     end
 end
 
-mutable struct GeometricMeanHypoConeConstraint <: Constraint
-    T::AbstractExpr
-    cone::GeometricMeanHypoCone
+MOI.dimension(set::GeometricMeanHypoConeSquare) = 3 * set.side_dimension^2
 
-    function GeometricMeanHypoConeConstraint(
-        T::AbstractExpr,
-        cone::GeometricMeanHypoCone,
-    )
-        if size(T) != cone.size
-            throw(DimensionMismatch("T must be size $(cone.size)"))
+function head(io::IO, ::GeometricMeanHypoConeSquare)
+    return print(io, "GeometricMeanHypoConeSquare")
+end
+
+function GenericConstraint(func::Tuple, set::GeometricMeanHypoConeSquare)
+    for f in func
+        n = LinearAlgebra.checksquare(f)
+        if n != set.side_dimension
+            throw(
+                DimensionMismatch(
+                    "Matrix of side dimension `$n` does not match set of side dimension `$(set.side_dimension)`",
+                ),
+            )
         end
-        return new(T, cone)
     end
-
-    function GeometricMeanHypoConeConstraint(
-        T::Value,
-        cone::GeometricMeanHypoCone,
-    )
-        return GeometricMeanHypoConeConstraint(constant(T), cone)
-    end
+    return GenericConstraint(vcat(vec.(func)...), set)
 end
 
-function iscomplex(c::GeometricMeanHypoConeConstraint)
-    return iscomplex(c.T) || iscomplex(c.cone)
-end
-
-iscomplex(c::GeometricMeanHypoCone) = iscomplex(c.A) || iscomplex(c.B)
-
-function head(io::IO, ::GeometricMeanHypoConeConstraint)
-    return print(io, "∈(GeometricMeanHypoCone)")
-end
-
-function Base.in(T, cone::GeometricMeanHypoCone)
-    return GeometricMeanHypoConeConstraint(T, cone)
-end
-
-function AbstractTrees.children(constraint::GeometricMeanHypoConeConstraint)
-    return (
-        constraint.T,
-        constraint.cone.A,
-        constraint.cone.B,
-        constraint.cone.t,
-    )
+function _get_matrices(c::GenericConstraint{GeometricMeanHypoConeSquare})
+    n = c.set.side_dimension
+    d = n^2
+    T = reshape(c.child[1:d], n, n)
+    A = reshape(c.child[d.+(1:d)], n, n)
+    B = reshape(c.child[2d.+(1:d)], n, n)
+    return T, A, B
 end
 
 # For t ∈ [0,1] the t-weighted matrix geometric mean is matrix concave (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪯ A #_t B will be a convex set.
-function vexity(constraint::GeometricMeanHypoConeConstraint)
-    A = vexity(constraint.cone.A)
-    B = vexity(constraint.cone.B)
-    T = vexity(constraint.T)
-
-    # NOTE: can't say A == NotDcp() because the NotDcp constructor prints a
-    # warning message.
-    if typeof(A) == ConvexVexity || typeof(A) == NotDcp
-        return NotDcp()
-    elseif typeof(B) == ConvexVexity || typeof(B) == NotDcp
+function vexity(constraint::GenericConstraint{GeometricMeanHypoConeSquare})
+    T, A, B = _get_matrices(constraint)
+    if vexity(A) in (ConvexVexity(), NotDcp()) ||
+       vexity(B) in (ConvexVexity(), NotDcp())
         return NotDcp()
     end
-    vex = -ConcaveVexity() + T
-    if vex == ConcaveVexity()
-        return NotDcp()
-    end
-    return vex
+    return -ConcaveVexity() + vexity(T)
 end
 
 function _add_constraint!(
     context::Context,
-    constraint::GeometricMeanHypoConeConstraint,
+    constraint::GenericConstraint{GeometricMeanHypoConeSquare},
 )
-    A = constraint.cone.A
-    B = constraint.cone.B
-    t = constraint.cone.t
-    T = constraint.T
-    fullhyp = constraint.cone.fullhyp
+    T, A, B = _get_matrices(constraint)
+    t = constraint.set.t
+    fullhyp = constraint.set.fullhyp
 
     is_complex =
         sign(A) == ComplexSign() ||
         sign(B) == ComplexSign() ||
         sign(T) == ComplexSign()
+    n = size(A, 1)
     if is_complex
-        make_temporary = () -> HermitianSemidefinite(size(A)[1])
+        make_temporary = () -> HermitianSemidefinite(n)
     else
-        make_temporary = () -> Semidefinite(size(A)[1])
+        make_temporary = () -> Semidefinite(n)
     end
 
     if fullhyp && t != 0 && t != 1
         W = make_temporary()
-        add_constraint!(context, W in GeometricMeanHypoCone(A, B, t, false))
+        add_constraint!(
+            context,
+            GenericConstraint(
+                (W, A, B),
+                GeometricMeanHypoConeSquare(t, n, false),
+            ),
+        )
         add_constraint!(context, W ⪰ T)
     else
         p = t.num
@@ -206,13 +139,19 @@ function _add_constraint!(
             if t < 1 / 2
                 add_constraint!(
                     context,
-                    Z in GeometricMeanHypoCone(A, B, 2 * t, false),
+                    GenericConstraint(
+                        (Z, A, B),
+                        GeometricMeanHypoConeSquare(2 * t, n, false),
+                    ),
                 )
                 add_constraint!(context, [A T; T' Z] ⪰ 0)
             else
                 add_constraint!(
                     context,
-                    Z in GeometricMeanHypoCone(A, B, 2 * t - 1, false),
+                    GenericConstraint(
+                        (Z, A, B),
+                        GeometricMeanHypoConeSquare(2 * t - 1, n, false),
+                    ),
                 )
                 add_constraint!(context, [B T; T' Z] ⪰ 0)
             end
@@ -221,7 +160,10 @@ function _add_constraint!(
             Z = make_temporary()
             add_constraint!(
                 context,
-                Z in GeometricMeanHypoCone(A, T, (2 * p - q) // p, false),
+                GenericConstraint(
+                    (Z, A, T),
+                    GeometricMeanHypoConeSquare((2 * p - q) // p, n, false),
+                ),
             )
             add_constraint!(context, [Z T; T B] ⪰ 0)
         elseif t < 1 / 2
@@ -231,18 +173,28 @@ function _add_constraint!(
             l = floor(Int, log2(q))
             add_constraint!(
                 context,
-                X in GeometricMeanHypoCone(A, B, p // (2^l), false),
+                GenericConstraint(
+                    (X, A, B),
+                    GeometricMeanHypoConeSquare(p // (2^l), n, false),
+                ),
             )
             add_constraint!(
                 context,
-                T in GeometricMeanHypoCone(A, X, (2^l) // q, false),
+                GenericConstraint(
+                    (T, A, X),
+                    GeometricMeanHypoConeSquare((2^l) // q, n, false),
+                ),
             )
         else
             #println("geom_mean_hypocone p=$p q=$q else")
             add_constraint!(
                 context,
-                T in GeometricMeanHypoCone(B, A, 1 - t, false),
+                GenericConstraint(
+                    (T, B, A),
+                    GeometricMeanHypoConeSquare(1 - t, n, false),
+                ),
             )
         end
     end
+    return
 end
