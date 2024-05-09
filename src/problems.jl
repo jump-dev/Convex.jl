@@ -95,7 +95,7 @@ end
 
 function vexity(p::Problem)
     if p.head == :satisfy
-        return vexity(p.objective)
+        return ConstVexity()
     elseif p.head == :minimize
         return vexity(p.objective) + ConvexVexity()
     elseif p.head == :maximize
