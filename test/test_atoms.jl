@@ -1975,6 +1975,18 @@ function test_conv()
     return
 end
 
+function test_conv2d()
+    target = """
+    variables: x1, x2
+    minobjective: [1.0 * x1, 2.0 * x1 + 1.0 * x2, 2.0 * x2]
+    """
+    _test_reformulation(target) do context
+        return conv2D(Variable(2, 2), [1 2; 3 4])
+    end
+
+
+end
+
 ### reformulations/dot
 
 function test_dot()
