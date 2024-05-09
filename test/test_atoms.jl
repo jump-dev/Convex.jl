@@ -2322,7 +2322,8 @@ function test_Problem_array()
     # This test checks that the two printed models are identical. This relies on
     # the conic_form! of HuberAtom being identical to the implementation in
     # op_huber. Feel free to change this test if HuberAtom changes.
-    @test sprint(print, context.model) == sprint(print, context_builtin.model)
+    @test sprint(print, context_op_huber.model) ==
+          sprint(print, context_builtin.model)
     return
 end
 
