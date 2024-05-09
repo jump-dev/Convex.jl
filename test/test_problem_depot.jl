@@ -44,6 +44,25 @@ end
 test_problem_depot_load_Float64() = _test_problem_depot_load(Float64)
 test_problem_depot_load_BigFloat() = _test_problem_depot_load(BigFloat)
 
+function _test_problem_depot_show()
+    Convex.ProblemDepot.foreach_problem() do name, func
+        @testset "$name" begin
+            func(Val(false), 0.0, 0.0, Float64) do problem
+                @test sprint(show, problem) isa AbstractString
+                solve!(
+                    problem,
+                    Clarabel.Optimizer;
+                    silent_solver = true,
+                    warmstart = true,
+                )
+                @test sprint(show, problem) isa AbstractString
+                return
+            end
+        end
+    end
+    return
+end
+
 function test_Clarabel_warmstarts()
     # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
     #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
@@ -51,12 +70,15 @@ function test_Clarabel_warmstarts()
     Convex.ProblemDepot.run_tests(;
         exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
     ) do p
-        return solve!(
+        ret = solve!(
             p,
             Clarabel.Optimizer;
             silent_solver = true,
             warmstart = true,
         )
+        # verify post-solve printing does not error
+        @test sprint(show, p) isa AbstractString
+        return ret
     end
     return
 end

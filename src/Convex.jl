@@ -249,6 +249,7 @@ end
 include("utilities/tree_print.jl")
 include("utilities/tree_interface.jl")
 include("utilities/show.jl")
+include("utilities/moi_utilities.jl")
 include("utilities/iteration.jl")
 include("problem_depot/problem_depot.jl")
 

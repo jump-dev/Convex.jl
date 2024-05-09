@@ -12,6 +12,7 @@ AbstractTrees.children(v::AbstractVariable) = ()
 AbstractTrees.children(c::Constant) = ()
 
 AbstractTrees.children(C::Constraint) = (C.lhs, C.rhs)
+AbstractTrees.children(C::RelativeEntropyEpiConeConstraint) = (C.τ, C.cone)
 
 AbstractTrees.printnode(io::IO, node::AbstractExpr) = summary(io, node)
 
@@ -186,10 +187,28 @@ function counts(node::GenericConstraint)
     )
 end
 
-function counts(node::Union{RelativeEntropyEpiCone,GeometricMeanHypoCone})
-    f = iscomplex(node) ? 2 : 1
-    return Counts(; n_constraints = 1, total_len_constraints = f * node.size[1])
+function counts(node::GeometricMeanHypoCone)
+    return Counts()
 end
+
+function counts(node::RelativeEntropyEpiCone)
+    return Counts()
+end
+
+function counts(node::RelativeEntropyEpiConeConstraint)
+    f = iscomplex(node) ? 2 : 1
+    return Counts(; n_constraints = 1, total_len_constraints = f * node.cone.size[1])
+end
+
+
+function counts(node::Convex.GeometricMeanHypoConeConstraint)
+    f = iscomplex(node) ? 2 : 1
+    return Counts(; n_constraints = 1, total_len_constraints = f * node.cone.size[1])
+end
+
+
+# e.g. `satisfy` objectives
+counts(node::Nothing) = Counts()
 
 function counts(node::Constant)
     return Counts(;
