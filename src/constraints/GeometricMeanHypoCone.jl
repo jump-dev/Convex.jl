@@ -128,7 +128,7 @@ function AbstractTrees.children(constraint::GeometricMeanHypoConeConstraint)
         constraint.T,
         constraint.cone.A,
         constraint.cone.B,
-        "t=$(constraint.cone.t)",
+        constraint.cone.t,
     )
 end
 

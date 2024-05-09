@@ -21,21 +21,9 @@ function get_counts(model)
     return (; n_variables, n_constraints, total_len_constraints, n_constants)
 end
 
+# If we use other MOI functions, we will need to add methods.
 function count_size(f::MOI.VectorAffineFunction)
     return length(f.terms) + length(f.constants)
-end
-
-function count_size(x)
-    error("Unknown:
-
-    $x
-
-    $(typeof(x))
-
-    $(propertynames(x))")
-    @show typeof(x)
-    @show propertynames(x)
-    return 0
 end
 
 function show_moi_counts(io::IO, model)
