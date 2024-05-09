@@ -822,7 +822,7 @@ function test_DictVectors()
     x = DictVectors.DictVector{BigFloat}(1)
     y = DictVectors.DictVector{BigFloat}(1)
     p = minimize(x + y, [x >= 3, y >= 2])
-    @test vexity(p) == Convex.AffineVexity()
+    @test vexity(p) == Convex.ConvexVexity()
     solve!(p, MOI.OptimizerWithAttributes(SCS.Optimizer, "verbose" => 0))
     @test p.optval ≈ 5 atol = 1e-3
     @test evaluate(x + y) ≈ 5 atol = 1e-3

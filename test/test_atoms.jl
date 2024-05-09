@@ -2265,6 +2265,26 @@ function test_transpose()
     return
 end
 
+function test_Problem_at_atom_lamba_min()
+    function lamb_min(A::Convex.AbstractExpr)
+        t = Variable()
+        n = size(A, 1)
+        @assert n == size(A, 2)
+        return maximize(t, [A - t * LinearAlgebra.I(n) ⪰ 0])
+    end
+    A = Variable(2, 2)
+    p = maximize(lamb_min(A) + 1)
+    @test vexity(p) == Convex.ConcaveVexity()
+    context = Convex.Context(p, MOI.Utilities.Model{Float64})
+    F = MOI.VectorAffineFunction{Float64}
+    S = MOI.PositiveSemidefiniteConeSquare
+    @test (F, S) in MOI.get(context.model, MOI.ListOfConstraintTypesPresent())
+    @test MOI.get(context.model, MOI.NumberOfConstraints{F,S}()) == 1
+    p = minimize(lamb_min(A) + 1)
+    @test vexity(p) == Convex.NotDcp()
+    return
+end
+
 end  # TestAtoms
 
 TestAtoms.runtests()
