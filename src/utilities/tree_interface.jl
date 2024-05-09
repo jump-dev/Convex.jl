@@ -12,9 +12,6 @@ AbstractTrees.children(v::AbstractVariable) = ()
 AbstractTrees.children(c::Constant) = ()
 
 AbstractTrees.children(C::Constraint) = (C.lhs, C.rhs)
-function AbstractTrees.children(C::RelativeEntropyEpiConeConstraint)
-    return (C.τ, C.cone.X, C.cone.Y)
-end
 
 AbstractTrees.printnode(io::IO, node::AbstractExpr) = summary(io, node)
 
