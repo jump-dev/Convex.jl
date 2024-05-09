@@ -237,13 +237,17 @@ end
 function Base.show(io::IO, p::Problem)
     TreePrint.print_tree(io, p, MAXDEPTH[], MAXWIDTH[])
     counts = counts_recursive(p)
-    bytes = Base.format_bytes(Base.summarysize(p))
-    print(io, "contains: ")
+    model_bytes = Base.summarysize(p.model)
+    bytes = Base.summarysize(p) - model_bytes
+    print(io, "expression tree: ")
     show(io, counts)
-    print(io, " (total: $bytes)")
+    print(io, " (total: ", Base.format_bytes(bytes), ")")
     if p.status == MOI.OPTIMIZE_NOT_CALLED
         print(io, "\nstatus: `solve!` not called yet")
     else
+        print(io, "\nreformulation: ")
+        show_moi_counts(io::IO, p.model)
+        print(io, " (total: ", Base.format_bytes(model_bytes), ")")
         print(io, "\ntermination status: $(p.status)")
         print(io, "\nprimal status: $(primal_status(p))")
         print(io, "\ndual status: $(dual_status(p))")
