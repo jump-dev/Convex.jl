@@ -127,7 +127,7 @@ end
 
 function _add_to_problem_count(
     counts::Counts,
-    node::SparseArrays.SparseMatrixCSC
+    node::SparseArrays.SparseMatrixCSC,
 )
     counts.n_nonzeros += SparseArrays.nnz(node)
     return
