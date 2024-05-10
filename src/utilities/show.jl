@@ -261,9 +261,6 @@ function Base.show(io::IO, p::Problem)
     if p.status == MOI.OPTIMIZE_NOT_CALLED
         print(io, "\nstatus: `solve!` not called yet")
     else
-        # print(io, "\nreformulation: ")
-        # show_moi_counts(io::IO, p.model)
-        # print(io, " (total: ", Base.format_bytes(model_bytes), ")")
         print(io, "\ntermination status: $(p.status)")
         print(io, "\nprimal status: $(primal_status(p))")
         print(io, "\ndual status: $(dual_status(p))")

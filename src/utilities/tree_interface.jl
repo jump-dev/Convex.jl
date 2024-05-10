@@ -132,4 +132,3 @@ function _add_to_problem_count(
     counts.n_nonzeros += SparseArrays.nnz(node)
     return
 end
-
