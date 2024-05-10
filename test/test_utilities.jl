@@ -1325,6 +1325,16 @@ function test_Constant_complex()
     return
 end
 
+function test_show_with_variable_constraints()
+    x = Variable()
+    add_constraint!(x, x >= 1)
+    p = minimize(x)
+    tree = sprint(show, p)
+    @test occursin("subject to", tree)
+    @test occursin("≥ constraint (affine)", tree)
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()

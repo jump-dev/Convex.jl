@@ -217,10 +217,16 @@ function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
         args...;
         kwargs...,
     )
-    if !isempty(p.constraints)
+    all_constraints = copy(p.constraints)
+    for leaf in AbstractTrees.Leaves(p)
+        if leaf isa AbstractVariable
+            append!(all_constraints, get_constraints(leaf))
+        end
+    end
+    if !isempty(all_constraints)
         TreePrint.print_tree(
             io,
-            ProblemConstraintsRoot(p.constraints),
+            ProblemConstraintsRoot(all_constraints),
             args...;
             kwargs...,
         )
