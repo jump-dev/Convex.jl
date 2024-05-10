@@ -17,6 +17,8 @@ function GenericConstraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
     return GenericConstraint(child, set_with_size(S, size(child)))
 end
 
+iscomplex(c::GenericConstraint) = iscomplex(c.child)
+
 function set_with_size(
     ::Type{S},
     sz::Tuple{Int,Int},

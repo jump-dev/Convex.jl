@@ -234,20 +234,36 @@ function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
     return
 end
 
+function _to_underscore(n::Integer)
+    x = Iterators.partition(digits(n), 3)
+    return join(reverse(join.(reverse.(x))), '_')
+end
+
+function _str_with_elements(x, y)
+    xs, ys = _to_underscore(x), _to_underscore(y)
+    return "$xs ($ys scalar elements)"
+end
+
 function Base.show(io::IO, p::Problem)
+    counts = Counts(p)
+    bytes = Base.summarysize(p) - Base.summarysize(p.model)
+    println(io, "summary")
+    var_str = _str_with_elements(counts.n_variables, counts.n_scalar_variables)
+    println(io, "├─ # variables    : ", var_str)
+    con_str =
+        _str_with_elements(counts.n_constraints, counts.n_scalar_constraints)
+    println(io, "├─ # constraints  : ", con_str)
+    println(io, "├─ # coefficients : ", counts.n_nonzeros)
+    println(io, "├─ # atoms        : ", counts.n_atoms)
+    println(io, "└─ size           : ", Base.format_bytes(bytes))
+    println(io)
     TreePrint.print_tree(io, p, MAXDEPTH[], MAXWIDTH[])
-    counts = counts_recursive(p)
-    model_bytes = Base.summarysize(p.model)
-    bytes = Base.summarysize(p) - model_bytes
-    print(io, "expression tree: ")
-    show(io, counts)
-    print(io, " (total: ", Base.format_bytes(bytes), ")")
     if p.status == MOI.OPTIMIZE_NOT_CALLED
         print(io, "\nstatus: `solve!` not called yet")
     else
-        print(io, "\nreformulation: ")
-        show_moi_counts(io::IO, p.model)
-        print(io, " (total: ", Base.format_bytes(model_bytes), ")")
+        # print(io, "\nreformulation: ")
+        # show_moi_counts(io::IO, p.model)
+        # print(io, " (total: ", Base.format_bytes(model_bytes), ")")
         print(io, "\ntermination status: $(p.status)")
         print(io, "\nprimal status: $(primal_status(p))")
         print(io, "\ndual status: $(dual_status(p))")

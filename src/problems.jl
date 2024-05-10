@@ -297,15 +297,6 @@ Base.:+(x::Constraint, y::Array{<:Constraint}) = vcat(x, y)
 Base.:+(x::Array{<:Constraint}, y::Constraint) = vcat(x, y)
 
 iscomplex(c::Constraint) = iscomplex(c.lhs) || iscomplex(c.rhs)
-iscomplex(c::GenericConstraint) = iscomplex(c.child)
-function iscomplex(c::RelativeEntropyEpiConeConstraint)
-    return iscomplex(c.τ) || iscomplex(c.cone)
-end
-iscomplex(c::RelativeEntropyEpiCone) = iscomplex(c.X) || iscomplex(c.Y)
-function iscomplex(c::GeometricMeanHypoConeConstraint)
-    return iscomplex(c.T) || iscomplex(c.cone)
-end
-iscomplex(c::GeometricMeanHypoCone) = iscomplex(c.A) || iscomplex(c.B)
 
 function add_constraint!(context::Context, c::Constraint)
     if c in keys(context.constr_to_moi_inds)

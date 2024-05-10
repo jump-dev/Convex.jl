@@ -106,6 +106,12 @@ mutable struct RelativeEntropyEpiConeConstraint <: Constraint
     end
 end
 
+function iscomplex(c::RelativeEntropyEpiConeConstraint)
+    return iscomplex(c.τ) || iscomplex(c.cone)
+end
+
+iscomplex(c::RelativeEntropyEpiCone) = iscomplex(c.X) || iscomplex(c.Y)
+
 function head(io::IO, ::RelativeEntropyEpiConeConstraint)
     return print(io, "∈(RelativeEntropyEpiCone)")
 end

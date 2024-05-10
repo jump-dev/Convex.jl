@@ -115,6 +115,12 @@ mutable struct GeometricMeanHypoConeConstraint <: Constraint
     end
 end
 
+function iscomplex(c::GeometricMeanHypoConeConstraint)
+    return iscomplex(c.T) || iscomplex(c.cone)
+end
+
+iscomplex(c::GeometricMeanHypoCone) = iscomplex(c.A) || iscomplex(c.B)
+
 function head(io::IO, ::GeometricMeanHypoConeConstraint)
     return print(io, "∈(GeometricMeanHypoCone)")
 end
