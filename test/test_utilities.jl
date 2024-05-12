@@ -179,9 +179,9 @@ function test_show()
       memory allocated       : 624 bytes
 
     Solution summary
-      Termination status : OPTIMIZE_NOT_CALLED
-      Primal status      : NO_SOLUTION
-      Dual status        : NO_SOLUTION
+      termination status : OPTIMIZE_NOT_CALLED
+      primal status      : NO_SOLUTION
+      dual status        : NO_SOLUTION
 
     Expression graph
       maximize
@@ -225,9 +225,9 @@ function test_show()
       memory allocated       : 584 bytes
 
     Solution summary
-      Termination status : OPTIMIZE_NOT_CALLED
-      Primal status      : NO_SOLUTION
-      Dual status        : NO_SOLUTION
+      termination status : OPTIMIZE_NOT_CALLED
+      primal status      : NO_SOLUTION
+      dual status        : NO_SOLUTION
 
     Expression graph
       minimize
@@ -259,9 +259,9 @@ function test_show()
       memory allocated       : 19.711 KiB
 
     Solution summary
-      Termination status : OPTIMIZE_NOT_CALLED
-      Primal status      : NO_SOLUTION
-      Dual status        : NO_SOLUTION
+      termination status : OPTIMIZE_NOT_CALLED
+      primal status      : NO_SOLUTION
+      dual status        : NO_SOLUTION
 
     Expression graph
       satisfy
@@ -281,7 +281,7 @@ function test_show()
 
     # solved problem
     x = Variable()
-    p = satisfy(x >= 0)
+    p = minimize(x, x >= 1)
     output = solve!(
         p,
         MOI.OptimizerWithAttributes(
@@ -299,18 +299,19 @@ function test_show()
       memory allocated       : 400 bytes
 
     Solution summary
-      Termination status : OPTIMAL
-      Primal status      : FEASIBLE_POINT
-      Dual status        : FEASIBLE_POINT
+      termination status : OPTIMAL
+      primal status      : FEASIBLE_POINT
+      dual status        : FEASIBLE_POINT
+      objective value    : 1.0
 
     Expression graph
-      satisfy
-       └─ nothing
+      minimize
+       └─ real variable ($(Convex.show_id(x)))
       subject to
        └─ ≥ constraint (affine)
           └─ + (affine; real)
              ├─ real variable ($(Convex.show_id(x)))
-             └─ $(reshape([0], 1, 1))
+             └─ $(reshape([-1], 1, 1))
     """
 
     # test small `MAXDIGITS`

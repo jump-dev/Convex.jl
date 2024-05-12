@@ -260,21 +260,16 @@ function Base.show(io::IO, p::Problem)
     println(io)
     # Print solution summary
     println(io, "Solution summary")
-    println(io, "  Termination status : ", p.status)
-    println(io, "  Primal status      : ", primal_status(p))
-    println(io, "  Dual status        : ", dual_status(p))
+    println(io, "  termination status : ", p.status)
+    println(io, "  primal status      : ", primal_status(p))
+    println(io, "  dual status        : ", dual_status(p))
     if p.status == MOI.OPTIMAL && p.optval !== nothing
-        println(io, "  objective value    : ", round(p.optval, digits=4))
+        println(io, "  objective value    : ", round(p.optval; digits = 4))
     end
     println(io)
     # Expression tree
     println(io, "Expression graph")
-    TreePrint.print_tree(
-        io,
-        p,
-        MAXDEPTH[] + 1,
-        MAXWIDTH[];
-        depth = 1,
-    )
+    # We offset the depth by 1 so things are printed with a three-space offset.
+    TreePrint.print_tree(io, p, MAXDEPTH[] + 1, MAXWIDTH[]; depth = 1)
     return
 end
