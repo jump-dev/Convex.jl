@@ -142,3 +142,73 @@ function new_conic_form!(::Context{T}, C::Constant) where {T}
 
     return x
 end
+
+# Only handle the real case for now
+# basically a duplicate of `Constant`
+# TODO- neither the sign nor the size must never change once we `formulate`
+# even if the values do
+mutable struct Parameter{T<:Real} <: AbstractExpr
+    head::Symbol
+    value::Union{Matrix{T},SPARSE_MATRIX{T}}
+    size::Tuple{Int,Int}
+    sign::Sign
+
+    function Parameter(x::Value, sign::Sign)
+        if x isa Complex || x isa AbstractArray{<:Complex}
+            throw(DomainError(x, "Parameter expects real values"))
+        end
+        return new{eltype(x)}(:parameter, _matrix(x), _size(x), sign)
+    end
+end
+
+function update_parameters!(context::Context{T}) where {T}
+    for (p, inds) in pairs(context.constr_to_moi_inds)
+        p isa Parameter || continue
+        @assert length(p.value) == length(inds)
+        for (elt, ci) in zip(p.value, inds)
+            @info "Setting $ci to $elt"
+            MOI.set(
+                context.model,
+                MOI.ConstraintSet(),
+                ci,
+                MOI.Parameter{T}(elt),
+            )
+        end
+    end
+end
+
+vexity(::Parameter) = ConstVexity()
+
+function Parameter(x::Value, check_sign::Bool = true)
+    return Parameter(x, check_sign ? _sign(x) : NoSign())
+end
+
+function evaluate(x::Parameter)
+    return output(x.value)
+end
+
+Base.sign(x::Parameter) = x.sign
+
+Base.length(x::Parameter) = length(x.value)
+AbstractTrees.children(::Parameter) = tuple()
+
+function new_conic_form!(context::Context{T}, c::Parameter) where {T}
+    @info "hi2"
+    model = context.model
+    variable_indices = MOI.VariableIndex[]
+    constraint_indices = MOI.ConstraintIndex{
+        MathOptInterface.VariableIndex,
+        MathOptInterface.Parameter{T},
+    }()
+    for elt in c.value
+        # TODO- convert?
+        v, ci = MOI.add_constrained_variable(model, MOI.Parameter{T}(elt))
+        push!(v, variable_indices)
+        push!(constraint_indices, ci)
+    end
+
+    context.var_to_moi_indices[c] = variable_indices
+    context.constr_to_moi_inds[c] = constraint_indices
+
+    return _to_tape(MOI.VectorOfVariables(variable_indices))
+end

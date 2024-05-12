@@ -8,7 +8,7 @@ mutable struct Problem{T<:Real} <: AbstractExpr
     objective::Union{AbstractExpr,Nothing}
     constraints::Array{Constraint}
     status::MOI.TerminationStatusCode
-    model::Union{MOI.ModelLike,Nothing}
+    context::Union{Context,Nothing}
     function Problem{T}(
         head::Symbol,
         objective::Union{AbstractExpr,Nothing},
@@ -37,8 +37,11 @@ function Base.getproperty(p::Problem, s::Symbol)
     elseif s === :size
         # Used when Problem is interpreted as an atom
         return p.objective.size
+    elseif s === :model
+        return p.context === nothing ? nothing : p.context.model
+    else
+        return getfield(p, s)
     end
-    return getfield(p, s)
 end
 
 dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())

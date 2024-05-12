@@ -55,6 +55,16 @@ function _add_variable_primal_start(context::Convex.Context{T}) where {T}
     return
 end
 
+function formulate!(p::Problem, optimizer_factory; silent = true)
+    context, (stats...) = @timed Context(p, optimizer_factory)
+    if !silent
+        s = round(stats.time; digits = 2), Base.format_bytes(stats.bytes)
+        @info "[Convex.jl] Compilation finished: $(s[1]) seconds, $(s[2]) of memory allocated"
+    end
+    p.context = context
+    return nothing
+end
+
 """
     solve!(
         problem::Problem,
@@ -77,18 +87,35 @@ Optional keyword arguments:
 """
 function solve!(
     p::Problem,
-    optimizer_factory;
+    optimizer_factory = nothing;
     silent_solver = false,
     warmstart::Bool = false,
+    formulate::Bool = true,
 )
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
-    context, (stats...) = @timed Context(p, optimizer_factory)
-    if !silent_solver
-        s = round(stats.time; digits = 2), Base.format_bytes(stats.bytes)
-        @info "[Convex.jl] Compilation finished: $(s[1]) seconds, $(s[2]) of memory allocated"
+    if formulate
+        if optimizer_factory === nothing
+            throw(
+                ArgumentError(
+                    "An `optimizer_factory` must be passed (unless the problem has already been formulated with an optimizer and `formulate=false`).",
+                ),
+            )
+        end
+        formulate!(p, optimizer_factory; silent = silent_solver)
+    else
+        if p.context === nothing
+            throw(
+                ArgumentError(
+                    "`solve!` with `formulate=false` is only allowed when the problem has already been formulated.",
+                ),
+            )
+        end
+        # we only need to do this if we didn't just formulate
+        update_parameters!(p.context)
     end
+    context = p.context
     if silent_solver
         MOI.set(context.model, MOI.Silent(), true)
     end
@@ -102,7 +129,7 @@ function solve!(
         MOI.optimize!(context.model)
         p.status = MOI.get(context.model, MOI.TerminationStatus())
     end
-    p.model = context.model
+    p.context = context
     if p.status != MOI.OPTIMAL
         @warn "Problem wasn't solved optimally" status = p.status
     end
