@@ -1,4 +1,4 @@
-# Dualization
+# # Dualization
 
 # Sometimes it can be much faster to solve the dual problem than the primal problem.
 # Some solvers will automatically dualize the problem when heuristics deem it beneficial,
