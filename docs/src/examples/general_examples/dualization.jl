@@ -2,7 +2,7 @@
 
 # Sometimes it can be much faster to solve the dual problem than the primal problem.
 # Some solvers will automatically dualize the problem when heuristics deem it beneficial,
-# and alternative DCP modelling lanaguages like CVX will also automatically dualize the
+# and alternative DCP modeling languages like CVX will also automatically dualize the
 # problem in some cases.
 # Convex.jl does not automatically dualize any problem, but it is easy to manually do so
 # with Dualization.jl.
