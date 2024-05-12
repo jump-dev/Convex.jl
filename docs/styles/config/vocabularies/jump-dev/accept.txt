@@ -2,6 +2,8 @@ autoregressive
 bijective
 [Bb]ugfix
 docstring
+[Dd]ualize
+[Dd]ualization
 [Ee]lementwise
 [Ee]num
 injective
