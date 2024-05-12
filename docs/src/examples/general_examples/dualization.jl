@@ -13,6 +13,7 @@
 using LinearAlgebra
 using Convex
 using SCS
+using Random
 using Dualization
 
 # Then we setup some test data.
