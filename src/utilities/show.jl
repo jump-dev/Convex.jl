@@ -256,7 +256,12 @@ function Base.show(io::IO, p::Problem)
     println(io, "  number of constraints  : ", con_str)
     println(io, "  number of coefficients : ", counts.n_nonzeros)
     println(io, "  number of atoms        : ", counts.n_atoms)
-    println(io, "  memory allocated       : ", Base.format_bytes(bytes))
+    p_bytes = Base.summarysize(p)
+    m_bytes = Base.summarysize(p.model)
+    t_bytes = p_bytes - m_bytes
+    println(io, "  size in memory         : ", Base.format_bytes(p_bytes))
+    println(io, "    expression tree      : ", Base.format_bytes(t_bytes))
+    println(io, "    optimization model   : ", Base.format_bytes(m_bytes))
     println(io)
     # Print solution summary
     println(io, "Solution summary")

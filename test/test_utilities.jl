@@ -176,7 +176,9 @@ function test_show()
       number of constraints  : 2 (2 scalar elements)
       number of coefficients : 2
       number of atoms        : 3
-      memory allocated       : 624 bytes
+      size in memory         : 624 bytes
+        expression tree      : 624 bytes
+        optimization model   : 0 bytes
 
     Solution summary
       termination status : OPTIMIZE_NOT_CALLED
@@ -222,7 +224,9 @@ function test_show()
       number of constraints  : 1 (16 scalar elements)
       number of coefficients : 0
       number of atoms        : 6
-      memory allocated       : 584 bytes
+      size in memory         : 584 bytes
+        expression tree      : 584 bytes
+        optimization model   : 0 bytes
 
     Solution summary
       termination status : OPTIMIZE_NOT_CALLED
@@ -256,7 +260,9 @@ function test_show()
       number of constraints  : 100 (100 scalar elements)
       number of coefficients : 100
       number of atoms        : 100
-      memory allocated       : 19.711 KiB
+      size in memory         : 19.711 KiB
+        expression tree      : 19.711 KiB
+        optimization model   : 0 bytes
 
     Solution summary
       termination status : OPTIMIZE_NOT_CALLED
@@ -296,7 +302,9 @@ function test_show()
       number of constraints  : 1 (1 scalar elements)
       number of coefficients : 1
       number of atoms        : 1
-      memory allocated       : 400 bytes
+      size in memory         : 20.477 KiB
+        expression tree      : 400 bytes
+        optimization model   : 20.086 KiB
 
     Solution summary
       termination status : OPTIMAL
