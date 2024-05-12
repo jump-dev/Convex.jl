@@ -6,7 +6,7 @@
 # problem in some cases.
 # Convex.jl does not automatically dualize any problem, but it is easy to manually do so
 # with Dualization.jl.
-# Here, we will solve a simple semi-definite program (from [issue #492](https://github.com/jump-dev/Convex.jl/issues/492)) to show how easy it is to dualize the problem,
+# Here, we will solve a simple semidefinite program (from [issue #492](https://github.com/jump-dev/Convex.jl/issues/492)) to show how easy it is to dualize the problem,
 # and that it can potentially provide speed ups.
 
 # First we load our packages:
