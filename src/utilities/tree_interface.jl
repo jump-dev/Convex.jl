@@ -98,7 +98,7 @@ end
 
 function _add_to_problem_count(counts::Counts, node::Constraint)
     counts.n_constraints += 1
-    # TODO(odow): we don't now the general case
+    # TODO(odow): we don't know the general case
     return
 end
 

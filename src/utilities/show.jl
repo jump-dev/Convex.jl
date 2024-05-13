@@ -247,7 +247,6 @@ end
 function Base.show(io::IO, p::Problem)
     # Print problem statistics
     counts = Counts(p)
-    bytes = Base.summarysize(p) - Base.summarysize(p.model)
     println(io, "Problem statistics")
     var_str = _str_with_elements(counts.n_variables, counts.n_scalar_variables)
     println(io, "  number of variables    : ", var_str)
