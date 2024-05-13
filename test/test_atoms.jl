@@ -689,6 +689,14 @@ function test_DotMultiplyAtom()
         return x ./ [2.0 0.5 0.25]
     end
     target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1, 3.0 * x2, 2.0 * x3, 4.0 * x4]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        return x .* [1 2; 3 4]
+    end
+    target = """
     variables: t1, t2, x1, x2
     minobjective: [1.0 * t1, 1.0 * t2]
     [t1, 0.5, x1] in RotatedSecondOrderCone(3)

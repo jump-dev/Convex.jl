@@ -12,6 +12,8 @@ mutable struct DotMultiplyAtom <: AbstractExpr
             (x.size[1], max(x.size[2], y.size[2]))
         elseif x.size[2] == y.size[2] && (x.size[1] == 1 || y.size[1] == 1)
             (max(x.size[1], y.size[1]), y.size[2])
+        elseif x.size == y.size
+            x.size
         else
             error(
                 "[DotMultiplyAtom] cannot multiply two expressions of sizes $(x.size) and $(y.size)",
