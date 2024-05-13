@@ -54,7 +54,10 @@ function evaluate(x::BroadcastMultiplyAtom)
     return reshape(evaluate(x.children[1]) .* evaluate(x.children[2]), size(x))
 end
 
-function new_conic_form!(context::Context{T}, x::BroadcastMultiplyAtom) where {T}
+function new_conic_form!(
+    context::Context{T},
+    x::BroadcastMultiplyAtom,
+) where {T}
     lhs, rhs = x.children
     if vexity(lhs) != ConstVexity()
         if vexity(rhs) != ConstVexity()
