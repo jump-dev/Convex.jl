@@ -39,8 +39,10 @@ function _literate_directory(dir)
 end
 
 if !SKIP_EXAMPLES
-    for (root, dir, files) in walkdir(joinpath(@__DIR__, "src", "examples"))
-        _literate_directory.(joinpath.(root, dir))
+    Test.@testset "Examples" verbose = true begin
+        for (root, dir, files) in walkdir(joinpath(@__DIR__, "src", "examples"))
+            _literate_directory.(joinpath.(root, dir))
+        end
     end
 end
 

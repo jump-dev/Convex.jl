@@ -1,14 +1,14 @@
 # # Worst case risk analysis
 # Generate data for worst-case risk analysis.
 using Random
-
+using LinearAlgebra
 Random.seed!(2);
 n = 5;
 r = abs.(randn(n, 1)) / 15;
 Sigma = 0.9 * rand(n, n) .- 0.15;
 Sigma_nom = Sigma' * Sigma;
 Sigma_nom .-= (maximum(Sigma_nom) - 0.9)
-
+Sigma_nom .+= (1e-4 - eigmin(Sigma_nom)) * I(n) # ensure positive-definite
 #-
 
 # Form and solve portfolio optimization problem.
