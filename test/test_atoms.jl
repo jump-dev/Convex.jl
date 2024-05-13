@@ -635,13 +635,74 @@ function test_MultiplyAtom()
         ErrorException(
             "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
         ),
-        _test_atom(_ -> Variable(2) .* Variable(2), ""),
+        _test_atom(_ -> Variable() * Variable(), ""),
     )
+    return
+end
+
+### DotMultiplyAtom
+
+function test_DotMultiplyAtom()
+    target = """
+    variables: x1, x2
+    minobjective: [0.25 * x1, 0.25 * x2]
+    """
+    _test_atom(target) do context
+        return Variable(2) ./ 4
+    end
+    _test_atom(target) do context
+        return 0.25 .* Variable(2)
+    end
+    _test_atom(target) do context
+        return Variable(2) .* 0.25
+    end
+    target = """
+    variables: x1, x2, x3, x4, x5, x6
+    minobjective: [0.5 * x1, 2.0 * x2, 0.5 * x3, 2.0 * x4, 0.5 * x5, 2.0 * x6]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x .* [0.5, 2.0]
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return [0.5, 2.0] .* x
+    end
+    target = """
+    variables: x1, x2, x3, x4, x5, x6
+    minobjective: [0.5 * x1, 0.5 * x2, 2.0 * x3, 2.0 * x4, 4.0 * x5, 4.0 * x6]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x .* [0.5 2.0 4.0]
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return [0.5 2.0 4.0] .* x
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x ./ [2.0 0.5 0.25]
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x ./ [2.0 0.5 0.25]
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [t1, 0.5, x1] in RotatedSecondOrderCone(3)
+    [t2, 0.5, x2] in RotatedSecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        return x .* x
+    end
     @test_throws(
         ErrorException(
-            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+            "[DotMultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
         ),
-        _test_atom(_ -> Variable() * Variable(), ""),
+        _test_atom(_ -> Variable(2) .* Variable(2), ""),
     )
     return
 end
