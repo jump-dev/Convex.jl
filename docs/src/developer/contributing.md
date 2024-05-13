@@ -40,6 +40,12 @@ Convex.jl. Let's say you're adding the new function $f$.
  -   Ensure the atom is a mutable struct, so that `objectid` can be called.
  -   Add as a comment a description of what the atom does and its
      parameters.
+ -   Ensure `evaluate` is only called during the definition of `evaluate` itself, from `conic_form!`, or
+     on constants or matrices. Specifically, `evaluate` must not be called on a potentially `fix!`'d variable
+     when the expression tree is being built (e.g. when constructing an atom or reformulating),
+     since then any changes to the variable's value (or it being `free!`'d) will not be recognized.
+     See [#653](https://github.com/jump-dev/Convex.jl/issues/653) and [#585](https://github.com/jump-dev/Convex.jl/issues/585)
+     for previous bugs caused by misuse here.
  -   The most mathematically interesting part is the `new_conic_form!`
      function. Following the example in the nuclear norm atom, you'll
      see that you can just construct the problem whose optimal value is
