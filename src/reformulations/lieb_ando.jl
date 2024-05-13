@@ -90,8 +90,10 @@ function lieb_ando(
         # Concave function
         add_constraint!(
             T,
-            GenericConstraint((T, kron(A, Im), kron(In, conj(B))),
-            GeometricMeanHypoConeSquare(t, n * m, false)),
+            GenericConstraint(
+                (T, kron(A, Im), kron(In, conj(B))),
+                GeometricMeanHypoConeSquare(t, n * m, false),
+            ),
         )
         return real(LinearAlgebra.tr(KvKv * T))
     elseif (t >= -1 && t <= 0) || (t >= 1 && t <= 2)
