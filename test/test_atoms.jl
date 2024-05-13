@@ -635,14 +635,109 @@ function test_MultiplyAtom()
         ErrorException(
             "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
         ),
-        _test_atom(_ -> Variable(2) .* Variable(2), ""),
-    )
-    @test_throws(
-        ErrorException(
-            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
-        ),
         _test_atom(_ -> Variable() * Variable(), ""),
     )
+    return
+end
+
+### BroadcastMultiplyAtom
+
+function test_BroadcastMultiplyAtom()
+    target = """
+    variables: x1, x2
+    minobjective: [0.25 * x1, 0.25 * x2]
+    """
+    _test_atom(target) do context
+        return Variable(2) ./ 4
+    end
+    _test_atom(target) do context
+        return 0.25 .* Variable(2)
+    end
+    _test_atom(target) do context
+        return Variable(2) .* 0.25
+    end
+    target = """
+    variables: x1, x2, x3, x4, x5, x6
+    minobjective: [0.5 * x1, 2.0 * x2, 0.5 * x3, 2.0 * x4, 0.5 * x5, 2.0 * x6]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x .* [0.5, 2.0]
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return [0.5, 2.0] .* x
+    end
+    target = """
+    variables: x1, x2, x3, x4, x5, x6
+    minobjective: [0.5 * x1, 0.5 * x2, 2.0 * x3, 2.0 * x4, 4.0 * x5, 4.0 * x6]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x .* [0.5 2.0 4.0]
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return [0.5 2.0 4.0] .* x
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x ./ [2.0 0.5 0.25]
+    end
+    _test_atom(target) do context
+        x = Variable(2, 3)
+        return x ./ [2.0 0.5 0.25]
+    end
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1, 3.0 * x2, 2.0 * x3, 4.0 * x4]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        return x .* [1 2; 3 4]
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [0.5 * x1, 0.5 * x2, 2.0 * x1, 2.0 * x2]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 1)
+        return x .* [0.5 2.0]
+    end
+    target = """
+    variables: x1, x2
+    minobjective: [0.5 * x1, 2.0 * x1, 0.5 * x2, 2.0 * x2]
+    """
+    _test_atom(target) do context
+        x = Variable(1, 2)
+        return x .* [0.5, 2.0]
+    end
+    target = """
+    variables: t1, t2, x1, x2
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [t1, 0.5, x1] in RotatedSecondOrderCone(3)
+    [t2, 0.5, x2] in RotatedSecondOrderCone(3)
+    """
+    _test_atom(target) do context
+        x = Variable(2)
+        return x .* x
+    end
+    @test_throws(
+        ErrorException(
+            "[BroadcastMultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+        ),
+        _test_atom(_ -> Variable(2) .* Variable(2), ""),
+    )
+    return
+end
+
+function test_BroadcastMultiply_issue_653()
+    x = Variable(2)
+    fix!(x, [1.0, 2.0])
+    atom = dot(x, [2.0, 1.0])
+    @test evaluate(atom) ≈ 4
+    fix!(x, [2.0, 1.0])
+    @test evaluate(atom) ≈ 5
     return
 end
 
