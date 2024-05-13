@@ -169,8 +169,8 @@ function test_show()
     @test monotonicity(p) == (Convex.Nonincreasing(),)
     @test sign(p) == NoSign()
     @test curvature(p) == Convex.ConvexVexity()
-    p_bytes = Base.summary_size(p)
-    m_bytes = Base.summary_size(p.model)
+    p_bytes = Base.summarysize(p)
+    m_bytes = Base.summarysize(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 1 (1 scalar elements)
@@ -219,8 +219,8 @@ function test_show()
     root = hcat(level2, level2)
     p = minimize(sum(x), root == root)
     @test curvature(p) == Convex.ConstVexity()
-    p_bytes = Base.summary_size(p)
-    m_bytes = Base.summary_size(p.model)
+    p_bytes = Base.summarysize(p)
+    m_bytes = Base.summarysize(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 2 (4 scalar elements)
@@ -257,8 +257,8 @@ function test_show()
     @test_throws err sign(p)
     old_maxwidth = Convex.MAXWIDTH[]
     Convex.MAXWIDTH[] = 2
-    p_bytes = Base.summary_size(p)
-    m_bytes = Base.summary_size(p.model)
+    p_bytes = Base.summarysize(p)
+    m_bytes = Base.summarysize(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 1 (1 scalar elements)
@@ -301,8 +301,8 @@ function test_show()
             "eps_abs" => 1e-6,
         ),
     )
-    p_bytes = Base.summary_size(p)
-    m_bytes = Base.summary_size(p.model)
+    p_bytes = Base.summarysize(p)
+    m_bytes = Base.summarysize(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 1 (1 scalar elements)
