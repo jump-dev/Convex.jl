@@ -42,7 +42,7 @@ Convex.jl. Let's say you're adding the new function $f$.
      parameters.
  -   Ensure `evaluate` is only called during the definition of `evaluate` itself, from `conic_form!`, or
      on constants or matrices. Specifically, `evaluate` must not be called on a potentially `fix!`'d variable
-     when the expression tree is being built (e.g. when constructing an atom or reformulating),
+     when the expression tree is being built (for example, when constructing an atom or reformulating),
      since then any changes to the variable's value (or it being `free!`'d) will not be recognized.
      See [#653](https://github.com/jump-dev/Convex.jl/issues/653) and [#585](https://github.com/jump-dev/Convex.jl/issues/585)
      for previous bugs caused by misuse here.
