@@ -86,6 +86,9 @@ end
 
 function _add_constraint!(context::Context, c::GenericConstraint)
     if vexity(c.child) == ConstVexity()
+        # This `evaluate` call is safe, since even if it refers to a `fix!`'d variable,
+        # it happens when we are formulating the problem (not at expression-time), so there
+        # is not time for the variable to be re-`fix!`'d to a different value (or `free!`'d)
         if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
             context.detected_infeasible_during_formulation = true
         end

@@ -159,6 +159,8 @@ function quantum_relative_entropy(
     k::Integer = 3,
     nullspace_tol::Real = 1e-6,
 )
+    # This `evaluate` is safe since it is not a `fix!`ed variable
+    # (it must be a constant or matrix)
     return QuantumRelativeEntropy2Atom(A, evaluate(B), m, k, nullspace_tol)
 end
 
@@ -168,6 +170,8 @@ function quantum_relative_entropy(
     m::Integer = 3,
     k::Integer = 3,
 )
+    # This `evaluate` is safe since it is not a `fix!`ed variable
+    # (it must be a constant or matrix)
     A = evaluate(A)
     return -quantum_entropy(A, m, k) - trace_logm(B, A, m, k)
 end
@@ -179,6 +183,8 @@ function quantum_relative_entropy(
     k::Integer = 0,
     nullspace_tol::Real = 1e-6,
 )
+    # These `evaluate`s are safe since it is not a `fix!`ed variable
+    # (it must be a constant or matrix)
     A, B = evaluate(A), evaluate(B)
     if size(A) != size(B)
         throw(DimensionMismatch("A and B must be the same size"))
