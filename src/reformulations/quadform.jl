@@ -85,6 +85,8 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     return factor * square(norm2(P * x))
 end
 
+# These `evaluate` calls are safe since they are not a `fix!`ed variable
+# (must be a constant):
 function quadform(x::Constant, A::AbstractExpr; kwargs...)
     return quadform(evaluate(x), A; kwargs...)
 end

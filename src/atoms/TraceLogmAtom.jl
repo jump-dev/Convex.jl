@@ -79,6 +79,8 @@ function trace_logm(
     m::Integer = 3,
     k::Integer = 3,
 )
+    # This `evaluate` is safe since it is not a `fix!`ed variable
+    # (it must be a constant or matrix)
     return TraceLogmAtom(X, evaluate(C), m, k)
 end
 

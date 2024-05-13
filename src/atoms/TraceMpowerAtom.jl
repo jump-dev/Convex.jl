@@ -64,6 +64,8 @@ function trace_mpower(
     t::Rational,
     C::Union{AbstractMatrix,Constant},
 )
+    # This `evaluate` is safe since it is not a `fix!`ed variable
+    # (it must be a constant or matrix)
     return TraceMpowerAtom(A, t, evaluate(C))
 end
 

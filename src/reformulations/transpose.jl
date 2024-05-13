@@ -12,6 +12,7 @@ end
 
 LinearAlgebra.adjoint(x::AbstractExpr) = transpose(conj(x))
 
+# These `evaluate` calls are safe since they are not a `fix!`ed variable:
 function LinearAlgebra.transpose(x::Union{Constant,ComplexConstant})
     return constant(transpose(evaluate(x)))
 end
