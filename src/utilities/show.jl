@@ -197,7 +197,7 @@ end
 AbstractTrees.children(p::ProblemObjectiveRoot) = (p.objective,)
 
 function AbstractTrees.printnode(io::IO, p::ProblemObjectiveRoot)
-    return print(io, string(p.head))
+    return print(io, "  ", string(p.head))
 end
 
 struct ProblemConstraintsRoot
@@ -207,7 +207,7 @@ end
 AbstractTrees.children(p::ProblemConstraintsRoot) = p.constraints
 
 function AbstractTrees.printnode(io::IO, p::ProblemConstraintsRoot)
-    return print(io, "subject to")
+    return print(io, "  subject to")
 end
 
 function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
@@ -234,17 +234,40 @@ function TreePrint.print_tree(io::IO, p::Problem, args...; kwargs...)
     return
 end
 
+function _to_underscore(n::Integer)
+    x = Iterators.partition(digits(n), 3)
+    return join(reverse(join.(reverse.(x))), '_')
+end
+
+function _str_with_elements(x, y)
+    xs, ys = _to_underscore(x), _to_underscore(y)
+    return "$xs ($ys scalar elements)"
+end
+
 function Base.show(io::IO, p::Problem)
-    TreePrint.print_tree(io, p, MAXDEPTH[], MAXWIDTH[])
-    if p.status == MOI.OPTIMIZE_NOT_CALLED
-        print(io, "\nstatus: `solve!` not called yet")
-    else
-        print(io, "\ntermination status: $(p.status)")
-        print(io, "\nprimal status: $(primal_status(p))")
-        print(io, "\ndual status: $(dual_status(p))")
+    # Print problem statistics
+    counts = Counts(p)
+    println(io, "Problem statistics")
+    var_str = _str_with_elements(counts.n_variables, counts.n_scalar_variables)
+    println(io, "  number of variables    : ", var_str)
+    con_str =
+        _str_with_elements(counts.n_constraints, counts.n_scalar_constraints)
+    println(io, "  number of constraints  : ", con_str)
+    println(io, "  number of coefficients : ", counts.n_nonzeros)
+    println(io, "  number of atoms        : ", counts.n_atoms)
+    println(io)
+    # Print solution summary
+    println(io, "Solution summary")
+    println(io, "  termination status : ", p.status)
+    println(io, "  primal status      : ", primal_status(p))
+    println(io, "  dual status        : ", dual_status(p))
+    if p.status == MOI.OPTIMAL && p.optval !== nothing
+        println(io, "  objective value    : ", round(p.optval; digits = 4))
     end
-    if p.status == "solved"
-        print(io, " with optimal value of $(round(p.optval, digits=4))")
-    end
+    println(io)
+    # Expression tree
+    println(io, "Expression graph")
+    # We offset the depth by 1 so things are printed with a three-space offset.
+    TreePrint.print_tree(io, p, MAXDEPTH[] + 1, MAXWIDTH[]; depth = 1)
     return
 end

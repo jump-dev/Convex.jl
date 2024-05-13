@@ -169,22 +169,32 @@ function test_show()
     @test monotonicity(p) == (Convex.Nonincreasing(),)
     @test sign(p) == NoSign()
     @test curvature(p) == Convex.ConvexVexity()
-
     @test sprint(show, p) == """
-    maximize
-    └─ log (concave; real)
-       └─ real variable ($(Convex.show_id(x)))
-    subject to
-    ├─ ≥ constraint (affine)
-    │  └─ + (affine; real)
-    │     ├─ real variable ($(Convex.show_id(x)))
-    │     └─ $(reshape([-1], 1, 1))
-    └─ ≤ constraint (affine)
-       └─ + (affine; real)
-          ├─ real variable ($(Convex.show_id(x)))
-          └─ $(reshape([-3], 1, 1))
+    Problem statistics
+      number of variables    : 1 (1 scalar elements)
+      number of constraints  : 2 (2 scalar elements)
+      number of coefficients : 2
+      number of atoms        : 3
 
-    status: `solve!` not called yet"""
+    Solution summary
+      termination status : OPTIMIZE_NOT_CALLED
+      primal status      : NO_SOLUTION
+      dual status        : NO_SOLUTION
+
+    Expression graph
+      maximize
+       └─ log (concave; real)
+          └─ real variable ($(Convex.show_id(x)))
+      subject to
+       ├─ ≥ constraint (affine)
+       │  └─ + (affine; real)
+       │     ├─ real variable ($(Convex.show_id(x)))
+       │     └─ $(reshape([-1], 1, 1))
+       └─ ≤ constraint (affine)
+          └─ + (affine; real)
+             ├─ real variable ($(Convex.show_id(x)))
+             └─ $(reshape([-3], 1, 1))
+    """
 
     x = ComplexVariable(2, 3)
     @test sprint(show, x) == """
@@ -205,19 +215,30 @@ function test_show()
     p = minimize(sum(x), root == root)
     @test curvature(p) == Convex.ConstVexity()
     @test sprint(show, p) == """
-        minimize
-        └─ sum (affine; real)
-           └─ 2-element real variable ($(Convex.show_id(x)))
-        subject to
-        └─ == constraint (affine)
-           └─ + (affine; real)
-              ├─ hcat (affine; real)
-              │  ├─ …
-              │  └─ …
-              └─ Convex.NegateAtom (affine; real)
-                 └─ …
+    Problem statistics
+      number of variables    : 2 (4 scalar elements)
+      number of constraints  : 1 (16 scalar elements)
+      number of coefficients : 0
+      number of atoms        : 6
 
-        status: `solve!` not called yet"""
+    Solution summary
+      termination status : OPTIMIZE_NOT_CALLED
+      primal status      : NO_SOLUTION
+      dual status        : NO_SOLUTION
+
+    Expression graph
+      minimize
+       └─ sum (affine; real)
+          └─ 2-element real variable ($(Convex.show_id(x)))
+      subject to
+       └─ == constraint (affine)
+          └─ + (affine; real)
+             ├─ hcat (affine; real)
+             │  ├─ …
+             │  └─ …
+             └─ Convex.NegateAtom (affine; real)
+                └─ …
+    """
 
     # test `MAXWIDTH`
     x = Variable()
@@ -227,25 +248,36 @@ function test_show()
     old_maxwidth = Convex.MAXWIDTH[]
     Convex.MAXWIDTH[] = 2
     @test sprint(show, p) == """
-        satisfy
-        └─ nothing
-        subject to
-        ├─ == constraint (affine)
-        │  └─ + (affine; real)
-        │     ├─ real variable ($(Convex.show_id(x)))
-        │     └─ $(reshape([-1], 1, 1))
-        ├─ == constraint (affine)
-        │  └─ + (affine; real)
-        │     ├─ real variable ($(Convex.show_id(x)))
-        │     └─ $(reshape([-2], 1, 1))
-        ⋮
+    Problem statistics
+      number of variables    : 1 (1 scalar elements)
+      number of constraints  : 100 (100 scalar elements)
+      number of coefficients : 100
+      number of atoms        : 100
 
-        status: `solve!` not called yet"""
+    Solution summary
+      termination status : OPTIMIZE_NOT_CALLED
+      primal status      : NO_SOLUTION
+      dual status        : NO_SOLUTION
+
+    Expression graph
+      satisfy
+       └─ nothing
+      subject to
+       ├─ == constraint (affine)
+       │  └─ + (affine; real)
+       │     ├─ real variable ($(Convex.show_id(x)))
+       │     └─ $(reshape([-1], 1, 1))
+       ├─ == constraint (affine)
+       │  └─ + (affine; real)
+       │     ├─ real variable ($(Convex.show_id(x)))
+       │     └─ $(reshape([-2], 1, 1))
+       ⋮
+    """
     Convex.MAXWIDTH[] = old_maxwidth
 
     # solved problem
     x = Variable()
-    p = satisfy(x >= 0)
+    p = minimize(x, x >= 1)
     output = solve!(
         p,
         MOI.OptimizerWithAttributes(
@@ -255,17 +287,27 @@ function test_show()
         ),
     )
     @test sprint(show, p) == """
-            satisfy
-            └─ nothing
-            subject to
-            └─ ≥ constraint (affine)
-               └─ + (affine; real)
-                  ├─ real variable ($(Convex.show_id(x)))
-                  └─ $(reshape([0], 1, 1))
+    Problem statistics
+      number of variables    : 1 (1 scalar elements)
+      number of constraints  : 1 (1 scalar elements)
+      number of coefficients : 1
+      number of atoms        : 1
 
-            termination status: OPTIMAL
-            primal status: FEASIBLE_POINT
-            dual status: FEASIBLE_POINT"""
+    Solution summary
+      termination status : OPTIMAL
+      primal status      : FEASIBLE_POINT
+      dual status        : FEASIBLE_POINT
+      objective value    : 1.0
+
+    Expression graph
+      minimize
+       └─ real variable ($(Convex.show_id(x)))
+      subject to
+       └─ ≥ constraint (affine)
+          └─ + (affine; real)
+             ├─ real variable ($(Convex.show_id(x)))
+             └─ $(reshape([-1], 1, 1))
+    """
 
     # test small `MAXDIGITS`
     x = Variable()

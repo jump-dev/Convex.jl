@@ -41,9 +41,19 @@ function Base.getproperty(p::Problem, s::Symbol)
     return getfield(p, s)
 end
 
-dual_status(p::Problem) = MOI.get(p.model, MOI.DualStatus())
+function dual_status(p::Problem)
+    if p.model === nothing
+        return MOI.NO_SOLUTION
+    end
+    return MOI.get(p.model, MOI.DualStatus())
+end
 
-primal_status(p::Problem) = MOI.get(p.model, MOI.PrimalStatus())
+function primal_status(p::Problem)
+    if p.model === nothing
+        return MOI.NO_SOLUTION
+    end
+    return MOI.get(p.model, MOI.PrimalStatus())
+end
 
 termination_status(p::Problem) = MOI.get(p.model, MOI.TerminationStatus())
 

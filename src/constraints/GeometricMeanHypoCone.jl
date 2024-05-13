@@ -115,6 +115,12 @@ mutable struct GeometricMeanHypoConeConstraint <: Constraint
     end
 end
 
+function iscomplex(c::GeometricMeanHypoConeConstraint)
+    return iscomplex(c.T) || iscomplex(c.cone)
+end
+
+iscomplex(c::GeometricMeanHypoCone) = iscomplex(c.A) || iscomplex(c.B)
+
 function head(io::IO, ::GeometricMeanHypoConeConstraint)
     return print(io, "∈(GeometricMeanHypoCone)")
 end
@@ -128,7 +134,7 @@ function AbstractTrees.children(constraint::GeometricMeanHypoConeConstraint)
         constraint.T,
         constraint.cone.A,
         constraint.cone.B,
-        "t=$(constraint.cone.t)",
+        constraint.cone.t,
     )
 end
 
