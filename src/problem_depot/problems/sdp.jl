@@ -1113,7 +1113,7 @@ end
         0,
         [
             B == [2 1; 1 2],
-            GenericConstraint(
+            Convex.GenericConstraint(
                 (B, A, eye(2)),
                 GeometricMeanHypoConeSquare(1 // 2, 2),
             ),
