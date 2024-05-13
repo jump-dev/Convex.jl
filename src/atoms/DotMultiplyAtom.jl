@@ -8,18 +8,26 @@ mutable struct DotMultiplyAtom <: AbstractExpr
     size::Tuple{Int,Int}
 
     function DotMultiplyAtom(x::AbstractExpr, y::AbstractExpr)
-        sz = if x.size[1] == y.size[1] && (x.size[2] == 1 || y.size[2] == 1)
-            (x.size[1], max(x.size[2], y.size[2]))
-        elseif x.size[2] == y.size[2] && (x.size[1] == 1 || y.size[1] == 1)
-            (max(x.size[1], y.size[1]), y.size[2])
-        elseif x.size == y.size
-            x.size
-        else
-            error(
-                "[DotMultiplyAtom] cannot multiply two expressions of sizes $(x.size) and $(y.size)",
-            )
+        (x_r, x_c), (y_r, y_c) = size(x), size(y)
+        if (x_r, x_c) == (y_r, y_c)
+            # Broadcasting over equal sized matrices
+            return new((x, y), (x_r, x_c))
+        elseif x_r == y_r && (x_c == 1 || y_c == 1)
+            # Broadcasting over columns
+            return new((x, y), (x_r, max(x_c, y_c)))
+        elseif x_c == y_c && (x_r == 1 || y_r == 1)
+            # Broadcasting over rows
+            return new((x, y), (max(x_r, y_r), y_c))
+        elseif x_r == y_c && x_c == y_r == 1
+            # x is a column vector and y is a row vector
+            return new((x, y), (x_r, y_c))
+        elseif x_c == y_r && x_r == y_c == 1
+            # x is a row vector and y is a column vector
+            return new((x, y), (y_r, x_c))
         end
-        return new((x, y), sz)
+        return error(
+            "[DotMultiplyAtom] cannot multiply two expressions of sizes $(x.size) and $(y.size)",
+        )
     end
 end
 
