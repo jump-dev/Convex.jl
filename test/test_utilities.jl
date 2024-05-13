@@ -169,16 +169,17 @@ function test_show()
     @test monotonicity(p) == (Convex.Nonincreasing(),)
     @test sign(p) == NoSign()
     @test curvature(p) == Convex.ConvexVexity()
-
+    p_bytes = Base.summary_size(p)
+    m_bytes = Base.summary_size(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 1 (1 scalar elements)
       number of constraints  : 2 (2 scalar elements)
       number of coefficients : 2
       number of atoms        : 3
-      size in memory         : 624 bytes
-        expression tree      : 624 bytes
-        optimization model   : 0 bytes
+      size in memory         : $(Base.format_bytes(p_bytes))
+        expression tree      : $(Base.format_bytes(p_bytes - m_bytes))
+        optimization model   : $(Base.format_bytes(m_bytes))
 
     Solution summary
       termination status : OPTIMIZE_NOT_CALLED
@@ -218,15 +219,17 @@ function test_show()
     root = hcat(level2, level2)
     p = minimize(sum(x), root == root)
     @test curvature(p) == Convex.ConstVexity()
+    p_bytes = Base.summary_size(p)
+    m_bytes = Base.summary_size(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 2 (4 scalar elements)
       number of constraints  : 1 (16 scalar elements)
       number of coefficients : 0
       number of atoms        : 6
-      size in memory         : 584 bytes
-        expression tree      : 584 bytes
-        optimization model   : 0 bytes
+      size in memory         : $(Base.format_bytes(p_bytes))
+        expression tree      : $(Base.format_bytes(p_bytes - m_bytes))
+        optimization model   : $(Base.format_bytes(m_bytes))
 
     Solution summary
       termination status : OPTIMIZE_NOT_CALLED
@@ -254,15 +257,17 @@ function test_show()
     @test_throws err sign(p)
     old_maxwidth = Convex.MAXWIDTH[]
     Convex.MAXWIDTH[] = 2
+    p_bytes = Base.summary_size(p)
+    m_bytes = Base.summary_size(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 1 (1 scalar elements)
       number of constraints  : 100 (100 scalar elements)
       number of coefficients : 100
       number of atoms        : 100
-      size in memory         : 19.711 KiB
-        expression tree      : 19.711 KiB
-        optimization model   : 0 bytes
+      size in memory         : $(Base.format_bytes(p_bytes))
+        expression tree      : $(Base.format_bytes(p_bytes - m_bytes))
+        optimization model   : $(Base.format_bytes(m_bytes))
 
     Solution summary
       termination status : OPTIMIZE_NOT_CALLED
@@ -296,15 +301,17 @@ function test_show()
             "eps_abs" => 1e-6,
         ),
     )
+    p_bytes = Base.summary_size(p)
+    m_bytes = Base.summary_size(p.model)
     @test sprint(show, p) == """
     Problem statistics
       number of variables    : 1 (1 scalar elements)
       number of constraints  : 1 (1 scalar elements)
       number of coefficients : 1
       number of atoms        : 1
-      size in memory         : 20.477 KiB
-        expression tree      : 400 bytes
-        optimization model   : 20.086 KiB
+      size in memory         : $(Base.format_bytes(p_bytes))
+        expression tree      : $(Base.format_bytes(p_bytes - m_bytes))
+        optimization model   : $(Base.format_bytes(m_bytes))
 
     Solution summary
       termination status : OPTIMAL
