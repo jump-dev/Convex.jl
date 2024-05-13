@@ -3,11 +3,11 @@
 # Use of this source code is governed by a BSD-style license that can be found
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
-mutable struct DotMultiplyAtom <: AbstractExpr
+mutable struct BroadcastMultiplyAtom <: AbstractExpr
     children::Tuple{AbstractExpr,AbstractExpr}
     size::Tuple{Int,Int}
 
-    function DotMultiplyAtom(x::AbstractExpr, y::AbstractExpr)
+    function BroadcastMultiplyAtom(x::AbstractExpr, y::AbstractExpr)
         (x_r, x_c), (y_r, y_c) = size(x), size(y)
         if (x_r, x_c) == (y_r, y_c)
             # Broadcasting over equal sized matrices
@@ -26,23 +26,23 @@ mutable struct DotMultiplyAtom <: AbstractExpr
             return new((x, y), (y_r, x_c))
         end
         return error(
-            "[DotMultiplyAtom] cannot multiply two expressions of sizes $(x.size) and $(y.size)",
+            "[BroadcastMultiplyAtom] cannot multiply two expressions of sizes $(x.size) and $(y.size)",
         )
     end
 end
 
-head(io::IO, ::DotMultiplyAtom) = print(io, ".*")
+head(io::IO, ::BroadcastMultiplyAtom) = print(io, ".*")
 
-Base.sign(x::DotMultiplyAtom) = sign(x.children[1]) * sign(x.children[2])
+Base.sign(x::BroadcastMultiplyAtom) = sign(x.children[1]) * sign(x.children[2])
 
-function monotonicity(x::DotMultiplyAtom)
+function monotonicity(x::BroadcastMultiplyAtom)
     return (
         sign(x.children[2]) * Nondecreasing(),
         sign(x.children[1]) * Nondecreasing(),
     )
 end
 
-function curvature(x::DotMultiplyAtom)
+function curvature(x::BroadcastMultiplyAtom)
     lhs, rhs = x.children
     if vexity(lhs) != ConstVexity() && vexity(rhs) != ConstVexity()
         return NotDcp()
@@ -50,16 +50,16 @@ function curvature(x::DotMultiplyAtom)
     return ConstVexity()
 end
 
-function evaluate(x::DotMultiplyAtom)
+function evaluate(x::BroadcastMultiplyAtom)
     return reshape(evaluate(x.children[1]) .* evaluate(x.children[2]), size(x))
 end
 
-function new_conic_form!(context::Context{T}, x::DotMultiplyAtom) where {T}
+function new_conic_form!(context::Context{T}, x::BroadcastMultiplyAtom) where {T}
     lhs, rhs = x.children
     if vexity(lhs) != ConstVexity()
         if vexity(rhs) != ConstVexity()
             error(
-                "[DotMultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+                "[BroadcastMultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
             )
         end
         # Switch arguments so that the left-hand side is constant
@@ -101,7 +101,7 @@ function Base.Broadcast.broadcasted(
     elseif x.size == (1, 1) || y.size == (1, 1)
         return x * y
     end
-    return DotMultiplyAtom(x, y)
+    return BroadcastMultiplyAtom(x, y)
 end
 
 function Base.Broadcast.broadcasted(::typeof(*), x::Value, y::AbstractExpr)

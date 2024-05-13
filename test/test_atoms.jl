@@ -640,9 +640,9 @@ function test_MultiplyAtom()
     return
 end
 
-### DotMultiplyAtom
+### BroadcastMultiplyAtom
 
-function test_DotMultiplyAtom()
+function test_BroadcastMultiplyAtom()
     target = """
     variables: x1, x2
     minobjective: [0.25 * x1, 0.25 * x2]
@@ -724,10 +724,20 @@ function test_DotMultiplyAtom()
     end
     @test_throws(
         ErrorException(
-            "[DotMultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
+            "[BroadcastMultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
         ),
         _test_atom(_ -> Variable(2) .* Variable(2), ""),
     )
+    return
+end
+
+function test_BroadcastMultiply_issue_653()
+    x = Variable(2)
+    fix!(x, [1.0, 2.0])
+    atom = dot(x, [2.0, 1.0])
+    @test evaluate(atom) ≈ 4
+    fix!(x, [2.0, 1.0])
+    @test evaluate(atom) ≈ 5
     return
 end
 
