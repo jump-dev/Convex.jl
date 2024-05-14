@@ -16,15 +16,15 @@
 # * [CVXPY](https://github.com/cvxgrp/cvxpy): Steven Diamond, Eric Chu, Stephen Boyd
 # * [JuliaOpt](https://github.com/JuliaOpt): Miles Lubin, Iain Dunning, Joey Huchette
 
-## initial package installation
+# initial package installation
 
 #-
 
-## Make the Convex.jl module available
+# Make the Convex.jl module available
 using Convex, SparseArrays, LinearAlgebra
 using SCS # first order splitting conic solver [O'Donoghue et al., 2014]
 
-## Generate random problem data
+# Generate random problem data
 m = 50;
 n = 100;
 A = randn(m, n)
@@ -32,10 +32,10 @@ x♮ = sprand(n, 1, 0.5) # true (sparse nonnegative) parameter vector
 noise = 0.1 * randn(m)    # gaussian noise
 b = A * x♮ + noise      # noisy linear observations
 
-## Create a (column vector) variable of size n.
+# Create a (column vector) variable of size n.
 x = Variable(n)
 
-## nonnegative elastic net with regularization
+# nonnegative elastic net with regularization
 λ = 1
 μ = 1
 problem = minimize(
@@ -43,7 +43,7 @@ problem = minimize(
     x >= 0,
 )
 
-## Solve the problem by calling solve!
+# Solve the problem by calling `solve!`
 solve!(problem, SCS.Optimizer; silent_solver = true)
 
 println("problem status is ", problem.status) # :Optimal, :Infeasible, :Unbounded etc.
@@ -62,6 +62,7 @@ using Interact, Plots
     solve!(problem, SCS.Optimizer; silent_solver = true)
     histogram(evaluate(x), xlims = (0, 3.5), label = "x")
 end
+nothing # hide
 
 # # Quick convex prototyping
 
@@ -69,17 +70,17 @@ end
 
 # ## Variables
 
-## Scalar variable
+# Scalar variable
 x = Variable()
 
 #-
 
-## (Column) vector variable
+# (Column) vector variable
 y = Variable(4)
 
 #-
 
-## Matrix variable
+# Matrix variable
 Z = Variable(4, 4)
 
 # # Expressions
@@ -132,7 +133,7 @@ p = minimize(objective, constraint)
 
 #-
 
-## solve the problem
+# Solve the problem:
 solve!(p, SCS.Optimizer; silent_solver = true)
 p.status
 
@@ -142,7 +143,7 @@ evaluate(x)
 
 #-
 
-## can evaluate expressions directly
+# Can evaluate expressions directly:
 evaluate(objective)
 
 # ## Pass to solver
@@ -163,7 +164,7 @@ evaluate(objective)
 
 # ## Warmstart
 
-## Generate random problem data
+# Generate random problem data:
 m = 50;
 n = 100;
 A = randn(m, n)
@@ -171,10 +172,10 @@ x♮ = sprand(n, 1, 0.5) # true (sparse nonnegative) parameter vector
 noise = 0.1 * randn(m)    # gaussian noise
 b = A * x♮ + noise      # noisy linear observations
 
-## Create a (column vector) variable of size n.
+# Create a (column vector) variable of size n.
 x = Variable(n)
 
-## nonnegative elastic net with regularization
+# nonnegative elastic net with regularization
 λ = 1
 μ = 1
 problem = minimize(
@@ -187,7 +188,7 @@ problem = minimize(
 
 # # DCP examples
 
-## affine
+# - affine
 x = Variable(4)
 y = Variable(2)
 sum(x) + y[2]
@@ -196,22 +197,14 @@ sum(x) + y[2]
 
 2 * maximum(x) + 4 * sum(y) - sqrt(y[1] + x[1]) - 7 * minimum(x[2:4])
 
-#-
-
-## not dcp compliant
+# - not DCP compliant
 log(x) + square(x)
 
-#-
-
-## $f$ is convex increasing and $g$ is convex
+# - Composition $f\circ g$ where $f$ is convex increasing and $g$ is convex
 square(pos(x))
 
-#-
-
-## $f$ is convex decreasing and $g$ is concave
+# - Composition $f\circ g$ where $f$ is convex decreasing and $g$ is concave
 invpos(sqrt(x))
 
-#-
-
-## $f$ is concave increasing and $g$ is concave
+# - Composition $f\circ g$ where $f$ is concave increasing and $g$ is concave
 sqrt(sqrt(x))

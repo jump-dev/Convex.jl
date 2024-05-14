@@ -16,12 +16,12 @@
 #
 # The original representation of the problem is as follows:
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{find} & x \in \mathbb{C}^p \\
 #     \text{subject to} & |Ax| = b
 # \end{array}
-# $$
+# ```
 #
 # where $A \in \mathbb{C}^{n \times p}$ and $b \in \mathbb{R}^n$.
 
@@ -38,13 +38,13 @@
 # Define the positive semidefinite hermitian matrix
 # $M = \text{diag}(b) (I - A A^*) \text{diag}(b)$. The problem is:
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{minimize} & \langle U, M \rangle \\
 #     \text{subject to} & \text{diag}(U) = 1\\
 #     & U \succeq 0
 # \end{array}
-# $$
+# ```
 #
 # Here the variable $U$ must be hermitian ($U \in \mathbb{H}_n $),
 # and we have a solution to the phase recovery problem if $U = u u^*$

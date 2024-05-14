@@ -6,7 +6,7 @@ using SCS
 
 # ### Linear program
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{maximize} & c^T x \\
 #   \text{subject to} & A x \leq b\\
@@ -15,7 +15,7 @@ using SCS
 #   & x_2 \leq 5 \\
 #   & x_1 + x_4 - x_2 \leq 10 \\
 # \end{array}
-# $$
+# ```
 #
 
 x = Variable(4)
@@ -33,7 +33,7 @@ println(evaluate(x[1] + x[4] - x[2]))
 
 # ### Matrix Variables and promotions
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{minimize} & \| X \|_F + y \\
 #   \text{subject to} & 2 X \leq 1\\
@@ -41,7 +41,7 @@ println(evaluate(x[1] + x[4] - x[2]))
 #   & X \geq 0 \\
 #   & y \geq 0 \\
 # \end{array}
-# $$
+# ```
 #
 
 X = Variable(2, 2)
@@ -55,14 +55,14 @@ p.optval
 
 # ### Norm, exponential and geometric mean
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{satisfy} & \| x \|_2 \leq 100 \\
 #   & e^{x_1} \leq 5 \\
 #   & x_2 \geq 7 \\
 #   & \sqrt{x_3 x_4} \geq x_2
 # \end{array}
-# $$
+# ```
 #
 
 x = Variable(4)

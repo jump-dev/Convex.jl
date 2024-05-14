@@ -3,13 +3,13 @@
 #
 # This can be formulated as a mixed-integer program as:
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{maximize} & x' p \\
 #     \text{subject to} & x \in \{0, 1\} \\
 #   & w' x \leq C \\
 # \end{array}
-# $$
+# ```
 #
 # where $x$ is a vector is size $n$ where $x_i$ is one if we chose to keep the object in the knapsack, 0 otherwise.
 
