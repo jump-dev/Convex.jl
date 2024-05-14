@@ -6,13 +6,13 @@
 mutable struct Problem{T<:Real} <: AbstractExpr
     head::Symbol
     objective::Union{AbstractExpr,Nothing}
-    constraints::Array{Constraint}
+    constraints::Vector{Constraint}
     status::MOI.TerminationStatusCode
     model::Union{MOI.ModelLike,Nothing}
     function Problem{T}(
         head::Symbol,
         objective::Union{AbstractExpr,Nothing},
-        constraints::Array = Constraint[],
+        constraints = Constraint[],
     ) where {T<:Real}
         if objective !== nothing && sign(objective) == Convex.ComplexSign()
             error("Objective cannot be a complex expression")
@@ -20,7 +20,7 @@ mutable struct Problem{T<:Real} <: AbstractExpr
         return new(
             head,
             objective,
-            constraints,
+            vec(constraints),
             MOI.OPTIMIZE_NOT_CALLED,
             nothing,
         )
@@ -272,7 +272,7 @@ end
 
 # Allow users to simply type satisfy (if there is no objective)
 function satisfy(constraints::Constraint...; numeric_type = Float64)
-    return Problem{numeric_type}(:satisfy, nothing, [constraints...])
+    return Problem{numeric_type}(:satisfy, nothing, Constraint[constraints...])
 end
 
 function satisfy(constraints = Constraint[]; numeric_type = Float64)

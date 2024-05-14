@@ -1118,6 +1118,19 @@ function test_dcp_rules()
     return
 end
 
+function test_problem_untyped_constraints()
+    x = Variable(1, Positive())
+    # Test untyped constraints
+    p = maximize(x, Any[x<=1])
+    @test p isa Problem
+    p = maximize(x, Any[x <= 1;; x <= 1])
+    @test p isa Problem
+    p = minimize(x, Any[x<=1])
+    @test p isa Problem
+    p = minimize(x, Any[x <= 1;; x <= 1])
+    @test p isa Problem
+end
+
 function test_problem_maximize()
     x = Variable(1, Positive())
     p = maximize(exp(x), x <= 1)
