@@ -43,7 +43,7 @@ problem = minimize(
     x >= 0,
 )
 
-# Solve the problem by calling solve!
+# Solve the problem by calling `solve!`
 solve!(problem, SCS.Optimizer; silent_solver = true)
 
 println("problem status is ", problem.status) # :Optimal, :Infeasible, :Unbounded etc.
@@ -197,7 +197,7 @@ sum(x) + y[2]
 
 2 * maximum(x) + 4 * sum(y) - sqrt(y[1] + x[1]) - 7 * minimum(x[2:4])
 
-# - not dcp compliant
+# - not DCP compliant
 log(x) + square(x)
 
 # - Composition $f\circ g$ where $f$ is convex increasing and $g$ is convex
