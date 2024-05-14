@@ -22,9 +22,8 @@ x = Variable(4)
 c = [1; 2; 3; 4]
 A = I(4)
 b = [10; 10; 10; 10]
-p = minimize(dot(c, x)) # or c' * x
-p.constraints += A * x <= b
-p.constraints += [x >= 1; x <= 10; x[2] <= 5; x[1] + x[4] - x[2] <= 10]
+constraints = [A * x <= b, x >= 1, x <= 10, x[2] <= 5, x[1] + x[4] - x[2] <= 10]
+p = minimize(dot(c, x), constraints) # or c' * x
 solve!(p, SCS.Optimizer; silent_solver = true)
 
 println(round(p.optval, digits = 2))

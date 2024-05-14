@@ -476,9 +476,8 @@ end
     x = Variable(5)
     q = 1.379  # q norm constraint that generates many inequalities
     qs = q / (q - 1)  # Conjugate to q
-    p = minimize(x' * v; numeric_type = T)
+    p = minimize(x' * v, norm(x, q) <= 1; numeric_type = T)
 
-    p.constraints += (norm(x, q) <= 1)
     if test
         @test problem_vexity(p) == ConvexVexity()
     end

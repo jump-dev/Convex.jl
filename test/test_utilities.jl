@@ -1008,6 +1008,16 @@ function test_deprecation_in_symbol()
     return
 end
 
+function test_deprecation_adding_constraints()
+    x = Variable()
+    c = x == x
+    @test_logs (:warn, r"^Adding") c + c
+    @test_logs (:warn, r"^Concatenating") [c] + c
+    @test_logs (:warn, r"^Concatenating") c + [c]
+    @test_logs (:warn, r"^Concatenating") [c] + [c]
+    return
+end
+
 function test_dcp_rules()
     vexities = (
         Convex.ConcaveVexity(),
@@ -1115,6 +1125,20 @@ function test_dcp_rules()
         @test signs[i] * vexities[j] == vexities[mul_rule_sign_vex[i, j]]
         @test vexities[j] * signs[i] == vexities[mul_rule_sign_vex[i, j]]
     end
+    return
+end
+
+function test_problem_untyped_constraints()
+    x = Variable(1, Positive())
+    # Test untyped constraints
+    p = maximize(x, Any[x<=1])
+    @test p isa Problem
+    p = maximize(x, Any[x <= 1;; x <= 1])
+    @test p isa Problem
+    p = minimize(x, Any[x<=1])
+    @test p isa Problem
+    p = minimize(x, Any[x <= 1;; x <= 1])
+    @test p isa Problem
     return
 end
 
