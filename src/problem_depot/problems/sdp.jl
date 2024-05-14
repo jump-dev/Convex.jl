@@ -670,75 +670,6 @@ end
     end
 end
 
-@add_problem sdp function sdp_geom_mean_hypocone_argcheck(
-    handle_problem!,
-    ::Val{test},
-    atol,
-    rtol,
-    ::Type{T},
-) where {T,test}
-    if test
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            zeros(2, 3),
-            zeros(2, 3),
-            1 // 2,
-        )
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            zeros(2, 3),
-            Variable(2, 3),
-            1 // 2,
-        )
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            Variable(2, 3),
-            zeros(2, 3),
-            1 // 2,
-        )
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            Variable(2, 3),
-            Variable(2, 3),
-            1 // 2,
-        )
-
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            zeros(2, 2),
-            zeros(3, 3),
-            1 // 2,
-        )
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            zeros(2, 2),
-            Variable(3, 3),
-            1 // 2,
-        )
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            Variable(2, 2),
-            zeros(3, 3),
-            1 // 2,
-        )
-        @test_throws DimensionMismatch GeometricMeanHypoCone(
-            Variable(2, 2),
-            Variable(2, 3),
-            1 // 2,
-        )
-
-        @test_throws DimensionMismatch Variable(2, 2) in GeometricMeanHypoCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            1 // 2,
-        )
-
-        @test_throws DomainError GeometricMeanHypoCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            -1 // 2,
-        )
-        @test_throws DomainError GeometricMeanHypoCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            3 // 2,
-        )
-    end
-end
-
 @add_problem sdp function sdp_relative_entropy_argcheck(
     handle_problem!,
     ::Val{test},
@@ -938,7 +869,10 @@ end
     B = B * B' # now A is positive semidefinite
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 0)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(0 // 1, n),
+    )
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -962,7 +896,10 @@ end
     B = B * B' # now A is positive semidefinite
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
 
-    c1 = eye(n) in GeometricMeanHypoCone(B, A, 1)
+    c1 = Convex.GenericConstraint(
+        (eye(n), B, A),
+        GeometricMeanHypoConeSquare(1 // 1, n),
+    )
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -986,7 +923,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 1 // 2)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(1 // 2, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1010,7 +950,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 3 // 8)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(3 // 8, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1035,7 +978,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 3 // 5)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(3 // 5, n),
+    )
     objective = tr(B)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1060,7 +1006,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 1 // 2)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(1 // 2, n),
+    )
     objective = real(tr(B))
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1085,7 +1034,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 3 // 8)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(3 // 8, n),
+    )
     objective = real(tr(B))
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1111,7 +1063,10 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
-    c1 = eye(n) in GeometricMeanHypoCone(A, B, 3 // 5)
+    c1 = Convex.GenericConstraint(
+        (eye(n), A, B),
+        GeometricMeanHypoConeSquare(3 // 5, n),
+    )
     objective = real(tr(B))
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1135,12 +1090,18 @@ end
     # A and B however do not satisfy A ⪰ B^2 and so [A B; B eye(2)] not
     # psd, and using fullhyp=false will give an infeasible SDP.
     A = [6.25 0; 0 16]
-    B = [2 1; 1 2]
+    B = Variable(2, 2)
     S = Semidefinite(2)
 
     p = minimize(
         0,
-        [B in GeometricMeanHypoCone(A, eye(2), 1 // 2, false)];
+        [
+            B == [2 1; 1 2],
+            Convex.GenericConstraint(
+                (B, A, eye(2)),
+                GeometricMeanHypoConeSquare(1 // 2, 2, false),
+            ),
+        ];
         numeric_type = T,
     )
     handle_problem!(p)
@@ -1150,7 +1111,13 @@ end
 
     p = minimize(
         0,
-        [B in GeometricMeanHypoCone(A, eye(2), 1 // 2)];
+        [
+            B == [2 1; 1 2],
+            Convex.GenericConstraint(
+                (B, A, eye(2)),
+                GeometricMeanHypoConeSquare(1 // 2, 2),
+            ),
+        ];
         numeric_type = T,
     )
     handle_problem!(p)

@@ -359,17 +359,6 @@ function test_constraints_RelativeEntropyEpiConeConstraint()
     return
 end
 
-### constraints/GeometricMeanHypoConeConstraint
-
-function test_constraints_GeometricMeanHypoConeConstraint()
-    T = Variable(2, 2)
-    A = Variable(2, 2)
-    B = Variable(2, 2)
-    c = T in GeometricMeanHypoCone(A, B, 1 // 2)
-    @test !Convex.iscomplex(c)
-    return
-end
-
 end  # TestConstraints
 
 TestConstraints.runtests()
