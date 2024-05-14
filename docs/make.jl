@@ -92,7 +92,6 @@ end
 
 Documenter.makedocs(
     sitename = "Convex.jl",
-    repo = Documenter.Remotes.GitHub("jump-dev", "Convex.jl"),
     # TODO(odow): uncomment this once all docstrings are in the manual
     # modules = [Convex],
     format = Documenter.HTML(;
