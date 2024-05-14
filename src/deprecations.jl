@@ -130,7 +130,9 @@ function warn_deprecated_constraint_concatenation()
         "Concatenating collections of constraints together with `+` or `+=` to produce a new list of constraints is deprecated. Instead, use `vcat` to concatenate collections of constraints.",
         maxlog = 1
     )
+    return
 end
+
 function Base.:+(x::Array{<:Constraint}, y::Array{<:Constraint})
     warn_deprecated_constraint_concatenation()
     return vcat(x, y)
