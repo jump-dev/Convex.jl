@@ -7,7 +7,7 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.16.0 (May 7, 2024)
+## v0.16.0 (unreleased)
 
 This release contains a large number of changes, including some breaking
 changes.
@@ -61,7 +61,7 @@ changes.
  * `quadform` now errors when fixed variables are used instead of silently
    giving incorrect answers if the value of the fixed variable is modified
    between solves (#586)
- * The `Context` struct has beenn refactored, and various fields have been
+ * The `Context` struct has been refactored and various fields have been
    changed. The internal details are now considered private. (#645)
 
 ### Added
