@@ -15,7 +15,7 @@ changes.
 ### Breaking
 
  * This release involved a substantial rewrite of Convex.jl to integrate better
-   with MathOptInterface. (#504), (#551), (#584), (#588)
+   with MathOptInterface. (#504), (#551), (#584), (#588), (#637)
     * `x + A` will error if `x` is a scalar variable and `A` is an array.
       Instead, use `x * ones(size(A)) + A`.
     * The `RelativeEntropyAtom` now returns a scalar value instead o
@@ -28,10 +28,13 @@ changes.
       (Following the convention in MathOptInterface, the dual of `a <= b` is
       always negative, regardless of optimization sense.) (#593)
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
-      `SOCConstraint`, `ExpConstraint`, `GeoMeanEpiConeConstraint`, and
-      `SDPConstraint` have been replaced by `GenericConstraint{S}` where
-      `S<:MOI.AbstractSet` (#590), (#597), (#598), (#599), (#601), (#602),
-      (#604), (#623), (#632)
+      `SOCConstraint`, `ExpConstraint`, `GeoMeanEpiConeConstraint`,
+      `GeoMeanHypoConeConstraint`, and `SDPConstraint` have been replaced by
+      `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590), (#597), (#598),
+      (#599), (#601), (#602), (#604), (#623), (#632), (#648)
+    * The set `GeomMeanEpiCone` has been renamed to `GeometricMeanEpiConeSquare`
+      and `GeomMeanHypoCone` has been renamed to `GeometricMeanHypoConeSquare`
+      (#638)
  * **Subtle breaking change**: scalar row indexing like `x[i, :]` now produces a
    column vector instead of a row vector. This better aligns with Julia Base,
    but it can result in subtle differences, particularly for code like
@@ -58,6 +61,8 @@ changes.
  * `quadform` now errors when fixed variables are used instead of silently
    giving incorrect answers if the value of the fixed variable is modified
    between solves (#586)
+ * The `Context` struct has beenn refactored, and various fields have been
+   changed. The internal details are now considered private. (#645)
 
 ### Added
 
@@ -75,6 +80,8 @@ changes.
    performance problems with some atoms (#631)
  * `solve!` now reports the time and memory allocation during compilation from
    the DCP expression graph to MathOptInterface (#633)
+ * Added support for using `Problem` as an atom (#646)
+ * `show(::IO, ::Problem)` now includes some problem statistics (#650)
 
 ### Fixed
 
@@ -82,17 +89,19 @@ changes.
  * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
    of `imag` and `real` has been removed. This should not affect use of Convex.
    (#504)
- * Fix `dot` to correctly complex-conjugates its first argument (#524)
+ * Fix `dot` to now correctly complex-conjugates its first argument (#524)
+ * Fixed ambiguities identified by Aqua.jl (#642), (#647)
  * Add tests and fix  a number of bugs in various atoms (#546), (#547), (#550),
    (#554), (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566),
-   (#567), (#568), (#608), (#609), (#617), (#626)
+   (#567), (#568), (#608), (#609), (#617), (#626), (#654), (#655)
  * Fixed performance issues in a number of issues related to scalar indexing
    (#618), (#619), (#620), (#621), (#625), (#634)
+ * Fixed `show` for `Problem` (#649)
 
 ### Other
 
  * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
-   (#576), (#579), (#587), (#594), (#628)
+   (#576), (#579), (#587), (#594), (#628), (#652), (#656)
  * Refactored the tests into a functional form (#532)
  * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
