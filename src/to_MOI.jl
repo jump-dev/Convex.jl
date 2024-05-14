@@ -25,15 +25,11 @@ function to_vaf(tape::SparseTape{T}) where {T}
     return MOI.VectorAffineFunction{T}(vats, tape.operation.vector)
 end
 
-# method for adding constraints and coverting to standard VAFs as needed
+# method for adding constraints and converting to standard VAFs as needed
 function MOI_add_constraint(model, f, set)
     return MOI.add_constraint(model, f, set)
 end
 
-function MOI_add_constraint(
-    model,
-    f::Union{VectorAffineFunctionAsMatrix,SparseTape},
-    set,
-)
+function MOI_add_constraint(model, f::SparseTape, set)
     return MOI_add_constraint(model, to_vaf(f), set)
 end
