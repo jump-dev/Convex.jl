@@ -65,7 +65,7 @@ end
 
 Solves the problem, populating `problem.optval` with the optimal value, as well
 as the values of the variables (accessed by [`evaluate`](@ref)) and constraint
-duals (accessed by `cons.dual`), where applicable.
+duals (accessed by `cons.dual`), where applicable. Returns the input `problem`.
 
 Optional keyword arguments:
 
@@ -134,7 +134,7 @@ function solve!(
             populate_dual!(context.model, c, indices)
         end
     end
-    return
+    return p
 end
 
 function populate_dual!(::MOI.ModelLike, c::Constraint, ::Nothing)
