@@ -15,7 +15,7 @@ changes.
 ### Breaking
 
  * This release involved a substantial rewrite of Convex.jl to integrate better
-   with MathOptInterface. (#504)
+   with MathOptInterface. (#504), (#551), (#584), (#588), (#637)
     * `x + A` will error if `x` is a scalar variable and `A` is an array.
       Instead, use `x * ones(size(A)) + A`.
     * The `RelativeEntropyAtom` now returns a scalar value instead o
@@ -28,8 +28,19 @@ changes.
       (Following the convention in MathOptInterface, the dual of `a <= b` is
       always negative, regardless of optimization sense.) (#593)
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
-      `SOCConstraint` and `SDPConstraint` have
-      been replaced by `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590)
+      `SOCConstraint`, `ExpConstraint`, `GeoMeanEpiConeConstraint`,
+      `GeoMeanHypoConeConstraint`, and `SDPConstraint` have been replaced by
+      `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590), (#597), (#598),
+      (#599), (#601), (#602), (#604), (#623), (#632), (#648)
+    * The set `GeomMeanEpiCone` has been renamed to `GeometricMeanEpiConeSquare`
+      and `GeomMeanHypoCone` has been renamed to `GeometricMeanHypoConeSquare`
+      (#638)
+ * **Subtle breaking change**: scalar row indexing like `x[i, :]` now produces a
+   column vector instead of a row vector. This better aligns with Julia Base,
+   but it can result in subtle differences, particularly for code like
+   `x[i, :] * y[i, :]'`: this used to be equivalent to the inner product, but it
+   is now the outer product. In Base Julia, this is the outer product, so the
+   previous code may be been silently broken (#624)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call
@@ -38,12 +49,20 @@ changes.
    individual variable, has been renamed `get_constraints` (#527)
  * DCP violations now throw a `DCPViolationError` exception, rather than a
    warning. Relatedly, `Convex.emit_dcp_warnings` has been removed (#523)
- * Removed the undocumented an internal function `latex_formulation` (#551)
  * The strict inequalities `>` and `<` have been deprecated. They will be
    removed in the next breaking release. Note that these never enforced strict
    inequalities, but instead were equivalent to `>=` and `<=` respectively (#555)
  * The functions `norm_inf`, `norm_1`, and `norm_fro` have been deprecated. They
    will be removed in the next breaking release (#567)
+ * The syntax `x in :PSD` to create a semidefinite constraint is deprecated and
+   will be removed in the next breaking release (#578)
+ * Fixed setting a `Constant` objective function. This is breaking because it
+   now has an objective sense instead of ignoring the objective. (#581)
+ * `quadform` now errors when fixed variables are used instead of silently
+   giving incorrect answers if the value of the fixed variable is modified
+   between solves (#586)
+ * The `Context` struct has been refactored and various fields have been
+   changed. The internal details are now considered private. (#645)
 
 ### Added
 
@@ -51,30 +70,50 @@ changes.
    (#504)
  * `geomean` supports more than 2 arguments (#504)
  * Added `Convex.Optimizer` (#511), (#530), (#534)
- * Added `write_to_file` (#531)
+ * Added `write_to_file` (#531), (#591)
  * Added `entropy_elementwise` (#570)
  * `norm` on `AbstractExpr` objects now supports matrices (treating them like
    vectors), matching Base's behavior (#528)
+ * Added `root_det` (#605)
+ * Added `VcatAtom` which is a more efficient implementation of `vcat` (#607)
+ * Added support for `SparseArrays.SparseMatrixCSC` in `Constant`. This fixed
+   performance problems with some atoms (#631)
+ * `solve!` now reports the time and memory allocation during compilation from
+   the DCP expression graph to MathOptInterface (#633)
+ * Added support for using `Problem` as an atom (#646)
+ * `show(::IO, ::Problem)` now includes some problem statistics (#650)
 
 ### Fixed
 
  * `sumlargesteigs` now enforces that it's argument is hermitian. (#504)
  * [Type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy)
-   of `imag` and `real` has been removed. This should not affect use of Convex. (#504)
- * Bugfix: `dot` now correctly complex-conjugates its first argument (#524)
- * Add tests and fix  a number of bugs in various atoms (#546), (#550), (#554),
-   (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566), (#567) (#568)
+   of `imag` and `real` has been removed. This should not affect use of Convex.
+   (#504)
+ * Fix `dot` to now correctly complex-conjugates its first argument (#524)
+ * Fixed ambiguities identified by Aqua.jl (#642), (#647)
+ * Add tests and fix  a number of bugs in various atoms (#546), (#547), (#550),
+   (#554), (#556), (#558), (#559), (#561), (#562), (#563), (#565), (#566),
+   (#567), (#568), (#608), (#609), (#617), (#626), (#654), (#655)
+ * Fixed performance issues in a number of issues related to scalar indexing
+   (#618), (#619), (#620), (#621), (#625), (#634)
+ * Fixed `show` for `Problem` (#649)
 
 ### Other
 
- * Improved the documentation (#517), (#529)
+ * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
+   (#576), (#579), (#587), (#594), (#628), (#652), (#656)
  * Refactored the tests into a functional form (#532)
+ * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
  * Refactored imports to explicitly overload methods (#537)
  * Tidied and renamed various atoms and files clarity. This should be
    non-breaking as no public API was changed. (#538), (#539), (#540), (#541),
-   (#543), (#545)
+   (#543), (#545), (#549), (#553), (#582), (#583)
  * Removed the unused file `src/problem_depot/problems/benchmark.jl` (#560)
+ * Added various tests to improve code coverage (#522), (#572), (#575), (#577),
+   (#580)
+ * Updated versions in GitHub actions (#596), (#612), (#629)
+ * Added license headers (#606)
 
 ## v0.15.4 (October 24, 2023)
 
