@@ -42,7 +42,7 @@ function solve_and_return_output(problem, solver; kwargs...)
     return fetch(out_task)
 end
 
-function test_solve!_does_not_return_anything()
+function test_solve!_returns_the_problem()
     x = Variable()
     p = satisfy(x >= 0)
     output = solve!(
@@ -53,7 +53,7 @@ function test_solve!_does_not_return_anything()
             "eps_abs" => 1e-6,
         ),
     )
-    @test output === nothing
+    @test output === p
     return
 end
 
@@ -85,7 +85,7 @@ function test_solve!_can_take_an_optimizer_directly()
             "eps_abs" => 1e-6,
         ),
     )
-    @test output === nothing
+    @test output === p
     return
 end
 
