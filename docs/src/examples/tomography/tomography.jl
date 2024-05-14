@@ -13,16 +13,16 @@
 # $A_{ij}$ describes how much of pixel $j$ is intersected by line $i$.
 # Assuming our measurements of the line integrals are perfect, we have the relationship that
 #
-# $$
+# ```math
 #   y = Ax
-# $$
+# ```
 #
 # However, anytime we have measurements, there are usually small errors that occur.
 # Therefore it makes sense to try to minimize
 #
-# $$
+# ```math
 #  \|y - Ax\|_2^2.
-# $$
+# ```
 #
 # This is simply an unconstrained least squares problem; something we can readily solve.
 

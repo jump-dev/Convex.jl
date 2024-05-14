@@ -7,9 +7,9 @@
 # denotes the input into the system over time. Linear constraints are used to
 # capture the evolution of the system over time:
 #
-# $$
+# ```math
 # x(t) = Ax(t - 1) + Bu(t), \ \text{for} \ t = 1,\ldots, T,
-# $$
+# ```
 #
 # where the numerical matrices $A$ and $B$ are called the dynamics and input matrices,
 # respectively.
@@ -30,7 +30,9 @@
 # have physical meaning, so we often want to find a sequence inputs that also
 # minimizes a least squares objective like the following:
 #
-# $$\sum_{t = 0}^T \|Fx(t)\|^2_2 + \sum_{t = 1}^T\|Gu(t)\|^2_2,$$
+# ```math
+# \sum_{t = 0}^T \|Fx(t)\|^2_2 + \sum_{t = 1}^T\|Gu(t)\|^2_2,
+# ```
 #
 # where $F$ and $G$ are numerical matrices.
 #
@@ -42,12 +44,12 @@
 # By the basic laws of physics, the relationship between force, velocity, and position
 # must satisfy:
 #
-# $$
+# ```math
 #   \begin{aligned}
 #     p(t+1) &= p(t) + h v(t) \\
 #     v(t+1) &= v(t) + h a(t)
 #   \end{aligned}.
-# $$
+# ```
 #
 # Here, $a(t)$ denotes the acceleration at time $t$, for which we use
 # $a(t) = f(t) / m + g - d v(t)$,
@@ -56,20 +58,20 @@
 #
 # Additionally, we have our initial/final position/velocity conditions:
 #
-# $$
+# ```math
 #   \begin{aligned}
 #     p(1) &= p_i\\
 #     v(1) &= v_i\\
 #     p(T+1) &= p_f\\
 #     v(T+1) &= 0
 #   \end{aligned}
-# $$
+# ```
 #
 # One reasonable objective to minimize would be
 #
-# $$
+# ```math
 #   \text{objective} = \mu \sum_{t = 1}^{T+1} (v(t))^2 + \sum_{t = 1}^T (f(t))^2
-# $$
+# ```
 #
 # We would like to keep both the forces small to perhaps save fuel, and keep
 # the velocities small for safety concerns.

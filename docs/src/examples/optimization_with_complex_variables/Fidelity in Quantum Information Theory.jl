@@ -3,20 +3,20 @@
 #
 # The Fidelity between two Hermitian semidefinite matrices P and Q is defined as:
 #
-# $$
+# ```math
 # F(P, Q) = \|P^{1/2}Q^{1/2}\|_{\text{tr}} = \max_U \mathrm{tr}(P^{1/2}U Q^{1/2})
-# $$
+# ```
 #
 # where the trace norm $\|\cdot\|_{\text{tr}}$ is the sum of the singular values, and the maximization goes over the set of all unitary matrices U. This quantity can be expressed as the optimal value of the following complex-valued SDP:
 #
-# $$
+# ```math
 # \begin{array}{ll}
 #   \text{maximize} &  \frac{1}{2}\text{tr}(Z+Z^\dagger) \\
 #   \text{subject to} &\\
 #   & \left[\begin{array}{cc}P&Z\\{Z}^{\dagger}&Q\end{array}\right] \succeq 0\\
 #   & Z \in \mathbf {C}^{n \times n}\\
 # \end{array}
-# $$
+# ```
 #
 
 using Convex, SCS, LinearAlgebra

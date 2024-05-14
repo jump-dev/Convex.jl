@@ -30,6 +30,9 @@ function _literate_directory(dir)
         # `include` the file to test it before `#src` lines are removed. It is
         # in a testset to isolate local variables between files.
         Test.@testset "$(filename)" begin
+            # we can't use just `mod = Module()`
+            # as some examples use `include`.
+            # TODO- remove `include`'s from examples
             mod = @eval module $(gensym()) end
             Base.include(mod, filename)
         end
@@ -84,12 +87,12 @@ open(joinpath(@__DIR__, "src", "changelog.md"), "r") do in_io
 end
 
 # ==============================================================================
-#  Build annd release
+#  Build and release
 # ==============================================================================
 
 Documenter.makedocs(
     sitename = "Convex.jl",
-    repo = "https://github.com/jump-dev/Convex.jl/blob/{commit}{path}#L{line}",
+    repo = Documenter.Remotes.GitHub("jump-dev", "Convex.jl"),
     # TODO(odow): uncomment this once all docstrings are in the manual
     # modules = [Convex],
     format = Documenter.HTML(;
@@ -97,7 +100,7 @@ Documenter.makedocs(
         collapselevel = 1,
         prettyurls = get(ENV, "CI", nothing) == "true",
     ),
-    strict = true,
+    warnonly = [:cross_references],
     pages = [
         "Introduction" => [
             "Home" => "index.md",
