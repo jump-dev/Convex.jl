@@ -42,7 +42,7 @@ function get_visibility(K)
     P = [[ComplexVariable(2, 2) for i in 1:2] for j in 1:6]
     q = Variable(6, Positive())
     t = Variable(1, Positive())
-    constraints = [isposdef(P[i][j]) for i in 1:6 for j in 1:2]
+    constraints = Constraint[isposdef(P[i][j]) for i in 1:6 for j in 1:2]
     push!(constraints, sum(q) == 1)
     push!(constraints, t <= 1)
     push!(constraints, [P[i][1] + P[i][2] == q[i] * I(2) for i in 1:6])
