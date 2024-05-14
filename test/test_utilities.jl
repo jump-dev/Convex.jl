@@ -1008,6 +1008,16 @@ function test_deprecation_in_symbol()
     return
 end
 
+function test_deprecation_adding_constraints()
+    x = Variable()
+    c = x == x
+    @test_logs (:warn, r"^Adding") c + c
+    @test_logs (:warn, r"^Concatenating") [c] + c
+    @test_logs (:warn, r"^Concatenating") c + [c]
+    @test_logs (:warn, r"^Concatenating") [c] + [c]
+    return
+end
+
 function test_dcp_rules()
     vexities = (
         Convex.ConcaveVexity(),
