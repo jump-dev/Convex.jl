@@ -1129,6 +1129,7 @@ function test_problem_untyped_constraints()
     @test p isa Problem
     p = minimize(x, Any[x <= 1;; x <= 1])
     @test p isa Problem
+    return
 end
 
 function test_problem_maximize()
