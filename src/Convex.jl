@@ -131,11 +131,11 @@ const MAXDEPTH = Ref(3)
 """
     MAXWIDTH
 
-Controls width of tree printing globally for Convex.jl; defaults to 15. Set via
+Controls width of tree printing globally for Convex.jl; defaults to 5. Set via
 
-    Convex.MAXWIDTH[] = 15
+    Convex.MAXWIDTH[] = 10
 """
-const MAXWIDTH = Ref(15)
+const MAXWIDTH = Ref(5)
 
 """
     MAXDIGITS
