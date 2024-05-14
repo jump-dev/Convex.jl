@@ -200,11 +200,11 @@ sum(x) + y[2]
 # - not dcp compliant
 log(x) + square(x)
 
-# - $f$ is convex increasing and $g$ is convex
+# - Composition $f\circ g$ where $f$ is convex increasing and $g$ is convex
 square(pos(x))
 
-# - $f$ is convex decreasing and $g$ is concave
+# - Composition $f\circ g$ where $f$ is convex decreasing and $g$ is concave
 invpos(sqrt(x))
 
-# - $f$ is concave increasing and $g$ is concave
+# - Composition $f\circ g$ where $f$ is concave increasing and $g$ is concave
 sqrt(sqrt(x))
