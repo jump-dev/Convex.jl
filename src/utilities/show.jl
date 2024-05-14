@@ -253,8 +253,12 @@ function Base.show(io::IO, p::Problem)
     con_str =
         _str_with_elements(counts.n_constraints, counts.n_scalar_constraints)
     println(io, "  number of constraints  : ", con_str)
-    println(io, "  number of coefficients : ", counts.n_nonzeros)
-    println(io, "  number of atoms        : ", counts.n_atoms)
+    println(
+        io,
+        "  number of coefficients : ",
+        _to_underscore(counts.n_nonzeros),
+    )
+    println(io, "  number of atoms        : ", _to_underscore(counts.n_atoms))
     println(io)
     # Print solution summary
     println(io, "Solution summary")
