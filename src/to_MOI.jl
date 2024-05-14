@@ -5,32 +5,11 @@
 
 # This is a variant of MOI.VectorAffineFunction which represents
 # the transformation `matrix * variables + vector` lazily.
-struct VectorAffineFunctionAsMatrix{T,V}
-    aff::SparseAffineOperation{T}
-    variables::V
-end
-
-function Base.isequal(
-    A::VectorAffineFunctionAsMatrix,
-    B::VectorAffineFunctionAsMatrix,
-)
-    return isequal(A.variables, B.variables) && isequal(A.aff, B.aff)
-end
-
-function MOI.output_dimension(v::VectorAffineFunctionAsMatrix)
-    return size(v.matrix, 1)
-end
-
 to_vaf(tape::SPARSE_VECTOR) = tape
 
-function to_vaf(tape::SparseTape)
-    op = SparseAffineOperation(tape)
-    return to_vaf(VectorAffineFunctionAsMatrix(op, tape.variables))
-end
-
 # convert to a usual VAF
-function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
-    I, J, V = SparseArrays.findnz(vaf_as_matrix.aff.matrix)
+function to_vaf(tape::SparseTape{T}) where {T}
+    I, J, V = SparseArrays.findnz(tape.operation.matrix)
     vats = Vector{MOI.VectorAffineTerm{T}}(undef, length(I))
     for (idx, n) in enumerate(eachindex(I, J, V))
         i = I[n]
@@ -39,11 +18,11 @@ function to_vaf(vaf_as_matrix::VectorAffineFunctionAsMatrix{T}) where {T}
 
         vats[idx] = MOI.VectorAffineTerm{T}(
             i,
-            MOI.ScalarAffineTerm{T}(v, vaf_as_matrix.variables[j]),
+            MOI.ScalarAffineTerm{T}(v, tape.variables[j]),
         )
     end
 
-    return MOI.VectorAffineFunction{T}(vats, vaf_as_matrix.aff.vector)
+    return MOI.VectorAffineFunction{T}(vats, tape.operation.vector)
 end
 
 # method for adding constraints and coverting to standard VAFs as needed
