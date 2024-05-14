@@ -197,7 +197,7 @@ function Problem{T}(
     constraint::Constraint,
     constraints::Constraint...,
 ) where {T<:Real}
-    return Problem{T}(head, objective, [constraint, constraints...])
+    return Problem{T}(head, objective, Constraint[constraint, constraints...])
 end
 
 # Allow users to simply type minimize
@@ -206,12 +206,16 @@ function minimize(
     constraints::Constraint...;
     numeric_type = Float64,
 )
-    return Problem{numeric_type}(:minimize, objective, collect(constraints))
+    return Problem{numeric_type}(
+        :minimize,
+        objective,
+        collect(Constraint, constraints),
+    )
 end
 
 function minimize(
     objective::AbstractExpr,
-    constraints::Array{<:Constraint} = Constraint[];
+    constraints = Constraint[];
     numeric_type = Float64,
 )
     return Problem{numeric_type}(:minimize, objective, constraints)
@@ -227,7 +231,7 @@ end
 
 function minimize(
     objective::Value,
-    constraints::Array{<:Constraint} = Constraint[];
+    constraints = Constraint[];
     numeric_type = Float64,
 )
     return minimize(constant(objective), constraints; numeric_type)
@@ -244,7 +248,7 @@ end
 
 function maximize(
     objective::AbstractExpr,
-    constraints::Array{<:Constraint} = Constraint[];
+    constraints = Constraint[];
     numeric_type = Float64,
 )
     return Problem{numeric_type}(:maximize, objective, constraints)
@@ -260,7 +264,7 @@ end
 
 function maximize(
     objective::Value,
-    constraints::Array{<:Constraint} = Constraint[];
+    constraints = Constraint[];
     numeric_type = Float64,
 )
     return maximize(constant(objective), constraints; numeric_type)
@@ -271,10 +275,7 @@ function satisfy(constraints::Constraint...; numeric_type = Float64)
     return Problem{numeric_type}(:satisfy, nothing, [constraints...])
 end
 
-function satisfy(
-    constraints::Array{<:Constraint} = Constraint[];
-    numeric_type = Float64,
-)
+function satisfy(constraints = Constraint[]; numeric_type = Float64)
     return Problem{numeric_type}(:satisfy, nothing, constraints)
 end
 
@@ -282,7 +283,7 @@ function satisfy(constraint::Constraint; numeric_type = Float64)
     return satisfy([constraint]; numeric_type = numeric_type)
 end
 
-function add_constraints!(p::Problem, constraints::Array{<:Constraint})
+function add_constraints!(p::Problem, constraints)
     return append!(p.constraints, constraints)
 end
 
@@ -290,21 +291,13 @@ function add_constraints!(p::Problem, constraint::Constraint)
     return add_constraints!(p, [constraint])
 end
 
-function add_constraint!(p::Problem, constraints::Array{<:Constraint})
+function add_constraint!(p::Problem, constraints)
     return add_constraints!(p, constraints)
 end
 
 function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
 end
-
-Base.:+(x::Array{<:Constraint}, y::Array{<:Constraint}) = vcat(x, y)
-
-Base.:+(x::Constraint, y::Constraint) = [x, y]
-
-Base.:+(x::Constraint, y::Array{<:Constraint}) = vcat(x, y)
-
-Base.:+(x::Array{<:Constraint}, y::Constraint) = vcat(x, y)
 
 iscomplex(c::Constraint) = iscomplex(c.lhs) || iscomplex(c.rhs)
 

@@ -43,13 +43,25 @@ function get_visibility(K)
     q = Variable(6, Positive())
     t = Variable(1, Positive())
     constraints = [isposdef(P[i][j]) for i in 1:6 for j in 1:2]
-    constraints += sum(q) == 1
-    constraints += t <= 1
-    constraints += [P[i][1] + P[i][2] == q[i] * I(2) for i in 1:6]
-    constraints += t * K[1] + (1 - t) * noise[1] == P[1][1] + P[2][1] + P[3][1]
-    constraints += t * K[2] + (1 - t) * noise[2] == P[1][2] + P[4][1] + P[5][1]
-    constraints += t * K[3] + (1 - t) * noise[3] == P[2][2] + P[4][2] + P[6][1]
-    constraints += t * K[4] + (1 - t) * noise[4] == P[3][2] + P[5][2] + P[6][2]
+    push!(constraints, sum(q) == 1)
+    push!(constraints, t <= 1)
+    push!(constraints, [P[i][1] + P[i][2] == q[i] * I(2) for i in 1:6])
+    push!(
+        constraints,
+        t * K[1] + (1 - t) * noise[1] == P[1][1] + P[2][1] + P[3][1],
+    )
+    push!(
+        constraints,
+        t * K[2] + (1 - t) * noise[2] == P[1][2] + P[4][1] + P[5][1],
+    )
+    push!(
+        constraints,
+        t * K[3] + (1 - t) * noise[3] == P[2][2] + P[4][2] + P[6][1],
+    )
+    push!(
+        constraints,
+        t * K[4] + (1 - t) * noise[4] == P[3][2] + P[5][2] + P[6][2],
+    )
     p = maximize(t, constraints)
     solve!(p, SCS.Optimizer; silent_solver = true)
     return p.optval

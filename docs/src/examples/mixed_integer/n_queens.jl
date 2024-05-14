@@ -10,12 +10,12 @@ x = Variable((n, n), BinVar)
 
 # Now we impose the constraints: at most one queen on any anti-diagonal, at most one queen on any diagonal, and we must have exactly one queen per row and per column.
 ## At most one queen on any anti-diagonal
-constr = Constraint[sum(antidiag(x, k)) <= 1 for k in -n+2:n-2]
+constraints = Constraint[sum(antidiag(x, k)) <= 1 for k in -n+2:n-2]
 ## At most one queen on any diagonal
-constr += Constraint[sum(diag(x, k)) <= 1 for k in -n+2:n-2]
+append!(constraints, [sum(diag(x, k)) <= 1 for k in -n+2:n-2])
 ## Exactly one queen per row and one queen per column
-constr += Constraint[sum(x, dims = 1)==1, sum(x, dims = 2)==1]
-p = satisfy(constr)
+append!(constraints, [sum(x, dims = 1) == 1, sum(x, dims = 2) == 1])
+p = satisfy(constraints)
 solve!(p, GLPK.Optimizer)
 
 # Let us test the results:

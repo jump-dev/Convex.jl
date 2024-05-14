@@ -123,3 +123,33 @@ end
 function ComplexVariable(set::Symbol, sets::Symbol...)
     return ComplexVariable((1, 1), set, sets...)
 end
+
+# `+` on constraints
+function warn_deprecated_constraint_concatenation()
+    @warn(
+        "Concatenating collections of constraints together with `+` or `+=` to produce a new list of constraints is deprecated. Instead, use `vcat` to concatenate collections of constraints.",
+        maxlog = 1
+    )
+end
+function Base.:+(x::Array{<:Constraint}, y::Array{<:Constraint})
+    warn_deprecated_constraint_concatenation()
+    return vcat(x, y)
+end
+
+function Base.:+(x::Constraint, y::Constraint)
+    @warn(
+        "Adding constraints together (with `+` or `+=`) to produce a list of constraints is deprecated. Instead, construct a list of constraints via `[constraint1, constraint2]`",
+        maxlog = 1
+    )
+    return [x, y]
+end
+
+function Base.:+(x::Constraint, y::Array{<:Constraint})
+    warn_deprecated_constraint_concatenation()
+    return vcat(x, y)
+end
+
+function Base.:+(x::Array{<:Constraint}, y::Constraint)
+    warn_deprecated_constraint_concatenation()
+    return vcat(x, y)
+end

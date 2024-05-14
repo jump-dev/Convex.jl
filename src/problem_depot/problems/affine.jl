@@ -754,11 +754,7 @@ end
         @test p.status == MOI.OPTIMAL
     end
 
-    constr = x >= 0
-    constr += x >= 1
-    constr += x <= 10
-    constr2 = x >= 0
-    constr2 += [x >= 2, x <= 3] + constr
+    constr = [x >= 0, x >= 1, x <= 10]
     p = satisfy(constr; numeric_type = T)
 
     handle_problem!(p)
