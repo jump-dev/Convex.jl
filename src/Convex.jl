@@ -224,7 +224,7 @@ for (root, _, files) in walkdir(joinpath(@__DIR__, "constraints"))
 end
 
 include("SparseTape.jl")
-include("VectorAffineFunctionAsMatrix.jl")
+include("to_MOI.jl")
 include("ComplexTape.jl")
 include("operate.jl")
 include("complex_operate.jl")
