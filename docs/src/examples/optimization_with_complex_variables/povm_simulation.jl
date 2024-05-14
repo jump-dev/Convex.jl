@@ -45,7 +45,7 @@ function get_visibility(K)
     constraints = Constraint[isposdef(P[i][j]) for i in 1:6 for j in 1:2]
     push!(constraints, sum(q) == 1)
     push!(constraints, t <= 1)
-    push!(constraints, [P[i][1] + P[i][2] == q[i] * I(2) for i in 1:6])
+    append!(constraints, [P[i][1] + P[i][2] == q[i] * I(2) for i in 1:6])
     push!(
         constraints,
         t * K[1] + (1 - t) * noise[1] == P[1][1] + P[2][1] + P[3][1],
