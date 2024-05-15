@@ -94,10 +94,7 @@ function _add_constraint!(
         add_constraint!(context, [T A; A Z] ⪰ 0)
         add_constraint!(
             context,
-            Constraint(
-                (Z, A, B),
-                GeometricMeanHypoConeSquare(-t, n, false),
-            ),
+            Constraint((Z, A, B), GeometricMeanHypoConeSquare(-t, n, false)),
         )
     else
         # range of t checked in GeometricMeanEpiConeSquare constructor.
@@ -105,10 +102,7 @@ function _add_constraint!(
         add_constraint!(context, [T B; B Z] ⪰ 0)
         add_constraint!(
             context,
-            Constraint(
-                (Z, A, B),
-                GeometricMeanHypoConeSquare(2 - t, n, false),
-            ),
+            Constraint((Z, A, B), GeometricMeanHypoConeSquare(2 - t, n, false)),
         )
     end
     return

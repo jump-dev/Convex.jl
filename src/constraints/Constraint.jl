@@ -111,11 +111,7 @@ function populate_dual!(
     return
 end
 
-function populate_dual!(
-    model::MOI.ModelLike,
-    c::Constraint,
-    indices::NTuple{2},
-)
+function populate_dual!(model::MOI.ModelLike, c::Constraint, indices::NTuple{2})
     re = MOI.get(model, MOI.ConstraintDual(), indices[1])
     imag = MOI.get(model, MOI.ConstraintDual(), indices[2])
     c.dual = output(reshape(re + im * imag, c.child.size))

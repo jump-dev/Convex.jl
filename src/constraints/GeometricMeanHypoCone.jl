@@ -110,10 +110,7 @@ function _add_constraint!(
         W = make_temporary()
         add_constraint!(
             context,
-            Constraint(
-                (W, A, B),
-                GeometricMeanHypoConeSquare(t, n, false),
-            ),
+            Constraint((W, A, B), GeometricMeanHypoConeSquare(t, n, false)),
         )
         add_constraint!(context, W ⪰ T)
     else

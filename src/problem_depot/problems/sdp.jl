@@ -686,10 +686,7 @@ end
             Y = Variable(n, n)
         end
 
-        c1 = Convex.Constraint(
-            (eye(n), X, Y),
-            RelativeEntropyEpiConeSquare(n),
-        )
+        c1 = Convex.Constraint((eye(n), X, Y), RelativeEntropyEpiConeSquare(n))
         objective = real(tr(Y))
         p = minimize(objective, c1; numeric_type = T)
 
@@ -1099,10 +1096,8 @@ end
     B /= tr(B) # solver has problems if B is large
     A = Variable(n, n)
 
-    c1 = Convex.Constraint(
-        (eye(n), A, B),
-        GeometricMeanEpiConeSquare(8 // 5, n),
-    )
+    c1 =
+        Convex.Constraint((eye(n), A, B), GeometricMeanEpiConeSquare(8 // 5, n))
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1127,10 +1122,8 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = Convex.Constraint(
-        (eye(n), A, B),
-        GeometricMeanEpiConeSquare(8 // 5, n),
-    )
+    c1 =
+        Convex.Constraint((eye(n), A, B), GeometricMeanEpiConeSquare(8 // 5, n))
     objective = tr(B)
     p = maximize(objective, c1; numeric_type = T)
 

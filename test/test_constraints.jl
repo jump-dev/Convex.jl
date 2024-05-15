@@ -172,9 +172,7 @@ end
 function test_Constraint_PositiveSemidefiniteConeSquare()
     @test_throws(
         ErrorException("Positive semidefinite expressions must be square"),
-        Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}(
-            Variable(2, 3),
-        ),
+        Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}(Variable(2, 3)),
     )
     X = Variable(2, 2)
     c = Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}(X)
@@ -183,10 +181,8 @@ function test_Constraint_PositiveSemidefiniteConeSquare()
     @test isapprox(X.value, [2.25 3; 3 4]; atol = 1e-3)
     y = (c.dual + c.dual') / 2
     @test isapprox(y[1], 1; atol = 1e-3)
-    @test (0 ⪯ X) isa
-          Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
-    @test (-X ⪯ 0) isa
-          Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
+    @test (0 ⪯ X) isa Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
+    @test (-X ⪯ 0) isa Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
     @test (-X ⪯ constant(0)) isa
           Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
     @test (constant(0) ⪯ X) isa
@@ -389,10 +385,7 @@ function test_RelativeEntropyEpiConeSquare()
         DimensionMismatch,
         Convex.Constraint((Variable(3, 1), X, Y), set)
     )
-    @test_throws(
-        DimensionMismatch,
-        Convex.Constraint((Variable(), X, Y), set),
-    )
+    @test_throws(DimensionMismatch, Convex.Constraint((Variable(), X, Y), set),)
     @test_throws(
         DimensionMismatch,
         Convex.Constraint((τ, Variable(2, 3), Y), set)
