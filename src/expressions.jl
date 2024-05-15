@@ -33,8 +33,6 @@
 
 abstract type AbstractExpr end
 
-abstract type Constraint end
-
 const Value = Union{Number,AbstractArray}
 
 # We commandeer `==` to create a constraint.
