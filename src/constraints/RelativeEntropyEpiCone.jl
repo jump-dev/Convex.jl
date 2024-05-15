@@ -45,8 +45,8 @@ struct RelativeEntropyEpiConeSquare <: MOI.AbstractVectorSet
         if length(size(e)) == 1
             e = reshape(e, (size(e, 1), 1))
         end
-        if ndims(e) != 2 || size(e, 1) != n
-            throw(DimensionMismatch("e matrix must have n rows"))
+        if ndims(e) != 2 || size(e, 1) != side_dimension
+            throw(DimensionMismatch("e matrix must have $side_dimension rows"))
         end
         return new(side_dimension, m, k, e)
     end
