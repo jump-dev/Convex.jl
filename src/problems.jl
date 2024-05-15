@@ -67,40 +67,30 @@ end
 
 Problem(args...) = Problem{Float64}(args...)
 
-function problem_vexity(p::Problem)
-    bad_vex = (ConcaveVexity, NotDcp)
-    obj_vex = objective_vexity(p)
-    constr_vex = ConstVexity()
-    for i in 1:length(p.constraints)
-        vex = vexity(p.constraints[i])
-        if typeof(vex) in bad_vex
-            @warn "Problem not DCP compliant: constraint $i is not DCP"
-        end
-        constr_vex += vex
+function problem_vexity(p::Problem; warn::Bool = true)
+    problem_vex = objective_vexity(p)
+    if warn && problem_vex in (ConcaveVexity(), NotDcp())
+        @warn("Problem not DCP compliant: objective is not DCP")
     end
-    problem_vex = obj_vex + constr_vex
-    # this check is redundant
-    if typeof(problem_vex) in bad_vex
-        @warn("Problem not DCP compliant")
+    for (i, constraint) in enumerate(p.constraints)
+        vex = vexity(constraint)
+        if warn && vex in (ConcaveVexity(), NotDcp())
+            @warn("Problem not DCP compliant: constraint $i is not DCP")
+        end
+        problem_vex += vex
     end
     return problem_vex
 end
 
 function objective_vexity(p::Problem)
-    bad_vex = (ConcaveVexity, NotDcp)
     if p.head == :satisfy
-        obj_vex = ConstVexity()
+        return ConstVexity()
     elseif p.head == :minimize
-        obj_vex = vexity(p.objective)
-    elseif p.head == :maximize
-        obj_vex = -vexity(p.objective)
+        return vexity(p.objective)
     else
-        error("Unknown type of problem $(p.head)")
+        @assert p.head == :maximize
+        return -vexity(p.objective)
     end
-    if typeof(obj_vex) in bad_vex
-        @warn "Problem not DCP compliant: objective is not DCP"
-    end
-    return obj_vex
 end
 
 function vexity(p::Problem)

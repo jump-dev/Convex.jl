@@ -171,6 +171,7 @@ function test_show()
     @test curvature(p) == Convex.ConvexVexity()
     @test sprint(show, p) == """
     Problem statistics
+      problem is DCP         : true
       number of variables    : 1 (1 scalar elements)
       number of constraints  : 2 (2 scalar elements)
       number of coefficients : 2
@@ -216,6 +217,7 @@ function test_show()
     @test curvature(p) == Convex.ConstVexity()
     @test sprint(show, p) == """
     Problem statistics
+      problem is DCP         : true
       number of variables    : 2 (4 scalar elements)
       number of constraints  : 1 (16 scalar elements)
       number of coefficients : 0
@@ -249,6 +251,7 @@ function test_show()
     Convex.MAXWIDTH[] = 2
     @test sprint(show, p) == """
     Problem statistics
+      problem is DCP         : true
       number of variables    : 1 (1 scalar elements)
       number of constraints  : 100 (100 scalar elements)
       number of coefficients : 100
@@ -288,6 +291,7 @@ function test_show()
     )
     @test sprint(show, p) == """
     Problem statistics
+      problem is DCP         : true
       number of variables    : 1 (1 scalar elements)
       number of constraints  : 1 (1 scalar elements)
       number of coefficients : 1

@@ -54,7 +54,7 @@ above, however, we arrive at the problem:
 using Convex
 x = Variable();
 t = Variable();
-maximize(t, x >= 1, x <= 2, t >= x, t >= -x)
+maximize(t, [x >= 1, x <= 2, t >= x, t >= -x])
 ```
 whose solution is infinity.
 
