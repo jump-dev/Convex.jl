@@ -1,14 +1,13 @@
 # Installation
 
-Installing Convex.jl is a one step process. Open up Julia and type:
+Install Convex.jl using the Julia package manager:
 ```julia
 using Pkg
-Pkg.update()
 Pkg.add("Convex")
 ```
 
-This does not install any solvers. If you don't have a solver installed
-already, you will want to install a solver such as [SCS](https://github.com/jump-dev/SCS.jl)
+This does not install any solvers. If you don't have a solver installed already,
+you will want to install a solver such as [SCS](https://github.com/jump-dev/SCS.jl)
 by running:
 ```julia
 Pkg.add("SCS")
