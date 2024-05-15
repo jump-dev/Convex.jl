@@ -686,10 +686,7 @@ end
             Y = Variable(n, n)
         end
 
-        c1 = Convex.GenericConstraint(
-            (eye(n), X, Y),
-            RelativeEntropyEpiConeSquare(n),
-        )
+        c1 = Convex.Constraint((eye(n), X, Y), RelativeEntropyEpiConeSquare(n))
         objective = real(tr(Y))
         p = minimize(objective, c1; numeric_type = T)
 
@@ -714,7 +711,7 @@ end
     B = B * B' # now A is positive semidefinite
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(0 // 1, n),
     )
@@ -741,7 +738,7 @@ end
     B = B * B' # now A is positive semidefinite
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), B, A),
         GeometricMeanHypoConeSquare(1 // 1, n),
     )
@@ -768,7 +765,7 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(1 // 2, n),
     )
@@ -795,7 +792,7 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(3 // 8, n),
     )
@@ -823,7 +820,7 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(3 // 5, n),
     )
@@ -851,7 +848,7 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(1 // 2, n),
     )
@@ -879,7 +876,7 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(3 // 8, n),
     )
@@ -908,7 +905,7 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = ComplexVariable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanHypoConeSquare(3 // 5, n),
     )
@@ -942,7 +939,7 @@ end
         0,
         [
             B == [2 1; 1 2],
-            Convex.GenericConstraint(
+            Convex.Constraint(
                 (B, A, eye(2)),
                 GeometricMeanHypoConeSquare(1 // 2, 2, false),
             ),
@@ -958,7 +955,7 @@ end
         0,
         [
             B == [2 1; 1 2],
-            Convex.GenericConstraint(
+            Convex.Constraint(
                 (B, A, eye(2)),
                 GeometricMeanHypoConeSquare(1 // 2, 2),
             ),
@@ -984,7 +981,7 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanEpiConeSquare(-1 // 1, n),
     )
@@ -1013,7 +1010,7 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanEpiConeSquare(-1 // 1, n),
     )
@@ -1041,7 +1038,7 @@ end
     B += 0.2 * LinearAlgebra.I # prevent numerical instability
     A = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanEpiConeSquare(-3 // 5, n),
     )
@@ -1070,7 +1067,7 @@ end
     A /= tr(A) # solver has problems if B is large
     B = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
+    c1 = Convex.Constraint(
         (eye(n), A, B),
         GeometricMeanEpiConeSquare(-3 // 5, n),
     )
@@ -1099,10 +1096,8 @@ end
     B /= tr(B) # solver has problems if B is large
     A = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
-        (eye(n), A, B),
-        GeometricMeanEpiConeSquare(8 // 5, n),
-    )
+    c1 =
+        Convex.Constraint((eye(n), A, B), GeometricMeanEpiConeSquare(8 // 5, n))
     objective = tr(A)
     p = minimize(objective, c1; numeric_type = T)
 
@@ -1127,10 +1122,8 @@ end
     A += 0.2 * LinearAlgebra.I # prevent numerical instability
     B = Variable(n, n)
 
-    c1 = Convex.GenericConstraint(
-        (eye(n), A, B),
-        GeometricMeanEpiConeSquare(8 // 5, n),
-    )
+    c1 =
+        Convex.Constraint((eye(n), A, B), GeometricMeanEpiConeSquare(8 // 5, n))
     objective = tr(B)
     p = maximize(objective, c1; numeric_type = T)
 

@@ -82,7 +82,7 @@ function new_conic_form!(
     end
     I = Matrix(one(T) * LinearAlgebra.I(size(X, 1)))
     set = RelativeEntropyEpiConeSquare(size(X, 1), atom.m, atom.k)
-    add_constraint!(context, GenericConstraint((τ, X, I), set))
+    add_constraint!(context, Constraint((τ, X, I), set))
     # It's already a real mathematically, but need to make it a real type.
     return conic_form!(context, real(-LinearAlgebra.tr(τ)))
 end

@@ -11,8 +11,6 @@ AbstractTrees.children(v::AbstractVariable) = ()
 
 AbstractTrees.children(c::Constant) = ()
 
-AbstractTrees.children(C::Constraint) = (C.lhs, C.rhs)
-
 AbstractTrees.printnode(io::IO, node::AbstractExpr) = summary(io, node)
 
 AbstractTrees.printnode(io::IO, node::Constraint) = summary(io, node)
@@ -84,21 +82,15 @@ function _add_to_problem_count(counts::Counts, node::AbstractVariable)
     return
 end
 
-_add_to_problem_count(::Counts, ::Vector{Constraint}) = nothing
+_add_to_problem_count(::Counts, ::Vector{<:Constraint}) = nothing
 
 _add_to_problem_count(::Counts, ::Nothing) = nothing
 
-function _add_to_problem_count(counts::Counts, node::GenericConstraint)
+function _add_to_problem_count(counts::Counts, node::Constraint)
     counts.n_constraints += 1
     counts.n_scalar_constraints +=
         (iscomplex(node) ? 2 : 1) * MOI.dimension(node.set)
     _add_to_problem_count(counts, node.child)
-    return
-end
-
-function _add_to_problem_count(counts::Counts, node::Constraint)
-    counts.n_constraints += 1
-    # TODO(odow): we don't know the general case
     return
 end
 

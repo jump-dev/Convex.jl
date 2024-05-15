@@ -30,7 +30,7 @@ changes.
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
       `SOCConstraint`, `ExpConstraint`, `GeoMeanEpiConeConstraint`,
       `GeoMeanHypoConeConstraint`, and `SDPConstraint` have been replaced by
-      `GenericConstraint{S}` where `S<:MOI.AbstractSet` (#590), (#597), (#598),
+      `Constraint{S}` where `S<:MOI.AbstractSet` (#590), (#597), (#598),
       (#599), (#601), (#602), (#604), (#623), (#632), (#648)
     * The set `GeomMeanEpiCone` has been renamed to `GeometricMeanEpiConeSquare`
       and `GeomMeanHypoCone` has been renamed to `GeometricMeanHypoConeSquare`

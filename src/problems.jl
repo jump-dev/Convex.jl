@@ -299,8 +299,6 @@ function add_constraint!(p::Problem, constraint::Constraint)
     return add_constraints!(p, constraint)
 end
 
-iscomplex(c::Constraint) = iscomplex(c.lhs) || iscomplex(c.rhs)
-
 function add_constraint!(context::Context, c::Constraint)
     if c in keys(context.constr_to_moi_inds)
         return

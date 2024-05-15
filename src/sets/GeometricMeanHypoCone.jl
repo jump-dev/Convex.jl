@@ -53,7 +53,7 @@ function head(io::IO, ::GeometricMeanHypoConeSquare)
     return print(io, "GeometricMeanHypoConeSquare")
 end
 
-function GenericConstraint(func::Tuple, set::GeometricMeanHypoConeSquare)
+function Constraint(func::Tuple, set::GeometricMeanHypoConeSquare)
     for f in func
         n = LinearAlgebra.checksquare(f)
         if n != set.side_dimension
@@ -64,10 +64,10 @@ function GenericConstraint(func::Tuple, set::GeometricMeanHypoConeSquare)
             )
         end
     end
-    return GenericConstraint(vcat(vec.(func)...), set)
+    return Constraint(vcat(vec.(func)...), set)
 end
 
-function _get_matrices(c::GenericConstraint{GeometricMeanHypoConeSquare})
+function _get_matrices(c::Constraint{GeometricMeanHypoConeSquare})
     n = c.set.side_dimension
     d = n^2
     T = reshape(c.child[1:d], n, n)
@@ -78,7 +78,7 @@ end
 
 # For t ∈ [0,1] the t-weighted matrix geometric mean is matrix concave (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪯ A #_t B will be a convex set.
-function vexity(constraint::GenericConstraint{GeometricMeanHypoConeSquare})
+function vexity(constraint::Constraint{GeometricMeanHypoConeSquare})
     T, A, B = _get_matrices(constraint)
     if vexity(A) in (ConvexVexity(), NotDcp()) ||
        vexity(B) in (ConvexVexity(), NotDcp())
@@ -89,7 +89,7 @@ end
 
 function _add_constraint!(
     context::Context,
-    constraint::GenericConstraint{GeometricMeanHypoConeSquare},
+    constraint::Constraint{GeometricMeanHypoConeSquare},
 )
     T, A, B = _get_matrices(constraint)
     t = constraint.set.t
@@ -110,10 +110,7 @@ function _add_constraint!(
         W = make_temporary()
         add_constraint!(
             context,
-            GenericConstraint(
-                (W, A, B),
-                GeometricMeanHypoConeSquare(t, n, false),
-            ),
+            Constraint((W, A, B), GeometricMeanHypoConeSquare(t, n, false)),
         )
         add_constraint!(context, W ⪰ T)
     else
@@ -139,7 +136,7 @@ function _add_constraint!(
             if t < 1 / 2
                 add_constraint!(
                     context,
-                    GenericConstraint(
+                    Constraint(
                         (Z, A, B),
                         GeometricMeanHypoConeSquare(2 * t, n, false),
                     ),
@@ -148,7 +145,7 @@ function _add_constraint!(
             else
                 add_constraint!(
                     context,
-                    GenericConstraint(
+                    Constraint(
                         (Z, A, B),
                         GeometricMeanHypoConeSquare(2 * t - 1, n, false),
                     ),
@@ -160,7 +157,7 @@ function _add_constraint!(
             Z = make_temporary()
             add_constraint!(
                 context,
-                GenericConstraint(
+                Constraint(
                     (Z, A, T),
                     GeometricMeanHypoConeSquare((2 * p - q) // p, n, false),
                 ),
@@ -173,14 +170,14 @@ function _add_constraint!(
             l = floor(Int, log2(q))
             add_constraint!(
                 context,
-                GenericConstraint(
+                Constraint(
                     (X, A, B),
                     GeometricMeanHypoConeSquare(p // (2^l), n, false),
                 ),
             )
             add_constraint!(
                 context,
-                GenericConstraint(
+                Constraint(
                     (T, A, X),
                     GeometricMeanHypoConeSquare((2^l) // q, n, false),
                 ),
@@ -189,7 +186,7 @@ function _add_constraint!(
             #println("geom_mean_hypocone p=$p q=$q else")
             add_constraint!(
                 context,
-                GenericConstraint(
+                Constraint(
                     (T, B, A),
                     GeometricMeanHypoConeSquare(1 - t, n, false),
                 ),
