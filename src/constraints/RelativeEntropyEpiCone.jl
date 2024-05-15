@@ -60,6 +60,22 @@ function head(io::IO, ::RelativeEntropyEpiConeSquare)
     return print(io, "RelativeEntropyEpiCone")
 end
 
+function GenericConstraint(func::Tuple, set::RelativeEntropyEpiConeSquare)
+    @assert length(func) == 3
+    sizes = (size(set.e, 2), set.side_dimension, set.side_dimension)
+    for (i, f) in enumerate(func)
+        n = LinearAlgebra.checksquare(f)
+        if n != sizes[i]
+            throw(
+                DimensionMismatch(
+                    "Matrix of side dimension `$n` does not match required side dimension `$(sizes[i])`",
+                ),
+            )
+        end
+    end
+    return GenericConstraint(vcat(vec.(func)...), set)
+end
+
 function _get_matrices(c::GenericConstraint{RelativeEntropyEpiConeSquare})
     n_τ, n_x = size(c.set.e, 2), c.set.side_dimension
     d_τ, d_x = n_τ^2, n_x^2
