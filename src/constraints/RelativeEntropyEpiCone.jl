@@ -30,11 +30,11 @@ Ported from CVXQUAD which is based on the paper: "Semidefinite approximations of
 matrix logarithm" by Hamza Fawzi, James Saunderson and Pablo A. Parrilo
 (arXiv:1705.00812)
 """
-struct RelativeEntropyEpiConeSquare <: MOI.AbstractVectorSet
+struct RelativeEntropyEpiConeSquare{T} <: MOI.AbstractVectorSet
     side_dimension::Int
-    m::Integer
-    k::Integer
-    e::AbstractMatrix
+    m::Int
+    k::Int
+    e::Matrix{T}
 
     function RelativeEntropyEpiConeSquare(
         side_dimension::Int,
@@ -48,7 +48,7 @@ struct RelativeEntropyEpiConeSquare <: MOI.AbstractVectorSet
         if ndims(e) != 2 || size(e, 1) != side_dimension
             throw(DimensionMismatch("e matrix must have $side_dimension rows"))
         end
-        return new(side_dimension, m, k, e)
+        return new{eltype(e)}(side_dimension, m, k, e)
     end
 end
 
