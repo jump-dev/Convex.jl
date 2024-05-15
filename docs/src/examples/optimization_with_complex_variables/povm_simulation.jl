@@ -63,8 +63,7 @@ function get_visibility(K)
         t * K[4] + (1 - t) * noise[4] == P[3][2] + P[5][2] + P[6][2],
     )
     p = maximize(t, constraints)
-    solve!(p, SCS.Optimizer; silent_solver = true)
-    return p.optval
+    return solve!(p, SCS.Optimizer; silent_solver = true)
 end
 
 # We check this function using the tetrahedron measurement (see Appendix B in [arXiv:quant-ph/0702021](https://arxiv.org/abs/quant-ph/0702021)). This measurement is non-simulable, so we expect a value below one.
@@ -79,6 +78,9 @@ b = [
     1 -1 -1
 ] / sqrt(3)
 M = [dp(b[i, :]) for i in 1:size(b, 1)] / 4;
-get_visibility(M)
+p = get_visibility(M)
+
+#-
+p.optval
 
 # This value matches the one [we obtained](https://github.com/peterwittek/ipython-notebooks/blob/master/Simulating_POVMs.ipynb) using [PICOS](http://picos.zib.de/).

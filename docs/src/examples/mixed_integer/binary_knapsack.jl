@@ -25,4 +25,6 @@ using Convex, GLPK
 x = Variable(n, BinVar)
 problem = maximize(dot(p, x), dot(w, x) <= C)
 solve!(problem, GLPK.Optimizer)
+#-
+
 evaluate(x)

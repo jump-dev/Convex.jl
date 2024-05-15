@@ -8,7 +8,7 @@
 
 using DelimitedFiles, LinearAlgebra, Statistics, Plots, Convex, SCS
 
-# # Loading Data
+# ## Loading Data
 #
 # We use the diabetes data from Efron et al, downloaded from https://web.stanford.edu/~hastie/StatLearnSparsity_files/DATA/diabetes.html and then converted from a tab to a comma delimited file.
 #
@@ -16,15 +16,11 @@ using DelimitedFiles, LinearAlgebra, Statistics, Plots, Convex, SCS
 
 x, header =
     readdlm(joinpath(@__DIR__, "aux_files/diabetes.csv"), ',', header = true)
-#display(header)
-#display(x)
+x = (x .- mean(x, dims = 1)) ./ std(x, dims = 1) # standardise
+(Y, X) = (x[:, end], x[:, 1:end-1]); # to get traditional names
+xNames = header[1:end-1]
 
-x = (x .- mean(x, dims = 1)) ./ std(x, dims = 1)          #standardise
-
-(Y, X) = (x[:, end], x[:, 1:end-1]);                  #to get traditional names
-xNames = header[1:end-1];
-
-# # Lasso, Ridge and Elastic Net Regressions
+# ## Lasso, Ridge and Elastic Net Regressions
 #
 # (a)  The regression is $Y = Xb + u$,
 # where $Y$ and $u$ are $T \times 1$, $X$ is $T \times K$, and $b$ is the $K$-vector of regression coefficients.
@@ -64,12 +60,14 @@ function LassoEN(Y, X, γ, λ = 0)
     L4 = sumsquares(b)            #sum(b^2)
 
     if λ > 0
-        Sol = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)      #u'u/T + γ*sum(|b|) + λ*sum(b^2), where u = Y-Xb
+        ## u'u/T + γ*sum(|b|) + λ*sum(b^2), where u = Y-Xb
+        problem = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)
     else
-        Sol = minimize(L1 - 2 * L2 + γ * L3)               #u'u/T + γ*sum(|b|) where u = Y-Xb
+        ## u'u/T + γ*sum(|b|) where u = Y-Xb
+        problem = minimize(L1 - 2 * L2 + γ * L3)
     end
-    solve!(Sol, SCS.Optimizer; silent_solver = true)
-    Sol.status == Convex.MOI.OPTIMAL ? b_i = vec(evaluate(b)) : b_i = NaN
+    solve!(problem, SCS.Optimizer; silent_solver = true)
+    problem.status == Convex.MOI.OPTIMAL ? b_i = vec(evaluate(b)) : b_i = NaN
 
     return b_i, b_ls
 end
@@ -82,7 +80,7 @@ K = size(X, 2)
 (b, b_ls) = LassoEN(Y, X, γ)
 
 println("OLS and Lasso coeffs (with γ=$γ)")
-display([["" "OLS" "Lasso"]; xNames b_ls b])
+println([["" "OLS" "Lasso"]; xNames b_ls b])
 
 # # Redo the Lasso Regression with Different Gamma Values
 #
@@ -111,7 +109,7 @@ plot(
     size = (600, 400),
 )
 
-# # Ridge Regression
+# ## Ridge Regression
 #
 # We use the same function to do a ridge regression. Alternatively, do `b = inv(X'X/T + λ*I)*X'Y/T`.
 

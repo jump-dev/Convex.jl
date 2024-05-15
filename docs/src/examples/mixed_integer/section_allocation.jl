@@ -22,7 +22,7 @@ X = Variable(size(P), BinVar)
 # columns for every row is 1. We also want each section to have between 6 and 10
 # students, so the sum of all the rows for every column should be between these.
 constraints =
-    [sum(X, dims = 2) == 1, sum(X, dims = 1) <= 10, sum(X, dims = 1) >= 6]
+    [sum(X, dims = 2) == 1, sum(X, dims = 1) <= 10, sum(X, dims = 1) >= 6];
 
 # Our objective is simple `sum(X .* P)`, which can be more efficiently
 # represented as `vec(X)' * vec(P)`. Since each entry of `X` is either 0 or 1,
@@ -32,4 +32,3 @@ constraints =
 p = minimize(vec(X)' * vec(P), constraints)
 
 solve!(p, GLPK.Optimizer)
-p.optval

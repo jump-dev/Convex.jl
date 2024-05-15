@@ -1,8 +1,10 @@
 # # Basic Usage
 
+# First we load Convex itself, LinearAlgebra to access the identity matrix `I`,
+# and two solvers: SCS and GLPK.
 using Convex
 using LinearAlgebra
-using SCS
+using SCS, GLPK
 
 # ### Linear program
 #
@@ -26,6 +28,7 @@ constraints = [A * x <= b, x >= 1, x <= 10, x[2] <= 5, x[1] + x[4] - x[2] <= 10]
 p = minimize(dot(c, x), constraints) # or c' * x
 solve!(p, SCS.Optimizer; silent_solver = true)
 
+# We can also inspect the objective value and the values of the variables at the solution:
 println(round(p.optval, digits = 2))
 println(round.(evaluate(x), digits = 2))
 println(evaluate(x[1] + x[4] - x[2]))
@@ -48,6 +51,8 @@ y = Variable()
 ## X is a 2 x 2 variable, and y is scalar. X' + y promotes y to a 2 x 2 variable before adding them
 p = minimize(norm(X) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
 solve!(p, SCS.Optimizer; silent_solver = true)
+
+# We can also inspect the values of the variables at the solution:
 println(round.(evaluate(X), digits = 2))
 println(evaluate(y))
 p.optval
@@ -72,24 +77,21 @@ p = satisfy(
     geomean(x[3], x[4]) >= x[2],
 )
 solve!(p, SCS.Optimizer; silent_solver = true)
-println(p.status)
-evaluate(x)
 
-# ### SDP cone and Eigenvalues
+# ### PSD cone and Eigenvalues
 
 y = Semidefinite(2)
 p = maximize(eigmin(y), tr(y) <= 6)
 solve!(p, SCS.Optimizer; silent_solver = true)
-p.optval
 
 #-
 
 x = Variable()
 y = Variable((2, 2))
-## SDP constraints
+
+## PSD constraints
 p = minimize(x + y[1, 1], y ⪰ 0, x >= 1, y[2, 1] == 1)
 solve!(p, SCS.Optimizer; silent_solver = true)
-evaluate(y)
 
 # ### Mixed integer program
 #
@@ -102,9 +104,10 @@ evaluate(y)
 # ```
 #
 
-using GLPK
 x = Variable(4, IntVar)
 p = minimize(sum(x), x >= 0.5)
 solve!(p, GLPK.Optimizer; silent_solver = true)
+
+# And the value of `x` at the solution:
 evaluate(x)
 #-

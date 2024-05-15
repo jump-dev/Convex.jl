@@ -30,7 +30,6 @@ constraints = [
 ]
 p = maximize(r, constraints)
 solve!(p, SCS.Optimizer; silent_solver = true)
-p.optval
 
 # Generate the figure
 x = range(-1.5, stop = 1.5, length = 100);
