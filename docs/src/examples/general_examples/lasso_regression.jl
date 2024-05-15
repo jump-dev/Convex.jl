@@ -60,10 +60,10 @@ function LassoEN(Y, X, γ, λ = 0)
     L4 = sumsquares(b)            #sum(b^2)
 
     if λ > 0
-        # u'u/T + γ*sum(|b|) + λ*sum(b^2), where u = Y-Xb
+        ## u'u/T + γ*sum(|b|) + λ*sum(b^2), where u = Y-Xb
         problem = minimize(L1 - 2 * L2 + γ * L3 + λ * L4)
     else
-        # u'u/T + γ*sum(|b|) where u = Y-Xb
+        ## u'u/T + γ*sum(|b|) where u = Y-Xb
         problem = minimize(L1 - 2 * L2 + γ * L3)
     end
     solve!(problem, SCS.Optimizer; silent_solver = true)
