@@ -670,164 +670,6 @@ end
     end
 end
 
-@add_problem sdp function sdp_relative_entropy_argcheck(
-    handle_problem!,
-    ::Val{test},
-    atol,
-    rtol,
-    ::Type{T},
-) where {T,test}
-    if test
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(2, 3),
-            zeros(2, 3),
-            3,
-            3,
-            eye(2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(2, 3),
-            Variable(2, 3),
-            3,
-            3,
-            eye(2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(2, 3),
-            zeros(2, 3),
-            3,
-            3,
-            eye(2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(2, 3),
-            Variable(2, 3),
-            3,
-            3,
-            eye(2),
-        )
-
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(2, 2),
-            zeros(3, 3),
-            3,
-            3,
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(2, 2),
-            Variable(3, 3),
-            3,
-            3,
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(2, 2),
-            zeros(3, 3),
-            3,
-            3,
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(2, 2),
-            Variable(2, 3),
-            3,
-            3,
-        )
-
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(3, 3),
-            zeros(3, 3),
-            3,
-            3,
-            zeros(2, 2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(3, 3),
-            Variable(3, 3),
-            3,
-            3,
-            zeros(2, 2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(3, 3),
-            zeros(3, 3),
-            3,
-            3,
-            zeros(2, 2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(3, 3),
-            Variable(2, 3),
-            3,
-            3,
-            zeros(2, 2),
-        )
-
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(3, 3),
-            zeros(3, 3),
-            3,
-            3,
-            zeros(2, 3),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(3, 3),
-            Variable(3, 3),
-            3,
-            3,
-            zeros(2, 3),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(3, 3),
-            zeros(3, 3),
-            3,
-            3,
-            zeros(2, 3),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(3, 3),
-            Variable(2, 3),
-            3,
-            3,
-            zeros(2, 3),
-        )
-
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(3, 3),
-            zeros(3, 3),
-            3,
-            3,
-            zeros(2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            zeros(3, 3),
-            Variable(3, 3),
-            3,
-            3,
-            zeros(2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(3, 3),
-            zeros(3, 3),
-            3,
-            3,
-            zeros(2),
-        )
-        @test_throws DimensionMismatch RelativeEntropyEpiCone(
-            Variable(3, 3),
-            Variable(2, 3),
-            3,
-            3,
-            zeros(2),
-        )
-
-        @test_throws DimensionMismatch Variable(2, 2) in RelativeEntropyEpiCone(
-            Variable(3, 3),
-            Variable(3, 3),
-            3,
-            3,
-        )
-    end
-end
-
 @add_problem sdp function sdp_relative_entropy(
     handle_problem!,
     ::Val{test},
@@ -844,7 +686,10 @@ end
             Y = Variable(n, n)
         end
 
-        c1 = eye(n) in RelativeEntropyEpiCone(X, Y)
+        c1 = Convex.GenericConstraint(
+            (eye(n), X, Y),
+            RelativeEntropyEpiConeSquare(n),
+        )
         objective = real(tr(Y))
         p = minimize(objective, c1; numeric_type = T)
 
