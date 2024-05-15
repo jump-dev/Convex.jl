@@ -102,7 +102,8 @@ function new_conic_form!(context::Context{T}, atom::TraceLogmAtom) where {T}
         Variable(size(X))
     end
     I = Matrix(one(T) * LinearAlgebra.I(size(X, 1)))
-    add_constraint!(context, τ in RelativeEntropyEpiCone(I, X, atom.m, atom.k))
+    set = RelativeEntropyEpiConeSquare(size(X, 1), atom.m, atom.k)
+    add_constraint!(context, GenericConstraint((τ, I, X), set))
     # It's already a real mathematically, but need to make it a real type.
     return conic_form!(context, real(-LinearAlgebra.tr(atom.C * τ)))
 end

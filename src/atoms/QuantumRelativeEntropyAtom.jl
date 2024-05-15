@@ -93,12 +93,9 @@ function new_conic_form!(
     add_constraint!(context, A ⪰ 0)
     add_constraint!(context, B ⪰ 0)
     I = Matrix(one(T) * LinearAlgebra.I(size(A, 1)))
-    m, k, e = atom.m, atom.k, vec(I)
-    τ = Variable()
-    add_constraint!(
-        context,
-        τ in RelativeEntropyEpiCone(kron(A, I), kron(I, conj(B)), m, k, e),
-    )
+    τ, X, Y = Variable(), kron(A, I), kron(I, conj(B))
+    set = RelativeEntropyEpiConeSquare(size(X, 1), atom.m, atom.k, vec(I))
+    add_constraint!(context, GenericConstraint((τ, X, Y), set))
     return conic_form!(context, τ)
 end
 
