@@ -24,4 +24,5 @@ problem = minimize(sumsquares(A * x - b), [x >= 0])
 solve!(problem, SCS.Optimizer; silent_solver = true)
 problem.status
 problem.optval
+x.value
 ```

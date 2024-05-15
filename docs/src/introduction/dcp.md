@@ -23,6 +23,7 @@ using Convex, SCS
 x = Variable();
 model_min = minimize(abs(x), [x >= 1, x <= 2]);
 solve!(model_min, SCS.Optimizer; silent_solver = true)
+x.value
 ```
 
 The optimum occurs at `x = 1`, but let us imagine we want to solve this problem
@@ -37,6 +38,7 @@ x = Variable();
 t = Variable();
 model_min_extended = minimize(t, [x >= 1, x <= 2, t >= x, t >= -x]);
 solve!(model_min_extended, SCS.Optimizer; silent_solver = true)
+x.value
 ```
 That is, we add the constraints `t >= x` and `t >= -x`, and replace `abs(x)` by
 `t`. Since we are minimizing over `t` and the smallest possible `t` satisfying
@@ -69,7 +71,7 @@ Stacktrace:
 The error is thrown because, if we do the same reformulation as before, we
 arrive at the problem:
 ```@repl
-using Convex
+using Convex, SCS
 x = Variable();
 t = Variable();
 model_max_extended = maximize(t, [x >= 1, x <= 2, t >= x, t >= -x]);
