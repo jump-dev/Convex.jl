@@ -57,7 +57,6 @@ export conv,
     Constraint,
     ⪰,
     ⪯,
-    Constraint, # useful for making abstractly-typed vectors via `Constraint[]`
     # Variables
     constant,
     ComplexVariable,
@@ -213,11 +212,12 @@ include("Context.jl")
 ### modeling framework
 include("dcp.jl")
 include("expressions.jl")
+include("Constraint.jl")
 include("variable.jl")
 include("variable_template.jl")
 include("constant.jl")
 
-for (root, _, files) in walkdir(joinpath(@__DIR__, "constraints"))
+for (root, _, files) in walkdir(joinpath(@__DIR__, "sets"))
     for file in files
         include(joinpath(root, file))
     end
