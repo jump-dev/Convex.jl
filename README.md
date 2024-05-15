@@ -131,8 +131,6 @@ A number of examples can be found [here](https://jump.dev/Convex.jl/stable/).
 The [basic usage notebook](https://jump.dev/Convex.jl/stable/examples/general_examples/basic_usage/)
 gives a simple tutorial on problems that can be solved using Convex.jl.
 
-All examples can be downloaded as a zip file from [here](https://jump.dev/Convex.jl/stable/examples/notebooks.zip).
-
 ## Citing this package
 
 If you use Convex.jl for published work, we encourage you to cite the software
