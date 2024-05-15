@@ -348,6 +348,62 @@ function test_GeometricMeanEpiConeSquare()
     return
 end
 
+### RelativeEntropyEpiConeSquare
+
+function test_RelativeEntropyEpiConeSquare()
+    set = Convex.RelativeEntropyEpiConeSquare(3)
+    @test sprint(Convex.head, set) == "RelativeEntropyEpiConeSquare"
+    @test MOI.dimension(set) == 3 * 3^2
+    e = [1 2; 3 4; 5 6]
+    set = Convex.RelativeEntropyEpiConeSquare(3, 3, 2, e)
+    @test MOI.dimension(set) == 2^2 + 2 * 3^2
+    @test_throws(
+        DimensionMismatch("e matrix must have 4 rows"),
+        Convex.RelativeEntropyEpiConeSquare(4, 3, 2, e),
+    )
+    τ = Variable(2, 2)
+    X = Variable(3, 3)
+    Y = Variable(3, 3)
+    C = [1 0 0; 0 1 0; 0 0 1]
+    C2 = [1 0; 0 1]
+    for (f, dcp) in (
+        (τ, X, Y) => Convex.ConvexVexity(),
+        (τ, X, C) => Convex.ConvexVexity(),
+        (τ, C, Y) => Convex.ConvexVexity(),
+        (C2, X, Y) => Convex.ConvexVexity(),
+        (τ * τ, X, Y) => Convex.NotDcp(),
+        (τ .^ 2, X, Y) => Convex.NotDcp(),
+        (τ, X * X, Y) => Convex.NotDcp(),
+        (τ, sqrt(X), Y) => Convex.NotDcp(),
+        (τ, X, Y * Y) => Convex.NotDcp(),
+        (τ, X, sqrt(Y)) => Convex.NotDcp(),
+        (sqrt(τ), X, Y) => Convex.ConvexVexity(),
+        (τ + C2, X, Y) => Convex.ConvexVexity(),
+        (τ * C2, X, Y) => Convex.ConvexVexity(),
+    )
+        c = Convex.GenericConstraint(f, set)
+        @test vexity(c) == dcp
+        @test sign(c.child) == Convex.NoSign()
+    end
+    @test_throws(
+        DimensionMismatch,
+        Convex.GenericConstraint((Variable(3, 1), X, Y), set)
+    )
+    @test_throws(
+        DimensionMismatch,
+        Convex.GenericConstraint((Variable(), X, Y), set),
+    )
+    @test_throws(
+        DimensionMismatch,
+        Convex.GenericConstraint((τ, Variable(2, 3), Y), set)
+    )
+    @test_throws(
+        DimensionMismatch,
+        Convex.GenericConstraint((τ, X, Variable(2, 3)), set)
+    )
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()

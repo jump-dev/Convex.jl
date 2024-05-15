@@ -57,7 +57,7 @@ function MOI.dimension(set::RelativeEntropyEpiConeSquare)
 end
 
 function head(io::IO, ::RelativeEntropyEpiConeSquare)
-    return print(io, "RelativeEntropyEpiCone")
+    return print(io, "RelativeEntropyEpiConeSquare")
 end
 
 function GenericConstraint(func::Tuple, set::RelativeEntropyEpiConeSquare)
