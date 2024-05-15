@@ -26,11 +26,13 @@ push!(c1, c2)
 push!(c1, c3)
 p = maximize(objective, c1);
 solve!(p, SCS.Optimizer; silent_solver = true)
+#-
 p.optval
-#15.125857662600703
-evaluate(objective)
-#15.1258578588357
 
+#-
+evaluate(objective)
+
+#-
 output = matopen(joinpath(@__DIR__, "Res.mat"))
 names(output)
 outputData = read(output, "Wres");

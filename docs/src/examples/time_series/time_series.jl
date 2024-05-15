@@ -110,7 +110,7 @@ solve!(
     MOI.OptimizerWithAttributes(ECOS.Optimizer, "maxit" => 200, "verbose" => 0),
 )
 
-## plot autoregressive fit of daily fluctuations for a few days
+# Plot autoregressive fit of daily fluctuations for a few days:
 ar_range = 1:145
 day_range = ar_range .+ ar_len
 plot(

@@ -22,8 +22,8 @@ v = randn(number_samples);
 
 #-
 
-## Generate data for different values of p.
-## Solve the resulting problems.
+# Generate data for different values of p.
+# Solve the resulting problems.
 using Convex, SCS, Distributions
 lsq_data = zeros(number_tests);
 huber_data = zeros(number_tests);

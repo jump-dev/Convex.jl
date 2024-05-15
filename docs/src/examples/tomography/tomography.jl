@@ -64,6 +64,8 @@ objective = sumsquares(line_mat * pixel_colors - line_vals)
 problem = minimize(objective)
 solve!(problem, ECOS.Optimizer; silent_solver = true)
 
+#-
+
 rows = zeros(img_size * img_size)
 cols = zeros(img_size * img_size)
 for i in 1:img_size

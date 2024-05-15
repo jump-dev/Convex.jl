@@ -25,8 +25,8 @@ p = 50
 # Now we formulate and solve our primal problem:
 d = Variable(p)
 problem = maximize(sum(d), 0 ≤ d, d ≤ 1, Σ ⪰ Diagonal(d))
-@elapsed solve!(problem, SCS.Optimizer; silent_solver = true)
+@time solve!(problem, SCS.Optimizer; silent_solver = true)
 
 # To solve the dual problem instead, we simply call `dual_optimizer` on our
 # optimizer function:
-@elapsed solve!(problem, dual_optimizer(SCS.Optimizer); silent_solver = true)
+@time solve!(problem, dual_optimizer(SCS.Optimizer); silent_solver = true)

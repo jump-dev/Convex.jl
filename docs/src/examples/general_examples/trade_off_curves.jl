@@ -1,4 +1,6 @@
-# # Trade-off curves
+# # Regularized least-squares
+# Here we solve some constrained least-squares problems with 1-norm regularization,
+# and plot how the solution changes with increasing regularization.
 using Random
 Random.seed!(1)
 m = 25;
