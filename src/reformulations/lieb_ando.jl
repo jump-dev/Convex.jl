@@ -90,7 +90,7 @@ function lieb_ando(
         # Concave function
         add_constraint!(
             T,
-            GenericConstraint(
+            Constraint(
                 (T, kron(A, Im), kron(In, conj(B))),
                 GeometricMeanHypoConeSquare(t, n * m, false),
             ),
@@ -100,7 +100,7 @@ function lieb_ando(
         # Convex function
         add_constraint!(
             T,
-            Convex.GenericConstraint(
+            Convex.Constraint(
                 (T, kron(A, Im), kron(In, conj(B))),
                 GeometricMeanEpiConeSquare(t, size(T, 1)),
             ),

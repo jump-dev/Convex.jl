@@ -116,14 +116,14 @@ solver (including SCS and Mosek).
 | `rootdet(X)`                      | n-th root-determinant of the $n$-by-$n$ matrix X, that is $det(X)^{1/n}$ | concave      | not monotonic |                        |
 | `matrixfrac(x, P)`                | $x^TP^{-1}x$                       | convex       | not monotonic | IC: P is positive semidefinite |
 | `sumlargesteigs(x, k)`            | sum of top $k$ eigenvalues of $x$  | convex       | not monotonic | IC: P symmetric        |
-| `Convex.GenericConstraint((T, A, B), GeometricMeanHypoConeSquare(t, size(T, 1)))`  | $T \preceq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | concave | increasing    | IC: $A \succeq 0$, $B \succeq 0$, $t \in [0,1]$ |
-| `Convex.GenericConstraint((T, A, B), GeometricMeanEpiConeSquare(t, size(T, 1)))`   | $T \succeq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | convex  | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $t \in [-1, 0] \cup [1, 2]$ |
+| `Convex.Constraint((T, A, B), GeometricMeanHypoConeSquare(t, size(T, 1)))`  | $T \preceq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | concave | increasing    | IC: $A \succeq 0$, $B \succeq 0$, $t \in [0,1]$ |
+| `Convex.Constraint((T, A, B), GeometricMeanEpiConeSquare(t, size(T, 1)))`   | $T \succeq A \#_t B = A^{1/2} (A^{-1/2} B A^{-1/2})^t A^{1/2}$ | convex  | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $t \in [-1, 0] \cup [1, 2]$ |
 | `quantum_entropy(X)`              | $-\textrm{Tr}(X \log X)$           | concave      | not monotonic | IC: $X \succeq 0$; uses natural log |
 | `quantum_relative_entropy(A, B)`  | $\textrm{Tr}(A \log A - A \log B)$ | convex       | not monotonic | IC: $A \succeq 0$, $B \succeq 0$; uses natural log |
 | `trace_logm(X, C)`                | $\textrm{Tr}(C \log X)$            | concave in X | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant; uses natural log |
 | `trace_mpower(A, t, C)`           | $\textrm{Tr}(C A^t)$ | concave in A for $t \in [0,1]$, convex for $t \in [-1,0] \cup [1,2]$   | not monotonic | IC: $X \succeq 0$, $C \succeq 0$, $C$ constant, $t \in [-1, 2]$ |
 | `lieb_ando(A, B, K, t)`           | $\textrm{Tr}(K' A^{1-t} K B^t)$    | concave in A,B for $t \in [0,1]$, convex for $t \in [-1,0] \cup [1,2]$ | not monotonic | IC: $A \succeq 0$, $B \succeq 0$, $K$ constant, $t \in [-1, 2]$ |
-| `Convex.GenericConstraint((T, X, Y), RelativeEntropyEpiConeSquare(size(X, 1), m, k, e))` | $T \succeq e' X^{1/2} \log(X^{1/2} Y^{-1} X^{1/2}) X^{1/2} e$ | convex | not monotonic | IC: $e$ constant; uses natural log |
+| `Convex.Constraint((T, X, Y), RelativeEntropyEpiConeSquare(size(X, 1), m, k, e))` | $T \succeq e' X^{1/2} \log(X^{1/2} Y^{-1} X^{1/2}) X^{1/2} e$ | convex | not monotonic | IC: $e$ constant; uses natural log |
 
 ## Exponential + SDP representable Functions
 

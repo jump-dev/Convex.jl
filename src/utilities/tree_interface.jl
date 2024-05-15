@@ -88,7 +88,7 @@ _add_to_problem_count(::Counts, ::Vector{Constraint}) = nothing
 
 _add_to_problem_count(::Counts, ::Nothing) = nothing
 
-function _add_to_problem_count(counts::Counts, node::GenericConstraint)
+function _add_to_problem_count(counts::Counts, node::Constraint)
     counts.n_constraints += 1
     counts.n_scalar_constraints +=
         (iscomplex(node) ? 2 : 1) * MOI.dimension(node.set)

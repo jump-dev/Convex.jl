@@ -36,7 +36,7 @@ function new_conic_form!(context::Context{T}, q::QuadOverLinAtom) where {T}
     t = Variable()
     x, y = q.children
     f = vcat(t, (1 / T(2)) * y, x)
-    add_constraint!(context, GenericConstraint{MOI.RotatedSecondOrderCone}(f))
+    add_constraint!(context, Constraint{MOI.RotatedSecondOrderCone}(f))
     return conic_form!(context, t)
 end
 

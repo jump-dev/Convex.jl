@@ -46,7 +46,7 @@ function new_conic_form!(context::Context{T}, e::RelativeEntropyAtom) where {T}
     # But MOI has the reversed convention:
     #   MOI.RelativeEntropyCone has the order (u, y, x)
     f = vcat(u, y, x)
-    add_constraint!(context, GenericConstraint{MOI.RelativeEntropyCone}(f))
+    add_constraint!(context, Constraint{MOI.RelativeEntropyCone}(f))
     return conic_form!(context, u)
 end
 

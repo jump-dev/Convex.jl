@@ -60,7 +60,7 @@ A naive implementation of this method is:
     t = Variable(m, n)
     for i in 1:m, j in 1:n
         f = vcat(x[i, j], 1, t[i, j])[collect(permutation)]
-        add_constraint!(context, GenericConstraint{MOI.ExponentialCone}(f))
+        add_constraint!(context, Constraint{MOI.ExponentialCone}(f))
     end
     return conic_form!(context, t)
 end

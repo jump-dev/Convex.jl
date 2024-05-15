@@ -43,7 +43,7 @@ function head(io::IO, ::GeometricMeanEpiConeSquare)
     return print(io, "GeometricMeanEpiConeSquare")
 end
 
-function GenericConstraint(func::Tuple, set::GeometricMeanEpiConeSquare)
+function Constraint(func::Tuple, set::GeometricMeanEpiConeSquare)
     for f in func
         n = LinearAlgebra.checksquare(f)
         if n != set.side_dimension
@@ -54,10 +54,10 @@ function GenericConstraint(func::Tuple, set::GeometricMeanEpiConeSquare)
             )
         end
     end
-    return GenericConstraint(vcat(vec.(func)...), set)
+    return Constraint(vcat(vec.(func)...), set)
 end
 
-function _get_matrices(c::GenericConstraint{GeometricMeanEpiConeSquare})
+function _get_matrices(c::Constraint{GeometricMeanEpiConeSquare})
     n = c.set.side_dimension
     d = n^2
     T = reshape(c.child[1:d], n, n)
@@ -69,7 +69,7 @@ end
 # For t ∈ [-1, 0] ∪ [1, 2] the t-weighted matrix geometric mean is matrix convex
 # (arxiv:1512.03401).
 # So if A and B are convex sets, then T ⪰ A #_t B will be a convex set.
-function vexity(constraint::GenericConstraint{GeometricMeanEpiConeSquare})
+function vexity(constraint::Constraint{GeometricMeanEpiConeSquare})
     T, A, B = _get_matrices(constraint)
     if vexity(A) in (ConcaveVexity(), NotDcp()) ||
        vexity(B) in (ConcaveVexity(), NotDcp())
@@ -80,7 +80,7 @@ end
 
 function _add_constraint!(
     context::Context,
-    constraint::GenericConstraint{GeometricMeanEpiConeSquare},
+    constraint::Constraint{GeometricMeanEpiConeSquare},
 )
     T, A, B = _get_matrices(constraint)
     t = constraint.set.t
@@ -94,7 +94,7 @@ function _add_constraint!(
         add_constraint!(context, [T A; A Z] ⪰ 0)
         add_constraint!(
             context,
-            GenericConstraint(
+            Constraint(
                 (Z, A, B),
                 GeometricMeanHypoConeSquare(-t, n, false),
             ),
@@ -105,7 +105,7 @@ function _add_constraint!(
         add_constraint!(context, [T B; B Z] ⪰ 0)
         add_constraint!(
             context,
-            GenericConstraint(
+            Constraint(
                 (Z, A, B),
                 GeometricMeanHypoConeSquare(2 - t, n, false),
             ),

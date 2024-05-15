@@ -60,7 +60,7 @@ function head(io::IO, ::RelativeEntropyEpiConeSquare)
     return print(io, "RelativeEntropyEpiConeSquare")
 end
 
-function GenericConstraint(func::Tuple, set::RelativeEntropyEpiConeSquare)
+function Constraint(func::Tuple, set::RelativeEntropyEpiConeSquare)
     @assert length(func) == 3
     sizes = (size(set.e, 2), set.side_dimension, set.side_dimension)
     for (i, f) in enumerate(func)
@@ -73,10 +73,10 @@ function GenericConstraint(func::Tuple, set::RelativeEntropyEpiConeSquare)
             )
         end
     end
-    return GenericConstraint(vcat(vec.(func)...), set)
+    return Constraint(vcat(vec.(func)...), set)
 end
 
-function _get_matrices(c::GenericConstraint{<:RelativeEntropyEpiConeSquare})
+function _get_matrices(c::Constraint{<:RelativeEntropyEpiConeSquare})
     n_τ, n_x = size(c.set.e, 2), c.set.side_dimension
     d_τ, d_x = n_τ^2, n_x^2
     τ = reshape(c.child[1:d_τ], n_τ, n_τ)
@@ -87,7 +87,7 @@ end
 
 # This negative relative entropy function is matrix convex (arxiv:1705.00812).
 # So if X and Y are convex sets, then τ ⪰ -D_op(X || Y) will be a convex set.
-function vexity(constraint::GenericConstraint{<:RelativeEntropyEpiConeSquare})
+function vexity(constraint::Constraint{<:RelativeEntropyEpiConeSquare})
     τ, X, Y = _get_matrices(constraint)
     if vexity(X) in (ConcaveVexity(), NotDcp()) ||
        vexity(Y) in (ConcaveVexity(), NotDcp())
@@ -117,7 +117,7 @@ end
 
 function _add_constraint!(
     context::Context,
-    constraint::GenericConstraint{<:RelativeEntropyEpiConeSquare},
+    constraint::Constraint{<:RelativeEntropyEpiConeSquare},
 )
     τ, X, Y = _get_matrices(constraint)
     m, k, e = constraint.set.m, constraint.set.k, constraint.set.e
@@ -135,7 +135,7 @@ function _add_constraint!(
         T = [Variable(r, r) for i in 1:m]
     end
     set = GeometricMeanHypoConeSquare(1 // (2^k), n, false)
-    add_constraint!(context, GenericConstraint((Z, X, Y), set))
+    add_constraint!(context, Constraint((Z, X, Y), set))
     for ii in 1:m
         # Note that we are dividing by w here because it is easier to do this
         # than to do sum w_i T(:,...,:,ii) later (cf. line that involves τ)

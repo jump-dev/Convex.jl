@@ -3,21 +3,21 @@
 # Use of this source code is governed by a BSD-style license that can be found
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
-mutable struct GenericConstraint{S<:MOI.AbstractSet} <: Constraint
+mutable struct Constraint{S<:MOI.AbstractSet} <: Constraint
     child::AbstractExpr
     set::S
     dual::Union{Value,Nothing}
 
-    function GenericConstraint(child::AbstractExpr, set::MOI.AbstractSet)
+    function Constraint(child::AbstractExpr, set::MOI.AbstractSet)
         return new{typeof(set)}(child, set, nothing)
     end
 end
 
-function GenericConstraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
-    return GenericConstraint(child, set_with_size(S, size(child)))
+function Constraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
+    return Constraint(child, set_with_size(S, size(child)))
 end
 
-iscomplex(c::GenericConstraint) = iscomplex(c.child)
+iscomplex(c::Constraint) = iscomplex(c.child)
 
 function set_with_size(
     ::Type{S},
@@ -32,13 +32,13 @@ function set_with_size(
     return MOI.Utilities.set_with_dimension(S, sz[1])
 end
 
-head(io::IO, c::GenericConstraint) = head(io, c.set)
+head(io::IO, c::Constraint) = head(io, c.set)
 
 function head(io::IO, set::MOI.AbstractSet)
     return print(io, replace("$(typeof(set))", "MathOptInterface" => "MOI"))
 end
 
-AbstractTrees.children(c::GenericConstraint) = (c.child,)
+AbstractTrees.children(c::Constraint) = (c.child,)
 
 # A fallback. Define a new method if `MOI.Utilities.distance_to_set`
 # is not defined.
@@ -50,7 +50,7 @@ function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
     return is_feasible([x], set, tol)
 end
 
-vexity(c::GenericConstraint) = vexity(vexity(c.child), c.set)
+vexity(c::Constraint) = vexity(vexity(c.child), c.set)
 
 function vexity(
     vex,
@@ -86,7 +86,7 @@ function vexity(::Any, set::MOI.AbstractSet)
     )
 end
 
-function _add_constraint!(context::Context, c::GenericConstraint)
+function _add_constraint!(context::Context, c::Constraint)
     if vexity(c.child) == ConstVexity()
         # This `evaluate` call is safe, since even if it refers to a `fix!`'d variable,
         # it happens when we are formulating the problem (not at expression-time), so there
@@ -103,7 +103,7 @@ end
 
 function populate_dual!(
     model::MOI.ModelLike,
-    c::GenericConstraint,
+    c::Constraint,
     indices::MOI.ConstraintIndex,
 )
     ret = MOI.get(model, MOI.ConstraintDual(), indices)
@@ -113,7 +113,7 @@ end
 
 function populate_dual!(
     model::MOI.ModelLike,
-    c::GenericConstraint,
+    c::Constraint,
     indices::NTuple{2},
 )
     re = MOI.get(model, MOI.ConstraintDual(), indices[1])
@@ -169,7 +169,7 @@ function Base.:>=(lhs::AbstractExpr, rhs::AbstractExpr)
         )
     end
     lhs, rhs = _promote_size(lhs, rhs)
-    return GenericConstraint{MOI.Nonnegatives}(lhs - rhs)
+    return Constraint{MOI.Nonnegatives}(lhs - rhs)
 end
 
 Base.:>=(lhs::AbstractExpr, rhs::Value) = >=(lhs, constant(rhs))
@@ -201,7 +201,7 @@ function Base.:<=(lhs::AbstractExpr, rhs::AbstractExpr)
         )
     end
     lhs, rhs = _promote_size(lhs, rhs)
-    return GenericConstraint{MOI.Nonpositives}(lhs - rhs)
+    return Constraint{MOI.Nonpositives}(lhs - rhs)
 end
 
 Base.:<=(lhs::AbstractExpr, rhs::Value) = <=(lhs, constant(rhs))
@@ -227,7 +227,7 @@ end
 
 function Base.:(==)(lhs::AbstractExpr, rhs::AbstractExpr)
     lhs, rhs = _promote_size(lhs, rhs)
-    return GenericConstraint{MOI.Zeros}(lhs - rhs)
+    return Constraint{MOI.Zeros}(lhs - rhs)
 end
 
 Base.:(==)(lhs::AbstractExpr, rhs::Value) = ==(lhs, constant(rhs))
@@ -260,11 +260,11 @@ end
 
 function LinearAlgebra.isposdef(x::AbstractExpr)
     if iscomplex(x)
-        return GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(
+        return Constraint{MOI.PositiveSemidefiniteConeSquare}(
             [real(x) -imag(x); imag(x) real(x)],
         )
     end
-    return GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(x)
+    return Constraint{MOI.PositiveSemidefiniteConeSquare}(x)
 end
 
 ⪰(x::AbstractExpr, y::AbstractExpr) = isposdef(x - y)

@@ -167,36 +167,36 @@ function test_LessThanConstraint_dual_maximize()
     return
 end
 
-### constraints/GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+### constraints/Constraint{MOI.PositiveSemidefiniteConeSquare}
 
-function test_GenericConstraint_PositiveSemidefiniteConeSquare()
+function test_Constraint_PositiveSemidefiniteConeSquare()
     @test_throws(
         ErrorException("Positive semidefinite expressions must be square"),
-        Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(
+        Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}(
             Variable(2, 3),
         ),
     )
     X = Variable(2, 2)
-    c = Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}(X)
+    c = Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}(X)
     p = minimize(tr(X), [c, X >= [1 2; 3 4]])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(X.value, [2.25 3; 3 4]; atol = 1e-3)
     y = (c.dual + c.dual') / 2
     @test isapprox(y[1], 1; atol = 1e-3)
     @test (0 ⪯ X) isa
-          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+          Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
     @test (-X ⪯ 0) isa
-          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+          Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
     @test (-X ⪯ constant(0)) isa
-          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+          Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
     @test (constant(0) ⪯ X) isa
-          Convex.GenericConstraint{MOI.PositiveSemidefiniteConeSquare}
+          Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}
     @test_throws(ErrorException("Set PSD not understood"), X in :PSD)
     @test vexity(X ⪯ square(Variable())) == Convex.NotDcp()
     return
 end
 
-function test_GenericConstraint_PositiveSemidefiniteConeSquare_violated()
+function test_Constraint_PositiveSemidefiniteConeSquare_violated()
     X = constant([1 2; 3 4])
     p = satisfy([X ⪰ 0])
     @test_logs (:info,) (:warn,) solve!(p, SCS.Optimizer)
@@ -206,25 +206,25 @@ function test_GenericConstraint_PositiveSemidefiniteConeSquare_violated()
     return
 end
 
-### constraints/GenericConstraint_SecondOrderCone
+### constraints/Constraint_SecondOrderCone
 
-function test_GenericConstraint_SecondOrderCone()
+function test_Constraint_SecondOrderCone()
     x = Variable(3)
     t = Variable()
-    c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(t, x))
+    c = Convex.Constraint{MOI.SecondOrderCone}(vcat(t, x))
     p = minimize(t, [c, x >= [2, 3, 4]])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
     t_ = sqrt(29)
     @test isapprox(t.value, t_; atol = 1e-3)
     @test isapprox(c.dual, [1, -2 / t_, -3 / t_, -4 / t_]; atol = 1e-3)
-    c = Convex.GenericConstraint{MOI.SecondOrderCone}(vcat(square(t), x))
+    c = Convex.Constraint{MOI.SecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
     @test Convex.sprint(Convex.head, c) == "MOI.SecondOrderCone"
     return
 end
 
-function test_GenericConstraint_SecondOrderCone_set_with_size()
+function test_Constraint_SecondOrderCone_set_with_size()
     x = Variable(2, 2)
     S = MOI.SecondOrderCone
     sz = size(x)
@@ -233,83 +233,83 @@ function test_GenericConstraint_SecondOrderCone_set_with_size()
             "Cannot constrain a matrix of size `$sz` to be long to the cone " *
             "`$S`, there should be only one column.",
         ),
-        Convex.GenericConstraint{S}(x),
+        Convex.Constraint{S}(x),
     )
     return
 end
 
-### constraints/GenericConstraint_RotatedSecondOrderCone
+### constraints/Constraint_RotatedSecondOrderCone
 
-function test_GenericConstraint_RotatedSecondOrderCone()
+function test_Constraint_RotatedSecondOrderCone()
     x = Variable(3)
     t = Variable()
-    c = Convex.GenericConstraint{MOI.RotatedSecondOrderCone}(vcat(t, 1, x))
+    c = Convex.Constraint{MOI.RotatedSecondOrderCone}(vcat(t, 1, x))
     p = minimize(t, [c, x >= [2, 3, 4]])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
     @test isapprox(t.value, 29 / 2; atol = 1e-3)
     @test isapprox(c.dual, [1, 29 / 2, -2, -3, -4]; atol = 1e-3)
-    c = Convex.GenericConstraint{MOI.RotatedSecondOrderCone}(vcat(square(t), x))
+    c = Convex.Constraint{MOI.RotatedSecondOrderCone}(vcat(square(t), x))
     @test vexity(c) === Convex.NotDcp()
     @test Convex.sprint(Convex.head, c) == "MOI.RotatedSecondOrderCone"
     return
 end
 
-### constraints/GenericConstraint_ExponentialCone
+### constraints/Constraint_ExponentialCone
 
-function test_GenericConstraint_ExponentialConeConstraint()
+function test_Constraint_ExponentialConeConstraint()
     # y * exp(x / y) <= z  <=>  (x, y, z) in ExpCone
     z = Variable()
     # 1 * exp(1 / 1) <= z
-    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(1, constant(1), z))
+    c = Convex.Constraint{MOI.ExponentialCone}(vcat(1, constant(1), z))
     p = minimize(z, [c])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(z.value, exp(1); atol = 1e-4)
     @test isapprox(c.dual, [-exp(1), 0, 1]; atol = 1e-4)
     z = Variable()
     # 2 * exp(3 / 2) <= z
-    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(constant(3), 2, z))
+    c = Convex.Constraint{MOI.ExponentialCone}(vcat(constant(3), 2, z))
     p = minimize(z, [c])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(z.value, 2 * exp(3 / 2); atol = 1e-4)
     @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
-    c = Convex.GenericConstraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
+    c = Convex.Constraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
     @test vexity(c) === Convex.NotDcp()
     @test sprint(Convex.head, c) == "MOI.ExponentialCone"
     return
 end
 
-### constraints/GenericConstraint_RelativeEntropyCone
+### constraints/Constraint_RelativeEntropyCone
 
-function test_GenericConstraint_RelativeEntropyConeConstraint()
+function test_Constraint_RelativeEntropyConeConstraint()
     # u >= sum_i( w_i log (w_i/v_i) )
     u = Variable()
     v = [1, 2]
     w = Variable(2)
-    c = Convex.GenericConstraint{MOI.RelativeEntropyCone}(vcat(u, v, w))
+    c = Convex.Constraint{MOI.RelativeEntropyCone}(vcat(u, v, w))
     p = minimize(u, [c, w >= 2])
     solve!(p, SCS.Optimizer; silent_solver = true)
     @test isapprox(u.value, 2 * log(2 / 1) + 2 * log(2 / 2); atol = 1e-4)
     @test isapprox(c.dual, [1, 2, 1, -log(2) - 1, -1]; atol = 1e-3)
-    c = Convex.GenericConstraint{MOI.RelativeEntropyCone}(vcat(square(u), 1, u))
+    c = Convex.Constraint{MOI.RelativeEntropyCone}(vcat(square(u), 1, u))
     @test vexity(c) === Convex.NotDcp()
     @test sprint(Convex.head, c) == "MOI.RelativeEntropyCone"
     return
 end
 
-function test_GenericConstraint_NoVexity()
+function test_Constraint_NoVexity()
     x = Variable(2)
     set = MOI.Complements(2)
     @test_throws(
         ErrorException(
             "`Convex.vexity(vex, ::$(typeof(set)))`: is not yet implemented. Please open an issue at https://github.com/jump-dev/Convex.jl",
         ),
-        vexity(Convex.GenericConstraint(x, set)),
+        vexity(Convex.Constraint(x, set)),
     )
     return
 end
 
-### constraints/GenericConstraint_GeometricMeanEpiConeSquare
+### constraints/Constraint_GeometricMeanEpiConeSquare
 
 function test_GeometricMeanEpiConeSquare()
     T = Variable(2, 2)
@@ -337,14 +337,14 @@ function test_GeometricMeanEpiConeSquare()
         (T + C, A, B) => Convex.ConvexVexity(),
         (T * C, A, B) => Convex.ConvexVexity(),
     )
-        c = Convex.GenericConstraint(f, set)
+        c = Convex.Constraint(f, set)
         @test vexity(c) == dcp
         @test sign(c.child) == Convex.NoSign()
     end
     Z = Variable(3, 3)
-    @test_throws DimensionMismatch Convex.GenericConstraint((Z, A, B), set)
-    @test_throws DimensionMismatch Convex.GenericConstraint((T, Z, B), set)
-    @test_throws DimensionMismatch Convex.GenericConstraint((T, A, Z), set)
+    @test_throws DimensionMismatch Convex.Constraint((Z, A, B), set)
+    @test_throws DimensionMismatch Convex.Constraint((T, Z, B), set)
+    @test_throws DimensionMismatch Convex.Constraint((T, A, Z), set)
     return
 end
 
@@ -381,25 +381,25 @@ function test_RelativeEntropyEpiConeSquare()
         (τ + C2, X, Y) => Convex.ConvexVexity(),
         (τ * C2, X, Y) => Convex.ConvexVexity(),
     )
-        c = Convex.GenericConstraint(f, set)
+        c = Convex.Constraint(f, set)
         @test vexity(c) == dcp
         @test sign(c.child) == Convex.NoSign()
     end
     @test_throws(
         DimensionMismatch,
-        Convex.GenericConstraint((Variable(3, 1), X, Y), set)
+        Convex.Constraint((Variable(3, 1), X, Y), set)
     )
     @test_throws(
         DimensionMismatch,
-        Convex.GenericConstraint((Variable(), X, Y), set),
+        Convex.Constraint((Variable(), X, Y), set),
     )
     @test_throws(
         DimensionMismatch,
-        Convex.GenericConstraint((τ, Variable(2, 3), Y), set)
+        Convex.Constraint((τ, Variable(2, 3), Y), set)
     )
     @test_throws(
         DimensionMismatch,
-        Convex.GenericConstraint((τ, X, Variable(2, 3)), set)
+        Convex.Constraint((τ, X, Variable(2, 3)), set)
     )
     return
 end

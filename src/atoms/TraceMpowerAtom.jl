@@ -97,7 +97,7 @@ function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     if 0 <= atom.t <= 1
         add_constraint!(
             context,
-            GenericConstraint(
+            Constraint(
                 (tmp, I, A),
                 GeometricMeanHypoConeSquare(atom.t, n, false),
             ),
@@ -105,7 +105,7 @@ function new_conic_form!(context::Context{T}, atom::TraceMpowerAtom) where {T}
     else
         add_constraint!(
             context,
-            Convex.GenericConstraint(
+            Convex.Constraint(
                 (tmp, I, A),
                 GeometricMeanEpiConeSquare(atom.t, size(A, 1)),
             ),
