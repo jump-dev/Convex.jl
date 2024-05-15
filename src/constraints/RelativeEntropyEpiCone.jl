@@ -76,7 +76,7 @@ function GenericConstraint(func::Tuple, set::RelativeEntropyEpiConeSquare)
     return GenericConstraint(vcat(vec.(func)...), set)
 end
 
-function _get_matrices(c::GenericConstraint{RelativeEntropyEpiConeSquare})
+function _get_matrices(c::GenericConstraint{<:RelativeEntropyEpiConeSquare})
     n_τ, n_x = size(c.set.e, 2), c.set.side_dimension
     d_τ, d_x = n_τ^2, n_x^2
     τ = reshape(c.child[1:d_τ], n_τ, n_τ)
@@ -87,7 +87,7 @@ end
 
 # This negative relative entropy function is matrix convex (arxiv:1705.00812).
 # So if X and Y are convex sets, then τ ⪰ -D_op(X || Y) will be a convex set.
-function vexity(constraint::GenericConstraint{RelativeEntropyEpiConeSquare})
+function vexity(constraint::GenericConstraint{<:RelativeEntropyEpiConeSquare})
     τ, X, Y = _get_matrices(constraint)
     if vexity(X) in (ConcaveVexity(), NotDcp()) ||
        vexity(Y) in (ConcaveVexity(), NotDcp())
@@ -117,12 +117,11 @@ end
 
 function _add_constraint!(
     context::Context,
-    constraint::GenericConstraint{RelativeEntropyEpiConeSquare},
+    constraint::GenericConstraint{<:RelativeEntropyEpiConeSquare},
 )
     τ, X, Y = _get_matrices(constraint)
     m, k, e = constraint.set.m, constraint.set.k, constraint.set.e
-    n = size(X, 1)
-    r = size(e, 2)
+    n, r = size(X, 1), size(e, 2)
     s, w = _gauss_legendre_quadrature(m)
     is_complex =
         sign(X) == ComplexSign() ||
@@ -135,19 +134,14 @@ function _add_constraint!(
         Z = Variable(n, n)
         T = [Variable(r, r) for i in 1:m]
     end
-    add_constraint!(
-        context,
-        GenericConstraint(
-            (Z, X, Y),
-            GeometricMeanHypoConeSquare(1 // (2^k), n, false),
-        ),
-    )
+    set = GeometricMeanHypoConeSquare(1 // (2^k), n, false)
+    add_constraint!(context, GenericConstraint((Z, X, Y), set))
     for ii in 1:m
         # Note that we are dividing by w here because it is easier to do this
         # than to do sum w_i T(:,...,:,ii) later (cf. line that involves τ)
         A_ii = [
-            (e' * X * e - s[ii] * T[ii] / w[ii]) (e' * X)
-            (X * e) ((1 - s[ii]) * X + s[ii] * Z)
+            e'*X*e-s[ii]*T[ii]/w[ii] e'*X
+            X*e (1-s[ii])*X+s[ii]*Z
         ]
         add_constraint!(context, A_ii ⪰ 0)
     end
