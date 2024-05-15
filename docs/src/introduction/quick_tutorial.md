@@ -16,7 +16,6 @@ $A \in \mathbf{R}^{m \times n}$, $b \in \mathbf{R}^{m}$.
 
 This problem can be solved in Convex.jl as follows:
 ```@example
-# Make the Convex.jl module available
 using Convex, SCS
 
 # Generate random problem data
@@ -34,7 +33,7 @@ problem = minimize(sumsquares(A * x - b), [x >= 0])
 solve!(problem, SCS.Optimizer; silent_solver = true)
 
 # Check the status of the problem
-problem.status # :Optimal, :Infeasible, :Unbounded etc.
+problem.status
 
 # Get the optimum value
 problem.optval
