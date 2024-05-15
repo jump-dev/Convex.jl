@@ -87,10 +87,10 @@ function objective_vexity(p::Problem)
         return ConstVexity()
     elseif p.head == :minimize
         return vexity(p.objective)
-    else
-        @assert p.head == :maximize
+    elseif p.head == :maximize
         return -vexity(p.objective)
     end
+    return error("Unknown type of problem $(p.head)")
 end
 
 function vexity(p::Problem)
