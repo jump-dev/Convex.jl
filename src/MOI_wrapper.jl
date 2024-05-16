@@ -193,24 +193,12 @@ function MOI.get(::Optimizer, ::MOI.ListOfSupportedNonlinearOperators)
     return Symbol[:+, :-, :*, :/, :^, :min, :max, :abs, :sqrt, :exp, :log]
 end
 
-function _constraint(expr::AbstractExpr, set::MOI.EqualTo)
-    return expr == MOI.constant(set)
-end
-
-function _constraint(expr::AbstractExpr, set::MOI.LessThan)
-    return expr <= MOI.constant(set)
-end
-
-function _constraint(expr::AbstractExpr, set::MOI.GreaterThan)
-    return expr >= MOI.constant(set)
-end
-
 function MOI.add_constraint(
     model::Optimizer{T},
     func::MOI.ScalarNonlinearFunction,
     set::MOI.AbstractScalarSet,
 ) where {T}
-    constraint = _constraint(_expr(model, func), set)
+    constraint = Constraint(_expr(model, func), set)
     add_constraint!(model.context, constraint)
     push!(model.constraint_map, model.context.constr_to_moi_inds[constraint])
     return MOI.ConstraintIndex{typeof(func),typeof(set)}(
