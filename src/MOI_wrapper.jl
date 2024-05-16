@@ -118,7 +118,7 @@ end
 function MOI.supports_constraint(
     ::Optimizer,
     ::Type{MOI.VectorNonlinearFunction},
-    ::Type{S<:MOI.AbstractVectorSet},
+    ::Type{<:MOI.AbstractVectorSet},
 )
     # FIXME
     # It would be better to do something like `hasmethod(vexity, Tuple{Vexity,S})`
