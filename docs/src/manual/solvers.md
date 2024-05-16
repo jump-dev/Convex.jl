@@ -41,7 +41,7 @@ solve!(p, solver)
 As another example, if we wish to turn off printing for the SCS solver
 (that is, run in quiet mode), we can do so as follows:
 ```@repl solvers
-silent_scs = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() => false)
+silent_scs = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() => true)
 solve!(p, silent_scs)
 ```
 
