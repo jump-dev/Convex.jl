@@ -2,35 +2,40 @@
 
 ## DCP Errors
 
-When a problem is solved that involves an expression which is not of [DCP
-form](https://dcp.stanford.edu/), an error is emitted. For example,
+When a problem is solved that involves an expression which is not of [DCP form](https://dcp.stanford.edu/),
+an error is emitted. For example,
 
-```repl
-using SCS
-x = Variable()
-y = Variable()
-p = minimize(log(x) + square(y), x >= 0, y >= 0)
-solve!(p, SCS.Optimizer)
+```jldoctest
+julia> using Convex, SCS
+
+julia> x = Variable();
+
+julia> y = Variable();
+
+julia> p = minimize(log(x) + square(y), [x >= 0, y >= 0]);
+
+julia> solve!(p, SCS.Optimizer; silent_solver = true)
+┌ Warning: Problem not DCP compliant: objective is not DCP
+└ @ Convex ~/.julia/dev/Convex/src/problems.jl:73
+ERROR: DCPViolationError: Expression not DCP compliant. This either means that your problem is not convex, or that we could not prove it was convex using the rules of disciplined convex programming. For a list of supported operations, see https://jump.dev/Convex.jl/stable/operations/. For help writing your problem as a disciplined convex program, please post a reproducible example on https://jump.dev/forum.
+Stacktrace:
+[...]
 ```
 
-See [Extended formulations and the DCP ruleset](@ref) for more discussion on why these errors occur.
+See [Extended formulations and the DCP ruleset](@ref) for more discussion on why
+these errors occur.
 
 ## Dual Variables
 
 Convex.jl also returns the optimal dual variables for a problem. These
 are stored in the `dual` field associated with each constraint.
 
-```julia
+```@repl
 using Convex, SCS
-
-x = Variable()
-constraint = x >= 0
-p = minimize(x, constraint)
-solve!(p, SCS.Optimizer)
-
-# Get the dual value for the constraint
-p.constraints[1].dual
-# or
+x = Variable();
+constraint = x >= 0;
+p = minimize(x, [constraint]);
+solve!(p, SCS.Optimizer; silent_solver = true)
 constraint.dual
 ```
 
@@ -47,7 +52,7 @@ method.
 ```julia
 using Convex, SCS
 n = 1_000
-y = rand(n)
+y = rand(n);
 x = Variable(n)
 lambda = Variable(Positive())
 fix!(lambda, 100)
@@ -78,42 +83,37 @@ approximate solution to a nonnegative matrix factorization problem with
 alternating minimization as follows. We use warmstarts to speed up the solution.
 
 ```julia
-# initialize nonconvex problem
 n, k = 10, 1
 A = rand(n, k) * rand(k, n)
 x = Variable(n, k)
 y = Variable(k, n)
-problem = minimize(sum_squares(A - x*y), x>=0, y>=0)
-
+problem = minimize(sum_squares(A - x * y), [x >= 0, y >= 0])
 # initialize value of y
 set_value!(y, rand(k, n))
 # we'll do 10 iterations of alternating minimization
-for i=1:10
-    # first solve for x
-    # with y fixed, the problem is convex
+for i in 1:10
+    # first solve for x. With y fixed, the problem is convex.
     fix!(y)
-    solve!(problem, SCS.Optimizer, warmstart = i > 1 ? true : false)
+    solve!(problem, SCS.Optimizer; warmstart = i > 1 ? true : false)
+    # Now solve for y with x fixed at the previous solution.
     free!(y)
-
-    # now solve for y with x fixed at the previous solution
     fix!(x)
-    solve!(problem, SCS.Optimizer, warmstart = true)
+    solve!(problem, SCS.Optimizer; warmstart = true)
     free!(x)
 end
 ```
 
 ## Custom Variable Types
 
-By making subtypes of [`Convex.AbstractVariable`](@ref) that conform to the appropriate
-interface (see the [`Convex.AbstractVariable`](@ref) docstring for details), one can
-easily provide custom variable types for specific constructions. These aren't
-always necessary though; for example, one can define the following function
-`probabilityvector`:
+By making subtypes of [`Convex.AbstractVariable`](@ref) that conform to the
+appropriate interface (see the [`Convex.AbstractVariable`](@ref) docstring for
+details), one can easily provide custom variable types for specific constructions.
+These aren't always necessary though; for example, one can define the following
+function `probabilityvector`:
 
-```@example prob
+```@example
 using Convex
-
-function probabilityvector(d::Int)
+function probability_vector(d::Int)
     x = Variable(d, Positive())
     add_constraint!(x, sum(x) == 1)
     return x
@@ -127,12 +127,10 @@ Custom types are necessary when one wants to dispatch on custom variables, use
 them as callable types, or provide a different implementation. Continuing with
 the probability vector example, let's say we often use probability vectors
 variables in taking expectation values, and we want to use function notation for
-this. To do so, we define
+this. To do so, we define:
 
-```@example 1
+```@repl 1
 using Convex
-
-# Must be mutable! Otherwise variables with the same size/value would be treated as the same object.
 mutable struct ProbabilityVector <: Convex.AbstractVariable
     head::Symbol
     size::Tuple{Int,Int}
@@ -142,26 +140,27 @@ mutable struct ProbabilityVector <: Convex.AbstractVariable
         return new(:ProbabilityVector, (d, 1), nothing, Convex.AffineVexity())
     end
 end
-
 Convex.get_constraints(p::ProbabilityVector) = [ sum(p) == 1 ]
 Convex.sign(::ProbabilityVector) = Convex.Positive()
 Convex.vartype(::ProbabilityVector) = Convex.ContVar
-
 (p::ProbabilityVector)(x) = dot(p, x)
 ```
+
+!!! warning
+    Custom variable types must be `mutable`, otherwise variables with the same
+    size and value would be treated as the same object.
 
 Then one can call `p = ProbabilityVector(3)` to construct a our custom variable
 which can be used in Convex, which already encodes the appropriate constraints
 (non-negative and sums to 1), and which can act on constants via `p(x)`. For
 example,
 
-```@example 1
+```@repl 1
 using SCS
 p = ProbabilityVector(3)
-x = [1.0, 2.0, 3.0]
-prob = minimize( p(x) )
-solve!(prob, SCS.Optimizer)
-evaluate(p) # [1.0, 0.0, 0.0]
+prob = minimize(p([1.0, 2.0, 3.0]))
+solve!(prob, SCS.Optimizer; silent_solver = false);
+evaluate(p)
 ```
 
 Subtypes of `AbstractVariable` must have the fields `head` and
@@ -171,14 +170,14 @@ Subtypes of `AbstractVariable` must have the fields `head` and
   [`Convex.set_value!`](@ref)
 * either have a field `vexity`, or implement [`Convex.vexity`](@ref) and
   [`Convex.vexity!`](@ref) (though the latter is only necessary if you wish to
-  support [`Convex.fix!`](@ref) and [`Convex.free!`](@ref)
-* have a field `constraints` or implement [`Convex.get_constraints`](@ref) (optionally,
-  implement [`Convex.add_constraint!`](@ref) to be able to add constraints to your
-  variable after its creation),
+  support [`Convex.fix!`](@ref) and [`Convex.free!`](@ref))
+* have a field `constraints` or implement [`Convex.get_constraints`](@ref)
+  (optionally implement [`Convex.add_constraint!`](@ref) to be able to add
+  constraints to your variable after its creation),
 * either have a field `sign` or implement [`Convex.sign`](@ref), and
-* either have a field `vartype`, or implement [`Convex.vartype`](@ref) (optionally,
-  implement [`Convex.vartype!`](@ref) to be able to change a variables' `vartype`
-  after construction.)
+* either have a field `vartype`, or implement [`Convex.vartype`](@ref)
+  (optionally, implement [`Convex.vartype!`](@ref) to be able to change a
+  variable's `vartype` after construction).
 
 
 ## Printing and the tree structure
