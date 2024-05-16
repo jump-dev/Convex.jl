@@ -3,17 +3,17 @@
 # Use of this source code is governed by a BSD-style license that can be found
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
-mutable struct Constraint{S<:MOI.AbstractSet}
+mutable struct Constraint{S<:MOI.AbstractVectorSet}
     child::AbstractExpr
     set::S
     dual::Union{Value,Nothing}
 
-    function Constraint(child::AbstractExpr, set::MOI.AbstractSet)
+    function Constraint(child::AbstractExpr, set::MOI.AbstractVectorSet)
         return new{typeof(set)}(child, set, nothing)
     end
 end
 
-function Constraint{S}(child::AbstractExpr) where {S<:MOI.AbstractSet}
+function Constraint{S}(child::AbstractExpr) where {S<:MOI.AbstractVectorSet}
     return Constraint(child, set_with_size(S, size(child)))
 end
 
@@ -34,7 +34,7 @@ end
 
 head(io::IO, c::Constraint) = head(io, c.set)
 
-function head(io::IO, set::MOI.AbstractSet)
+function head(io::IO, set::MOI.AbstractVectorSet)
     return print(io, replace("$(typeof(set))", "MathOptInterface" => "MOI"))
 end
 
@@ -80,7 +80,7 @@ function vexity(
     return ConvexVexity()
 end
 
-function vexity(::Any, set::MOI.AbstractSet)
+function vexity(::Any, set::MOI.AbstractVectorSet)
     return error(
         "`Convex.vexity(vex, ::$(typeof(set)))`: is not yet implemented. Please open an issue at https://github.com/jump-dev/Convex.jl",
     )
