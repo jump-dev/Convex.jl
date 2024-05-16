@@ -5,7 +5,7 @@
 When a problem is solved that involves an expression which is not of [DCP form](https://dcp.stanford.edu/),
 an error is emitted. For example,
 
-```jldoctest
+```jldoctest; filter=r"@ Convex .+\.jl:[0-9]+"
 julia> using Convex, SCS
 
 julia> x = Variable();
