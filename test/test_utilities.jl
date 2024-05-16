@@ -1405,6 +1405,14 @@ function test_show_with_variable_constraints()
     return
 end
 
+function test_not_dcp_warn()
+    x = Variable()
+    atom = sqrt(square(x) + 1)
+    @test_logs (:warn,) problem_vexity(maximize(x, [atom <= 3]))
+    @test_logs (:warn,) problem_vexity(maximize(atom))
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
