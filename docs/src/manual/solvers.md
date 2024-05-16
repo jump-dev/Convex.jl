@@ -4,8 +4,8 @@ Convex.jl depends on third-party solvers to solve optimization problems.
 Therefore, you will need to install one before you can solve problems with
 Convex.jl.
 
-Install a solver usign the Julia package manager, replacing `"SCS"` by Julia
-package name as appopriate:
+Install a solver using the Julia package manager, replacing `"SCS"` by Julia
+package name as appropriate:
 ```julia
 import Pkg
 Pkg.add("SCS")
