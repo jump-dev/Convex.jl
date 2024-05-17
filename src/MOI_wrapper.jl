@@ -122,7 +122,7 @@ function MOI.supports_constraint(
 )
     # This can cause false positives because:
     #  1) some sets might not be supported by Convex.jl (e.g., `vexity` might
-    #     be missing
+    #     be missing)
     #  2) whether we support the constraint can depend on the vexity of the
     #     function, which we currently don't know.
     # Rather than attempt an enumeration of supported sets here, let's just
