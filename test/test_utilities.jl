@@ -1029,7 +1029,12 @@ function test_deprecation_silent_solver()
     @test_logs (:warn, str) solve!(p, SCS.Optimizer; silent_solver = true)
 
     # Can't set both
-    @test_throws ArgumentError solve!(p, SCS.Optimizer; silent_solver = true, silent = false)
+    @test_throws ArgumentError solve!(
+        p,
+        SCS.Optimizer;
+        silent_solver = true,
+        silent = false,
+    )
 
     return
 end
