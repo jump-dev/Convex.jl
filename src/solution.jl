@@ -84,13 +84,17 @@ function solve!(
     silent_solver = nothing, # deprecated
 )
     if silent_solver !== nothing && silent !== nothing
-        throw(ArgumentError("Cannot set both `silent` and `silent_solver` in `solve!`. `silent_solver` is deprecated, only set `silent`."))
+        throw(
+            ArgumentError(
+                "Cannot set both `silent` and `silent_solver` in `solve!`. `silent_solver` is deprecated, only set `silent`.",
+            ),
+        )
     elseif silent_solver !== nothing
         @warn "The keyword argument `silent_solver` in `Convex.solve!` has been deprecated in favor of `silent`." maxlog =
             1
         silent = silent_solver
     end
-    
+
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end

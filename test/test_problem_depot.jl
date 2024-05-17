@@ -51,12 +51,7 @@ function test_Clarabel_warmstarts()
     Convex.ProblemDepot.run_tests(;
         exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
     ) do p
-        ret = solve!(
-            p,
-            Clarabel.Optimizer;
-            silent = true,
-            warmstart = true,
-        )
+        ret = solve!(p, Clarabel.Optimizer; silent = true, warmstart = true)
         # verify post-solve printing does not error
         @test sprint(show, p) isa AbstractString
         return ret
