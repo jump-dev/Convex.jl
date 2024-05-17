@@ -116,10 +116,18 @@ function MOI.add_constraint(
 end
 
 function MOI.supports_constraint(
-    ::Optimizer{T},
-    ::Type{MOI.ScalarNonlinearFunction},
-    ::Type{<:Union{MOI.EqualTo{T},MOI.GreaterThan{T},MOI.LessThan{T}}},
-) where {T}
+    ::Optimizer,
+    ::Type{MOI.VectorNonlinearFunction},
+    ::Type{<:MOI.AbstractVectorSet},
+)
+    # This can cause false positives because:
+    #  1) some sets might not be supported by Convex.jl (e.g., `vexity` might
+    #     be missing)
+    #  2) whether we support the constraint can depend on the vexity of the
+    #     function, which we currently don't know.
+    # Rather than attempt an enumeration of supported sets here, let's just
+    # pass things on and hope that there is a nice error message elsewhere in
+    # the callchain.
     return true
 end
 
@@ -189,28 +197,20 @@ function _expr(model::Optimizer, f::MOI.ScalarNonlinearFunction)
     return throw(MOI.UnsupportedNonlinearOperator(f.head))
 end
 
+function _expr(model::Optimizer, f::MOI.VectorNonlinearFunction)
+    return vcat(_expr.(model, f.rows)...)
+end
+
 function MOI.get(::Optimizer, ::MOI.ListOfSupportedNonlinearOperators)
     return Symbol[:+, :-, :*, :/, :^, :min, :max, :abs, :sqrt, :exp, :log]
 end
 
-function _constraint(expr::AbstractExpr, set::MOI.EqualTo)
-    return expr == MOI.constant(set)
-end
-
-function _constraint(expr::AbstractExpr, set::MOI.LessThan)
-    return expr <= MOI.constant(set)
-end
-
-function _constraint(expr::AbstractExpr, set::MOI.GreaterThan)
-    return expr >= MOI.constant(set)
-end
-
 function MOI.add_constraint(
     model::Optimizer{T},
-    func::MOI.ScalarNonlinearFunction,
-    set::MOI.AbstractScalarSet,
+    func::MOI.VectorNonlinearFunction,
+    set::MOI.AbstractVectorSet,
 ) where {T}
-    constraint = _constraint(_expr(model, func), set)
+    constraint = Constraint(_expr(model, func), set)
     add_constraint!(model.context, constraint)
     push!(model.constraint_map, model.context.constr_to_moi_inds[constraint])
     return MOI.ConstraintIndex{typeof(func),typeof(set)}(
@@ -317,10 +317,9 @@ end
 function MOI.get(
     model::Optimizer,
     attr::Union{MOI.ConstraintDual,MOI.ConstraintPrimal},
-    ci::MOI.ConstraintIndex{MOI.ScalarNonlinearFunction,S},
-) where {S<:MOI.AbstractScalarSet}
-    ret = MOI.get(model.context.model, attr, model.constraint_map[ci.value])
-    return ret[]
+    ci::MOI.ConstraintIndex{MOI.VectorNonlinearFunction,S},
+) where {S<:MOI.AbstractVectorSet}
+    return MOI.get(model.context.model, attr, model.constraint_map[ci.value])
 end
 
 function MOI.get(model::Optimizer, I::Type{<:MOI.Index}, name::String)
