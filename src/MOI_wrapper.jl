@@ -120,13 +120,14 @@ function MOI.supports_constraint(
     ::Type{MOI.VectorNonlinearFunction},
     ::Type{<:MOI.AbstractVectorSet},
 )
-    # FIXME
-    # It would be better to do something like `hasmethod(vexity, Tuple{Vexity,S})`
-    # instead. Indeed, if there is a set for which `vexity` is not defined but
-    # there is a bridge to convert it into sets for which `vexity` is defined,
-    # it won't be applied because Convex lied saying that the set is supported.
-    # However for `S = GeometricMeanEpiCone`, `vexity((::Vexity, ::S)` is not
-    # defined but only `vexity(::Constraint{S})` is defined so that won't work.
+    # This can cause false positives because:
+    #  1) some sets might not be supported by Convex.jl (e.g., `vexity` might
+    #     be missing
+    #  2) whether we support the constraint can depend on the vexity of the
+    #     function, which we currently don't know.
+    # Rather than attempt an enumeration of supported sets here, let's just
+    # pass things on and hope that there is a nice error message elsewhere in
+    # the callchain.
     return true
 end
 
