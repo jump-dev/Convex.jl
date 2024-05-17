@@ -248,6 +248,8 @@ function Base.show(io::IO, p::Problem)
     # Print problem statistics
     counts = Counts(p)
     println(io, "Problem statistics")
+    is_dcp = !(problem_vexity(p; warn = false) in (ConcaveVexity(), NotDcp()))
+    println(io, "  problem is DCP         : ", is_dcp)
     var_str = _str_with_elements(counts.n_variables, counts.n_scalar_variables)
     println(io, "  number of variables    : ", var_str)
     con_str =

@@ -105,6 +105,7 @@ Documenter.makedocs(
             "Home" => "index.md",
             "introduction/installation.md",
             "introduction/quick_tutorial.md",
+            "introduction/dcp.md",
             "introduction/faq.md",
         ],
         "Examples" => examples_nav,
