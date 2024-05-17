@@ -29,7 +29,7 @@ constraints = [
     a4' * x_c + r * norm(a4, 2) <= b[4],
 ]
 p = maximize(r, constraints)
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 
 # Generate the figure
 x = range(-1.5, stop = 1.5, length = 100);

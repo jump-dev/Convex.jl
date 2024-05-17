@@ -25,7 +25,7 @@ c3 = real(W[1, 1]) == 1.06^2;
 push!(c1, c2)
 push!(c1, c3)
 p = maximize(objective, c1);
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 #-
 p.optval
 

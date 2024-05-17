@@ -59,7 +59,7 @@ end
     solve!(
         problem::Problem,
         optimizer_factory;
-        silent_solver = false,
+        silent = false,
         warmstart::Bool = true,
     )
 
@@ -69,7 +69,7 @@ duals (accessed by `cons.dual`), where applicable. Returns the input `problem`.
 
 Optional keyword arguments:
 
- * `silent_solver`: whether the solver should be silent (and not emit output or
+ * `silent`: whether the solver should be silent (and not emit output or
    logs) during the solution process.
  * `warmstart` (default: `false`): whether the solver should start the
    optimization from a previous optimal value (according to the current primal
@@ -78,18 +78,18 @@ Optional keyword arguments:
 function solve!(
     p::Problem,
     optimizer_factory;
-    silent_solver = false,
+    silent = false,
     warmstart::Bool = false,
 )
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
     context, (stats...) = @timed Context(p, optimizer_factory)
-    if !silent_solver
+    if !silent
         s = round(stats.time; digits = 2), Base.format_bytes(stats.bytes)
         @info "[Convex.jl] Compilation finished: $(s[1]) seconds, $(s[2]) of memory allocated"
     end
-    if silent_solver
+    if silent
         MOI.set(context.model, MOI.Silent(), true)
     end
     attr = MOI.VariablePrimalStart()

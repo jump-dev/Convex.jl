@@ -40,18 +40,18 @@ for i in 1:length(p_vals)
     fit = norm(beta - beta_true) / norm(beta_true)
     cost = norm(X' * beta - Y)
     prob = minimize(cost)
-    solve!(prob, SCS.Optimizer; silent_solver = true)
+    solve!(prob, SCS.Optimizer; silent = true)
     lsq_data[i] = evaluate(fit)
 
     ## Form and solve a prescient regression problem,
     ## that is, where the sign changes are known.
     cost = norm(factor .* (X' * beta) - Y)
-    solve!(minimize(cost), SCS.Optimizer; silent_solver = true)
+    solve!(minimize(cost), SCS.Optimizer; silent = true)
     prescient_data[i] = evaluate(fit)
 
     ## Form and solve the Huber regression problem.
     cost = sum(huber(X' * beta - Y, 1))
-    solve!(minimize(cost), SCS.Optimizer; silent_solver = true)
+    solve!(minimize(cost), SCS.Optimizer; silent = true)
     huber_data[i] = evaluate(fit)
 end
 

@@ -45,7 +45,7 @@ function svm(pos_data, neg_data)
         C * sum(max(1 - b + w' * neg_data, 0))
     ## Form and solve problem.
     problem = minimize(obj)
-    solve!(problem, SCS.Optimizer; silent_solver = true)
+    solve!(problem, SCS.Optimizer; silent = true)
     return evaluate(w), evaluate(b)
 end;
 

@@ -45,10 +45,10 @@ silent_scs = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() => true)
 solve!(p, silent_scs)
 ```
 
-Another option is to use the solver-independent `silent_solver` keyword
+Another option is to use the solver-independent `silent` keyword
 argument to `solve!`:
 ```@repl solvers
-solve!(p, SCS.Optimizer; silent_solver=true)
+solve!(p, SCS.Optimizer; silent=true)
 ```
 
 See each solver's documentation for more information on solver-dependent

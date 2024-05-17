@@ -54,7 +54,7 @@ function test_Clarabel_warmstarts()
         ret = solve!(
             p,
             Clarabel.Optimizer;
-            silent_solver = true,
+            silent = true,
             warmstart = true,
         )
         # verify post-solve printing does not error
@@ -71,7 +71,7 @@ function test_Clarabel()
     Convex.ProblemDepot.run_tests(;
         exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
     ) do p
-        return solve!(p, Clarabel.Optimizer; silent_solver = true)
+        return solve!(p, Clarabel.Optimizer; silent = true)
     end
     return
 end
@@ -82,7 +82,7 @@ end
 #         exclude = [r"mip"],
 #         T = BigFloat,
 #     ) do p
-#         return solve!(p, Clarabel.Optimizer{BigFloat}; silent_solver = true)
+#         return solve!(p, Clarabel.Optimizer{BigFloat}; silent = true)
 #     end
 #     return
 # end
@@ -94,7 +94,7 @@ end
 #     # >   MathOptInterface.UnsupportedConstraint{MathOptInterface.VectorAffineFunction{Float64}, MathOptInterface.NormCone}: `MathOptInterface.VectorAffineFunction{Float64}`-in-`MathOptInterface.NormCone` constraint is not supported by the model.
 #     # Missing a bridge?
 #     Convex.ProblemDepot.run_tests(; exclude = [r"mip", r"sdp", r"rational_norm"]) do p
-#         return solve!(p, ECOS.Optimizer; silent_solver = true)
+#         return solve!(p, ECOS.Optimizer; silent = true)
 #     end
 #     return
 # end
@@ -103,7 +103,7 @@ function test_GLPK()
     # Note this is an inclusion, not exclusion;
     # we only test GLPK with MIPs, since those we can't test elsewhere.
     Convex.ProblemDepot.run_tests([r"mip"]) do p
-        return solve!(p, GLPK.Optimizer; silent_solver = true)
+        return solve!(p, GLPK.Optimizer; silent = true)
     end
     return
 end

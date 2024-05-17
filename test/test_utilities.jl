@@ -68,7 +68,7 @@ function test_silent_solver_works()
     output_silent = solve_and_return_output(
         p,
         MOI.OptimizerWithAttributes(SCS.Optimizer, "eps_abs" => 1e-6),
-        silent_solver = true,
+        silent = true,
     )
     @test output_silent == ""
     return
@@ -1236,16 +1236,16 @@ end
 function test_scalar_fn_constant_objective()
     x = Variable()
     p = minimize(2.1, [x >= 1])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(p.optval, 2.1; atol = 1e-5)
     p = minimize(2.2, x >= 1)
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(p.optval, 2.2; atol = 1e-5)
     p = maximize(2.3, [x >= 1])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(p.optval, 2.3; atol = 1e-5)
     p = maximize(2.4, x >= 1)
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(p.optval, 2.4; atol = 1e-5)
     return
 end

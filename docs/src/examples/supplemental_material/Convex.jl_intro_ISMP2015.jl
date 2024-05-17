@@ -44,7 +44,7 @@ problem = minimize(
 )
 
 # Solve the problem by calling `solve!`
-solve!(problem, SCS.Optimizer; silent_solver = true)
+solve!(problem, SCS.Optimizer; silent = true)
 
 println("problem status is ", problem.status)
 println("optimal value is ", problem.optval)
@@ -59,7 +59,7 @@ using Interact, Plots
         square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
         x >= 0,
     )
-    solve!(problem, SCS.Optimizer; silent_solver = true)
+    solve!(problem, SCS.Optimizer; silent = true)
     histogram(evaluate(x), xlims = (0, 3.5), label = "x")
 end
 nothing # hide
@@ -134,7 +134,7 @@ p = minimize(objective, constraint)
 #-
 
 # Solve the problem:
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 p.status
 
 #-
@@ -182,9 +182,9 @@ problem = minimize(
     square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
     x >= 0,
 )
-@time solve!(problem, SCS.Optimizer; silent_solver = true)
+@time solve!(problem, SCS.Optimizer; silent = true)
 λ = 1.5
-@time solve!(problem, SCS.Optimizer; silent_solver = true)#, warmstart = true) # FIXME
+@time solve!(problem, SCS.Optimizer; silent = true)#, warmstart = true) # FIXME
 
 # # DCP examples
 

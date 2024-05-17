@@ -65,7 +65,7 @@ objective = inner_product(U, M)
 c1 = diag(U) == 1
 c2 = isposdef(U)
 p = minimize(objective, c1, c2)
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 #-
 
 evaluate(U)

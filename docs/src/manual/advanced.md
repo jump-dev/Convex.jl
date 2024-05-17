@@ -14,7 +14,7 @@ julia> y = Variable();
 
 julia> p = minimize(log(x) + square(y), [x >= 0, y >= 0]);
 
-julia> solve!(p, SCS.Optimizer; silent_solver = true)
+julia> solve!(p, SCS.Optimizer; silent = true)
 ┌ Warning: Problem not DCP compliant: objective is not DCP
 └ @ Convex ~/.julia/dev/Convex/src/problems.jl:73
 ERROR: DCPViolationError: Expression not DCP compliant. This either means that your problem is not convex, or that we could not prove it was convex using the rules of disciplined convex programming. For a list of supported operations, see https://jump.dev/Convex.jl/stable/operations/. For help writing your problem as a disciplined convex program, please post a reproducible example on https://jump.dev/forum.
@@ -35,7 +35,7 @@ using Convex, SCS
 x = Variable();
 constraint = x >= 0;
 p = minimize(x, [constraint]);
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 constraint.dual
 ```
 
@@ -159,7 +159,7 @@ example,
 using SCS
 p = ProbabilityVector(3)
 prob = minimize(p([1.0, 2.0, 3.0]))
-solve!(prob, SCS.Optimizer; silent_solver = false);
+solve!(prob, SCS.Optimizer; silent = false);
 evaluate(p)
 ```
 

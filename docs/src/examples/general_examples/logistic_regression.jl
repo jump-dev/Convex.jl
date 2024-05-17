@@ -28,7 +28,7 @@ X = hcat(
 n, p = size(X)
 beta = Variable(p)
 problem = minimize(logisticloss(-Y .* (X * beta)))
-solve!(problem, SCS.Optimizer; silent_solver = true)
+solve!(problem, SCS.Optimizer; silent = true)
 
 # Let's see how well the model fits.
 using Plots
