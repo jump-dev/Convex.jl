@@ -1022,6 +1022,18 @@ function test_deprecation_adding_constraints()
     return
 end
 
+function test_deprecation_silent_solver()
+    x = Variable(2)
+    p = minimize(sum(x))
+    str = "The keyword argument `silent_solver` in `Convex.solve!` has been deprecated in favor of `silent`."
+    @test_logs (:warn, str) solve!(p; silent_solver = true)
+
+    # Can't set both
+    @test_throws ArgumentError solve!(p; silent_solver = true, silent=false)
+
+    return
+end
+
 function test_dcp_rules()
     vexities = (
         Convex.ConcaveVexity(),

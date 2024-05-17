@@ -69,8 +69,9 @@ duals (accessed by `cons.dual`), where applicable. Returns the input `problem`.
 
 Optional keyword arguments:
 
- * `silent`: whether the solver should be silent (and not emit output or
-   logs) during the solution process.
+ * `silent`: whether or not Convex and the solver should be silent (and not emit output or
+   logs) during the solution process. When `silent=false`, Convex will print the formulation time,
+   and warn if the problem was not solved optimally.
  * `warmstart` (default: `false`): whether the solver should start the
    optimization from a previous optimal value (according to the current primal
    value of the variables in the problem, which can be set by [`set_value!`](@ref).
@@ -78,9 +79,18 @@ Optional keyword arguments:
 function solve!(
     p::Problem,
     optimizer_factory;
-    silent = false,
+    silent = nothing, # to become `false` once `silent_solver` deprecation removed
     warmstart::Bool = false,
+    silent_solver = nothing, # deprecated
 )
+    if silent_solver !== nothing && silent !== nothing
+        throw(ArgumentError("Cannot set both `silent` and `silent_solver` in `solve!`. `silent_solver` is deprecated, only set `silent`."))
+    elseif silent_solver !== nothing
+        @warn "The keyword argument `silent_solver` in `Convex.solve!` has been deprecated in favor of `silent`." maxlog =
+            1
+        silent = silent_solver
+    end
+    
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
@@ -103,7 +113,7 @@ function solve!(
         p.status = MOI.get(context.model, MOI.TerminationStatus())
     end
     p.model = context.model
-    if p.status != MOI.OPTIMAL
+    if !silent && p.status != MOI.OPTIMAL
         @warn "Problem wasn't solved optimally" status = p.status
     end
     primal_status = MOI.get(context.model, MOI.PrimalStatus())
