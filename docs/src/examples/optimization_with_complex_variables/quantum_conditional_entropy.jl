@@ -43,7 +43,7 @@
 # First, we can formulate the conditional entropy in terms of the relative entropy using the relationship
 #
 # ```math
-# S(A|B)_\rho = - D(\rho_^{AB} \| I_A \otimes \rho^B)
+# S(A|B)_\rho = - D(\rho^{AB} \| I_A \otimes \rho^B)
 # ```math
 #
 # where $D$ is the quantum relative entropy. Thus:
