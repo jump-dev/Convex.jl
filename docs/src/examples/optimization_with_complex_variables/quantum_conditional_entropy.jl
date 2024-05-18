@@ -16,7 +16,7 @@
 #
 # Here, $\rho^{AB}$ represents an operator on the tensor product of two finite-dimensional Hilbert spaces $A$ and $B$ (with dimensions $d_A$ and $d_B$ respectively), so we can regard $\rho_{AB}$ as a matrix on the vector space $\mathbb{C}^{d_Ad_B}$. Moreover, $\rho^B$ denotes the partial trace of $\rho^{AB}$ over the system $A$, so $\rho^B$ is a matrix on $\mathbb{C}^{d_B}$.
 #
-# One question is how much can $S(A|B)_\rho$ vary between two density matrices $\rho$ and $\sigma$ as a function of the trace-distance $\text{trdist}(\rho, \sigma) := \|\rho-\sigma\|_1 = \frac{1}{2} \text{tr}\left(\sqrt{(\rho-\sigma)^\dagger (\rho-\sigma)}\right)$ (i.e. 1/2 of the nuclear norm). Here the trace distance is meaningful as it is the quantum analog to the total variation distance, and has an inteprepration in terms of the maximal possible probability to distinguish between $\rho$ and $\sigma$ by measurement.
+# One question is how much can $S(A|B)_\rho$ vary between two density matrices $\rho$ and $\sigma$ as a function of the trace-distance $\text{trdist}(\rho, \sigma) := \|\rho-\sigma\|_1 = \frac{1}{2} \text{tr}\left(\sqrt{(\rho-\sigma)^\dagger (\rho-\sigma)}\right)$ (that is, half of the nuclear norm). Here the trace distance is meaningful as it is the quantum analog to the total variation distance, and has an interpretation in terms of the maximal possible probability to distinguish between $\rho$ and $\sigma$ by measurement.
 #
 # The Alicki-Fannes-Winter (AFW) bound (https://arxiv.org/abs/1507.07775v6 Lemma 2) states that if $\rho$ and $\sigma$ are density matrices, then $\text{trdist}(\rho, \sigma) \leq \varepsilon \leq 1$, then
 #
