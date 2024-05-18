@@ -18,7 +18,7 @@
 #
 # One question is how much can $S(A|B)_\rho$ vary between two density matrices $\rho$ and $\sigma$ as a function of the trace-distance $\text{trdist}(\rho, \sigma) := \|\rho-\sigma\|_1 = \frac{1}{2} \text{tr}\left(\sqrt{(\rho-\sigma)^\dagger (\rho-\sigma)}\right)$ (that is, half of the nuclear norm). Here the trace distance is meaningful as it is the quantum analog to the total variation distance, and has an interpretation in terms of the maximal possible probability to distinguish between $\rho$ and $\sigma$ by measurement.
 #
-# The Alicki-Fannes-Winter (AFW) bound (https://arxiv.org/abs/1507.07775v6 Lemma 2) states that if $\rho$ and $\sigma$ are density matrices, then $\text{trdist}(\rho, \sigma) \leq \varepsilon \leq 1$, then
+# The Alicki-Fannes-Winter (AFW) bound ([*Winter 2015*](https://arxiv.org/abs/1507.07775v6), Lemma 2) states that if $\rho$ and $\sigma$ are density matrices, then $\text{trdist}(\rho, \sigma) \leq \varepsilon \leq 1$, then
 #
 # ```math
 # | S(A|B)_\rho - S(A|B)_\sigma| \leq 2 \varepsilon \log d_A + (1 + \varepsilon) h \left(\frac{\varepsilon}{1+\varepsilon}\right)
@@ -43,10 +43,10 @@
 # First, we can formulate the conditional entropy in terms of the relative entropy using the relationship
 #
 # ```math
-# S(A|B)_\rho = - D(\rho^{AB} \| I_A \otimes \rho^B)
+# S(A|B)_\rho = - D(\rho^{AB} \| I^A \otimes \rho^B)
 # ```math
 #
-# where $D$ is the quantum relative entropy. Thus:
+# where $D$ is the quantum relative entropy and $I^A$ is the $d_A$-dimensional identity matrix. Thus:
 
 using Convex
 using LinearAlgebra: I
