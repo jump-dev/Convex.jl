@@ -74,8 +74,11 @@ using SCS
 ρ_AB = HermitianSemidefinite(d_A * d_B)
 add_constraint!(ρ_AB, tr(ρ_AB) == 1)
 
-add_constraint!(ρ_AB, 0.5 * nuclearnorm(ρ_AB - σ_AB) ≤ ϵ)
-problem = maximize(quantum_conditional_entropy(ρ_AB, d_A, d_B))
+problem = maximize(
+    quantum_conditional_entropy(ρ_AB, d_A, d_B),
+    0.5 * nuclearnorm(ρ_AB - σ_AB) ≤ ϵ,
+)
+
 solve!(problem, SCS.Optimizer; silent_solver = false)
 
 # We can then check the observed difference in relative entropies:
