@@ -76,7 +76,7 @@ add_constraint!(ρ_AB, tr(ρ_AB) == 1)
 
 add_constraint!(ρ_AB, 0.5 * nuclearnorm(ρ_AB - σ_AB) ≤ ϵ)
 problem = maximize(quantum_conditional_entropy(ρ_AB, d_A, d_B))
-solve!(problem, SCS.Optimizer; silent=true)
+solve!(problem, SCS.Optimizer; silent_solver=true)
 
 # We can then check the observed difference in relative entropies:
 
@@ -84,4 +84,14 @@ difference = evaluate(quantum_conditional_entropy(ρ_AB, d_A, d_B) - quantum_con
 
 # We can compare to the bound:
 h(x) = -x*log(x)  - (1-x)*log(1-x)
-2 * ϵ *  log(d_A) + (1 + ϵ) * h(ϵ/(1+ϵ))
+bound = 2 * ϵ *  log(d_A) + (1 + ϵ) * h(ϵ/(1+ϵ))
+
+# In fact, in this case we know the maximizer is given by
+
+ρ_max =  σ_AB*(1-ϵ) + ϵ*(I(d_A*d_B) - σ_AB)/(d_A*d_B-1)
+
+# We can check that `ρ_AB` obtained the right value:
+
+norm(evaluate(ρ_AB) - ρ_max)
+
+# Here we see a result within the expected tolerances of SCS.
