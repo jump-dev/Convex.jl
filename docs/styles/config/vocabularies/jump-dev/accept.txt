@@ -52,9 +52,10 @@ Markowitz
 Mohan
 Namkoong
 Nemirovski
+Neumann
 Skaf
 Udell
 Vandenberghe
-von Neumann
+von
 Watrous
 Zeng
