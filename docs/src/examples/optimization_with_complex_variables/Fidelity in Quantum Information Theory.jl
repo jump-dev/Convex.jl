@@ -1,5 +1,5 @@
 # # Fidelity in quantum information theory
-# This example is inspired from a lecture of John Watrous in the [course on Theory of Quantum Information](https://cs.uwaterloo.ca/~watrous/CS766/LectureNotes/08.pdf).
+# This example is inspired from a lecture of John Watrous in the [course on Theory of Quantum Information](https://johnwatrous.com/wp-content/uploads/TQI-notes.08.pdf).
 #
 # The Fidelity between two Hermitian semidefinite matrices P and Q is defined as:
 #
