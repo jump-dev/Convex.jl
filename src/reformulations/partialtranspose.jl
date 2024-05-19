@@ -51,13 +51,10 @@ Returns a matrix `M` so that for any vector `v` of length `prod(dims)`,
 `M*v == vec(permutedims(reshape(v, dims), p))`.
 """
 function permutedims_matrix(dims, p)
-    d, n = prod(dims), length(dims)
-    dense = reshape(
-        PermutedDimsArray(
-            reshape(LinearAlgebra.I(d), (dims..., dims...)),
-            (p..., (n+1:2n)...),
-        ),
-        (d, d),
-    )
-    return SparseArrays.sparse(dense)
+    d = prod(dims)
+    # Generalization of https://stackoverflow.com/a/60680132
+    rows = 1:d
+    cols = vec(permutedims(reshape(rows, dims), p))
+    data = ones(Int, d)
+    return SparseArrays.sparse(rows, cols, data, d, d)
 end

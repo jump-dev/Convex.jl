@@ -5,6 +5,7 @@ docstring
 [Dd]ualize
 [Dd]ualization
 [Ee]lementwise
+entropies
 [Ee]num
 injective
 nonconvex
@@ -51,8 +52,10 @@ Markowitz
 Mohan
 Namkoong
 Nemirovski
+Neumann
 Skaf
 Udell
 Vandenberghe
+von
 Watrous
 Zeng
