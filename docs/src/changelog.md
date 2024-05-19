@@ -85,7 +85,7 @@ changes.
  * Added support for using `Problem` as an atom (#646)
  * `show(::IO, ::Problem)` now includes some problem statistics (#650)
  * `show(::IO, ::Problem)` now prints less of the expression tree by default (#661)
- * A [new example](#Continuity-of-the-quantum-conditional-entropy) for quantum conditional entropy has been added. (#671)
+ * A [new example](@ref "Continuity of the quantum conditional entropy") for quantum conditional entropy has been added. (#671)
  * `solve!` now returns the problem itself (#658)
 
 ### Fixed
