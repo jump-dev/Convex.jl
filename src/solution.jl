@@ -98,7 +98,6 @@ function solve!(
     elseif silent === nothing
         silent = false
     end
-
     if problem_vexity(p) in (ConcaveVexity(), NotDcp())
         throw(DCPViolationError())
     end
