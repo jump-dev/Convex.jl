@@ -18,7 +18,7 @@ changes.
    with MathOptInterface. (#504), (#551), (#584), (#588), (#637)
     * `x + A` will error if `x` is a scalar variable and `A` is an array.
       Instead, use `x * ones(size(A)) + A`.
-    * The `RelativeEntropyAtom` now returns a scalar value instead o
+    * The `RelativeEntropyAtom` now returns a scalar value instead of
       elementwise values. This does not affect the result of `relative_entropy`.
     * The function `constant` should be used instead of the type `Constant`
       (which now refers to exclusively real constants).
@@ -28,10 +28,10 @@ changes.
       (Following the convention in MathOptInterface, the dual of `a <= b` is
       always negative, regardless of optimization sense.) (#593)
     * The structs `LtConstraint`, `GtConstraint`, `EqConstraint`
-      `SOCConstraint`, `ExpConstraint`, `GeoMeanEpiConeConstraint`,
-      `GeoMeanHypoConeConstraint`, and `SDPConstraint` have been replaced by
+      `SOCConstraint`, `ExpConstraint`, `SDPConstraint`, `GeoMeanEpiConeConstraint`,
+      `GeoMeanHypoConeConstraint`, and `RelativeEntropyEpiCone`, have been replaced by
       `Constraint{S}` where `S<:MOI.AbstractSet` (#590), (#597), (#598),
-      (#599), (#601), (#602), (#604), (#623), (#632), (#648)
+      (#599), (#601), (#602), (#604), (#623), (#632), (#648), (#663), (#665)
     * The set `GeomMeanEpiCone` has been renamed to `GeometricMeanEpiConeSquare`
       and `GeomMeanHypoCone` has been renamed to `GeometricMeanHypoConeSquare`
       (#638)
@@ -63,6 +63,8 @@ changes.
    between solves (#586)
  * The `Context` struct has been refactored and various fields have been
    changed. The internal details are now considered private. (#645)
+ * The keyword argument `silent_solver` has been deprecated to `silent`. (#670)
+ * Concatenating lists of constraints using `+` (and `+=`) has been deprecated. (#659)
 
 ### Added
 
@@ -82,6 +84,9 @@ changes.
    the DCP expression graph to MathOptInterface (#633)
  * Added support for using `Problem` as an atom (#646)
  * `show(::IO, ::Problem)` now includes some problem statistics (#650)
+ * `show(::IO, ::Problem)` now prints less of the expression tree by default (#661)
+ * A [new example](#Continuity-of-the-quantum-conditional-entropy) for quantum conditional entropy has been added. (#671)
+ * `solve!` now returns the problem itself (#658)
 
 ### Fixed
 
@@ -101,7 +106,7 @@ changes.
 ### Other
 
  * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
-   (#576), (#579), (#587), (#594), (#628), (#652), (#656)
+   (#576), (#579), (#587), (#594), (#628), (#652), (#656), (#666)
  * Refactored the tests into a functional form (#532)
  * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
