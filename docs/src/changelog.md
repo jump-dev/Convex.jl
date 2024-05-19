@@ -106,7 +106,7 @@ changes.
 ### Other
 
  * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
-   (#576), (#579), (#587), (#594), (#628), (#652), (#656), (#666)
+   (#576), (#579), (#587), (#594), (#628), (#652), (#656), (#666), (#674)
  * Refactored the tests into a functional form (#532)
  * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
