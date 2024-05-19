@@ -26,7 +26,7 @@ A = I(4)
 b = [10; 10; 10; 10]
 constraints = [A * x <= b, x >= 1, x <= 10, x[2] <= 5, x[1] + x[4] - x[2] <= 10]
 p = minimize(dot(c, x), constraints) # or c' * x
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 
 # We can also inspect the objective value and the values of the variables at the solution:
 println(round(p.optval, digits = 2))
@@ -50,7 +50,7 @@ X = Variable(2, 2)
 y = Variable()
 ## X is a 2 x 2 variable, and y is scalar. X' + y promotes y to a 2 x 2 variable before adding them
 p = minimize(norm(X) + y, 2 * X <= 1, X' + y >= 1, X >= 0, y >= 0)
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 
 # We can also inspect the values of the variables at the solution:
 println(round.(evaluate(X), digits = 2))
@@ -76,13 +76,13 @@ p = satisfy(
     x[2] >= 7,
     geomean(x[3], x[4]) >= x[2],
 )
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 
 # ### PSD cone and Eigenvalues
 
 y = Semidefinite(2)
 p = maximize(eigmin(y), tr(y) <= 6)
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 
 #-
 
@@ -91,7 +91,7 @@ y = Variable((2, 2))
 
 ## PSD constraints
 p = minimize(x + y[1, 1], y ⪰ 0, x >= 1, y[2, 1] == 1)
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 
 # ### Mixed integer program
 #
@@ -106,7 +106,7 @@ solve!(p, SCS.Optimizer; silent_solver = true)
 
 x = Variable(4, IntVar)
 p = minimize(sum(x), x >= 0.5)
-solve!(p, GLPK.Optimizer; silent_solver = true)
+solve!(p, GLPK.Optimizer; silent = true)
 
 # And the value of `x` at the solution:
 evaluate(x)

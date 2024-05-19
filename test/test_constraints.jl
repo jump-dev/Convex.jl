@@ -46,7 +46,7 @@ function test_EqualToConstraint_dual_minimize()
     x = Variable()
     c = 3 * x == 1
     p = minimize(2.0 * x + 1.0, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, 2 / 3; atol = 1e-4)
     return
 end
@@ -55,7 +55,7 @@ function test_EqualToConstraint_dual_maximize()
     x = Variable()
     c = 3 * x == 1
     p = maximize(2.0 * x + 1.0, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, -2 / 3; atol = 1e-4)
     return
 end
@@ -64,7 +64,7 @@ function test_EqualToConstraint_dual_complex()
     x = ComplexVariable()
     c = 3 * x == 1 - 2im
     p = minimize(real(x) + 2imag(x), [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, 1 / 3 - 2 / 3im; atol = 1e-4)
     return
 end
@@ -104,7 +104,7 @@ function test_GreaterThanConstraint_dual_minimize()
     x = Variable()
     c = 3 * x >= 1
     p = minimize(2.0 * x + 1.0, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, 2 / 3; atol = 1e-4)
     return
 end
@@ -113,7 +113,7 @@ function test_GreaterThanConstraint_dual_maximize()
     x = Variable()
     c = 1 >= 3 * x
     p = maximize(2.0 * x + 1.0, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, 2 / 3; atol = 1e-4)
     return
 end
@@ -153,7 +153,7 @@ function test_LessThanConstraint_dual_minimize()
     x = Variable()
     c = 1 <= 3 * x
     p = minimize(2.0 * x + 1.0, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, -2 / 3; atol = 1e-4)
     return
 end
@@ -162,7 +162,7 @@ function test_LessThanConstraint_dual_maximize()
     x = Variable()
     c = 3 * x <= 1
     p = maximize(2.0 * x + 1.0, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(c.dual, -2 / 3; atol = 1e-4)
     return
 end
@@ -177,7 +177,7 @@ function test_Constraint_PositiveSemidefiniteConeSquare()
     X = Variable(2, 2)
     c = Convex.Constraint{MOI.PositiveSemidefiniteConeSquare}(X)
     p = minimize(tr(X), [c, X >= [1 2; 3 4]])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(X.value, [2.25 3; 3 4]; atol = 1e-3)
     y = (c.dual + c.dual') / 2
     @test isapprox(y[1], 1; atol = 1e-3)
@@ -209,7 +209,7 @@ function test_Constraint_SecondOrderCone()
     t = Variable()
     c = Convex.Constraint{MOI.SecondOrderCone}(vcat(t, x))
     p = minimize(t, [c, x >= [2, 3, 4]])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
     t_ = sqrt(29)
     @test isapprox(t.value, t_; atol = 1e-3)
@@ -241,7 +241,7 @@ function test_Constraint_RotatedSecondOrderCone()
     t = Variable()
     c = Convex.Constraint{MOI.RotatedSecondOrderCone}(vcat(t, 1, x))
     p = minimize(t, [c, x >= [2, 3, 4]])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
     @test isapprox(t.value, 29 / 2; atol = 1e-3)
     @test isapprox(c.dual, [1, 29 / 2, -2, -3, -4]; atol = 1e-3)
@@ -259,14 +259,14 @@ function test_Constraint_ExponentialConeConstraint()
     # 1 * exp(1 / 1) <= z
     c = Convex.Constraint{MOI.ExponentialCone}(vcat(1, constant(1), z))
     p = minimize(z, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(z.value, exp(1); atol = 1e-4)
     @test isapprox(c.dual, [-exp(1), 0, 1]; atol = 1e-4)
     z = Variable()
     # 2 * exp(3 / 2) <= z
     c = Convex.Constraint{MOI.ExponentialCone}(vcat(constant(3), 2, z))
     p = minimize(z, [c])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(z.value, 2 * exp(3 / 2); atol = 1e-4)
     @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
     c = Convex.Constraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
@@ -284,7 +284,7 @@ function test_Constraint_RelativeEntropyConeConstraint()
     w = Variable(2)
     c = Convex.Constraint{MOI.RelativeEntropyCone}(vcat(u, v, w))
     p = minimize(u, [c, w >= 2])
-    solve!(p, SCS.Optimizer; silent_solver = true)
+    solve!(p, SCS.Optimizer; silent = true)
     @test isapprox(u.value, 2 * log(2 / 1) + 2 * log(2 / 2); atol = 1e-4)
     @test isapprox(c.dual, [1, 2, 1, -log(2) - 1, -1]; atol = 1e-3)
     c = Convex.Constraint{MOI.RelativeEntropyCone}(vcat(square(u), 1, u))

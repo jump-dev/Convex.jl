@@ -101,7 +101,7 @@ constraints = [
     isposdef(ρ),
   ]
 p = satisfy(constraints)
-solve!(p, SCS.Optimizer; silent_solver = true)
+solve!(p, SCS.Optimizer; silent = true)
 p.status
 ```
 

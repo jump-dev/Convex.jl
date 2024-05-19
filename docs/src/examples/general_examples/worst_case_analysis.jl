@@ -18,7 +18,7 @@ w = Variable(n);
 ret = dot(r, w);
 risk = sum(quadform(w, Sigma_nom));
 problem = minimize(risk, [sum(w) == 1, ret >= 0.1, norm(w, 1) <= 2])
-solve!(problem, SCS.Optimizer; silent_solver = true)
+solve!(problem, SCS.Optimizer; silent = true)
 #-
 wval = vec(evaluate(w))
 
@@ -37,7 +37,7 @@ problem = maximize(
         Delta == Delta',
     ],
 );
-solve!(problem, SCS.Optimizer; silent_solver = true)
+solve!(problem, SCS.Optimizer; silent = true)
 #-
 println(
     "standard deviation = ",

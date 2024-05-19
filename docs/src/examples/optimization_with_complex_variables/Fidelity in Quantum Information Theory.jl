@@ -30,7 +30,7 @@ Z = ComplexVariable(n, n)
 objective = 0.5 * real(tr(Z + Z'))
 constraint = [P Z; Z' Q] ⪰ 0
 problem = maximize(objective, constraint)
-solve!(problem, SCS.Optimizer; silent_solver = true)
+solve!(problem, SCS.Optimizer; silent = true)
 #-
 computed_fidelity = evaluate(objective)
 

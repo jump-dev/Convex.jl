@@ -22,7 +22,7 @@ As a simple example, consider the problem:
 using Convex, SCS
 x = Variable();
 model_min = minimize(abs(x), [x >= 1, x <= 2]);
-solve!(model_min, SCS.Optimizer; silent_solver = true)
+solve!(model_min, SCS.Optimizer; silent = true)
 x.value
 ```
 
@@ -37,7 +37,7 @@ using Convex, SCS
 x = Variable();
 t = Variable();
 model_min_extended = minimize(t, [x >= 1, x <= 2, t >= x, t >= -x]);
-solve!(model_min_extended, SCS.Optimizer; silent_solver = true)
+solve!(model_min_extended, SCS.Optimizer; silent = true)
 x.value
 ```
 That is, we add the constraints `t >= x` and `t >= -x`, and replace `abs(x)` by
@@ -60,7 +60,7 @@ model_max = maximize(abs(x), [x >= 1, x <= 2])
 This time, `problem is DCP` reports `false`. If we attempt to solve the problem,
 an error is thrown:
 ```julia
-julia> solve!(model_max, SCS.Optimizer; silent_solver = true)
+julia> solve!(model_max, SCS.Optimizer; silent = true)
 ┌ Warning: Problem not DCP compliant: objective is not DCP
 └ @ Convex ~/.julia/dev/Convex/src/problems.jl:73
 ERROR: DCPViolationError: Expression not DCP compliant. This either means that your problem is not convex, or that we could not prove it was convex using the rules of disciplined convex programming. For a list of supported operations, see https://jump.dev/Convex.jl/stable/operations/. For help writing your problem as a disciplined convex program, please post a reproducible example on https://jump.dev/forum.
@@ -75,7 +75,7 @@ using Convex, SCS
 x = Variable();
 t = Variable();
 model_max_extended = maximize(t, [x >= 1, x <= 2, t >= x, t >= -x]);
-solve!(model_max_extended, SCS.Optimizer; silent_solver = true)
+solve!(model_max_extended, SCS.Optimizer; silent = true)
 ```
 whose solution is unbounded.
 

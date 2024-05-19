@@ -21,7 +21,7 @@ m = 4;  n = 5
 A = randn(m, n); b = randn(m)
 x = Variable(n)
 problem = minimize(sumsquares(A * x - b), [x >= 0])
-solve!(problem, SCS.Optimizer; silent_solver = true)
+solve!(problem, SCS.Optimizer; silent = true)
 problem.status
 problem.optval
 x.value
