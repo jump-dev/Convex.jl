@@ -79,7 +79,7 @@ problem = maximize(
     0.5 * nuclearnorm(ρ_AB - σ_AB) ≤ ϵ,
 )
 
-solve!(problem, SCS.Optimizer; silent_solver = false)
+solve!(problem, SCS.Optimizer; silent = false)
 
 # We can then check the observed difference in relative entropies:
 
