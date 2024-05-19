@@ -1027,7 +1027,6 @@ function test_deprecation_silent_solver()
     p = minimize(sum(x))
     str = "The keyword argument `silent_solver` in `Convex.solve!` has been deprecated in favor of `silent`."
     @test_logs (:warn, str) solve!(p, SCS.Optimizer; silent_solver = true)
-
     # Can't set both
     @test_throws ArgumentError solve!(
         p,
@@ -1035,7 +1034,6 @@ function test_deprecation_silent_solver()
         silent_solver = true,
         silent = false,
     )
-
     return
 end
 

@@ -59,7 +59,7 @@ end
     solve!(
         problem::Problem,
         optimizer_factory;
-        silent = false,
+        silent::Bool = false,
         warmstart::Bool = true,
     )
 
@@ -79,7 +79,7 @@ Optional keyword arguments:
 function solve!(
     p::Problem,
     optimizer_factory;
-    silent = nothing, # to become `false` once `silent_solver` deprecation removed
+    silent::Union{Nothing,Bool} = nothing, # to become `false` once `silent_solver` deprecation removed
     warmstart::Bool = false,
     silent_solver = nothing, # deprecated
 )
