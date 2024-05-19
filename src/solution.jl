@@ -90,8 +90,10 @@ function solve!(
             ),
         )
     elseif silent_solver !== nothing
-        @warn "The keyword argument `silent_solver` in `Convex.solve!` has been deprecated in favor of `silent`." maxlog =
-            1
+        @warn(
+            "The keyword argument `silent_solver` in `Convex.solve!` has been deprecated in favor of `silent`.",
+            maxlog = 1,
+        )
         silent = silent_solver
     elseif silent === nothing
         silent = false
