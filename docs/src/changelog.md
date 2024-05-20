@@ -106,6 +106,7 @@ or post on the JuMP community forum: https://jump.dev/forum.
  * Fixed performance issues in a number of issues related to scalar indexing
    (#618), (#619), (#620), (#621), (#625), (#634)
  * Fixed `show` for `Problem` (#649)
+ * `sumsquares` has a more efficient formulation (#678)
 
 ### Other
 
