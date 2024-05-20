@@ -27,4 +27,3 @@ function MOI_add_constraint(
     im_inds = MOI_add_constraint(model, to_vaf(imag(f)), set)
     return (re_inds, im_inds)
 end
-
