@@ -56,7 +56,6 @@ operate on complex variables as well. Notable exceptions include:
 
 > -   `inverse`
 > -   `square`
-> -   `quadoverlin`
 > -   `sqrt`
 > -   `geomean`
 > -   `huber`

@@ -1958,16 +1958,34 @@ function test_QuadOverLinAtom()
     _test_atom(target) do context
         return quadoverlin(Variable(2), Variable())
     end
+    target = """
+    variables: t, y, x1, x2, x3, x4
+    minobjective: 1.0 * t
+    [t, 0.5 * y, x1, x2, x3, x4] in RotatedSecondOrderCone(6)
+    """
+    _test_atom(target) do context
+        return quadoverlin(ComplexVariable(2), Variable())
+    end
     @test_throws(
         ErrorException(
             "[QuadOverLinAtom] quadoverlin arguments must be a vector and a scalar",
         ),
         quadoverlin(Variable(2), Variable(2))
     )
+    @test_throws(
+        ErrorException(
+            "[QuadOverLinAtom] the second argument to quadoverlin must be real, not complex.",
+        ),
+        quadoverlin(Variable(2), ComplexVariable())
+    )
     x = Variable(2)
     x.value = [2.0, 3.0]
     atom = quadoverlin(x, constant(2.0))
     @test evaluate(atom) ≈ 13 / 2
+    x = ComplexVariable(2)
+    x.value = [2.0 + im, 3.0]
+    atom = quadoverlin(x, constant(2.0))
+    @test evaluate(atom) ≈ 14 / 2
     return
 end
 
