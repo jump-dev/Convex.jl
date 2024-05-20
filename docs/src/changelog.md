@@ -7,10 +7,14 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.16.0 (unreleased)
+## v0.16.0 (May 21, 2024)
 
 This release contains a large number of changes, including some breaking
-changes.
+changes. However, despite the large number of changes, most user code should not need
+to change. 
+
+If you encounter an issue updating to this release, please open a GitHub issue,
+or post on the JuMP community forum: https://jump.dev/forum.
 
 ### Breaking
 
@@ -40,7 +44,7 @@ changes.
    but it can result in subtle differences, particularly for code like
    `x[i, :] * y[i, :]'`: this used to be equivalent to the inner product, but it
    is now the outer product. In Base Julia, this is the outer product, so the
-   previous code may be been silently broken (#624)
+   previous code may have be been silently broken (#624)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call
