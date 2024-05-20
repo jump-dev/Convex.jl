@@ -1959,6 +1959,14 @@ function test_QuadOverLinAtom()
         return quadoverlin(Variable(2), Variable())
     end
     target = """
+    variables: t, x1, x2
+    minobjective: 1.0 * t
+    [t, 0.5, x1, x2] in RotatedSecondOrderCone(4)
+    """
+    _test_atom(target) do context
+        return sumsquares(Variable(1, 2))
+    end
+    target = """
     variables: t, y, x1, x2, x3, x4
     minobjective: 1.0 * t
     [t, 0.5 * y, x1, x2, x3, x4] in RotatedSecondOrderCone(6)
