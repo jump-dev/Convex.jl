@@ -42,4 +42,6 @@ end
 
 quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)
 
-sumsquares(x::AbstractExpr) = QuadOverLinAtom(x, constant(1))
+function sumsquares(x::AbstractExpr)
+    return QuadOverLinAtom(reshape(x, length(x), 1), constant(1))
+end
