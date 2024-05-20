@@ -27,9 +27,3 @@ function MOI_add_constraint(
     im_inds = MOI_add_constraint(model, to_vaf(imag(f)), set)
     return (re_inds, im_inds)
 end
-
-function MOI_add_constraint(model, f::ComplexTape, set::MOI.NormOneCone)
-    re_inds = MOI_add_constraint(model, to_vaf(real(f)), set)
-    im_inds = MOI_add_constraint(model, to_vaf(imag(f)), set)
-    return (re_inds, im_inds)
-end
