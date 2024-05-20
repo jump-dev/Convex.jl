@@ -41,3 +41,5 @@ function new_conic_form!(context::Context{T}, q::QuadOverLinAtom) where {T}
 end
 
 quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)
+
+sumsquares(x::AbstractExpr) = QuadOverLinAtom(x, constant(1))
