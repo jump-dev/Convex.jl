@@ -20,6 +20,7 @@ subtyping
 syntaxes
 unary
 uncomment
+unintuitive
 vexit(y|ies)
 [Ww]armstart
 waypoint
