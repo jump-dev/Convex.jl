@@ -44,7 +44,7 @@ or post on the JuMP community forum: https://jump.dev/forum.
    but it can result in subtle differences, particularly for code like
    `x[i, :] * y[i, :]'`: this used to be equivalent to the inner product, but it
    is now the outer product. In Base Julia, this is the outer product, so the
-   previous code may have be been silently broken (#624)
+   previous code may have been silently broken (#624)
  * The syntaxes `dot(*)`, `dot(/)` and `dot(^)` have been removed in favor of
    explicit broadcasting (`x .* y`, `x ./ y`, and `x .^ y`). These were (mild)
    type piracy. In addition, `vecdot(x,y)` has been removed. Call
