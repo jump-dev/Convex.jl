@@ -57,8 +57,6 @@ function square(x::AbstractExpr)
     return QolElemAtom(x, constant(ones(x.size)))
 end
 
-sumsquares(x::AbstractExpr) = square(norm2(x))
-
 invpos(x::AbstractExpr) = QolElemAtom(constant(ones(x.size)), x)
 
 function Base.Broadcast.broadcasted(::typeof(/), x::Value, y::AbstractExpr)
