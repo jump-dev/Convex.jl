@@ -1,6 +1,6 @@
 # Performance tips
 
-There are 3 phases of building and solving a Convex.jl problem:
+There are three phases of building and solving a Convex.jl problem:
 
 1. Building the expression tree. This is everything that happens before `solve!` is called, for example, creating variables, problems, constraints, and other expressions.
 2. Formulating the problem in MathOptInterface. This happens automatically when `solve!` is called, and (as long as `solve!` is not called with `silent=true`) emits a log message when completed, containing the amount of time it took and the total amount of memory allocations.
