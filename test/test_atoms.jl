@@ -1983,7 +1983,7 @@ function test_QuadOverLinAtom()
     atom = quadoverlin(x, constant(2.0))
     @test evaluate(atom) ≈ 13 / 2
     x = ComplexVariable(2)
-    x.value = [2.0+im, 3.0]
+    x.value = [2.0 + im, 3.0]
     atom = quadoverlin(x, constant(2.0))
     @test evaluate(atom) ≈ 14 / 2
     return
