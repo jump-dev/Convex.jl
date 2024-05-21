@@ -152,6 +152,16 @@ end
         @test evaluate(y[:, 2]) ≈ 2 * ones(5) atol = atol rtol = rtol
         @test p.optval ≈ log(exp(1) * 5 + exp(2) * 5) atol = atol rtol = rtol
     end
+
+    x = Variable(2, 3)
+    v = Convex.ColwiseLogSumExpAtom(x)
+    p = minimize(sum(v), x >= [1 2 3; 4 5 6])
+    handle_problem!(p)
+    if test
+        @test evaluate(x) ≈ [1 2 3; 4 5 6] atol = atol rtol = rtol
+        @test evaluate(v) ≈ [log(sum(exp, col)) for col in eachcol(evaluate(x))] atol = atol rtol = rtol
+        @test vexity(v) == Convex.ConvexVexity()
+    end
 end
 
 @add_problem exp function exp_logistic_loss_atom(
