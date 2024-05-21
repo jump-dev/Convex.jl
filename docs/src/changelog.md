@@ -107,11 +107,12 @@ or post on the JuMP community forum: https://jump.dev/forum.
    (#618), (#619), (#620), (#621), (#625), (#634)
  * Fixed `show` for `Problem` (#649)
  * `sumsquares` has a more efficient formulation (#678)
+ * Fixed `vexity` of `lieb_ando` (#684)
 
 ### Other
 
  * Improved the documentation (#506), (#517), (#529), (#571), (#573), (#574),
-   (#576), (#579), (#587), (#594), (#628), (#652), (#656), (#666), (#674)
+   (#576), (#579), (#587), (#594), (#628), (#652), (#656), (#666), (#674), (#686)
  * Refactored the tests into a functional form (#532)
  * Updated `Project.toml` (#535)
  * Added `test/Project.toml` (#536)
