@@ -3,40 +3,50 @@
 # Use of this source code is governed by a BSD-style license that can be found
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
-mutable struct LogSumExpAtom <: AbstractExpr
+# Returns:
+# [logsumexp(v) for v in eachcol(x)]
+# where `logsumexp(v) = log(sum(exp, v))` except hopefully more numerically stable
+mutable struct ColwiseLogSumExpAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
 
-    function LogSumExpAtom(x::AbstractExpr)
+    function ColwiseLogSumExpAtom(x::AbstractExpr)
         if sign(x) == ComplexSign()
             error(
-                "[LogSumExpAtom] the argument should be real but it's instead complex",
+                "[ColwiseLogSumExpAtom] the argument should be real but it's instead complex",
             )
         end
-        return new((x,), (1, 1))
+        ncols = size(x, 2)
+        return new((x,), (1, ncols))
     end
 end
 
-head(io::IO, ::LogSumExpAtom) = print(io, "logsumexp")
+head(io::IO, ::ColwiseLogSumExpAtom) = print(io, "logsumexp")
 
-Base.sign(::LogSumExpAtom) = NoSign()
+Base.sign(::ColwiseLogSumExpAtom) = NoSign()
 
-monotonicity(::LogSumExpAtom) = (Nondecreasing(),)
+monotonicity(::ColwiseLogSumExpAtom) = (Nondecreasing(),)
 
-curvature(::LogSumExpAtom) = ConvexVexity()
+curvature(::ColwiseLogSumExpAtom) = ConvexVexity()
 
-function evaluate(x::LogSumExpAtom)
+function evaluate(x::ColwiseLogSumExpAtom)
     _x = evaluate(x.children[1])
-    max_x = maximum(_x)
-    return max_x + log(sum(exp.(_x .- max_x)))
+    return map(eachcol(_x)) do col
+        max_x = maximum(col)
+        return max_x + log(sum(exp.(col .- max_x)))
+    end
 end
 
-logsumexp(x::AbstractExpr) = LogSumExpAtom(x)
+# We call `vec` first, to treat this as one long vector to `logsumexp`
+# (otherwise, `ColwiseLogSumExpAtom` computes `logsumexp` over each column)
+logsumexp(x::AbstractExpr) = ColwiseLogSumExpAtom(vec(x))[1]
 
-function new_conic_form!(context::Context, e::LogSumExpAtom)
+function new_conic_form!(context::Context, e::ColwiseLogSumExpAtom)
+    x = e.children[1]
+    ncols = size(x, 2)
     # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
-    t = Variable()
-    z = sum(exp(e.children[1] - t * ones(size(e.children[1]))))
+    t = Variable(ncols)
+    z = sum(exp(x - transpose(t) .* ones(size(x))); dims = 1)
     add_constraint!(context, 1 >= z)
     return conic_form!(context, t)
 end
@@ -45,5 +55,7 @@ function logisticloss(e::AbstractExpr)
     if length(e) == 1
         return logsumexp([e; 0])
     end
-    return sum(logsumexp([e[i]; 0]) for i in 1:length(e))
+    n = length(e)
+    e = transpose(vec(e))
+    return sum(ColwiseLogSumExpAtom(vcat(e, zeros(1, n))))
 end

@@ -1093,7 +1093,7 @@ end
 
 ### exp_cone/LogSumExp
 
-function test_LogSumExpAtom()
+function test_ColwiseLogSumExpAtom()
     target = """
     variables: x1, x2, t, z1, z2
     minobjective: 1.0 * t
@@ -1115,21 +1115,20 @@ function test_LogSumExpAtom()
         return logisticloss(Variable())
     end
     target = """
-    variables: x1, x1_, t, z1, z2, t_, z1_, z2_
+    variables: x1, x1_, t, t_, z1, z2, z1_, z2_
     minobjective: 1.0 * t + 1.0 * t_
     [1.0 * x1 + -1.0 * t, 1.0, 1.0 * z1] in ExponentialCone()
     [-1.0 * t, 1.0, 1.0 * z2] in ExponentialCone()
     [1.0 * x1_ + -1.0 * t_, 1.0, 1.0 * z1_] in ExponentialCone()
     [-1.0 * t_, 1.0, 1.0 * z2_] in ExponentialCone()
-    [1.0 + -1.0*z1 + -1.0*z2] in Nonnegatives(1)
-    [1.0 + -1.0*z1_ + -1.0*z2_] in Nonnegatives(1)
+    [1.0 + -1.0*z1 + -1.0*z2, 1.0 + -1.0*z1_ + -1.0*z2_] in Nonnegatives(2)
     """
     _test_atom(target) do context
         return logisticloss(Variable(2))
     end
     @test_throws(
         ErrorException(
-            "[LogSumExpAtom] the argument should be real but it's instead complex",
+            "[ColwiseLogSumExpAtom] the argument should be real but it's instead complex",
         ),
         logsumexp(im * Variable()),
     )
