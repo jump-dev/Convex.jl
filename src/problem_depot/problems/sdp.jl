@@ -1935,17 +1935,27 @@ end
                 end
                 handle_problem!(p)
                 if test
+                    if 0 <= t <= 1
+                        @test vexity(objective) == ConcaveVexity()
+                    else
+                        @test vexity(objective) == ConvexVexity()
+                    end
                     @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
                 end
 
                 objective = lieb_ando(A, Y, eye(n), t)
-                if t >= 0 && t <= 1
+                if 0 <= t <= 1
                     p = maximize(objective, [Y == B]; numeric_type = T)
                 else
                     p = minimize(objective, [Y == B]; numeric_type = T)
                 end
                 handle_problem!(p)
                 if test
+                    if 0 <= t <= 1
+                        @test vexity(objective) == ConcaveVexity()
+                    else
+                        @test vexity(objective) == ConvexVexity()
+                    end
                     @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
                 end
 
