@@ -129,6 +129,23 @@ end
     if test
         @test p.optval ≈ log(exp(1) * 5) atol = atol rtol = rtol
     end
+
+    y = Variable(5, 2)
+    p = minimize(sum(Convex.ColwiseLogSumExpAtom(y)), y[:, 1] >= 1, y[:, 2] >= 2; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test evaluate(y[:, 1]) ≈ ones(5) atol = atol rtol = rtol
+        @test evaluate(y[:, 2]) ≈ 2*ones(5) atol = atol rtol = rtol
+        @test p.optval ≈ log(exp(1) * 5) + log(exp(2) * 5) atol = atol rtol = rtol
+    end
+
+    p = minimize(logsumexp(y), y[:, 1] >= 1, y[:, 2] >= 2; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test evaluate(y[:, 1]) ≈ ones(5) atol = atol rtol = rtol
+        @test evaluate(y[:, 2]) ≈ 2*ones(5) atol = atol rtol = rtol
+        @test p.optval ≈ log(exp(1) * 5 + exp(2)*5) atol = atol rtol = rtol
+    end
 end
 
 @add_problem exp function exp_logistic_loss_atom(
