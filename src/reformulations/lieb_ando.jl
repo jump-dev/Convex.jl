@@ -88,24 +88,18 @@ function lieb_ando(
 
     if t >= 0 && t <= 1
         # Concave function
-        add_constraint!(
-            T,
-            Constraint(
-                (T, kron(A, Im), kron(In, conj(B))),
-                GeometricMeanHypoConeSquare(t, n * m, false),
-            ),
+        constraint = Constraint(
+            (T, kron(A, Im), kron(In, conj(B))),
+            GeometricMeanHypoConeSquare(t, n * m, false),
         )
-        return real(LinearAlgebra.tr(KvKv * T))
+        return maximize(real(LinearAlgebra.tr(KvKv * T)), constraint)
     elseif (t >= -1 && t <= 0) || (t >= 1 && t <= 2)
         # Convex function
-        add_constraint!(
-            T,
-            Convex.Constraint(
-                (T, kron(A, Im), kron(In, conj(B))),
-                GeometricMeanEpiConeSquare(t, size(T, 1)),
-            ),
+        constraint = Convex.Constraint(
+            (T, kron(A, Im), kron(In, conj(B))),
+            GeometricMeanEpiConeSquare(t, size(T, 1)),
         )
-        return real(LinearAlgebra.tr(KvKv * T))
+        return minimize(real(LinearAlgebra.tr(KvKv * T)), constraint)
     else
         throw(DomainError(t, "t must be between -1 and 2"))
     end

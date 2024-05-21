@@ -1935,6 +1935,11 @@ end
                 end
                 handle_problem!(p)
                 if test
+                    if t >= 0 && t <= 1
+                        @test vexity(objective) in ConvexVexity()
+                    else
+                        @test vexity(objective) == ConcaveVexity()
+                    end
                     @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
                 end
 
@@ -1946,6 +1951,11 @@ end
                 end
                 handle_problem!(p)
                 if test
+                    if t >= 0 && t <= 1
+                        @test vexity(objective) in ConvexVexity()
+                    else
+                        @test vexity(objective) == ConcaveVexity()
+                    end
                     @test p.optval ≈ QtAB atol = atol * 5 rtol = rtol
                 end
 
