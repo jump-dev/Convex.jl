@@ -155,7 +155,7 @@ end
 
     x = Variable(2, 3)
     v = Convex.ColwiseLogSumExpAtom(x)
-    p = minimize(sum(v), x >= [1 2 3; 4 5 6])
+    p = minimize(sum(v), x >= [1 2 3; 4 5 6]; numeric_type = T)
     handle_problem!(p)
     if test
         @test evaluate(x) ≈ [1 2 3; 4 5 6] atol = atol rtol = rtol
