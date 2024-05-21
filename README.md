@@ -5,7 +5,7 @@
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://jump.dev/Convex.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://jump.dev/Convex.jl/dev)
 
-**Convex.jl** is a [Julia](http://julialang.org) package for
+Convex.jl is a [Julia](http://julialang.org) package for
 [Disciplined Convex Programming](http://dcp.stanford.edu/) (DCP).
 
 Convex.jl can solve linear programs, mixed-integer linear programs, and
@@ -19,9 +19,15 @@ DCP-compliant convex programs using a variety of solvers, including
 
 Convex.jl also supports optimization with complex variables and coefficients.
 
+## Getting help
+
 For usage questions, please contact us via [Discourse](https://discourse.julialang.org/c/domain/opt).
 
+If you have a reproducible example of a bug, please open a [GitHub issue](https://github.com/jump-dev/Convex.jl/issues/new).
+
 ## Installation
+
+Install Convex using the Julia package manager:
 
 ```julia
 import Pkg
@@ -57,19 +63,17 @@ problem.optval
 
 ## Using with JuMP
 
-The `master` branch of this package (not yet released) contains an experimental
-JuMP solver. This solver reformulates a nonlinear JuMP model into a conic
-program using DCP. Note that it currently supports only a limited subset of
-scalar nonlinear programs, such as those involving `log` and `exp`.
+Convex.jl contains an experimental JuMP solver. This solver reformulates a
+nonlinear JuMP model into a conic program using DCP. Note that it currently
+supports only a limited subset of scalar nonlinear programs, such as those
+involving `log` and `exp`.
 
 ```julia
-julia> model = Model(() -> Convex.Optimizer(Clarabel.Optimizer))
-A JuMP Model
-Feasibility problem with:
-Variables: 0
-Model mode: AUTOMATIC
-CachingOptimizer state: EMPTY_OPTIMIZER
-Solver name: Convex with Clarabel
+julia> using JuMP, Convex, Clarabel
+
+julia> model = Model(() -> Convex.Optimizer(Clarabel.Optimizer));
+
+julia> set_silent(model)
 
 julia> @variable(model, x >= 1);
 
@@ -81,45 +85,6 @@ t - exp(x) ≥ 0
 julia> @objective(model, Min, t);
 
 julia> optimize!(model)
--------------------------------------------------------------
-           Clarabel.jl v0.5.1  -  Clever Acronym
-                   (c) Paul Goulart
-                University of Oxford, 2022
--------------------------------------------------------------
-
-problem:
-  variables     = 3
-  constraints   = 5
-  nnz(P)        = 0
-  nnz(A)        = 5
-  cones (total) = 2
-    : Nonnegative = 1,  numel = 2
-    : Exponential = 1,  numel = 3
-
-settings:
-  linear algebra: direct / qdldl, precision: Float64
-  max iter = 200, time limit = Inf,  max step = 0.990
-  tol_feas = 1.0e-08, tol_gap_abs = 1.0e-08, tol_gap_rel = 1.0e-08,
-  static reg : on, ϵ1 = 1.0e-08, ϵ2 = 4.9e-32
-  dynamic reg: on, ϵ = 1.0e-13, δ = 2.0e-07
-  iter refine: on, reltol = 1.0e-13, abstol = 1.0e-12,
-               max iter = 10, stop ratio = 5.0
-  equilibrate: on, min_scale = 1.0e-04, max_scale = 1.0e+04
-               max iter = 10
-
-iter    pcost        dcost       gap       pres      dres      k/t        μ       step
----------------------------------------------------------------------------------------------
-  0   0.0000e+00   4.4359e-01  4.44e-01  8.68e-01  8.16e-02  1.00e+00  1.00e+00   ------
-  1   2.2037e+00   2.6563e+00  2.05e-01  7.34e-02  6.03e-03  5.44e-01  1.01e-01  9.33e-01
-  2   2.5276e+00   2.6331e+00  4.17e-02  1.43e-02  1.26e-03  1.27e-01  2.26e-02  7.84e-01
-  3   2.6758e+00   2.7129e+00  1.39e-02  4.09e-03  3.42e-04  4.35e-02  6.00e-03  7.84e-01
-  4   2.7167e+00   2.7178e+00  3.90e-04  1.18e-04  9.82e-06  1.25e-03  1.72e-04  9.80e-01
-  5   2.7182e+00   2.7183e+00  9.60e-06  3.39e-06  2.82e-07  3.15e-05  4.95e-06  9.80e-01
-  6   2.7183e+00   2.7183e+00  1.92e-07  6.74e-08  5.62e-09  6.29e-07  9.84e-08  9.80e-01
-  7   2.7183e+00   2.7183e+00  4.70e-09  1.94e-09  1.61e-10  1.59e-08  2.83e-09  9.80e-01
----------------------------------------------------------------------------------------------
-Terminated with status = solved
-solve time =  941μs
 
 julia> value(x), value(t)
 (0.9999999919393833, 2.7182818073461403)
