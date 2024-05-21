@@ -46,10 +46,10 @@ Convex.jl. Let's say you're adding the new function $f$.
      since then any changes to the variable's value (or it being `free!`'d) will not be recognized.
      See [#653](https://github.com/jump-dev/Convex.jl/issues/653) and [#585](https://github.com/jump-dev/Convex.jl/issues/585)
      for previous bugs caused by misuse here.
- -  Do not add constraints to variables directly during a reformulation.
-    Instead, create an atom to control the vexity, or return a partially
-    specified problem: `minimize(var, constraints...)`, to ensure the `vexity`
-    of the result is correct.
+ -   Do not add constraints to variables directly during a reformulation.
+     Instead, create an atom to control the vexity, or return a partially
+     specified problem: `minimize(var, constraints...)`, to ensure the `vexity`
+     of the result is correct.
  -   The most mathematically interesting part is the `new_conic_form!`
      function. Following the example in the nuclear norm atom, you'll
      see that you can just construct the problem whose optimal value is
