@@ -49,7 +49,7 @@ x = Variable(n)
 
 # The problem is to minimize ||Ax - b||^2 subject to x >= 0
 # This can be done by: minimize(objective, constraints)
-problem = minimize(sumsquares(A * x - b), x >= 0)
+problem = minimize(sumsquares(A * x - b), [x >= 0, x <= 1])
 
 # Solve the problem by calling solve!
 solve!(problem, SCS.Optimizer)
@@ -59,9 +59,6 @@ problem.status
 
 # Get the optimal value
 problem.optval
-
-# Note collections of constraints can also be passed as a vector:
-problem = minimize(sumsquares(A * x - b), [x >= 0, x <= 1])
 ```
 
 ## Using with JuMP
