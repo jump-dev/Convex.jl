@@ -59,6 +59,9 @@ problem.status
 
 # Get the optimal value
 problem.optval
+
+# Note collections of constraints can also be passed as a vector:
+problem = minimize(sumsquares(A * x - b), [x >= 0, x <= 1])
 ```
 
 ## Using with JuMP
