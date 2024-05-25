@@ -47,7 +47,7 @@ A = randn(m, n); b = randn(m, 1)
 # Create a (column vector) variable of size n x 1.
 x = Variable(n)
 
-# The problem is to minimize ||Ax - b||^2 subject to x >= 0
+# The problem is to minimize ||Ax - b||^2 subject to 0 <= x <= 1
 # This can be done by: minimize(objective, constraints)
 problem = minimize(sumsquares(A * x - b), [x >= 0, x <= 1])
 
