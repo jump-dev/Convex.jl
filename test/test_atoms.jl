@@ -1141,7 +1141,7 @@ function test_LogSumExpAtom()
     @test evaluate(logsumexp(x; dims = :)) ≈ 6.456193316018123
     @test ≈(
         evaluate(logsumexp(x; dims = 1)),
-        [4.04859  5.04859  6.04859],
+        [4.04859 5.04859 6.04859],
         atol = 1e-5,
     )
     @test ≈(
