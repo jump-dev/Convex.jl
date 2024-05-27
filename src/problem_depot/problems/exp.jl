@@ -128,7 +128,6 @@ end
     if test
         @test p.optval ≈ log(exp(1) * 5) atol = atol rtol = rtol
     end
-    
     y = Variable(5, 2)
     p = minimize(
         sum(Convex.logsumexp(y; dims = 1)),
