@@ -121,7 +121,6 @@ end
 ) where {T,test}
     y = Variable(5)
     p = minimize(logsumexp(y), y >= 1; numeric_type = T)
-
     if test
         @test problem_vexity(p) == ConvexVexity()
     end
@@ -129,6 +128,48 @@ end
     if test
         @test p.optval ≈ log(exp(1) * 5) atol = atol rtol = rtol
     end
+    
+    y = Variable(5, 2)
+    p = minimize(
+        sum(Convex.logsumexp(y; dims = 1)),
+        y[:, 1] >= 1,
+        y[:, 2] >= 2;
+        numeric_type = T,
+    )
+    handle_problem!(p)
+    if test
+        @test evaluate(y[:, 1]) ≈ ones(5) atol = atol rtol = rtol
+        @test evaluate(y[:, 2]) ≈ 2 * ones(5) atol = atol rtol = rtol
+        @test ≈(
+            p.optval,
+            log(exp(1) * 5) + log(exp(2) * 5);
+            atol = atol,
+            rtol = rtol,
+        )
+    end
+    p = minimize(logsumexp(y), y[:, 1] >= 1, y[:, 2] >= 2; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test evaluate(y[:, 1]) ≈ ones(5) atol = atol rtol = rtol
+        @test evaluate(y[:, 2]) ≈ 2 * ones(5) atol = atol rtol = rtol
+        @test p.optval ≈ log(exp(1) * 5 + exp(2) * 5) atol = atol rtol = rtol
+    end
+
+    x = Variable(2, 3)
+    v = Convex.logsumexp(x; dims = 1)
+    p = minimize(sum(v), x >= [1 2 3; 4 5 6]; numeric_type = T)
+    handle_problem!(p)
+    if test
+        @test evaluate(x) ≈ [1 2 3; 4 5 6] atol = atol rtol = rtol
+        @test ≈(
+            evaluate(v),
+            log.(sum(exp, evaluate(x); dims = 1));
+            atol = atol,
+            rtol = rtol,
+        )
+        @test vexity(v) == Convex.ConvexVexity()
+    end
+    return
 end
 
 @add_problem exp function exp_logistic_loss_atom(
