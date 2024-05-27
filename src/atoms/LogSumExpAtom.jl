@@ -4,7 +4,7 @@
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
 """
-    LogSumExpAtom(x::AbstractExpr, dims::Int = 0)
+    LogSumExpAtom(x::AbstractExpr, dims::Union{Colon,Int} = :)
 
 Represents the expression `log.(sum(exp.(x); dims))`.
 """
