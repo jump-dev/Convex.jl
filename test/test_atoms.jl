@@ -1115,14 +1115,13 @@ function test_LogSumExpAtom()
         return logisticloss(Variable())
     end
     target = """
-    variables: x1, x1_, t, z1, z2, t_, z1_, z2_
+    variables: x1, x1_, t, t_, z1, z1_, z2, z2_
     minobjective: 1.0 * t + 1.0 * t_
+    [1.0 + -1.0*z1 + -1.0*z2, 1.0 + -1.0*z1_ + -1.0*z2_] in Nonnegatives(2)
     [1.0 * x1 + -1.0 * t, 1.0, 1.0 * z1] in ExponentialCone()
-    [-1.0 * t, 1.0, 1.0 * z2] in ExponentialCone()
     [1.0 * x1_ + -1.0 * t_, 1.0, 1.0 * z1_] in ExponentialCone()
+    [-1.0 * t, 1.0, 1.0 * z2] in ExponentialCone()
     [-1.0 * t_, 1.0, 1.0 * z2_] in ExponentialCone()
-    [1.0 + -1.0*z1 + -1.0*z2] in Nonnegatives(1)
-    [1.0 + -1.0*z1_ + -1.0*z2_] in Nonnegatives(1)
     """
     _test_atom(target) do context
         return logisticloss(Variable(2))
@@ -1137,6 +1136,49 @@ function test_LogSumExpAtom()
     atom = logsumexp(x)
     x.value = [1.0 1_000.0]
     @test evaluate(atom) ≈ 1_000.0
+    x = Variable(2, 3)
+    x.value = [1 2 3; 4 5 6]
+    @test evaluate(logsumexp(x; dims = :)) ≈ 6.456193316018123
+    @test ≈(
+        evaluate(logsumexp(x; dims = 1)),
+        [4.04859 5.04859 6.04859],
+        atol = 1e-5,
+    )
+    @test ≈(
+        evaluate(logsumexp(x; dims = 2)),
+        [3.40760596444438, 6.407605964444381],
+        atol = 1e-5,
+    )
+    target = """
+    variables: x11, x12, x21, x22, t1, t2, y11, y12, y21, y22
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [-1.0 + x11, -2 + x12, -3 + x21, -4 + x22] in Nonnegatives(4)
+    [1.0 + -1.0 * y11 + -1.0 * y21, 1.0 + -1.0 * y12 + -1.0 * y22] in Nonnegatives(2)
+    [1.0 * x11 + -1.0 * t1, 1.0, y11] in ExponentialCone()
+    [1.0 * x12 + -1.0 * t2, 1.0, y12] in ExponentialCone()
+    [1.0 * x21 + -1.0 * t1, 1.0, y21] in ExponentialCone()
+    [1.0 * x22 + -1.0 * t2, 1.0, y22] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x >= [1 3; 2 4])
+        return logsumexp(x; dims = 2)
+    end
+    target = """
+    variables: x11, x12, x21, x22, t1, t2, y11, y12, y21, y22
+    minobjective: [1.0 * t1, 1.0 * t2]
+    [-1.0 + x11, -2 + x12, -3 + x21, -4 + x22] in Nonnegatives(4)
+    [1.0 + -1.0 * y11 + -1.0 * y12, 1.0 + -1.0 * y21 + -1.0 * y22] in Nonnegatives(2)
+    [1.0 * x11 + -1.0 * t1, 1.0, y11] in ExponentialCone()
+    [1.0 * x12 + -1.0 * t1, 1.0, y12] in ExponentialCone()
+    [1.0 * x21 + -1.0 * t2, 1.0, y21] in ExponentialCone()
+    [1.0 * x22 + -1.0 * t2, 1.0, y22] in ExponentialCone()
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        add_constraint!(context, x >= [1 3; 2 4])
+        return logsumexp(x; dims = 1)
+    end
     return
 end
 
