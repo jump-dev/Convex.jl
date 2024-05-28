@@ -21,7 +21,7 @@ There are a few ways to get started with Convex:
 
  * Read the [Installation](@ref) guide
  * Read the introductory tutorial [Quick Tutorial](@ref)
- * Read the list of [Supported Operations](@ref)
+ * Read the list of [Supported operations](@ref)
  * Browse some of our examples
 
 !!! tip

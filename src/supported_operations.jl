@@ -774,7 +774,7 @@ julia> b = Variable(1, 2);
 
 julia> c = Variable(1, 3);
 
-julia> atom = [a b; c]  # Sytactic sugar for: hvcat((2, 1), a, b, c)
+julia> atom = [a b; c]  # Syntactic sugar for: hvcat((2, 1), a, b, c)
 vcat (affine; real)
 ├─ hcat (affine; real)
 │  ├─ real variable (id: 429…021)
