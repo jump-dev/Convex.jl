@@ -1,8 +1,9 @@
-# Atoms
+# Supported operations
 
 Convex.jl supports the following functions. These functions may be composed
 according to the [DCP](http://dcp.stanford.edu) composition rules to form new
 convex, concave, or affine expressions.
+
 ## `*`
 ```@docs
 Base.:*(::Convex.AbstractExpr, ::Convex.AbstractExpr)

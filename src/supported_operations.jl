@@ -774,7 +774,7 @@ julia> b = Variable(1, 2);
 
 julia> c = Variable(1, 3);
 
-julia> atom = hvcat((2, 1), a, b, c)
+julia> atom = [a b; c]  # Sytactic sugar for: hvcat((2, 1), a, b, c)
 vcat (affine; real)
 ├─ hcat (affine; real)
 │  ├─ real variable (id: 429…021)
@@ -1145,14 +1145,28 @@ The epigraph of \$\\log\\left(\\sum_i e^{x_i}\\right)\$.
 Applies to a single expression:
 
 ```jldoctest; filter=r"id: [0-9]+…[0-9]+"
-julia> x = Variable(3);
+julia> x = Variable(2, 3);
 
 julia> atom = logsumexp(x)
 logsumexp (convex; real)
-└─ 3-element real variable (id: 102…634)
+└─ 2×3 real variable (id: 121…604)
 
 julia> size(atom)
 (1, 1)
+
+julia> atom = logsumexp(x; dims = 1)
+logsumexp (convex; real)
+└─ 2×3 real variable (id: 121…604)
+
+julia> size(atom)
+(1, 3)
+
+julia> atom = logsumexp(x; dims = 2)
+logsumexp (convex; real)
+└─ 2×3 real variable (id: 121…604)
+
+julia> size(atom)
+(2, 1)
 ```
 """
 logsumexp(x::AbstractExpr; dims = Colon()) = LogSumExpAtom(x, dims)
