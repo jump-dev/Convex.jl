@@ -13,6 +13,7 @@ import OrderedCollections
 import SparseArrays
 
 export conv,
+    conv2D,
     dotsort,
     entropy,
     entropy_elementwise,
