@@ -1,4 +1,8 @@
-# Reference
+# API
+
+!!! info
+    See [Supported operations](@ref) for a list of the operations supported by
+    Convex.
 
 ```@docs
 Convex.AbstractVariable
