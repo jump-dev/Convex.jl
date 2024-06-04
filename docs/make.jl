@@ -112,7 +112,6 @@ Documenter.makedocs(
         "Manual" => [
             "manual/types.md",
             "manual/operations.md",
-            "manual/atoms.md",
             "Complex-domain Optimization" => "manual/complex-domain_optimization.md",
             "manual/solvers.md",
             "manual/performance_tips.md",
