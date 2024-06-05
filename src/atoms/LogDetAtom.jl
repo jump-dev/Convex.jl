@@ -29,5 +29,3 @@ function new_conic_form!(context::Context{T}, x::LogDetAtom) where {T}
     MOI_add_constraint(context.model, f, MOI.LogDetConeSquare(size(A, 1)))
     return t
 end
-
-LinearAlgebra.logdet(x::AbstractExpr) = LogDetAtom(x)

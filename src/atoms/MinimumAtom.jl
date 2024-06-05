@@ -32,5 +32,3 @@ function new_conic_form!(context::Context, x::MinimumAtom)
     add_constraint!(context, x.children[1] >= t)
     return conic_form!(context, t)
 end
-
-Base.minimum(x::AbstractExpr) = MinimumAtom(x)

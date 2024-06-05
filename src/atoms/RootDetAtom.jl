@@ -25,5 +25,3 @@ function new_conic_form!(context::Context{T}, x::RootDetAtom) where {T}
     MOI_add_constraint(context.model, f, MOI.RootDetConeSquare(size(A, 1)))
     return t
 end
-
-rootdet(x::AbstractExpr) = RootDetAtom(x)

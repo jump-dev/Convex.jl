@@ -16,6 +16,29 @@ _expr_vec(x) = convert(AbstractExpr, _vec(x))
 
 _dot(x, y) = sum(broadcast(*, conj(_expr_vec(x)), _expr_vec(y)))
 
+"""
+    LinearAlgebra.dot(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
+
+The dot product \$x \\cdot y\$. If `x` is complex, it is conjugated.
+
+## Examples
+
+```jldoctest; filter=r"id: [0-9]+…[0-9]+"
+julia> x = ComplexVariable(2);
+
+julia> y = [1, 2];
+
+julia> atom = dot(x, y)
+sum (affine; complex)
+└─ .* (affine; complex)
+   ├─ conj (affine; complex)
+   │  └─ 2-element complex variable (id: 133…443)
+   └─ [1; 2;;]
+
+julia> size(atom)
+(1, 1)
+```
+"""
 LinearAlgebra.dot(x::AbstractExpr, y::AbstractExpr) = _dot(x, y)
 
 LinearAlgebra.dot(x::Value, y::AbstractExpr) = _dot(x, y)

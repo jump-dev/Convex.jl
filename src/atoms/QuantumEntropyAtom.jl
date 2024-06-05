@@ -4,34 +4,6 @@
 # Use of this source code is governed by an MIT-style license that can be found
 # in the LICENSE.md file or at https://opensource.org/licenses/MIT.
 
-"""
-    QuantumEntropyAtom(X::AbstractExpr, m::Integer, k::Integer)
-
-quantum_entropy returns -LinearAlgebra.tr(X*log(X)) where X is a positive
-semidefinite.
-
-Note this function uses logarithm base e, not base 2, so return value is in
-units of nats, not bits.
-
-Quantum entropy is concave. This function implements the semidefinite
-programming approximation given in the reference below.  Parameters m and k
-control the accuracy of this approximation: m is the number of quadrature nodes
-to use and k the number of square-roots to take. See reference for more details.
-
-Implementation uses the expression
-
-    H(X) = -trace( D_{op}(X||I) )
-
-where D_{op} is the operator relative entropy:
-
-    D_{op}(X||Y) = X^{1/2}*logm(X^{1/2} Y^{-1} X^{1/2})*X^{1/2}
-
-## Reference
-
-Ported from CVXQUAD which is based on the paper: "Lieb's concavity theorem,
-matrix geometric means and semidefinite optimization" by Hamza Fawzi and James
-Saunderson (arXiv:1512.03401)
-"""
 mutable struct QuantumEntropyAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -56,18 +28,6 @@ monotonicity(::QuantumEntropyAtom) = (NoMonotonicity(),)
 curvature(::QuantumEntropyAtom) = ConcaveVexity()
 
 evaluate(atom::QuantumEntropyAtom) = quantum_entropy(evaluate(atom.children[1]))
-
-function quantum_entropy(X::AbstractExpr, m::Integer = 3, k::Integer = 3)
-    return QuantumEntropyAtom(X, m, k)
-end
-
-function quantum_entropy(
-    X::Union{AbstractMatrix,Constant},
-    m::Integer = 0,
-    k::Integer = 0,
-)
-    return -quantum_relative_entropy(X, Matrix(1.0 * LinearAlgebra.I, size(X)))
-end
 
 function new_conic_form!(
     context::Context{T},

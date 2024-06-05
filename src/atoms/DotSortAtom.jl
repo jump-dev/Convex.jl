@@ -3,8 +3,6 @@
 # Use of this source code is governed by a BSD-style license that can be found
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
-# This atom computes dot(sort(x), sort(w)), where w is constant. For example, if
-# w = [1 1 1 0 0 0 ... 0], it computes the sum of the 3 largest elements of x
 mutable struct DotSortAtom <: AbstractExpr
     children::Tuple{AbstractExpr}
     size::Tuple{Int,Int}
@@ -58,6 +56,3 @@ function new_conic_form!(context::Context{T}, x::DotSortAtom) where {T}
     add_constraint!(context, e * ν' + μ * e' >= y * x.w')
     return conic_form!(context, sum(μ) + sum(ν))
 end
-
-dotsort(a::AbstractExpr, b::Value) = DotSortAtom(a, b)
-dotsort(b::Value, a::AbstractExpr) = DotSortAtom(a, b)

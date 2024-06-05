@@ -38,7 +38,3 @@ end
 function new_conic_form!(context::Context, A::ReshapeAtom)
     return conic_form!(context, only(AbstractTrees.children(A)))
 end
-
-Base.reshape(x::AbstractExpr, m::Int, n::Int) = ReshapeAtom(x, m, n)
-
-Base.vec(x::AbstractExpr) = reshape(x, length(x), 1)

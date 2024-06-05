@@ -56,13 +56,3 @@ function new_conic_form!(context::Context, x::MaxAtom)
     end
     return t_obj
 end
-
-Base.max(x::AbstractExpr, y::AbstractExpr) = MaxAtom(x, y)
-
-Base.max(x::AbstractExpr, y::Value) = max(x, constant(y))
-
-Base.max(x::Value, y::AbstractExpr) = max(constant(x), y)
-
-pos(x::AbstractExpr) = max(x, Constant(0, Positive()))
-
-hinge_loss(x::AbstractExpr) = pos(1 - x)

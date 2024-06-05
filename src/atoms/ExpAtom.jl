@@ -27,8 +27,6 @@ curvature(::ExpAtom) = ConvexVexity()
 
 evaluate(x::ExpAtom) = exp.(evaluate(x.children[1]))
 
-Base.exp(x::AbstractExpr) = ExpAtom(x)
-
 function new_conic_form!(context::Context{T}, e::ExpAtom) where {T}
     # exp(x) <= t  <=>  (x, 1, t) in ExponentialCone()
     x = e.children[1]

@@ -32,5 +32,3 @@ function new_conic_form!(context::Context, x::MaximumAtom)
     add_constraint!(context, t >= x.children[1])
     return conic_form!(context, t)
 end
-
-Base.maximum(x::AbstractExpr) = MaximumAtom(x)

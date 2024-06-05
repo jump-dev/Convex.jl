@@ -44,7 +44,3 @@ function new_conic_form!(context::Context{T}, A::AbsAtom) where {T}
     end
     return t_obj
 end
-
-Base.abs(x::AbstractExpr) = AbsAtom(x)
-
-Base.abs2(x::AbstractExpr) = square(abs(x))

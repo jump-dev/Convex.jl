@@ -110,16 +110,3 @@ function new_conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
         )
     end
 end
-
-function Base.:*(x::AbstractExpr, y::AbstractExpr)
-    if isequal(x, y) && x.size == (1, 1)
-        return square(x)
-    end
-    return MultiplyAtom(x, y)
-end
-
-Base.:*(x::Value, y::AbstractExpr) = MultiplyAtom(constant(x), y)
-
-Base.:*(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(y))
-
-Base.:/(x::AbstractExpr, y::Value) = MultiplyAtom(x, constant(1 ./ y))

@@ -10,11 +10,35 @@ Computes the `p`-norm `‖x‖ₚ = (∑ᵢ |xᵢ|^p)^(1/p)` of a vector express
 
 Matrices are vectorized (i.e., `norm(x)` is the same as `norm(vec(x))`.)
 
-This function uses specialized methods for `p=1, 2, Inf`. For `p > 1` otherwise,
-this function uses the procedure documented at
-[`rational_to_socp.pdf`](https://github.com/jump-dev/Convex.jl/raw/master/docs/supplementary/rational_to_socp.pdf),
-based on the paper "Second-order cone programming" by F. Alizadeh and D. Goldfarb,
-Mathematical Programming, Series B, 95:3-51, 2001.
+The return value depends on the value of `p`. Specialized cases are used for
+`p = 1`, `p = 2`, and `p = Inf`.
+
+## Examples
+
+```jldoctest; filter=r"id: [0-9]+…[0-9]+"
+julia> x = Variable(2);
+
+julia> atom = norm(x, 1)
+sum (convex; positive)
+└─ abs (convex; positive)
+   └─ 2-element real variable (id: 779…899)
+
+julia> size(atom)
+(1, 1)
+
+julia> norm(x, 2)
+norm2 (convex; positive)
+└─ 2-element real variable (id: 779…899)
+
+julia> norm(x, Inf)
+maximum (convex; positive)
+└─ abs (convex; positive)
+   └─ 2-element real variable (id: 779…899)
+
+julia> norm(x, 3 // 2)
+rationalnorm (convex; positive)
+└─ 2-element real variable (id: 779…899)
+```
 """
 function LinearAlgebra.norm(x::AbstractExpr, p::Real = 2)
     if size(x, 2) > 1

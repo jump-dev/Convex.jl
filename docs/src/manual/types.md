@@ -52,7 +52,7 @@ in a Convex.jl expression.
 Expressions in Convex.jl are formed by applying any *atom* (mathematical
 function defined in Convex.jl) to variables, constants, and other
 expressions. For a list of these functions, see
-[Supported Operations](@ref). Atoms are applied to expressions using
+[Supported operations](@ref). Atoms are applied to expressions using
 operator overloading. For example, `2+2` calls Julia's built-in
 addition operator, while `2+x` calls the Convex.jl addition method and
 returns a Convex.jl expression. Many of the useful language features in

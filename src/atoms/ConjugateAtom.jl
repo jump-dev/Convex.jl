@@ -24,14 +24,3 @@ function new_conic_form!(context::Context{T}, x::ConjugateAtom) where {T}
     objective = conic_form!(context, only(AbstractTrees.children(x)))
     return operate(conj, T, sign(x), objective)
 end
-
-function Base.conj(x::AbstractExpr)
-    if sign(x) == ComplexSign()
-        return ConjugateAtom(x)
-    end
-    return x
-end
-
-Base.conj(x::Constant) = x
-
-Base.conj(x::ComplexConstant) = ComplexConstant(real(x), -imag(x))

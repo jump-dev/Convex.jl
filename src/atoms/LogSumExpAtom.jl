@@ -40,8 +40,6 @@ function evaluate(x::LogSumExpAtom)
     return max_x .+ log.(sum(exp.(_x .- max_x); x.dims))
 end
 
-logsumexp(x::AbstractExpr; dims = Colon()) = LogSumExpAtom(x, dims)
-
 function new_conic_form!(context::Context, e::LogSumExpAtom)
     # log(sum(exp(x))) <= t  <=>  sum(exp(x)) <= exp(t) <=> sum(exp(x - t)) <= 1
     x = only(e.children)
@@ -55,11 +53,4 @@ function new_conic_form!(context::Context, e::LogSumExpAtom)
     end
     add_constraint!(context, 1 >= sum(exp(x - y); dims = e.dims))
     return conic_form!(context, t)
-end
-
-function logisticloss(e::AbstractExpr)
-    if length(e) == 1
-        return logsumexp([e; 0])
-    end
-    return sum(logsumexp(hcat(vec(e), zeros(length(e))); dims = 2))
 end

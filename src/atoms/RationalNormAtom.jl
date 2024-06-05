@@ -48,14 +48,3 @@ function new_conic_form!(context::Context{T}, x::RationalNormAtom) where {T}
     MOI_add_constraint(context.model, f, MOI.NormCone(Float64(x.k), d))
     return t_obj
 end
-
-function rationalnorm(x::AbstractExpr, k::Rational{Int})
-    if sign(x) == ComplexSign()
-        row, col = size(x)
-        if !(row == 1 || col == 1)
-            error("[RationalNormAtom] not defined for complex matrices")
-        end
-        return RationalNormAtom(abs(x), k)
-    end
-    return RationalNormAtom(x, k)
-end

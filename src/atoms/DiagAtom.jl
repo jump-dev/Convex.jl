@@ -31,8 +31,6 @@ function evaluate(x::DiagAtom)
     return LinearAlgebra.diag(evaluate(x.children[1]), x.k)
 end
 
-LinearAlgebra.diag(x::AbstractExpr, k::Int = 0) = DiagAtom(x, k)
-
 # Finds the "k"-th diagonal of x as a column vector.
 #
 # If k == 0, it returns the main diagonal and so on.

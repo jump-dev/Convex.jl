@@ -27,8 +27,6 @@ function evaluate(x::EigMinAtom)
     return LinearAlgebra.eigmin(evaluate(x.children[1]))
 end
 
-LinearAlgebra.eigmin(x::AbstractExpr) = EigMinAtom(x)
-
 function new_conic_form!(context::Context, x::EigMinAtom)
     A = only(x.children)
     m, n = size(A)

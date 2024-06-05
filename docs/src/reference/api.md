@@ -1,4 +1,8 @@
-# Reference
+# API
+
+!!! info
+    See [Supported operations](@ref) for a list of the operations supported by
+    Convex.
 
 ```@docs
 Convex.AbstractVariable
@@ -8,7 +12,7 @@ Convex.get_constraints
 Convex.add_constraint!
 Convex.vexity
 Convex.vexity!
-Convex.sign
+Base.sign(x::Convex.AbstractVariable)
 Convex.sign!
 Convex.VarType
 Convex.vartype
@@ -26,4 +30,5 @@ Convex.ProblemDepot.foreach_problem
 Convex.ProblemDepot.PROBLEMS
 Convex.conic_form!
 Convex.new_conic_form!
+Convex.write_to_file
 ```

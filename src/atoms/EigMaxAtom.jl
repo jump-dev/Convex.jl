@@ -27,8 +27,6 @@ function evaluate(x::EigMaxAtom)
     return LinearAlgebra.eigmax(evaluate(x.children[1]))
 end
 
-LinearAlgebra.eigmax(x::AbstractExpr) = EigMaxAtom(x)
-
 function new_conic_form!(context::Context{T}, x::EigMaxAtom) where {T}
     A = only(x.children)
     m, n = size(A)

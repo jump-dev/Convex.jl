@@ -29,10 +29,6 @@ function evaluate(x::SumLargestEigsAtom)
     return LinearAlgebra.eigvals(evaluate(x.children[1]))[end-x.children[2]:end]
 end
 
-function sumlargesteigs(x::AbstractExpr, k::Int)
-    return k == 0 ? Constant(0) : SumLargestEigsAtom(x, Constant(k))
-end
-
 # Create the equivalent conic problem:
 #   minimize sk + Tr(Z)
 #   subject to

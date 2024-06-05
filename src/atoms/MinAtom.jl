@@ -56,11 +56,3 @@ function new_conic_form!(context::Context, x::MinAtom)
     end
     return t_obj
 end
-
-Base.min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
-
-Base.min(x::AbstractExpr, y::Value) = min(x, constant(y))
-
-Base.min(x::Value, y::AbstractExpr) = min(constant(x), y)
-
-neg(x::AbstractExpr) = max(-x, Constant(0, Positive()))

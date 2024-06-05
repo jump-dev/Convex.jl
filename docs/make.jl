@@ -122,7 +122,7 @@ Documenter.makedocs(
             "developer/contributing.md",
             "developer/credits.md",
         ],
-        "reference.md",
+        "API Reference" => ["reference/api.md", "reference/atoms.md"],
         "release_notes.md",
     ],
 )

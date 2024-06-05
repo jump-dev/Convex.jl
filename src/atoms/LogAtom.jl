@@ -27,8 +27,6 @@ curvature(::LogAtom) = ConcaveVexity()
 
 evaluate(x::LogAtom) = log.(evaluate(x.children[1]))
 
-Base.log(x::AbstractExpr) = LogAtom(x)
-
 function new_conic_form!(context::Context, e::LogAtom)
     # log(x) >= t  <=> (t, 1, x) in ExponentialCone()
     x = e.children[1]

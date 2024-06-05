@@ -25,7 +25,3 @@ function new_conic_form!(context::Context{T}, A::NegateAtom) where {T}
     end
     return operate(-, T, sign(A), subobj)
 end
-
-Base.:-(x::AbstractExpr) = NegateAtom(x)
-
-Base.:-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))

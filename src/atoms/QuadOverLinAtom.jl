@@ -52,12 +52,3 @@ function new_conic_form!(context::Context{T}, q::QuadOverLinAtom) where {T}
     add_constraint!(context, Constraint{MOI.RotatedSecondOrderCone}(f))
     return conic_form!(context, t)
 end
-
-quadoverlin(x::AbstractExpr, y::AbstractExpr) = QuadOverLinAtom(x, y)
-
-function sumsquares(x::AbstractExpr)
-    if size(x, 2) != 1
-        return QuadOverLinAtom(reshape(x, length(x), 1), constant(1))
-    end
-    return QuadOverLinAtom(x, constant(1))
-end
