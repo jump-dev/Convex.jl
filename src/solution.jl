@@ -60,7 +60,7 @@ end
         problem::Problem,
         optimizer_factory;
         silent::Bool = false,
-        warmstart::Bool = true,
+        warmstart::Bool = false,
     )
 
 Solves the problem, populating `problem.optval` with the optimal value, as well
