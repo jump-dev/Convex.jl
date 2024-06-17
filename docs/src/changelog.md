@@ -7,11 +7,26 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.16.1 (Jue 18, 2024)
+
+### Added
+
+ - Added a `dims` argument to `LogSumExpAtom` and [`logsumexp`](@ref) that
+   reduces the summation along `dims` (#692)
+ - Added support for `AbstractArray` arguments to [`relative_entropy`](@ref) and
+   [`log_perspective`](@ref) (#695)
+
+### Other
+
+ - Minor updates to the README (#687), (#688), (#689), (#690)
+ - Added API documentation (#610)
+ - Fixed `solve!` docstring (#693)
+
 ## v0.16.0 (May 21, 2024)
 
 This release contains a large number of changes, including some breaking
 changes. However, despite the large number of changes, most user code should not need
-to change. 
+to change.
 
 If you encounter an issue updating to this release, please open a GitHub issue,
 or post on the JuMP community forum: https://jump.dev/forum.
