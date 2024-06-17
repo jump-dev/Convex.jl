@@ -1869,7 +1869,7 @@ function relative_entropy(x::AbstractArray, y::AbstractExpr)
     return RelativeEntropyAtom(constant(x), y)
 end
 
-relative_entropy(x::AbstractArray, y::AbstractArray) = sum(y .* log(x ./ y))
+relative_entropy(x::AbstractArray, y::AbstractArray) = sum(y .* log.(x ./ y))
 
 """
     Base.reshape(x::AbstractExpr, m::Int, n::Int)
