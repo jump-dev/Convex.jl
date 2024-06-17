@@ -1826,7 +1826,7 @@ Base.real(x::Constant) = x
 """
     relative_entropy(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
 
-The epigraph of \$\\sum y_i*\\log \\frac{x_i}{y_i}\$.
+The epigraph of \$\\sum x_i*\\log \\frac{x_i}{y_i}\$.
 
 ## Examples
 
@@ -1869,7 +1869,7 @@ function relative_entropy(x::AbstractArray, y::AbstractExpr)
     return RelativeEntropyAtom(constant(x), y)
 end
 
-relative_entropy(x::AbstractArray, y::AbstractArray) = sum(y .* log.(x ./ y))
+relative_entropy(x::AbstractArray, y::AbstractArray) = sum(x .* log.(x ./ y))
 
 """
     Base.reshape(x::AbstractExpr, m::Int, n::Int)
