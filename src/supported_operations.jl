@@ -1056,7 +1056,12 @@ julia> size(atom)
 (1, 1)
 ```
 """
-log_perspective(x::AbstractExpr, y::AbstractExpr) = -relative_entropy(y, x)
+function log_perspective(
+    x::Union{AbstractExpr,AbstractArray},
+    y::Union{AbstractExpr,AbstractArray},
+)
+    return -relative_entropy(y, x)
+end
 
 """
     LinearAlgebra.logdet(X::Convex.AbstractExpr)
@@ -1821,7 +1826,7 @@ Base.real(x::Constant) = x
 """
     relative_entropy(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
 
-The epigraph of \$\\sum y_i*\\log \\frac{x_i}{y_i}\$.
+The epigraph of \$\\sum x_i*\\log \\frac{x_i}{y_i}\$.
 
 ## Examples
 
@@ -1846,7 +1851,6 @@ julia> x = Variable(3);
 julia> y = Variable(3);
 
 julia> atom = relative_entropy(x, y)
-julia> atom = relative_entropy(x, y)
 relative_entropy (convex; real)
 ├─ 3-element real variable (id: 906…671)
 └─ 3-element real variable (id: 118…912)
@@ -1856,6 +1860,16 @@ julia> size(atom)
 ```
 """
 relative_entropy(x::AbstractExpr, y::AbstractExpr) = RelativeEntropyAtom(x, y)
+
+function relative_entropy(x::AbstractExpr, y::AbstractArray)
+    return RelativeEntropyAtom(x, constant(y))
+end
+
+function relative_entropy(x::AbstractArray, y::AbstractExpr)
+    return RelativeEntropyAtom(constant(x), y)
+end
+
+relative_entropy(x::AbstractArray, y::AbstractArray) = sum(x .* log.(x ./ y))
 
 """
     Base.reshape(x::AbstractExpr, m::Int, n::Int)

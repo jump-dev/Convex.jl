@@ -1196,12 +1196,46 @@ function test_RelativeEntropyAtom()
         return relative_entropy(x, y)
     end
     target = """
+    variables: u, v1, v2
+    minobjective: 1.0 * u + 0.0
+    [1.0*u, 1.0*v1, 1.0*v2, 2.0, 3.0] in RelativeEntropyCone(5)
+    """
+    _test_atom(target) do context
+        return relative_entropy([2, 3], Variable(2))
+    end
+    target = """
+    variables: u, w1, w2
+    minobjective: 1.0 * u + 0.0
+    [1.0*u, 2.0, 3.0, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
+    """
+    _test_atom(target) do context
+        return relative_entropy(Variable(2), [2, 3])
+    end
+    target = """
     variables: u, v1, v2, w1, w2
     minobjective: -1.0 * u + 1.0
     [1.0*u, 1.0*v1, 1.0*v2, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
     """
     _test_atom(target) do context
         x = Variable(2)
+        y = Variable(2)
+        return 1.0 + log_perspective(x, y)
+    end
+    target = """
+    variables: u, w1, w2
+    minobjective: -1.0 * u + 1.0
+    [1.0*u, 1.0*w1, 1.0*w2, 2.0, 3.0] in RelativeEntropyCone(5)
+    """
+    _test_atom(target) do context
+        return 1.0 + log_perspective(Variable(2), [2, 3])
+    end
+    target = """
+    variables: u, w1, w2
+    minobjective: -1.0 * u + 1.0
+    [1.0*u, 2.0, 3.0, 1.0*w1, 1.0*w2] in RelativeEntropyCone(5)
+    """
+    _test_atom(target) do context
+        x = [2.0, 3.0]
         y = Variable(2)
         return 1.0 + log_perspective(x, y)
     end
@@ -1229,7 +1263,9 @@ function test_RelativeEntropyAtom()
     @test evaluate(atom) ≈ log(0.5)
     x.value = [5.0, 1.0]
     y.value = [3.0, 2.0]
-    @test evaluate(atom) ≈ 5 * log(5 / 3) + log(0.5)
+    u = 5 * log(5 / 3) + log(0.5)
+    @test evaluate(atom) ≈ u
+    @test relative_entropy([5.0, 1.0], [3.0, 2.0]) ≈ u
     return
 end
 
