@@ -44,7 +44,7 @@ AbstractTrees.children(c::Constraint) = (c.child,)
 # defined.
 function is_feasible(x, set, tol)
     try
-      return MOI.Utilities.distance_to_set(x, set) <= tol
+        return MOI.Utilities.distance_to_set(x, set) <= tol
     catch
         return true  # default to `true`
     end
