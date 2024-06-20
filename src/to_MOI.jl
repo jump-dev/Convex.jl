@@ -30,6 +30,11 @@ function MOI_add_constraint(model, f, set)
     return MOI.add_constraint(model, f, set)
 end
 
+function MOI_add_constraint(model, f::SPARSE_VECTOR{T}, set) where {T}
+    g = MOI.VectorAffineFunction{T}(MOI.VectorAffineTerm{T}[], f)
+    return MOI.add_constraint(model, g, set)
+end
+
 function MOI_add_constraint(model, f::SparseTape, set)
     return MOI_add_constraint(model, to_vaf(f), set)
 end

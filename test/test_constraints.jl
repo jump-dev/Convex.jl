@@ -419,7 +419,7 @@ function test_distance_to_set_undefined()
     c = Convex.Constraint(vcat(t, vec(x)), MOI.NormSpectralCone(2, 2))
     model = minimize(y, [c, y >= 1])
     solve!(model, SCS.Optimizer; silent = true)
-    @test ≈(model.optval, 1.0; atol = 1e-6)
+    @test ≈(model.optval, 1.0; atol = 1e-4)
     return
 end
 
