@@ -397,6 +397,32 @@ function test_RelativeEntropyEpiConeSquare()
     return
 end
 
+function test_distance_to_set_matrix()
+    x = Variable(2, 2)
+    y = Variable()
+    fix!(x, [1 0; 0 1])
+    # Constraint has a fixed `Matrix` value.
+    model = minimize(y, [sum(x; dims = 1) <= 1, y >= 1])
+    solve!(model, SCS.Optimizer; silent = true)
+    @test ≈(model.optval, 1.0; atol = 1e-6)
+    return
+end
+
+function test_distance_to_set_undefined()
+    t = Variable()
+    fix!(t, 2)
+    x = Variable(2, 2)
+    fix!(x, [1 0; 0 1])
+    y = Variable()
+    # This constraint is fixed, and `MOI.distance_to_set` is not defined for it,
+    # but it should still work without erroring.
+    c = Convex.Constraint(vcat(t, vec(x)), MOI.NormSpectralCone(2, 2))
+    model = minimize(y, [c, y >= 1])
+    solve!(model, SCS.Optimizer; silent = true)
+    @test ≈(model.optval, 1.0; atol = 1e-6)
+    return
+end
+
 end  # TestConstraints
 
 TestConstraints.runtests()

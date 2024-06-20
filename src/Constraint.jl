@@ -40,10 +40,18 @@ end
 
 AbstractTrees.children(c::Constraint) = (c.child,)
 
-# A fallback. Define a new method if `MOI.Utilities.distance_to_set`
-# is not defined.
+# A fallback. Define a new method if `MOI.Utilities.distance_to_set` is not
+# defined.
 function is_feasible(x, set, tol)
-    return MOI.Utilities.distance_to_set(x, set) <= tol
+    try
+      return MOI.Utilities.distance_to_set(x, set) <= tol
+    catch
+        return true  # default to `true`
+    end
+end
+
+function is_feasible(x::AbstractMatrix, set::MOI.AbstractVectorSet, tol)
+    return is_feasible(vec(x), set, tol)
 end
 
 function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
