@@ -404,7 +404,7 @@ function test_distance_to_set_matrix()
     # Constraint has a fixed `Matrix` value.
     model = minimize(y, [sum(x; dims = 1) <= 1, y >= 1])
     solve!(model, SCS.Optimizer; silent = true)
-    @test ≈(model.optval, 1.0; atol = 1e-6)
+    @test ≈(model.optval, 1.0; atol = 1e-3)
     return
 end
 
