@@ -40,10 +40,33 @@ end
 
 AbstractTrees.children(c::Constraint) = (c.child,)
 
-# A fallback. Define a new method if `MOI.Utilities.distance_to_set`
-# is not defined.
-function is_feasible(x, set, tol)
+# A default fallback which means that we are unsure.
+is_feasible(x, set, tol) = missing
+
+function is_feasible(
+    x::Vector,
+    set::Union{
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.Zeros,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.ExponentialCone,
+        MOI.DualExponentialCone,
+        MOI.PowerCone,
+        MOI.DualPowerCone,
+        MOI.GeometricMeanCone,
+        MOI.NormCone,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+    },
+    tol,
+)
     return MOI.Utilities.distance_to_set(x, set) <= tol
+end
+
+function is_feasible(x::AbstractMatrix, set::MOI.AbstractVectorSet, tol)
+    return is_feasible(vec(x), set, tol)
 end
 
 function is_feasible(x::Number, set::MOI.AbstractVectorSet, tol)
@@ -88,13 +111,26 @@ end
 
 function _add_constraint!(context::Context, c::Constraint)
     if vexity(c.child) == ConstVexity()
-        # This `evaluate` call is safe, since even if it refers to a `fix!`'d variable,
-        # it happens when we are formulating the problem (not at expression-time), so there
-        # is not time for the variable to be re-`fix!`'d to a different value (or `free!`'d)
-        if !is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
+        # This `evaluate` call is safe, since even if it refers to a `fix!`'d
+        # variable, it happens when we are formulating the problem (not at
+        # expression-time), so there is no time for the variable to be
+        # re-`fix!`'d to a different value (or `free!`'d)
+        feas = is_feasible(evaluate(c.child), c.set, CONSTANT_CONSTRAINT_TOL[])
+        # There are three possible values of feas: true, false, and missing.
+        if feas === true
+            # Do nothing. The constraint is satisfied. Do not add it to the
+            # solver.
+            return
+        elseif feas === false
+            # We have proven the constraint is not satisfied. Set a flag and
+            # bail. We don't need to add it to the solver.
             context.detected_infeasible_during_formulation = true
+            return
+        else
+            # The feasibility check was unsure, likely because a method was
+            # missing. Pass the constraint to the solver.
+            @assert ismissing(feas)
         end
-        return
     end
     f = conic_form!(context, c.child)
     context.constr_to_moi_inds[c] = MOI_add_constraint(context.model, f, c.set)
