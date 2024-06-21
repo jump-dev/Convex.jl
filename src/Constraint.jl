@@ -44,7 +44,7 @@ AbstractTrees.children(c::Constraint) = (c.child,)
 is_feasible(x, set, tol) = missing
 
 function is_feasible(
-    x,
+    x::Vector,
     set::Union{
         MOI.SecondOrderCone,
         MOI.RotatedSecondOrderCone,
