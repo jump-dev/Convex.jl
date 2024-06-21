@@ -46,6 +46,9 @@ is_feasible(x, set, tol) = missing
 function is_feasible(
     x::Vector,
     set::Union{
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.Zeros,
         MOI.SecondOrderCone,
         MOI.RotatedSecondOrderCone,
         MOI.ExponentialCone,

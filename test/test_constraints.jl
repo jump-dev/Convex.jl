@@ -397,6 +397,23 @@ function test_RelativeEntropyEpiConeSquare()
     return
 end
 
+function test_is_feasible()
+    @test Convex.is_feasible([1.0, 0.0], MOI.Nonnegatives(2), 0.0)
+    @test !Convex.is_feasible([-1.0, 0.0], MOI.Nonnegatives(2), 0.0)
+    @test Convex.is_feasible([-1.0, 0.0], MOI.Nonpositives(2), 0.0)
+    @test !Convex.is_feasible([1.0, 0.0], MOI.Nonpositives(2), 0.0)
+    @test Convex.is_feasible([1e-5, 0.0], MOI.Zeros(2), 1e-5)
+    @test !Convex.is_feasible([1e-5, 0.0], MOI.Zeros(2), 0.0)
+    @test Convex.is_feasible([5.0, 3.0, 4.0], MOI.SecondOrderCone(3), 0.0)
+    set = MOI.PositiveSemidefiniteConeSquare(2)
+    @test Convex.is_feasible([1.0 0.0; 0.0 1.0], set, 0.0)
+    @test !Convex.is_feasible([-1.0 0.0; 0.0 1.0], set, 0.0)
+    @test !Convex.is_feasible([1.0 1e-6; 0.0 1.0], set, 0.0)
+    set = MOI.NormSpectralCone(2, 2)
+    @test Convex.is_feasible([1.0, 1.0, 0.0, 0.0, 1.0], set, 0.0) === missing
+    return
+end
+
 function test_distance_to_set_matrix()
     x = Variable(2, 2)
     y = Variable()
