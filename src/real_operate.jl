@@ -220,7 +220,7 @@ function real_operate(
     args::AllAllowedReal{T}...,
 ) where {T<:Real}
     all_args = (arg1, arg2, arg3, args...)
-    return foldl((a, b) -> real_operate(vcat, T, a, b), all_args)::SparseTape{T}
+    return foldl((a, b) -> real_operate(vcat, T, a, b), all_args)
 end
 
 function real_operate(
