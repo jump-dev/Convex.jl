@@ -1428,6 +1428,13 @@ function test_not_dcp_warn()
     return
 end
 
+function test_real_operate_vector()
+    x = BigFloat[0]
+    y = Convex.real_operate(vcat, BigFloat, x, x, x, x, x)
+    @test y == BigFloat[0, 0, 0, 0, 0]
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
