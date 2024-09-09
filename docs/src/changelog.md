@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
- - Fixed an incorrect type asssertion in `real_operate` (#704)
+ - Fixed an incorrect type assertion in `real_operate` (#704)
 
 ## v0.16.2 (June 21, 2024)
 
