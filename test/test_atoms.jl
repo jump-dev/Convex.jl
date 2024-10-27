@@ -521,14 +521,14 @@ function test_IndexAtom()
     x = Variable(3)
     @test string(x[y]) == string([x[1], x[3]])
     target = """ 
-     variables: x1, x2, x3 
-     minobjective: [1.0 * x1, 1.0 * x3] 
-     """ 
-     _test_atom(target) do context 
-         x = Variable(3)
-         y = BitVector([true, false, true])
-         return x[y] 
-     end
+    variables: x1, x2, x3 
+    minobjective: [1.0 * x1, 1.0 * x3] 
+    """ 
+    _test_atom(target) do context 
+        x = Variable(3)
+        y = BitVector([true, false, true])
+        return x[y] 
+    end
     return
 end
 
