@@ -117,6 +117,14 @@ function Base.getindex(x::AbstractExpr, I::AbstractVector{Bool})
     return [xi for (xi, ii) in zip(x, I) if ii]
 end
 
+function Base.getindex(x::AbstractExpr, I::BitMatrix)
+    return [xi for (xi, ii) in zip(x, I) if ii]
+end
+
+function Base.getindex(x::AbstractExpr, I::BitVector)
+    return [xi for (xi, ii) in zip(x, I) if ii]
+end
+
 # All rows and columns
 Base.getindex(x::AbstractExpr, ::Colon, ::Colon) = x
 
