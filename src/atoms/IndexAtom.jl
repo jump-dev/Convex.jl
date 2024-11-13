@@ -109,11 +109,17 @@ function Base.getindex(x::AbstractExpr, rows::AbstractVector{<:Real}, col::Real)
     return getindex(x, rows, col:col)
 end
 
-function Base.getindex(x::AbstractExpr, I::AbstractMatrix{Bool})
+function Base.getindex(
+    x::AbstractExpr,
+    I::Union{AbstractMatrix{Bool},<:BitMatrix},
+)
     return [xi for (xi, ii) in zip(x, I) if ii]
 end
 
-function Base.getindex(x::AbstractExpr, I::AbstractVector{Bool})
+function Base.getindex(
+    x::AbstractExpr,
+    I::Union{<:AbstractVector{Bool},<:BitVector},
+)
     return [xi for (xi, ii) in zip(x, I) if ii]
 end
 
