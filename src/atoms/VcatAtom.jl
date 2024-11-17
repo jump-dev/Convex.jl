@@ -119,7 +119,7 @@ function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
     return IndexAtom(remaining, inds)
 end
 
-function getindex(x::VcatAtom, inds::BitVector)
+function Base.getindex(x::VcatAtom, inds::BitVector)
     return getindex(x, findall(inds))
 end
 
