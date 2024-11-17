@@ -535,22 +535,25 @@ function test_IndexAtom()
     Convex.set_value!(x, [1 3; 2 4])
     @test Convex.evaluate.(z) == [1, 2, 4]
     # Base.getindex(x::AbstractExpr, I::BitVector)
-    y = BitVector([true, false, true])
-    x = Variable(3)
-    z = x[y]
-    @test string(z) == string([x[1], x[3]])
-    @test z isa Vector{Convex.IndexAtom}
-    @test length(z) == 2
-    Convex.set_value!(x, [1, 2, 3])
-    @test Convex.evaluate.(z) == [1, 3]
+    target = """
+    variables: x1, x2, x3
+    minobjective: [1.0 * x1, 1.0 * x3]
+    """
+    _test_atom(target) do context
+        x = Variable(3)
+        y = BitVector([true, false, true])
+        return x[y]
+    end
     # Base.getindex(x::AbstractExpr, I::BitMatrix)
-    y = BitMatrix([true false; true true])
-    x = Variable(2, 2)
-    z = x[y]
-    @test z isa Vector{Convex.IndexAtom}
-    @test length(z) == 3
-    Convex.set_value!(x, [1 3; 2 4])
-    @test Convex.evaluate.(z) == [1, 2, 4]
+    target = """
+    variables: x1, x2, x3, x4
+    minobjective: [1.0 * x1, 1.0 * x2, 1.0 * x4]
+    """
+    _test_atom(target) do context
+        x = Variable(2, 2)
+        y = BitMatrix([true false; true true])
+        return x[y]
+    end
     return
 end
 
