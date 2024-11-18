@@ -119,6 +119,10 @@ function Base.getindex(x::VcatAtom, inds::AbstractVector{<:Real})
     return IndexAtom(remaining, inds)
 end
 
+function Base.getindex(x::VcatAtom, inds::BitVector)
+    return getindex(x, findall(inds))
+end
+
 function Base.getindex(x::VcatAtom, inds::AbstractVector{Bool})
-    return getindex(x, first.(filter!(last, collect(enumerate(inds)))))
+    return getindex(x, convert(BitVector, inds))
 end
