@@ -7,6 +7,12 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.16.4 (November 19, 2024)
+
+### Added
+
+ - Added support for indexing with `BitVector` and `BitMatrix` (#708) (#710)
+
 ## v0.16.3 (September 10, 2024)
 
 ### Fixed
