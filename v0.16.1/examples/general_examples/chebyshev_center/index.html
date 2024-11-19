@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Chebyshev center · Convex.jl</title><meta name="title" content="Chebyshev center · Convex.jl"/><meta property="og:title" content="Chebyshev center · Convex.jl"/><meta property="twitter:title" content="Chebyshev center · Convex.jl"/><meta name="description" content="Documentation for Convex.jl."/><meta property="og:description" content="Documentation for Convex.jl."/><meta property="twitter:description" content="Documentation for Convex.jl."/><script data-outdated-warner src="../../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../../assets/documenter.js"></script><script src="../../../search_index.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../../">Convex.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><input class="collapse-toggle" id="menuitem-1" type="checkbox"/><label class="tocitem" for="menuitem-1"><span class="docs-label">Introduction</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../introduction/installation/">Installation</a></li><li><a class="tocitem" href="../../../introduction/quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../introduction/dcp/">Extended formulations and the DCP ruleset</a></li><li><a class="tocitem" href="../../../introduction/faq/">FAQ</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><input class="collapse-toggle" id="menuitem-2-1" type="checkbox" checked/><label class="tocitem" for="menuitem-2-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li class="is-active"><a class="tocitem" href>Chebyshev center</a></li><li><a class="tocitem" href="../control/">Control</a></li><li><a class="tocitem" href="../dualization/">Dualization</a></li><li><a class="tocitem" href="../huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../lasso_regression/">Lasso, Ridge and Elastic Net Regressions</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Regularized least-squares</a></li><li><a class="tocitem" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-2" type="checkbox"/><label class="tocitem" for="menuitem-2-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox"/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/quantum_conditional_entropy/">Continuity of the quantum conditional entropy</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-4" type="checkbox"/><label class="tocitem" for="menuitem-2-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-5" type="checkbox"/><label class="tocitem" for="menuitem-2-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-6" type="checkbox"/><label class="tocitem" for="menuitem-2-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-7" type="checkbox"/><label class="tocitem" for="menuitem-2-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Manual</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../manual/types/">Basic Types</a></li><li><a class="tocitem" href="../../../manual/operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../manual/complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../manual/solvers/">Solvers</a></li><li><a class="tocitem" href="../../../manual/performance_tips/">Performance tips</a></li><li><a class="tocitem" href="../../../manual/advanced/">Advanced Features</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Developer Docs</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../developer/problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../developer/contributing/">Contributing</a></li><li><a class="tocitem" href="../../../developer/credits/">Credits</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">API Reference</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../reference/api/">API</a></li><li><a class="tocitem" href="../../../reference/atoms/">Supported operations</a></li></ul></li><li><a class="tocitem" href="../../../release_notes/">Release notes</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href>Chebyshev center</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Chebyshev center</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jump-dev/Convex.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jump-dev/Convex.jl/blob/master/docs/src/examples/general_examples/chebyshev_center.jl" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Chebyshev-center"><a class="docs-heading-anchor" href="#Chebyshev-center">Chebyshev center</a><a id="Chebyshev-center-1"></a><a class="docs-heading-anchor-permalink" href="#Chebyshev-center" title="Permalink"></a></h1><p>Boyd &amp; Vandenberghe, &quot;Convex Optimization&quot; Joëlle Skaf - 08/16/05</p><p>Adapted for Convex.jl by Karanveer Mohan and David Zeng - 26/05/14</p><p>The goal is to find the largest Euclidean ball (that is, its center and radius) that lies in a polyhedron described by affine inequalities in this fashion: <span>$P = \{x : a_i&#39;*x \leq b_i, i=1,\ldots,m \}$</span> where <span>$x \in \mathbb{R}^2$</span>.</p><pre><code class="language-julia hljs">using Convex
+using LinearAlgebra
+import SCS</code></pre><p>Generate the input data</p><pre><code class="language-julia hljs">a1 = [2; 1];
+a2 = [2; -1];
+a3 = [-1; 2];
+a4 = [-1; -2];
+b = ones(4, 1);</code></pre><p>Create and solve the model</p><pre><code class="language-julia hljs">r = Variable(1)
+x_c = Variable(2)
+constraints = [
+    a1&#39; * x_c + r * norm(a1, 2) &lt;= b[1],
+    a2&#39; * x_c + r * norm(a2, 2) &lt;= b[2],
+    a3&#39; * x_c + r * norm(a3, 2) &lt;= b[3],
+    a4&#39; * x_c + r * norm(a4, 2) &lt;= b[4],
+]
+p = maximize(r, constraints)
+solve!(p, SCS.Optimizer; silent = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Problem statistics
+  problem is DCP         : true
+  number of variables    : 2 (3 scalar elements)
+  number of constraints  : 4 (4 scalar elements)
+  number of coefficients : 16
+  number of atoms        : 12
+
+Solution summary
+  termination status : OPTIMAL
+  primal status      : FEASIBLE_POINT
+  dual status        : FEASIBLE_POINT
+  objective value    : 0.4472
+
+Expression graph
+  maximize
+   └─ real variable (id: 704…289)
+  subject to
+   ├─ ≤ constraint (affine)
+   │  └─ + (affine; real)
+   │     ├─ * (affine; real)
+   │     │  ├─ …
+   │     │  └─ …
+   │     ├─ * (affine; real)
+   │     │  ├─ …
+   │     │  └─ …
+   │     └─ [-1.0;;]
+   ├─ ≤ constraint (affine)
+   │  └─ + (affine; real)
+   │     ├─ * (affine; real)
+   │     │  ├─ …
+   │     │  └─ …
+   │     ├─ * (affine; real)
+   │     │  ├─ …
+   │     │  └─ …
+   │     └─ [-1.0;;]
+   ├─ ≤ constraint (affine)
+   │  └─ + (affine; real)
+   │     ├─ * (affine; real)
+   │     │  ├─ …
+   │     │  └─ …
+   │     ├─ * (affine; real)
+   │     │  ├─ …
+   │     │  └─ …
+   │     └─ [-1.0;;]
+   ⋮
+</code></pre><p>Generate the figure</p><pre><code class="language-julia hljs">x = range(-1.5, stop = 1.5, length = 100);
+theta = 0:pi/100:2*pi;
+using Plots
+plot(x, x -&gt; -x * a1[1] / a1[2] + b[1] / a1[2])
+plot!(x, x -&gt; -x * a2[1] / a2[2] + b[2] / a2[2])
+plot!(x, x -&gt; -x * a3[1] / a3[2] + b[3] / a3[2])
+plot!(x, x -&gt; -x * a4[1] / a4[2] + b[4] / a4[2])
+plot!(
+    evaluate(x_c)[1] .+ evaluate(r) * cos.(theta),
+    evaluate(x_c)[2] .+ evaluate(r) * sin.(theta),
+    linewidth = 2,
+)
+plot!(
+    title = &quot;Largest Euclidean ball lying in a 2D polyhedron&quot;,
+    legend = nothing,
+)</code></pre><img src="9b900464.svg" alt="Example block output"/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../basic_usage/">« Basic Usage</a><a class="docs-footer-nextpage" href="../control/">Control »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.1 on <span class="colophon-date" title="Tuesday 18 June 2024 07:18">Tuesday 18 June 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
