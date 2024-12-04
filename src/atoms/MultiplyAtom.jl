@@ -65,9 +65,7 @@ real_convert(::Type{T}, x::AbstractVector) where {T} = SPARSE_VECTOR{T}(x)
 
 function new_conic_form!(context::Context{T}, x::MultiplyAtom) where {T}
     if curvature(x) == NotDcp()
-        error(
-            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
-        )
+        throw(DCPViolationError())
     end
     if x.children[1].size == (1, 1) || x.children[2].size == (1, 1)
         # scalar multiplication

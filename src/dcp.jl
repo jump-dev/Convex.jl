@@ -15,7 +15,9 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-struct DCPViolationError <: Exception end
+# This is a subtype of MOI.UnsupportedError so that non-DCP
+# errors trigger the correct paths in MOI.Test for Convex.Optimizer.
+struct DCPViolationError <: MOI.UnsupportedError end
 
 function Base.showerror(io::IO, ::DCPViolationError)
     return print(

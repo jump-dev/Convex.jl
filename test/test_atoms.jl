@@ -660,15 +660,11 @@ function test_MultiplyAtom()
         Variable(2, 2) * Variable(3, 3)
     )
     @test_throws(
-        ErrorException(
-            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
-        ),
+        DCPViolationError,
         _test_atom(_ -> Variable(2)' * Variable(2), ""),
     )
     @test_throws(
-        ErrorException(
-            "[MultiplyAtom] multiplication of two non-constant expressions is not DCP compliant",
-        ),
+        DCPViolationError,
         _test_atom(_ -> Variable() * Variable(), ""),
     )
     return

@@ -44,8 +44,7 @@ function test_runtests()
                 MOI.VariableBasisStatus,
                 MOI.ObjectiveBound,
             ],
-        );
-        exclude = ["hs071"],  # HS071 is not convex
+        ),
     )
     return
 end
