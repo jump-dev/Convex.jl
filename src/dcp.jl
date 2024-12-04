@@ -15,7 +15,7 @@
 # http://web.stanford.edu/~boyd/papers/disc_cvx_prog.html
 #############################################################################
 
-struct DCPViolationError <: Exception end
+struct DCPViolationError <: MOI.UnsupportedError end
 
 function Base.showerror(io::IO, ::DCPViolationError)
     return print(
