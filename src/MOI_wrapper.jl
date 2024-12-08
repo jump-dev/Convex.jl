@@ -213,8 +213,7 @@ function MOI.add_constraint(
 ) where {T}
     constraint = Constraint(_expr(model, func), set)
     if vexity(constraint) == Convex.NotDcp()
-        msg =
-            "\n\n[Convex.jl] The constraint is not convex according to the axioms of Disciplined Convex Programming.\n\n"
+        msg = "\n\n[Convex.jl] The constraint is not convex according to the axioms of Disciplined Convex Programming.\n\n"
         throw(MOI.AddConstraintNotAllowed{typeof(func),typeof(set)}(msg))
     end
     add_constraint!(model.context, constraint)
@@ -246,8 +245,7 @@ function MOI.set(
         vex = -vex
     end
     if vex in (Convex.NotDcp(), Convex.ConcaveVexity())
-        msg =
-            "\n\n[Convex.jl] The objective is not convex according to the axioms of Disciplined Convex Programming.\n\n"
+        msg = "\n\n[Convex.jl] The objective is not convex according to the axioms of Disciplined Convex Programming.\n\n"
         throw(MOI.SetAttributeNotAllowed(attr, msg))
     end
     cfp = conic_form!(model.context, obj_fn)
