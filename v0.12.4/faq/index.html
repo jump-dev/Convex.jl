@@ -1,0 +1,51 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>FAQ · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script data-main="../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../installation/">Installation</a></li><li><a class="toctext" href="../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../types/">Basic Types</a></li><li><a class="toctext" href="../operations/">Supported Operations</a></li><li><a class="toctext" href="../examples/">Examples</a></li><li><a class="toctext" href="../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../solvers/">Solvers</a></li><li class="current"><a class="toctext" href="">FAQ</a><ul class="internal"><li><a class="toctext" href="#Where-can-I-get-help?-1">Where can I get help?</a></li><li><a class="toctext" href="#How-does-Convex.jl-differ-from-JuMP?-1">How does Convex.jl differ from JuMP?</a></li><li><a class="toctext" href="#Where-can-I-learn-more-about-Convex-Optimization?-1">Where can I learn more about Convex Optimization?</a></li><li><a class="toctext" href="#Are-there-similar-packages-available-in-other-languages?-1">Are there similar packages available in other languages?</a></li><li><a class="toctext" href="#How-does-Convex.jl-work?-1">How does Convex.jl work?</a></li><li><a class="toctext" href="#How-do-I-cite-this-package?-1">How do I cite this package?</a></li></ul></li><li><a class="toctext" href="../loop/">Optimizing in a Loop</a></li><li><a class="toctext" href="../advanced/">Advanced</a></li><li><a class="toctext" href="../contributing/">Contributing</a></li><li><a class="toctext" href="../credits/">Credits</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="">FAQ</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/src/faq.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>FAQ</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" href="#FAQ-1" id="FAQ-1">FAQ</a></h1><h2><a class="nav-anchor" href="#Where-can-I-get-help?-1" id="Where-can-I-get-help?-1">Where can I get help?</a></h2><p>For usage questions, please contact us via the <a href="https://discourse.julialang.org/c/domain/opt">Julia Discourse</a>. If you're running into bugs or have feature requests, please use the <a href="https://github.com/JuliaOpt/Convex.jl/issues">Github Issue Tracker</a>.</p><h2><a class="nav-anchor" href="#How-does-Convex.jl-differ-from-JuMP?-1" id="How-does-Convex.jl-differ-from-JuMP?-1">How does Convex.jl differ from JuMP?</a></h2><p>Convex.jl and JuMP are both modelling languages for mathematical programming embedded in Julia, and both interface with solvers via the MathProgBase interface, so many of the same solvers are available in both. Convex.jl converts problems to a standard conic form. This approach requires (and certifies) that the problem is convex and DCP compliant, and guarantees global optimality of the resulting solution. JuMP allows nonlinear programming through an interface that learns about functions via their derivatives. This approach is more flexible (for example, you can optimize non-convex functions), but can't guarantee global optimality if your function is not convex, or warn you if you've entered a non-convex formulation.</p><p>For linear programming, the difference is more stylistic. JuMP's syntax is scalar-based and similar to AMPL and GAMS making it easy and fast to create constraints by indexing and summation (like <code>sum{x[i], i=1:numLocation}</code>). Convex.jl allows (and prioritizes) linear algebraic and functional constructions (like <code>max(x,y) &lt; A*z</code>); indexing and summation are also supported in Convex.jl, but are somewhat slower than in JuMP. JuMP also lets you efficiently solve a sequence of problems when new constraints are added or when coefficients are modified, whereas Convex.jl parses the problem again whenever the [solve!]{.title-ref} method is called.</p><h2><a class="nav-anchor" href="#Where-can-I-learn-more-about-Convex-Optimization?-1" id="Where-can-I-learn-more-about-Convex-Optimization?-1">Where can I learn more about Convex Optimization?</a></h2><p>See the freely available book <a href="http://web.stanford.edu/~boyd/cvxbook/">Convex Optimization</a> by Boyd and Vandenberghe for general background on convex optimization. For help understanding the rules of Disciplined Convex Programming, we recommend this <a href="http://dcp.stanford.edu/">DCP tutorial website</a>.</p><h2><a class="nav-anchor" href="#Are-there-similar-packages-available-in-other-languages?-1" id="Are-there-similar-packages-available-in-other-languages?-1">Are there similar packages available in other languages?</a></h2><p>Indeed! You might use <a href="http://www.cvxpy.org">CVXPY</a> in Python, or <a href="http://cvxr.com/">CVX</a> in Matlab.</p><h2><a class="nav-anchor" href="#How-does-Convex.jl-work?-1" id="How-does-Convex.jl-work?-1">How does Convex.jl work?</a></h2><p>For a detailed discussion of how Convex.jl works, see <a href="http://www.arxiv.org/abs/1410.4821">our paper</a>.</p><h2><a class="nav-anchor" href="#How-do-I-cite-this-package?-1" id="How-do-I-cite-this-package?-1">How do I cite this package?</a></h2><p>If you use Convex.jl for published work, we encourage you to cite the software using the following BibTeX citation: :</p><pre><code class="language-none">@article{convexjl,
+ title = {Convex Optimization in {J}ulia},
+ author ={Udell, Madeleine and Mohan, Karanveer and Zeng, David and Hong, Jenny and Diamond, Steven and Boyd, Stephen},
+ year = {2014},
+ journal = {SC14 Workshop on High Performance Technical Computing in Dynamic Languages},
+ archivePrefix = "arXiv",
+ eprint = {1410.4821},
+ primaryClass = "math-oc",
+}</code></pre><footer><hr/><a class="previous" href="../solvers/"><span class="direction">Previous</span><span class="title">Solvers</span></a><a class="next" href="../loop/"><span class="direction">Next</span><span class="title">Optimizing in a Loop</span></a></footer></article></body></HTML>

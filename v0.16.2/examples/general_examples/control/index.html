@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Control · Convex.jl</title><meta name="title" content="Control · Convex.jl"/><meta property="og:title" content="Control · Convex.jl"/><meta property="twitter:title" content="Control · Convex.jl"/><meta name="description" content="Documentation for Convex.jl."/><meta property="og:description" content="Documentation for Convex.jl."/><meta property="twitter:description" content="Documentation for Convex.jl."/><script data-outdated-warner src="../../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../../assets/documenter.js"></script><script src="../../../search_index.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../../">Convex.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><input class="collapse-toggle" id="menuitem-1" type="checkbox"/><label class="tocitem" for="menuitem-1"><span class="docs-label">Introduction</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../introduction/installation/">Installation</a></li><li><a class="tocitem" href="../../../introduction/quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../introduction/dcp/">Extended formulations and the DCP ruleset</a></li><li><a class="tocitem" href="../../../introduction/faq/">FAQ</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><input class="collapse-toggle" id="menuitem-2-1" type="checkbox" checked/><label class="tocitem" for="menuitem-2-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../chebyshev_center/">Chebyshev center</a></li><li class="is-active"><a class="tocitem" href>Control</a></li><li><a class="tocitem" href="../dualization/">Dualization</a></li><li><a class="tocitem" href="../huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../lasso_regression/">Lasso, Ridge and Elastic Net Regressions</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Regularized least-squares</a></li><li><a class="tocitem" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-2" type="checkbox"/><label class="tocitem" for="menuitem-2-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox"/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/quantum_conditional_entropy/">Continuity of the quantum conditional entropy</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-4" type="checkbox"/><label class="tocitem" for="menuitem-2-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-5" type="checkbox"/><label class="tocitem" for="menuitem-2-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-6" type="checkbox"/><label class="tocitem" for="menuitem-2-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-7" type="checkbox"/><label class="tocitem" for="menuitem-2-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Manual</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../manual/types/">Basic Types</a></li><li><a class="tocitem" href="../../../manual/operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../manual/complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../manual/solvers/">Solvers</a></li><li><a class="tocitem" href="../../../manual/performance_tips/">Performance tips</a></li><li><a class="tocitem" href="../../../manual/advanced/">Advanced Features</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Developer Docs</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../developer/problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../developer/contributing/">Contributing</a></li><li><a class="tocitem" href="../../../developer/credits/">Credits</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">API Reference</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../reference/api/">API</a></li><li><a class="tocitem" href="../../../reference/atoms/">Supported operations</a></li></ul></li><li><a class="tocitem" href="../../../release_notes/">Release notes</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href>Control</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Control</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jump-dev/Convex.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jump-dev/Convex.jl/blob/master/docs/src/examples/general_examples/control.jl" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Control"><a class="docs-heading-anchor" href="#Control">Control</a><a id="Control-1"></a><a class="docs-heading-anchor-permalink" href="#Control" title="Permalink"></a></h1><p>A simple control problem on a system usually involves a variable <span>$x(t)$</span> that denotes the state of the system over time, and a variable <span>$u(t)$</span> that denotes the input into the system over time. Linear constraints are used to capture the evolution of the system over time:</p><p class="math-container">\[x(t) = Ax(t - 1) + Bu(t), \ \text{for} \ t = 1,\ldots, T,\]</p><p>where the numerical matrices <span>$A$</span> and <span>$B$</span> are called the dynamics and input matrices, respectively.</p><p>The goal of the control problem is to find a sequence of inputs <span>$u(t)$</span> that will allow the state <span>$x(t)$</span> to achieve specified values at certain times. For example, we can specify initial and final states of the system:</p><p class="math-container">\[\begin{aligned}
+  x(0) &amp;= x_i \\
+  x(T) &amp;= x_f
+\end{aligned}\]</p><p>Additional states between the initial and final states can also be specified. These are known as waypoint constraints. Often, the input and state of the system will have physical meaning, so we often want to find a sequence inputs that also minimizes a least squares objective like the following:</p><p class="math-container">\[\sum_{t = 0}^T \|Fx(t)\|^2_2 + \sum_{t = 1}^T\|Gu(t)\|^2_2,\]</p><p>where <span>$F$</span> and <span>$G$</span> are numerical matrices.</p><p>We&#39;ll now apply the basic format of the control problem to an example of controlling the motion of an object in a fluid over <span>$T$</span> intervals, each of <span>$h$</span> seconds. The state of the system at time interval <span>$t$</span> will be given by the position and the velocity of the object, denoted <span>$p(t)$</span> and <span>$v(t)$</span>, while the input will be forces applied to the object, denoted by <span>$f(t)$</span>. By the basic laws of physics, the relationship between force, velocity, and position must satisfy:</p><p class="math-container">\[  \begin{aligned}
+    p(t+1) &amp;= p(t) + h v(t) \\
+    v(t+1) &amp;= v(t) + h a(t)
+  \end{aligned}.\]</p><p>Here, <span>$a(t)$</span> denotes the acceleration at time <span>$t$</span>, for which we use <span>$a(t) = f(t) / m + g - d v(t)$</span>, where <span>$m$</span>, <span>$d$</span>, <span>$g$</span> are constants for the mass of the object, the drag coefficient of the fluid, and the acceleration from gravity, respectively.</p><p>Additionally, we have our initial/final position/velocity conditions:</p><p class="math-container">\[  \begin{aligned}
+    p(1) &amp;= p_i\\
+    v(1) &amp;= v_i\\
+    p(T+1) &amp;= p_f\\
+    v(T+1) &amp;= 0
+  \end{aligned}\]</p><p>One reasonable objective to minimize would be</p><p class="math-container">\[  \text{objective} = \mu \sum_{t = 1}^{T+1} (v(t))^2 + \sum_{t = 1}^T (f(t))^2\]</p><p>We would like to keep both the forces small to perhaps save fuel, and keep the velocities small for safety concerns. Here <span>$\mu$</span> serves as a parameter to control which part of the objective we deem more important, keeping the velocity small or keeping the force small.</p><p>The following code builds and solves our control example:</p><pre><code class="language-julia hljs">using Convex, SCS, Plots
+
+# Some constraints on our motion
+# The object should start from the origin, and end at rest
+initial_velocity = [-20; 100]
+final_position = [100; 100]
+
+T = 100 # The number of timesteps
+h = 0.1 # The time between time intervals
+mass = 1 # Mass of object
+drag = 0.1 # Drag on object
+g = [0, -9.8] # Gravity on object
+
+# Declare the variables we need
+position = Variable(2, T)
+velocity = Variable(2, T)
+force = Variable(2, T - 1)
+
+# Create a problem instance
+mu = 1
+
+# Add constraints on our variables
+constraints = Constraint[
+    position[:, i+1] == position[:, i] + h * velocity[:, i] for i in 1:T-1
+]
+
+for i in 1:T-1
+    acceleration = force[:, i] / mass + g - drag * velocity[:, i]
+    push!(constraints, velocity[:, i+1] == velocity[:, i] + h * acceleration)
+end
+
+# Add position constraints
+push!(constraints, position[:, 1] == 0)
+push!(constraints, position[:, T] == final_position)
+
+# Add velocity constraints
+push!(constraints, velocity[:, 1] == initial_velocity)
+push!(constraints, velocity[:, T] == 0)
+
+# Solve the problem
+problem = minimize(sumsquares(force), constraints)
+solve!(problem, SCS.Optimizer; silent = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Problem statistics
+  problem is DCP         : true
+  number of variables    : 3 (598 scalar elements)
+  number of constraints  : 202 (404 scalar elements)
+  number of coefficients : 605
+  number of atoms        : 1_895
+
+Solution summary
+  termination status : OPTIMAL
+  primal status      : FEASIBLE_POINT
+  dual status        : FEASIBLE_POINT
+  objective value    : 17849.7044
+
+Expression graph
+  minimize
+   └─ qol (convex; positive)
+      ├─ reshape (affine; real)
+      │  └─ 2×99 real variable (id: 128…312)
+      └─ [1;;]
+  subject to
+   ├─ == constraint (affine)
+   │  └─ + (affine; real)
+   │     ├─ index (affine; real)
+   │     │  └─ …
+   │     └─ Convex.NegateAtom (affine; real)
+   │        └─ …
+   ├─ == constraint (affine)
+   │  └─ + (affine; real)
+   │     ├─ index (affine; real)
+   │     │  └─ …
+   │     └─ Convex.NegateAtom (affine; real)
+   │        └─ …
+   ├─ == constraint (affine)
+   │  └─ + (affine; real)
+   │     ├─ index (affine; real)
+   │     │  └─ …
+   │     └─ Convex.NegateAtom (affine; real)
+   │        └─ …
+   ⋮
+</code></pre><p>We can plot the trajectory taken by the object.</p><pre><code class="language-julia hljs">pos = evaluate(position)
+plot([pos[1, 1]], [pos[2, 1]], st = :scatter, label = &quot;initial point&quot;)
+plot!([pos[1, T]], [pos[2, T]], st = :scatter, label = &quot;final point&quot;)
+plot!(pos[1, :], pos[2, :], label = &quot;trajectory&quot;)</code></pre><img src="192e57fe.svg" alt="Example block output"/><p>We can also see how the magnitude of the force changes over time.</p><pre><code class="language-julia hljs">plot(vec(sum(evaluate(force) .^ 2, dims = 1)), label = &quot;force (magnitude)&quot;)</code></pre><img src="475aac04.svg" alt="Example block output"/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chebyshev_center/">« Chebyshev center</a><a class="docs-footer-nextpage" href="../dualization/">Dualization »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.1 on <span class="colophon-date" title="Friday 21 June 2024 23:58">Friday 21 June 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
