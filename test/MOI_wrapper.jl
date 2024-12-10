@@ -143,6 +143,25 @@ function test_not_dcp_objective()
     return
 end
 
+function test_not_dcp_objective_min()
+    inner = Convex.Optimizer(ECOS.Optimizer)
+    model = MOI.Utilities.CachingOptimizer(
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+        MOI.Bridges.full_bridge_optimizer(inner, Float64),
+    )
+    x = MOI.add_variable(model)
+    g = MOI.ScalarNonlinearFunction(:^, Any[x, 2])
+    f = MOI.ScalarNonlinearFunction(:-, Any[f])
+    MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+    attr = MOI.ObjectiveFunction{typeof(f)}()
+    MOI.set(model, attr, f)
+    @test_throws(
+        MOI.SetAttributeNotAllowed{typeof(attr)},
+        MOI.Utilities.attach_optimizer(model),
+    )
+    return
+end
+
 end  # TestMOIWrapper
 
 TestMOIWrapper.runtests()
