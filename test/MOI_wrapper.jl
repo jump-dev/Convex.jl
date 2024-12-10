@@ -108,6 +108,41 @@ function test_scalar_nonlinear_function()
     return
 end
 
+function test_not_dcp_constraint()
+    inner = Convex.Optimizer(ECOS.Optimizer)
+    model = MOI.Utilities.CachingOptimizer(
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+        MOI.Bridges.full_bridge_optimizer(inner, Float64),
+    )
+    x = MOI.add_variable(model)
+    f = MOI.ScalarNonlinearFunction(:^, Any[x, 2])
+    MOI.add_constraint(model, f, MOI.GreaterThan(1.0))
+    F, S = MOI.VectorNonlinearFunction, MOI.Nonnegatives
+    @test_throws(
+        MOI.AddConstraintNotAllowed{F,S},
+        MOI.Utilities.attach_optimizer(model),
+    )
+    return
+end
+
+function test_not_dcp_objective()
+    inner = Convex.Optimizer(ECOS.Optimizer)
+    model = MOI.Utilities.CachingOptimizer(
+        MOI.Utilities.UniversalFallback(MOI.Utilities.Model{Float64}()),
+        MOI.Bridges.full_bridge_optimizer(inner, Float64),
+    )
+    x = MOI.add_variable(model)
+    f = MOI.ScalarNonlinearFunction(:^, Any[x, 2])
+    MOI.set(model, MOI.ObjectiveSense(), MOI.MAX_SENSE)
+    attr = MOI.ObjectiveFunction{typeof(f)}()
+    MOI.set(model, attr, f)
+    @test_throws(
+        MOI.SetAttributeNotAllowed{typeof(attr)},
+        MOI.Utilities.attach_optimizer(model),
+    )
+    return
+end
+
 end  # TestMOIWrapper
 
 TestMOIWrapper.runtests()
