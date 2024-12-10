@@ -8,6 +8,7 @@ struct Optimizer{T,M} <: MOI.AbstractOptimizer
     moi_to_convex::OrderedCollections.OrderedDict{MOI.VariableIndex,Any}
     convex_to_moi::Dict{UInt64,Vector{MOI.VariableIndex}}
     constraint_map::Vector{MOI.ConstraintIndex}
+
     function Optimizer(context::Context{T,M}) where {T,M}
         return new{T,M}(
             context,
@@ -211,6 +212,10 @@ function MOI.add_constraint(
     set::MOI.AbstractVectorSet,
 ) where {T}
     constraint = Constraint(_expr(model, func), set)
+    if vexity(constraint) == Convex.NotDcp()
+        msg = "\n\n[Convex.jl] The constraint is not convex according to the axioms of Disciplined Convex Programming.\n\n"
+        throw(MOI.AddConstraintNotAllowed{typeof(func),typeof(set)}(msg))
+    end
     add_constraint!(model.context, constraint)
     push!(model.constraint_map, model.context.constr_to_moi_inds[constraint])
     return MOI.ConstraintIndex{typeof(func),typeof(set)}(
@@ -231,10 +236,19 @@ end
 
 function MOI.set(
     model::Optimizer{T},
-    ::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
+    attr::MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction},
     func::MOI.ScalarNonlinearFunction,
 ) where {T}
-    cfp = conic_form!(model.context, _expr(model, func))
+    obj_fn = _expr(model, func)
+    vex = vexity(obj_fn)
+    if MOI.get(model, MOI.ObjectiveSense()) == MOI.MAX_SENSE
+        vex = -vex
+    end
+    if vex in (Convex.NotDcp(), Convex.ConcaveVexity())
+        msg = "\n\n[Convex.jl] The objective is not convex according to the axioms of Disciplined Convex Programming.\n\n"
+        throw(MOI.SetAttributeNotAllowed(attr, msg))
+    end
+    cfp = conic_form!(model.context, obj_fn)
     obj = _to_scalar_moi(T, cfp)
     MOI.set(model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
     return
