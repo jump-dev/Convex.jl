@@ -84,6 +84,7 @@ solve!(problem, SCS.Optimizer)
 # Once the problem is solved, we can call evaluate() on expr:
 evaluate(expr)
 ```
+!!! warning Julia's broadcasting, using the `.` operator should be avoided. The expression `-log(1.0 .+ A * x)` will fail while `-log(1.0 + A * x)` will be correctly encoded. 
 
 ## Constraints
 
