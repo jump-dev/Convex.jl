@@ -85,6 +85,11 @@ solve!(problem, SCS.Optimizer)
 evaluate(expr)
 ```
 
+!!! warning
+    Avoid using Julia's broadcasting (the `.` operator). As an example, the
+    expression `-log(1.0 .+ A * x)` will fail while `-log(1.0 + A * x)` will
+    succeed.
+
 ## Constraints
 
 *Constraints* in Convex.jl are declared using the standard comparison
