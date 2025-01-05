@@ -2272,6 +2272,20 @@ function test_inner_product()
     return
 end
 
+### reformulations/log1p
+
+function test_log1p()
+    target = """
+    variables: t, x
+    minobjective: 1.0 * t + 0.0
+    [1.0 * t, 1.0, 1.0 * x + 1.0] in ExponentialCone()
+    """
+    _test_reformulation(target) do context
+        return log1p(Variable(1))
+    end
+    return
+end
+
 ### reformulations/norm
 
 function test_norm()
