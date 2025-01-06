@@ -1,0 +1,96 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Quick Tutorial · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script data-main="../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../installation/">Installation</a></li><li class="current"><a class="toctext" href="">Quick Tutorial</a><ul class="internal"></ul></li><li><a class="toctext" href="../types/">Basic Types</a></li><li><a class="toctext" href="../operations/">Supported Operations</a></li><li><a class="toctext" href="../examples/">Examples</a></li><li><a class="toctext" href="../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../solvers/">Solvers</a></li><li><a class="toctext" href="../faq/">FAQ</a></li><li><a class="toctext" href="../loop/">Optimizing in a Loop</a></li><li><a class="toctext" href="../advanced/">Advanced</a></li><li><a class="toctext" href="../contributing/">Contributing</a></li><li><a class="toctext" href="../credits/">Credits</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="">Quick Tutorial</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/src/quick_tutorial.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Quick Tutorial</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" href="#Quick-Tutorial-1" id="Quick-Tutorial-1">Quick Tutorial</a></h1><p>Consider a constrained least squares problem</p><div>\[\begin{aligned}
+\begin{array}{ll}
+\mbox{minimize} &amp; \|Ax - b\|_2^2 \\
+\mbox{subject to} &amp; x \geq 0
+\end{array}
+\end{aligned}\]</div><p>with variable <span>$x\in \mathbf{R}^{n}$</span>, and problem data <span>$A \in \mathbf{R}^{m \times n}$</span>, <span>$b \in \mathbf{R}^{m}$</span>.</p><p>This problem can be solved in Convex.jl as follows: :</p><pre><code class="language-julia-repl">julia&gt; # Make the Convex.jl module available
+       using Convex, SCS
+
+julia&gt; # Generate random problem data
+       m = 4;  n = 5
+5
+
+julia&gt; A = randn(m, n); b = randn(m, 1)
+4×1 Array{Float64,2}:
+ -0.42401071668280776
+ -0.9667057889970926
+ -0.4795497853388761
+ -0.9641429528764401
+
+julia&gt; # Create a (column vector) variable of size n x 1.
+       x = Variable(n)
+Variable
+size: (5, 1)
+sign: real
+vexity: affine
+id: 895…632
+
+julia&gt; # The problem is to minimize ||Ax - b||^2 subject to x &gt;= 0
+       # This can be done by: minimize(objective, constraints)
+       problem = minimize(sumsquares(A * x - b), [x &gt;= 0])
+minimize
+└─ qol_elem (convex; positive)
+   ├─ norm2 (convex; positive)
+   │  └─ + (affine; real)
+   │     ├─ …
+   │     └─ …
+   └─ [1.0]
+subject to
+└─ &gt;= constraint (affine)
+   ├─ 5-element real variable (id: 895…632)
+   └─ 0
+
+current status: not yet solved
+
+julia&gt; # Solve the problem by calling solve!
+       solve!(problem, SCSSolver())
+
+julia&gt; # Check the status of the problem
+       problem.status # :Optimal, :Infeasible, :Unbounded etc.
+:Optimal
+
+julia&gt; # Get the optimum value
+       problem.optval
+0.16939313830888272</code></pre><footer><hr/><a class="previous" href="../installation/"><span class="direction">Previous</span><span class="title">Installation</span></a><a class="next" href="../types/"><span class="direction">Next</span><span class="title">Basic Types</span></a></footer></article></body></HTML>
