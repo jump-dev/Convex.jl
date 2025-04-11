@@ -4,6 +4,7 @@
 # in the LICENSE file or at https://opensource.org/license/bsd-2-clause
 
 using Convex
+
 import Documenter
 import Literate
 import Test
