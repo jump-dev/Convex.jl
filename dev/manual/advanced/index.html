@@ -12,7 +12,7 @@ julia&gt; solve!(p, SCS.Optimizer; silent = true)
 └ @ Convex ~/.julia/dev/Convex/src/problems.jl:73
 ERROR: DCPViolationError: Expression not DCP compliant. This either means that your problem is not convex, or that we could not prove it was convex using the rules of disciplined convex programming. For a list of supported operations, see https://jump.dev/Convex.jl/stable/operations/. For help writing your problem as a disciplined convex program, please post a reproducible example on https://jump.dev/forum.
 Stacktrace:
-[...]</code></pre><p>See <a href="../../introduction/dcp/#Extended-formulations-and-the-DCP-ruleset">Extended formulations and the DCP ruleset</a> for more discussion on why these errors occur.</p><h2 id="Dual-Variables"><a class="docs-heading-anchor" href="#Dual-Variables">Dual Variables</a><a id="Dual-Variables-1"></a><a class="docs-heading-anchor-permalink" href="#Dual-Variables" title="Permalink"></a></h2><p>Convex.jl also returns the optimal dual variables for a problem. These are stored in the <code>dual</code> field associated with each constraint.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Convex, SCS</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x = Variable();</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; constraint = x &gt;= 0;</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; p = minimize(x, [constraint]);</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, SCS.Optimizer; silent = true)</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
+[...]</code></pre><p>See <a href="../../introduction/dcp/#Extended-formulations-and-the-DCP-ruleset">Extended formulations and the DCP ruleset</a> for more discussion on why these errors occur.</p><h2 id="Dual-Variables"><a class="docs-heading-anchor" href="#Dual-Variables">Dual Variables</a><a id="Dual-Variables-1"></a><a class="docs-heading-anchor-permalink" href="#Dual-Variables" title="Permalink"></a></h2><p>Convex.jl also returns the optimal dual variables for a problem. These are stored in the <code>dual</code> field associated with each constraint.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Convex, SCS</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x = Variable();</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; constraint = x &gt;= 0;</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; p = minimize(x, [constraint]);</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, SCS.Optimizer; silent = true)</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
   number of variables    : 1 (1 scalar elements)
   number of constraints  : 1 (1 scalar elements)
@@ -27,11 +27,11 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 181…351)
+   └─ real variable (id: 111…835)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 181…351)
+         ├─ real variable (id: 111…835)
          └─ [0;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; constraint.dual</code><code class="nohighlight hljs ansi" style="display:block;">0.999999976532818</code></pre><h2 id="Warmstarting"><a class="docs-heading-anchor" href="#Warmstarting">Warmstarting</a><a id="Warmstarting-1"></a><a class="docs-heading-anchor-permalink" href="#Warmstarting" title="Permalink"></a></h2><p>If you&#39;re solving the same problem many times with different values of a parameter, Convex.jl can initialize many solvers with the solution to the previous problem, which sometimes speeds up the solution time. This is called a <strong>warm start</strong>.</p><p>To use this feature, pass the optional argument <code>warmstart=true</code> to the <code>solve!</code> method.</p><pre><code class="language-julia hljs">using Convex, SCS
 n = 1_000
 y = rand(n);
@@ -65,7 +65,7 @@ function probability_vector(d::Int)
     x = Variable(d, Positive())
     add_constraint!(x, sum(x) == 1)
     return x
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">probability_vector (generic function with 1 method)</code></pre><p>and then use, say, <code>p = probabilityvector(3)</code> in any Convex.jl problem. The constraints that the entries of <code>p</code> are non-negative and sum to 1 will be automatically added to any problem <code>p</code> is used in.</p><p>Custom types are necessary when one wants to dispatch on custom variables, use them as callable types, or provide a different implementation. Continuing with the probability vector example, let&#39;s say we often use probability vectors variables in taking expectation values, and we want to use function notation for this. To do so, we define:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Convex</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; mutable struct ProbabilityVector &lt;: Convex.AbstractVariable
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">probability_vector (generic function with 1 method)</code></pre><p>and then use, say, <code>p = probabilityvector(3)</code> in any Convex.jl problem. The constraints that the entries of <code>p</code> are non-negative and sum to 1 will be automatically added to any problem <code>p</code> is used in.</p><p>Custom types are necessary when one wants to dispatch on custom variables, use them as callable types, or provide a different implementation. Continuing with the probability vector example, let&#39;s say we often use probability vectors variables in taking expectation values, and we want to use function notation for this. To do so, we define:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Convex</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; mutable struct ProbabilityVector &lt;: Convex.AbstractVariable
            head::Symbol
            size::Tuple{Int,Int}
            value::Union{Convex.Value,Nothing}
@@ -73,11 +73,11 @@ end</code></pre><pre class="documenter-example-output"><code class="nohighlight 
            function ProbabilityVector(d)
                return new(:ProbabilityVector, (d, 1), nothing, Convex.AffineVexity())
            end
-       end</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Convex.get_constraints(p::ProbabilityVector) = [ sum(p) == 1 ]</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Convex.sign(::ProbabilityVector) = Convex.Positive()</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Convex.vartype(::ProbabilityVector) = Convex.ContVar</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; (p::ProbabilityVector)(x) = dot(p, x)</code><code class="nohighlight hljs ansi" style="display:block;"></code></pre><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>Custom variable types must be <code>mutable</code>, otherwise variables with the same size and value would be treated as the same object.</p></div></div><p>Then one can call <code>p = ProbabilityVector(3)</code> to construct a our custom variable which can be used in Convex, which already encodes the appropriate constraints (non-negative and sums to 1), and which can act on constants via <code>p(x)</code>. For example,</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using SCS</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; p = ProbabilityVector(3)</code><code class="nohighlight hljs ansi" style="display:block;">Variable
+       end</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Convex.get_constraints(p::ProbabilityVector) = [ sum(p) == 1 ]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Convex.sign(::ProbabilityVector) = Convex.Positive()</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Convex.vartype(::ProbabilityVector) = Convex.ContVar</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; (p::ProbabilityVector)(x) = dot(p, x)</code></pre><div class="admonition is-warning" id="Warning-f7d5b9fc06f4c3b8"><header class="admonition-header">Warning<a class="admonition-anchor" href="#Warning-f7d5b9fc06f4c3b8" title="Permalink"></a></header><div class="admonition-body"><p>Custom variable types must be <code>mutable</code>, otherwise variables with the same size and value would be treated as the same object.</p></div></div><p>Then one can call <code>p = ProbabilityVector(3)</code> to construct a our custom variable which can be used in Convex, which already encodes the appropriate constraints (non-negative and sums to 1), and which can act on constants via <code>p(x)</code>. For example,</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using SCS</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; p = ProbabilityVector(3)</code><code class="nohighlight hljs ansi" style="display:block;">Variable
 size: (3, 1)
 sign: positive
 vexity: affine
-id: 177…520</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; prob = minimize(p([1.0, 2.0, 3.0]))</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
+id: 844…164</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; prob = minimize(p([1.0, 2.0, 3.0]))</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
   number of variables    : 1 (3 scalar elements)
   number of constraints  : 1 (1 scalar elements)
@@ -93,14 +93,14 @@ Expression graph
   minimize
    └─ sum (affine; positive)
       └─ .* (affine; positive)
-         ├─ 3-element positive variable (id: 177…520)
+         ├─ 3-element positive variable (id: 844…164)
          └─ [1.0; 2.0; 3.0;;]
   subject to
    └─ == constraint (affine)
       └─ + (affine; real)
          ├─ sum (affine; positive)
          │  └─ …
-         └─ [-1;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(prob, SCS.Optimizer; silent = false);</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.16 seconds, 5.896 MiB of memory allocated
+         └─ [-1;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(prob, SCS.Optimizer; silent = false);</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.17 seconds, 5.896 MiB of memory allocated
 ------------------------------------------------------------------
 	       SCS v3.2.3 - Splitting Conic Solver
 	(c) Brendan O&#39;Donoghue, Stanford University, 2012
@@ -117,12 +117,12 @@ lin-sys:  sparse-direct-amd-qdldl
 ------------------------------------------------------------------
  iter | pri res | dua res |   gap   |   obj   |  scale  | time (s)
 ------------------------------------------------------------------
-     0| 1.94e+01  3.06e+00  4.02e+01 -1.60e+01  1.00e-01  5.04e-05 
-    50| 1.09e-04  7.07e-05  1.94e-04  1.00e+00  1.00e-01  7.46e-05 
+     0| 1.94e+01  3.06e+00  4.02e+01 -1.60e+01  1.00e-01  6.04e-05 
+    50| 1.09e-04  7.07e-05  1.94e-04  1.00e+00  1.00e-01  8.48e-05 
 ------------------------------------------------------------------
 status:  solved
-timings: total: 7.54e-05s = setup: 3.88e-05s + solve: 3.66e-05s
-	 lin-sys: 7.25e-06s, cones: 4.48e-06s, accel: 2.16e-06s
+timings: total: 8.56e-05s = setup: 4.84e-05s + solve: 3.72e-05s
+	 lin-sys: 7.26e-06s, cones: 4.36e-06s, accel: 2.11e-06s
 ------------------------------------------------------------------
 objective = 1.000168
 ------------------------------------------------------------------</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; evaluate(p)</code><code class="nohighlight hljs ansi" style="display:block;">3-element Vector{Float64}:
@@ -133,19 +133,19 @@ x = Variable()
 p = maximize( log(x), x &gt;= 1, x &lt;= 3 )
 for leaf in AbstractTrees.Leaves(p)
     println(&quot;Here&#39;s a leaf: $(summary(leaf))&quot;)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s a leaf: real variable (id: 139…114)
-Here&#39;s a leaf: real variable (id: 139…114)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s a leaf: real variable (id: 181…294)
+Here&#39;s a leaf: real variable (id: 181…294)
 Here&#39;s a leaf: negative constant
-Here&#39;s a leaf: real variable (id: 139…114)
+Here&#39;s a leaf: real variable (id: 181…294)
 Here&#39;s a leaf: negative constant</code></pre><p>We can also iterate over the problem in various orders. The following descriptions are taken from the AbstractTrees.jl docstrings, which have more information.</p><h3 id="PostOrderDFS"><a class="docs-heading-anchor" href="#PostOrderDFS">PostOrderDFS</a><a id="PostOrderDFS-1"></a><a class="docs-heading-anchor-permalink" href="#PostOrderDFS" title="Permalink"></a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that children will be visited before their parents.</p><pre><code class="language-julia hljs">for (i, node) in enumerate(AbstractTrees.PostOrderDFS(p))
     println(&quot;Here&#39;s node $i via PostOrderDFS: $(summary(node))&quot;)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PostOrderDFS: real variable (id: 139…114)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PostOrderDFS: real variable (id: 181…294)
 Here&#39;s node 2 via PostOrderDFS: log (concave; real)
-Here&#39;s node 3 via PostOrderDFS: real variable (id: 139…114)
+Here&#39;s node 3 via PostOrderDFS: real variable (id: 181…294)
 Here&#39;s node 4 via PostOrderDFS: negative constant
 Here&#39;s node 5 via PostOrderDFS: + (affine; real)
 Here&#39;s node 6 via PostOrderDFS: ≥ constraint (affine)
-Here&#39;s node 7 via PostOrderDFS: real variable (id: 139…114)
+Here&#39;s node 7 via PostOrderDFS: real variable (id: 181…294)
 Here&#39;s node 8 via PostOrderDFS: negative constant
 Here&#39;s node 9 via PostOrderDFS: + (affine; real)
 Here&#39;s node 10 via PostOrderDFS: ≤ constraint (affine)
@@ -154,26 +154,26 @@ Here&#39;s node 12 via PostOrderDFS: Problem{Float64} (concave; real)</code></pr
     println(&quot;Here&#39;s node $i via PreOrderDFS: $(summary(node))&quot;)
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PreOrderDFS: Problem{Float64} (concave; real)
 Here&#39;s node 2 via PreOrderDFS: log (concave; real)
-Here&#39;s node 3 via PreOrderDFS: real variable (id: 139…114)
+Here&#39;s node 3 via PreOrderDFS: real variable (id: 181…294)
 Here&#39;s node 4 via PreOrderDFS: 2-element Vector{Constraint}
 Here&#39;s node 5 via PreOrderDFS: ≥ constraint (affine)
 Here&#39;s node 6 via PreOrderDFS: + (affine; real)
-Here&#39;s node 7 via PreOrderDFS: real variable (id: 139…114)
+Here&#39;s node 7 via PreOrderDFS: real variable (id: 181…294)
 Here&#39;s node 8 via PreOrderDFS: negative constant
 Here&#39;s node 9 via PreOrderDFS: ≤ constraint (affine)
 Here&#39;s node 10 via PreOrderDFS: + (affine; real)
-Here&#39;s node 11 via PreOrderDFS: real variable (id: 139…114)
+Here&#39;s node 11 via PreOrderDFS: real variable (id: 181…294)
 Here&#39;s node 12 via PreOrderDFS: negative constant</code></pre><h3 id="StatelessBFS"><a class="docs-heading-anchor" href="#StatelessBFS">StatelessBFS</a><a id="StatelessBFS-1"></a><a class="docs-heading-anchor-permalink" href="#StatelessBFS" title="Permalink"></a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that all nodes of a level will be visited before their children.</p><pre><code class="language-julia hljs">for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
     println(&quot;Here&#39;s node $i via StatelessBFS: $(summary(node))&quot;)
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via StatelessBFS: Problem{Float64} (concave; real)
 Here&#39;s node 2 via StatelessBFS: log (concave; real)
 Here&#39;s node 3 via StatelessBFS: 2-element Vector{Constraint}
-Here&#39;s node 4 via StatelessBFS: real variable (id: 139…114)
+Here&#39;s node 4 via StatelessBFS: real variable (id: 181…294)
 Here&#39;s node 5 via StatelessBFS: ≥ constraint (affine)
 Here&#39;s node 6 via StatelessBFS: ≤ constraint (affine)
 Here&#39;s node 7 via StatelessBFS: + (affine; real)
 Here&#39;s node 8 via StatelessBFS: + (affine; real)
-Here&#39;s node 9 via StatelessBFS: real variable (id: 139…114)
+Here&#39;s node 9 via StatelessBFS: real variable (id: 181…294)
 Here&#39;s node 10 via StatelessBFS: negative constant
-Here&#39;s node 11 via StatelessBFS: real variable (id: 139…114)
-Here&#39;s node 12 via StatelessBFS: negative constant</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../performance_tips/">« Performance tips</a><a class="docs-footer-nextpage" href="../../developer/problem_depot/">Problem Depot »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Monday 6 January 2025 00:38">Monday 6 January 2025</span>. Using Julia version 1.10.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Here&#39;s node 11 via StatelessBFS: real variable (id: 181…294)
+Here&#39;s node 12 via StatelessBFS: negative constant</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../performance_tips/">« Performance tips</a><a class="docs-footer-nextpage" href="../../developer/problem_depot/">Problem Depot »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Monday 2 June 2025 21:36">Monday 2 June 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
