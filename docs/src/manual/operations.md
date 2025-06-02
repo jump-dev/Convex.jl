@@ -83,7 +83,7 @@ any solver that can solve both LPs and SOCPs can solve the problem.
 | `square(x), x^2`    | $x^2$                           | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ | PR : $x$ is scalar |
 | `x .^ 2`            | $x.^2$                          | convex         | increasing on $x \ge 0$ decreasing on $x \le 0$ | elementwise |
 | `geomean(x, y)`     | $\sqrt{xy}$                     | concave        | increasing              | IC: $x\ge0$, $y\ge0$            |
-| `huber(x, M=1)`     | $\begin{cases} x^2 &\|x\| \leq M \\ 2M\|x\| - M^2 &\|x\| > M \end{cases}$ | convex | increasing on $x \ge 0$ decreasing on $x \le 0$ | PR: $M>=1$ |
+| `huber(x, M=1)`     | $\begin{cases} x^2 &\|x\| \leq M \\ 2M\|x\| - M^2 &\|x\| > M \end{cases}$ | convex | increasing on $x \ge 0$ decreasing on $x \le 0$ | PR: $M > 0$ |
 
 Note that for `p=1` and `p=Inf`, the function `norm(x,p)` is a linear-program representable, and does not need a SOCP solver, and for a matrix `x`, `norm(x,p)` is defined as `norm(vec(x), p)`.
 
