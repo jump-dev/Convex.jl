@@ -851,7 +851,7 @@ The epigraph of the Huber loss function:
     2M|x| - M^2 & |x| > M
 \\end{cases}
 ```
-where \$M \\ge 1\$.
+where \$M > 0\$.
 
 ## Examples
 
