@@ -21,7 +21,7 @@ c = round.(c, digits = 3);
 R = [rand(LogNormal(minimum(c) / c[i]), 1) for i in 1:m]; # revenue</code></pre><pre><code class="language-julia hljs"># Form and solve the optimal advertising problem.
 using Convex, SCS;
 D = Variable(m, n);
-Si = [min(R[i] * dot(P[i, :], D[i, :]&#39;), B[i]) for i in 1:m];
+Si = vcat([min(R[i] * dot(P[i, :], D[i, :]&#39;), B[i]) for i in 1:m]...);
 problem =
     maximize(sum(Si), [D &gt;= 0, sum(D, dims = 1)&#39; &lt;= T, sum(D, dims = 2) &gt;= c]);
 solve!(problem, SCS.Optimizer; silent = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Problem statistics
@@ -29,7 +29,7 @@ solve!(problem, SCS.Optimizer; silent = true)</code></pre><pre class="documenter
   number of variables    : 1 (120 scalar elements)
   number of constraints  : 3 (149 scalar elements)
   number of coefficients : 453
-  number of atoms        : 51
+  number of atoms        : 52
 
 Solution summary
   termination status : OPTIMAL
@@ -39,27 +39,22 @@ Solution summary
 
 Expression graph
   maximize
-   └─ + (concave; real)
-      ├─ min (concave; real)
-      │  ├─ * (affine; real)
-      │  │  ├─ …
-      │  │  └─ …
-      │  └─ [12777.8;;]
-      ├─ min (concave; real)
-      │  ├─ * (affine; real)
-      │  │  ├─ …
-      │  │  └─ …
-      │  └─ [15071.9;;]
-      ├─ min (concave; real)
-      │  ├─ * (affine; real)
-      │  │  ├─ …
-      │  │  └─ …
-      │  └─ [11330.3;;]
-      ⋮
+   └─ sum (concave; real)
+      └─ vcat (concave; real)
+         ├─ min (concave; real)
+         │  ├─ …
+         │  └─ …
+         ├─ min (concave; real)
+         │  ├─ …
+         │  └─ …
+         ├─ min (concave; real)
+         │  ├─ …
+         │  └─ …
+         ⋮
   subject to
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ 5×24 real variable (id: 699…135)
+   │     ├─ 5×24 real variable (id: 159…663)
    │     └─ Convex.NegateAtom (constant; negative)
    │        └─ …
    ├─ ≤ constraint (affine)
@@ -74,4 +69,4 @@ Expression graph
          │  └─ …
          └─ 5×1 Matrix{Float64}
 </code></pre><p>Plot traffic.</p><pre><code class="language-julia hljs">using Plots
-plot(1:length(T), T, xlabel = &quot;hour&quot;, ylabel = &quot;Traffic&quot;)</code></pre><img src="2f25108a.svg" alt="Example block output"/><p>Plot P.</p><pre><code class="language-julia hljs">heatmap(P)</code></pre><img src="8cc9c846.svg" alt="Example block output"/><p>Plot optimal D.</p><pre><code class="language-julia hljs">heatmap(evaluate(D))</code></pre><img src="5afe1dc4.svg" alt="Example block output"/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../max_entropy/">« Entropy Maximization</a><a class="docs-footer-nextpage" href="../robust_approx_fitting/">Robust approximate fitting »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Monday 2 June 2025 21:36">Monday 2 June 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot(1:length(T), T, xlabel = &quot;hour&quot;, ylabel = &quot;Traffic&quot;)</code></pre><img src="e4eebe15.svg" alt="Example block output"/><p>Plot P.</p><pre><code class="language-julia hljs">heatmap(P)</code></pre><img src="ccf07e69.svg" alt="Example block output"/><p>Plot optimal D.</p><pre><code class="language-julia hljs">heatmap(evaluate(D))</code></pre><img src="aef806fd.svg" alt="Example block output"/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../max_entropy/">« Entropy Maximization</a><a class="docs-footer-nextpage" href="../robust_approx_fitting/">Robust approximate fitting »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Tuesday 15 July 2025 08:13">Tuesday 15 July 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -42,7 +42,7 @@ R = [rand(LogNormal(minimum(c) / c[i]), 1) for i in 1:m]; # revenue
 ## Form and solve the optimal advertising problem.
 using Convex, SCS;
 D = Variable(m, n);
-Si = [min(R[i] * dot(P[i, :], D[i, :]'), B[i]) for i in 1:m];
+Si = vcat([min(R[i] * dot(P[i, :], D[i, :]'), B[i]) for i in 1:m]...);
 problem =
     maximize(sum(Si), [D >= 0, sum(D, dims = 1)' <= T, sum(D, dims = 2) >= c]);
 solve!(problem, SCS.Optimizer; silent = true)
