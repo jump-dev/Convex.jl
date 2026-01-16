@@ -121,7 +121,7 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     else
         error("Quadratic forms supported only for semidefinite matrices")
     end
-    # Caluclates matrix `P` such that `A = P' * P`
+    # Calculates matrix `P` such that `A = P' * P`
     P = _square_root(factor * A)
     return factor * square(norm2(P * x))
 end
