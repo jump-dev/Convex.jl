@@ -126,13 +126,13 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     return factor * square(norm2(P * x))
 end
 
-function _squareroot(x::AbstractExpr, A::Value;)
+function _squareroot(A::Value)
     # Caluclates matrix `P` such that `A = P' * P`
     P = sqrt(LinearAlgebra.Hermitian(A))
     return P
 end
 
-function _squareroot(x::AbstractExpr, A::SparseArrays.SparseMatrixCSC; shift = 1e-10)
+function _squareroot(A::SparseArrays.SparseMatrixCSC; shift = 1e-10)
     # Caluclates matrix `P` such that `A = P' * P`
     _chol = cholesky(A; shift = shift, check = false)
     if !issuccess(_chol)
