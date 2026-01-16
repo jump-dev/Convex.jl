@@ -121,29 +121,22 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     else
         error("Quadratic forms supported only for semidefinite matrices")
     end
-    # The term `factor * A` is SPSD
-    P = _squareroot(factor * A)
+    # Caluclates matrix `P` such that `A = P' * P`
+    P = _square_root(factor * A)
     return factor * square(norm2(P * x))
 end
 
-function _squareroot(A::Value)
-    # Caluclates matrix `P` such that `A = P' * P`
-    P = sqrt(LinearAlgebra.Hermitian(A))
-    return P
-end
+_square_root(A::Value) = sqrt(LinearAlgebra.Hermitian(A))
 
 function _squareroot(A::SparseArrays.SparseMatrixCSC; shift = 1e-10)
-    # Caluclates matrix `P` such that `A = P' * P`
-    _chol = cholesky(A; shift = shift, check = false)
-    if !issuccess(_chol)
-        error("The Shifted Cholesky decomposition failed. The matrix may not be an SPSD.");
+    chol = cholesky(A; shift, check = false)
+    if !issuccess(chol)
+        error(
+            "The Shifted Cholesky decomposition failed. The matrix may not be an SPSD.",
+        )
     end
-    # Extract sparse L and permutation
-    L = sparse(_chol.L);
-    p = _chol.p;
-    pinv = invperm(p);
-    P = L'[:, pinv];
-    return P
+    L = sparse(chol.L)
+    return L'[:, invperm(chol.p)]
 end
 
 # These `evaluate` calls are safe since they are not a `fix!`ed variable
