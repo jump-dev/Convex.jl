@@ -1,0 +1,251 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Huber regression · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link href="../../../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../../../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../../../">Home</a></li><li><a class="toctext" href="../../../installation/">Installation</a></li><li><a class="toctext" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../../../types/">Basic Types</a></li><li><a class="toctext" href="../../../operations/">Supported Operations</a></li><li><a class="toctext" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../../../solvers/">Solvers</a></li><li><a class="toctext" href="../../../faq/">FAQ</a></li><li><a class="toctext" href="../../../advanced/">Advanced</a></li><li><a class="toctext" href="../../../problem_depot/">Problem Depot</a></li><li><a class="toctext" href="../../../contributing/">Contributing</a></li><li><a class="toctext" href="../../../credits/">Credits</a></li><li><span class="toctext">Examples</span><ul><li><span class="toctext">General examples</span><ul><li><a class="toctext" href="../DCP_analysis/">DCP analysis</a></li><li><a class="toctext" href="../basic_usage/">Basic Usage</a></li><li><a class="toctext" href="../chebyshev_center/">Chebyshev center</a></li><li><a class="toctext" href="../control/">Control</a></li><li class="current"><a class="toctext" href="">Huber regression</a><ul class="internal"></ul></li><li><a class="toctext" href="../logistic_regression/">Logistic regression</a></li><li><a class="toctext" href="../max_entropy/">Entropy Maximization</a></li><li><a class="toctext" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="toctext" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="toctext" href="../svm/">Support vector machine</a></li><li><a class="toctext" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="toctext" href="../trade_off_curves/">Trade-off curves</a></li><li><a class="toctext" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><span class="toctext">Mixed integer</span><ul><li><a class="toctext" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="toctext" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="toctext" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><span class="toctext">Optimization with complex variables</span><ul><li><a class="toctext" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="toctext" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><span class="toctext">Portfolio optimization</span><ul><li><a class="toctext" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="toctext" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><span class="toctext">Supplemental material</span><ul><li><a class="toctext" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="toctext" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><span class="toctext">Time series</span><ul><li><a class="toctext" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><span class="toctext">Tomography</span><ul><li><a class="toctext" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li>Examples</li><li>General examples</li><li><a href="">Huber regression</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/general_examples/huber_regression.jl"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Huber regression</span><a class="fa fa-bars" href="#"></a></div></header><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><div></div><h1><a class="nav-anchor" href="#Huber-regression-1" id="Huber-regression-1">Huber regression</a></h1><p>This example can be found here: <a href="https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf">https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf</a>. Here we set <code>big_example = false</code> to only generate a small example which takes less time to run.</p><pre><code class="language-julia">big_example = false
+if big_example
+    n = 300
+    number_tests = 50
+else
+    n = 100
+    number_tests = 20
+end</code></pre><pre><code class="language-none">20</code></pre><p>Generate data for Huber regression.</p><pre><code class="language-julia">using Random
+Random.seed!(1);
+number_samples = round(Int,1.5*n);
+beta_true = 5*randn(n);
+X = randn(n, number_samples);
+Y = zeros(number_samples);
+v = randn(number_samples);</code></pre><pre><code class="language-none">150-element Array{Float64,1}:
+ -2.3874184380608665 
+ -0.3345278893811703 
+  0.3521640978598238 
+  0.19222463012443236
+ -0.18773214390856913
+ -0.1736297986066058 
+ -0.03746154984126831
+  0.4730247734413477 
+ -0.07815326136157633
+ -0.9170476515936279 
+  ⋮                  
+  1.9748675639276607 
+  2.467078344635155  
+ -1.0610227595005945 
+  0.7204373474052508 
+ -1.516119726946284  
+  1.9269564250121325 
+ -0.20166563384162725
+ -1.6819247549653935 
+  0.4148890577716049 </code></pre><pre><code class="language-julia"># Generate data for different values of p.
+# Solve the resulting problems.
+using Convex, SCS, Distributions
+lsq_data = zeros(number_tests);
+huber_data = zeros(number_tests);
+prescient_data = zeros(number_tests);
+p_vals = range(0, stop=0.15, length=number_tests);
+for i=1:length(p_vals)
+    p = p_vals[i];
+    # Generate the sign changes.
+    factor = 2 * rand(Binomial(1, 1-p), number_samples) .- 1;
+    Y = factor .* X' * beta_true + v;
+
+    # Form and solve a standard regression problem.
+    beta = Variable(n);
+    fit = norm(beta - beta_true) / norm(beta_true);
+    cost = norm(X' * beta - Y);
+    prob = minimize(cost);
+    solve!(prob, SCSSolver(verbose=0));
+    lsq_data[i] = evaluate(fit);
+
+    # Form and solve a prescient regression problem,
+    # i.e., where the sign changes are known.
+    cost = norm(factor .* (X'*beta) - Y);
+    solve!(minimize(cost), SCSSolver(verbose=0))
+    prescient_data[i] = evaluate(fit);
+
+    # Form and solve the Huber regression problem.
+    cost = sum(huber(X' * beta - Y, 1));
+    solve!(minimize(cost), SCSSolver(verbose=0))
+    huber_data[i] = evaluate(fit);
+end</code></pre><pre><code class="language-julia">using Plots
+
+plot(p_vals, huber_data, label="Huber", xlabel="p", ylabel="Fit" )
+plot!(p_vals, lsq_data, label="Least squares")
+plot!(p_vals, prescient_data, label="Prescient")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip1500"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip1500)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip1501"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip1500)" d="
+M215.754 1425.62 L2352.76 1425.62 L2352.76 47.2441 L215.754 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip1502"><rect height="1379" width="2138" x="215" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip1502)" points="
+  276.235,1425.62 276.235,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  948.248,1425.62 948.248,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  1620.26,1425.62 1620.26,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  2292.27,1425.62 2292.27,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,1409.32 2352.76,1409.32 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,1191.86 2352.76,1191.86 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,974.406 2352.76,974.406 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,756.95 2352.76,756.95 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,539.493 2352.76,539.493 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,322.037 2352.76,322.037 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  215.754,104.58 2352.76,104.58 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,1425.62 215.754,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  276.235,1425.62 276.235,1404.94 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  948.248,1425.62 948.248,1404.94 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  1620.26,1425.62 1620.26,1404.94 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  2292.27,1425.62 2292.27,1404.94 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,1409.32 247.809,1409.32 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,1191.86 247.809,1191.86 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,974.406 247.809,974.406 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,756.95 247.809,756.95 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,539.493 247.809,539.493 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,322.037 247.809,322.037 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  215.754,104.58 247.809,104.58 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 276.235, 1479.62)" x="276.235" y="1479.62">0.00</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 948.248, 1479.62)" x="948.248" y="1479.62">0.05</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1620.26, 1479.62)" x="1620.26" y="1479.62">0.10</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2292.27, 1479.62)" x="2292.27" y="1479.62">0.15</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1426.82)" x="191.754" y="1426.82">0.0</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1209.36)" x="191.754" y="1209.36">0.2</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 991.906)" x="191.754" y="991.906">0.4</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 774.45)" x="191.754" y="774.45">0.6</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 556.993)" x="191.754" y="556.993">0.8</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 339.537)" x="191.754" y="339.537">1.0</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 122.08)" x="191.754" y="122.08">1.2</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1284.25, 1559.48)" x="1284.25" y="1559.48">p</text></g><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 736.431)" x="89.2861" y="736.431">Fit</text></g><polyline clip-path="url(#clip1502)" points="
+  276.235,1383.55 382.343,1383.55 488.45,1363.86 594.557,1380.88 700.665,1379.75 806.772,1372.47 912.879,1263.63 1018.99,1373.44 1125.09,1362.53 1231.2,1342.55 
+  1337.31,1364.15 1443.42,999.37 1549.52,1091.16 1655.63,1320.76 1761.74,526.013 1867.85,946.435 1973.95,529.913 2080.06,897.204 2186.17,612.754 2292.27,180.953 
+  
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  276.235,1383.01 382.343,1383.01 488.45,654.947 594.557,890.197 700.665,1062.81 806.772,1008.12 912.879,640.41 1018.99,667.653 1125.09,578.366 1231.2,936.444 
+  1337.31,1168.19 1443.42,589.527 1549.52,526.543 1655.63,505.44 1761.74,212.837 1867.85,347.492 1973.95,431.971 2080.06,366.693 2186.17,349.329 2292.27,86.2547 
+  
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1502)" points="
+  276.235,1383.01 382.343,1383.01 488.45,1386.61 594.557,1382.64 700.665,1382.49 806.772,1383.9 912.879,1382.67 1018.99,1381.12 1125.09,1383.99 1231.2,1383.79 
+  1337.31,1382.15 1443.42,1383.38 1549.52,1382.92 1655.63,1381.4 1761.74,1382.48 1867.85,1385.04 1973.95,1376.5 2080.06,1383.29 2186.17,1378.76 2292.27,1382.14 
+  
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip1500)" d="
+M1738.43 372.684 L2280.76 372.684 L2280.76 130.764 L1738.43 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip1500)" points="
+  1738.43,372.684 2280.76,372.684 2280.76,130.764 1738.43,130.764 1738.43,372.684 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip1500)" points="
+  1762.43,191.244 1906.43,191.244 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1930.43, 208.744)" x="1930.43" y="208.744">Huber</text></g><polyline clip-path="url(#clip1500)" points="
+  1762.43,251.724 1906.43,251.724 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1930.43, 269.224)" x="1930.43" y="269.224">Least squares</text></g><polyline clip-path="url(#clip1500)" points="
+  1762.43,312.204 1906.43,312.204 
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip1500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1930.43, 329.704)" x="1930.43" y="329.704">Prescient</text></g></svg><pre><code class="language-julia"># Plot the relative reconstruction error for Huber and prescient regression,
+# zooming in on smaller values of p.
+indices = findall(p_vals .&lt;= 0.08);
+plot(p_vals[indices], huber_data[indices], label="Huber")
+plot!(p_vals[indices], prescient_data[indices], label="Prescient")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip2100"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip2100)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip2101"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip2100)" d="
+M207.423 1487.47 L2352.76 1487.47 L2352.76 47.2441 L207.423 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip2102"><rect height="1441" width="2146" x="207" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip2102)" points="
+  268.14,1487.47 268.14,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  780.861,1487.47 780.861,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  1293.58,1487.47 1293.58,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  1806.3,1487.47 1806.3,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  2319.02,1487.47 2319.02,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  207.423,1397.31 2352.76,1397.31 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  207.423,1097 2352.76,1097 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  207.423,796.681 2352.76,796.681 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  207.423,496.364 2352.76,496.364 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  207.423,196.048 2352.76,196.048 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,1487.47 2352.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,1487.47 207.423,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  268.14,1487.47 268.14,1465.87 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  780.861,1487.47 780.861,1465.87 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  1293.58,1487.47 1293.58,1465.87 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  1806.3,1487.47 1806.3,1465.87 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  2319.02,1487.47 2319.02,1465.87 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,1397.31 239.603,1397.31 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,1097 239.603,1097 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,796.681 239.603,796.681 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,496.364 239.603,496.364 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  207.423,196.048 239.603,196.048 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 268.14, 1541.47)" x="268.14" y="1541.47">0.00</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 780.861, 1541.47)" x="780.861" y="1541.47">0.02</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1293.58, 1541.47)" x="1293.58" y="1541.47">0.04</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1806.3, 1541.47)" x="1806.3" y="1541.47">0.06</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2319.02, 1541.47)" x="2319.02" y="1541.47">0.08</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 1414.81)" x="183.423" y="1414.81">0.025</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 1114.5)" x="183.423" y="1114.5">0.050</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 814.181)" x="183.423" y="814.181">0.075</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 513.864)" x="183.423" y="513.864">0.100</text></g><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 213.548)" x="183.423" y="213.548">0.125</text></g><polyline clip-path="url(#clip2102)" points="
+  268.14,1412.92 470.53,1412.92 672.919,1195.39 875.309,1383.43 1077.7,1370.92 1280.09,1290.46 1482.48,88.0053 1684.87,1301.26 1887.26,1180.64 2089.65,959.972 
+  2292.04,1198.62 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2102)" points="
+  268.14,1406.93 470.53,1406.93 672.919,1446.71 875.309,1402.91 1077.7,1401.26 1280.09,1416.82 1482.48,1403.22 1684.87,1386.13 1887.26,1417.82 2089.65,1415.56 
+  2292.04,1397.51 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip2100)" d="
+M1840.13 312.204 L2280.76 312.204 L2280.76 130.764 L1840.13 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip2100)" points="
+  1840.13,312.204 2280.76,312.204 2280.76,130.764 1840.13,130.764 1840.13,312.204 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2100)" points="
+  1864.13,191.244 2008.13,191.244 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2032.13, 208.744)" x="2032.13" y="208.744">Huber</text></g><polyline clip-path="url(#clip2100)" points="
+  1864.13,251.724 2008.13,251.724 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip2100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2032.13, 269.224)" x="2032.13" y="269.224">Prescient</text></g></svg><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><div></div><footer><hr/><a class="previous" href="../control/"><span class="direction">Previous</span><span class="title">Control</span></a><a class="next" href="../logistic_regression/"><span class="direction">Next</span><span class="title">Logistic regression</span></a></footer></article></body></HTML>

@@ -1,0 +1,80 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Worst case risk analysis · Convex.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" data-theme-name="documenter-dark" data-theme-primary-dark="" href="../../../assets/themes/documenter-dark.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" data-theme-name="documenter-light" data-theme-primary="" href="../../../assets/themes/documenter-light.css" rel="stylesheet" type="text/css"/><script src="../../../assets/themeswap.js"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Convex.jl</span></div><form action="../../../search/" class="docs-search"><input class="docs-search-query" id="documenter-search-query" name="q" placeholder="Search docs" type="text"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../installation/">Installation</a></li><li><a class="tocitem" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../types/">Basic Types</a></li><li><a class="tocitem" href="../../../operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../solvers/">Solvers</a></li><li><a class="tocitem" href="../../../faq/">FAQ</a></li><li><a class="tocitem" href="../../../advanced/">Advanced</a></li><li><a class="tocitem" href="../../../problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../../credits/">Credits</a></li><li><a class="tocitem" href="../../../reference/">Reference</a></li><li><span class="tocitem">Examples</span><ul><li><input checked="" class="collapse-toggle" id="menuitem-14-1" type="checkbox"/><label class="tocitem" for="menuitem-14-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../chebyshev_center/">Chebyshev center</a></li><li><a class="tocitem" href="../control/">Control</a></li><li><a class="tocitem" href="../huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../lasso_regression/">Lasso, Ridge and Elastic Net Regressions</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Trade-off curves</a></li><li class="is-active"><a class="tocitem" href="">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-14-2" type="checkbox"/><label class="tocitem" for="menuitem-14-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-14-3" type="checkbox"/><label class="tocitem" for="menuitem-14-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-14-4" type="checkbox"/><label class="tocitem" for="menuitem-14-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-14-5" type="checkbox"/><label class="tocitem" for="menuitem-14-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-14-6" type="checkbox"/><label class="tocitem" for="menuitem-14-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-14-7" type="checkbox"/><label class="tocitem" for="menuitem-14-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href="">Worst case risk analysis</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="">Worst case risk analysis</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jump-dev/Convex.jl/blob/master/docs/examples_literate/general_examples/worst_case_analysis.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" href="#" id="documenter-settings-button" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" href="#" id="documenter-sidebar-button"></a></div></header><article class="content" id="documenter-page"><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><h1 id="Worst-case-risk-analysis"><a class="docs-heading-anchor" href="#Worst-case-risk-analysis">Worst case risk analysis</a><a id="Worst-case-risk-analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Worst-case-risk-analysis" title="Permalink"></a></h1><p>Generate data for worst-case risk analysis.</p><pre><code class="language-julia">using Random
+
+Random.seed!(2);
+n = 5;
+r = abs.(randn(n, 1))/15;
+Sigma = 0.9 * rand(n, n) .- 0.15;
+Sigma_nom = Sigma' * Sigma;
+Sigma_nom .-= (maximum(Sigma_nom) - 0.9)</code></pre><pre class="documenter-example-output">5×5 Array{Float64,2}:
+ 0.54178     0.45192   0.328892    0.0123621   0.400576
+ 0.45192     0.694173  0.416407   -0.237798    0.295939
+ 0.328892    0.416407  0.496781    0.0266768   0.31054 
+ 0.0123621  -0.237798  0.0266768   0.414028   -0.181312
+ 0.400576    0.295939  0.31054    -0.181312    0.9     </pre><p>Form and solve portfolio optimization problem. Here we minimize risk while requiring a 0.1 return.</p><pre><code class="language-julia">using Convex, SCS
+w = Variable(n);
+ret = dot(r, w);
+risk = sum(quadform(w, Sigma_nom));
+problem = minimize(risk, [sum(w) == 1, ret &gt;= 0.1, norm(w, 1) &lt;= 2])
+solve!(problem, () -&gt; SCS.Optimizer(verbose=0));
+wval = vec(evaluate(w))</code></pre><pre class="documenter-example-output">5-element Array{Float64,1}:
+ -0.2584111225097882 
+  0.5388445424592738 
+ -0.24158885787869822
+  0.751630898449201  
+  0.20952450574832615</pre><p>Form and solve worst-case risk analysis problem.</p><pre><code class="language-julia">Sigma = Semidefinite(n);
+Delta = Variable(n, n);
+risk = sum(quadform(wval, Sigma));
+problem = maximize(risk, [Sigma == Sigma_nom + Delta,
+                    diag(Delta) == 0,
+                    abs(Delta) &lt;= 0.2,
+                    Delta == Delta']);
+solve!(problem, () -&gt; SCS.Optimizer(verbose=0));
+println("standard deviation = ", round(sqrt(wval' * Sigma_nom * wval), sigdigits=2));
+println("worst-case standard deviation = ", round(sqrt(evaluate(risk)), sigdigits=2));
+println("worst-case Delta = ");
+println(round.(evaluate(Delta), sigdigits=2));</code></pre><pre class="documenter-example-output">standard deviation = 0.27
+worst-case standard deviation = 0.82
+worst-case Delta =
+[7.0e-7 -0.2 0.19 -0.2 -0.2; -0.2 1.9e-7 -0.2 0.2 0.2; 0.19 -0.2 6.6e-7 -0.2 -0.2; -0.2 0.2 -0.2 -4.3e-7 0.2; -0.2 0.2 -0.2 0.2 6.4e-7]</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../trade_off_curves/">« Trade-off curves</a><a class="docs-footer-nextpage" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label></p><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div><p></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 28 March 2021 14:24">Sunday 28 March 2021</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></HTML>

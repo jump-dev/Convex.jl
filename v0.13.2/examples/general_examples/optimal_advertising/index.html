@@ -1,0 +1,880 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Optimal advertising · Convex.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" data-theme-name="documenter-dark" href="../../../assets/themes/documenter-dark.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" data-theme-name="documenter-light" data-theme-primary="" href="../../../assets/themes/documenter-light.css" rel="stylesheet" type="text/css"/><script src="../../../assets/themeswap.js"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Convex.jl</span></div><form action="../../../search/" class="docs-search"><input class="docs-search-query" id="documenter-search-query" name="q" placeholder="Search docs" type="text"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../installation/">Installation</a></li><li><a class="tocitem" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../types/">Basic Types</a></li><li><a class="tocitem" href="../../../operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../solvers/">Solvers</a></li><li><a class="tocitem" href="../../../faq/">FAQ</a></li><li><a class="tocitem" href="../../../advanced/">Advanced</a></li><li><a class="tocitem" href="../../../problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../../credits/">Credits</a></li><li><span class="tocitem">Examples</span><ul><li><input checked="" class="collapse-toggle" id="menuitem-13-1" type="checkbox"/><label class="tocitem" for="menuitem-13-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../chebyshev_center/">Chebyshev center</a></li><li><a class="tocitem" href="../control/">Control</a></li><li><a class="tocitem" href="../huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li class="is-active"><a class="tocitem" href="">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Trade-off curves</a></li><li><a class="tocitem" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-2" type="checkbox"/><label class="tocitem" for="menuitem-13-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-3" type="checkbox"/><label class="tocitem" for="menuitem-13-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-4" type="checkbox"/><label class="tocitem" for="menuitem-13-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-5" type="checkbox"/><label class="tocitem" for="menuitem-13-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-6" type="checkbox"/><label class="tocitem" for="menuitem-13-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-7" type="checkbox"/><label class="tocitem" for="menuitem-13-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href="">Optimal advertising</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="">Optimal advertising</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/general_examples/optimal_advertising.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" href="#" id="documenter-settings-button" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" href="#" id="documenter-sidebar-button"></a></div></header><article class="content" id="documenter-page"><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><h1 id="Optimal-advertising-1"><a class="docs-heading-anchor" href="#Optimal-advertising-1">Optimal advertising</a><a class="docs-heading-anchor-permalink" href="#Optimal-advertising-1" title="Permalink"></a></h1><p>This example is taken from <a href="https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf">https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf</a>.</p><p>Setup:</p><ul><li>We have <span>$m$</span> adverts and <span>$n$</span> timeslots</li><li>The total traffic in time slot <span>$t$</span> is <span>$T_t$</span></li><li>The number of ad <span>$i$</span> displayed in period <span>$t$</span> is <span>$D_{it} \geq 0$</span></li><li>We require <span>$\sum_{i=1}^m D_{it} \leq T_t$</span> since we cannot show more than <span>$T_t$</span> ads during time slot <span>$t$</span>.</li><li>We require <span>$\sum_{t=1}^n D_{it} \geq c_i$</span> to fulfill a contract to show advertisement <span>$i$</span> at least <span>$c_i$</span> times.</li></ul><p>Goal: Choose <span>$D_{it}$</span>.</p><p>For some empirical <span>$P_{it}$</span> with <span>$0 \leq P_{it} \leq 1$</span>, we obtain <span>$C_{it} = P_{it}D_{it}$</span> clicks for ad <span>$i$</span>, which pays us some number <span>$R_i &gt; 0$</span> up to a budget <span>$B_i$</span>. The ad revenue for ad <span>$i$</span> is <span>$S_i = \min( R_i \sum_t C_{it}, B_i )$</span> which is concave in <span>$D$</span>. We aim to maximize <span>$\sum_i S_i$</span>.</p><pre><code class="language-julia">using Random
+using Distributions: LogNormal
+Random.seed!(1);
+
+
+m = 5; # number of adverts
+n = 24; # number of timeslots
+SCALE = 10000;
+B = rand(LogNormal(8), m) .+ 10000;
+B = round.(B, digits=3); # Budget
+
+P_ad = rand(m);
+P_time = rand(1,n);
+P = P_ad * P_time;
+
+T = sin.(range(-2*pi/2, stop=2*pi-2*pi/2, length=n)) * SCALE;
+T .+= -minimum(T) + SCALE; # traffic
+c = rand(m); # contractual minimum
+c *= 0.6*sum(T)/sum(c);
+c = round.(c, digits=3);
+R = [rand(LogNormal(minimum(c)/c[i]), 1) for i=1:m]; # revenue</code></pre><pre><code class="language-julia"># Form and solve the optimal advertising problem.
+using Convex, SCS;
+D = Variable(m, n);
+Si = [min(R[i]*dot(P[i,:], D[i,:]'), B[i]) for i=1:m];
+problem = maximize(sum(Si),
+               [D &gt;= 0, sum(D, dims=1)' &lt;= T, sum(D, dims=2) &gt;= c]);
+solve!(problem, () -&gt; SCS.Optimizer(verbose=0));</code></pre><p>Plot traffic.</p><pre><code class="language-julia">using Plots
+plot(1:length(T), T, xlabel="hour", ylabel="Traffic")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip7500"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip7500)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip7501"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip7500)" d="
+M349.806 1425.62 L2352.76 1425.62 L2352.76 47.2441 L349.806 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip7502"><rect height="1379" width="2004" x="349" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip7502)" points="
+  735.115,1425.62 735.115,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  1145.89,1425.62 1145.89,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  1556.67,1425.62 1556.67,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  1967.45,1425.62 1967.45,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  349.806,1386.61 2352.76,1386.61 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  349.806,1060.76 2352.76,1060.76 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  349.806,734.912 2352.76,734.912 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  349.806,409.064 2352.76,409.064 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7502)" points="
+  349.806,83.2162 2352.76,83.2162 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,1425.62 349.806,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  735.115,1425.62 735.115,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  1145.89,1425.62 1145.89,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  1556.67,1425.62 1556.67,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  1967.45,1425.62 1967.45,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,1386.61 373.842,1386.61 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,1060.76 373.842,1060.76 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,734.912 373.842,734.912 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,409.064 373.842,409.064 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  349.806,83.2162 373.842,83.2162 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 735.115, 1479.62)" x="735.115" y="1479.62">5</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1145.89, 1479.62)" x="1145.89" y="1479.62">10</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1556.67, 1479.62)" x="1556.67" y="1479.62">15</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1967.45, 1479.62)" x="1967.45" y="1479.62">20</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 155.521, 1410.34)" x="155.521" y="1410.34">1.0×10</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:38px; text-anchor:start;" transform="rotate(0, 304.062, 1382.93)" x="304.062" y="1382.93">4</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 155.521, 1084.49)" x="155.521" y="1084.49">1.5×10</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:38px; text-anchor:start;" transform="rotate(0, 304.062, 1057.08)" x="304.062" y="1057.08">4</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 155.521, 758.64)" x="155.521" y="758.64">2.0×10</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:38px; text-anchor:start;" transform="rotate(0, 304.062, 731.229)" x="304.062" y="731.229">4</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 155.521, 432.792)" x="155.521" y="432.792">2.5×10</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:38px; text-anchor:start;" transform="rotate(0, 304.062, 405.381)" x="304.062" y="405.381">4</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 155.521, 106.944)" x="155.521" y="106.944">3.0×10</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:38px; text-anchor:start;" transform="rotate(0, 304.062, 79.5334)" x="304.062" y="79.5334">4</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1351.28, 1559.48)" x="1351.28" y="1559.48">hour</text></g><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 736.431)" x="89.2861" y="736.431">Traffic</text></g><polyline clip-path="url(#clip7502)" points="
+  406.494,736.431 488.649,912.257 570.805,1075.04 652.96,1212.71 735.115,1315.06 817.271,1374.5 899.426,1386.61 981.582,1350.5 1063.74,1268.85 1145.89,1147.71 
+  1228.05,996.068 1310.2,825.171 1392.36,647.692 1474.51,476.795 1556.67,325.154 1638.83,204.015 1720.98,122.364 1803.14,86.2547 1885.29,98.3663 1967.45,157.8 
+  2049.6,260.149 2131.76,397.821 2213.91,560.606 2296.07,736.431 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip7500)" d="
+M1989.93 251.724 L2280.76 251.724 L2280.76 130.764 L1989.93 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip7500)" points="
+  1989.93,251.724 2280.76,251.724 2280.76,130.764 1989.93,130.764 1989.93,251.724 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip7500)" points="
+  2013.93,191.244 2157.93,191.244 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip7500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2181.93, 208.744)" x="2181.93" y="208.744">y1</text></g></svg><p>Plot P.</p><pre><code class="language-julia">heatmap(P)</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip8100"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip8100)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip8101"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip8100)" d="
+M113.754 1487.47 L2112.76 1487.47 L2112.76 47.2441 L113.754 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip8102"><rect height="1441" width="2000" x="113" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip8102)" points="
+  488.567,1487.47 488.567,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  905.026,1487.47 905.026,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  1321.48,1487.47 1321.48,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  1737.94,1487.47 1737.94,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  113.754,1343.45 2112.76,1343.45 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  113.754,1055.41 2112.76,1055.41 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  113.754,767.359 2112.76,767.359 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  113.754,479.313 2112.76,479.313 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8102)" points="
+  113.754,191.267 2112.76,191.267 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,1487.47 2112.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,1487.47 113.754,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  488.567,1487.47 488.567,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  905.026,1487.47 905.026,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  1321.48,1487.47 1321.48,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  1737.94,1487.47 1737.94,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,1343.45 137.742,1343.45 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,1055.41 137.742,1055.41 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,767.359 137.742,767.359 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,479.313 137.742,479.313 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8100)" points="
+  113.754,191.267 137.742,191.267 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 488.567, 1541.47)" x="488.567" y="1541.47">5</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 905.026, 1541.47)" x="905.026" y="1541.47">10</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1321.48, 1541.47)" x="1321.48" y="1541.47">15</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1737.94, 1541.47)" x="1737.94" y="1541.47">20</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 1360.95)" x="89.7545" y="1360.95">1</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 1072.91)" x="89.7545" y="1072.91">2</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 784.859)" x="89.7545" y="784.859">3</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 496.813)" x="89.7545" y="496.813">4</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 208.767)" x="89.7545" y="208.767">5</text></g><g clip-path="url(#clip8102)"><image height="1440" href="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAB88AAAWgCAYAAADQIAL0AAAgAElEQVR4nOzbT6vmYxzH8XMfo5kh
+g9RYsBImK1nYiAV1yBKbWZCSJGVhqTwGGxvZiNIsLJTVWFBjr/xZiDSUhfK3Zpo5pjnu40mc+tb1
+fr0ewaff6rqud7/N13t7hzscme9+u3t6wjIOtrvTE5bx/BsfTU9YyqtvvjI9YRm/7l+fnrCM2288
+Nj1hKR9fen96wjJevuOl6QnLeOfTC9MTlnH6iYPpCUv54exmesIybnv9lukJy3jtyYenJyzl3bfe
+m56wjH++vWd6wjLuP+fd6Kj8cd7d/Cjd+fTJ6QnL+OKR09MTlnHxT9/yKL394/HpCcv4efen6QnL
+uPj32ekJy3DKBAAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgb3Pm5mcPp0es5PLmr+kJyzjc2U5PWMaZ7QPTE5by
+1fbL6QnLuL69Mj1hGTdsjk9PWMqVa79MT1jGqRP3TU9YxqPHHp+esIzzVz+YnrCUB088Mz1hGXft
+3jo9YRkXDj6fnrCUh3Yfm56wjMs7+9MTlvHNv59MT1jGUydfnJ6wlM/2P5yesIx7b9qbnrCM/Z1L
+0xOW8vu176cnLOPgv6vTE5bx3KkXpicsw5/nAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+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
+AHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAA
+AAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5
+AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAA
+eeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAA
+AAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkA
+AAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB5
+4jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAA
+AAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAA
+AAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHni
+OQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAA
+AHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAA
+AAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5
+AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAA
+eeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAA
+AAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkA
+AAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB5
+4jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAIcjhsgAABwSSURBVAAAAAB54jkAAAAAAAAAeeI5AAAA
+AAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5
+AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAA
+eeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAA
+AAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkA
+AAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB5
+4jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAA
+AAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAA
+AAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHni
+OQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAA
+AHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAA
+AAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5
+AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAA
+eeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAA
+AAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkA
+AAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB5
+4jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAA
+AAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAA
+AAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHni
+OQAAAAAAAAB54jkAAAAAAAAAeeI5AAAAAAAAAHniOQAAAAAAAAB5l84ePzW9YSln+9PpCcvYH/3b
+sZXDfWe5pfOL6QXrOD86zK2cH4/TExbjPLfyn8t8M6e7X6cnLON4fG56wlIeP3hmesIynt/dm56w
+jPOL69MTlnL48+npCctwz9zO8eRsesIyTne76QlLuThem56wjEfaxWYe7S9PT1jK/sTHjq0cTg7T
+E5bx8I+vpycsQ1EDAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+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
+AAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQ
+J54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAA
+AACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMA
+AAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAn
+ngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAA
+AJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAA
+AAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCee
+AwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAA
+kCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAA
+AAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54D
+AAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQ
+J54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAA
+AACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMA
+AAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAn
+ngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAA
+AJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAA
+AAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCee
+AwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAA
+kCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAA
+AAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54D
+AAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQ
+J54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAA
+AACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMA
+AAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAn
+ngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAA
+AJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAA
+AAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCee
+AwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAA
+kCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAA
+AAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54D
+AAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQ
+J54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAA
+AACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMA
+AAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAn
+ngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAA
+AJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAA
+AAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCee
+AwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAA
+kCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAA
+AAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54D
+AAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQ
+J54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAA
+AACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMA
+AAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAn
+ngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAA
+AJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAA
+AAAAAJAnngMAAAAAAACQJ54DAAAAAAAAkCeeAwAAAAAAAJD3H7/h0udPAuHQAAAAAElFTkSuQmCC
+" transform="translate(114, 47)" width="1999"/></g><defs><clipPath id="clip8103"><rect height="1441" width="73" x="2160" y="47"></rect></clipPath></defs><g clip-path="url(#clip8103)"><image height="1440" href="data:image/png;base64,
+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
+X8iooQAAAABJRU5ErkJggg==
+" transform="translate(2161, 47)" width="72"/></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 1359.31)" x="2268.76" y="1359.31">0.1</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 1211.13)" x="2268.76" y="1211.13">0.2</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 1062.94)" x="2268.76" y="1062.94">0.3</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 914.759)" x="2268.76" y="914.759">0.4</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 766.575)" x="2268.76" y="766.575">0.5</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 618.391)" x="2268.76" y="618.391">0.6</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 470.207)" x="2268.76" y="470.207">0.7</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 322.023)" x="2268.76" y="322.023">0.8</text></g><g clip-path="url(#clip8100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 173.839)" x="2268.76" y="173.839">0.9</text></g><polyline clip-path="url(#clip8100)" points="
+  2232.76,1487.47 2232.76,1345.66 2256.76,1345.66 2232.76,1345.66 2232.76,1197.48 2256.76,1197.48 2232.76,1197.48 2232.76,1049.29 2256.76,1049.29 2232.76,1049.29 
+  2232.76,901.108 2256.76,901.108 2232.76,901.108 2232.76,752.924 2256.76,752.924 2232.76,752.924 2232.76,604.74 2256.76,604.74 2232.76,604.74 2232.76,456.556 
+  2256.76,456.556 2232.76,456.556 2232.76,308.372 2256.76,308.372 2232.76,308.372 2232.76,160.188 2256.76,160.188 2232.76,160.188 2232.76,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline></svg><p>Plot optimal D.</p><pre><code class="language-julia">heatmap(evaluate(D))</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip8700"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip8700)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip8701"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip8700)" d="
+M113.754 1487.47 L2112.76 1487.47 L2112.76 47.2441 L113.754 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip8702"><rect height="1441" width="2000" x="113" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip8702)" points="
+  488.567,1487.47 488.567,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  905.026,1487.47 905.026,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  1321.48,1487.47 1321.48,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  1737.94,1487.47 1737.94,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  113.754,1343.45 2112.76,1343.45 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  113.754,1055.41 2112.76,1055.41 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  113.754,767.359 2112.76,767.359 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  113.754,479.313 2112.76,479.313 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8702)" points="
+  113.754,191.267 2112.76,191.267 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,1487.47 2112.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,1487.47 113.754,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  488.567,1487.47 488.567,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  905.026,1487.47 905.026,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  1321.48,1487.47 1321.48,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  1737.94,1487.47 1737.94,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,1343.45 137.742,1343.45 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,1055.41 137.742,1055.41 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,767.359 137.742,767.359 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,479.313 137.742,479.313 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip8700)" points="
+  113.754,191.267 137.742,191.267 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 488.567, 1541.47)" x="488.567" y="1541.47">5</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 905.026, 1541.47)" x="905.026" y="1541.47">10</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1321.48, 1541.47)" x="1321.48" y="1541.47">15</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1737.94, 1541.47)" x="1737.94" y="1541.47">20</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 1360.95)" x="89.7545" y="1360.95">1</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 1072.91)" x="89.7545" y="1072.91">2</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 784.859)" x="89.7545" y="784.859">3</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 496.813)" x="89.7545" y="496.813">4</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 89.7545, 208.767)" x="89.7545" y="208.767">5</text></g><g clip-path="url(#clip8702)"><image height="1440" href="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAB88AAAWgCAYAAADQIAL0AAAgAElEQVR4nOzbu4peVRyH4exvxsTR
+xBOm0VYciyBY21jaiIWlYGkREPQuFOw9oGBvpYW9YkpFEBSUpNFGLBQHRcY5eBMf/GG9z3MFP1ax
+WYuXvV2///jyCntzdPDw9IRlnF/+Nz1hGX/++9P0hKXstmvTE5Zxfn4yPWEZ2+7q9ISlbJvz3JfD
+3QPTE5Zxevb79IRl7Laj6QlLOb/4e3rCMrYr2/SEZbx04/XpCUv5/OSD6QnL2LaD6QnLeP/4tekJ
+y7j986fTE5by0fEr0xOW8ca9r6cnLEQG2qdXH3pxesIyTmSgvfnsny+mJyxjNz0AAAAAAAAAAKaJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkbYcHNy+nR6zk6uH16QnLOD37a3rCMj5+5uXpCUt589430xOWcd/uaHrCMs4uT6cn
+LOXJ7enpCcv45eKH6QnLeO+p56YnLOPtu76Z+3Tr2s3pCcv45J0Ppycs44m3np2esJSvXnBv35cv
+77pn7su7v/42PWEZ39/5Y3rCUm49/8j0hGU8evHY9IRl/Hh+Z3rCUh489Abalxvb49MTlvHd7W+n
+JyzDn+cAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+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
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAM04i0AABwQSURBVAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAg
+TzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAA
+AAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcA
+AAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBP
+PAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAA
+ACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAA
+AAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88
+BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAA
+IE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAA
+AAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwHAAAAAAAAIE88BwAAAAAAACBPPAcAAAAAAAAgTzwH
+AAAAAAAAIE88BwAAAAAAACBv4/UD53emR6zk2t6fpifAf/yyfXl6wlJe2f/29IRlPNjzcHoC/K9b
+e29NT1jG8xtb0xOW8dXvn05PWMaHz5ybnrCUT27/MD1hGb/e/3F6wjKuvvHy9ISlvHjpyvSEZbzw
+yJnpCcu4/MFn0xOWcfDC49MTlrL98b3pCcs48d7Z6QnL2No8PD1hKRdPOhvtls3Nf6YnLOPZz29O
+T1iGn+cAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAA
+AAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecA
+AAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADk
+iecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAA
+AADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAA
+AAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ
+5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAA
+AOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAA
+AAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5Inn
+AAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA5InnAAAAAAAAAOSJ5wAAAAAAAADkiecAAAAAAAAA
+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
+AAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzx
+HAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAA
+gDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAA
+AAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEc
+AAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACA
+PPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAA
+AACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwA
+AAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA8
+8RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAA
+AIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAA
+AAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzx
+HAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAA
+gDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAA
+AAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEc
+AAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACA
+PPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAA
+AACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwA
+AAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA8
+8RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAA
+AIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAA
+AAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzx
+HAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAA
+gDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAA
+AAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEc
+AAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACA
+PPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAA
+AACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwA
+AAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA8
+8RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAA
+AIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAA
+AAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzx
+HAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAA
+gDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAA
+AAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEc
+AAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACA
+PPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAA
+AACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwA
+AAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA8
+8RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAA
+AIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAA
+AAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzx
+HAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAA
+gDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAA
+AAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEc
+AAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACA
+PPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAA
+AACAPPEcAAAAAAAAgDzxHAAAAAAAAIA88RwAAAAAAACAvP+EdbAuNQ8iSAAAAABJRU5ErkJggg==
+" transform="translate(114, 47)" width="1999"/></g><defs><clipPath id="clip8703"><rect height="1441" width="73" x="2160" y="47"></rect></clipPath></defs><g clip-path="url(#clip8703)"><image height="1440" href="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAAEgAAAWgCAYAAAD9wgUPAAAMT0lEQVR4nO3dwY3sRhAFQY5Q/lsh
+L6XfLQtUeSQPERYsEg8kmpyZ/f17/r4P/+uvt/+ArxMoCBQECgKFOffft/+GT7OgIFAQKAgUBApz
+3cVWFhQECgIFgcLc4yK9saAgUBAoCBQECo4awYKCQEGgIFAQKLiLBQsKAgWBgkDBRTpYUBAoCBQE
+CgIFr32CBQWBgkBBoOCoESwoCBQECgIFgYK7WLCgIFAQKAgUBArzeGC2sqAgUBAoCBRcpIMFBYGC
+QEGgIFCYxwOzlQUFgYJAQaAgUHAWCxYUBAoCBYGCi3SwoCBQECgIFAQK85x/3v4bPs2CgkBBoCBQ
+8FYjWFAQKAgUBAoCBQ/MggUFgYJAQaAgUHAXCxYUBAoCBYHC/O6ft/+GT7OgIFAQKAgUBArzHHex
+jQUFgYJAQaAgUJifu9jKgoJAQaAgUHDUCBYUBAoCBYGCQGEer31WFhQECgIFgYLnQcGCgkBBoCBQ
+ECh4YBYsKAgUBAoCBYGCs1iwoCBQECgIFBw1ggUFgYJAQaAgUJjfOW//DZ9mQUGgIFAQKAgUnMWC
+BQWBgkBBoOAiHSwoCBQECgIFgYJ388GCgkBBoCBQmMdbjZUFBYGCQEGgIFBw1AgWFAQKAgWBgkDB
+a59gQUGgIFAQKLhIBwsKAgWBgkBBoODLLMGCgkBBoCBQECj48EKwoCBQECgIFDwwCxYUBAoCBYGC
+QMFRI1hQECgIFAQKLtLBgoJAQaAgUBAoeDcfLCgIFAQKAgWBgtc+wYKCQEGgIFDwwCxYUBAoCBQE
+CgIFd7FgQUGgIFAQKAgU3MWCBQWBgkBBoDDPuW//DZ9mQUGgIFAQKAgU5rmOGhsLCgIFgYJAwfOg
+YEFBoCBQECgIFDwwCxYUBAoCBYGCQMFZLFhQECgIFAQKLtLBgoJAQaAgUBAoeGAWLCgIFAQKAgWB
+grNYsKAgUBAoCBTmcY1eWVAQKAgUBAoCBXexYEFBoCBQECiMLxzuLCgIFAQKAgWBgqNGsKAgUBAo
+CBQECu5iwYKCQEGgIFBwkQ4WFAQKAgWBgkBhHt9lWVlQECgIFAQKAoW55/f23/BpFhQECgIFgYIH
+ZsGCgkBBoCBQECjM46ixsqAgUBAoCBTmXhfpjQUFgYJAQaAgUHDUCBYUBAoCBYGCQMFdLFhQECgI
+FAQKHpgFCwoCBYGCQEGg4KgRLCgIFAQKAgWBwjxHo406QaAgUBAoeGAWLCgIFAQKAgWBggdmwYKC
+QEGgIFDw4ybBgoJAQaAgUBAozHM12qgTBAoCBYGCQMFZLFhQECgIFAQKLtLBgoJAQaAgUBAo+Bhw
+UCcIFAQKAgWBgs9JBwsKAgWBgkDBx4CDBQWBgkBBoCBQmOuB2UqdIFAQKAgUPA8KFhQECgIFgYJA
+wQOzYEFBoCBQECgIFDwwC+oEgYJAQaDggVmwoCBQECgIFAQKvpIZLCgIFAQKAgWBwly/YbZSJwgU
+BAoCBe/mgwUFgYJAQaAgUPDALFhQECgIFAQK3s0HCwoCBYGCQEGg4GPAQZ0gUBAoCBQECs5iwYKC
+QEGgIFDwViNYUBAoCBQECgIFR41gQUGgIFAQKAgUvPYJ6gSBgkBBoOCoESwoCBQECgIFgYLXPsGC
+gkBBoCBQcNQIFhQECgIFgYJAwVuNoE4QKAgUBAoCBWexYEFBoCBQECi4SAcLCgIFgYJAQaDgLhYs
+KAgUBAoCBYGCT5gFCwoCBYGCQGGOf5+1UicIFAQKAgWBggdmwYKCQEGgIFDwPChYUBAoCBQECgIF
+R41gQUGgIFAQKAgU3MWCBQWBgkBBoOAiHSwoCBQECgIFgYK7WLCgIFAQKAgUBApz3MVWFhQECgIF
+gYKjRrCgIFAQKAgUBAruYsGCgkBBoCBQcJEOFhQECgIFgYJAwV0sWFAQKAgUBAoCBXexYEFBoCBQ
+ECj4AFWwoCBQECgIFAQKjhrBgoJAQaAgUBAouIsFCwoCBYGCQMF/ZgnqBIGCQEGgIFBw1AgWFAQK
+AgWBgnfzwYKCQEGgIFAQKDhqBAsKAgWBgkBBoOAsFiwoCBQECgIFR41gQUGgIFAQKAgU3MWCBQWB
+gkBBoCBQ8MAsWFAQKAgUBApzHxfpjQUFgYJAQaAgUHDUCBYUBAoCBYGCtxrBgoJAQaAgUBAozLlv
+/wnfZkFBoCBQECgIFJzFggUFgYJAQaDgrUawoCBQECgIFAQKc3zCbGVBQaAgUBAoCBQ8MAsWFAQK
+AgWBggdmwYKCQEGgIFAQKDhqBAsKAgWBgkBhztt/wcdZUBAoCBQECgIFR41gQUGgIFAQKAgUvPYJ
+FhQECgIFgYIfmgwWFAQKAgWBgkDBUSNYUBAoCBQECgIFv2EWLCgIFAQKAgUPzIIFBYGCQEGgIFDw
+CbNgQUGgIFAQKPgyS7CgIFAQKAgUBAqOGsGCgkBBoCBQECg4iwULCgIFgYJAwVEjWFAQKAgUBAoC
+BV9mCRYUBAoCBYGCQGF8l2VnQUGgIFAQKDhqBAsKAgWBgkBBoOCoESwoCBQECgIFR41gQUGgIFAQ
+KAgUHDWCBQWBgkBBoCBQcBYLFhQECgIFgYJfAw4WFAQKAgWBgkDBzyUHCwoCBYGCQEGg4CwWLCgI
+FAQKAoU5jhorCwoCBYGCQEGgMNdRY2VBQaAgUBAo+ABVsKAgUBAoCBQECr7MEiwoCBQECgIFgYJ3
+88GCgkBBoCBQ8G4+WFAQKAgUBAoCBe/mgwUFgYJAQaAgUPCvjIMFBYGCQEGg4BNmwYKCQEGgIFAQ
+KHhgFiwoCBQECgIFz4OCBQWBgkBBoCBQcNQIFhQECgIFgYJAweekgwUFgYJAQaDgG4fBgoJAQaAg
+UBAo+PWXYEFBoCBQECgIFJzFggUFgYJAQaDgIh0sKAgUBAoCBYGCf2UcLCgIFAQKAgVHjWBBQaAg
+UBAoCBS8mw8WFAQKAgWBgkDBWSxYUBAoCBQECi7SwYKCQEGgIFAQKHhgFiwoCBQECgIFgYKzWLCg
+IFAQKAgU/FxysKAgUBAoCBQECn4uOVhQECgIFAQKngcFCwoCBYGCQEGg4N18sKAgUBAoCBQECs5i
+wYKCQEGgIFCY+7hKbywoCBQECgIFgYKjRrCgIFAQKAgUBApe+wQLCgIFgYJAwVEjWFAQKAgUBAoC
+BUeNYEFBoCBQECg4agQLCgIFgYJAQaDge/PBgoJAQaAgUBAozPE56ZUFBYGCQEGg4KgRLCgIFAQK
+AgWBgqNGsKAgUBAoCBQECn70P1hQECgIFAQKcz0xW1lQECgIFAQKAgVHjWBBQaAgUBAo+DJLsKAg
+UBAoCBQECn4uOVhQECgIFAQKAgVnsWBBQaAgUBAo+BhwsKAgUBAoCBQECh6YBQsKAgWBgkBBoOAs
+FiwoCBQECgIFF+lgQUGgIFAQKAgU5vhK5sqCgkBBoCBQ8FYjWFAQKAgUBAoCBQ/MggUFgYJAQaAg
+UHAXCxYUBAoCBYGCi3SwoCBQECgIFAQKcx8/NbmxoCBQECgIFAQKzmLBgoJAQaAgUJjzc9TYWFAQ
+KAgUBAoChTkemK0sKAgUBAoCBRfpYEFBoCBQECgIFLybDxYUBAoCBYGCQGHOz7v5jQUFgYJAQaDg
+gVmwoCBQECgIFAQK7mLBgoJAQaAgUBAoeO0TLCgIFAQKAoU5z5+3/4ZPs6AgUBAoCBQECh6YBQsK
+AgWBgkBhrqPGyoKCQEGgIFAQKDhqBAsKAgWBgkBBoOAuFiwoCBQECgIFD8yCBQWBgkBBoCBQcNQI
+FhQECgIFgYJAwVksWFAQKAgUBAq+cRgsKAgUBAoCBYHCnOsutrGgIFAQKAgUHDWCBQWBgkBBoCBQ
+mOuosbKgIFAQKAgUBArOYsGCgkBBoCBQ8AGqYEFBoCBQECgIFLybDxYUBAoCBYGCQMEDs2BBQaAg
+UBAoeDcfLCgIFAQKAgWBgtc+wYKCQEGgIFBw1AgWFAQKAgWBgkDBW41gQUGgIFAQKAgUnMWCBQWB
+gkBBoOCtRrCgIFAQKAgUBAqOGsGCgkBBoCBQECh47RMsKAgUBAoChbnXA7ONBQWBgkBBoCBQcNQI
+FhQECgIFgcI89779N3yaBQWBgkBBoCBQmMdRY2VBQaAgUBAoCBR8wixYUBAoCBQECo4awYKCQEGg
+IFAQKHg3HywoCBQECgIFgcI8HpitLCgIFAQKAgVHjWBBQaAgUBAoCBS89gkWFAQKAgWBwn8v2/BP
+X8iooQAAAABJRU5ErkJggg==
+" transform="translate(2161, 47)" width="72"/></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 1311.87)" x="2268.76" y="1311.87">2500</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 1097.7)" x="2268.76" y="1097.7">5000</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 883.541)" x="2268.76" y="883.541">7500</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 669.378)" x="2268.76" y="669.378">10000</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 455.216)" x="2268.76" y="455.216">12500</text></g><g clip-path="url(#clip8700)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2268.76, 241.053)" x="2268.76" y="241.053">15000</text></g><polyline clip-path="url(#clip8700)" points="
+  2232.76,1487.47 2232.76,1298.21 2256.76,1298.21 2232.76,1298.21 2232.76,1084.05 2256.76,1084.05 2232.76,1084.05 2232.76,869.889 2256.76,869.889 2232.76,869.889 
+  2232.76,655.727 2256.76,655.727 2232.76,655.727 2232.76,441.564 2256.76,441.564 2232.76,441.564 2232.76,227.402 2256.76,227.402 2232.76,227.402 2232.76,47.2441 
+  
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline></svg><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../max_entropy/">« Entropy Maximization</a><a class="docs-footer-nextpage" href="../robust_approx_fitting/">Robust approximate fitting »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label></p><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div><p></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 13 March 2020 23:49">Friday 13 March 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></HTML>

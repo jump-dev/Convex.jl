@@ -1,0 +1,233 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Control · Convex.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" data-theme-name="documenter-dark" href="../../../assets/themes/documenter-dark.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" data-theme-name="documenter-light" data-theme-primary="" href="../../../assets/themes/documenter-light.css" rel="stylesheet" type="text/css"/><script src="../../../assets/themeswap.js"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Convex.jl</span></div><form action="../../../search/" class="docs-search"><input class="docs-search-query" id="documenter-search-query" name="q" placeholder="Search docs" type="text"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../installation/">Installation</a></li><li><a class="tocitem" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../types/">Basic Types</a></li><li><a class="tocitem" href="../../../operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../solvers/">Solvers</a></li><li><a class="tocitem" href="../../../faq/">FAQ</a></li><li><a class="tocitem" href="../../../advanced/">Advanced</a></li><li><a class="tocitem" href="../../../problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../../credits/">Credits</a></li><li><span class="tocitem">Examples</span><ul><li><input checked="" class="collapse-toggle" id="menuitem-13-1" type="checkbox"/><label class="tocitem" for="menuitem-13-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../chebyshev_center/">Chebyshev center</a></li><li class="is-active"><a class="tocitem" href="">Control</a></li><li><a class="tocitem" href="../huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Trade-off curves</a></li><li><a class="tocitem" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-2" type="checkbox"/><label class="tocitem" for="menuitem-13-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-3" type="checkbox"/><label class="tocitem" for="menuitem-13-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-4" type="checkbox"/><label class="tocitem" for="menuitem-13-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-5" type="checkbox"/><label class="tocitem" for="menuitem-13-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-6" type="checkbox"/><label class="tocitem" for="menuitem-13-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-7" type="checkbox"/><label class="tocitem" for="menuitem-13-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href="">Control</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="">Control</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/general_examples/control.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" href="#" id="documenter-settings-button" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" href="#" id="documenter-sidebar-button"></a></div></header><article class="content" id="documenter-page"><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><h1 id="Control-1"><a class="docs-heading-anchor" href="#Control-1">Control</a><a class="docs-heading-anchor-permalink" href="#Control-1" title="Permalink"></a></h1><p>A simple control problem on a system usually involves a variable <span>$x(t)$</span> that denotes the state of the system over time, and a variable <span>$u(t)$</span> that denotes the input into the system over time. Linear constraints are used to capture the evolution of the system over time:</p><div>\[x(t) = Ax(t - 1) + Bu(t), \ \text{for} \ t = 1,\ldots, T,\]</div><p>where the numerical matrices <span>$A$</span> and <span>$B$</span> are called the dynamics and input matrices, respectively.</p><p>The goal of the control problem is to find a sequence of inputs <span>$u(t)$</span> that will allow the state <span>$x(t)$</span> to achieve specified values at certain times. For example, we can specify initial and final states of the system:</p><div>\[\begin{aligned}
+  x(0) &amp;= x_i \\
+  x(T) &amp;= x_f
+\end{aligned}\]</div><p>Additional states between the initial and final states can also be specified. These are known as waypoint constraints. Often, the input and state of the system will have physical meaning, so we often want to find a sequence inputs that also minimizes a least squares objective like the following:</p><div>\[  \sum_{t = 0}^T \|Fx(t)\|^2_2 + \sum_{t = 1}^T\|Gu(t)\|^2_2,\]</div><p>where <span>$F$</span> and <span>$G$</span> are numerical matrices.</p><p>We'll now apply the basic format of the control problem to an example of controlling the motion of an object in a fluid over <span>$T$</span> intervals, each of <span>$h$</span> seconds. The state of the system at time interval <span>$t$</span> will be given by the position and the velocity of the object, denoted <span>$p(t)$</span> and <span>$v(t)$</span>, while the input will be forces applied to the object, denoted by <span>$f(t)$</span>. By the basic laws of physics, the relationship between force, velocity, and position must satisfy:</p><div>\[  \begin{aligned}
+    p(t+1) &amp;= p(t) + h v(t) \\
+    v(t+1) &amp;= v(t) + h a(t)
+  \end{aligned}.\]</div><p>Here, <span>$a(t)$</span> denotes the acceleration at time <span>$t$</span>, for which we we use <span>$a(t) = f(t) / m + g - d v(t)$</span>, where <span>$m$</span>, <span>$d$</span>, <span>$g$</span> are constants for the mass of the object, the drag coefficient of the fluid, and the acceleration from gravity, respectively.</p><p>Additionally, we have our initial/final position/velocity conditions:</p><div>\[  \begin{aligned}
+    p(1) &amp;= p_i\\
+    v(1) &amp;= v_i\\
+    p(T+1) &amp;= p_f\\
+    v(T+1) &amp;= 0
+  \end{aligned}\]</div><p>One reasonable objective to minimize would be</p><div>\[  \text{objective} = \mu \sum_{t = 1}^{T+1} (v(t))^2 + \sum_{t = 1}^T (f(t))^2\]</div><p>We would like to keep both the forces small to perhaps save fuel, and keep the velocities small for safety concerns. Here <span>$\mu$</span> serves as a parameter to control which part of the objective we deem more important, keeping the velocity small or keeping the force small.</p><p>The following code builds and solves our control example:</p><pre><code class="language-julia">using Convex, SCS, Plots
+
+# Some constraints on our motion
+# The object should start from the origin, and end at rest
+initial_velocity = [-20; 100]
+final_position = [100; 100]
+
+T = 100 # The number of timesteps
+h = 0.1 # The time between time intervals
+mass = 1 # Mass of object
+drag = 0.1 # Drag on object
+g = [0, -9.8] # Gravity on object
+
+# Declare the variables we need
+position = Variable(2, T)
+velocity = Variable(2, T)
+force = Variable(2, T - 1)
+
+# Create a problem instance
+mu = 1
+
+# Add constraints on our variables
+constraints = Constraint[ position[:, i + 1] == position[:, i] + h * velocity[:, i] for i in 1 : T - 1]
+
+
+for i in 1 : T - 1
+  acceleration = force[:, i]/mass + g - drag * velocity[:, i]
+  push!(constraints, velocity[:, i + 1] == velocity[:, i] + h * acceleration)
+end
+
+# Add position constraints
+push!(constraints, position[:, 1] == 0)
+push!(constraints, position[:, T] == final_position)
+
+# Add velocity constraints
+push!(constraints, velocity[:, 1] == initial_velocity)
+push!(constraints, velocity[:, T] == 0)
+
+# Solve the problem
+problem = minimize(sumsquares(force), constraints)
+solve!(problem, () -&gt; SCS.Optimizer(verbose=0))</code></pre><pre><code class="language-none">┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229</code></pre><p>We can plot the trajectory taken by the object.</p><pre><code class="language-julia">pos = evaluate(position)
+plot([pos[1, 1]], [pos[2, 1]], st=:scatter, label="initial point")
+plot!([pos[1, T]], [pos[2, T]], st=:scatter, label="final point")
+plot!(pos[1, :], pos[2, :], label="trajectory")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip4500"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip4500)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip4501"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip4500)" d="
+M167.279 1487.47 L2352.76 1487.47 L2352.76 47.2441 L167.279 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip4502"><rect height="1441" width="2186" x="167" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip4502)" points="
+  516.089,1487.47 516.089,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  959.794,1487.47 959.794,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  1403.5,1487.47 1403.5,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  1847.2,1487.47 1847.2,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  2290.91,1487.47 2290.91,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  167.279,1446.71 2352.76,1446.71 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  167.279,1066.31 2352.76,1066.31 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  167.279,685.899 2352.76,685.899 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4502)" points="
+  167.279,305.492 2352.76,305.492 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  167.279,1487.47 2352.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  167.279,1487.47 167.279,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  516.089,1487.47 516.089,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  959.794,1487.47 959.794,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  1403.5,1487.47 1403.5,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  1847.2,1487.47 1847.2,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  2290.91,1487.47 2290.91,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  167.279,1446.71 193.505,1446.71 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  167.279,1066.31 193.505,1066.31 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  167.279,685.899 193.505,685.899 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip4500)" points="
+  167.279,305.492 193.505,305.492 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 516.089, 1541.47)" x="516.089" y="1541.47">0</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 959.794, 1541.47)" x="959.794" y="1541.47">25</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1403.5, 1541.47)" x="1403.5" y="1541.47">50</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1847.2, 1541.47)" x="1847.2" y="1541.47">75</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2290.91, 1541.47)" x="2290.91" y="1541.47">100</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 1464.21)" x="143.279" y="1464.21">0</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 1083.81)" x="143.279" y="1083.81">50</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 703.399)" x="143.279" y="703.399">100</text></g><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 322.992)" x="143.279" y="322.992">150</text></g><circle clip-path="url(#clip4502)" cx="516.089" cy="1446.71" fill="#009af9" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><circle clip-path="url(#clip4502)" cx="2290.9" cy="685.903" fill="#e26f46" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><polyline clip-path="url(#clip4502)" points="
+  516.089,1446.71 480.594,1370.63 447.67,1297.25 417.268,1226.53 389.338,1158.42 363.831,1092.88 340.699,1029.86 319.892,969.326 301.361,911.225 285.059,855.517 
+  270.937,802.159 258.947,751.108 249.042,702.321 241.174,655.756 235.296,611.371 231.361,569.123 229.322,528.971 229.132,490.873 230.745,454.788 234.115,420.675 
+  239.195,388.493 245.94,358.2 254.303,329.757 264.24,303.123 275.704,278.258 288.651,255.121 303.034,233.673 318.81,213.874 335.933,195.685 354.359,179.067 
+  374.042,163.979 394.94,150.384 417.006,138.241 440.198,127.513 464.47,118.161 489.779,110.147 516.081,103.431 543.332,97.976 571.489,93.7439 600.508,90.6966 
+  630.344,88.7963 660.956,88.0053 692.299,88.2861 724.33,89.601 757.007,91.9127 790.285,95.1838 824.122,99.3774 858.474,104.456 893.3,110.383 928.555,117.121 
+  964.198,124.634 1000.18,132.885 1036.47,141.836 1073.02,151.452 1109.78,161.696 1146.71,172.531 1183.78,183.921 1220.93,195.829 1258.13,208.22 1295.33,221.057 
+  1332.49,234.304 1369.56,247.924 1406.51,261.882 1443.3,276.14 1479.87,290.665 1516.18,305.418 1552.2,320.365 1587.88,335.468 1623.18,350.693 1658.05,366.003 
+  1692.45,381.362 1726.35,396.735 1759.68,412.084 1792.43,427.375 1824.53,442.571 1855.94,457.637 1886.63,472.535 1916.55,487.231 1945.65,501.689 1973.9,515.871 
+  2001.25,529.743 2027.65,543.267 2053.07,556.408 2077.45,569.13 2100.75,581.396 2122.94,593.171 2143.96,604.417 2163.77,615.098 2182.33,625.179 2199.59,634.622 
+  2215.51,643.391 2230.04,651.449 2243.14,658.759 2254.76,665.285 2264.85,670.99 2273.38,675.837 2280.3,679.789 2285.55,682.809 2289.1,684.859 2290.9,685.903 
+  
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip4500)" d="
+M1813.37 372.684 L2280.76 372.684 L2280.76 130.764 L1813.37 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip4500)" points="
+  1813.37,372.684 2280.76,372.684 2280.76,130.764 1813.37,130.764 1813.37,372.684 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><circle clip-path="url(#clip4500)" cx="1921.37" cy="191.244" fill="#009af9" fill-opacity="1" fill-rule="evenodd" r="21" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2005.37, 208.744)" x="2005.37" y="208.744">initial point</text></g><circle clip-path="url(#clip4500)" cx="1921.37" cy="251.724" fill="#e26f46" fill-opacity="1" fill-rule="evenodd" r="21" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2005.37, 269.224)" x="2005.37" y="269.224">final point</text></g><polyline clip-path="url(#clip4500)" points="
+  1837.37,312.204 1981.37,312.204 
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip4500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2005.37, 329.704)" x="2005.37" y="329.704">trajectory</text></g></svg><p>We can also see how the magnitude of the force changes over time.</p><pre><code class="language-julia">plot(vec(sum(evaluate(force).^2, dims=1)), label="force (magnitude)")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip5100"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip5100)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip5101"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip5100)" d="
+M167.279 1487.47 L2352.76 1487.47 L2352.76 47.2441 L167.279 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip5102"><rect height="1441" width="2186" x="167" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip5102)" points="
+  208.094,1487.47 208.094,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  734.056,1487.47 734.056,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  1260.02,1487.47 1260.02,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  1785.98,1487.47 1785.98,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  2311.94,1487.47 2311.94,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,1465.61 2352.76,1465.61 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,1252.9 2352.76,1252.9 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,1040.2 2352.76,1040.2 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,827.492 2352.76,827.492 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,614.788 2352.76,614.788 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,402.083 2352.76,402.083 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5102)" points="
+  167.279,189.379 2352.76,189.379 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,1487.47 2352.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,1487.47 167.279,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  208.094,1487.47 208.094,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  734.056,1487.47 734.056,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  1260.02,1487.47 1260.02,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  1785.98,1487.47 1785.98,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  2311.94,1487.47 2311.94,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,1465.61 193.505,1465.61 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,1252.9 193.505,1252.9 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,1040.2 193.505,1040.2 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,827.492 193.505,827.492 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,614.788 193.505,614.788 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,402.083 193.505,402.083 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  167.279,189.379 193.505,189.379 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 208.094, 1541.47)" x="208.094" y="1541.47">0</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 734.056, 1541.47)" x="734.056" y="1541.47">25</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1260.02, 1541.47)" x="1260.02" y="1541.47">50</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1785.98, 1541.47)" x="1785.98" y="1541.47">75</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2311.94, 1541.47)" x="2311.94" y="1541.47">100</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 1483.11)" x="143.279" y="1483.11">0</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 1270.4)" x="143.279" y="1270.4">100</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 1057.7)" x="143.279" y="1057.7">200</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 844.992)" x="143.279" y="844.992">300</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 632.288)" x="143.279" y="632.288">400</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 419.583)" x="143.279" y="419.583">500</text></g><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 143.279, 206.879)" x="143.279" y="206.879">600</text></g><polyline clip-path="url(#clip5102)" points="
+  229.132,608.346 250.171,631.137 271.209,653.839 292.248,676.445 313.286,698.948 334.325,721.339 355.363,743.611 376.402,765.756 397.44,787.764 418.479,809.627 
+  439.517,831.337 460.555,852.885 481.594,874.26 502.632,895.453 523.671,916.454 544.709,937.254 565.748,957.841 586.786,978.205 607.825,998.335 628.863,1018.22 
+  649.902,1037.85 670.94,1057.21 691.979,1076.28 713.017,1095.07 734.056,1113.55 755.094,1131.7 776.133,1149.53 797.171,1167.01 818.21,1184.12 839.248,1200.86 
+  860.287,1217.21 881.325,1233.16 902.363,1248.68 923.402,1263.77 944.44,1278.4 965.479,1292.56 986.517,1306.23 1007.56,1319.39 1028.59,1332.03 1049.63,1344.13 
+  1070.67,1355.67 1091.71,1366.62 1112.75,1376.97 1133.79,1386.7 1154.83,1395.79 1175.86,1404.21 1196.9,1411.94 1217.94,1418.97 1238.98,1425.26 1260.02,1430.79 
+  1281.06,1435.55 1302.09,1439.5 1323.13,1442.61 1344.17,1444.87 1365.21,1446.25 1386.25,1446.71 1407.29,1446.24 1428.33,1444.8 1449.36,1442.36 1470.4,1438.89 
+  1491.44,1434.36 1512.48,1428.75 1533.52,1422.01 1554.56,1414.12 1575.59,1405.04 1596.63,1394.74 1617.67,1383.18 1638.71,1370.32 1659.75,1356.14 1680.79,1340.58 
+  1701.83,1323.62 1722.86,1305.21 1743.9,1285.31 1764.94,1263.88 1785.98,1240.88 1807.02,1216.26 1828.06,1189.99 1849.09,1162.01 1870.13,1132.27 1891.17,1100.74 
+  1912.21,1067.36 1933.25,1032.08 1954.29,994.86 1975.33,955.634 1996.36,914.355 2017.4,870.968 2038.44,825.417 2059.48,777.646 2080.52,727.597 2101.56,675.209 
+  2122.59,620.422 2143.63,563.175 2164.67,503.403 2185.71,441.04 2206.75,376.022 2227.79,308.28 2248.83,237.744 2269.86,164.343 2290.9,88.0053 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip5100)" d="
+M1663.58 251.724 L2280.76 251.724 L2280.76 130.764 L1663.58 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip5100)" points="
+  1663.58,251.724 2280.76,251.724 2280.76,130.764 1663.58,130.764 1663.58,251.724 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5100)" points="
+  1687.58,191.244 1831.58,191.244 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip5100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1855.58, 208.744)" x="1855.58" y="208.744">force (magnitude)</text></g></svg><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chebyshev_center/">« Chebyshev center</a><a class="docs-footer-nextpage" href="../huber_regression/">Huber regression »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label></p><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div><p></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 13 March 2020 23:49">Friday 13 March 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></HTML>

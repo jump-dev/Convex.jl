@@ -1,0 +1,154 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Advanced · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script data-main="../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../installation/">Installation</a></li><li><a class="toctext" href="../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../types/">Basic Types</a></li><li><a class="toctext" href="../operations/">Supported Operations</a></li><li><a class="toctext" href="../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../solvers/">Solvers</a></li><li><a class="toctext" href="../faq/">FAQ</a></li><li class="current"><a class="toctext" href="">Advanced</a><ul class="internal"><li><a class="toctext" href="#Dual-Variables-1">Dual Variables</a></li><li><a class="toctext" href="#Warmstarting-1">Warmstarting</a></li><li><a class="toctext" href="#Fixing-and-freeing-variables-1">Fixing and freeing variables</a></li><li><a class="toctext" href="#Printing-and-the-tree-structure-1">Printing and the tree structure</a></li><li><a class="toctext" href="#Reference-1">Reference</a></li></ul></li><li><a class="toctext" href="../problem_depot/">Problem Depot</a></li><li><a class="toctext" href="../contributing/">Contributing</a></li><li><a class="toctext" href="../credits/">Credits</a></li><li><span class="toctext">Examples</span><ul><li><span class="toctext">General examples</span><ul><li><a class="toctext" href="../examples/general_examples/DCP_analysis/">DCP analysis</a></li><li><a class="toctext" href="../examples/general_examples/basic_usage/">Basic Usage</a></li><li><a class="toctext" href="../examples/general_examples/chebyshev_center/">Chebyshev center</a></li><li><a class="toctext" href="../examples/general_examples/control/">Control</a></li><li><a class="toctext" href="../examples/general_examples/huber_regression/">Huber regression</a></li><li><a class="toctext" href="../examples/general_examples/logistic_regression/">Logistic regression</a></li><li><a class="toctext" href="../examples/general_examples/max_entropy/">Entropy Maximization</a></li><li><a class="toctext" href="../examples/general_examples/optimal_advertising/">Optimal advertising</a></li><li><a class="toctext" href="../examples/general_examples/robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="toctext" href="../examples/general_examples/svm/">Support vector machine</a></li><li><a class="toctext" href="../examples/general_examples/svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="toctext" href="../examples/general_examples/trade_off_curves/">Trade-off curves</a></li><li><a class="toctext" href="../examples/general_examples/worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><span class="toctext">Mixed integer</span><ul><li><a class="toctext" href="../examples/mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="toctext" href="../examples/mixed_integer/n_queens/">N queens</a></li><li><a class="toctext" href="../examples/mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><span class="toctext">Optimization with complex variables</span><ul><li><a class="toctext" href="../examples/optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="toctext" href="../examples/optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="toctext" href="../examples/optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="toctext" href="../examples/optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><span class="toctext">Portfolio optimization</span><ul><li><a class="toctext" href="../examples/portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="toctext" href="../examples/portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><span class="toctext">Supplemental material</span><ul><li><a class="toctext" href="../examples/supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="toctext" href="../examples/supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><span class="toctext">Time series</span><ul><li><a class="toctext" href="../examples/time_series/time_series/">Time Series Analysis</a></li></ul></li><li><span class="toctext">Tomography</span><ul><li><a class="toctext" href="../examples/tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href="">Advanced</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/src/advanced.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Advanced</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" href="#Advanced-Features-1" id="Advanced-Features-1">Advanced Features</a></h1><h2><a class="nav-anchor" href="#Dual-Variables-1" id="Dual-Variables-1">Dual Variables</a></h2><p>Convex.jl also returns the optimal dual variables for a problem. These are stored in the <code>dual</code> field associated with each constraint.</p><pre><code class="language-julia">using Convex, SCS
+
+x = Variable()
+constraint = x &gt;= 0
+p = minimize(x, constraint)
+solve!(p, SCSSolver())
+
+# Get the dual value for the constraint
+p.constraints[1].dual
+# or
+constraint.dual</code></pre><h2><a class="nav-anchor" href="#Warmstarting-1" id="Warmstarting-1">Warmstarting</a></h2><p>If you're solving the same problem many times with different values of a parameter, Convex.jl can initialize many solvers with the solution to the previous problem, which sometimes speeds up the solution time. This is called a <strong>warm start</strong>.</p><p>To use this feature, pass the optional argument <code>warmstart=true</code> to the <code>solve!</code> method.</p><pre><code class="language-julia"># initialize data
+n = 1000
+y = rand(n)
+x = Variable(n)
+
+# first solve
+lambda = 100
+problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
+@time solve!(problem, SCSSolver())
+
+# now warmstart
+# if the solver takes advantage of warmstarts, 
+# this run will be faster
+lambda = 105
+@time solve!(problem, SCSSolver(), warmstart=true)</code></pre><h2><a class="nav-anchor" href="#Fixing-and-freeing-variables-1" id="Fixing-and-freeing-variables-1">Fixing and freeing variables</a></h2><p>Convex.jl allows you to fix a variable <code>x</code> to a value by calling the <code>fix!</code> method. Fixing the variable essentially turns it into a constant. Fixed variables are sometimes also called parameters.</p><p><code>fix!(x, v)</code> fixes the variable <code>x</code> to the value <code>v</code>.</p><p><code>fix!(x)</code> fixes <code>x</code> to the value <code>x.value</code>, which might be the value obtained by solving another problem involving the variable <code>x</code>.</p><p>To allow the variable <code>x</code> to vary again, call <code>free!(x)</code>.</p><p>Fixing and freeing variables can be particularly useful as a tool for performing alternating minimization on nonconvex problems. For example, we can find an approximate solution to a nonnegative matrix factorization problem with alternating minimization as follows. We use warmstarts to speed up the solution.</p><pre><code class="language-julia"># initialize nonconvex problem
+n, k = 10, 1
+A = rand(n, k) * rand(k, n)
+x = Variable(n, k)
+y = Variable(k, n)
+problem = minimize(sum_squares(A - x*y), x&gt;=0, y&gt;=0)
+
+# initialize value of y
+y.value = rand(k, n)
+# we'll do 10 iterations of alternating minimization
+for i=1:10 
+    # first solve for x
+    # with y fixed, the problem is convex
+    fix!(y)
+    solve!(problem, SCSSolver(), warmstart = i &gt; 1 ? true : false)
+    free!(y)
+
+    # now solve for y with x fixed at the previous solution
+    fix!(x)
+    solve!(problem, SCSSolver(), warmstart = true)
+    free!(x)
+end</code></pre><h2><a class="nav-anchor" href="#Printing-and-the-tree-structure-1" id="Printing-and-the-tree-structure-1">Printing and the tree structure</a></h2><p>A Convex problem is structured as a <em>tree</em>, with the <em>root</em> being the problem object, with branches to the objective and the set of constraints. The objective is an <code>AbstractExpr</code> which itself is a tree, with each atom being a node and having <code>children</code> which are other atoms, variables, or constants. Convex provides <code>children</code> methods from <a href="https://github.com/Keno/AbstractTrees.jl">AbstractTrees.jl</a> so that the tree-traversal functions of that package can be used with Convex.jl problems and structures. This is what allows powers the printing of problems, expressions, and constraints. The depth to which the tree corresponding to a problem, expression, or constraint is printed is controlled by the global variable <a href="#Convex.MAXDEPTH"><code>Convex.MAXDEPTH</code></a>, which defaults to 3. This can be changed by e.g. setting</p><pre><code class="language-julia">Convex.MAXDEPTH[] = 5</code></pre><p>Likewise, <a href="#Convex.MAXWIDTH"><code>Convex.MAXWIDTH</code></a>, which defaults to 15, controls the "width" of the printed tree. For example, when printing a problem with 20 constraints, only the first <code>MAXWIDTH</code> of the constraints will be printed. Vertical dots, "⋮", will be printed indicating that some constraints were omitted in the printing.</p><p>The AbstractTrees methods can also be used to analyze the structure of a Convex.jl problem. For example,</p><pre><code class="language-julia-repl">julia&gt; using Convex, AbstractTrees
+
+julia&gt; x = Variable()
+Variable
+size: (1, 1)
+sign: real
+vexity: affine
+id: 138…080
+
+julia&gt; p = maximize( log(x), x &gt;= 1, x &lt;= 3 )
+maximize
+└─ log (concave; real)
+   └─ real variable (id: 138…080)
+subject to
+├─ &gt;= constraint (affine)
+│  ├─ real variable (id: 138…080)
+│  └─ 1
+└─ &lt;= constraint (affine)
+   ├─ real variable (id: 138…080)
+   └─ 3
+
+current status: not yet solved
+
+julia&gt; for leaf in AbstractTrees.Leaves(p)
+           println("Here's a leaf: $(summary(leaf))")
+       end
+Here's a leaf: real variable (id: 138…080)
+Here's a leaf: real variable (id: 138…080)
+Here's a leaf: constant (constant; positive)
+Here's a leaf: real variable (id: 138…080)
+Here's a leaf: constant (constant; positive)</code></pre><p>We can also iterate over the problem in various orders. The following descriptions are taken from the AbstractTrees.jl docstrings, which have more information.</p><h3><a class="nav-anchor" href="#PostOrderDFS-1" id="PostOrderDFS-1">PostOrderDFS</a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that children will be visited before their parents.</p><pre><code class="language-julia-repl">julia&gt; for (i, node) in enumerate(AbstractTrees.PostOrderDFS(p))
+           println("Here's node $i via PostOrderDFS: $(summary(node))")
+       end
+Here's node 1 via PostOrderDFS: real variable (id: 138…080)
+Here's node 2 via PostOrderDFS: log (concave; real)
+Here's node 3 via PostOrderDFS: real variable (id: 138…080)
+Here's node 4 via PostOrderDFS: constant (constant; positive)
+Here's node 5 via PostOrderDFS: &gt;= constraint (affine)
+Here's node 6 via PostOrderDFS: real variable (id: 138…080)
+Here's node 7 via PostOrderDFS: constant (constant; positive)
+Here's node 8 via PostOrderDFS: &lt;= constraint (affine)
+Here's node 9 via PostOrderDFS: 2-element Array{Constraint,1}
+Here's node 10 via PostOrderDFS: Problem</code></pre><h3><a class="nav-anchor" href="#PreOrderDFS-1" id="PreOrderDFS-1">PreOrderDFS</a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that parents will be visited before their children.</p><pre><code class="language-julia-repl">julia&gt; for (i, node) in enumerate(AbstractTrees.PreOrderDFS(p))
+           println("Here's node $i via PreOrderDFS: $(summary(node))")
+       end
+Here's node 1 via PreOrderDFS: Problem
+Here's node 2 via PreOrderDFS: log (concave; real)
+Here's node 3 via PreOrderDFS: real variable (id: 138…080)
+Here's node 4 via PreOrderDFS: 2-element Array{Constraint,1}
+Here's node 5 via PreOrderDFS: &gt;= constraint (affine)
+Here's node 6 via PreOrderDFS: real variable (id: 138…080)
+Here's node 7 via PreOrderDFS: constant (constant; positive)
+Here's node 8 via PreOrderDFS: &lt;= constraint (affine)
+Here's node 9 via PreOrderDFS: real variable (id: 138…080)
+Here's node 10 via PreOrderDFS: constant (constant; positive)</code></pre><h3><a class="nav-anchor" href="#StatelessBFS-1" id="StatelessBFS-1">StatelessBFS</a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that all nodes of a level will be visited before their children.</p><pre><code class="language-julia-repl">julia&gt; for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
+           println("Here's node $i via StatelessBFS: $(summary(node))")
+       end
+Here's node 1 via StatelessBFS: Problem
+Here's node 2 via StatelessBFS: log (concave; real)
+Here's node 3 via StatelessBFS: 2-element Array{Constraint,1}
+Here's node 4 via StatelessBFS: real variable (id: 138…080)
+Here's node 5 via StatelessBFS: &gt;= constraint (affine)
+Here's node 6 via StatelessBFS: &lt;= constraint (affine)
+Here's node 7 via StatelessBFS: real variable (id: 138…080)
+Here's node 8 via StatelessBFS: constant (constant; positive)
+Here's node 9 via StatelessBFS: real variable (id: 138…080)
+Here's node 10 via StatelessBFS: constant (constant; positive)</code></pre><h2><a class="nav-anchor" href="#Reference-1" id="Reference-1">Reference</a></h2><section class="docstring"><div class="docstring-header"><a class="docstring-binding" href="#Convex.MAXDEPTH" id="Convex.MAXDEPTH"><code>Convex.MAXDEPTH</code></a> — <span class="docstring-category">Constant</span>.</div><div><div><pre><code class="language-julia">const MAXDEPTH = Ref(3)</code></pre><p>Controls depth of tree printing globally for Convex.jl</p></div></div><a class="source-link" href="https://github.com/JuliaOpt/Convex.jl/blob/aa61f5342842a70670a37ebb91d4c646e058294d/src/utilities/show.jl#LL6-L10" target="_blank">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" href="#Convex.MAXWIDTH" id="Convex.MAXWIDTH"><code>Convex.MAXWIDTH</code></a> — <span class="docstring-category">Constant</span>.</div><div><div><pre><code class="language-julia">const MAXWIDTH = Ref(15)</code></pre><p>Controls width of tree printing globally for Convex.jl</p></div></div><a class="source-link" href="https://github.com/JuliaOpt/Convex.jl/blob/aa61f5342842a70670a37ebb91d4c646e058294d/src/utilities/show.jl#LL13-L17" target="_blank">source</a></section><footer><hr/><a class="previous" href="../faq/"><span class="direction">Previous</span><span class="title">FAQ</span></a><a class="next" href="../problem_depot/"><span class="direction">Next</span><span class="title">Problem Depot</span></a></footer></article></body></HTML>

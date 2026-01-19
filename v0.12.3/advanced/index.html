@@ -1,0 +1,88 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Advanced · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script data-main="../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../installation/">Installation</a></li><li><a class="toctext" href="../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../types/">Basic Types</a></li><li><a class="toctext" href="../operations/">Supported Operations</a></li><li><a class="toctext" href="../examples/">Examples</a></li><li><a class="toctext" href="../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../solvers/">Solvers</a></li><li><a class="toctext" href="../faq/">FAQ</a></li><li><a class="toctext" href="../loop/">Optimizing in a Loop</a></li><li class="current"><a class="toctext" href="">Advanced</a><ul class="internal"><li><a class="toctext" href="#Dual-Variables-1">Dual Variables</a></li><li><a class="toctext" href="#Warmstarting-1">Warmstarting</a></li><li><a class="toctext" href="#Fixing-and-freeing-variables-1">Fixing and freeing variables</a></li></ul></li><li><a class="toctext" href="../contributing/">Contributing</a></li><li><a class="toctext" href="../credits/">Credits</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="">Advanced</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/src/advanced.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Advanced</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" href="#Advanced-Features-1" id="Advanced-Features-1">Advanced Features</a></h1><h2><a class="nav-anchor" href="#Dual-Variables-1" id="Dual-Variables-1">Dual Variables</a></h2><p>Convex.jl also returns the optimal dual variables for a problem. These are stored in the <code>dual</code> field associated with each constraint.</p><pre><code class="language-julia">using Convex, SCS
+
+x = Variable()
+constraint = x &gt;= 0
+p = minimize(x, constraint)
+solve!(p, SCSSolver())
+
+# Get the dual value for the constraint
+p.constraints[1].dual
+# or
+constraint.dual</code></pre><h2><a class="nav-anchor" href="#Warmstarting-1" id="Warmstarting-1">Warmstarting</a></h2><p>If you're solving the same problem many times with different values of a parameter, Convex.jl can initialize many solvers with the solution to the previous problem, which sometimes speeds up the solution time. This is called a <strong>warm start</strong>.</p><p>To use this feature, pass the optional argument <code>warmstart=true</code> to the <code>solve!</code> method.</p><pre><code class="language-julia"># initialize data
+n = 1000
+y = rand(n)
+x = Variable(n)
+
+# first solve
+lambda = 100
+problem = minimize(sumsquares(y - x) + lambda * sumsquares(x - 10))
+@time solve!(problem, SCSSolver())
+
+# now warmstart
+# if the solver takes advantage of warmstarts, 
+# this run will be faster
+lambda = 105
+@time solve!(problem, SCSSolver(), warmstart=true)</code></pre><h2><a class="nav-anchor" href="#Fixing-and-freeing-variables-1" id="Fixing-and-freeing-variables-1">Fixing and freeing variables</a></h2><p>Convex.jl allows you to fix a variable <code>x</code> to a value by calling the <code>fix!</code> method. Fixing the variable essentially turns it into a constant. Fixed variables are sometimes also called parameters.</p><p><code>fix!(x, v)</code> fixes the variable <code>x</code> to the value <code>v</code>.</p><p><code>fix!(x)</code> fixes <code>x</code> to the value <code>x.value</code>, which might be the value obtained by solving another problem involving the variable <code>x</code>.</p><p>To allow the variable <code>x</code> to vary again, call <code>free!(x)</code>.</p><p>Fixing and freeing variables can be particularly useful as a tool for performing alternating minimization on nonconvex problems. For example, we can find an approximate solution to a nonnegative matrix factorization problem with alternating minimization as follows. We use warmstarts to speed up the solution.</p><pre><code class="language-julia"># initialize nonconvex problem
+n, k = 10, 1
+A = rand(n, k) * rand(k, n)
+x = Variable(n, k)
+y = Variable(k, n)
+problem = minimize(sum_squares(A - x*y), x&gt;=0, y&gt;=0)
+
+# initialize value of y
+y.value = rand(k, n)
+# we'll do 10 iterations of alternating minimization
+for i=1:10 
+    # first solve for x
+    # with y fixed, the problem is convex
+    fix!(y)
+    solve!(problem, SCSSolver(), warmstart = i &gt; 1 ? true : false)
+    free!(y)
+
+    # now solve for y with x fixed at the previous solution
+    fix!(x)
+    solve!(problem, SCSSolver(), warmstart = true)
+    free!(x)
+end</code></pre><footer><hr/><a class="previous" href="../loop/"><span class="direction">Previous</span><span class="title">Optimizing in a Loop</span></a><a class="next" href="../contributing/"><span class="direction">Next</span><span class="title">Contributing</span></a></footer></article></body></HTML>
