@@ -2420,12 +2420,6 @@ function test_quadform()
         return quadform(Variable(2), [20.0 16.0; 16.0 20.0])
     end
     _test_reformulation(target) do context
-        return quadform(
-            Variable(2),
-            SparseArrays.sparse([20.0 16.0; 16.0 20.0]),
-        )
-    end
-    _test_reformulation(target) do context
         return quadform(Variable(2), [20.0 16.0; 16.0 20.0]; assume_psd = true)
     end
     _test_reformulation(target) do context
@@ -2466,6 +2460,15 @@ function test_quadform()
         quadform(Variable(2), [1 0; -2 1]),
     )
     @test quadform(constant([1, 2]), constant([1 2; 2 3])) == 21
+    target = """
+    variables: u, t, x1, x2
+    minobjective: 1.0 * u
+    [t, 2.000000000025 * x1, 3.0000000000166667*x2] in SecondOrderCone(3)
+    [u, 0.5, t] in RotatedSecondOrderCone(3)
+    """
+    _test_reformulation(target) do context
+        return quadform(Variable(2), A)
+    end
     return
 end
 
