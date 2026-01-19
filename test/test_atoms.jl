@@ -12,6 +12,7 @@ using Test
 import LinearAlgebra
 
 import MathOptInterface as MOI
+import SparseArrays
 
 function runtests()
     for name in names(@__MODULE__; all = true)
@@ -2417,6 +2418,12 @@ function test_quadform()
     """
     _test_reformulation(target) do context
         return quadform(Variable(2), [20.0 16.0; 16.0 20.0])
+    end
+    _test_reformulation(target) do context
+        return quadform(
+            Variable(2),
+            SparseArrays.sparse([20.0 16.0; 16.0 20.0]),
+        )
     end
     _test_reformulation(target) do context
         return quadform(Variable(2), [20.0 16.0; 16.0 20.0]; assume_psd = true)
