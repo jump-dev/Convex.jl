@@ -128,14 +128,9 @@ end
 
 _square_root(A::Value) = sqrt(LinearAlgebra.Hermitian(A))
 
-function _squareroot(A::SparseArrays.SparseMatrixCSC; shift = 1e-10)
-    chol = cholesky(A; shift, check = false)
-    if !issuccess(chol)
-        error(
-            "The Shifted Cholesky decomposition failed. The matrix may not be an SPSD.",
-        )
-    end
-    L = sparse(chol.L)
+function _square_root(A::SparseArrays.SparseMatrixCSC)
+    chol = LinearAlgebra.cholesky(A; shift = 1e-10)
+    L = SparseArrays.sparse(chol.L)
     return L'[:, invperm(chol.p)]
 end
 
