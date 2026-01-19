@@ -2466,6 +2466,7 @@ function test_quadform()
     [t, 2.000000000025 * x1, 3.0000000000166667*x2] in SecondOrderCone(3)
     [u, 0.5, t] in RotatedSecondOrderCone(3)
     """
+    A = SparseArrays.sparse([4.0 0.0; 0.0 9.0])
     _test_reformulation(target) do context
         return quadform(Variable(2), A)
     end
