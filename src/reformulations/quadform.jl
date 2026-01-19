@@ -121,8 +121,17 @@ function quadform(x::AbstractExpr, A::Value; assume_psd = false)
     else
         error("Quadratic forms supported only for semidefinite matrices")
     end
-    P = sqrt(LinearAlgebra.Hermitian(factor * A))
+    # Calculates matrix `P` such that `A = P' * P`
+    P = _square_root(factor * A)
     return factor * square(norm2(P * x))
+end
+
+_square_root(A::Value) = sqrt(LinearAlgebra.Hermitian(A))
+
+function _square_root(A::SparseArrays.SparseMatrixCSC)
+    chol = LinearAlgebra.cholesky(A; shift = 1e-10)
+    L = SparseArrays.sparse(chol.L)
+    return L'[:, invperm(chol.p)]
 end
 
 # These `evaluate` calls are safe since they are not a `fix!`ed variable
