@@ -16,12 +16,12 @@ lin-sys:  sparse-direct-amd-qdldl
 ------------------------------------------------------------------
  iter | pri res | dua res |   gap   |   obj   |  scale  | time (s)
 ------------------------------------------------------------------
-     0| 1.90e+01  1.00e+00  2.00e+01 -8.00e+00  1.00e-01  4.18e-05 
-    25| 9.46e-06  2.35e-08  9.49e-06  1.00e+00  1.00e-01  5.38e-05 
+     0| 1.90e+01  1.00e+00  2.00e+01 -8.00e+00  1.00e-01  5.04e-05 
+    25| 9.46e-06  2.35e-08  9.49e-06  1.00e+00  1.00e-01  6.24e-05 
 ------------------------------------------------------------------
 status:  solved
-timings: total: 5.44e-05s = setup: 3.28e-05s + solve: 2.16e-05s
-	 lin-sys: 2.62e-06s, cones: 1.75e-06s, accel: 9.91e-07s
+timings: total: 6.31e-05s = setup: 4.08e-05s + solve: 2.24e-05s
+	 lin-sys: 2.65e-06s, cones: 1.84e-06s, accel: 1.10e-06s
 ------------------------------------------------------------------
 objective = 1.000005
 ------------------------------------------------------------------
@@ -40,11 +40,11 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 618…099)
+   └─ real variable (id: 181…044)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 618…099)
+         ├─ real variable (id: 181…044)
          └─ [-1;;]</code></pre><p>A different solver can be used by replacing <code>SCS</code> as appropriate. For example, GLPK is a mixed-inter linear solver:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using GLPK</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, GLPK.Optimizer)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.0 seconds, 150.203 KiB of memory allocated
 Problem statistics
   problem is DCP         : true
@@ -61,12 +61,12 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 618…099)
+   └─ real variable (id: 181…044)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 618…099)
-         └─ [-1;;]</code></pre><p>Many of the solvers also allow options to be passed using <code>MOI.OptimizerWithAttributes</code>. For example, to set a time limit (in milliseconds) with GLPK, use:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; import Convex: MOI</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solver = MOI.OptimizerWithAttributes(GLPK.Optimizer, &quot;tm_lim&quot; =&gt; 60_000.0)</code><code class="nohighlight hljs ansi" style="display:block;">MathOptInterface.OptimizerWithAttributes(GLPK.Optimizer, Pair{MathOptInterface.AbstractOptimizerAttribute, Any}[MathOptInterface.RawOptimizerAttribute(&quot;tm_lim&quot;) =&gt; 60000.0])</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, solver)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.05 seconds, 1.142 MiB of memory allocated
+         ├─ real variable (id: 181…044)
+         └─ [-1;;]</code></pre><p>Many of the solvers also allow options to be passed using <code>MOI.OptimizerWithAttributes</code>. For example, to set a time limit (in milliseconds) with GLPK, use:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; import Convex: MOI</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solver = MOI.OptimizerWithAttributes(GLPK.Optimizer, &quot;tm_lim&quot; =&gt; 60_000.0)</code><code class="nohighlight hljs ansi" style="display:block;">MathOptInterface.OptimizerWithAttributes(GLPK.Optimizer, Pair{MathOptInterface.AbstractOptimizerAttribute, Any}[MathOptInterface.RawOptimizerAttribute(&quot;tm_lim&quot;) =&gt; 60000.0])</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, solver)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.06 seconds, 1.142 MiB of memory allocated
 Problem statistics
   problem is DCP         : true
   number of variables    : 1 (1 scalar elements)
@@ -82,11 +82,11 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 618…099)
+   └─ real variable (id: 181…044)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 618…099)
+         ├─ real variable (id: 181…044)
          └─ [-1;;]</code></pre><p>As another example, if we wish to turn off printing for the SCS solver (that is, run in quiet mode), we can do so as follows:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; silent_scs = MOI.OptimizerWithAttributes(SCS.Optimizer, MOI.Silent() =&gt; true)</code><code class="nohighlight hljs ansi" style="display:block;">MathOptInterface.OptimizerWithAttributes(SCS.Optimizer, Pair{MathOptInterface.AbstractOptimizerAttribute, Any}[MathOptInterface.Silent() =&gt; true])</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, silent_scs)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.0 seconds, 56.688 KiB of memory allocated
 Problem statistics
   problem is DCP         : true
@@ -103,11 +103,11 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 618…099)
+   └─ real variable (id: 181…044)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 618…099)
+         ├─ real variable (id: 181…044)
          └─ [-1;;]</code></pre><p>Another option is to use the solver-independent <code>silent</code> keyword argument to <code>solve!</code>:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(p, SCS.Optimizer; silent=true)</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
   number of variables    : 1 (1 scalar elements)
@@ -123,9 +123,9 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 618…099)
+   └─ real variable (id: 181…044)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 618…099)
-         └─ [-1;;]</code></pre><p>See each solver&#39;s documentation for more information on solver-dependent options.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../complex-domain_optimization/">« Complex-domain Optimization</a><a class="docs-footer-nextpage" href="../performance_tips/">Performance tips »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 09:07">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+         ├─ real variable (id: 181…044)
+         └─ [-1;;]</code></pre><p>See each solver&#39;s documentation for more information on solver-dependent options.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../complex-domain_optimization/">« Complex-domain Optimization</a><a class="docs-footer-nextpage" href="../performance_tips/">Performance tips »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

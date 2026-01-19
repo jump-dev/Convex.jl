@@ -29,7 +29,7 @@ b = A * x♮ + noise      # noisy linear observations</code></pre><pre class="do
 size: (100, 1)
 sign: real
 vexity: affine
-id: 482…203</code></pre><p>nonnegative elastic net with regularization</p><pre><code class="language-julia hljs">λ = 1
+id: 989…043</code></pre><p>nonnegative elastic net with regularization</p><pre><code class="language-julia hljs">λ = 1
 μ = 1
 problem = minimize(
     square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
@@ -65,7 +65,7 @@ Expression graph
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ 100-element real variable (id: 482…203)
+         ├─ 100-element real variable (id: 989…043)
          └─ Convex.NegateAtom (constant; negative)
             └─ …
 </code></pre><p>Solve the problem by calling <code>solve!</code></p><pre><code class="language-julia hljs">solve!(problem, SCS.Optimizer; silent = true)
@@ -86,34 +86,34 @@ end</code></pre><h1 id="Quick-convex-prototyping"><a class="docs-heading-anchor"
 size: (1, 1)
 sign: real
 vexity: affine
-id: 101…563</code></pre><p>(Column) vector variable</p><pre><code class="language-julia hljs">y = Variable(4)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Variable
+id: 157…955</code></pre><p>(Column) vector variable</p><pre><code class="language-julia hljs">y = Variable(4)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Variable
 size: (4, 1)
 sign: real
 vexity: affine
-id: 125…010</code></pre><p>Matrix variable</p><pre><code class="language-julia hljs">Z = Variable(4, 4)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Variable
+id: 293…162</code></pre><p>Matrix variable</p><pre><code class="language-julia hljs">Z = Variable(4, 4)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Variable
 size: (4, 4)
 sign: real
 vexity: affine
-id: 562…121</code></pre><h1 id="Expressions"><a class="docs-heading-anchor" href="#Expressions">Expressions</a><a id="Expressions-1"></a><a class="docs-heading-anchor-permalink" href="#Expressions" title="Permalink"></a></h1><p>Convex.jl allows you to use a <a href="http://convexjl.readthedocs.org/en/latest/operations.html">wide variety of functions</a> on variables and on expressions to form new expressions.</p><pre><code class="language-julia hljs">x + 2x</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (affine; real)
-├─ real variable (id: 101…563)
+id: 215…084</code></pre><h1 id="Expressions"><a class="docs-heading-anchor" href="#Expressions">Expressions</a><a id="Expressions-1"></a><a class="docs-heading-anchor-permalink" href="#Expressions" title="Permalink"></a></h1><p>Convex.jl allows you to use a <a href="http://convexjl.readthedocs.org/en/latest/operations.html">wide variety of functions</a> on variables and on expressions to form new expressions.</p><pre><code class="language-julia hljs">x + 2x</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (affine; real)
+├─ real variable (id: 157…955)
 └─ * (affine; real)
    ├─ [2;;]
-   └─ real variable (id: 101…563)</code></pre><pre><code class="language-julia hljs">e = y[1] + logdet(Z) + sqrt(x) + minimum(y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (concave; real)
+   └─ real variable (id: 157…955)</code></pre><pre><code class="language-julia hljs">e = y[1] + logdet(Z) + sqrt(x) + minimum(y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (concave; real)
 ├─ index (affine; real)
-│  └─ 4-element real variable (id: 125…010)
+│  └─ 4-element real variable (id: 293…162)
 ├─ logdet (concave; real)
-│  └─ 4×4 real variable (id: 562…121)
+│  └─ 4×4 real variable (id: 215…084)
 ├─ geomean (concave; positive)
-│  ├─ real variable (id: 101…563)
+│  ├─ real variable (id: 157…955)
 │  └─ [1.0;;]
 ⋮</code></pre><h3 id="Examine-the-expression-tree"><a class="docs-heading-anchor" href="#Examine-the-expression-tree">Examine the expression tree</a><a id="Examine-the-expression-tree-1"></a><a class="docs-heading-anchor-permalink" href="#Examine-the-expression-tree" title="Permalink"></a></h3><pre><code class="language-julia hljs">e.children[2]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">logdet (concave; real)
-└─ 4×4 real variable (id: 562…121)</code></pre><h1 id="Constraints"><a class="docs-heading-anchor" href="#Constraints">Constraints</a><a id="Constraints-1"></a><a class="docs-heading-anchor-permalink" href="#Constraints" title="Permalink"></a></h1><p>A constraint is convex if convex combinations of feasible points are also feasible. Equivalently, feasible sets are convex sets.</p><p>In other words, convex constraints are of the form</p><ul><li><code>convexExpr &lt;= 0</code></li><li><code>concaveExpr &gt;= 0</code></li><li><code>affineExpr == 0</code></li></ul><pre><code class="language-julia hljs">x &lt;= 0</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">≤ constraint (affine)
+└─ 4×4 real variable (id: 215…084)</code></pre><h1 id="Constraints"><a class="docs-heading-anchor" href="#Constraints">Constraints</a><a id="Constraints-1"></a><a class="docs-heading-anchor-permalink" href="#Constraints" title="Permalink"></a></h1><p>A constraint is convex if convex combinations of feasible points are also feasible. Equivalently, feasible sets are convex sets.</p><p>In other words, convex constraints are of the form</p><ul><li><code>convexExpr &lt;= 0</code></li><li><code>concaveExpr &gt;= 0</code></li><li><code>affineExpr == 0</code></li></ul><pre><code class="language-julia hljs">x &lt;= 0</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">≤ constraint (affine)
 └─ + (affine; real)
-   ├─ real variable (id: 101…563)
+   ├─ real variable (id: 157…955)
    └─ [0;;]</code></pre><pre><code class="language-julia hljs">square(x) &lt;= sum(y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">≤ constraint (convex)
 └─ + (convex; real)
    ├─ qol_elem (convex; positive)
-   │  ├─ real variable (id: 101…563)
+   │  ├─ real variable (id: 157…955)
    │  └─ [1.0;;]
    └─ Convex.NegateAtom (affine; real)
       └─ sum (affine; real)
@@ -123,7 +123,7 @@ for i in 1:length(y)
 end
 M ⪰ 0</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PSD constraint (convex)
 └─ + (affine; real)
-   ├─ 4×4 real variable (id: 562…121)
+   ├─ 4×4 real variable (id: 215…084)
    ├─ * (affine; real)
    │  ├─ 4×4 Matrix{Float64}
    │  └─ index (affine; real)
@@ -153,7 +153,7 @@ Expression graph
    └─ + (convex; real)
       ├─ * (affine; real)
       │  ├─ [2;;]
-      │  └─ real variable (id: 932…345)
+      │  └─ real variable (id: 163…320)
       ├─ [1;;]
       └─ Convex.NegateAtom (convex; negative)
          └─ geomean (concave; positive)
@@ -162,7 +162,7 @@ Expression graph
   subject to
    └─ ≥ constraint (convex)
       └─ + (concave; real)
-         ├─ real variable (id: 932…345)
+         ├─ real variable (id: 163…320)
          └─ Convex.NegateAtom (concave; real)
             └─ …
 </code></pre><p>Solve the problem:</p><pre><code class="language-julia hljs">solve!(p, SCS.Optimizer; silent = true)
@@ -196,7 +196,7 @@ b = A * x♮ + noise      # noisy linear observations</code></pre><pre class="do
 size: (100, 1)
 sign: real
 vexity: affine
-id: 596…505</code></pre><p>nonnegative elastic net with regularization</p><pre><code class="language-julia hljs">λ = 1
+id: 118…886</code></pre><p>nonnegative elastic net with regularization</p><pre><code class="language-julia hljs">λ = 1
 μ = 1
 problem = minimize(
     square(norm(A * x - b)) + λ * square(norm(x)) + μ * norm(x, 1),
@@ -236,24 +236,24 @@ Expression graph
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ 100-element real variable (id: 596…505)
+         ├─ 100-element real variable (id: 118…886)
          └─ Convex.NegateAtom (constant; negative)
             └─ …
 </code></pre><h1 id="DCP-examples"><a class="docs-heading-anchor" href="#DCP-examples">DCP examples</a><a id="DCP-examples-1"></a><a class="docs-heading-anchor-permalink" href="#DCP-examples" title="Permalink"></a></h1><ul><li>affine</li></ul><pre><code class="language-julia hljs">x = Variable(4)
 y = Variable(2)
 sum(x) + y[2]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (affine; real)
 ├─ sum (affine; real)
-│  └─ 4-element real variable (id: 104…331)
+│  └─ 4-element real variable (id: 783…261)
 └─ index (affine; real)
-   └─ 2-element real variable (id: 727…577)</code></pre><pre><code class="language-julia hljs">2 * maximum(x) + 4 * sum(y) - sqrt(y[1] + x[1]) - 7 * minimum(x[2:4])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (convex; real)
+   └─ 2-element real variable (id: 376…921)</code></pre><pre><code class="language-julia hljs">2 * maximum(x) + 4 * sum(y) - sqrt(y[1] + x[1]) - 7 * minimum(x[2:4])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (convex; real)
 ├─ * (convex; real)
 │  ├─ [2;;]
 │  └─ maximum (convex; real)
-│     └─ 4-element real variable (id: 104…331)
+│     └─ 4-element real variable (id: 783…261)
 ├─ * (affine; real)
 │  ├─ [4;;]
 │  └─ sum (affine; real)
-│     └─ 2-element real variable (id: 727…577)
+│     └─ 2-element real variable (id: 376…921)
 ├─ Convex.NegateAtom (convex; negative)
 │  └─ geomean (concave; positive)
 │     ├─ + (affine; real)
@@ -262,19 +262,19 @@ sum(x) + y[2]</code></pre><pre class="documenter-example-output"><code class="no
 │     └─ [1.0;;]
 ⋮</code></pre><ul><li>not DCP compliant</li></ul><pre><code class="language-julia hljs">log(x) + square(x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (Convex.NotDcp; real)
 ├─ log (concave; real)
-│  └─ 4-element real variable (id: 104…331)
+│  └─ 4-element real variable (id: 783…261)
 └─ qol_elem (convex; positive)
-   ├─ 4-element real variable (id: 104…331)
+   ├─ 4-element real variable (id: 783…261)
    └─ 4×1 Matrix{Float64}</code></pre><ul><li>Composition <span>$f\circ g$</span> where <span>$f$</span> is convex increasing and <span>$g$</span> is convex</li></ul><pre><code class="language-julia hljs">square(pos(x))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">qol_elem (convex; positive)
 ├─ max (convex; positive)
-│  ├─ 4-element real variable (id: 104…331)
+│  ├─ 4-element real variable (id: 783…261)
 │  └─ [0;;]
 └─ 4×1 Matrix{Float64}</code></pre><ul><li>Composition <span>$f\circ g$</span> where <span>$f$</span> is convex decreasing and <span>$g$</span> is concave</li></ul><pre><code class="language-julia hljs">invpos(sqrt(x))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">qol_elem (convex; positive)
 ├─ 4×1 Matrix{Float64}
 └─ geomean (concave; positive)
-   ├─ 4-element real variable (id: 104…331)
+   ├─ 4-element real variable (id: 783…261)
    └─ 4×1 Matrix{Float64}</code></pre><ul><li>Composition <span>$f\circ g$</span> where <span>$f$</span> is concave increasing and <span>$g$</span> is concave</li></ul><pre><code class="language-julia hljs">sqrt(sqrt(x))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">geomean (concave; positive)
 ├─ geomean (concave; positive)
-│  ├─ 4-element real variable (id: 104…331)
+│  ├─ 4-element real variable (id: 783…261)
 │  └─ 4×1 Matrix{Float64}
-└─ 4×1 Matrix{Float64}</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../portfolio_optimization/portfolio_optimization2/">« Portfolio Optimization - Markowitz Efficient Frontier</a><a class="docs-footer-nextpage" href="../paper_examples/">Paper examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 09:07">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+└─ 4×1 Matrix{Float64}</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../portfolio_optimization/portfolio_optimization2/">« Portfolio Optimization - Markowitz Efficient Frontier</a><a class="docs-footer-nextpage" href="../paper_examples/">Paper examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

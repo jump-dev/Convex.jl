@@ -15,15 +15,15 @@ Solution summary
 Expression graph
   minimize
    └─ abs (convex; positive)
-      └─ real variable (id: 169…905)
+      └─ real variable (id: 165…933)
   subject to
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 169…905)
+   │     ├─ real variable (id: 165…933)
    │     └─ [-1;;]
    └─ ≤ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 169…905)
+         ├─ real variable (id: 165…933)
          └─ [-2;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x.value</code><code class="nohighlight hljs ansi" style="display:block;">0.999999999998428</code></pre><p>The optimum occurs at <code>x = 1</code>, but let us imagine we want to solve this problem via Convex.jl using a linear programming (LP) solver.</p><p>Since <code>abs</code> is a nonlinear function, we need to reformulate the problem to pass it to the LP solver. We do this by introducing an auxiliary variable <code>t</code> and instead solving:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Convex, SCS</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x = Variable();</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; t = Variable();</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; model_min_extended = minimize(t, [x &gt;= 1, x &lt;= 2, t &gt;= x, t &gt;= -x]);</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(model_min_extended, SCS.Optimizer; silent = true)</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
   number of variables    : 2 (2 scalar elements)
@@ -39,19 +39,19 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 168…036)
+   └─ real variable (id: 752…287)
   subject to
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 832…630)
+   │     ├─ real variable (id: 107…709)
    │     └─ [-1;;]
    ├─ ≤ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 832…630)
+   │     ├─ real variable (id: 107…709)
    │     └─ [-2;;]
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 168…036)
+   │     ├─ real variable (id: 752…287)
    │     └─ Convex.NegateAtom (affine; real)
    │        └─ …
    ⋮</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x.value</code><code class="nohighlight hljs ansi" style="display:block;">0.999999999998428</code></pre><p>That is, we add the constraints <code>t &gt;= x</code> and <code>t &gt;= -x</code>, and replace <code>abs(x)</code> by <code>t</code>. Since we are minimizing over <code>t</code> and the smallest possible <code>t</code> satisfying these constraints is the absolute value of <code>x</code>, we get the right answer. This reformulation worked because we were minimizing <code>abs(x)</code>, and that is a valid way to use the primitive <code>abs</code>.</p><h2 id="An-invalid-formulation"><a class="docs-heading-anchor" href="#An-invalid-formulation">An invalid formulation</a><a id="An-invalid-formulation-1"></a><a class="docs-heading-anchor-permalink" href="#An-invalid-formulation" title="Permalink"></a></h2><p>The reformulation of <code>abx(x)</code> works only if we are minimizing <code>t</code>.</p><p>Why? Well, let us consider the same reformulation for a maximization problem. The original problem is:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Convex</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x = Variable();</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; model_max = maximize(abs(x), [x &gt;= 1, x &lt;= 2])</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
@@ -69,15 +69,15 @@ Solution summary
 Expression graph
   maximize
    └─ abs (convex; positive)
-      └─ real variable (id: 140…183)
+      └─ real variable (id: 923…487)
   subject to
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 140…183)
+   │     ├─ real variable (id: 923…487)
    │     └─ [-1;;]
    └─ ≤ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 140…183)
+         ├─ real variable (id: 923…487)
          └─ [-2;;]</code></pre><p>This time, <code>problem is DCP</code> reports <code>false</code>. If we attempt to solve the problem, an error is thrown:</p><pre><code class="language-julia hljs">julia&gt; solve!(model_max, SCS.Optimizer; silent = true)
 ┌ Warning: Problem not DCP compliant: objective is not DCP
 └ @ Convex ~/.julia/dev/Convex/src/problems.jl:73
@@ -97,19 +97,19 @@ Solution summary
 
 Expression graph
   maximize
-   └─ real variable (id: 726…097)
+   └─ real variable (id: 387…309)
   subject to
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 638…823)
+   │     ├─ real variable (id: 110…258)
    │     └─ [-1;;]
    ├─ ≤ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 638…823)
+   │     ├─ real variable (id: 110…258)
    │     └─ [-2;;]
    ├─ ≥ constraint (affine)
    │  └─ + (affine; real)
-   │     ├─ real variable (id: 726…097)
+   │     ├─ real variable (id: 387…309)
    │     └─ Convex.NegateAtom (affine; real)
    │        └─ …
-   ⋮</code></pre><p>whose solution is unbounded.</p><p>In other words, we can get the wrong answer by using the extended reformulation, because the extended formulation was only valid for a minimization problem.</p><p>Convex.jl always creates the extended reformulation, but because they are only guaranteed to be valid when the DCP ruleset is followed, Convex.jl will programmatically check the whether or not these DCP rules were satisfied and error if they were not.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../quick_tutorial/">« Quick Tutorial</a><a class="docs-footer-nextpage" href="../faq/">FAQ »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 09:07">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+   ⋮</code></pre><p>whose solution is unbounded.</p><p>In other words, we can get the wrong answer by using the extended reformulation, because the extended formulation was only valid for a minimization problem.</p><p>Convex.jl always creates the extended reformulation, but because they are only guaranteed to be valid when the DCP ruleset is followed, Convex.jl will programmatically check the whether or not these DCP rules were satisfied and error if they were not.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../quick_tutorial/">« Quick Tutorial</a><a class="docs-footer-nextpage" href="../faq/">FAQ »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

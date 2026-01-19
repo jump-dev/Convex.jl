@@ -12,7 +12,7 @@
 size: (5, 1)
 sign: real
 vexity: affine
-id: 867…127</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem = minimize(sumsquares(A * x - b), [x &gt;= 0])</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
+id: 283…676</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem = minimize(sumsquares(A * x - b), [x &gt;= 0])</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
   number of variables    : 1 (5 scalar elements)
   number of constraints  : 1 (5 scalar elements)
@@ -36,7 +36,7 @@ Expression graph
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ 5-element real variable (id: 867…127)
+         ├─ 5-element real variable (id: 283…676)
          └─ Convex.NegateAtom (constant; negative)
             └─ …</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(problem, SCS.Optimizer; silent = true)</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
@@ -63,11 +63,11 @@ Expression graph
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ 5-element real variable (id: 867…127)
+         ├─ 5-element real variable (id: 283…676)
          └─ Convex.NegateAtom (constant; negative)
             └─ …</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem.status</code><code class="nohighlight hljs ansi" style="display:block;">OPTIMAL::TerminationStatusCode = 1</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem.optval</code><code class="nohighlight hljs ansi" style="display:block;">4.101528223800368e-7</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; x.value</code><code class="nohighlight hljs ansi" style="display:block;">5×1 Matrix{Float64}:
  0.41358470955079846
  0.245090958084477
  0.4111181215831069
  0.8509570025155792
- 0.18183695552228096</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../installation/">« Installation</a><a class="docs-footer-nextpage" href="../dcp/">Extended formulations and the DCP ruleset »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 09:07">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0.18183695552228096</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../installation/">« Installation</a><a class="docs-footer-nextpage" href="../dcp/">Extended formulations and the DCP ruleset »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
