@@ -1572,11 +1572,13 @@ function Base.Broadcast.broadcasted(
     )
 end
 
-Base.Broadcast.broadcasted(::typeof(max), x::Value, y::AbstractExpr) =
-    max(constant(x), y)
+function Base.Broadcast.broadcasted(::typeof(max), x::Value, y::AbstractExpr)
+    return max(constant(x), y)
+end
 
-Base.Broadcast.broadcasted(::typeof(max), x::AbstractExpr, y::Value) =
-    max(x, constant(y))
+function Base.Broadcast.broadcasted(::typeof(max), x::AbstractExpr, y::Value)
+    return max(x, constant(y))
+end
 
 """
     Base.maximum(x::Convex.AbstractExpr)
@@ -1658,11 +1660,13 @@ function Base.Broadcast.broadcasted(
     )
 end
 
-Base.Broadcast.broadcasted(::typeof(min), x::Value, y::AbstractExpr) =
-    min(constant(x), y)
+function Base.Broadcast.broadcasted(::typeof(min), x::Value, y::AbstractExpr)
+    return min(constant(x), y)
+end
 
-Base.Broadcast.broadcasted(::typeof(min), x::AbstractExpr, y::Value) =
-    min(x, constant(y))
+function Base.Broadcast.broadcasted(::typeof(min), x::AbstractExpr, y::Value)
+    return min(x, constant(y))
+end
 
 """
     Base.minimum(x::Convex.AbstractExpr)
