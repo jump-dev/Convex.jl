@@ -1380,8 +1380,10 @@ function test_broadcasting()
     A = [1 2; 3 4]
     x = Variable(2)
     y = [1.1, 2.2]
-    @test_throws MethodError (A * x) .<= y
-    @test sprint(show, x .== y) == sprint(show, [x[i] == y[i] for i in 1:2])
+    # Broadcasting .<= should now work (not throw MethodError)
+    c = (A * x) .<= y
+    @test c isa Convex.Constraint
+    @test sprint(show, x .== y) == sprint(show, x == y)
     return
 end
 
@@ -1427,6 +1429,82 @@ function test_broadcast_addition()
     solve!(p2, SCS.Optimizer; silent = true)
     val_normal = p2.optval
     @test val_broadcast ≈ val_normal atol = 1e-4
+    return
+end
+
+function test_broadcast_comparison()
+    x = Variable(2)
+    y = [1.0, 2.0]
+    A = [1.0 2.0; 3.0 4.0]
+    # .>= expr .>= scalar
+    c1 = x .>= 0
+    @test c1 isa Convex.Constraint
+    # .>= scalar .>= expr
+    c2 = 0 .>= x
+    @test c2 isa Convex.Constraint
+    # .>= expr .>= same-size value
+    c3 = x .>= y
+    @test c3 isa Convex.Constraint
+    # .>= value .>= expr
+    c4 = y .>= x
+    @test c4 isa Convex.Constraint
+    # .>= expr .>= expr
+    z = Variable(2)
+    c5 = x .>= z
+    @test c5 isa Convex.Constraint
+    # .<= expr .<= scalar
+    c6 = x .<= 1
+    @test c6 isa Convex.Constraint
+    # .<= scalar .<= expr
+    c7 = 1 .<= x
+    @test c7 isa Convex.Constraint
+    # .<= expr .<= same-size value
+    c8 = x .<= y
+    @test c8 isa Convex.Constraint
+    # .<= with matrix expression
+    c9 = (A * x) .<= y
+    @test c9 isa Convex.Constraint
+    # .== expr .== scalar
+    c10 = x .== 1
+    @test c10 isa Convex.Constraint
+    # .== scalar .== expr
+    c11 = 1 .== x
+    @test c11 isa Convex.Constraint
+    # .== expr .== same-size value
+    c12 = x .== y
+    @test c12 isa Convex.Constraint
+    # .== expr .== expr
+    c13 = x .== z
+    @test c13 isa Convex.Constraint
+    # .> and .< (deprecated, delegate to >= and <=)
+    c14 = @test_logs (:warn,) x .> 0
+    @test c14 isa Convex.Constraint
+    c15 = @test_logs (:warn,) x .< 1
+    @test c15 isa Convex.Constraint
+    # Correctness: solve with broadcast constraints, compare to non-broadcast
+    p1 = minimize(sum(x), [x .>= y])
+    solve!(p1, SCS.Optimizer; silent = true)
+    val_broadcast = p1.optval
+    p2 = minimize(sum(x), [x >= y])
+    solve!(p2, SCS.Optimizer; silent = true)
+    val_normal = p2.optval
+    @test val_broadcast ≈ val_normal atol = 1e-4
+    # Correctness with .<=
+    p3 = maximize(sum(x), [x .<= y])
+    solve!(p3, SCS.Optimizer; silent = true)
+    val_broadcast2 = p3.optval
+    p4 = maximize(sum(x), [x <= y])
+    solve!(p4, SCS.Optimizer; silent = true)
+    val_normal2 = p4.optval
+    @test val_broadcast2 ≈ val_normal2 atol = 1e-4
+    # Correctness with .==
+    p5 = minimize(sum(x), [x .== y])
+    solve!(p5, SCS.Optimizer; silent = true)
+    val_broadcast3 = p5.optval
+    p6 = minimize(sum(x), [x == y])
+    solve!(p6, SCS.Optimizer; silent = true)
+    val_normal3 = p6.optval
+    @test val_broadcast3 ≈ val_normal3 atol = 1e-4
     return
 end
 
