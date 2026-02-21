@@ -1558,6 +1558,50 @@ function test_real_operate_vector()
     return
 end
 
+function test_broadcast_functions()
+    A = [1.0 2.0; 3.0 4.0]
+    x = Variable(2)
+    # Test on compound expression (A * x) — the main failure case
+    expr = A * x
+    # Unary negation
+    @test (.-expr) isa Convex.NegateAtom
+    @test (.-x) isa Convex.NegateAtom
+    # abs
+    @test abs.(expr) isa Convex.AbsAtom
+    @test abs.(x) isa Convex.AbsAtom
+    # exp
+    @test exp.(expr) isa Convex.ExpAtom
+    @test exp.(x) isa Convex.ExpAtom
+    # log
+    @test log.(expr) isa Convex.LogAtom
+    @test log.(x) isa Convex.LogAtom
+    # sqrt
+    @test sqrt.(expr) isa Convex.GeoMeanAtom
+    @test sqrt.(x) isa Convex.GeoMeanAtom
+    # max — expr-expr, expr-value, value-expr
+    z = Variable(2)
+    @test max.(expr, z) isa Convex.MaxAtom
+    @test max.(x, 0) isa Convex.MaxAtom
+    @test max.(0, x) isa Convex.MaxAtom
+    @test max.(expr, 1.0) isa Convex.MaxAtom
+    @test max.(1.0, expr) isa Convex.MaxAtom
+    # min — expr-expr, expr-value, value-expr
+    @test min.(expr, z) isa Convex.MinAtom
+    @test min.(x, 0) isa Convex.MinAtom
+    @test min.(0, x) isa Convex.MinAtom
+    @test min.(expr, 1.0) isa Convex.MinAtom
+    @test min.(1.0, expr) isa Convex.MinAtom
+    # Correctness: solve with broadcast abs vs non-broadcast abs
+    p1 = minimize(sum(abs.(x)), [x >= -2, x <= -1])
+    solve!(p1, SCS.Optimizer; silent = true)
+    val_broadcast = p1.optval
+    p2 = minimize(sum(abs(x)), [x >= -2, x <= -1])
+    solve!(p2, SCS.Optimizer; silent = true)
+    val_normal = p2.optval
+    @test val_broadcast ≈ val_normal atol = 1e-4
+    return
+end
+
 end  # TestUtilities
 
 TestUtilities.runtests()
