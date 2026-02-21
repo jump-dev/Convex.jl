@@ -366,6 +366,8 @@ Base.:-(x::AbstractExpr) = NegateAtom(x)
 
 Base.:-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
 
+Base.Broadcast.broadcasted(::typeof(-), x::AbstractExpr) = -x
+
 """
     Base.:*(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
 
@@ -586,6 +588,8 @@ julia> size(atom)
 ```
 """
 Base.abs(x::AbstractExpr) = AbsAtom(x)
+
+Base.Broadcast.broadcasted(::typeof(abs), x::AbstractExpr) = abs(x)
 
 """
     Base.abs2(x::Convex.AbstractExpr)
@@ -911,6 +915,8 @@ julia> size(atom)
 ```
 """
 Base.exp(x::AbstractExpr) = ExpAtom(x)
+
+Base.Broadcast.broadcasted(::typeof(exp), x::AbstractExpr) = exp(x)
 
 """
     geomean(x::Convex.AbstractExpr...)
@@ -1264,6 +1270,8 @@ julia> size(atom)
 """
 Base.log(x::AbstractExpr) = LogAtom(x)
 
+Base.Broadcast.broadcasted(::typeof(log), x::AbstractExpr) = log(x)
+
 """
     log_perspective(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
 
@@ -1492,6 +1500,20 @@ Base.max(x::AbstractExpr, y::Value) = max(x, constant(y))
 
 Base.max(x::Value, y::AbstractExpr) = max(constant(x), y)
 
+function Base.Broadcast.broadcasted(
+    ::typeof(max),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    return max(x, y)
+end
+
+Base.Broadcast.broadcasted(::typeof(max), x::Value, y::AbstractExpr) =
+    max(constant(x), y)
+
+Base.Broadcast.broadcasted(::typeof(max), x::AbstractExpr, y::Value) =
+    max(x, constant(y))
+
 """
     Base.maximum(x::Convex.AbstractExpr)
 
@@ -1555,6 +1577,20 @@ Base.min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
 Base.min(x::AbstractExpr, y::Value) = min(x, constant(y))
 
 Base.min(x::Value, y::AbstractExpr) = min(constant(x), y)
+
+function Base.Broadcast.broadcasted(
+    ::typeof(min),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    return min(x, y)
+end
+
+Base.Broadcast.broadcasted(::typeof(min), x::Value, y::AbstractExpr) =
+    min(constant(x), y)
+
+Base.Broadcast.broadcasted(::typeof(min), x::AbstractExpr, y::Value) =
+    min(x, constant(y))
 
 """
     Base.minimum(x::Convex.AbstractExpr)
@@ -2233,6 +2269,8 @@ julia> size(atom)
 function Base.sqrt(x::AbstractExpr)
     return GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
 end
+
+Base.Broadcast.broadcasted(::typeof(sqrt), x::AbstractExpr) = sqrt(x)
 
 """
     Base.sum(x::Convex.AbstractExpr; dims = :)
