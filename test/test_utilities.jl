@@ -1385,6 +1385,51 @@ function test_broadcasting()
     return
 end
 
+function test_broadcast_addition()
+    A = [1.0 2.0; 3.0 4.0]
+    x = Variable(2)
+    # scalar .+ vector expression
+    expr1 = A * x .+ 1
+    @test expr1 isa Convex.AbstractExpr
+    @test size(expr1) == (2, 1)
+    # vector expression .+ scalar (reversed operand order)
+    expr2 = 1 .+ (A * x)
+    @test expr2 isa Convex.AbstractExpr
+    @test size(expr2) == (2, 1)
+    # scalar .- vector expression
+    expr3 = A * x .- 1
+    @test expr3 isa Convex.AbstractExpr
+    @test size(expr3) == (2, 1)
+    # vector expression .- scalar (reversed)
+    expr4 = 1 .- (A * x)
+    @test expr4 isa Convex.AbstractExpr
+    @test size(expr4) == (2, 1)
+    # matrix expression .+ scalar
+    expr5 = (x * ones(1, 2)) .+ 1
+    @test expr5 isa Convex.AbstractExpr
+    @test size(expr5) == (2, 2)
+    # same-size .+
+    expr6 = x .+ [1.0, 2.0]
+    @test expr6 isa Convex.AbstractExpr
+    @test size(expr6) == (2, 1)
+    # Value .+ expr and expr .+ Value
+    expr7 = [1, 2] .+ x
+    @test expr7 isa Convex.AbstractExpr
+    @test size(expr7) == (2, 1)
+    expr8 = x .+ [1, 2]
+    @test expr8 isa Convex.AbstractExpr
+    @test size(expr8) == (2, 1)
+    # Correctness: solve with .+ and verify matches non-broadcast +
+    p1 = minimize(sum(A * x .+ 1), [x >= 0])
+    solve!(p1, SCS.Optimizer; silent = true)
+    val_broadcast = p1.optval
+    p2 = minimize(sum(A * x + 1), [x >= 0])
+    solve!(p2, SCS.Optimizer; silent = true)
+    val_normal = p2.optval
+    @test val_broadcast ≈ val_normal atol = 1e-4
+    return
+end
+
 function test_matrix_constants()
     I, V = [1, 3, 4], [2.1, 2.2, 3.3]
     x = SparseArrays.sparsevec(I, V)

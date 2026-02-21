@@ -85,6 +85,78 @@ Base.:-(x::Value, y::AbstractExpr) = constant(x) + (-y)
 
 Base.:-(x::AbstractExpr, y::Value) = x + constant(-y)
 
+# .+ methods: delegate to existing + operator which handles scalar promotion.
+# For mixed Value/AbstractExpr, only delegate when sizes are compatible
+# (same size or one is scalar), otherwise fall back to default broadcasting.
+function Base.Broadcast.broadcasted(
+    ::typeof(+),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    return x + y
+end
+
+function Base.Broadcast.broadcasted(::typeof(+), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx + y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        +,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(+), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x + cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        +,
+        x,
+        y,
+    )
+end
+
+# .- methods: delegate to existing - operator which handles scalar promotion.
+function Base.Broadcast.broadcasted(
+    ::typeof(-),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    return x - y
+end
+
+function Base.Broadcast.broadcasted(::typeof(-), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx - y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        -,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(-), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x - cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        -,
+        x,
+        y,
+    )
+end
+
 """
     Base.:-(x::Convex.AbstractExpr)
 
