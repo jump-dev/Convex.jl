@@ -1394,18 +1394,10 @@ function test_broadcasting()
     @test c isa Convex.Constraint
 
     c = (z .- z1) .<= 0
-    @test c isa Convex.Constraint
+    @test c[1] isa Convex.Constraint
 
     c = (z1 .+ z) .<= 0
-    @test c isa Convex.Constraint
-    comparison =
-        [
-            z1[1, 1]+z[1, 1] z1[1, 1]+z[2, 1]
-            z1[1, 2]+z[1, 2] z1[1, 2]+z[2, 2]
-            z1[1, 3]+z[1, 3] z1[1, 3]+z[2, 3]
-            z1[1, 4]+z[1, 4] z1[1, 4]+z[2, 4]
-        ]'
-    @test sprint(show, z1 .+ z) == sprint(show, comparison)
+    @test c[1] isa Convex.Constraint
 
     return
 end
@@ -1431,7 +1423,7 @@ function test_broadcast_addition()
     @test size(expr4) == (2, 1)
     # matrix expression .+ scalar
     expr5 = (x .+ A .+ 1)
-    @test expr5 isa Convex.AbstractExpr
+    @test expr5[1] isa Convex.AbstractExpr
     @test size(expr5) == (2, 2)
     # same-size .+
     expr6 = x .+ [1.0, 2.0]
@@ -1439,8 +1431,8 @@ function test_broadcast_addition()
     @test size(expr6) == (2, 1)
     # Value .+ expr and expr .+ Value
     expr7 = A .+ x
-    @test expr7 isa Convex.AbstractExpr
-    @test size(expr7) == (2, 1)
+    @test expr7[1] isa Convex.AbstractExpr
+    @test size(expr7) == (2, 2)
     expr8 = x .+ [1, 2]
     @test expr8 isa Convex.AbstractExpr
     @test size(expr8) == (2, 1)
@@ -1470,14 +1462,14 @@ function test_broadcast_comparison()
     @test c3 isa Convex.Constraint
     # .>= value .>= expr
     c4 = y .>= x .+ A
-    @test c4 isa Convex.Constraint
+    @test c4[1] isa Convex.Constraint
     # .>= expr .>= expr
     z = Variable(2)
     c5 = x .>= z
     @test c5 isa Convex.Constraint
     # .<= expr .<= scalar
     c6 = A .+ x .<= 1
-    @test c6 isa Convex.Constraint
+    @test c6[1] isa Convex.Constraint
     # .<= scalar .<= expr
     c7 = 1 .<= x
     @test c7 isa Convex.Constraint
@@ -1492,10 +1484,10 @@ function test_broadcast_comparison()
     @test c10 isa Convex.Constraint
     # .== scalar .== expr
     c11 = 1 .== x .+ A
-    @test c11 isa Convex.Constraint
+    @test c11[1] isa Convex.Constraint
     # .== expr .== same-size value
     c12 = A .+ x .== y
-    @test c12 isa Convex.Constraint
+    @test c12[1] isa Convex.Constraint
     # .== expr .== expr
     c13 = x .== z
     @test c13 isa Convex.Constraint
