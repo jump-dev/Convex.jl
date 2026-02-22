@@ -93,7 +93,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x + y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x + y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        +,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(+), x::Value, y::AbstractExpr)
@@ -128,7 +136,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x - y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x - y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        -,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(-), x::Value, y::AbstractExpr)
@@ -163,7 +179,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x >= y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x >= y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >=,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(>=), x::Value, y::AbstractExpr)
@@ -198,7 +222,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x <= y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x <= y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <=,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(<=), x::Value, y::AbstractExpr)
@@ -233,7 +265,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x == y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x == y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        ==,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(==), x::Value, y::AbstractExpr)
@@ -268,7 +308,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x > y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x > y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(>), x::Value, y::AbstractExpr)
@@ -303,7 +351,15 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return x < y
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x < y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <,
+        x,
+        y,
+    )
 end
 
 function Base.Broadcast.broadcasted(::typeof(<), x::Value, y::AbstractExpr)
@@ -1505,14 +1561,24 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return max(x, y)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return max(x, y)
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        max,
+        x,
+        y,
+    )
 end
 
-Base.Broadcast.broadcasted(::typeof(max), x::Value, y::AbstractExpr) =
-    max(constant(x), y)
+function Base.Broadcast.broadcasted(::typeof(max), x::Value, y::AbstractExpr)
+    return max(constant(x), y)
+end
 
-Base.Broadcast.broadcasted(::typeof(max), x::AbstractExpr, y::Value) =
-    max(x, constant(y))
+function Base.Broadcast.broadcasted(::typeof(max), x::AbstractExpr, y::Value)
+    return max(x, constant(y))
+end
 
 """
     Base.maximum(x::Convex.AbstractExpr)
@@ -1583,14 +1649,24 @@ function Base.Broadcast.broadcasted(
     x::AbstractExpr,
     y::AbstractExpr,
 )
-    return min(x, y)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return min(x, y)
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        min,
+        x,
+        y,
+    )
 end
 
-Base.Broadcast.broadcasted(::typeof(min), x::Value, y::AbstractExpr) =
-    min(constant(x), y)
+function Base.Broadcast.broadcasted(::typeof(min), x::Value, y::AbstractExpr)
+    return min(constant(x), y)
+end
 
-Base.Broadcast.broadcasted(::typeof(min), x::AbstractExpr, y::Value) =
-    min(x, constant(y))
+function Base.Broadcast.broadcasted(::typeof(min), x::AbstractExpr, y::Value)
+    return min(x, constant(y))
+end
 
 """
     Base.minimum(x::Convex.AbstractExpr)
