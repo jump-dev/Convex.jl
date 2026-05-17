@@ -1,0 +1,306 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Portfolio Optimization - Markowitz Efficient Frontier · Convex.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" data-theme-name="documenter-dark" href="../../../assets/themes/documenter-dark.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" data-theme-name="documenter-light" data-theme-primary="" href="../../../assets/themes/documenter-light.css" rel="stylesheet" type="text/css"/><script src="../../../assets/themeswap.js"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Convex.jl</span></div><form action="../../../search/" class="docs-search"><input class="docs-search-query" id="documenter-search-query" name="q" placeholder="Search docs" type="text"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../installation/">Installation</a></li><li><a class="tocitem" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../types/">Basic Types</a></li><li><a class="tocitem" href="../../../operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../solvers/">Solvers</a></li><li><a class="tocitem" href="../../../faq/">FAQ</a></li><li><a class="tocitem" href="../../../advanced/">Advanced</a></li><li><a class="tocitem" href="../../../problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../../credits/">Credits</a></li><li><span class="tocitem">Examples</span><ul><li><input class="collapse-toggle" id="menuitem-13-1" type="checkbox"/><label class="tocitem" for="menuitem-13-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../general_examples/DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../../general_examples/basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../../general_examples/chebyshev_center/">Chebyshev center</a></li><li><a class="tocitem" href="../../general_examples/control/">Control</a></li><li><a class="tocitem" href="../../general_examples/huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../../general_examples/logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../../general_examples/max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../../general_examples/optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../../general_examples/robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../../general_examples/svm/">Support vector machine</a></li><li><a class="tocitem" href="../../general_examples/svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../../general_examples/trade_off_curves/">Trade-off curves</a></li><li><a class="tocitem" href="../../general_examples/worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-2" type="checkbox"/><label class="tocitem" for="menuitem-13-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-3" type="checkbox"/><label class="tocitem" for="menuitem-13-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input checked="" class="collapse-toggle" id="menuitem-13-4" type="checkbox"/><label class="tocitem" for="menuitem-13-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../portfolio_optimization/">Portfolio Optimization</a></li><li class="is-active"><a class="tocitem" href="">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-5" type="checkbox"/><label class="tocitem" for="menuitem-13-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-6" type="checkbox"/><label class="tocitem" for="menuitem-13-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-7" type="checkbox"/><label class="tocitem" for="menuitem-13-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">Portfolio optimization</a></li><li class="is-active"><a href="">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/portfolio_optimization/portfolio_optimization2.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" href="#" id="documenter-settings-button" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" href="#" id="documenter-sidebar-button"></a></div></header><article class="content" id="documenter-page"><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><h1 id="Portfolio-Optimization-Markowitz-Efficient-Frontier-1"><a class="docs-heading-anchor" href="#Portfolio-Optimization-Markowitz-Efficient-Frontier-1">Portfolio Optimization - Markowitz Efficient Frontier</a><a class="docs-heading-anchor-permalink" href="#Portfolio-Optimization-Markowitz-Efficient-Frontier-1" title="Permalink"></a></h1><p>In this problem, we will find the unconstrained portfolio allocation where we introduce the weighting parameter <span>$\lambda \;(0 \leq \lambda \leq$</span> 1) and minimize <span>$\lambda * \text{risk} - (1-\lambda)* \text{expected return}$</span>. By varying the values of <span>$\lambda$</span>, we trace out the efficient frontier.</p><p>Suppose that we know the mean returns <span>$\mu \in \mathbf{R}^n$</span> of each asset and the covariance <span>$\Sigma \in \mathbf{R}^{n \times n}$</span> between the assets. Our objective is to find a portfolio allocation that minimizes the <em>risk</em> (which we measure as the variance <span>$w^T \Sigma w$</span>) and maximizes the <em>expected return</em> (<span>$w^T \mu$</span>) of the portfolio of the simulataneously. We require <span>$w \in \mathbf{R}^n$</span> and <span>$\sum_i w_i = 1$</span>.</p><p>This problem can be written as</p><div>\[\begin{array}{ll}
+    \text{minimize}   &amp; \lambda*w^T \Sigma w - (1-\lambda)*w^T \mu \\
+    \text{subject to} &amp; \sum_i w_i = 1
+\end{array}\]</div><p>where <span>$w \in \mathbf{R}^n$</span> is the vector containing weights allocated to each asset.</p><pre><code class="language-julia">using Convex, SCS    #We are using SCS solver. Install using Pkg.add("SCS")
+
+# generate problem data
+μ = [11.5; 9.5; 6]/100          #expected returns
+Σ  = [166  34  58;              #covariance matrix
+       34  64   4;
+       58   4 100]/100^2
+
+n = length(μ)                   #number of assets</code></pre><pre><code class="language-none">3</code></pre><p>If you want to try the optimization with more assets, uncomment and run the next cell. It creates a vector or average returns and a variance-covariance matrix that have scales similar to the numbers above.</p><pre><code class="language-julia">#=
+using Random
+Random.seed!(123)
+
+n = 15                                      #number of assets, CHANGE IT?
+
+μ = (6 .+ (11.5-6)*rand(n))/100             #mean
+A = randn(n,n)
+Σ = (A * A' + diagm(0=&gt;rand(n)))/500;       #covariance matrix
+=#</code></pre><p>First we solve without any bounds on <span>$w$</span></p><pre><code class="language-julia">N = 101
+λ_vals = range(0.01,stop=0.99,length=N)
+
+w    = Variable(n)
+ret  = dot(w,μ)
+risk = quadform(w,Σ)
+
+MeanVarA = zeros(N,2)
+for i = 1:N
+    λ = λ_vals[i]
+    p = minimize( λ*risk - (1-λ)*ret,
+                  sum(w) == 1 )
+    solve!(p, () -&gt; SCS.Optimizer(verbose = false))
+    MeanVarA[i,:]= [evaluate(ret),evaluate(risk)]
+end</code></pre><p>Now we solve with the bounds <span>$0\le w_i \le 1$</span></p><pre><code class="language-julia">w_lower = 0                     #bounds on w
+w_upper = 1
+
+MeanVarB = zeros(N,2)   #repeat, but with 0&lt;w[i]&lt;1
+for i = 1:N
+    λ = λ_vals[i]
+    p = minimize( λ*risk - (1-λ)*ret,
+                  sum(w) == 1,
+                  w_lower &lt;= w,     #w[i] is bounded
+                  w &lt;= w_upper )
+    solve!(p, () -&gt; SCS.Optimizer(verbose = false))
+    MeanVarB[i,:]= [evaluate(ret),evaluate(risk)]
+end</code></pre><pre><code class="language-julia">using Plots
+plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2]]),
+      [MeanVarA[:,1] MeanVarB[:,1]],
+      xlim = (0,0.25),
+      ylim = (0,0.15),
+      title = "Markowitz Efficient Frontier",
+      xlabel = "Standard deviation",
+      ylabel = "Expected return",
+      label = ["no bounds on w" "with 0&lt;w&lt;1"])
+scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip5500"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip5500)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip5501"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip5500)" d="
+M242.516 1425.62 L2352.76 1425.62 L2352.76 121.675 L242.516 121.675  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip5502"><rect height="1305" width="2111" x="242" y="121"></rect></clipPath></defs><polyline clip-path="url(#clip5502)" points="
+  242.516,1425.62 242.516,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  664.564,1425.62 664.564,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  1086.61,1425.62 1086.61,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  1508.66,1425.62 1508.66,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  1930.71,1425.62 1930.71,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  2352.76,1425.62 2352.76,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  242.516,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  242.516,1164.83 2352.76,1164.83 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  242.516,904.041 2352.76,904.041 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  242.516,643.253 2352.76,643.253 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  242.516,382.464 2352.76,382.464 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  242.516,121.675 2352.76,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,1425.62 242.516,121.675 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,1425.62 242.516,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  664.564,1425.62 664.564,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  1086.61,1425.62 1086.61,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  1508.66,1425.62 1508.66,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  1930.71,1425.62 1930.71,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  2352.76,1425.62 2352.76,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,1425.62 267.839,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,1164.83 267.839,1164.83 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,904.041 267.839,904.041 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,643.253 267.839,643.253 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,382.464 267.839,382.464 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  242.516,121.675 267.839,121.675 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 242.516, 1479.62)" x="242.516" y="1479.62">0.00</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 664.564, 1479.62)" x="664.564" y="1479.62">0.05</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1086.61, 1479.62)" x="1086.61" y="1479.62">0.10</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1508.66, 1479.62)" x="1508.66" y="1479.62">0.15</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1930.71, 1479.62)" x="1930.71" y="1479.62">0.20</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2352.76, 1479.62)" x="2352.76" y="1479.62">0.25</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 1443.12)" x="218.516" y="1443.12">0.00</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 1182.33)" x="218.516" y="1182.33">0.03</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 921.541)" x="218.516" y="921.541">0.06</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 660.753)" x="218.516" y="660.753">0.09</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 399.964)" x="218.516" y="399.964">0.12</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 139.175)" x="218.516" y="139.175">0.15</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:84px; text-anchor:middle;" transform="rotate(0, 1297.64, 73.2)" x="1297.64" y="73.2">Markowitz Efficient Frontier</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1297.64, 1559.48)" x="1297.64" y="1559.48">Standard deviation</text></g><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 773.647)" x="89.2861" y="773.647">Expected return</text></g><polyline clip-path="url(#clip5502)" points="
+  190691,-88674.6 95474.5,-43978.8 63310.6,-28880.3 47146.4,-21292.3 37420.3,-16726.4 30928.8,-13678.8 26285.3,-11498.7 22799.9,-9862.2 20087.6,-8588.56 17916.8,-7569.14 
+  16140.1,-6734.72 14659.2,-6039.13 13406,-5450.4 12331.7,-4945.64 11400.5,-4508.09 10585.8,-4125.17 9866.98,-3787.24 9228.06,-3486.82 8656.46,-3217.99 8142.1,-2976.01 
+  7676.84,-2757.07 7253.92,-2557.99 6867.96,-2376.24 6514.15,-2209.57 6188.81,-2056.25 5888.66,-1914.75 5610.77,-1783.67 5352.88,-1661.97 5112.87,-1548.64 4889.04,-1442.88 
+  4679.74,-1343.94 4483.65,-1251.17 4299.58,-1164.02 4126.46,-1082 3963.37,-1004.66 3809.47,-931.612 3664.03,-862.512 3526.36,-797.036 3395.95,-734.937 3272.18,-675.933 
+  3154.6,-619.803 3042.71,-566.315 2936.3,-515.374 2834.72,-466.664 2738.02,-420.214 2645.63,-375.751 2557.25,-333.133 2472.86,-292.357 2392.05,-253.213 2314.72,-215.666 
+  2240.49,-179.529 2169.35,-144.795 2101.18,-111.408 2035.7,-79.2323 1972.84,-48.2332 1912.44,-18.3347 1854.42,10.5052 1798.63,38.3625 1744.99,65.2707 1693.41,91.2822 
+  1643.32,116.69 1596.08,140.789 1550.18,164.364 1506.39,187.008 1463.5,209.366 1422.66,230.824 1383.49,251.596 1345.68,271.841 1309.41,291.468 1274.58,310.534 
+  1241.14,329.063 1209.08,347.078 1178.42,364.555 1148.91,381.647 1120.76,398.241 1093.87,414.398 1068.2,430.145 1044.08,445.277 1020.53,460.42 998.486,474.987 
+  977.597,489.203 957.876,503.064 939.29,516.598 921.834,529.813 905.51,542.708 890.288,555.306 876.162,567.615 863.11,579.651 851.137,591.405 840.208,602.903 
+  830.31,614.149 821.44,625.128 813.525,635.915 806.592,646.45 800.595,656.765 795.507,666.864 791.297,676.755 787.931,686.444 785.374,695.938 783.595,705.213 
+  782.543,714.361 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5502)" points="
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.93 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.928 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1329.01,426.14 1301.85,431.638 1276,436.955 1251.8,442.009 1228.92,446.862 1207.37,451.514 1187.03,455.98 
+  1167.81,460.278 1149.74,464.397 1132.67,468.368 1116.56,472.191 1101.37,475.875 1087.04,479.429 1073.53,482.857 1060.8,486.167 1048.8,489.365 1037.53,492.45 
+  1026.84,495.446 1016.82,498.34 1007.39,501.142 998.522,503.854 990.175,506.487 982.328,509.041 974.98,511.513 968.07,513.917 961.597,516.249 955.536,518.511 
+  949.795,520.737 944.537,522.857 939.57,524.939 934.933,526.965 930.599,528.945 926.58,530.858 922.833,532.728 919.35,534.55 916.137,536.313 913.139,538.05 
+  910.371,539.742 907.813,541.396 905.457,543.009 903.319,544.567 901.335,546.107 890.289,555.306 876.162,567.615 863.116,579.645 851.137,591.405 840.089,603.033 
+  830.309,614.149 821.423,625.15 813.525,635.915 806.551,646.516 800.598,656.759 795.507,666.864 791.328,676.673 787.931,686.444 785.374,695.938 783.59,705.241 
+  782.626,713.36 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><circle clip-path="url(#clip5502)" cx="1330.06" cy="425.929" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><circle clip-path="url(#clip5502)" cx="917.793" cy="599.788" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><circle clip-path="url(#clip5502)" cx="1086.61" cy="904.041" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><path clip-path="url(#clip5500)" d="
+M1700.93 447.115 L2280.76 447.115 L2280.76 205.195 L1700.93 205.195  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip5500)" points="
+  1700.93,447.115 2280.76,447.115 2280.76,205.195 1700.93,205.195 1700.93,447.115 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip5500)" points="
+  1724.93,265.675 1868.93,265.675 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1892.93, 283.175)" x="1892.93" y="283.175">no bounds on w</text></g><polyline clip-path="url(#clip5500)" points="
+  1724.93,326.155 1868.93,326.155 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1892.93, 343.655)" x="1892.93" y="343.655">with 0&lt;w&lt;1</text></g><circle clip-path="url(#clip5500)" cx="1808.93" cy="386.635" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="21" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><g clip-path="url(#clip5500)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1892.93, 404.135)" x="1892.93" y="404.135">assets</text></g></svg><p>We now instead impose a restriction on  <span>$\sum_i |w_i| - 1$</span>, allowing for varying degrees of "leverage".</p><pre><code class="language-julia">Lmax = 0.5
+
+MeanVarC = zeros(N,2)   #repeat, but with restriction on Sum(|w[i]|)
+for i = 1:N
+    λ = λ_vals[i]
+    p = minimize( λ*risk - (1-λ)*ret,
+                  sum(w) == 1,
+                  (norm(w, 1)-1) &lt;= Lmax)
+    solve!(p, () -&gt; SCS.Optimizer(verbose = false))
+    MeanVarC[i,:]= [evaluate(ret),evaluate(risk)]
+end</code></pre><pre><code class="language-julia">plot( sqrt.([MeanVarA[:,2] MeanVarB[:,2] MeanVarC[:,2]]),
+      [MeanVarA[:,1] MeanVarB[:,1] MeanVarC[:,1]],
+      xlim = (0,0.25),
+      ylim = (0,0.15),
+      title = "Markowitz Efficient Frontier",
+      xlabel = "Standard deviation",
+      ylabel = "Expected return",
+      label = ["no bounds on w" "with 0&lt;w&lt;1" "restriction on sum(|w|)"])
+scatter!(sqrt.(diag(Σ)),μ,color=:red,label = "assets")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip6100"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip6100)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip6101"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip6100)" d="
+M242.516 1425.62 L2352.76 1425.62 L2352.76 121.675 L242.516 121.675  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip6102"><rect height="1305" width="2111" x="242" y="121"></rect></clipPath></defs><polyline clip-path="url(#clip6102)" points="
+  242.516,1425.62 242.516,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  664.564,1425.62 664.564,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  1086.61,1425.62 1086.61,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  1508.66,1425.62 1508.66,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  1930.71,1425.62 1930.71,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  2352.76,1425.62 2352.76,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  242.516,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  242.516,1164.83 2352.76,1164.83 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  242.516,904.041 2352.76,904.041 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  242.516,643.253 2352.76,643.253 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  242.516,382.464 2352.76,382.464 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  242.516,121.675 2352.76,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,1425.62 242.516,121.675 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,1425.62 242.516,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  664.564,1425.62 664.564,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  1086.61,1425.62 1086.61,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  1508.66,1425.62 1508.66,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  1930.71,1425.62 1930.71,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  2352.76,1425.62 2352.76,1409.97 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,1425.62 267.839,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,1164.83 267.839,1164.83 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,904.041 267.839,904.041 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,643.253 267.839,643.253 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,382.464 267.839,382.464 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  242.516,121.675 267.839,121.675 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 242.516, 1479.62)" x="242.516" y="1479.62">0.00</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 664.564, 1479.62)" x="664.564" y="1479.62">0.05</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1086.61, 1479.62)" x="1086.61" y="1479.62">0.10</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1508.66, 1479.62)" x="1508.66" y="1479.62">0.15</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1930.71, 1479.62)" x="1930.71" y="1479.62">0.20</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2352.76, 1479.62)" x="2352.76" y="1479.62">0.25</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 1443.12)" x="218.516" y="1443.12">0.00</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 1182.33)" x="218.516" y="1182.33">0.03</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 921.541)" x="218.516" y="921.541">0.06</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 660.753)" x="218.516" y="660.753">0.09</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 399.964)" x="218.516" y="399.964">0.12</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 218.516, 139.175)" x="218.516" y="139.175">0.15</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:84px; text-anchor:middle;" transform="rotate(0, 1297.64, 73.2)" x="1297.64" y="73.2">Markowitz Efficient Frontier</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1297.64, 1559.48)" x="1297.64" y="1559.48">Standard deviation</text></g><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 773.647)" x="89.2861" y="773.647">Expected return</text></g><polyline clip-path="url(#clip6102)" points="
+  190691,-88674.6 95474.5,-43978.8 63310.6,-28880.3 47146.4,-21292.3 37420.3,-16726.4 30928.8,-13678.8 26285.3,-11498.7 22799.9,-9862.2 20087.6,-8588.56 17916.8,-7569.14 
+  16140.1,-6734.72 14659.2,-6039.13 13406,-5450.4 12331.7,-4945.64 11400.5,-4508.09 10585.8,-4125.17 9866.98,-3787.24 9228.06,-3486.82 8656.46,-3217.99 8142.1,-2976.01 
+  7676.84,-2757.07 7253.92,-2557.99 6867.96,-2376.24 6514.15,-2209.57 6188.81,-2056.25 5888.66,-1914.75 5610.77,-1783.67 5352.88,-1661.97 5112.87,-1548.64 4889.04,-1442.88 
+  4679.74,-1343.94 4483.65,-1251.17 4299.58,-1164.02 4126.46,-1082 3963.37,-1004.66 3809.47,-931.612 3664.03,-862.512 3526.36,-797.036 3395.95,-734.937 3272.18,-675.933 
+  3154.6,-619.803 3042.71,-566.315 2936.3,-515.374 2834.72,-466.664 2738.02,-420.214 2645.63,-375.751 2557.25,-333.133 2472.86,-292.357 2392.05,-253.213 2314.72,-215.666 
+  2240.49,-179.529 2169.35,-144.795 2101.18,-111.408 2035.7,-79.2323 1972.84,-48.2332 1912.44,-18.3347 1854.42,10.5052 1798.63,38.3625 1744.99,65.2707 1693.41,91.2822 
+  1643.32,116.69 1596.08,140.789 1550.18,164.364 1506.39,187.008 1463.5,209.366 1422.66,230.824 1383.49,251.596 1345.68,271.841 1309.41,291.468 1274.58,310.534 
+  1241.14,329.063 1209.08,347.078 1178.42,364.555 1148.91,381.647 1120.76,398.241 1093.87,414.398 1068.2,430.145 1044.08,445.277 1020.53,460.42 998.486,474.987 
+  977.597,489.203 957.876,503.064 939.29,516.598 921.834,529.813 905.51,542.708 890.288,555.306 876.162,567.615 863.11,579.651 851.137,591.405 840.208,602.903 
+  830.31,614.149 821.44,625.128 813.525,635.915 806.592,646.45 800.595,656.765 795.507,666.864 791.297,676.755 787.931,686.444 785.374,695.938 783.595,705.213 
+  782.543,714.361 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.93 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.928 1330.06,425.929 1330.06,425.929 1330.06,425.929 1330.06,425.929 
+  1330.06,425.929 1330.06,425.929 1330.06,425.929 1329.01,426.14 1301.85,431.638 1276,436.955 1251.8,442.009 1228.92,446.862 1207.37,451.514 1187.03,455.98 
+  1167.81,460.278 1149.74,464.397 1132.67,468.368 1116.56,472.191 1101.37,475.875 1087.04,479.429 1073.53,482.857 1060.8,486.167 1048.8,489.365 1037.53,492.45 
+  1026.84,495.446 1016.82,498.34 1007.39,501.142 998.522,503.854 990.175,506.487 982.328,509.041 974.98,511.513 968.07,513.917 961.597,516.249 955.536,518.511 
+  949.795,520.737 944.537,522.857 939.57,524.939 934.933,526.965 930.599,528.945 926.58,530.858 922.833,532.728 919.35,534.55 916.137,536.313 913.139,538.05 
+  910.371,539.742 907.813,541.396 905.457,543.009 903.319,544.567 901.335,546.107 890.289,555.306 876.162,567.615 863.116,579.645 851.137,591.405 840.089,603.033 
+  830.309,614.149 821.423,625.15 813.525,635.915 806.551,646.516 800.598,656.759 795.507,666.864 791.328,676.673 787.931,686.444 785.374,695.938 783.59,705.241 
+  782.626,713.36 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6102)" points="
+  1520.91,306.4 1520.91,306.4 1520.91,306.401 1520.91,306.401 1520.91,306.401 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 
+  1520.91,306.4 1520.91,306.4 1520.91,306.402 1520.91,306.399 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.92,306.4 1520.91,306.4 
+  1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 
+  1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.4 1520.91,306.401 1520.91,306.4 1520.91,306.4 1520.91,306.4 
+  1506.66,309.345 1476.27,315.698 1447.76,321.756 1421.02,327.539 1395.91,333.068 1372.36,338.35 1350.23,343.411 1329.44,348.261 1309.91,352.913 1291.57,357.379 
+  1274.33,361.67 1258.13,365.797 1242.9,369.769 1228.6,373.59 1215.14,377.281 1202.53,380.828 1190.67,384.256 1179.53,387.566 1169.07,390.765 1159.25,393.856 
+  1150.03,396.845 1141.39,399.736 1133.26,402.541 1125.66,405.255 1118.53,407.886 1111.85,410.437 1105.6,412.913 1099.74,415.315 1094.27,417.646 1089.16,419.913 
+  1084.38,422.114 1079.92,424.256 1075.76,426.339 1071.88,428.365 1068.27,430.337 1064.92,432.257 1061.81,434.127 1043.78,445.468 1020.5,460.441 998.489,474.985 
+  977.602,489.2 957.874,503.066 939.292,516.598 921.841,529.807 905.511,542.706 890.289,555.306 876.162,567.615 863.116,579.645 851.14,591.402 840.207,602.903 
+  830.309,614.149 821.423,625.15 813.525,635.915 806.587,646.459 800.61,656.738 795.504,666.872 791.297,676.755 787.943,686.402 785.373,695.942 783.59,705.241 
+  782.537,714.425 
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><circle clip-path="url(#clip6102)" cx="1330.06" cy="425.929" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><circle clip-path="url(#clip6102)" cx="917.793" cy="599.788" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><circle clip-path="url(#clip6102)" cx="1086.61" cy="904.041" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="14" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><path clip-path="url(#clip6100)" d="
+M1569.09 507.595 L2280.76 507.595 L2280.76 205.195 L1569.09 205.195  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip6100)" points="
+  1569.09,507.595 2280.76,507.595 2280.76,205.195 1569.09,205.195 1569.09,507.595 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip6100)" points="
+  1593.09,265.675 1737.09,265.675 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1761.09, 283.175)" x="1761.09" y="283.175">no bounds on w</text></g><polyline clip-path="url(#clip6100)" points="
+  1593.09,326.155 1737.09,326.155 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1761.09, 343.655)" x="1761.09" y="343.655">with 0&lt;w&lt;1</text></g><polyline clip-path="url(#clip6100)" points="
+  1593.09,386.635 1737.09,386.635 
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1761.09, 404.135)" x="1761.09" y="404.135">restriction on sum(|w|)</text></g><circle clip-path="url(#clip6100)" cx="1677.09" cy="447.115" fill="#ff0000" fill-opacity="1" fill-rule="evenodd" r="21" stroke="#000000" stroke-opacity="1" stroke-width="3.2"></circle><g clip-path="url(#clip6100)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1761.09, 464.615)" x="1761.09" y="464.615">assets</text></g></svg><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../portfolio_optimization/">« Portfolio Optimization</a><a class="docs-footer-nextpage" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label></p><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div><p></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 6 March 2020 01:51">Friday 6 March 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></HTML>

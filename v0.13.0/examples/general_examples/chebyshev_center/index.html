@@ -1,0 +1,189 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Chebyshev center · Convex.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" data-theme-name="documenter-dark" href="../../../assets/themes/documenter-dark.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" data-theme-name="documenter-light" data-theme-primary="" href="../../../assets/themes/documenter-light.css" rel="stylesheet" type="text/css"/><script src="../../../assets/themeswap.js"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Convex.jl</span></div><form action="../../../search/" class="docs-search"><input class="docs-search-query" id="documenter-search-query" name="q" placeholder="Search docs" type="text"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../installation/">Installation</a></li><li><a class="tocitem" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../types/">Basic Types</a></li><li><a class="tocitem" href="../../../operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../solvers/">Solvers</a></li><li><a class="tocitem" href="../../../faq/">FAQ</a></li><li><a class="tocitem" href="../../../advanced/">Advanced</a></li><li><a class="tocitem" href="../../../problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../../credits/">Credits</a></li><li><span class="tocitem">Examples</span><ul><li><input checked="" class="collapse-toggle" id="menuitem-13-1" type="checkbox"/><label class="tocitem" for="menuitem-13-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li class="is-active"><a class="tocitem" href="">Chebyshev center</a></li><li><a class="tocitem" href="../control/">Control</a></li><li><a class="tocitem" href="../huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Trade-off curves</a></li><li><a class="tocitem" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-2" type="checkbox"/><label class="tocitem" for="menuitem-13-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-3" type="checkbox"/><label class="tocitem" for="menuitem-13-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-4" type="checkbox"/><label class="tocitem" for="menuitem-13-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-5" type="checkbox"/><label class="tocitem" for="menuitem-13-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-6" type="checkbox"/><label class="tocitem" for="menuitem-13-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-7" type="checkbox"/><label class="tocitem" for="menuitem-13-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href="">Chebyshev center</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="">Chebyshev center</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/general_examples/chebyshev_center.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" href="#" id="documenter-settings-button" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" href="#" id="documenter-sidebar-button"></a></div></header><article class="content" id="documenter-page"><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><h1 id="Chebyshev-center-1"><a class="docs-heading-anchor" href="#Chebyshev-center-1">Chebyshev center</a><a class="docs-heading-anchor-permalink" href="#Chebyshev-center-1" title="Permalink"></a></h1><p>Boyd &amp; Vandenberghe, "Convex Optimization" Joëlle Skaf - 08/16/05</p><p>Adapted for Convex.jl by Karanveer Mohan and David Zeng - 26/05/14</p><p>The goal is to find the largest Euclidean ball (i.e. its center and radius) that lies in a polyhedron described by affine inequalites in this fashion: <span>$P = \{x : a_i'*x \leq b_i, i=1,\ldots,m \}$</span> where <span>$x \in \mathbb{R}^2$</span>.</p><pre><code class="language-julia">using Convex, LinearAlgebra, SCS</code></pre><p>Generate the input data</p><pre><code class="language-julia">a1 = [ 2;  1];
+a2 = [ 2; -1];
+a3 = [-1;  2];
+a4 = [-1; -2];
+b = ones(4, 1);</code></pre><p>Create and solve the model</p><pre><code class="language-julia">r = Variable(1)
+x_c = Variable(2)
+p = maximize(r)
+p.constraints += a1' * x_c + r * norm(a1, 2) &lt;= b[1];
+p.constraints += a2' * x_c + r * norm(a2, 2) &lt;= b[2];
+p.constraints += a3' * x_c + r * norm(a3, 2) &lt;= b[3];
+p.constraints += a4' * x_c + r * norm(a4, 2) &lt;= b[4];
+solve!(p, () -&gt; SCS.Optimizer(verbose=0))
+p.optval</code></pre><pre><code class="language-none">0.4472135955080841</code></pre><p>Generate the figure</p><pre><code class="language-julia">x = range(-1.5, stop=1.5, length=100);
+theta = 0:pi/100:2*pi;
+using Plots
+plot(x, x -&gt; -x * a1[1] / a1[2] + b[1] / a1[2])
+plot!(x, x -&gt; -x * a2[1]/ a2[2] + b[2] / a2[2])
+plot!(x, x -&gt; -x * a3[1]/ a3[2] + b[3] / a3[2])
+plot!(x, x -&gt; -x * a4[1]/ a4[2] + b[4] / a4[2])
+plot!(x_c.value[1] .+ r.value * cos.(theta), x_c.value[2] .+ r.value * sin.(theta), linewidth = 2)
+plot!(title ="Largest Euclidean ball lying in a 2D polyhedron", legend = nothing)</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip2600"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip2600)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip2601"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip2600)" d="
+M141.865 1487.47 L2352.76 1487.47 L2352.76 121.675 L141.865 121.675  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip2602"><rect height="1367" width="2212" x="141" y="121"></rect></clipPath></defs><polyline clip-path="url(#clip2602)" points="
+  204.437,1487.47 204.437,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  552.061,1487.47 552.061,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  899.686,1487.47 899.686,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  1247.31,1487.47 1247.31,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  1594.93,1487.47 1594.93,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  1942.56,1487.47 1942.56,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  2290.18,1487.47 2290.18,121.675 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  141.865,1448.82 2352.76,1448.82 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  141.865,1126.7 2352.76,1126.7 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  141.865,804.575 2352.76,804.575 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  141.865,482.452 2352.76,482.452 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  141.865,160.33 2352.76,160.33 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,1487.47 2352.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,1487.47 141.865,121.675 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  204.437,1487.47 204.437,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  552.061,1487.47 552.061,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  899.686,1487.47 899.686,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  1247.31,1487.47 1247.31,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  1594.93,1487.47 1594.93,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  1942.56,1487.47 1942.56,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  2290.18,1487.47 2290.18,1471.09 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,1448.82 168.395,1448.82 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,1126.7 168.395,1126.7 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,804.575 168.395,804.575 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,482.452 168.395,482.452 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2600)" points="
+  141.865,160.33 168.395,160.33 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 204.437, 1541.47)" x="204.437" y="1541.47">-1.5</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 552.061, 1541.47)" x="552.061" y="1541.47">-1.0</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 899.686, 1541.47)" x="899.686" y="1541.47">-0.5</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1247.31, 1541.47)" x="1247.31" y="1541.47">0.0</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1594.93, 1541.47)" x="1594.93" y="1541.47">0.5</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1942.56, 1541.47)" x="1942.56" y="1541.47">1.0</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2290.18, 1541.47)" x="2290.18" y="1541.47">1.5</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 117.865, 1466.32)" x="117.865" y="1466.32">-4</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 117.865, 1144.2)" x="117.865" y="1144.2">-2</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 117.865, 822.075)" x="117.865" y="822.075">0</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 117.865, 499.952)" x="117.865" y="499.952">2</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 117.865, 177.83)" x="117.865" y="177.83">4</text></g><g clip-path="url(#clip2600)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:84px; text-anchor:middle;" transform="rotate(0, 1247.31, 73.2)" x="1247.31" y="73.2">Largest Euclidean ball lying in a 2D polyhedron</text></g><polyline clip-path="url(#clip2602)" points="
+  204.437,160.33 225.505,170.091 246.573,179.852 267.641,189.614 288.71,199.375 309.778,209.136 330.846,218.898 351.914,228.659 372.982,238.42 394.05,248.181 
+  415.118,257.943 436.187,267.704 457.255,277.465 478.323,287.227 499.391,296.988 520.459,306.749 541.527,316.51 562.595,326.272 583.664,336.033 604.732,345.794 
+  625.8,355.556 646.868,365.317 667.936,375.078 689.004,384.839 710.072,394.601 731.141,404.362 752.209,414.123 773.277,423.885 794.345,433.646 815.413,443.407 
+  836.481,453.169 857.55,462.93 878.618,472.691 899.686,482.452 920.754,492.214 941.822,501.975 962.89,511.736 983.958,521.498 1005.03,531.259 1026.09,541.02 
+  1047.16,550.781 1068.23,560.543 1089.3,570.304 1110.37,580.065 1131.44,589.827 1152.5,599.588 1173.57,609.349 1194.64,619.11 1215.71,628.872 1236.78,638.633 
+  1257.84,648.394 1278.91,658.156 1299.98,667.917 1321.05,677.678 1342.12,687.439 1363.19,697.201 1384.25,706.962 1405.32,716.723 1426.39,726.485 1447.46,736.246 
+  1468.53,746.007 1489.59,755.768 1510.66,765.53 1531.73,775.291 1552.8,785.052 1573.87,794.814 1594.93,804.575 1616,814.336 1637.07,824.098 1658.14,833.859 
+  1679.21,843.62 1700.28,853.381 1721.34,863.143 1742.41,872.904 1763.48,882.665 1784.55,892.427 1805.62,902.188 1826.68,911.949 1847.75,921.71 1868.82,931.472 
+  1889.89,941.233 1910.96,950.994 1932.03,960.756 1953.09,970.517 1974.16,980.278 1995.23,990.039 2016.3,999.801 2037.37,1009.56 2058.43,1019.32 2079.5,1029.08 
+  2100.57,1038.85 2121.64,1048.61 2142.71,1058.37 2163.77,1068.13 2184.84,1077.89 2205.91,1087.65 2226.98,1097.41 2248.05,1107.17 2269.12,1116.94 2290.18,1126.7 
+  
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  204.437,1448.82 225.505,1439.06 246.573,1429.3 267.641,1419.54 288.71,1409.77 309.778,1400.01 330.846,1390.25 351.914,1380.49 372.982,1370.73 394.05,1360.97 
+  415.118,1351.21 436.187,1341.45 457.255,1331.68 478.323,1321.92 499.391,1312.16 520.459,1302.4 541.527,1292.64 562.595,1282.88 583.664,1273.12 604.732,1263.36 
+  625.8,1253.59 646.868,1243.83 667.936,1234.07 689.004,1224.31 710.072,1214.55 731.141,1204.79 752.209,1195.03 773.277,1185.27 794.345,1175.5 815.413,1165.74 
+  836.481,1155.98 857.55,1146.22 878.618,1136.46 899.686,1126.7 920.754,1116.94 941.822,1107.17 962.89,1097.41 983.958,1087.65 1005.03,1077.89 1026.09,1068.13 
+  1047.16,1058.37 1068.23,1048.61 1089.3,1038.85 1110.37,1029.08 1131.44,1019.32 1152.5,1009.56 1173.57,999.801 1194.64,990.039 1215.71,980.278 1236.78,970.517 
+  1257.84,960.756 1278.91,950.994 1299.98,941.233 1321.05,931.472 1342.12,921.71 1363.19,911.949 1384.25,902.188 1405.32,892.427 1426.39,882.665 1447.46,872.904 
+  1468.53,863.143 1489.59,853.381 1510.66,843.62 1531.73,833.859 1552.8,824.098 1573.87,814.336 1594.93,804.575 1616,794.814 1637.07,785.052 1658.14,775.291 
+  1679.21,765.53 1700.28,755.768 1721.34,746.007 1742.41,736.246 1763.48,726.485 1784.55,716.723 1805.62,706.962 1826.68,697.201 1847.75,687.439 1868.82,677.678 
+  1889.89,667.917 1910.96,658.156 1932.03,648.394 1953.09,638.633 1974.16,628.872 1995.23,619.11 2016.3,609.349 2037.37,599.588 2058.43,589.827 2079.5,580.065 
+  2100.57,570.304 2121.64,560.543 2142.71,550.781 2163.77,541.02 2184.84,531.259 2205.91,521.498 2226.98,511.736 2248.05,501.975 2269.12,492.214 2290.18,482.452 
+  
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  204.437,844.84 225.505,842.4 246.573,839.96 267.641,837.519 288.71,835.079 309.778,832.639 330.846,830.198 351.914,827.758 372.982,825.318 394.05,822.877 
+  415.118,820.437 436.187,817.997 457.255,815.556 478.323,813.116 499.391,810.676 520.459,808.235 541.527,805.795 562.595,803.355 583.664,800.914 604.732,798.474 
+  625.8,796.034 646.868,793.593 667.936,791.153 689.004,788.713 710.072,786.273 731.141,783.832 752.209,781.392 773.277,778.952 794.345,776.511 815.413,774.071 
+  836.481,771.631 857.55,769.19 878.618,766.75 899.686,764.31 920.754,761.869 941.822,759.429 962.89,756.989 983.958,754.548 1005.03,752.108 1026.09,749.668 
+  1047.16,747.227 1068.23,744.787 1089.3,742.347 1110.37,739.906 1131.44,737.466 1152.5,735.026 1173.57,732.585 1194.64,730.145 1215.71,727.705 1236.78,725.264 
+  1257.84,722.824 1278.91,720.384 1299.98,717.943 1321.05,715.503 1342.12,713.063 1363.19,710.623 1384.25,708.182 1405.32,705.742 1426.39,703.302 1447.46,700.861 
+  1468.53,698.421 1489.59,695.981 1510.66,693.54 1531.73,691.1 1552.8,688.66 1573.87,686.219 1594.93,683.779 1616,681.339 1637.07,678.898 1658.14,676.458 
+  1679.21,674.018 1700.28,671.577 1721.34,669.137 1742.41,666.697 1763.48,664.256 1784.55,661.816 1805.62,659.376 1826.68,656.935 1847.75,654.495 1868.82,652.055 
+  1889.89,649.614 1910.96,647.174 1932.03,644.734 1953.09,642.293 1974.16,639.853 1995.23,637.413 2016.3,634.973 2037.37,632.532 2058.43,630.092 2079.5,627.652 
+  2100.57,625.211 2121.64,622.771 2142.71,620.331 2163.77,617.89 2184.84,615.45 2205.91,613.01 2226.98,610.569 2248.05,608.129 2269.12,605.689 2290.18,603.248 
+  
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  204.437,764.31 225.505,766.75 246.573,769.19 267.641,771.631 288.71,774.071 309.778,776.511 330.846,778.952 351.914,781.392 372.982,783.832 394.05,786.273 
+  415.118,788.713 436.187,791.153 457.255,793.593 478.323,796.034 499.391,798.474 520.459,800.914 541.527,803.355 562.595,805.795 583.664,808.235 604.732,810.676 
+  625.8,813.116 646.868,815.556 667.936,817.997 689.004,820.437 710.072,822.877 731.141,825.318 752.209,827.758 773.277,830.198 794.345,832.639 815.413,835.079 
+  836.481,837.519 857.55,839.96 878.618,842.4 899.686,844.84 920.754,847.281 941.822,849.721 962.89,852.161 983.958,854.602 1005.03,857.042 1026.09,859.482 
+  1047.16,861.923 1068.23,864.363 1089.3,866.803 1110.37,869.243 1131.44,871.684 1152.5,874.124 1173.57,876.564 1194.64,879.005 1215.71,881.445 1236.78,883.885 
+  1257.84,886.326 1278.91,888.766 1299.98,891.206 1321.05,893.647 1342.12,896.087 1363.19,898.527 1384.25,900.968 1405.32,903.408 1426.39,905.848 1447.46,908.289 
+  1468.53,910.729 1489.59,913.169 1510.66,915.61 1531.73,918.05 1552.8,920.49 1573.87,922.931 1594.93,925.371 1616,927.811 1637.07,930.252 1658.14,932.692 
+  1679.21,935.132 1700.28,937.572 1721.34,940.013 1742.41,942.453 1763.48,944.893 1784.55,947.334 1805.62,949.774 1826.68,952.214 1847.75,954.655 1868.82,957.095 
+  1889.89,959.535 1910.96,961.976 1932.03,964.416 1953.09,966.856 1974.16,969.297 1995.23,971.737 2016.3,974.177 2037.37,976.618 2058.43,979.058 2079.5,981.498 
+  2100.57,983.939 2121.64,986.379 2142.71,988.819 2163.77,991.26 2184.84,993.7 2205.91,996.14 2226.98,998.581 2248.05,1001.02 2269.12,1003.46 2290.18,1005.9 
+  
+  " style="stroke:#c271d2; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip2602)" points="
+  1558.23,804.575 1558.08,802.312 1557.62,800.052 1556.86,797.796 1555.78,795.547 1554.41,793.307 1552.73,791.078 1550.75,788.862 1548.47,786.662 1545.89,784.48 
+  1543.02,782.317 1539.85,780.176 1536.4,778.059 1532.66,775.969 1528.64,773.907 1524.35,771.875 1519.78,769.875 1514.94,767.909 1509.83,765.98 1504.47,764.089 
+  1498.85,762.237 1492.99,760.428 1486.88,758.662 1480.54,756.941 1473.96,755.268 1467.17,753.643 1460.15,752.068 1452.93,750.545 1445.5,749.076 1437.88,747.661 
+  1430.07,746.302 1422.08,745.001 1413.91,743.759 1405.58,742.577 1397.1,741.456 1388.47,740.397 1379.7,739.401 1370.79,738.47 1361.77,737.604 1352.63,736.804 
+  1343.39,736.071 1334.06,735.406 1324.63,734.809 1315.14,734.281 1305.57,733.822 1295.95,733.433 1286.28,733.114 1276.57,732.866 1266.83,732.688 1257.08,732.582 
+  1247.31,732.546 1237.54,732.582 1227.79,732.688 1218.05,732.866 1208.34,733.114 1198.67,733.433 1189.05,733.822 1179.48,734.281 1169.99,734.809 1160.56,735.406 
+  1151.23,736.071 1141.99,736.804 1132.85,737.604 1123.83,738.47 1114.92,739.401 1106.15,740.397 1097.52,741.456 1089.04,742.577 1080.71,743.759 1072.54,745.001 
+  1064.55,746.302 1056.74,747.661 1049.12,749.076 1041.69,750.545 1034.47,752.068 1027.45,753.643 1020.66,755.268 1014.08,756.941 1007.74,758.662 1001.63,760.428 
+  995.767,762.237 990.15,764.089 984.788,765.98 979.684,767.909 974.845,769.875 970.274,771.875 965.977,773.907 961.958,775.969 958.22,778.059 954.767,780.176 
+  951.603,782.317 948.731,784.48 946.154,786.662 943.874,788.862 941.893,791.078 940.213,793.307 938.837,795.547 937.765,797.796 936.999,800.052 936.539,802.312 
+  936.385,804.575 936.539,806.837 936.999,809.098 937.765,811.353 938.837,813.603 940.213,815.843 941.893,818.072 943.874,820.288 946.154,822.488 948.731,824.67 
+  951.603,826.833 954.767,828.974 958.22,831.09 961.958,833.181 965.977,835.243 970.274,837.275 974.845,839.275 979.684,841.241 984.788,843.17 990.15,845.061 
+  995.767,846.912 1001.63,848.722 1007.74,850.488 1014.08,852.208 1020.66,853.882 1027.45,855.507 1034.47,857.082 1041.69,858.605 1049.12,860.074 1056.74,861.489 
+  1064.55,862.847 1072.54,864.149 1080.71,865.391 1089.04,866.573 1097.52,867.694 1106.15,868.753 1114.92,869.749 1123.83,870.68 1132.85,871.546 1141.99,872.345 
+  1151.23,873.078 1160.56,873.744 1169.99,874.341 1179.48,874.869 1189.05,875.328 1198.67,875.717 1208.34,876.036 1218.05,876.284 1227.79,876.462 1237.54,876.568 
+  1247.31,876.604 1257.08,876.568 1266.83,876.462 1276.57,876.284 1286.28,876.036 1295.95,875.717 1305.57,875.328 1315.14,874.869 1324.63,874.341 1334.06,873.744 
+  1343.39,873.078 1352.63,872.345 1361.77,871.546 1370.79,870.68 1379.7,869.749 1388.47,868.753 1397.1,867.694 1405.58,866.573 1413.91,865.391 1422.08,864.149 
+  1430.07,862.847 1437.88,861.489 1445.5,860.074 1452.93,858.605 1460.15,857.082 1467.17,855.507 1473.96,853.882 1480.54,852.208 1486.88,850.488 1492.99,848.722 
+  1498.85,846.912 1504.47,845.061 1509.83,843.17 1514.94,841.241 1519.78,839.275 1524.35,837.275 1528.64,835.243 1532.66,833.181 1536.4,831.09 1539.85,828.974 
+  1543.02,826.833 1545.89,824.67 1548.47,822.488 1550.75,820.288 1552.73,818.072 1554.41,815.843 1555.78,813.603 1556.86,811.353 1557.62,809.098 1558.08,806.837 
+  
+  " style="stroke:#ac8d18; stroke-width:8; stroke-opacity:1; fill:none"></polyline></svg><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../basic_usage/">« Basic Usage</a><a class="docs-footer-nextpage" href="../control/">Control »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label></p><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div><p></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 February 2020 23:05">Friday 28 February 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></HTML>

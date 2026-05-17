@@ -1,0 +1,246 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Huber regression · Convex.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script data-main="../../../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" data-theme-name="documenter-dark" href="../../../assets/themes/documenter-dark.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" data-theme-name="documenter-light" data-theme-primary="" href="../../../assets/themes/documenter-light.css" rel="stylesheet" type="text/css"/><script src="../../../assets/themeswap.js"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Convex.jl</span></div><form action="../../../search/" class="docs-search"><input class="docs-search-query" id="documenter-search-query" name="q" placeholder="Search docs" type="text"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../installation/">Installation</a></li><li><a class="tocitem" href="../../../quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../types/">Basic Types</a></li><li><a class="tocitem" href="../../../operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../solvers/">Solvers</a></li><li><a class="tocitem" href="../../../faq/">FAQ</a></li><li><a class="tocitem" href="../../../advanced/">Advanced</a></li><li><a class="tocitem" href="../../../problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../../credits/">Credits</a></li><li><span class="tocitem">Examples</span><ul><li><input checked="" class="collapse-toggle" id="menuitem-13-1" type="checkbox"/><label class="tocitem" for="menuitem-13-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../chebyshev_center/">Chebyshev center</a></li><li><a class="tocitem" href="../control/">Control</a></li><li class="is-active"><a class="tocitem" href="">Huber regression</a></li><li><a class="tocitem" href="../logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../svm/">Support vector machine</a></li><li><a class="tocitem" href="../svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../trade_off_curves/">Trade-off curves</a></li><li><a class="tocitem" href="../worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-2" type="checkbox"/><label class="tocitem" for="menuitem-13-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-3" type="checkbox"/><label class="tocitem" for="menuitem-13-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../optimization_with_complex_variables/Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/phase_recovery_using_MaxCut/">Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../../optimization_with_complex_variables/power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-4" type="checkbox"/><label class="tocitem" for="menuitem-13-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-5" type="checkbox"/><label class="tocitem" for="menuitem-13-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-6" type="checkbox"/><label class="tocitem" for="menuitem-13-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-13-7" type="checkbox"/><label class="tocitem" for="menuitem-13-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">General examples</a></li><li class="is-active"><a href="">Huber regression</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="">Huber regression</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/examples_literate/general_examples/huber_regression.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" href="#" id="documenter-settings-button" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" href="#" id="documenter-sidebar-button"></a></div></header><article class="content" id="documenter-page"><p>All of the examples can be found in Jupyter notebook form <a href="../../notebooks.zip">here</a>.</p><h1 id="Huber-regression-1"><a class="docs-heading-anchor" href="#Huber-regression-1">Huber regression</a><a class="docs-heading-anchor-permalink" href="#Huber-regression-1" title="Permalink"></a></h1><p>This example can be found here: <a href="https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf">https://web.stanford.edu/~boyd/papers/pdf/cvx_applications.pdf</a>. Here we set <code>big_example = false</code> to only generate a small example which takes less time to run.</p><pre><code class="language-julia">big_example = false
+if big_example
+    n = 300
+    number_tests = 50
+else
+    n = 100
+    number_tests = 20
+end</code></pre><pre><code class="language-none">20</code></pre><p>Generate data for Huber regression.</p><pre><code class="language-julia">using Random
+Random.seed!(1);
+number_samples = round(Int,1.5*n);
+beta_true = 5*randn(n);
+X = randn(n, number_samples);
+Y = zeros(number_samples);
+v = randn(number_samples);</code></pre><pre><code class="language-julia"># Generate data for different values of p.
+# Solve the resulting problems.
+using Convex, SCS, Distributions
+lsq_data = zeros(number_tests);
+huber_data = zeros(number_tests);
+prescient_data = zeros(number_tests);
+p_vals = range(0, stop=0.15, length=number_tests);
+for i=1:length(p_vals)
+    p = p_vals[i];
+    # Generate the sign changes.
+    factor = 2 * rand(Binomial(1, 1-p), number_samples) .- 1;
+    Y = factor .* X' * beta_true + v;
+
+    # Form and solve a standard regression problem.
+    beta = Variable(n);
+    fit = norm(beta - beta_true) / norm(beta_true);
+    cost = norm(X' * beta - Y);
+    prob = minimize(cost);
+    solve!(prob, () -&gt; SCS.Optimizer(verbose=0));
+    lsq_data[i] = evaluate(fit);
+
+    # Form and solve a prescient regression problem,
+    # i.e., where the sign changes are known.
+    cost = norm(factor .* (X'*beta) - Y);
+    solve!(minimize(cost), () -&gt; SCS.Optimizer(verbose=0))
+    prescient_data[i] = evaluate(fit);
+
+    # Form and solve the Huber regression problem.
+    cost = sum(huber(X' * beta - Y, 1));
+    solve!(minimize(cost), () -&gt; SCS.Optimizer(verbose=0))
+    huber_data[i] = evaluate(fit);
+end</code></pre><pre><code class="language-none">┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229
+┌ Warning: Problem status ALMOST_OPTIMAL; solution may be inaccurate.
+└ @ Convex ~/build/JuliaOpt/Convex.jl/src/solution.jl:229</code></pre><pre><code class="language-julia">using Plots
+
+plot(p_vals, huber_data, label="Huber", xlabel="p", ylabel="Fit" )
+plot!(p_vals, lsq_data, label="Least squares")
+plot!(p_vals, prescient_data, label="Prescient")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip3200"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip3200)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip3201"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip3200)" d="
+M215.754 1425.62 L2352.76 1425.62 L2352.76 47.2441 L215.754 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip3202"><rect height="1379" width="2138" x="215" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip3202)" points="
+  276.235,1425.62 276.235,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  948.248,1425.62 948.248,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  1620.26,1425.62 1620.26,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  2292.27,1425.62 2292.27,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,1409.32 2352.76,1409.32 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,1191.86 2352.76,1191.86 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,974.408 2352.76,974.408 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,756.952 2352.76,756.952 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,539.496 2352.76,539.496 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,322.04 2352.76,322.04 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  215.754,104.584 2352.76,104.584 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,1425.62 2352.76,1425.62 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,1425.62 215.754,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  276.235,1425.62 276.235,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  948.248,1425.62 948.248,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  1620.26,1425.62 1620.26,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  2292.27,1425.62 2292.27,1409.08 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,1409.32 241.398,1409.32 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,1191.86 241.398,1191.86 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,974.408 241.398,974.408 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,756.952 241.398,756.952 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,539.496 241.398,539.496 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,322.04 241.398,322.04 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  215.754,104.584 241.398,104.584 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 276.235, 1479.62)" x="276.235" y="1479.62">0.00</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 948.248, 1479.62)" x="948.248" y="1479.62">0.05</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1620.26, 1479.62)" x="1620.26" y="1479.62">0.10</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2292.27, 1479.62)" x="2292.27" y="1479.62">0.15</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1426.82)" x="191.754" y="1426.82">0.0</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1209.36)" x="191.754" y="1209.36">0.2</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 991.908)" x="191.754" y="991.908">0.4</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 774.452)" x="191.754" y="774.452">0.6</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 556.996)" x="191.754" y="556.996">0.8</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 339.54)" x="191.754" y="339.54">1.0</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 122.084)" x="191.754" y="122.084">1.2</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1284.25, 1559.48)" x="1284.25" y="1559.48">p</text></g><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 736.431)" x="89.2861" y="736.431">Fit</text></g><polyline clip-path="url(#clip3202)" points="
+  276.235,1383.55 382.343,1383.55 488.45,1363.86 594.557,1380.88 700.665,1379.75 806.772,1372.46 912.879,1263.63 1018.99,1373.45 1125.09,1362.53 1231.2,1342.56 
+  1337.31,1364.15 1443.42,999.379 1549.52,1091.68 1655.63,1320.77 1761.74,526.318 1867.85,946.397 1973.95,529.19 2080.06,896.707 2186.17,612.899 2292.27,180.95 
+  
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  276.235,1383.01 382.343,1383.01 488.45,654.948 594.557,890.199 700.665,1062.81 806.772,1008.12 912.879,640.413 1018.99,667.645 1125.09,578.37 1231.2,936.441 
+  1337.31,1168.19 1443.42,589.533 1549.52,526.54 1655.63,505.444 1761.74,212.84 1867.85,347.497 1973.95,431.974 2080.06,366.693 2186.17,349.332 2292.27,86.2547 
+  
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3202)" points="
+  276.235,1383.01 382.343,1383.01 488.45,1386.61 594.557,1382.64 700.665,1382.49 806.772,1383.9 912.879,1382.67 1018.99,1381.13 1125.09,1383.99 1231.2,1383.79 
+  1337.31,1382.16 1443.42,1383.38 1549.52,1382.92 1655.63,1381.4 1761.74,1382.48 1867.85,1385.04 1973.95,1376.5 2080.06,1383.29 2186.17,1378.76 2292.27,1382.14 
+  
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip3200)" d="
+M1738.43 372.684 L2280.76 372.684 L2280.76 130.764 L1738.43 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip3200)" points="
+  1738.43,372.684 2280.76,372.684 2280.76,130.764 1738.43,130.764 1738.43,372.684 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3200)" points="
+  1762.43,191.244 1906.43,191.244 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1930.43, 208.744)" x="1930.43" y="208.744">Huber</text></g><polyline clip-path="url(#clip3200)" points="
+  1762.43,251.724 1906.43,251.724 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1930.43, 269.224)" x="1930.43" y="269.224">Least squares</text></g><polyline clip-path="url(#clip3200)" points="
+  1762.43,312.204 1906.43,312.204 
+  " style="stroke:#3da44d; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3200)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 1930.43, 329.704)" x="1930.43" y="329.704">Prescient</text></g></svg><pre><code class="language-julia"># Plot the relative reconstruction error for Huber and prescient regression,
+# zooming in on smaller values of p.
+indices = findall(p_vals .&lt;= 0.08);
+plot(p_vals[indices], huber_data[indices], label="Huber")
+plot!(p_vals[indices], prescient_data[indices], label="Prescient")</code></pre><svg height="400" viewBox="0 0 2400 1600" width="600" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="clip3800"><rect height="1600" width="2400" x="0" y="0"></rect></clipPath></defs><path clip-path="url(#clip3800)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip3801"><rect height="1600" width="1681" x="480" y="0"></rect></clipPath></defs><path clip-path="url(#clip3800)" d="
+M207.423 1487.47 L2352.76 1487.47 L2352.76 47.2441 L207.423 47.2441  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><defs><clipPath id="clip3802"><rect height="1441" width="2146" x="207" y="47"></rect></clipPath></defs><polyline clip-path="url(#clip3802)" points="
+  268.14,1487.47 268.14,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  780.861,1487.47 780.861,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  1293.58,1487.47 1293.58,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  1806.3,1487.47 1806.3,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  2319.02,1487.47 2319.02,47.2441 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  207.423,1397.32 2352.76,1397.32 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  207.423,1097.01 2352.76,1097.01 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  207.423,796.689 2352.76,796.689 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  207.423,496.373 2352.76,496.373 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  207.423,196.057 2352.76,196.057 
+  " style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,1487.47 2352.76,1487.47 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,1487.47 207.423,47.2441 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  268.14,1487.47 268.14,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  780.861,1487.47 780.861,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  1293.58,1487.47 1293.58,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  1806.3,1487.47 1806.3,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  2319.02,1487.47 2319.02,1470.19 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,1397.32 233.167,1397.32 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,1097.01 233.167,1097.01 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,796.689 233.167,796.689 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,496.373 233.167,496.373 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  207.423,196.057 233.167,196.057 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 268.14, 1541.47)" x="268.14" y="1541.47">0.00</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 780.861, 1541.47)" x="780.861" y="1541.47">0.02</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1293.58, 1541.47)" x="1293.58" y="1541.47">0.04</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1806.3, 1541.47)" x="1806.3" y="1541.47">0.06</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2319.02, 1541.47)" x="2319.02" y="1541.47">0.08</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 1414.82)" x="183.423" y="1414.82">0.025</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 1114.51)" x="183.423" y="1114.51">0.050</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 814.189)" x="183.423" y="814.189">0.075</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 513.873)" x="183.423" y="513.873">0.100</text></g><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 183.423, 213.557)" x="183.423" y="213.557">0.125</text></g><polyline clip-path="url(#clip3802)" points="
+  268.14,1412.92 470.53,1412.92 672.919,1195.41 875.309,1383.46 1077.7,1370.92 1280.09,1290.42 1482.48,88.0053 1684.87,1301.3 1887.26,1180.69 2089.65,960.073 
+  2292.04,1198.61 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3802)" points="
+  268.14,1406.94 470.53,1406.94 672.919,1446.71 875.309,1402.92 1077.7,1401.27 1280.09,1416.83 1482.48,1403.23 1684.87,1386.14 1887.26,1417.83 2089.65,1415.57 
+  2292.04,1397.52 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><path clip-path="url(#clip3800)" d="
+M1840.13 312.204 L2280.76 312.204 L2280.76 130.764 L1840.13 130.764  Z
+  " fill="#ffffff" fill-opacity="1" fill-rule="evenodd"></path><polyline clip-path="url(#clip3800)" points="
+  1840.13,312.204 2280.76,312.204 2280.76,130.764 1840.13,130.764 1840.13,312.204 
+  " style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none"></polyline><polyline clip-path="url(#clip3800)" points="
+  1864.13,191.244 2008.13,191.244 
+  " style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2032.13, 208.744)" x="2032.13" y="208.744">Huber</text></g><polyline clip-path="url(#clip3800)" points="
+  1864.13,251.724 2008.13,251.724 
+  " style="stroke:#e26f46; stroke-width:4; stroke-opacity:1; fill:none"></polyline><g clip-path="url(#clip3800)"><text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2032.13, 269.224)" x="2032.13" y="269.224">Prescient</text></g></svg><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../control/">« Control</a><a class="docs-footer-nextpage" href="../logistic_regression/">Logistic regression »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label></p><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div><p></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 February 2020 23:05">Friday 28 February 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></HTML>

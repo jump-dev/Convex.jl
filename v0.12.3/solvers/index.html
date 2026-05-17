@@ -1,0 +1,53 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Solvers · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script data-main="../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../installation/">Installation</a></li><li><a class="toctext" href="../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../types/">Basic Types</a></li><li><a class="toctext" href="../operations/">Supported Operations</a></li><li><a class="toctext" href="../examples/">Examples</a></li><li><a class="toctext" href="../complex-domain_optimization/">Complex-domain Optimization</a></li><li class="current"><a class="toctext" href="">Solvers</a><ul class="internal"></ul></li><li><a class="toctext" href="../faq/">FAQ</a></li><li><a class="toctext" href="../loop/">Optimizing in a Loop</a></li><li><a class="toctext" href="../advanced/">Advanced</a></li><li><a class="toctext" href="../contributing/">Contributing</a></li><li><a class="toctext" href="../credits/">Credits</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="">Solvers</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/src/solvers.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Solvers</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" href="#Solvers-1" id="Solvers-1">Solvers</a></h1><p>Convex.jl transforms each problem into an equivalent <a href="http://mathprogbasejl.readthedocs.org/en/latest/conic.html">cone program</a> in order to pass the problem to a specialized solver. Depending on the types of functions used in the problem, the conic constraints may include linear, second-order, exponential, or semidefinite constraints, as well as any binary or integer constraints placed on the variables.</p><p>By default, Convex.jl does not install any solvers. Many users use the solver <a href="https://github.com/JuliaOpt/SCS.jl">SCS</a>, which is able to solve problems with linear, second-order cone constraints (SOCPs), exponential constraints and semidefinite constraints (SDPs). Any other solver in <a href="http://www.juliaopt.org/">JuliaOpt</a> may also be used, so long as it supports the conic constraints used to represent the problem. Most other solvers in the JuliaOpt ecosystem can be used to solve (mixed integer) linear programs (LPs and MILPs). Mosek and Gurobi can be used to solve SOCPs (even with binary or integer constraints), and Mosek can also solve SDPs. For up-to-date information about solver capabilities, please see the table <a href="http://www.juliaopt.org/">here</a> describing which solvers can solve which kind of problems.</p><p>Installing these solvers is very simple. Just follow the instructions in the documentation for that solver.</p><p>To use a specific solver, you can use the following syntax</p><pre><code class="language-julia">solve!(p, GurobiSolver())
+solve!(p, MosekSolver())
+solve!(p, GLPKSolverMIP())
+solve!(p, GLPKSolverLP())
+solve!(p, ECOSSolver())
+solve!(p, SCSSolver())</code></pre><p>(Of course, the solver must be installed first.) For example, we can use GLPK to solve a MILP</p><pre><code class="language-julia">using GLPKMathProgInterface
+solve!(p, GLPKSolverMIP())</code></pre><p>Many of the solvers also allow options to be passed in. More details can be found in each solver's documentation.</p><p>For example, if we wish to turn off printing for the SCS solver (ie, run in quiet mode), we can do so by</p><pre><code class="language-julia">using SCS
+solve!(p, SCSSolver(verbose=false))</code></pre><p>If we wish to increase the maximum number of iterations for ECOS or SCS, we can do so by</p><pre><code class="language-julia">using ECOS
+solve!(p, ECOSSolver(maxit=10000))
+using SCS
+solve!(p, SCSSolver(max_iters=10000))</code></pre><p>To turn off the problem status warning issued by Convex when a solver is not able to solve a problem to optimality, use the keyword argument <code>verbose=false</code> of the solve method, along with any desired solver parameters:</p><pre><code class="language-julia">solve!(p, SCSSolver(verbose=false), verbose=false)</code></pre><footer><hr/><a class="previous" href="../complex-domain_optimization/"><span class="direction">Previous</span><span class="title">Complex-domain Optimization</span></a><a class="next" href="../faq/"><span class="direction">Next</span><span class="title">FAQ</span></a></footer></article></body></HTML>
