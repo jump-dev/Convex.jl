@@ -55,7 +55,7 @@ Expression graph
             ├─ …
             └─ …
 </code></pre><pre><code class="language-julia hljs">evaluate(U)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20×20 Matrix{ComplexF64}:
-       1.0-1.72242e-18im  …    0.908392-0.4182im
+       1.0+3.84088e-19im  …    0.908392-0.4182im
  0.0843738+0.996467im          0.493334+0.869839im
  -0.701167+0.713019im         -0.338727+0.940865im
  -0.438539+0.898749im        -0.0225063+0.999746im
@@ -74,29 +74,29 @@ Expression graph
  -0.191165+0.981592im          0.236834+0.971549im
  -0.405244+0.914245im         0.0142165+0.999898im
   0.867785+0.497007im           0.99607+0.088563im
-  0.908392+0.4182im                 1.0+1.00568e-17im</code></pre><p>Verify if the rank of <span>$U$</span> is 1:</p><pre><code class="language-julia hljs">B, C = eigen(evaluate(U));
+  0.908392+0.4182im                 1.0-2.48317e-19im</code></pre><p>Verify if the rank of <span>$U$</span> is 1:</p><pre><code class="language-julia hljs">B, C = eigen(evaluate(U));
 length([e for e in B if (abs(real(e)) &gt; 1e-4)])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1</code></pre><p>Decompose <span>$U = uu^*$</span> where <span>$u$</span> is the phase of <span>$Ax$</span></p><pre><code class="language-julia hljs">u = C[:, 1];
 for i in 1:n
     u[i] = u[i] / abs(u[i])
 end
 u</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20-element Vector{ComplexF64}:
                   1.0 + 0.0im
- -0.08587617156793281 - 0.9963058180884196im
-   0.7007444287759066 - 0.7134123951400961im
-   0.4389476384188856 - 0.8985126436096953im
-  0.39554091208698205 - 0.9184483583007802im
-   0.3591401372349993 - 0.9332836448941051im
-   0.8732753348467414 - 0.4872270410684444im
-  -0.9986936614787048 + 0.05109765671983609im
-  -0.7826418178857034 - 0.6224723165704331im
- -0.35306666434319034 - 0.9355981672329061im
-   0.6376163361964394 - 0.7703540795085265im
- -0.37182170163690464 - 0.9283041646959452im
-   0.9512405083789296 - 0.30845015029822154im
-  -0.9943767183319128 - 0.10590062341391507im
-   0.5687889470923485 - 0.8224835157409404im
-  0.47214939201546746 - 0.8815185486530753im
-  0.18909979675222313 - 0.9819578742839572im
-   0.4049479605176449 - 0.9143397340554549im
-  -0.8654893733197792 - 0.5009272848134108im
-  -0.9098300101257855 - 0.4149811473723996im</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Fidelity in Quantum Information Theory/">« Fidelity in quantum information theory</a><a class="docs-footer-nextpage" href="../povm_simulation/">POVM simulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ -0.08587132179694834 - 0.99630623610055im
+   0.7007395451715687 - 0.7134171919940975im
+   0.4389506306203079 - 0.898511181832499im
+   0.3955948457690977 - 0.9184251292298811im
+  0.35914204689208534 - 0.9332829100300525im
+    0.873248205335325 - 0.4872756631298491im
+  -0.9986938831595508 + 0.05109332382706699im
+  -0.7826347886620693 - 0.6224811543941537im
+ -0.35305637384167127 - 0.9356020504946374im
+   0.6375948789731608 - 0.7703718389889395im
+ -0.37181550062897295 - 0.9283066484152885im
+   0.9512415646668894 - 0.30844689275479553im
+  -0.9943811755450965 - 0.10585876308342175im
+   0.5687867313703463 - 0.82248504802035im
+   0.4721488363595818 - 0.8815188462672213im
+  0.18910756868256298 - 0.9819563775784389im
+  0.40495283530635234 - 0.9143375750658759im
+  -0.8654863166949045 - 0.5009325659346651im
+  -0.9098281854029572 - 0.41498514798286723im</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Fidelity in Quantum Information Theory/">« Fidelity in quantum information theory</a><a class="docs-footer-nextpage" href="../povm_simulation/">POVM simulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 17 May 2026 07:45">Sunday 17 May 2026</span>. Using Julia version 1.10.11.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

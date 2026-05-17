@@ -27,12 +27,12 @@ Solution summary
 
 Expression graph
   minimize
-   └─ real variable (id: 293…502)
+   └─ real variable (id: 178…923)
   subject to
    └─ ≥ constraint (affine)
       └─ + (affine; real)
-         ├─ real variable (id: 293…502)
-         └─ [0;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; constraint.dual</code><code class="nohighlight hljs ansi" style="display:block;">0.999999976532818</code></pre><h2 id="Warmstarting"><a class="docs-heading-anchor" href="#Warmstarting">Warmstarting</a><a id="Warmstarting-1"></a><a class="docs-heading-anchor-permalink" href="#Warmstarting" title="Permalink"></a></h2><p>If you&#39;re solving the same problem many times with different values of a parameter, Convex.jl can initialize many solvers with the solution to the previous problem, which sometimes speeds up the solution time. This is called a <strong>warm start</strong>.</p><p>To use this feature, pass the optional argument <code>warmstart=true</code> to the <code>solve!</code> method.</p><pre><code class="language-julia hljs">using Convex, SCS
+         ├─ real variable (id: 178…923)
+         └─ [0;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; constraint.dual</code><code class="nohighlight hljs ansi" style="display:block;">0.9999999765328186</code></pre><h2 id="Warmstarting"><a class="docs-heading-anchor" href="#Warmstarting">Warmstarting</a><a id="Warmstarting-1"></a><a class="docs-heading-anchor-permalink" href="#Warmstarting" title="Permalink"></a></h2><p>If you&#39;re solving the same problem many times with different values of a parameter, Convex.jl can initialize many solvers with the solution to the previous problem, which sometimes speeds up the solution time. This is called a <strong>warm start</strong>.</p><p>To use this feature, pass the optional argument <code>warmstart=true</code> to the <code>solve!</code> method.</p><pre><code class="language-julia hljs">using Convex, SCS
 n = 1_000
 y = rand(n);
 x = Variable(n)
@@ -77,7 +77,7 @@ end</code></pre><pre class="documenter-example-output"><code class="nohighlight 
 size: (3, 1)
 sign: positive
 vexity: affine
-id: 102…135</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; prob = minimize(p([1.0, 2.0, 3.0]))</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
+id: 433…952</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; prob = minimize(p([1.0, 2.0, 3.0]))</code><code class="nohighlight hljs ansi" style="display:block;">Problem statistics
   problem is DCP         : true
   number of variables    : 1 (3 scalar elements)
   number of constraints  : 1 (1 scalar elements)
@@ -93,14 +93,14 @@ Expression graph
   minimize
    └─ sum (affine; positive)
       └─ .* (affine; positive)
-         ├─ 3-element positive variable (id: 102…135)
+         ├─ 3-element positive variable (id: 433…952)
          └─ [1.0; 2.0; 3.0;;]
   subject to
    └─ == constraint (affine)
       └─ + (affine; real)
          ├─ sum (affine; positive)
          │  └─ …
-         └─ [-1;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(prob, SCS.Optimizer; silent = false);</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.18 seconds, 5.899 MiB of memory allocated
+         └─ [-1;;]</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; solve!(prob, SCS.Optimizer; silent = false);</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>[Convex.jl] Compilation finished: 0.19 seconds, 7.291 MiB of memory allocated
 ------------------------------------------------------------------
 	       SCS v3.2.3 - Splitting Conic Solver
 	(c) Brendan O&#39;Donoghue, Stanford University, 2012
@@ -117,35 +117,35 @@ lin-sys:  sparse-direct-amd-qdldl
 ------------------------------------------------------------------
  iter | pri res | dua res |   gap   |   obj   |  scale  | time (s)
 ------------------------------------------------------------------
-     0| 1.94e+01  3.06e+00  4.02e+01 -1.60e+01  1.00e-01  5.39e-05 
-    50| 1.09e-04  7.07e-05  1.94e-04  1.00e+00  1.00e-01  7.85e-05 
+     0| 1.94e+01  3.06e+00  4.02e+01 -1.60e+01  1.00e-01  5.70e-05 
+    50| 1.09e-04  7.07e-05  1.94e-04  1.00e+00  1.00e-01  7.93e-05 
 ------------------------------------------------------------------
 status:  solved
-timings: total: 7.97e-05s = setup: 4.22e-05s + solve: 3.75e-05s
-	 lin-sys: 7.09e-06s, cones: 3.94e-06s, accel: 2.07e-06s
+timings: total: 8.00e-05s = setup: 4.31e-05s + solve: 3.69e-05s
+	 lin-sys: 6.77e-06s, cones: 4.89e-06s, accel: 1.75e-06s
 ------------------------------------------------------------------
 objective = 1.000168
 ------------------------------------------------------------------</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; evaluate(p)</code><code class="nohighlight hljs ansi" style="display:block;">3-element Vector{Float64}:
- 0.9998127159848165
- 0.00010875388968836632
- 7.823604474042554e-5</code></pre><p>Subtypes of <code>AbstractVariable</code> must have the fields <code>head</code> and <code>size</code>. Then they must also</p><ul><li>either have a field <code>value</code>, or implement <a href="../../reference/api/#Convex._value"><code>Convex._value</code></a> and <a href="../../reference/api/#Convex.set_value!"><code>Convex.set_value!</code></a></li><li>either have a field <code>vexity</code>, or implement <a href="../../reference/api/#Convex.vexity"><code>Convex.vexity</code></a> and <a href="../../reference/api/#Convex.vexity!"><code>Convex.vexity!</code></a> (though the latter is only necessary if you wish to support <a href="../../reference/api/#Convex.fix!"><code>Convex.fix!</code></a> and <a href="../../reference/api/#Convex.free!"><code>Convex.free!</code></a>)</li><li>have a field <code>constraints</code> or implement <a href="../../reference/api/#Convex.get_constraints"><code>Convex.get_constraints</code></a> (optionally implement <a href="../../reference/api/#Convex.add_constraint!"><code>Convex.add_constraint!</code></a> to be able to add constraints to your variable after its creation),</li><li>either have a field <code>sign</code> or implement <a href="../../reference/api/#Base.sign-Tuple{Convex.AbstractVariable}"><code>Convex.sign</code></a>, and</li><li>either have a field <code>vartype</code>, or implement <a href="../../reference/api/#Convex.vartype"><code>Convex.vartype</code></a> (optionally, implement <a href="../../reference/api/#Convex.vartype!"><code>Convex.vartype!</code></a> to be able to change a variable&#39;s <code>vartype</code> after construction).</li></ul><h2 id="Printing-and-the-tree-structure"><a class="docs-heading-anchor" href="#Printing-and-the-tree-structure">Printing and the tree structure</a><a id="Printing-and-the-tree-structure-1"></a><a class="docs-heading-anchor-permalink" href="#Printing-and-the-tree-structure" title="Permalink"></a></h2><p>A Convex problem is structured as a <em>tree</em>, with the <em>root</em> being the problem object, with branches to the objective and the set of constraints. The objective is an <code>AbstractExpr</code> which itself is a tree, with each atom being a node and having <code>children</code> which are other atoms, variables, or constants. Convex provides <code>children</code> methods from <a href="https://github.com/Keno/AbstractTrees.jl">AbstractTrees.jl</a> so that the tree-traversal functions of that package can be used with Convex.jl problems and structures. This is what allows powers the printing of problems, expressions, and constraints. The depth to which the tree corresponding to a problem, expression, or constraint is printed is controlled by the global variable <a href="../../reference/api/#Convex.MAXDEPTH"><code>Convex.MAXDEPTH</code></a>, which defaults to 3. This can be changed by for example, setting</p><pre><code class="language-julia hljs">Convex.MAXDEPTH[] = 5</code></pre><p>Likewise, <a href="../../reference/api/#Convex.MAXWIDTH"><code>Convex.MAXWIDTH</code></a>, which defaults to 15, controls the &quot;width&quot; of the printed tree. For example, when printing a problem with 20 constraints, only the first <code>MAXWIDTH</code> of the constraints will be printed. Vertical dots, <code>⋮</code>, will be printed indicating that some constraints were omitted in the printing.</p><p>A related setting is <a href="../../reference/api/#Convex.MAXDIGITS"><code>Convex.MAXDIGITS</code></a>, which controls printing the internal IDs of atoms: if the string representation of an ID is longer than double the value of <code>MAXDIGITS</code>, then it is shortened by printing only the first and last <code>MAXDIGITS</code> characters.</p><p>The AbstractTrees methods can also be used to analyze the structure of a Convex.jl problem. For example,</p><pre><code class="language-julia hljs">using Convex, AbstractTrees
+ 0.9998127159848309
+ 0.0001087538896968035
+ 7.823604471416514e-5</code></pre><p>Subtypes of <code>AbstractVariable</code> must have the fields <code>head</code> and <code>size</code>. Then they must also</p><ul><li>either have a field <code>value</code>, or implement <a href="../../reference/api/#Convex._value"><code>Convex._value</code></a> and <a href="../../reference/api/#Convex.set_value!"><code>Convex.set_value!</code></a></li><li>either have a field <code>vexity</code>, or implement <a href="../../reference/api/#Convex.vexity"><code>Convex.vexity</code></a> and <a href="../../reference/api/#Convex.vexity!"><code>Convex.vexity!</code></a> (though the latter is only necessary if you wish to support <a href="../../reference/api/#Convex.fix!"><code>Convex.fix!</code></a> and <a href="../../reference/api/#Convex.free!"><code>Convex.free!</code></a>)</li><li>have a field <code>constraints</code> or implement <a href="../../reference/api/#Convex.get_constraints"><code>Convex.get_constraints</code></a> (optionally implement <a href="../../reference/api/#Convex.add_constraint!"><code>Convex.add_constraint!</code></a> to be able to add constraints to your variable after its creation),</li><li>either have a field <code>sign</code> or implement <a href="../../reference/api/#Base.sign-Tuple{Convex.AbstractVariable}"><code>Convex.sign</code></a>, and</li><li>either have a field <code>vartype</code>, or implement <a href="../../reference/api/#Convex.vartype"><code>Convex.vartype</code></a> (optionally, implement <a href="../../reference/api/#Convex.vartype!"><code>Convex.vartype!</code></a> to be able to change a variable&#39;s <code>vartype</code> after construction).</li></ul><h2 id="Printing-and-the-tree-structure"><a class="docs-heading-anchor" href="#Printing-and-the-tree-structure">Printing and the tree structure</a><a id="Printing-and-the-tree-structure-1"></a><a class="docs-heading-anchor-permalink" href="#Printing-and-the-tree-structure" title="Permalink"></a></h2><p>A Convex problem is structured as a <em>tree</em>, with the <em>root</em> being the problem object, with branches to the objective and the set of constraints. The objective is an <code>AbstractExpr</code> which itself is a tree, with each atom being a node and having <code>children</code> which are other atoms, variables, or constants. Convex provides <code>children</code> methods from <a href="https://github.com/Keno/AbstractTrees.jl">AbstractTrees.jl</a> so that the tree-traversal functions of that package can be used with Convex.jl problems and structures. This is what allows powers the printing of problems, expressions, and constraints. The depth to which the tree corresponding to a problem, expression, or constraint is printed is controlled by the global variable <a href="../../reference/api/#Convex.MAXDEPTH"><code>Convex.MAXDEPTH</code></a>, which defaults to 3. This can be changed by for example, setting</p><pre><code class="language-julia hljs">Convex.MAXDEPTH[] = 5</code></pre><p>Likewise, <a href="../../reference/api/#Convex.MAXWIDTH"><code>Convex.MAXWIDTH</code></a>, which defaults to 15, controls the &quot;width&quot; of the printed tree. For example, when printing a problem with 20 constraints, only the first <code>MAXWIDTH</code> of the constraints will be printed. Vertical dots, <code>⋮</code>, will be printed indicating that some constraints were omitted in the printing.</p><p>A related setting is <a href="../../reference/api/#Convex.MAXDIGITS"><code>Convex.MAXDIGITS</code></a>, which controls printing the internal IDs of atoms: if the string representation of an ID is longer than double the value of <code>MAXDIGITS</code>, then it is shortened by printing only the first and last <code>MAXDIGITS</code> characters.</p><p>The AbstractTrees methods can also be used to analyze the structure of a Convex.jl problem. For example,</p><pre><code class="language-julia hljs">using Convex, AbstractTrees
 x = Variable()
 p = maximize( log(x), x &gt;= 1, x &lt;= 3 )
 for leaf in AbstractTrees.Leaves(p)
     println(&quot;Here&#39;s a leaf: $(summary(leaf))&quot;)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s a leaf: real variable (id: 173…421)
-Here&#39;s a leaf: real variable (id: 173…421)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s a leaf: real variable (id: 109…867)
+Here&#39;s a leaf: real variable (id: 109…867)
 Here&#39;s a leaf: negative constant
-Here&#39;s a leaf: real variable (id: 173…421)
+Here&#39;s a leaf: real variable (id: 109…867)
 Here&#39;s a leaf: negative constant</code></pre><p>We can also iterate over the problem in various orders. The following descriptions are taken from the AbstractTrees.jl docstrings, which have more information.</p><h3 id="PostOrderDFS"><a class="docs-heading-anchor" href="#PostOrderDFS">PostOrderDFS</a><a id="PostOrderDFS-1"></a><a class="docs-heading-anchor-permalink" href="#PostOrderDFS" title="Permalink"></a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that children will be visited before their parents.</p><pre><code class="language-julia hljs">for (i, node) in enumerate(AbstractTrees.PostOrderDFS(p))
     println(&quot;Here&#39;s node $i via PostOrderDFS: $(summary(node))&quot;)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PostOrderDFS: real variable (id: 173…421)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PostOrderDFS: real variable (id: 109…867)
 Here&#39;s node 2 via PostOrderDFS: log (concave; real)
-Here&#39;s node 3 via PostOrderDFS: real variable (id: 173…421)
+Here&#39;s node 3 via PostOrderDFS: real variable (id: 109…867)
 Here&#39;s node 4 via PostOrderDFS: negative constant
 Here&#39;s node 5 via PostOrderDFS: + (affine; real)
 Here&#39;s node 6 via PostOrderDFS: ≥ constraint (affine)
-Here&#39;s node 7 via PostOrderDFS: real variable (id: 173…421)
+Here&#39;s node 7 via PostOrderDFS: real variable (id: 109…867)
 Here&#39;s node 8 via PostOrderDFS: negative constant
 Here&#39;s node 9 via PostOrderDFS: + (affine; real)
 Here&#39;s node 10 via PostOrderDFS: ≤ constraint (affine)
@@ -154,26 +154,26 @@ Here&#39;s node 12 via PostOrderDFS: Problem{Float64} (concave; real)</code></pr
     println(&quot;Here&#39;s node $i via PreOrderDFS: $(summary(node))&quot;)
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via PreOrderDFS: Problem{Float64} (concave; real)
 Here&#39;s node 2 via PreOrderDFS: log (concave; real)
-Here&#39;s node 3 via PreOrderDFS: real variable (id: 173…421)
+Here&#39;s node 3 via PreOrderDFS: real variable (id: 109…867)
 Here&#39;s node 4 via PreOrderDFS: 2-element Vector{Constraint}
 Here&#39;s node 5 via PreOrderDFS: ≥ constraint (affine)
 Here&#39;s node 6 via PreOrderDFS: + (affine; real)
-Here&#39;s node 7 via PreOrderDFS: real variable (id: 173…421)
+Here&#39;s node 7 via PreOrderDFS: real variable (id: 109…867)
 Here&#39;s node 8 via PreOrderDFS: negative constant
 Here&#39;s node 9 via PreOrderDFS: ≤ constraint (affine)
 Here&#39;s node 10 via PreOrderDFS: + (affine; real)
-Here&#39;s node 11 via PreOrderDFS: real variable (id: 173…421)
+Here&#39;s node 11 via PreOrderDFS: real variable (id: 109…867)
 Here&#39;s node 12 via PreOrderDFS: negative constant</code></pre><h3 id="StatelessBFS"><a class="docs-heading-anchor" href="#StatelessBFS">StatelessBFS</a><a id="StatelessBFS-1"></a><a class="docs-heading-anchor-permalink" href="#StatelessBFS" title="Permalink"></a></h3><p>Iterator to visit the nodes of a tree, guaranteeing that all nodes of a level will be visited before their children.</p><pre><code class="language-julia hljs">for (i, node) in enumerate(AbstractTrees.StatelessBFS(p))
     println(&quot;Here&#39;s node $i via StatelessBFS: $(summary(node))&quot;)
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Here&#39;s node 1 via StatelessBFS: Problem{Float64} (concave; real)
 Here&#39;s node 2 via StatelessBFS: log (concave; real)
 Here&#39;s node 3 via StatelessBFS: 2-element Vector{Constraint}
-Here&#39;s node 4 via StatelessBFS: real variable (id: 173…421)
+Here&#39;s node 4 via StatelessBFS: real variable (id: 109…867)
 Here&#39;s node 5 via StatelessBFS: ≥ constraint (affine)
 Here&#39;s node 6 via StatelessBFS: ≤ constraint (affine)
 Here&#39;s node 7 via StatelessBFS: + (affine; real)
 Here&#39;s node 8 via StatelessBFS: + (affine; real)
-Here&#39;s node 9 via StatelessBFS: real variable (id: 173…421)
+Here&#39;s node 9 via StatelessBFS: real variable (id: 109…867)
 Here&#39;s node 10 via StatelessBFS: negative constant
-Here&#39;s node 11 via StatelessBFS: real variable (id: 173…421)
-Here&#39;s node 12 via StatelessBFS: negative constant</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../performance_tips/">« Performance tips</a><a class="docs-footer-nextpage" href="../../developer/problem_depot/">Problem Depot »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Here&#39;s node 11 via StatelessBFS: real variable (id: 109…867)
+Here&#39;s node 12 via StatelessBFS: negative constant</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../performance_tips/">« Performance tips</a><a class="docs-footer-nextpage" href="../../developer/problem_depot/">Problem Depot »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 17 May 2026 07:45">Sunday 17 May 2026</span>. Using Julia version 1.10.11.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

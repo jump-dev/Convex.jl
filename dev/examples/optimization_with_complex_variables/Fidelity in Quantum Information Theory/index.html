@@ -44,28 +44,28 @@ Expression graph
          └─ hcat (affine; real)
             ├─ …
             └─ …
-</code></pre><pre><code class="language-julia hljs">computed_fidelity = evaluate(objective)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">594.7494990013275</code></pre><pre><code class="language-julia hljs"># Verify that computer fidelity is equal to actual fidelity
+</code></pre><pre><code class="language-julia hljs">computed_fidelity = evaluate(objective)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">594.7494990013226</code></pre><pre><code class="language-julia hljs"># Verify that computer fidelity is equal to actual fidelity
 P1, P2 = eigen(P)
 sqP = P2 * diagm([p1^0.5 for p1 in P1]) * P2&#39;
 Q1, Q2 = eigen(Q)
 sqQ = Q2 * diagm([q1^0.5 for q1 in Q1]) * Q2&#39;</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20×20 Matrix{ComplexF64}:
-    5.38006+2.50657e-17im  …  0.00764943+0.18069im
-   -1.09495+0.92107im          0.0809456-0.155984im
-  -0.550562+0.439034im         -0.526088-0.639864im
-  -0.649293-0.0308768im        -0.064919+0.0401416im
-   0.228963-0.387478im         -0.295176-0.362662im
-   0.341702-0.695126im     …   -0.952577-0.931465im
-  -0.407313+0.665933im         -0.958451-0.331556im
-    0.32162-0.280273im          0.547943-0.90029im
-   0.635895-0.200483im          0.688909-0.168503im
-    1.01216+0.148413im          -0.15593-0.00733035im
-   0.765091+0.34633im      …    0.595993-0.255228im
-   -1.01904-0.0603644im        0.0375434-0.0471595im
-  -0.112082+0.0227483im        -0.731198+0.231123im
-  0.0525511+0.298068im           0.29118+0.697098im
-   0.703363-0.804591im         -0.278485-0.00596324im
-  0.0158827+0.495351im     …    0.998033-0.371941im
-  -0.908249-0.437721im         -0.813657-0.0610957im
- -0.0927775+0.306206im         -0.481457+0.476183im
-  -0.242561+0.0848857im         0.117876+0.27859im
- 0.00764943-0.18069im            4.55598+0.0im</code></pre><pre><code class="language-julia hljs">actual_fidelity = sum(svdvals(sqP * sqQ))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">594.7979633637808</code></pre><p>We can see that the actual fidelity value is very close the computed fidelity value.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../mixed_integer/section_allocation/">« Section Allocation</a><a class="docs-footer-nextpage" href="../phase_recovery_using_MaxCut/">Phase recovery using MaxCut »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 19 January 2026 19:35">Monday 19 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+    5.38006+0.0im          -1.09495-0.92107im    …  0.00764943+0.18069im
+   -1.09495+0.92107im       4.49616+0.0im            0.0809456-0.155984im
+  -0.550562+0.439034im     0.115214+0.471947im       -0.526088-0.639864im
+  -0.649293-0.0308768im   -0.323619-1.00655im        -0.064919+0.0401416im
+   0.228963-0.387478im    -0.302375-0.490588im       -0.295176-0.362662im
+   0.341702-0.695126im    -0.137043+0.19446im    …   -0.952577-0.931465im
+  -0.407313+0.665933im     0.447785+0.836608im       -0.958451-0.331556im
+    0.32162-0.280273im      0.28357+0.676529im        0.547943-0.90029im
+   0.635895-0.200483im      0.54725-0.0626734im       0.688909-0.168503im
+    1.01216+0.148413im    -0.317495+0.209016im        -0.15593-0.00733035im
+   0.765091+0.34633im    0.00155354+0.904327im   …    0.595993-0.255228im
+   -1.01904-0.0603644im   -0.536079-1.11498im        0.0375434-0.0471595im
+  -0.112082+0.0227483im   -0.662357+0.0255589im      -0.731198+0.231123im
+  0.0525511+0.298068im     0.235739+0.0555825im        0.29118+0.697098im
+   0.703363-0.804591im    -0.312215-0.0111624im      -0.278485-0.00596324im
+  0.0158827+0.495351im     0.114124-0.598838im   …    0.998033-0.371941im
+  -0.908249-0.437721im    -0.560081+0.264481im       -0.813657-0.0610957im
+ -0.0927775+0.306206im    -0.973672+0.648366im       -0.481457+0.476183im
+  -0.242561+0.0848857im    0.466288-0.918887im        0.117876+0.27859im
+ 0.00764943-0.18069im     0.0809456+0.155984im         4.55598+0.0im</code></pre><pre><code class="language-julia hljs">actual_fidelity = sum(svdvals(sqP * sqQ))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">594.7979633637808</code></pre><p>We can see that the actual fidelity value is very close the computed fidelity value.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../mixed_integer/section_allocation/">« Section Allocation</a><a class="docs-footer-nextpage" href="../phase_recovery_using_MaxCut/">Phase recovery using MaxCut »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 17 May 2026 07:45">Sunday 17 May 2026</span>. Using Julia version 1.10.11.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
