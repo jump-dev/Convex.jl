@@ -132,6 +132,23 @@ function MOI.supports_constraint(
     return true
 end
 
+function MOI.get(
+    ::Optimizer,
+    ::MOI.ConstraintBridgingCost{
+        MOI.VectorNonlinearFunction,
+        <:MOI.AbstractVectorSet,
+    },
+)
+    # Must agree with `supports_constraint` above: the generic
+    # `MOI.get(::Optimizer, ::AbstractModelAttribute)` would otherwise forward
+    # this query to the inner model, which does not handle
+    # `VectorNonlinearFunction` and would return `Inf`. `LazyBridgeOptimizer`
+    # then sees `supports = true, cost = Inf` and treats the node as
+    # unreachable when building the bridge graph.
+    # See https://github.com/jump-dev/MathOptInterface.jl/pull/3001
+    return 0.0
+end
+
 function _expr(::Optimizer, v::Value)
     return Constant(v)
 end
