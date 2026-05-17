@@ -58,6 +58,25 @@ function test_issue_564()
     return
 end
 
+function test_constraint_bridging_cost_vector_nonlinear()
+    model = Convex.Optimizer(ECOS.Optimizer)
+    for S in (
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.Zeros,
+        MOI.SecondOrderCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+    )
+        @test MOI.supports_constraint(model, MOI.VectorNonlinearFunction, S)
+        @test MOI.get(
+            model,
+            MOI.ConstraintBridgingCost{MOI.VectorNonlinearFunction,S}(),
+        ) == 0.0
+    end
+    return
+end
+
 function test_scalar_nonlinear_function()
     model = Convex.Optimizer(ECOS.Optimizer)
     x = MOI.add_variable(model)
