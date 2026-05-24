@@ -85,6 +85,309 @@ Base.:-(x::Value, y::AbstractExpr) = constant(x) + (-y)
 
 Base.:-(x::AbstractExpr, y::Value) = x + constant(-y)
 
+# .+ methods: delegate to existing + operator which handles scalar promotion.
+# For mixed Value/AbstractExpr, only delegate when sizes are compatible
+# (same size or one is scalar), otherwise fall back to default broadcasting.
+function Base.Broadcast.broadcasted(
+    ::typeof(+),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x + y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        +,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(+), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx + y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        +,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(+), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x + cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        +,
+        x,
+        y,
+    )
+end
+
+# .- methods: delegate to existing - operator which handles scalar promotion.
+function Base.Broadcast.broadcasted(
+    ::typeof(-),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x - y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        -,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(-), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx - y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        -,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(-), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x - cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        -,
+        x,
+        y,
+    )
+end
+
+# .>= methods: delegate to existing >= operator which handles scalar promotion.
+function Base.Broadcast.broadcasted(
+    ::typeof(>=),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x >= y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >=,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(>=), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx >= y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >=,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(>=), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x >= cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >=,
+        x,
+        y,
+    )
+end
+
+# .<= methods: delegate to existing <= operator which handles scalar promotion.
+function Base.Broadcast.broadcasted(
+    ::typeof(<=),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x <= y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <=,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(<=), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx <= y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <=,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(<=), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x <= cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <=,
+        x,
+        y,
+    )
+end
+
+# .== methods: delegate to existing == operator which handles scalar promotion.
+function Base.Broadcast.broadcasted(
+    ::typeof(==),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x == y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        ==,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(==), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx == y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        ==,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(==), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x == cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        ==,
+        x,
+        y,
+    )
+end
+
+# .> methods: delegate to existing > operator (deprecated, maps to >=).
+function Base.Broadcast.broadcasted(
+    ::typeof(>),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x > y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(>), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx > y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(>), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x > cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        >,
+        x,
+        y,
+    )
+end
+
+# .< methods: delegate to existing < operator (deprecated, maps to <=).
+function Base.Broadcast.broadcasted(
+    ::typeof(<),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return x < y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(<), x::Value, y::AbstractExpr)
+    cx = constant(x)
+    if cx.size == (1, 1) || cx.size == y.size || y.size == (1, 1)
+        return cx < y
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(<), x::AbstractExpr, y::Value)
+    cy = constant(y)
+    if cy.size == (1, 1) || x.size == cy.size || x.size == (1, 1)
+        return x < cy
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        <,
+        x,
+        y,
+    )
+end
+
 """
     Base.:-(x::Convex.AbstractExpr)
 
@@ -118,6 +421,8 @@ julia> size(atom)
 Base.:-(x::AbstractExpr) = NegateAtom(x)
 
 Base.:-(x::Union{Constant,ComplexConstant}) = constant(-evaluate(x))
+
+Base.Broadcast.broadcasted(::typeof(-), x::AbstractExpr) = -x
 
 """
     Base.:*(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
@@ -339,6 +644,8 @@ julia> size(atom)
 ```
 """
 Base.abs(x::AbstractExpr) = AbsAtom(x)
+
+Base.Broadcast.broadcasted(::typeof(abs), x::AbstractExpr) = abs(x)
 
 """
     Base.abs2(x::Convex.AbstractExpr)
@@ -664,6 +971,8 @@ julia> size(atom)
 ```
 """
 Base.exp(x::AbstractExpr) = ExpAtom(x)
+
+Base.Broadcast.broadcasted(::typeof(exp), x::AbstractExpr) = exp(x)
 
 """
     geomean(x::Convex.AbstractExpr...)
@@ -1017,6 +1326,8 @@ julia> size(atom)
 """
 Base.log(x::AbstractExpr) = LogAtom(x)
 
+Base.Broadcast.broadcasted(::typeof(log), x::AbstractExpr) = log(x)
+
 """
     log_perspective(x::Convex.AbstractExpr, y::Convex.AbstractExpr)
 
@@ -1245,6 +1556,30 @@ Base.max(x::AbstractExpr, y::Value) = max(x, constant(y))
 
 Base.max(x::Value, y::AbstractExpr) = max(constant(x), y)
 
+function Base.Broadcast.broadcasted(
+    ::typeof(max),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return max(x, y)
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        max,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(max), x::Value, y::AbstractExpr)
+    return max(constant(x), y)
+end
+
+function Base.Broadcast.broadcasted(::typeof(max), x::AbstractExpr, y::Value)
+    return max(x, constant(y))
+end
+
 """
     Base.maximum(x::Convex.AbstractExpr)
 
@@ -1308,6 +1643,30 @@ Base.min(x::AbstractExpr, y::AbstractExpr) = MinAtom(x, y)
 Base.min(x::AbstractExpr, y::Value) = min(x, constant(y))
 
 Base.min(x::Value, y::AbstractExpr) = min(constant(x), y)
+
+function Base.Broadcast.broadcasted(
+    ::typeof(min),
+    x::AbstractExpr,
+    y::AbstractExpr,
+)
+    if x.size == (1, 1) || y.size == (1, 1) || x.size == y.size
+        return min(x, y)
+    end
+    return Base.Broadcast.broadcasted(
+        Base.Broadcast.DefaultArrayStyle{2}(),
+        min,
+        x,
+        y,
+    )
+end
+
+function Base.Broadcast.broadcasted(::typeof(min), x::Value, y::AbstractExpr)
+    return min(constant(x), y)
+end
+
+function Base.Broadcast.broadcasted(::typeof(min), x::AbstractExpr, y::Value)
+    return min(x, constant(y))
+end
 
 """
     Base.minimum(x::Convex.AbstractExpr)
@@ -1986,6 +2345,8 @@ julia> size(atom)
 function Base.sqrt(x::AbstractExpr)
     return GeoMeanAtom(x, constant(ones(x.size[1], x.size[2])))
 end
+
+Base.Broadcast.broadcasted(::typeof(sqrt), x::AbstractExpr) = sqrt(x)
 
 """
     Base.sum(x::Convex.AbstractExpr; dims = :)
