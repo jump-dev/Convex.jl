@@ -15,7 +15,7 @@ This release changes the minimum version of Julia to v1.10.
 
  - Added support for OrderedCollections@2 (#731)
  - Added dependabot.yml (#732), (#734)
- - Droped support for Julia v1.6 (#733)
+ - Dropped support for Julia v1.6 (#733)
 
 ## v0.16.6 (May 28, 2026)
 
