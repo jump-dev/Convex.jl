@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Phase recovery using MaxCut · Convex.jl</title><meta name="title" content="Phase recovery using MaxCut · Convex.jl"/><meta property="og:title" content="Phase recovery using MaxCut · Convex.jl"/><meta property="twitter:title" content="Phase recovery using MaxCut · Convex.jl"/><meta name="description" content="Documentation for Convex.jl."/><meta property="og:description" content="Documentation for Convex.jl."/><meta property="twitter:description" content="Documentation for Convex.jl."/><script data-outdated-warner src="../../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../../assets/documenter.js"></script><script src="../../../search_index.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../../">Convex.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><input class="collapse-toggle" id="menuitem-1" type="checkbox"/><label class="tocitem" for="menuitem-1"><span class="docs-label">Introduction</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../introduction/installation/">Installation</a></li><li><a class="tocitem" href="../../../introduction/quick_tutorial/">Quick Tutorial</a></li><li><a class="tocitem" href="../../../introduction/faq/">FAQ</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><input class="collapse-toggle" id="menuitem-2-1" type="checkbox"/><label class="tocitem" for="menuitem-2-1"><span class="docs-label">General examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../general_examples/DCP_analysis/">DCP analysis</a></li><li><a class="tocitem" href="../../general_examples/basic_usage/">Basic Usage</a></li><li><a class="tocitem" href="../../general_examples/chebyshev_center/">Chebyshev center</a></li><li><a class="tocitem" href="../../general_examples/control/">Control</a></li><li><a class="tocitem" href="../../general_examples/dualization/">Dualization</a></li><li><a class="tocitem" href="../../general_examples/huber_regression/">Huber regression</a></li><li><a class="tocitem" href="../../general_examples/lasso_regression/">Lasso, Ridge and Elastic Net Regressions</a></li><li><a class="tocitem" href="../../general_examples/logistic_regression/">Logistic regression</a></li><li><a class="tocitem" href="../../general_examples/max_entropy/">Entropy Maximization</a></li><li><a class="tocitem" href="../../general_examples/optimal_advertising/">Optimal advertising</a></li><li><a class="tocitem" href="../../general_examples/robust_approx_fitting/">Robust approximate fitting</a></li><li><a class="tocitem" href="../../general_examples/svm/">Support vector machine</a></li><li><a class="tocitem" href="../../general_examples/svm_l1regularization/">SVM with L^1 regularization</a></li><li><a class="tocitem" href="../../general_examples/trade_off_curves/">Regularized least-squares</a></li><li><a class="tocitem" href="../../general_examples/worst_case_analysis/">Worst case risk analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-2" type="checkbox"/><label class="tocitem" for="menuitem-2-2"><span class="docs-label">Mixed integer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../mixed_integer/binary_knapsack/">Binary (or 0-1) knapsack problem</a></li><li><a class="tocitem" href="../../mixed_integer/n_queens/">N queens</a></li><li><a class="tocitem" href="../../mixed_integer/section_allocation/">Section Allocation</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox" checked/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Optimization with complex variables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../Fidelity in Quantum Information Theory/">Fidelity in quantum information theory</a></li><li class="is-active"><a class="tocitem" href>Phase recovery using MaxCut</a></li><li><a class="tocitem" href="../povm_simulation/">POVM simulation</a></li><li><a class="tocitem" href="../power_flow_optimization/">Power flow optimization</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-4" type="checkbox"/><label class="tocitem" for="menuitem-2-4"><span class="docs-label">Portfolio optimization</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization/">Portfolio Optimization</a></li><li><a class="tocitem" href="../../portfolio_optimization/portfolio_optimization2/">Portfolio Optimization - Markowitz Efficient Frontier</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-5" type="checkbox"/><label class="tocitem" for="menuitem-2-5"><span class="docs-label">Supplemental material</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../supplemental_material/Convex.jl_intro_ISMP2015/">Convex Optimization in Julia</a></li><li><a class="tocitem" href="../../supplemental_material/paper_examples/">Paper examples</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-6" type="checkbox"/><label class="tocitem" for="menuitem-2-6"><span class="docs-label">Time series</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../time_series/time_series/">Time Series Analysis</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-7" type="checkbox"/><label class="tocitem" for="menuitem-2-7"><span class="docs-label">Tomography</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tomography/tomography/">Tomography</a></li></ul></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Manual</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../manual/types/">Basic Types</a></li><li><a class="tocitem" href="../../../manual/operations/">Supported Operations</a></li><li><a class="tocitem" href="../../../manual/complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="tocitem" href="../../../manual/solvers/">Solvers</a></li><li><a class="tocitem" href="../../../manual/advanced/">Advanced Features</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Developer Docs</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../../developer/problem_depot/">Problem Depot</a></li><li><a class="tocitem" href="../../../developer/contributing/">Contributing</a></li><li><a class="tocitem" href="../../../developer/credits/">Credits</a></li></ul></li><li><a class="tocitem" href="../../../reference/">Reference</a></li><li><a class="tocitem" href="../../../release_notes/">Release notes</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li><a class="is-disabled">Optimization with complex variables</a></li><li class="is-active"><a href>Phase recovery using MaxCut</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Phase recovery using MaxCut</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jump-dev/Convex.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jump-dev/Convex.jl/blob/master/docs/src/examples/optimization_with_complex_variables/phase_recovery_using_MaxCut.jl" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Phase-recovery-using-MaxCut"><a class="docs-heading-anchor" href="#Phase-recovery-using-MaxCut">Phase recovery using MaxCut</a><a id="Phase-recovery-using-MaxCut-1"></a><a class="docs-heading-anchor-permalink" href="#Phase-recovery-using-MaxCut" title="Permalink"></a></h1><p>In this example, we relax the phase retrieval problem similar to the classical <a href="http://www-math.mit.edu/~goemans/PAPERS/maxcut-jacm.pdf">MaxCut</a> semidefinite program and recover the phase of the signal given the magnitude of the linear measurements.</p><p>Phase recovery has wide applications such as  in X-ray and crystallography imaging, diffraction imaging or microscopy and audio signal processing. In all these applications, the detectors cannot measure the phase of the incoming wave and only record its amplitude i.e complex measurements of a signal <span>$x \in \mathbb{C}^p$</span> are obtained from a linear injective operator <span>$A$</span>, <strong>but we can only measure the magnitude vector <span>$Ax$</span>, not the phase of <span>$Ax$</span></strong>.</p><p>Recovering the phase of <span>$Ax$</span> from <span>$|Ax|$</span> is a <strong>nonconvex optimization problem</strong>. Using results from <a href="https://arxiv.org/abs/1206.0102">this paper</a>, the problem can be relaxed to a (complex) semidefinite program (complex SDP).</p><p>The original representation of the problem is as follows:</p><p class="math-container">\[\begin{array}{ll}
+  \text{find} &amp; x \in \mathbb{C}^p \\
+    \text{subject to} &amp; |Ax| = b
+\end{array}\]</p><p>where <span>$A \in \mathbb{C}^{n \times p}$</span> and <span>$b \in \mathbb{R}^n$</span>.</p><p>In this example, <strong>the problem is to find the phase of <span>$Ax$</span> given the value <span>$|Ax|$</span></strong>. Given a linear operator <span>$A$</span> and a vector <span>$b= |Ax|$</span> of measured amplitudes, in the noiseless case, we can write <span>$Ax = \text{diag}(b)u$</span> where <span>$u \in \mathbb{C}^n$</span>  is a phase vector, satisfying <span>$|\mathbb{u}_i| = 1$</span> for <span>$i = 1,\ldots, n$</span>.</p><p>We relax this problem as Complex Semidefinite Programming.</p><h3 id="Relaxed-Problem-similar-to-[MaxCut](http://www-math.mit.edu/goemans/PAPERS/maxcut-jacm.pdf)"><a class="docs-heading-anchor" href="#Relaxed-Problem-similar-to-[MaxCut](http://www-math.mit.edu/goemans/PAPERS/maxcut-jacm.pdf)">Relaxed Problem similar to <a href="http://www-math.mit.edu/~goemans/PAPERS/maxcut-jacm.pdf">MaxCut</a></a><a id="Relaxed-Problem-similar-to-[MaxCut](http://www-math.mit.edu/goemans/PAPERS/maxcut-jacm.pdf)-1"></a><a class="docs-heading-anchor-permalink" href="#Relaxed-Problem-similar-to-[MaxCut](http://www-math.mit.edu/goemans/PAPERS/maxcut-jacm.pdf)" title="Permalink"></a></h3><p>Define the positive semidefinite hermitian matrix <span>$M = \text{diag}(b) (I - A A^*) \text{diag}(b)$</span>. The problem is:</p><p class="math-container">\[\begin{array}{ll}
+  \text{minimize} &amp; \langle U, M \rangle \\
+    \text{subject to} &amp; \text{diag}(U) = 1\\
+    &amp; U \succeq 0
+\end{array}\]</p><p>Here the variable <span>$U$</span> must be hermitian (<span>$U \in \mathbb{H}_n $), and we have a solution to the phase recovery problem if $U = u u^*$</span> has rank one. Otherwise, the leading singular vector of <span>$U$</span> can be used to approximate the solution.</p><pre><code class="language-julia hljs">using Convex, SCS, LinearAlgebra
+
+n = 20
+p = 2
+A = rand(n, p) + im * randn(n, p)
+x = rand(p) + im * randn(p)
+b = abs.(A * x) + rand(n)
+
+M = diagm(b) * (I(n) - A * A&#39;) * diagm(b)
+U = ComplexVariable(n, n)
+objective = inner_product(U, M)
+c1 = diag(U) == 1
+c2 = isposdef(U)
+p = minimize(objective, c1, c2)
+solve!(p, SCS.Optimizer; silent_solver = true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Problem statistics
+  number of variables    : 1 (800 scalar elements)
+  number of constraints  : 2 (1_640 scalar elements)
+  number of coefficients : 1_221
+  number of atoms        : 20
+
+Solution summary
+  termination status : OPTIMAL
+  primal status      : FEASIBLE_POINT
+  dual status        : FEASIBLE_POINT
+  objective value    : -5835.2273
+
+Expression graph
+  minimize
+   └─ real (affine; real)
+      └─ sum (affine; complex)
+         └─ diag (affine; complex)
+            └─ …
+  subject to
+   ├─ == constraint (affine)
+   │  └─ + (affine; complex)
+   │     ├─ diag (affine; complex)
+   │     │  └─ …
+   │     └─ Convex.NegateAtom (constant; negative)
+   │        └─ …
+   └─ PSD constraint (convex)
+      └─ vcat (affine; real)
+         ├─ hcat (affine; real)
+         │  ├─ …
+         │  └─ …
+         └─ hcat (affine; real)
+            ├─ …
+            └─ …
+</code></pre><pre><code class="language-julia hljs">evaluate(U)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20×20 Matrix{ComplexF64}:
+        1.0+4.28674e-19im  …  -0.504673-0.863311im
+   0.161996+0.986792im         0.770152-0.63786im
+  -0.882315+0.47066im          0.851606+0.524182im
+   0.501709+0.865037im         0.493596-0.869691im
+   0.915649+0.40198im         -0.115069-0.993357im
+   0.140706+0.990052im     …   0.783711-0.621125im
+ -0.0639361+0.997954im         0.893811-0.448444im
+  -0.834078+0.551647im         0.897179+0.441667im
+   0.975724-0.219005im        -0.681491-0.731827im
+  -0.807576+0.589764im         0.916711+0.399551im
+   0.944051+0.329802im     …  -0.191715-0.981451im
+  -0.745935+0.66602im          0.951435+0.307851im
+  -0.085919+0.996303im         0.903479-0.428632im
+   0.767044+0.641596im          0.16679-0.985993im
+  -0.614344+0.789038im         0.991228+0.132164im
+   -0.33699+0.941509im     …   0.982884-0.184227im
+   0.725317+0.688415im         0.228268-0.973598im
+  -0.269226+0.963077im         0.967306-0.253613im
+   0.988525+0.151055im        -0.368474-0.929638im
+  -0.504673+0.863311im              1.0-8.35041e-18im</code></pre><p>Verify if the rank of <span>$U$</span> is 1:</p><pre><code class="language-julia hljs">B, C = eigen(evaluate(U));
+length([e for e in B if (abs(real(e)) &gt; 1e-4)])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1</code></pre><p>Decompose <span>$U = uu^*$</span> where <span>$u$</span> is the phase of <span>$Ax$</span></p><pre><code class="language-julia hljs">u = C[:, 1];
+for i in 1:n
+    u[i] = u[i] / abs(u[i])
+end
+u</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">20-element Vector{ComplexF64}:
+                  1.0 + 0.0im
+ -0.16279413346314903 - 0.9866600580290976im
+   0.9061078518145439 - 0.4230467596850642im
+   -0.523459970488254 - 0.8520502680572528im
+  -0.8967280409963284 - 0.4425819929582395im
+  -0.1799894772011611 - 0.9836685356850918im
+    0.065058608286222 - 0.9978814446054501im
+   0.8580610124781907 - 0.5135477571413416im
+  -0.9737398404683185 + 0.22766361827207635im
+   0.8315307200328751 - 0.5554787679485224im
+  -0.9295253705758827 - 0.36875816662925315im
+   0.7919511265894237 - 0.6105844848124972im
+   0.1326046202510303 - 0.9911690141888416im
+  -0.8506598094853204 - 0.5257165477007534im
+   0.5549714851531254 - 0.8318693711556726im
+  0.19334104118838571 - 0.9811316128798373im
+  -0.7553072333265941 - 0.6553708746080541im
+   0.2395500220692762 - 0.9708840234171171im
+  -0.9971268057082702 - 0.07575046757625697im
+   0.5587615660812553 - 0.8293283500944745im</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Fidelity in Quantum Information Theory/">« Fidelity in quantum information theory</a><a class="docs-footer-nextpage" href="../povm_simulation/">POVM simulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.1 on <span class="colophon-date" title="Thursday 16 May 2024 07:25">Thursday 16 May 2024</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html><HTML lang="en"><head><meta charset="UTF-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Optimizing in a Loop · Convex.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script data-main="../assets/documenter.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body><nav class="toc"><h1>Convex.jl</h1><select id="version-selector" onchange="window.location.href=this.value" style="visibility: hidden"></select><form action="../search/" class="search" id="search-form"><input id="search-query" name="q" placeholder="Search docs" type="text"/></form><ul><li><a class="toctext" href="../">Home</a></li><li><a class="toctext" href="../installation/">Installation</a></li><li><a class="toctext" href="../quick_tutorial/">Quick Tutorial</a></li><li><a class="toctext" href="../types/">Basic Types</a></li><li><a class="toctext" href="../operations/">Supported Operations</a></li><li><a class="toctext" href="../examples/">Examples</a></li><li><a class="toctext" href="../complex-domain_optimization/">Complex-domain Optimization</a></li><li><a class="toctext" href="../solvers/">Solvers</a></li><li><a class="toctext" href="../faq/">FAQ</a></li><li class="current"><a class="toctext" href="">Optimizing in a Loop</a><ul class="internal"><li><a class="toctext" href="#Memory-Management-1">Memory Management</a></li><li><a class="toctext" href="#Caching-Expressions-1">Caching Expressions</a></li><li><a class="toctext" href="#Warmstarts,-Parameters,-Fixing-and-Freeing-Variables-1">Warmstarts, Parameters, Fixing and Freeing Variables</a></li></ul></li><li><a class="toctext" href="../advanced/">Advanced</a></li><li><a class="toctext" href="../contributing/">Contributing</a></li><li><a class="toctext" href="../credits/">Credits</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="">Optimizing in a Loop</a></li></ul><a class="edit-page" href="https://github.com/JuliaOpt/Convex.jl/blob/master/docs/src/loop.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Optimizing in a Loop</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" href="#Optimizing-in-a-Loop-1" id="Optimizing-in-a-Loop-1">Optimizing in a Loop</a></h1><h2><a class="nav-anchor" href="#Memory-Management-1" id="Memory-Management-1">Memory Management</a></h2><p>Convex uses a module-level dictionary to store the conic forms of every variable and expression created in the same Julia session. These variables and expressions persist even after they are out of scope. If you create large numbers of variables inside a loop, this dictionary can eat a considerable amount of memory.</p><p>To flush the memory, you can call <code>Convex.clearmemory()</code>.</p><p>This will remove every variable and expression you've formed before from the memory cache, so that you're starting as fresh as if you'd just reimported Convex.</p><h2><a class="nav-anchor" href="#Caching-Expressions-1" id="Caching-Expressions-1">Caching Expressions</a></h2><p>Better yet, take advantage of this cache of variables and expressions! Create variables and expressions outside the loop, and reuse them inside the loop as you tweak parameters. Doing this will allow Convex to reuse the conic forms it has already calculated for previously used expressions.</p><p>For example, the following <strong>bad</strong> code will create a new instance of a variable and of the expression <code>square(x)</code> for each value of <code>i</code>. Don't do this:</p><pre><code class="language-julia">for i = 1:10
+    x = Variable()
+    p = minimize(square(x), x &gt;= i)
+    solve!(p, SCSSolver())
+end</code></pre><p>Contrast this with the following <strong>good</strong> code, which will reuse the cached conic form for <code>square(x)</code> for each <code>i</code>, reducing the memory footprint and speeding up the computation. Do this instead:</p><pre><code class="language-julia">x = Variable()
+obj = square(x)
+for i = 1:10
+    p = minimize(obj, x &gt;= i)
+    solve!(p, SCSSolver())
+end</code></pre><h2><a class="nav-anchor" href="#Warmstarts,-Parameters,-Fixing-and-Freeing-Variables-1" id="Warmstarts,-Parameters,-Fixing-and-Freeing-Variables-1">Warmstarts, Parameters, Fixing and Freeing Variables</a></h2><p>If you're solving many problems of the same form, or many similar problems, you may also want to use warmstarts, or to dynamically fix and free variables. The former is particularly good for a family of problems related by a parameter; the latter allows for easy implementation of alternating minimization for nonconvex problems. See the <a href="../advanced/#Advanced-Features-1">Advanced Features</a> section of the documentation for more information.</p><footer><hr/><a class="previous" href="../faq/"><span class="direction">Previous</span><span class="title">FAQ</span></a><a class="next" href="../advanced/"><span class="direction">Next</span><span class="title">Advanced</span></a></footer></article></body></HTML>
