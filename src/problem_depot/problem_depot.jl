@@ -51,13 +51,13 @@ const PROBLEMS = Dict{String,Dict{String,Function}}()
         problems::Union{Nothing, Vector{String}, Vector{Regex}} = nothing;
         exclude::Vector{Regex} = Regex[])
 
-Provides a convience method for iterating over problems in [`PROBLEMS`](@ref).
+Provides a convenient method for iterating over problems in [`PROBLEMS`](@ref).
 For each problem in [`PROBLEMS`](@ref), apply the function `apply`, which
 takes two arguments: the name of the function associated to the problem,
 and the function associated to the problem itself.
 
 Optionally, pass a second argument `class` to only iterate over a class of
-problems (`class` should satsify `class ∈ keys(PROBLEMS)`), and pass third
+problems (`class` should satisfy `class ∈ keys(PROBLEMS)`), and pass third
 argument `problems` to only allow certain problems (specified by exact names or
 regex). Use the `exclude` keyword argument to exclude problems by regex.
 """

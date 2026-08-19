@@ -76,7 +76,7 @@ end
 
 Prints an ASCII formatted representation of the `tree` to the given `io` object.
 By default all children will be printed up to a maximum level of 5, though this
-valud can be overriden by the `maxdepth` parameter. The charset to use in
+valid can be overridden by the `maxdepth` parameter. The charset to use in
 printing can be customized using the `charset` keyword argument.
 
 # Examples

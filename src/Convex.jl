@@ -140,7 +140,7 @@ const MAXWIDTH = Ref(3)
 """
     MAXDIGITS
 
-When priting IDs of variables, only show the initial and final digits
+When printing IDs of variables, only show the initial and final digits
 if the full ID has more than double the number of digits specified
 here.  So, with the default setting MAXDIGITS=3, any ID longer than 7
 digits would be shortened; for example, ID `14656210999710729289`
