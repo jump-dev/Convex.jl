@@ -7,6 +7,22 @@ CurrentModule = Convex
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.16.7 (August 19, 2026)
+
+This release changes the minimum version of Julia to v1.10.
+
+### Other
+
+ - Added support for OrderedCollections@2 (#731)
+ - Added dependabot.yml (#732), (#734)
+ - Dropped support for Julia v1.6 (#733)
+
+## v0.16.6 (May 28, 2026)
+
+### Fixed
+
+ - Fixed `MOI.ConstraintBridgeCost` (#729)
+
 ## v0.16.5 (January 19, 2026)
 
 ### Added
