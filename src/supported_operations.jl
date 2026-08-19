@@ -2020,7 +2020,7 @@ julia> size(atom)
 (1, 2)
 ```
 
-Sum along the second dimension, creating a columnn vector:
+Sum along the second dimension, creating a column vector:
 ```jldoctest; filter=r"id: [0-9]+…[0-9]+"
 julia> atom = sum(x; dims = 2)
 * (affine; real)
