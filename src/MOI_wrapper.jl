@@ -157,11 +157,26 @@ function _expr(model::Optimizer, x::MOI.VariableIndex)
     return model.moi_to_convex[x]
 end
 
+function _expr(model::Optimizer, A::AbstractArray{MOI.VariableIndex})
+    return reshape(vcat([_expr(model, x) for x in vec(A)]...), size(A)...)
+end
+
 function _expr(model::Optimizer, f::MOI.AbstractScalarFunction)
     return _expr(model, convert(MOI.ScalarNonlinearFunction, f))
 end
 
 function _expr(model::Optimizer, f::MOI.ScalarNonlinearFunction)
+    # log(det(X)) is a single concave atom in Convex (logdet); det alone is not
+    # representable, so we recognise the composition here before generic
+    # recursion would fail on the unsupported `:det` head.
+    if f.head == :log &&
+       length(f.args) == 1 &&
+       f.args[1] isa MOI.ScalarNonlinearFunction &&
+       f.args[1].head == :det &&
+       length(f.args[1].args) == 1 &&
+       f.args[1].args[1] isa AbstractMatrix
+        return LinearAlgebra.logdet(_expr(model, f.args[1].args[1]))
+    end
     args = _expr.(model, f.args)
     if f.head == :+
         if length(args) == 1

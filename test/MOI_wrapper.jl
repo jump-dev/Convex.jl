@@ -9,7 +9,10 @@ using Test
 
 import Convex
 import ECOS
+import JuMP
+import LinearAlgebra
 import MathOptInterface as MOI
+import SCS
 import SparseArrays
 
 function runtests()
@@ -178,6 +181,28 @@ function test_not_dcp_objective_min()
         MOI.SetAttributeNotAllowed{typeof(attr)},
         MOI.Utilities.attach_optimizer(model),
     )
+    return
+end
+
+function test_log_det_objective_from_jump()
+    n = 2
+    model = JuMP.Model(() -> Convex.Optimizer(SCS.Optimizer))
+    JuMP.set_silent(model)
+    JuMP.@variable(model, X[1:n, 1:n], Symmetric)
+    JuMP.@constraint(model, X in JuMP.PSDCone())
+    JuMP.@constraint(model, LinearAlgebra.tr(X) <= 4)
+    op_det = JuMP.NonlinearOperator(LinearAlgebra.det, :det)
+    JuMP.@objective(model, Max, log(op_det(X)))
+    attr = MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}()
+    moi_f = MOI.get(model, attr)
+    @test moi_f.head == :log
+    @test moi_f.args[1] isa MOI.ScalarNonlinearFunction
+    @test moi_f.args[1].head == :det
+    @test moi_f.args[1].args[1] isa Matrix{MOI.VariableIndex}
+    JuMP.optimize!(model)
+    @test JuMP.termination_status(model) == MOI.OPTIMAL
+    # log det X is maximised on tr(X) ≤ 4, X ⪰ 0 by X = 2I, giving log det = 2 log 2
+    @test isapprox(JuMP.objective_value(model), 2 * log(2); atol = 1e-3)
     return
 end
 
