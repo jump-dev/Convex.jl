@@ -161,21 +161,29 @@ function _test_reformulation(
     MOI.set(context.model, MOI.ObjectiveFunction{typeof(obj)}(), obj)
     target = MOI.Utilities.Model{value_type}()
     MOI.Utilities.loadfromstring!(target, target_string)
-    # Use the same names for each model
-    for (x, y) in zip(
-        MOI.get(context.model, MOI.ListOfVariableIndices()),
-        MOI.get(target, MOI.ListOfVariableIndices()),
+    # Matrix factorizations can introduce small differences in coefficients.
+    index_map = Dict(
+        x => y for (x, y) in zip(
+            MOI.get(context.model, MOI.ListOfVariableIndices()),
+            MOI.get(target, MOI.ListOfVariableIndices()),
+        )
     )
-        name = MOI.get(target, MOI.VariableName(), y)
-        MOI.set(context.model, MOI.VariableName(), x, name)
+    @test MOI.get(context.model, MOI.ListOfConstraintTypesPresent()) ==
+          MOI.get(target, MOI.ListOfConstraintTypesPresent())
+    for (F, S) in MOI.get(target, MOI.ListOfConstraintTypesPresent())
+        actual = MOI.get(context.model, MOI.ListOfConstraintIndices{F,S}())
+        expected = MOI.get(target, MOI.ListOfConstraintIndices{F,S}())
+        @test length(actual) == length(expected)
+        for (i, j) in zip(actual, expected)
+            f = MOI.get(context.model, MOI.ConstraintFunction(), i)
+            g = MOI.get(target, MOI.ConstraintFunction(), j)
+            @test MOI.Utilities.map_indices(index_map, f) ≈ g
+            @test MOI.get(context.model, MOI.ConstraintSet(), i) ==
+                  MOI.get(target, MOI.ConstraintSet(), j)
+        end
     end
-    context_string = sprint(print, context.model)
-    target_string = sprint(print, target)
-    if context_string != target_string
-        @info "Target model\n$target_string"
-        @info "context.model\n$context_string"
-    end
-    @test context_string == target_string
+    attr = MOI.ObjectiveFunction{typeof(obj)}()
+    @test MOI.Utilities.map_indices(index_map, obj) ≈ MOI.get(target, attr)
     return
 end
 
@@ -2413,7 +2421,7 @@ function test_quadform()
     target = """
     variables: u, t, x1, x2
     minobjective: 1.0 * u
-    [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
+    [t, 4.0*x1+2.0*x2, 2.0*x1+4.0*x2] in SecondOrderCone(3)
     [u, 0.5, t] in RotatedSecondOrderCone(3)
     """
     _test_reformulation(target) do context
@@ -2428,7 +2436,7 @@ function test_quadform()
     target = """
     variables: u, t, x1, x2
     minobjective: 1.0 + -1.0 * u
-    [t, 3.999999999999999*x1+1.9999999999999998*x2, 1.9999999999999998*x1+3.999999999999999*x2] in SecondOrderCone(3)
+    [t, 4.0*x1+2.0*x2, 2.0*x1+4.0*x2] in SecondOrderCone(3)
     [u, 0.5, t] in RotatedSecondOrderCone(3)
     """
     _test_reformulation(target) do context

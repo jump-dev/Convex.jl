@@ -237,11 +237,16 @@ end
 ### constraints/Constraint_RotatedSecondOrderCone
 
 function test_Constraint_RotatedSecondOrderCone()
+    optimizer = MOI.OptimizerWithAttributes(
+        SCS.Optimizer,
+        "eps_abs" => 1e-6,
+        "eps_rel" => 1e-6,
+    )
     x = Variable(3)
     t = Variable()
     c = Convex.Constraint{MOI.RotatedSecondOrderCone}(vcat(t, 1, x))
     p = minimize(t, [c, x >= [2, 3, 4]])
-    solve!(p, SCS.Optimizer; silent = true)
+    solve!(p, optimizer; silent = true)
     @test isapprox(x.value, [2, 3, 4]; atol = 1e-3)
     @test isapprox(t.value, 29 / 2; atol = 1e-3)
     @test isapprox(c.dual, [1, 29 / 2, -2, -3, -4]; atol = 1e-3)
@@ -254,19 +259,24 @@ end
 ### constraints/Constraint_ExponentialCone
 
 function test_Constraint_ExponentialConeConstraint()
+    optimizer = MOI.OptimizerWithAttributes(
+        SCS.Optimizer,
+        "eps_abs" => 1e-6,
+        "eps_rel" => 1e-6,
+    )
     # y * exp(x / y) <= z  <=>  (x, y, z) in ExpCone
     z = Variable()
     # 1 * exp(1 / 1) <= z
     c = Convex.Constraint{MOI.ExponentialCone}(vcat(1, constant(1), z))
     p = minimize(z, [c])
-    solve!(p, SCS.Optimizer; silent = true)
+    solve!(p, optimizer; silent = true)
     @test isapprox(z.value, exp(1); atol = 1e-4)
     @test isapprox(c.dual, [-exp(1), 0, 1]; atol = 1e-4)
     z = Variable()
     # 2 * exp(3 / 2) <= z
     c = Convex.Constraint{MOI.ExponentialCone}(vcat(constant(3), 2, z))
     p = minimize(z, [c])
-    solve!(p, SCS.Optimizer; silent = true)
+    solve!(p, optimizer; silent = true)
     @test isapprox(z.value, 2 * exp(3 / 2); atol = 1e-4)
     @test isapprox(c.dual, [-exp(3 / 2), exp(3 / 2) / 2, 1]; atol = 1e-4)
     c = Convex.Constraint{MOI.ExponentialCone}(vcat(square(z), 1, z))
