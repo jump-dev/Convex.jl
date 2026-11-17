@@ -61,6 +61,17 @@ function test_Hypatia()
     return
 end
 
+# Slow, and also hits linear algebra issues with BigFloat matrices
+# function test_Clarabel_BigFloat()
+#     Convex.ProblemDepot.run_tests(;
+#         exclude = [r"mip"],
+#         T = BigFloat,
+#     ) do p
+#         return solve!(p, Clarabel.Optimizer{BigFloat}; silent = true)
+#     end
+#     return
+# end
+
 # Disabling ECOS due to this segfault:
 # https://github.com/jump-dev/ECOS.jl/issues/144
 # function test_ecos()
