@@ -8,7 +8,7 @@ module TestProblemDepot
 using Convex
 using Test
 
-import Clarabel
+import Hypatia
 # import ECOS
 import GLPK
 import MathOptInterface as MOI
@@ -44,14 +44,9 @@ end
 test_problem_depot_load_Float64() = _test_problem_depot_load(Float64)
 test_problem_depot_load_BigFloat() = _test_problem_depot_load(BigFloat)
 
-function test_Clarabel_warmstarts()
-    # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
-    #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
-    #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
-    Convex.ProblemDepot.run_tests(;
-        exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
-    ) do p
-        ret = solve!(p, Clarabel.Optimizer; silent = true, warmstart = true)
+function test_Hypatia_warmstarts()
+    Convex.ProblemDepot.run_tests(; exclude = [r"mip"]) do p
+        ret = solve!(p, Hypatia.Optimizer; silent = true, warmstart = true)
         # verify post-solve printing does not error
         @test sprint(show, p) isa AbstractString
         return ret
@@ -59,28 +54,12 @@ function test_Clarabel_warmstarts()
     return
 end
 
-function test_Clarabel()
-    # `sdp_quantum_relative_entropy3_lowrank` failed on CI for Ubuntu with
-    #   Expression: ≈(p.optval, evaluate(quantum_relative_entropy(B, A)), atol = atol, rtol = rtol)
-    #    Evaluated: -4.887297347885561e-6 ≈ Inf (atol=0.001, rtol=0.0)
-    Convex.ProblemDepot.run_tests(;
-        exclude = [r"mip", r"sdp_quantum_relative_entropy3_lowrank"],
-    ) do p
-        return solve!(p, Clarabel.Optimizer; silent = true)
+function test_Hypatia()
+    Convex.ProblemDepot.run_tests(; exclude = [r"mip"]) do p
+        return solve!(p, Hypatia.Optimizer; silent = true)
     end
     return
 end
-
-# Slow, and also hits linear algebra issues with BigFloat matrices
-# function test_Clarabel_BigFloat()
-#     Convex.ProblemDepot.run_tests(;
-#         exclude = [r"mip"],
-#         T = BigFloat,
-#     ) do p
-#         return solve!(p, Clarabel.Optimizer{BigFloat}; silent = true)
-#     end
-#     return
-# end
 
 # Disabling ECOS due to this segfault:
 # https://github.com/jump-dev/ECOS.jl/issues/144

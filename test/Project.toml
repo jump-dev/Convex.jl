@@ -1,10 +1,10 @@
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
-Clarabel = "61c947e1-3e6d-4ee4-985a-eec8c727bd6e"
 Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
 ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
 GLPK = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
+Hypatia = "b99e6be6-89ff-11e8-14f8-45c827f4f8f2"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
@@ -13,9 +13,9 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-Clarabel = "0.11"
 ECOS = "1"
 GLPK = "1"
+Hypatia = "0.11"
 LinearAlgebra = "1"
 MathOptInterface = "1.17"
 Random = "1"
