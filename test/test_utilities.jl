@@ -1380,8 +1380,146 @@ function test_broadcasting()
     A = [1 2; 3 4]
     x = Variable(2)
     y = [1.1, 2.2]
-    @test_throws MethodError (A * x) .<= y
-    @test sprint(show, x .== y) == sprint(show, [x[i] == y[i] for i in 1:2])
+    z = Variable(2, 4)
+    z1 = Variable(1, 4)
+    # Broadcasting .<= should now work (not throw MethodError)
+    c = (A * x) .<= y
+    @test c isa Convex.Constraint
+    @test sprint(show, x .== y) == sprint(show, x == y)
+
+    c = (y .+ x) .<= 0
+    @test c isa Convex.Constraint
+
+    c = (x .- y) .<= 0
+    @test c isa Convex.Constraint
+
+    c = (z .- z1) .<= 0
+    @test c[1] isa Convex.Constraint
+
+    c = (z1 .+ z) .<= 0
+    @test c[1] isa Convex.Constraint
+
+    return
+end
+
+function test_broadcast_addition()
+    A = [1.0 2.0; 3.0 4.0]
+    x = Variable(2)
+    # scalar .+ vector expression
+    expr1 = A * x .+ 1
+    @test expr1 isa Convex.AbstractExpr
+    @test size(expr1) == (2, 1)
+    # vector expression .+ scalar (reversed operand order)
+    expr2 = 1 .+ (A * x)
+    @test expr2 isa Convex.AbstractExpr
+    @test size(expr2) == (2, 1)
+    # scalar .- vector expression
+    expr3 = A * x .- 1
+    @test expr3 isa Convex.AbstractExpr
+    @test size(expr3) == (2, 1)
+    # vector expression .- scalar (reversed)
+    expr4 = 1 .- (A * x)
+    @test expr4 isa Convex.AbstractExpr
+    @test size(expr4) == (2, 1)
+    # matrix expression .+ scalar
+    expr5 = (x .+ A .+ 1)
+    @test expr5[1] isa Convex.AbstractExpr
+    @test size(expr5) == (2, 2)
+    # same-size .+
+    expr6 = x .+ [1.0, 2.0]
+    @test expr6 isa Convex.AbstractExpr
+    @test size(expr6) == (2, 1)
+    # Value .+ expr and expr .+ Value
+    expr7 = A .+ x
+    @test expr7[1] isa Convex.AbstractExpr
+    @test size(expr7) == (2, 2)
+    expr8 = x .+ [1, 2]
+    @test expr8 isa Convex.AbstractExpr
+    @test size(expr8) == (2, 1)
+    # Correctness: solve with .+ and verify matches non-broadcast +
+    p1 = minimize(sum(A * x .+ 1), [x >= 0])
+    solve!(p1, SCS.Optimizer; silent = true)
+    val_broadcast = p1.optval
+    p2 = minimize(sum(A * x + 1), [x >= 0])
+    solve!(p2, SCS.Optimizer; silent = true)
+    val_normal = p2.optval
+    @test val_broadcast ≈ val_normal atol = 1e-4
+    return
+end
+
+function test_broadcast_comparison()
+    x = Variable(2)
+    y = [1.0, 2.0]
+    A = [1.0 2.0; 3.0 4.0]
+    # .>= expr .>= scalar
+    c1 = x .>= 0
+    @test c1 isa Convex.Constraint
+    # .>= scalar .>= expr
+    c2 = 0 .>= x
+    @test c2 isa Convex.Constraint
+    # .>= expr .>= same-size value
+    c3 = x .>= y
+    @test c3 isa Convex.Constraint
+    # .>= value .>= expr
+    c4 = y .>= x .+ A
+    @test c4[1] isa Convex.Constraint
+    # .>= expr .>= expr
+    z = Variable(2)
+    c5 = x .>= z
+    @test c5 isa Convex.Constraint
+    # .<= expr .<= scalar
+    c6 = A .+ x .<= 1
+    @test c6[1] isa Convex.Constraint
+    # .<= scalar .<= expr
+    c7 = 1 .<= x
+    @test c7 isa Convex.Constraint
+    # .<= expr .<= same-size value
+    c8 = x .<= y
+    @test c8 isa Convex.Constraint
+    # .<= with matrix expression
+    c9 = (A * x) .<= y
+    @test c9 isa Convex.Constraint
+    # .== expr .== scalar
+    c10 = x .== 1
+    @test c10 isa Convex.Constraint
+    # .== scalar .== expr
+    c11 = 1 .== x .+ A
+    @test c11[1] isa Convex.Constraint
+    # .== expr .== same-size value
+    c12 = A .+ x .== y
+    @test c12[1] isa Convex.Constraint
+    # .== expr .== expr
+    c13 = x .== z
+    @test c13 isa Convex.Constraint
+    # .> and .< (deprecated, delegate to >= and <=)
+    c14 = @test_logs (:warn,) x .> 0
+    @test c14 isa Convex.Constraint
+    c15 = @test_logs (:warn,) x .< 1
+    @test c15 isa Convex.Constraint
+    # Correctness: solve with broadcast constraints, compare to non-broadcast
+    p1 = minimize(sum(x), [x .>= y])
+    solve!(p1, SCS.Optimizer; silent = true)
+    val_broadcast = p1.optval
+    p2 = minimize(sum(x), [x >= y])
+    solve!(p2, SCS.Optimizer; silent = true)
+    val_normal = p2.optval
+    @test val_broadcast ≈ val_normal atol = 1e-4
+    # Correctness with .<=
+    p3 = maximize(sum(x), [x .<= y])
+    solve!(p3, SCS.Optimizer; silent = true)
+    val_broadcast2 = p3.optval
+    p4 = maximize(sum(x), [x <= y])
+    solve!(p4, SCS.Optimizer; silent = true)
+    val_normal2 = p4.optval
+    @test val_broadcast2 ≈ val_normal2 atol = 1e-4
+    # Correctness with .==
+    p5 = minimize(sum(x), [x .== y])
+    solve!(p5, SCS.Optimizer; silent = true)
+    val_broadcast3 = p5.optval
+    p6 = minimize(sum(x), [x == y])
+    solve!(p6, SCS.Optimizer; silent = true)
+    val_normal3 = p6.optval
+    @test val_broadcast3 ≈ val_normal3 atol = 1e-4
     return
 end
 
@@ -1432,6 +1570,50 @@ function test_real_operate_vector()
     x = BigFloat[0]
     y = Convex.real_operate(vcat, BigFloat, x, x, x, x, x)
     @test y == BigFloat[0, 0, 0, 0, 0]
+    return
+end
+
+function test_broadcast_functions()
+    A = [1.0 2.0; 3.0 4.0]
+    x = Variable(2)
+    # Test on compound expression (A * x) — the main failure case
+    expr = A * x
+    # Unary negation
+    @test (.-expr) isa Convex.NegateAtom
+    @test (.-x) isa Convex.NegateAtom
+    # abs
+    @test abs.(expr) isa Convex.AbsAtom
+    @test abs.(x) isa Convex.AbsAtom
+    # exp
+    @test exp.(expr) isa Convex.ExpAtom
+    @test exp.(x) isa Convex.ExpAtom
+    # log
+    @test log.(expr) isa Convex.LogAtom
+    @test log.(x) isa Convex.LogAtom
+    # sqrt
+    @test sqrt.(expr) isa Convex.GeoMeanAtom
+    @test sqrt.(x) isa Convex.GeoMeanAtom
+    # max — expr-expr, expr-value, value-expr
+    z = Variable(2)
+    @test max.(expr, z) isa Convex.MaxAtom
+    @test max.(x, 0) isa Convex.MaxAtom
+    @test max.(0, x) isa Convex.MaxAtom
+    @test max.(expr, 1.0) isa Convex.MaxAtom
+    @test max.(1.0, expr) isa Convex.MaxAtom
+    # min — expr-expr, expr-value, value-expr
+    @test min.(expr, z) isa Convex.MinAtom
+    @test min.(x, 0) isa Convex.MinAtom
+    @test min.(0, x) isa Convex.MinAtom
+    @test min.(expr, 1.0) isa Convex.MinAtom
+    @test min.(1.0, expr) isa Convex.MinAtom
+    # Correctness: solve with broadcast abs vs non-broadcast abs
+    p1 = minimize(sum(abs.(x)), [x >= -2, x <= -1])
+    solve!(p1, SCS.Optimizer; silent = true)
+    val_broadcast = p1.optval
+    p2 = minimize(sum(abs(x)), [x >= -2, x <= -1])
+    solve!(p2, SCS.Optimizer; silent = true)
+    val_normal = p2.optval
+    @test val_broadcast ≈ val_normal atol = 1e-4
     return
 end
 
